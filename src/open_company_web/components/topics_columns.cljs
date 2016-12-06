@@ -177,12 +177,14 @@
                              :is-stakeholder-update (:is-stakeholder-update props)
                              :section-data sd
                              :card-width (:card-width props)
+                             :columns-num (:columns-num props)
                              :foce-data-editing? (:foce-data-editing? props)
                              :read-only-company (:read-only company-data)
                              :currency (:currency company-data)
                              :foce-key (:foce-key props)
                              :foce-data (:foce-data props)
-                             :is-dashboard is-dashboard}
+                             :is-dashboard is-dashboard
+                             :column column}
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click section-name)}})))))))
 
@@ -296,7 +298,7 @@
                         (for [idx (range (count column))
                               :let [section-kw (get column idx)
                                     section-name (name section-kw)]]
-                          (partial-render-topic section-name)))))))))
+                          (partial-render-topic section-name (name kw))))))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
@@ -304,4 +306,4 @@
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
               (for [section topics]
-                (partial-render-topic (name section))))))))))
+                (partial-render-topic (name section) 1)))))))))

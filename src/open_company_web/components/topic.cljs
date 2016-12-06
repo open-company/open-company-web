@@ -42,7 +42,8 @@
                                       is-topic-view
                                       foce-active
                                       topic-click
-                                      show-editing] :as data} owner options]
+                                      show-editing
+                                      column] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -54,7 +55,8 @@
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          company-data        (dis/company-data)]
+          company-data        (dis/company-data)
+          fixed-column        (js/parseInt column)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :onClick #(when (and (responsive/is-mobile-size?)
@@ -81,7 +83,13 @@
                       (and (not is-mobile?)
                            is-dashboard))
               (dom/span {:data-toggle "tooltip"
-                         :data-placement "top"
+                         :data-placement (if (= fixed-column 1)
+                                            "right"
+                                            (if (or (and (= columns-num 2)
+                                                         (= fixed-column 2))
+                                                    (= fixed-column 3))
+                                              "left"
+                                              "top"))
                          :data-container "body"
                          :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
                          :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
@@ -159,6 +167,7 @@
                              currency
                              column
                              card-width
+                             columns-num
                              archived-topics
                              is-stakeholder-update
                              is-dashboard
@@ -231,12 +240,14 @@
                                     :is-stakeholder-update (:is-stakeholder-update data)
                                     :currency currency
                                     :card-width card-width
+                                    :columns-num columns-num
                                     :read-only-company (:read-only-company data)
                                     :topic-click (:topic-click options)
                                     :foce-active foce-active
                                     :is-mobile? is-mobile?
                                     :is-dashboard is-dashboard
                                     :is-topic-view is-topic-view
-                                    :show-editing show-editing}
+                                    :show-editing show-editing
+                                    :column column}
                                    {:opts options
                                     :key (str "topic-" section)}))))))
