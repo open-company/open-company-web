@@ -53,5 +53,6 @@
                                 :topic-flex-num idx}
                     topic-opts {:opts {:section-name section-name
                                        :topic-click (partial (:topic-click options) section-name)}}]]
-          (dom/div {:class "topics-mobile-item" :style {:width (str card-width "px")}}
-            (om/build topic topic-data topic-opts)))))))
+          (when-not (:placeholder sd)
+            (dom/div {:class "topics-mobile-item" :style {:width (str card-width "px")}}
+              (om/build topic topic-data topic-opts))))))))
