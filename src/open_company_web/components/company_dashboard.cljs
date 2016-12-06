@@ -67,6 +67,7 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :mobile-company-dashboard (responsive/is-mobile-size?)
+                                           :selected-topic-view (:selected-topic-view data)
                                            :small-navbar (not (utils/company-has-topics? company-data))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
@@ -80,20 +81,23 @@
                (om/build footer {:footer-width total-width-int}))
             (dom/div {:class "page"}
               ;; Navbar
-              (om/build navbar {:save-bt-active save-bt-active
-                                :company-data company-data
-                                :card-width card-width
-                                :header-width total-width-int
-                                :columns-num columns-num
-                                :foce-key (:foce-key data)
-                                :show-share-su-button (utils/can-edit-sections? company-data)
-                                :show-login-overlay (:show-login-overlay data)
-                                :mobile-menu-open (:mobile-menu-open data)
-                                :auth-settings (:auth-settings data)
-                                :active :dashboard
-                                :show-navigation-bar (utils/company-has-topics? company-data)})
+              (when-not (and (responsive/is-mobile-size?)
+                             (:selected-topic-view data))
+                (om/build navbar {:save-bt-active save-bt-active
+                                  :company-data company-data
+                                  :card-width card-width
+                                  :header-width total-width-int
+                                  :columns-num columns-num
+                                  :foce-key (:foce-key data)
+                                  :show-share-su-button (utils/can-edit-sections? company-data)
+                                  :show-login-overlay (:show-login-overlay data)
+                                  :mobile-menu-open (:mobile-menu-open data)
+                                  :auth-settings (:auth-settings data)
+                                  :active :dashboard
+                                  :show-navigation-bar (utils/company-has-topics? company-data)}))
               (when (and (responsive/is-mobile-size?)
-                         (utils/company-has-topics? company-data))
+                         (utils/company-has-topics? company-data)
+                         (not (:selected-topic-view data)))
                 (oc-switch :dashboard))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
