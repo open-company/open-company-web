@@ -1,7 +1,7 @@
 div.updates {
   background-color: $oc_gray_8;
 
-  @include mobile(){
+  &.mobile-layout {
     padding-top: #{$mobile_navbar_height}px;
   }
 

@@ -123,10 +123,11 @@
 
   (render-state [_ {:keys [columns-num card-width]}]
     (let [company-data (dis/company-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)]
+          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          mobile-layout (<= (responsive/ww) responsive/updates-list-breakpoint)]
       (if-not (dis/stakeholder-update-list-data data)
         (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
-        (dom/div {:class "updates main-scroll group"}
+        (dom/div {:class (str "updates main-scroll group" (when mobile-layout " mobile-layout"))}
           (dom/div {:class "page"}
             (om/build navbar (merge data {:card-width card-width
                                           :columns-num columns-num
@@ -135,9 +136,10 @@
                                           :show-share-su-button (utils/can-edit-sections? company-data)
                                           :show-navigation-bar (utils/company-has-topics? company-data)
                                           :active :updates}))
-            (when (responsive/is-mobile-size?)
+            (when mobile-layout
               (oc-switch :updates))
-            (if (responsive/is-mobile-size?)
+            (if mobile-layout
               (prior-updates true nil)
-              (om/build updates (merge data {:total-width-int total-width-int}))))
+              (om/build updates (merge data {:total-width-int total-width-int
+                                             :mobile-layout mobile-layout}))))
           (om/build footer {:footer-width total-width-int}))))))
