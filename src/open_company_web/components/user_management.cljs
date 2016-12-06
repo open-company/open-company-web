@@ -54,7 +54,9 @@
                               (if (utils/valid-email? email)
                                 (dis/dispatch! [:invite-by-email email])
                                 (dis/dispatch! [:input [:invite-by-email-error] true])))}
-               "SEND INVITE"]]
+               "SEND INVITE"]
+               (when (responsive/is-mobile-size?)
+                 [:p.pt2 "Team members you invite can view, edit and share information."])]
           (when (:invite-by-email-error (rum/react dis/app-state))
             [:div
               (cond
