@@ -248,7 +248,6 @@
       (om/set-state! owner :start-foce nil)))
 
   (render-state [_ {:keys [best-layout filtered-topics]}]
-    (js/console.log "topics-columns/render topics" topics "best-layout" best-layout "filtered-topics" filtered-topics)
     (let [selected-topic-view   (:selected-topic-view data)
           partial-render-topic  (partial render-topic owner options)
           columns-container-key (apply str filtered-topics)

@@ -49,7 +49,6 @@
     (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
 
 (defn- force-hide-placeholder [owner]
-  (js/console.log "force-hide-placeholder")
   (let [editor       (om/get-state owner :body-editor)
         section-name (name (:section (dis/foce-section-data)))
         body-el      (sel1 [(str "div#foce-body-" section-name)])]
