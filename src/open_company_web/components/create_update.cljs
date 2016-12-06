@@ -104,6 +104,7 @@
                             :company-data company-data
                             :foce-key (:foce-key data)
                             :show-share-su-button false
+                            :show-login-overlay (:show-login-overlay data)
                             :create-update-share-button-cb #(share-clicked owner)
                             :create-update-share-button-disabled (zero? (count su-topics))
                             :active nil

@@ -77,4 +77,4 @@
             (dom/a {:href oc-urls/logout :on-click logout-click} "Sign Out")))
         (when-not (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href oc-urls/login} "Sign In / Sign Up")))))))
+            (dom/a {:href "" :on-click #(do (.preventDefault %) (dis/dispatch! [:show-login-overlay :login-with-slack]))} "Sign In / Sign Up")))))))

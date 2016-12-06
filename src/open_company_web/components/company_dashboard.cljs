@@ -87,6 +87,7 @@
                                 :columns-num columns-num
                                 :foce-key (:foce-key data)
                                 :show-share-su-button (utils/can-edit-sections? company-data)
+                                :show-login-overlay (:show-login-overlay data)
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
                                 :active :dashboard
