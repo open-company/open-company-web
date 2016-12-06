@@ -68,7 +68,8 @@
         (when (and image-header
                    (or (not is-mobile?)
                        (not is-dashboard))
-                   (not is-topic-view))
+                   (not is-mobile?)
+                   is-dashboard)
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
@@ -103,7 +104,8 @@
 
         ;; Topic image for dashboard
         (when (and image-header
-                   is-topic-view)
+                   (or is-stakeholder-update
+                       is-topic-view))
           (dom/div {:class "card-header card-image"}
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
