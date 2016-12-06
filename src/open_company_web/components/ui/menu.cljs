@@ -67,7 +67,7 @@
                    (not (utils/in? (:route @router/path) "user-management"))
                    (not (:read-only (dis/company-data))))
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} "Invite and Manage Team")))
+            (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} (if (responsive/is-mobile-size?) "Invite Team Members" "Invite and Manage Team"))))
         (when (and (router/current-company-slug)
                    (not (utils/in? (:route @router/path) "profile"))
                    (not (:read-only (dis/company-data)))
