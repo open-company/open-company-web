@@ -772,7 +772,7 @@
          (not (nil? (-> jwt :bot :token)))))) ; with an installed Slack bot
 
 (defn new-section-body-placeholder []
-  "Post something new.")
+  "What would you like to say...")
 
 (defn new-section-initial-data [section title old-section-data]
   (let [section-name (name section)
