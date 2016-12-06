@@ -306,6 +306,15 @@ div.topic.topic-edit {
           margin-left: 7px;
           float: right;
         }
+
+        button.archive-button {
+          color: rgba(78, 90, 107, 0.5);
+          margin-top: 2px;
+
+          &:hover {
+            color: rgba(78, 90, 107, 1);
+          }
+        }
       }
     }
 
