@@ -177,10 +177,14 @@
 // highlight a .child with the brand underline
 
 .yellow-line-hover-child {
-  .child {
+  &.disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  &:not(.disabled) .child {
     transition: box-shadow 200ms;
   }
-  &:hover .child {
+  &:not(.disabled):hover .child {
     box-shadow: inset 0 -6px 0 $oc_yellow
   }
 }
