@@ -22,6 +22,12 @@
             (assoc :section (:section-name sec))
             (select-keys [:title :section]))))))
 
+(defn get-categories []
+  (let [slug       (keyword (router/current-company-slug))
+        categories (-> @caches/new-sections slug :categories)]
+    {:1 (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) 1) categories))
+     :2 (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) 2) categories))}))
+
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
   [s submit-fn]
@@ -43,14 +49,6 @@
                                         :placeholder true}]
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
-(defn chunk-topics
-  "Partition the provided sequences as if they were one with `::archived` inbetween"
-  [inactive archived]
-  (let [w-marker   (cond-> inactive (seq archived) (conj ::archived))
-        items      (into w-marker archived)
-        chunk-size (inc (quot (count items) 2))]
-    (partition-all chunk-size items)))
-
 (rum/defcs add-topic < (drv/drv :company-data)
                        rum/static
                        rum/reactive
@@ -60,11 +58,7 @@
         archived-topics (:archived company-data)
         all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
-        slug (keyword (router/current-company-slug))
-        topic-order (map keyword (:new-section-order (get @caches/new-sections slug)))
-        inactive-not-archived (filterv (complement (clojure.set/union (set active-topics) (set archived-topics)))
-                                       topic-order)
-        chunked (chunk-topics inactive-not-archived archived-topics)]
+        categories (get-categories)]
       [:div.add-topic.group
        [:div.open-sans.small-caps.bold.mb2.gray5
         [:span.mr1 "Suggested Topics"]
@@ -72,19 +66,55 @@
          {:on-click #(dis/dispatch! [:show-add-topic false])}
           (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]]
        [:div.mxn2.clearfix
-        (for [col chunked]
-          [:div.col.col-6.px2
-           {:key (first col)}
-           (for [topic col]
-             (if (= ::archived topic)
-               [:span.block.open-sans.small-caps.bold.mb1.mt2 {:key topic} "Archived"]
-               (let [topic-full (get all-sections topic)]
-                 [:div.mb1.btn-reset.yellow-line-hover-child
-                  {:key topic
-                   :on-click #(update-active-topics-cb (:section topic-full) {:title (:title topic-full) :section (:section topic-full) :placeholder true})}
-                  [:span.child
-                   (str (:title topic-full) (when (#{:finances :growth} topic) " "))
-                   (when (#{:finances :growth} topic)
-                      [:i.fa.fa-line-chart])
-                   (:section-name topic-full)]])))])]
+        ;; column 1
+        [:div.col.col-4.px2
+          (for [cat (:1 categories)]
+            [:div
+              [:span.block.open-sans.small-caps.bold.mb1.mt2
+                {:key (str "col-" (:name cat))}
+                (str (:name cat) (when (:icon cat) " "))
+                (when (:icon cat)
+                  [:i.fa {:class (:icon cat)}])]
+              (for [sec (:sections cat)
+                    :let [section-data (get all-sections (keyword sec))
+                          disabled? (or (utils/in? (:sections company-data) sec)
+                                        (utils/in? (:archived company-data) sec))]]
+                [:div.mb1.btn-reset.yellow-line-hover-child
+                  {:key (:section section-data)
+                   :class (when disabled? "disabled")
+                   :on-click #(when-not disabled?
+                               (update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :placeholder true}))}
+                  [:span.child (:title section-data)]])])]
+        ;; column 2
+        [:div.col.col-4.px2
+          (for [cat (:2 categories)]
+            [:div
+              [:span.block.open-sans.small-caps.bold.mb1.mt2wh
+                {:key (str "col-" (:name cat))}
+                (str (:name cat) (when (:icon cat) " "))
+                (when (:icon cat)
+                  [:i.fa {:class (:icon cat)}])]
+              (for [sec (:sections cat)
+                    :let [section-data (get all-sections (keyword sec))
+                          disabled? (or (utils/in? (:sections company-data) sec)
+                                        (utils/in? (:archived company-data) sec))]]
+                [:div.mb1.btn-reset.yellow-line-hover-child
+                  {:key (:section section-data)
+                   :class (when disabled? "disabled")
+                   :on-click #(when-not disabled?
+                               (update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :placeholder true}))}
+                  [:span.child (:title section-data)]])])]
+        ;; column 3 - archived only
+        (if (pos? (count (:archived company-data)))
+          [:div.col.col-4.px2
+            [:span.block.open-sans.small-caps.bold.mb1.mt2
+              {:key (str "col-archived")}
+              "Archived"]
+            (for [sec (:archived company-data)
+                  :let [section-data (get all-sections (keyword (:section sec)))]]
+              [:div.mb1.btn-reset.yellow-line-hover-child
+                {:key (:section section-data)
+                 :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data)})}
+                [:span.child
+                  (:title section-data)]])])]
        (custom-topic-input #(update-active-topics-cb %1 %2))]))
