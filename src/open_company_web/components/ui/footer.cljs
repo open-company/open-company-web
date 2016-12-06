@@ -19,8 +19,7 @@
       (dom/div {:class "footer-internal"}
         (dom/div {:class "footer-bottom"
                   :style #js {:width (str footer-width "px")}}
-          (when-not (responsive/is-mobile-size?)
-            (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-wordmark.svg"})))
+          (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-wordmark.svg"}))
           ; (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile-size?) " US")))
           (dom/a {:class "footer-link" :href oc-urls/contact-mail-to} "CONTACT")
           (when (responsive/is-mobile-size?)
