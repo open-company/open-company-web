@@ -19,6 +19,7 @@
 
 (defn logout-click [e]
   (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
   (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
   (dis/dispatch! [:logout]))
 
@@ -35,10 +36,12 @@
 
 (defn company-profile-click [e]
   (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
 
 (defn um-click [e]
   (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings-um))))
 
 (defn updates-click [e]
@@ -82,4 +85,4 @@
             (dom/a {:href oc-urls/logout :on-click logout-click} "Sign Out")))
         (when-not (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href "" :on-click #(sign-in-sign-up-click %)} "Sign In / Sign Up")))))))
+            (dom/a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up")))))))
