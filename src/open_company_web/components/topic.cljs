@@ -93,7 +93,7 @@
                          :data-container "body"
                          :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
                          :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-                " · " (utils/time-since (:updated-at topic-data)))))
+                " · " (utils/time-since (:updated-at topic-data) [:short-month]))))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (or (not is-mobile?)

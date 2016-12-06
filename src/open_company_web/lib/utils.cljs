@@ -173,7 +173,7 @@
 
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
-  (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (in? flags :short-month) [:short]))
+  (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))
         day (.getDate js-date)]
     (str month " " day (when (in? flags :year) (str ", " (.getFullYear js-date))))))
 
@@ -184,7 +184,7 @@
 
 (defn time-since
   "Get a string representing the elapsed time from a date in the past"
-  [past-date]
+  [past-date & [flags]]
   (let [past-js-date (js-date past-date)
         past (.getTime past-js-date)
         now (.getTime (js-date))
@@ -195,10 +195,10 @@
         hours-interval (.floor js/Math (/ seconds 3600))]
     (cond
       (pos? years-interval)
-      (date-string past-js-date [:year])
+      (date-string past-js-date (concat flags [:year]))
 
       (pos? months-interval)
-      (date-string past-js-date)
+      (date-string past-js-date flags)
 
       (pos? days-interval)
       (str days-interval " " (pluralize "day" days-interval) " ago")
