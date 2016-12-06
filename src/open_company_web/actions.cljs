@@ -69,6 +69,7 @@
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
       (swap! cache/new-sections assoc-in [(keyword slug) :new-section-order] (:sections response))
+      (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
       ;; signal to the app-state that the new-sections have been loaded
       (-> db
         (assoc-in [(keyword slug) :new-sections] (:templates response))
@@ -109,14 +110,18 @@
     success
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)
-          with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)]
+          with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)
+          with-open-add-topic (if (and (zero? (count (:sections updated-body)))
+                                       (zero? (count (:archived updated-body))))
+                               (assoc with-company-data :show-add-topic true)
+                               with-company-data)]
       ; async preload the SU list
       (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
               (pos? (count (:sections updated-body)))
               (:force-remove-loading with-company-data))
-          (dissoc with-company-data :loading :force-remove-loading)
-          with-company-data))
+          (dissoc with-open-add-topic :loading :force-remove-loading)
+          with-open-add-topic))
     (= 403 status)
     (-> db
         (assoc-in [(keyword slug) :error] :forbidden)
