@@ -23,11 +23,10 @@ body.fullscreen-topic {
   }
 }
 
-div.company-dashboard.selected-topic-view{
+div.company-dashboard.selected-topic-view.mobile-or-tablet {
   div.topic-list{
-    @include mobile (){
-      padding-bottom: 0px;
-    }
+    padding-bottom: 0px;
+    padding-top: 0px;
   }
 }
 

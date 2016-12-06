@@ -51,17 +51,17 @@
           revisions (:revisions-data topic-data)
           is-new-foce (and (= foce-key section-kw) (nil? (:updated-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:updated-at foce-data))))]
-      (dom/div {:class "topic-view"
-                :style {:width (if (responsive/is-mobile-size?) "100%" (str topic-card-width "px"))
-                        :margin-right (if (responsive/is-mobile-size?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
+      (dom/div {:class (str "topic-view" (when (responsive/is-tablet-or-mobile?) " tablet-view"))
+                :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str topic-card-width "px"))
+                        :margin-right (if (responsive/is-tablet-or-mobile?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
                 :key (str "topic-view-inner-" selected-topic-view)}
-        (when (responsive/is-mobile-size?)
+        (when (responsive/is-tablet-or-mobile?)
           (dom/div {:class "topic-view-navbar"}
             (dom/div {:class "topic-view-navbar-close left"
                       :on-click #(router/nav! (oc-urls/company))} "<")
             (dom/div {:class "topic-view-navbar-title left"} (:title topic-data))))
         (dom/div {:class "topic-view-internal"
-                  :style {:width (if (responsive/is-mobile-size?) "auto" (str topic-card-width "px"))}}
+                  :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str topic-card-width "px"))}}
           (when (and (not (:read-only company-data))
                      (not (responsive/is-tablet-or-mobile?)))
             (dom/div {:class (str "fake-textarea " (when is-another-foce "disabled"))}
@@ -91,7 +91,7 @@
               (when (and (not (:read-only company-data))
                          (not (responsive/is-tablet-or-mobile?)))
                 (dom/hr {:class "separator-line"
-                         :style {:width (if (responsive/is-mobile-size?) "auto" (str (- topic-card-width 80) "px"))}}))
+                         :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 80) "px"))}}))
               (om/build topic {:section selected-topic-view
                                :section-data topic-data
                                :card-width (- topic-card-width 60)
@@ -112,7 +112,7 @@
                                (or (responsive/is-tablet-or-mobile?)
                                    (:read-only company-data)))
                   (dom/hr {:class "separator-line"
-                           :style {:width (if (responsive/is-mobile-size?) "auto" (str (- topic-card-width 60) "px"))}}))
+                           :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
                 (om/build topic {:section selected-topic-view
                                  :section-data rev
                                  :card-width (- topic-card-width 60)

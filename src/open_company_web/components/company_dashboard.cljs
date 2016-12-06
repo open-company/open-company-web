@@ -68,6 +68,7 @@
         (dom/div {:class (utils/class-set {:company-dashboard true
                                            :mobile-company-dashboard (responsive/is-mobile-size?)
                                            :selected-topic-view (:selected-topic-view data)
+                                           :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :small-navbar (not (utils/company-has-topics? company-data))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
@@ -81,7 +82,7 @@
                (om/build footer {:footer-width total-width-int}))
             (dom/div {:class "page"}
               ;; Navbar
-              (when-not (and (responsive/is-mobile-size?)
+              (when-not (and (responsive/is-tablet-or-mobile?)
                              (:selected-topic-view data))
                 (om/build navbar {:save-bt-active save-bt-active
                                   :company-data company-data

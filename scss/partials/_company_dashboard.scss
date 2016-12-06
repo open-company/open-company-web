@@ -5,11 +5,9 @@ div.company-dashboard {
     min-height: calc(100vh - #{$footer_height}px - 41px);
   }
 
-  &.selected-topic-view {
+  &.selected-topic-view.mobile-or-tablet {
     div.page{
-      @include mobile(){
-        padding-top: 0px;
-      }
+      padding-top: 0px;
     }
   }
 

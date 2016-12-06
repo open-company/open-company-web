@@ -7,11 +7,17 @@ div.topic-view {
   margin: 0 0 0 50px;
   padding: 0 30px;
 
-  @include mobile(){
+  &.tablet-view{
     padding: 0px;
     margin: 0px;
 
-    min-height: 100vh;
+    min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_height}px);
+
+    div.topic-view-internal {
+      float: none;
+      padding: 0px;
+      margin-top: #{$mobile_navbar_height}px;
+    }
   }
 
   div.topic-view-navbar {
@@ -45,12 +51,6 @@ div.topic-view {
     margin: 0 auto;
     padding: 20px 0px;
     float: left;
-
-    @include mobile(){
-      float: none;
-      padding: 0px;
-      margin-top: #{$mobile_navbar_height}px;
-    }
 
     div.fake-textarea {
       padding: 20px;
