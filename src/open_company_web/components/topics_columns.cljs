@@ -285,7 +285,7 @@
                    (not selected-topic-view)
                    show-add-topic)
               (dom/div {:class "add-topic-container"
-                        :style {:margin-right (str (- topic-view-width 560) "px")}}
+                        :style {:margin-right (str (- topic-view-width 660) "px")}}
                 (add-topic (partial update-active-topics owner)))
               (and is-dashboard
                    (not (responsive/is-mobile-size?))
