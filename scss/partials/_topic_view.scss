@@ -7,6 +7,11 @@ div.topic-view {
   margin: 0 0 0 50px;
   padding: 0 30px;
 
+  @include mobile(){
+    padding: 0px;
+    margin: 0px;
+  }
+
   div.topic-view-internal {
     margin: 0 auto;
     padding: 20px 0px;

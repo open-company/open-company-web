@@ -59,11 +59,6 @@
           fixed-column        (js/parseInt column)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
-                    :onClick #(when (and (responsive/is-mobile-size?)
-                                         (not foce-active)
-                                         (not is-stakeholder-update))
-                                (.preventDefault %)
-                                (topic-click))
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
@@ -78,7 +73,9 @@
         ;; Topic title
         (dom/div {:class "group"}
           (dom/div {:class "topic-title"}
-            (:title topic-data)
+            (when-not (and is-topic-view
+                       is-mobile?)
+              (:title topic-data))
             (when (or is-topic-view
                       (and (not is-mobile?)
                            is-dashboard))
@@ -93,7 +90,10 @@
                          :data-container "body"
                          :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
                          :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-                " · " (utils/time-since (:updated-at topic-data) [:short-month]))))
+                (when-not (and is-topic-view
+                               is-mobile?)
+                  " · ")
+                (utils/time-since (:updated-at topic-data) [:short-month]))))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (or (not is-mobile?)
@@ -215,8 +215,7 @@
                                                  :dashboard-topic is-dashboard
                                                  :no-foce (and foce-active (not is-current-foce))})
                     :onClick (fn []
-                                (when (and (not (responsive/is-mobile-size?))
-                                           is-dashboard)
+                                (when is-dashboard
                                   (router/nav! (oc-urls/company-section (router/current-company-slug) section))))
                     :style topic-style
                     :ref "topic"
