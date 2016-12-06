@@ -23,6 +23,14 @@ body.fullscreen-topic {
   }
 }
 
+div.company-dashboard.selected-topic-view{
+  div.topic-list{
+    @include mobile (){
+      padding-bottom: 0px;
+    }
+  }
+}
+
 div.topic-list{
   padding-bottom: 20px;
   min-height: calc(100vh - #{$footer_height}px);
