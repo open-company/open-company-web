@@ -70,8 +70,8 @@
           {:class (if show-archived "col-4" "col-6")}
           (for [cat (:1 categories)]
             [:div
+              {:key (str "col-" (:name cat))}
               [:span.block.mb1.mt2.all-caps
-                {:key (str "col-" (:name cat))}
                 (str (:name cat) (when (:icon cat) " "))
                 (when (:icon cat)
                   [:i.fa {:class (:icon cat)}])]
@@ -90,8 +90,8 @@
           {:class (if show-archived "col-4" "col-5")}
           (for [cat (:2 categories)]
             [:div
+              {:key (str "col-" (:name cat))}
               [:span.block.mb1.mt2.all-caps
-                {:key (str "col-" (:name cat))}
                 (str (:name cat) (when (:icon cat) " "))
                 (when (:icon cat)
                   [:i.fa {:class (:icon cat)}])]
@@ -108,7 +108,8 @@
         ;; column 3 - archived only
         (if show-archived
           [:div.col.col-4.px2
-            {:style {:margin-top "-16px"}}
+            {:key "col-3"
+             :style {:margin-top "-16px"}}
             [:span.block.mb1.mt2.all-caps
               {:key (str "col-archived")}
               "Archived"]
