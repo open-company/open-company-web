@@ -1,8 +1,10 @@
-div.prior-updates {
-
-  @include mobile(){
+div.mobile-layout {
+  div.prior-updates {
     min-height: calc(100vh - #{$mobile_navbar_height}px - #{$oc_switch_height}px - #{$footer_small_height}px);
+    padding: 20px;
   }
+}
+div.prior-updates {
 
   h3.mobile-title {
     margin-left: 20px;

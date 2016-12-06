@@ -67,7 +67,7 @@
              (not (dispatcher/stakeholder-update-list-data)))
       [:div.prior-updates
         [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
-      [:div.prior-updates {:style {:padding 0}}
+      [:div.prior-updates
 
         [:div.prior-updates-container {}
           
