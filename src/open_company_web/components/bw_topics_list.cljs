@@ -63,7 +63,7 @@
                    (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
                        :on-click #(dis/dispatch! [:show-add-topic true])}
-            (dom/i {:class "fa fa-plus"}))))
+            (dom/i {:class "fa fa-plus-circle"}))))
       (dom/div {:class (str "left-topics-list-items group" (when (:read-only company-data) " read-only"))}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
