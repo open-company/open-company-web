@@ -4,6 +4,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.api :as api]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
@@ -51,9 +52,14 @@
           is-new-foce (and (= foce-key section-kw) (nil? (:updated-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:updated-at foce-data))))]
       (dom/div {:class "topic-view"
-                :style {:width (if (responsive/is-mobile-size?) "auto" (str topic-card-width "px"))
+                :style {:width (if (responsive/is-mobile-size?) "100%" (str topic-card-width "px"))
                         :margin-right (if (responsive/is-mobile-size?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
                 :key (str "topic-view-inner-" selected-topic-view)}
+        (when (responsive/is-mobile-size?)
+          (dom/div {:class "topic-view-navbar"}
+            (dom/div {:class "topic-view-navbar-close left"
+                      :on-click #(router/nav! (oc-urls/company))} "<")
+            (dom/div {:class "topic-view-navbar-title left"} (:title topic-data))))
         (dom/div {:class "topic-view-internal"
                   :style {:width (if (responsive/is-mobile-size?) "auto" (str topic-card-width "px"))}}
           (when (and (not (:read-only company-data))
