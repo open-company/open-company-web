@@ -46,6 +46,11 @@
   (dis/dispatch! [:mobile-menu-toggle])
   (router/nav! (oc-urls/stakeholder-update-list)))
 
+(defn sign-in-sign-up-click [e]
+  (dis/dispatch! [:mobile-menu-toggle])
+  (.preventDefault e)
+  (dis/dispatch! [:show-login-overlay :login-with-slack]))
+
 (defcomponent menu [{:keys [mobile-menu-open]} owner options]
 
   (render [_]
@@ -77,4 +82,4 @@
             (dom/a {:href oc-urls/logout :on-click logout-click} "Sign Out")))
         (when-not (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href "" :on-click #(do (.preventDefault %) (dis/dispatch! [:show-login-overlay :login-with-slack]))} "Sign In / Sign Up")))))))
+            (dom/a {:href "" :on-click #(sign-in-sign-up-click %)} "Sign In / Sign Up")))))))
