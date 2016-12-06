@@ -38,21 +38,27 @@
 (defn can-dnd? []
   (not (:read-only (dis/company-data))))
 
+(defn get-topics [owner]
+  (let [company-data (om/get-props owner :company-data)]
+    (if (:read-only company-data)
+      (utils/filter-placeholder-sections (:sections company-data) company-data)
+      (:sections company-data))))
+
 (defcomponent bw-topics-list [{:keys [company-data card-width selected-topic-view show-add-topic] :as data} owner options]
 
   (init-state [_]
-    {:topics (:sections company-data)})
+    {:topics (get-topics owner)})
 
   (did-mount [_]
     (when (can-dnd?)
       (setup-sortable owner)))
 
   (did-update [_ _ _]
-    (om/set-state! owner :topics (:sections company-data))
+    (om/set-state! owner :topics (get-topics owner))
     (when (can-dnd?)
       (setup-sortable owner)))
 
-  (render [_]
+  (render-state [_ {:keys [topics]}]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
         (dom/h3 {:class "left-topics-list-top-title left"
@@ -69,7 +75,7 @@
                        :data-container "body"}
             (dom/i {:class "fa fa-plus-circle"}))))
       (dom/div {:class (str "left-topics-list-items group" (when (:read-only company-data) " read-only"))}
-        (for [topic (:sections company-data)
+        (for [topic topics
               :let [sd (->> topic keyword (get company-data))]]
           (dom/div {:class (utils/class-set {:left-topics-list-item true
                                              :dnd (can-dnd?)

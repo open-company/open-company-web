@@ -135,7 +135,7 @@
     :else
     (let [columns-num (:columns-num data)
           company-data (:company-data data)
-          topics-list (:topics data)
+          topics-list (om/get-state owner :filtered-topics)
           final-layout (loop [idx 0
                               layout (get-initial-layout columns-num)]
                           (let [shortest-column (get-shortest-column owner data layout)
@@ -210,6 +210,13 @@
                                       is-stakeholder-update
                                       show-add-topic] :as data} owner options]
 
+  (init-state [_]
+    {:best-layout nil
+     :filtered-topics (if (or (:read-only company-data)
+                              (responsive/is-mobile-size?))
+                        (utils/filter-placeholder-sections topics topics-data)
+                        topics)})
+
   (did-mount [_]
     (when (> columns-num 1)
       (om/set-state! owner :best-layout (calc-layout owner data))))
@@ -218,6 +225,10 @@
     (when (and (> (:columns-num next-props) 1)
                (or (not= (:topics next-props) (:topics data))
                    (not= (:columns-num next-props) (:columns-num data))))
+      (om/set-state! owner :filtered-topics (if (or (:read-only (:company-data next-props))
+                                                    (responsive/is-mobile-size?))
+                                              (utils/filter-placeholder-sections (:topics next-props) (:topics-data next-props))
+                                              (:topics next-props)))
       (om/set-state! owner :best-layout (calc-layout owner next-props)))
     (when-let* [start-foce (om/get-state owner :start-foce)
                 new-section (:section start-foce)
@@ -236,10 +247,11 @@
                                                                     :body-placeholder (utils/new-section-body-placeholder)})])))
       (om/set-state! owner :start-foce nil)))
 
-  (render-state [_ {:keys [best-layout]}]
+  (render-state [_ {:keys [best-layout filtered-topics]}]
+    (js/console.log "topics-columns/render topics" topics "best-layout" best-layout "filtered-topics" filtered-topics)
     (let [selected-topic-view   (:selected-topic-view data)
           partial-render-topic  (partial render-topic owner options)
-          columns-container-key (apply str topics)
+          columns-container-key (apply str filtered-topics)
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
                                             #js {:width total-width}
@@ -305,5 +317,5 @@
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (for [section topics]
+              (for [section filtered-topics]
                 (partial-render-topic (name section) 1)))))))))
