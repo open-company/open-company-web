@@ -222,13 +222,13 @@
       (om/set-state! owner :best-layout (calc-layout owner data))))
 
   (will-receive-props [_ next-props]
+    (om/set-state! owner :filtered-topics (if (or (:read-only (:company-data next-props))
+                                                  (responsive/is-mobile-size?))
+                                            (utils/filter-placeholder-sections (:topics next-props) (:topics-data next-props))
+                                            (:topics next-props)))
     (when (and (> (:columns-num next-props) 1)
                (or (not= (:topics next-props) (:topics data))
                    (not= (:columns-num next-props) (:columns-num data))))
-      (om/set-state! owner :filtered-topics (if (or (:read-only (:company-data next-props))
-                                                    (responsive/is-mobile-size?))
-                                              (utils/filter-placeholder-sections (:topics next-props) (:topics-data next-props))
-                                              (:topics next-props)))
       (om/set-state! owner :best-layout (calc-layout owner next-props)))
     (when-let* [start-foce (om/get-state owner :start-foce)
                 new-section (:section start-foce)
