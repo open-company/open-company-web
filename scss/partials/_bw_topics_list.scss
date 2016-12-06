@@ -40,6 +40,12 @@ div.left-topics-list {
   div.left-topics-list-items{
     cursor: pointer;
 
+    &.read-only {
+      div.left-topics-list-item:hover {
+        background-color: rgba(78,90,107,0.1);
+      }
+    }
+
     div.left-topics-list-item {
       height: 21px;
       padding: 0 5px 0 5px;

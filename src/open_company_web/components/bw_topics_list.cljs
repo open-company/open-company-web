@@ -59,11 +59,12 @@
                  :on-click #(do
                               (dis/dispatch! [:show-add-topic false])
                               (router/nav! (oc-urls/company)))} "TOPICS")
-        (when-not show-add-topic
+        (when (and (not show-add-topic)
+                   (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
                        :on-click #(dis/dispatch! [:show-add-topic true])}
             (dom/i {:class "fa fa-plus"}))))
-      (dom/div {:class "left-topics-list-items group"}
+      (dom/div {:class (str "left-topics-list-items group" (when (:read-only company-data) " read-only"))}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
           (dom/div {:class (utils/class-set {:left-topics-list-item true
