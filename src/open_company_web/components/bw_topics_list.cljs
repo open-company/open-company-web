@@ -61,7 +61,8 @@
                               (router/nav! (oc-urls/company)))} "TOPICS")
         (when-not show-add-topic
           (dom/button {:class "left-topics-list-top-title btn-reset right"
-                       :on-click #(dis/dispatch! [:show-add-topic true])} "+")))
+                       :on-click #(dis/dispatch! [:show-add-topic true])}
+            (dom/i {:class "fa fa-plus"}))))
       (dom/div {:class "left-topics-list-items group"}
         (for [topic (:sections company-data)
               :let [sd (->> topic keyword (get company-data))]]
