@@ -43,11 +43,11 @@
 
   ;; progress cases
   ([mediums :guard #(= "email" (first %)) html] 
-    (medium-for (rest mediums) (conj html [:div.medium (i/icon :email-84 {:size 13 :class "inline"})])))
+    (medium-for (rest mediums) (conj html [:div.medium [:i.fa.fa-envelope-o]])))
   ([mediums :guard #(= "slack" (first %)) html] 
-    (medium-for (rest mediums) (conj html [:div.medium [:i {:class "fa fa-slack"}]])))
+    (medium-for (rest mediums) (conj html [:div.medium [:i.fa.fa-slack]])))
   ([mediums :guard #(= "link" (first %)) html] 
-    (medium-for (rest mediums) (conj html [:div.medium (i/icon :link-72 {:size 13 :class "inline"})])))
+    (medium-for (rest mediums) (conj html [:div.medium [:i.fa.fa-link]])))
   ([mediums html] ; legacy, unknown?
     (medium-for (rest mediums) html)))
 
