@@ -215,6 +215,8 @@
               sections     (vec (:sections company-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
+          (when (:new topic-data)
+            (utils/after 1000 #(router/nav! (oc-urls/company))))
           (dis/dispatch! [:foce-save sections data-to-save]))))))
 
 (defn- data-editing-cb [owner value]
