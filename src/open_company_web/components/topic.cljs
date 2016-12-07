@@ -231,7 +231,8 @@
                                 :foce-data-editing? foce-data-editing?
                                 :read-only-company (:read-only-company data)
                                 :foce-key foce-key
-                                :foce-data foce-data}
+                                :foce-data foce-data
+                                :columns-num columns-num}
                                {:opts options
                                 :key (str "topic-foce-" section "-" (:updated-at section-data))})
           (om/build topic-internal {:section section

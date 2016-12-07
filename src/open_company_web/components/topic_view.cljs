@@ -71,6 +71,7 @@
                   (om/build topic-edit {:is-stakeholder-update false
                                         :currency (:currency company-data)
                                         :card-width (- topic-card-width 120)
+                                        :columns-num columns-num
                                         :is-topic-view true
                                         :foce-data-editing? foce-data-editing?
                                         :foce-key foce-key

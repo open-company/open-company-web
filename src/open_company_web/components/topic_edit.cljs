@@ -224,6 +224,7 @@
 
 (defcomponent topic-edit [{:keys [currency
                                   card-width
+                                  columns-num
                                   prev-rev
                                   next-rev] :as data} owner options]
 
@@ -358,6 +359,8 @@
                                         :section section-kw
                                         :currency currency
                                         :editable? true
+                                        :card-width card-width
+                                        :columns-num columns-num
                                         :data-section-on-change #(om/set-state! owner :has-changes true)
                                         :foce-data-editing? (:foce-data-editing? data)
                                         :editing-cb (partial data-editing-cb owner)}
@@ -367,6 +370,8 @@
                                           :section section-kw
                                           :currency currency
                                           :editable? true
+                                          :card-width card-width
+                                          :columns-num columns-num
                                           :data-section-on-change #(om/set-state! owner :has-changes true)
                                           :foce-data-editing? (:foce-data-editing? data)
                                           :editing-cb (partial data-editing-cb owner)}
