@@ -70,6 +70,7 @@
                                            :selected-topic-view (:selected-topic-view data)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :small-navbar (not (utils/company-has-topics? company-data))
+                                           :editing-topic (not (nil? (:foce-key data)))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
                      (get-in data [(keyword (router/current-company-slug)) :error]))
