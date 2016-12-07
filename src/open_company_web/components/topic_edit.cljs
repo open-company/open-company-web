@@ -267,7 +267,10 @@
             current-token (str (.-pathname loc) (.-search loc) (.-hash loc))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                       (partial handle-navigate-event current-token owner))]
-        (om/set-state! owner :history-listener-id listener))))
+        (om/set-state! owner :history-listener-id listener))
+      ;; scroll to top of this div
+      (utils/after 10 #(let [topic-edit-div (js/$ "div.topic-edit")]
+                          (.animate (js/$ "html, body") #js {:scrollTop (- (.-top (.offset topic-edit-div)) 66)} "slow")))))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)

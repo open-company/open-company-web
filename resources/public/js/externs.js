@@ -36,6 +36,7 @@ $.height = function(){};
 $.last = function(){};
 $.text = function(){};
 $.remove = function(){};
+$.animate = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
