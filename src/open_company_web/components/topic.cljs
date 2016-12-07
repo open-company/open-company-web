@@ -28,7 +28,7 @@
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
         section-data (om/get-props owner :topic-data)]
-    (dis/dispatch! [:start-foce section-kw section-data])))
+    (dis/dispatch! [:start-foce section-kw (assoc section-data :section (name section-kw))])))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
