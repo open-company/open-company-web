@@ -21,16 +21,9 @@
                   :style #js {:width (str footer-width "px")}}
           (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-wordmark.svg"}))
           ; (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile-size?) " US")))
-          (dom/a {:class "footer-link" :href oc-urls/contact-mail-to} "CONTACT")
-          (when (responsive/is-mobile-size?)
+          (dom/div {:class "footer-bottom-right"}
+            (dom/a {:class "contact" :href oc-urls/contact-mail-to :alt "Contact OpenCompany"} "CONTACT")
             (dom/a {:class "twitter" :target "_blank" :href oc-urls/oc-twitter :alt "twitter"}
-              (dom/img {:src "/img/twitter.svg"})))
-          (when (responsive/is-mobile-size?)
+              (dom/img {:src "/img/twitter.svg"}))
             (dom/a {:class "github" :target "_blank" :href oc-urls/oc-github :alt "github"}
-              (dom/img {:src "/img/github.svg"})))
-          (when-not (responsive/is-mobile-size?)
-            (dom/div {:class "footer-bottom-right"}
-              (dom/a {:class "twitter" :target "_blank" :href oc-urls/oc-twitter :alt "twitter"}
-                (dom/img {:src "/img/twitter.svg"}))
-              (dom/a {:class "github" :target "_blank" :href oc-urls/oc-github :alt "github"}
-                (dom/img {:src "/img/github.svg"})))))))))
+              (dom/img {:src "/img/github.svg"}))))))))

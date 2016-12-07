@@ -91,7 +91,18 @@ div.footer {
         }
       }
 
-      a.twitter, a.github {
+      a.contact{
+        opacity: 0.5;
+        font-weight: 700;
+        font-family: $oc_headers_font;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+        padding: 5.5px;
+      }
+
+      a.twitter, a.github, a.contact {
         margin-left: 10px;
         img {
           width: 30px;
@@ -101,14 +112,10 @@ div.footer {
 
       div.footer-bottom-right {
         float: right;
-        width: 80px;
+        width: 165px;
         height: 30px;
 
         @media screen and (max-width: 683px){
-          float: none;
-          text-align: left;
-          width: 100%;
-          margin-top: 10px;
 
           a:first-child{
             margin-left: 0px;
