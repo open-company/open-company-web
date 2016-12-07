@@ -9,7 +9,8 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
-            [open-company-web.local-settings :as ls]))
+            [open-company-web.local-settings :as ls]
+            [open-company-web.lib.responsive :as responsive]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -466,7 +467,9 @@
 
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
-  (assoc db :mobile-menu-open (not (:mobile-menu-open db))))
+  (if (responsive/is-mobile-size?)
+    (assoc db :mobile-menu-open (not (:mobile-menu-open db)))
+    db))
 
 (defmethod dispatcher/action :reset-su-list
   [db [_]]
