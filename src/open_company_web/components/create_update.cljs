@@ -136,7 +136,8 @@
                                             (om/update-state! owner #(merge % {:su-topics (utils/vec-dissoc su-topics topic)
                                                                                :should-update-data false}))
                                             (patch-stakeholder-update owner))}
-                        (:title sd))))
+                        (:title sd) " "
+                        (dom/i {:class "fa fa-check"}))))
                   (let [all-topics (:sections company-data)
                         remaining-topics (vec (first (cd/diff (set all-topics) (set su-topics))))
                         filtered-topics (utils/filter-placeholder-sections remaining-topics company-data)
