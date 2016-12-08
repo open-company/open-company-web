@@ -17,9 +17,13 @@
             [goog.events.EventType :as EventType]
             [om-bootstrap.button :as b]))
 
-(defn logout-click [e]
+(defn prior-updates-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/stakeholder-update-list))))
+
+(defn logout-click [e]
+  (utils/event-stop e)
   (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
   (dis/dispatch! [:logout]))
 
@@ -63,11 +67,12 @@
                             " dropdown-menu"))]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
-        (when (jwt/jwt)
-          (dom/li {:class "oc-menu-item"}
-            (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
+        (when-let [su-link (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET")]
+          (when (and (router/current-company-slug)
+                     (pos? (:count su-link)))
+            (dom/li {:class "oc-menu-item"}
+              (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "Prior Updates"))))
         (when (and (router/current-company-slug)
-                   (not (utils/in? (:route @router/path) "user-management"))
                    (not (:read-only (dis/company-data))))
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} (if (responsive/is-mobile-size?) "Invite Team Members" "Invite and Manage Team"))))
