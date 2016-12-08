@@ -47,3 +47,5 @@ var location = {};
 location.reload = function(){};
 // EmojiAutocomplete
 var emojiAutocomplete = function(){};
+// cleanHTML
+var cleanHTML = function(){};
