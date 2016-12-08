@@ -155,8 +155,7 @@ var removeAttributes = [
 // <a href>
 
 
-function cleanHTML(el){
-  var text = $(el).html();
+function cleanHTML(text){
   // Transform tags
   transformTag.forEach(function(v){
     var replacer = new RegExp(v[0], "i");
@@ -206,7 +205,37 @@ function cleanHTML(el){
       }
     }
   });
-  console.log("FINISH:", text);
+  return text;
 }
 
+function replaceSelectionWithHtml(html) {
+    var range;
+    if (window.getSelection && window.getSelection().getRangeAt) {
+        console.log("replaceSelectionWithHtml 1");
+        range = window.getSelection().getRangeAt(0);
+        range.deleteContents();
+        var div = document.createElement("p");
+        div.innerHTML = html;
+        var frag = document.createDocumentFragment(), child;
+        while ( (child = div.firstChild) ) {
+            frag.appendChild(child);
+        }
+        range.insertNode(frag);
+    } else if (document.selection && document.selection.createRange) {
+        console.log("replaceSelectionWithHtml 2");
+        range = document.selection.createRange();
+        range.pasteHTML(html);
+    }
+}
 
+function cleanHTMLOnElement(el) {
+  el.addEventListener("paste",
+    function(e){
+      console.log("Paste", cleanHTML(e.clipboardData.getData("text/html")));
+      replaceSelectionWithHtml(cleanHTML(e.clipboardData.getData("text/html")));
+      // Stop data actually being pasted into div
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  );
+}
