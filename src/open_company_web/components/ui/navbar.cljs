@@ -125,15 +125,7 @@
                             :on-click #(do
                                          (utils/event-stop %)
                                          (router/nav! (oc-urls/company)))}
-                      "Dashboard"))
-                  (when should-show-left-links
-                    (dom/a {:class (when (= active :updates) "active")
-                            :href (oc-urls/stakeholder-update-list)
-                            :on-click (fn [e]
-                                        (utils/event-stop e)
-                                        (dis/dispatch! [:reset-su-list])
-                                        (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
-                      "Updates")))
+                      "Dashboard")))
                 (dom/div {:class "right"}
                   (when fixed-show-share-su-button
                     (dom/div {:class "sharing-button-container"}

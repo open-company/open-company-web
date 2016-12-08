@@ -10,9 +10,4 @@
       {:on-click #(router/nav! (oc-urls/company))}
       [:button.btn-reset
         {:class (when (= active :dashboard) "active")}
-        "Dashboard"]]
-    [:div.oc-switch-btn.updates
-      {:on-click #(router/nav! (oc-urls/stakeholder-update-list))}
-      [:button.btn-reset
-        {:class (when (= active :updates) "active")}
-        "Updates"]]])
+        "Dashboard"]]])
