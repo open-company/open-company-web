@@ -49,7 +49,7 @@
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings-um))))
 
 (defn updates-click [e]
-  (utils/event-stop-e)
+  (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
   (router/nav! (oc-urls/stakeholder-update-list)))
 
