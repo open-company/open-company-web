@@ -165,13 +165,15 @@
                                           (om/update-state! owner #(merge % {:su-title (.. e -target -value)
                                                                              :should-update-data false}))
                                           (patch-stakeholder-update owner))})
-                (om/build topics-columns {:columns-num 1
-                                          :card-width (- fixed-card-width 60) ; remove 60 padding around it
-                                          :total-width (- fixed-card-width 60)
-                                          :is-stakeholder-update true
-                                          :content-loaded (not (:loading data))
-                                          :topics su-topics
-                                          :topics-data company-data
-                                          :company-data company-data
-                                          :hide-add-topic true}))))
+                (if (zero? (count su-topics))
+                  (dom/div {:class "create-update-content-cards-no-topics"} "No Topics Selected")
+                  (om/build topics-columns {:columns-num 1
+                                            :card-width (- fixed-card-width 60) ; remove 60 padding around it
+                                            :total-width (- fixed-card-width 60)
+                                            :is-stakeholder-update true
+                                            :content-loaded (not (:loading data))
+                                            :topics su-topics
+                                            :topics-data company-data
+                                            :company-data company-data
+                                            :hide-add-topic true})))))
           (om/build footer {:footer-width total-width-int}))))))
