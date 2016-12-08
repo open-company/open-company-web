@@ -49,3 +49,5 @@ location.reload = function(){};
 var emojiAutocomplete = function(){};
 // cleanHTML
 var cleanHTML = function(){};
+var cleanHTMLOnElement = function(){};
+var replaceSelectionWithHtml = function(){};
