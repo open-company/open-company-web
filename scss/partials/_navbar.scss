@@ -29,17 +29,17 @@ nav.oc-navbar {
       height: #{$mobile_navbar_height + $mobile_menu_item_height}px;
 
       &.jwt {
-        height: #{$mobile_navbar_height + ($mobile_menu_item_height * 2)}px;
+        height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
 
         &.has-prior-updates {
-          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
+          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 4)}px;
         }
 
         &.can-edit-company {
-          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
+          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 4)}px;
 
           &.has-prior-updates {
-            height: #{$mobile_navbar_height + ($mobile_menu_item_height * 4)}px;
+            height: #{$mobile_navbar_height + ($mobile_menu_item_height * 5)}px;
           }
         }
       }
