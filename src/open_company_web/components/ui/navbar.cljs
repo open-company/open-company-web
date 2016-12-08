@@ -84,7 +84,11 @@
                                          :small-navbar (or su-navbar (not show-navigation-bar))
                                          :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
-                                         :no-jwt (not (jwt/jwt))})}
+                                         :has-prior-updates (and (router/current-company-slug)
+                                                                 (pos? (:count (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET"))))
+                                         :can-edit-company (and (router/current-company-slug)
+                                                                (not (:read-only (dis/company-data))))
+                                         :jwt (jwt/jwt)})}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"

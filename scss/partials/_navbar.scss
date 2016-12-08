@@ -25,12 +25,28 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
 
-    &.no-jwt.mobile-menu-open {
-      height: #{$mobile_navbar_height + $mobile_menu_signout_height}px;
-    }
-
     &.mobile-menu-open {
-      height: #{$mobile_navbar_height + ($mobile_menu_item_height * $mobile_menu_items_num)}px;
+      height: #{$mobile_navbar_height + $mobile_menu_item_height}px;
+
+      &.jwt {
+        height: #{$mobile_navbar_height + ($mobile_menu_item_height * 2)}px;
+
+        &.has-prior-updates {
+          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
+        }
+
+        &.can-edit-company {
+          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
+
+          &.has-prior-updates {
+            height: #{$mobile_navbar_height + ($mobile_menu_item_height * 4)}px;
+          }
+        }
+      }
+
+      &.has-prior-updates {
+        height: #{$mobile_navbar_height + ($mobile_menu_item_height * 2)}px;
+      }
     }
   }
   z-index: 1030;
