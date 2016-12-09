@@ -35,7 +35,7 @@
       (let [section-kw (keyword selected-topic-view)
             topic-data (get company-data section-kw)]
         (when (:placeholder topic-data)
-          (dis/dispatch! [:start-foce (keyword selected-topic-view) (dissoc topic-data :updated-at)]))))))
+          (dis/dispatch! [:start-foce section-kw (dissoc topic-data :updated-at)]))))))
 
 (defn start-foce-if-needed [owner]
   (let [{:keys [foce-key
