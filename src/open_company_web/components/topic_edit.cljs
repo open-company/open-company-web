@@ -70,12 +70,23 @@
                                          :char-count-alert (< remaining-chars body-alert-limit)
                                          :body-exceeds (neg? remaining-chars)})))))
 
-(defn- setup-edit [owner]
+(defn- setup-body-editor [owner]
   (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
+      ;; Temp comment out the paste stuff:
+      ; (.forEach (.-elements body-editor)
+      ;  (fn [element]
+      ;   (.addEventListener element "paste"
+      ;    (fn [event editable]
+      ;     (.preventDefault event)))))
+      ; (.subscribe body-editor "addElements"
+      ;  (fn [event editable]
+      ;   (.addEventListener editable "paste"
+      ;    (fn [paste-event paste-editable]
+      ;     (.preventDefault paste-event)))))
       (.subscribe body-editor
                   "editableInput"
                   (fn [event editable]
@@ -260,7 +271,7 @@
       (js/filepicker.setKey ls/filestack-key)
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-      (setup-edit owner)
+      (setup-body-editor owner)
       (utils/after 100 #(focus-headline))
       (reset! prevent-route-dispatch true)
       (let [loc (.-location js/window)
@@ -270,7 +281,11 @@
         (om/set-state! owner :history-listener-id listener))
       ;; scroll to top of this div
       (utils/after 10 #(let [topic-edit-div (js/$ "div.topic-edit")]
-                          (.animate (js/$ "html, body") #js {:scrollTop (- (.-top (.offset topic-edit-div)) 66)} "slow")))))
+                        (when (and topic-edit-div
+                                   (.-offset topic-edit-div)
+                                   (.-top (.offset topic-edit-div)))
+                          (.animate (js/$ "html, body")
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 66)} "slow"))))))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
