@@ -117,7 +117,7 @@
                   :let [section-data (get all-sections (keyword (:section sec)))]]
               [:div.mb1.btn-reset.yellow-line-hover-child
                 {:key (:section section-data)
-                 :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data)})}
+                 :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :was-archived true})}
                 [:span.child
                   (:title section-data)]])])]
        (custom-topic-input #(update-active-topics-cb %1 %2))]))
