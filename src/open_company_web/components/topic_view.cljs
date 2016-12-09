@@ -37,17 +37,6 @@
         (when (:placeholder topic-data)
           (dis/dispatch! [:start-foce section-kw (dissoc topic-data :updated-at)]))))))
 
-(defn start-foce-if-needed [owner]
-  (let [{:keys [foce-key
-                company-data
-                selected-topic-view]} (om/get-props owner)]
-    (when (and (nil? foce-key)
-               (not (:read-only company-data)))
-      (let [section-kw (keyword selected-topic-view)
-            topic-data (->> selected-topic-view keyword (get company-data))]
-        (when (:placeholder topic-data)
-          (dis/dispatch! [:start-foce (keyword selected-topic-view) (dissoc topic-data :updated-at)]))))))
-
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
                                   selected-topic-view
