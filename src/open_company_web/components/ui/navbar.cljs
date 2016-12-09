@@ -89,7 +89,7 @@
                                          :can-edit-company (and (router/current-company-slug)
                                                                 (not (:read-only (dis/company-data))))
                                          :jwt (jwt/jwt)})}
-        (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
+        (when (not (utils/is-test-env?))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
                   :style {:width (str header-width "px")}}

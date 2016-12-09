@@ -16,6 +16,7 @@ div.login-overlay-container {
     min-height: 100%;
     overflow: auto;
     position: relative;
+    background-color: white;
   }
 
   button.close {
@@ -69,6 +70,7 @@ div.login-overlay-container {
       left: 0px;
       top: 0px;
       overflow: auto;
+      box-shadow: none;
     }
 
     a.red {
