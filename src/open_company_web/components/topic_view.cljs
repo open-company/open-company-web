@@ -33,7 +33,7 @@
     (when (and (nil? foce-key)
                (not (:read-only company-data)))
       (let [section-kw (keyword selected-topic-view)
-            topic-data (->> selected-topic-view keyword (get company-data))]
+            topic-data (get company-data section-kw)]
         (when (:placeholder topic-data)
           (dis/dispatch! [:start-foce (keyword selected-topic-view) (dissoc topic-data :updated-at)]))))))
 
