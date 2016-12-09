@@ -196,7 +196,8 @@
                            :oc-editing
                            :revisions-data
                            :new
-                           :placeholder])
+                           :placeholder
+                           :was-archived])
 
 (defn save-or-create-section [section-data]
   (when section-data
