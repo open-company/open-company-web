@@ -22,6 +22,17 @@
       (om/set-state! owner :revisions-requested true)
       (api/load-revisions (router/current-company-slug) topic-name revisions-link))))
 
+(defn start-foce-if-needed [owner]
+  (let [{:keys [foce-key
+                company-data
+                selected-topic-view]} (om/get-props owner)]
+    (when (and (nil? foce-key)
+               (not (:read-only company-data)))
+      (let [section-kw (keyword selected-topic-view)
+            topic-data (->> selected-topic-view keyword (get company-data))]
+        (when (:placeholder topic-data)
+          (dis/dispatch! [:start-foce (keyword selected-topic-view) (dissoc topic-data :updated-at)]))))))
+
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
                                   selected-topic-view
@@ -34,14 +45,16 @@
 
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
-    (load-revisions-if-needed owner))
+    (load-revisions-if-needed owner)
+    (start-foce-if-needed owner))
 
   (will-update [_ next-props _]
     (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :revisions-requested false)))
 
   (did-update [_ _ _]
-    (load-revisions-if-needed owner))
+    (load-revisions-if-needed owner)
+    (start-foce-if-needed owner))
 
   (render [_]
     (let [section-kw (keyword selected-topic-view)
