@@ -119,6 +119,7 @@
                              :foce-data (:foce-data data)
                              :show-add-topic (:show-add-topic data)
                              :selected-topic-view (:selected-topic-view data)
+                             :dashboard-selected-topics (:dashboard-selected-topics data)
                              :is-dashboard true}))
               ;;Footer
               (om/build footer {:footer-width total-width-int}))))))))
