@@ -6,6 +6,7 @@
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
@@ -66,6 +67,11 @@
                      (not su-navbar))
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
+  (will-receive-props [_ _]
+    (when (om/get-state owner :su-redirect)
+      (router/nav! (oc-urls/stakeholder-update-preview))
+      (om/set-state! owner :su-redirect nil)))
+
   (will-unmount [_]
     (when-let [scroll-listener (om/get-state owner :scroll-listener)]
       (events/unlistenByKey scroll-listener)))
@@ -119,7 +125,10 @@
                                     :data-toggle "tooltip"
                                     :data-container "body"
                                     :data-placement "left"
-                                    :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
+                                    :on-click (fn []
+                                                (let [selection (:dashboard-selected-topics @dis/app-state)]
+                                                  (om/set-state! owner :su-redirect true)
+                                                  (api/patch-stakeholder-update {:sections selection :title (:title (:stakeholder-update company-data))})))}
                               "Share new update"))))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
@@ -135,16 +144,19 @@
               (dom/div {:class "right"}
                 (when create-update-share-button-cb
                   (dom/div {:class "sharing-button-container"}
-                    (dom/button {:class "btn-reset btn-OUTLINE"
+                    (dom/button {:class "btn-reset btn-outline cancel-button"
                                  :title "Back to Dashboard."
                                  :data-toggle "tooltip"
                                  :data-container "body"
                                  :data-placement "left"
                                  :on-click #(router/nav! (oc-urls/company))} "CANCEL")
-                    (dom/button {:class "btn-reset btn-solid"
+                    (dom/button {:class "share-button btn-reset btn-solid"
                                  :title (share-tooltip)
                                  :data-toggle "tooltip"
                                  :data-container "body"
                                  :data-placement "left"
                                  :on-click create-update-share-button-cb
-                                 :disabled create-update-share-button-disabled} "SHARE")))))))))))
+                                 :disabled create-update-share-button-disabled}
+                      (dom/i {:class "fa fa-slack"})
+                      (dom/i {:class "fa fa-envelope-o"})
+                      (dom/i {:class "fa fa-link"}))))))))))))

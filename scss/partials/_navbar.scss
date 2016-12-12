@@ -155,6 +155,7 @@ nav.oc-navbar {
 
       div.sharing-button-container{
         float: right;
+
         a.sharing-button {
           font-size: 14px;
           color: $oc_blue_dark;
@@ -202,16 +203,23 @@ nav.oc-navbar {
 
   div.oc-navbar-bottom {
     position: relative;
-    margin: 10px auto;
+    margin: 7px auto;
     padding: 0 28px;
 
     div.sharing-button-container{
+
       button {
+        width: 128px;
         margin-left: 10px;
-        height: 29px;
+        height: 33px;
         font-size: 0.75rem;
         font-weight: 700;
         font-family: $oc_headers_font;
+      }
+
+      button.share-button {
+        font-size: 16px;
+        padding-top: 3px;
       }
     }
 
