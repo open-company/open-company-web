@@ -39,7 +39,8 @@
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
 (defn focus-headline []
-  (when-let [headline (sel1 [(str "div#foce-headline-" (name (dis/foce-section-key)))])]
+  (when-let* [section-kw (dis/foce-section-key)
+              headline (sel1 [(str "div#foce-headline-" (name section-kw))])]
     (.focus headline)
     (utils/to-end-of-content-editable headline)))
 
@@ -55,7 +56,7 @@
     (utils/medium-editor-hide-placeholder editor body-el)))
 
 (defn body-on-change [owner]
-  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
+  (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
@@ -71,7 +72,7 @@
                                          :body-exceeds (neg? remaining-chars)})))))
 
 (defn- setup-body-editor [owner]
-  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
+  (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
@@ -95,7 +96,8 @@
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
-  (when-let [headline        (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+  (when-let* [section-kw     (dis/foce-section-key)
+              headline       (sel1 (str "div#foce-headline-" (name section-kw)))]
     (let [headline-innerHTML (.-innerHTML headline)
           emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))
           remaining-chars    (- headline-max-length (count (.-innerText headline)))]
@@ -106,7 +108,8 @@
                                          :has-changes true})))))
 
 (defn- check-headline-count [owner e has-changes]
-  (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+  (when-let* [section-kw   (dis/foce-section-key)
+              headline (sel1 (str "div#foce-headline-" (name section-kw)))]
     (let [headline-value (.-innerText headline)]
       (when (and e
                  (not= (.-keyCode e) 8)
