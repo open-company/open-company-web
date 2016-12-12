@@ -183,7 +183,10 @@
                              :currency (:currency company-data)
                              :foce-key (:foce-key props)
                              :foce-data (:foce-data props)
+                             :dashboard-selected-topics (:dashboard-selected-topics props)
                              :is-dashboard is-dashboard
+                             :show-editing (and is-dashboard
+                                                (not (:read-only company-data)))
                              :column column}
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click section-name)}})))))))
