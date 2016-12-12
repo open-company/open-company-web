@@ -97,7 +97,7 @@
 (defn- finances-check-value
   "Return true if the value is a number."
   [v]
-  (and (not (= v ""))
+  (and (not (clojure.string/blank? v))
        (not (nil? v))
        (not (js/isNaN v))))
 
