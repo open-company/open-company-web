@@ -15,7 +15,6 @@
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.loading :refer (loading)]
-            [open-company-web.components.ui.oc-switch :refer (oc-switch)]
             [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
@@ -97,10 +96,6 @@
                                   :auth-settings (:auth-settings data)
                                   :active :dashboard
                                   :show-navigation-bar (utils/company-has-topics? company-data)}))
-              (when (and (responsive/is-mobile-size?)
-                         (utils/company-has-topics? company-data)
-                         (not (:selected-topic-view data)))
-                (oc-switch :dashboard))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
                   (dom/h3 {:class "empty-dashboard-title"}
