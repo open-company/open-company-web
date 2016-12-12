@@ -485,3 +485,10 @@
         (assoc :show-add-topic true)
         (dissoc :selected-topic-view)))
     (dissoc db :show-add-topic))))
+
+(defmethod dispatcher/action :dashboard-select-topic
+  [db [_ section-kw]]
+  (assoc db :dashboard-selected-topics
+    (if (utils/in? (:dashboard-selected-topics db) section-kw)
+      (utils/vec-dissoc (:dashboard-selected-topics db) section-kw)
+      (conj (:dashboard-selected-topics db) section-kw))))
