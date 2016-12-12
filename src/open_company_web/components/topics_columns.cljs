@@ -189,7 +189,6 @@
                                      :topic-click (partial topic-click section-name)}})))))))
 
 (defn- update-active-topics [owner new-topic section-data]
-  (dis/dispatch! [:show-add-topic false])
   (let [company-data (om/get-props owner :company-data)
         old-topics (:sections company-data)
         new-topics (conj old-topics new-topic)
@@ -235,6 +234,7 @@
                 new-section-data (get company-data new-section)]
       ; A new section was added, switch the topic-view when the add section is finished
       ; and enable FoCE
+      (dis/dispatch! [:show-add-topic false])
       (let [new-title (:title start-foce)
             foce-section-data (utils/new-section-initial-data
                                new-section
