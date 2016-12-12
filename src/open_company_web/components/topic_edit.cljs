@@ -285,7 +285,7 @@
       ;; scroll to top of this div
       (utils/after 10 #(let [topic-edit-div (js/$ "div.topic-edit")]
                         (when (and topic-edit-div
-                                   (.-offset topic-edit-div)
+                                   (.offset topic-edit-div)
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
                            #js {:scrollTop (- (.-top (.offset topic-edit-div)) 66)} "slow"))))))
