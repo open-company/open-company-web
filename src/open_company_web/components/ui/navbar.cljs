@@ -49,7 +49,8 @@
                               mobile-menu-open
                               header-width
                               su-navbar
-                              show-navigation-bar] :as data} owner options]
+                              show-navigation-bar
+                              dashboard-selected-topics] :as data} owner options]
 
   (did-mount [_]
     (when-not (and (responsive/is-mobile-size?)
@@ -114,16 +115,20 @@
                           (om/build menu {}))
                         (when fixed-show-share-su-button
                           (dom/div {:class "sharing-button-container"}
-                            (dom/a {:class "btn-reset sharing-button right"
-                                    :title (share-new-tooltip)
-                                    :data-toggle "tooltip"
-                                    :data-container "body"
-                                    :data-placement "left"
-                                    :on-click (fn []
-                                                (let [selection (:dashboard-selected-topics @dis/app-state)]
-                                                  (om/set-state! owner :su-redirect true)
-                                                  (api/patch-stakeholder-update {:sections selection :title (:title (:stakeholder-update company-data))})))}
-                              "Share new update"))))
+                            (dom/button {:class (str "btn-reset sharing-button right " (if (zero? (count dashboard-selected-topics)) "btn-link" "btn-solid"))
+                                         :title (share-new-tooltip)
+                                         :data-toggle "tooltip"
+                                         :data-container "body"
+                                         :data-placement "left"
+                                         :disabled (zero? (count dashboard-selected-topics))
+                                         :on-click (fn []
+                                                     (om/set-state! owner :su-redirect true)
+                                                     (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update company-data))}))}
+                              (when (om/get-state owner :su-redirect)
+                                (loading/small-loading))
+                              (if (pos? (count dashboard-selected-topics))
+                                (str "Share " (count dashboard-selected-topics) " topic" (when (> (count dashboard-selected-topics) 1) "s"))
+                                "Share new update")))))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)

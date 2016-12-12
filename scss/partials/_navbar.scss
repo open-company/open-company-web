@@ -148,27 +148,30 @@ nav.oc-navbar {
       div.sharing-button-container{
         float: right;
 
-        a.sharing-button {
-          font-size: 14px;
-          color: $oc_blue_dark;
-          margin-right: 20px;
-          font-family: $oc_headers_font;
-          margin-top: 11px;
-          outline: none;
-          font-weight: 400;
-          text-transform: capitalize;
+        button.sharing-button {
+          margin-top: 7px;
+          margin-right: 10px;
 
-          &:hover {
-            color: $oc_gray_5;
-          }
-
-          &:hover, &:active, &:focus {
+          &.btn-link {
+            font-size: 14px;
+            color: $oc_blue_dark;
+            margin-right: 20px;
+            font-family: $oc_headers_font;
+            margin-top: 11px;
             outline: none;
+            font-weight: 400;
+            text-transform: none;
+            font-style: none;
             text-decoration: none;
-          }
+            opacity: 1;
 
-          &.active {
-            color: $oc_gray_5;
+            &:hover {
+              color: black;
+            }
+
+            [disabled=disabled]{
+              opacity: 1;
+            }
           }
         }
       }

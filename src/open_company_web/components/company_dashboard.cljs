@@ -95,6 +95,7 @@
                                   :mobile-menu-open (:mobile-menu-open data)
                                   :auth-settings (:auth-settings data)
                                   :active :dashboard
+                                  :dashboard-selected-topics (:dashboard-selected-topics data)
                                   :show-navigation-bar (utils/company-has-topics? company-data)}))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
