@@ -229,9 +229,13 @@
               sections     (vec (:sections company-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
+          (dis/dispatch! [:foce-save sections data-to-save])
+          ; go back to dashbaord if it's a brand new topic
           (when (:new topic-data)
-            (utils/after 1000 #(router/nav! (oc-urls/company))))
-          (dis/dispatch! [:foce-save sections data-to-save]))))))
+            (reset! prevent-route-dispatch false)
+            (utils/after 10 #(router/nav! (oc-urls/company))))
+          ; dismissing foce
+          (utils/after 100 #(dis/dispatch! [:start-foce nil])))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
