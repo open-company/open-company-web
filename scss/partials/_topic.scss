@@ -18,6 +18,13 @@ div.topic {
     border-right: 2px solid transparent;
     border-top: 2px solid transparent;
 
+    &.dashboard-selected {
+      border-bottom: 2px solid $oc_yellow;
+      border-left: 2px solid $oc_yellow;
+      border-right: 2px solid $oc_yellow;
+      border-top: 2px solid $oc_yellow;
+    }
+
     div.topic-internal {
       & > div{
         padding-left: 16px;
@@ -41,7 +48,7 @@ div.topic {
       }
     }
 
-    &:hover{
+    &.dashboard-selected, &:hover{
       border-top: 2px solid $oc_yellow;
       border-bottom: 2px solid $oc_yellow;
       border-left: 2px solid $oc_yellow;
@@ -125,6 +132,13 @@ div.topic {
   div.topic-internal{
     position: relative;
     height: auto;
+
+    button.topic-history-button {
+      color: rgba(78, 90, 107, 0.7);
+      &:hover {
+        color: rgba(78, 90, 107, 1);
+      }
+    }
 
     &:hover {
       button.topic-pencil-button {

@@ -109,17 +109,30 @@
                 (when-not (and is-topic-view
                                is-mobile?)
                   " · ")
-                (utils/time-since (:updated-at topic-data) [:short-month]))))
+                (utils/time-since (:updated-at topic-data) [:short-month])))
+            (when (and is-dashboard
+                       (not is-mobile?)
+                       (pos? (count (:revisions topic-data))))
+              (dom/button {:class "topic-history-button btn-reset"
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-toggle "tooltip"
+                           :title "History"
+                           :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))}
+                (dom/i {:class "fa fa-history"}))))
           (when (and show-editing
                      (not is-stakeholder-update)
-                     (or (not is-mobile?)
-                         (not is-dashboard))
+                     (not is-mobile?)
+                     (or is-dashboard
+                         is-topic-view)
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
                      (not foce-active))
             (dom/button {:class (str "topic-pencil-button btn-reset")
-                         :on-click #(start-foce-click owner)}
+                         :on-click #(if is-dashboard
+                                      (router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))
+                                      (start-foce-click owner))}
               (dom/i {:class "fa fa-pencil"
                       :title "Edit"
                       :data-toggle "tooltip"
@@ -192,6 +205,7 @@
                              foce-data
                              foce-data-editing?
                              show-editing
+                             dashboard-selected-topics
                              topic-flex-num] :as data} owner options]
 
   (init-state [_]
@@ -229,10 +243,11 @@
                                                  :no-tablet (not (responsive/is-tablet-or-mobile?))
                                                  :topic-edit is-current-foce
                                                  :dashboard-topic is-dashboard
+                                                 :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
                                                  :no-foce (and foce-active (not is-current-foce))})
                     :onClick (fn []
                                 (when is-dashboard
-                                  (router/nav! (oc-urls/company-section (router/current-company-slug) section))))
+                                  (dis/dispatch! [:dashboard-select-topic section-kw])))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
