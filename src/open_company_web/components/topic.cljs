@@ -112,7 +112,7 @@
                 (utils/time-since (:updated-at topic-data) [:short-month])))
             (when (and is-dashboard
                        (not is-mobile?)
-                       (pos? (count (:revisions topic-data))))
+                       (> (count (:revisions topic-data)) 1))
               (dom/button {:class "topic-history-button btn-reset"
                            :data-placement "top"
                            :data-container "body"
