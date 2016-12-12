@@ -1,4 +1,5 @@
 (ns open-company-web.components.add-topic
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.lib.utils :as utils]
@@ -23,8 +24,8 @@
             (select-keys [:title :section]))))))
 
 (defn get-categories []
-  (let [slug       (keyword (router/current-company-slug))
-        categories (-> @caches/new-sections slug :categories)]
+  (when-let* [slug       (keyword (router/current-company-slug))
+              categories (:new-sections-categories (slug @caches/new-sections))]
     {:1 (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) 1) categories))
      :2 (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) 2) categories))}))
 
