@@ -69,7 +69,7 @@
     (let [slug (:slug body)
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
-      (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
+      (swap! cache/new-sections assoc-in [(keyword slug) :new-sections-categories] (:categories response))
       ;; signal to the app-state that the new-sections have been loaded
       (-> db
         (assoc-in [(keyword slug) :new-sections] (:templates response))
@@ -243,11 +243,7 @@
     (if (utils/link-for (:links with-fixed-body) "partial-update" "PATCH")
       (api/partial-update-section topic with-fixed-body)
       (api/save-or-create-section with-fixed-body))
-    (-> db
-        (dissoc :foce-key)
-        (dissoc :foce-data)
-        (dissoc :foce-data-editing?)
-        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) with-fixed-body))))
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) with-fixed-body)))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
