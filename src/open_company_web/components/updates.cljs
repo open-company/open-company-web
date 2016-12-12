@@ -12,7 +12,6 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
-            [open-company-web.components.ui.oc-switch :refer (oc-switch)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.prior-updates :refer (prior-updates)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
@@ -136,8 +135,6 @@
                                           :show-share-su-button (utils/can-edit-sections? company-data)
                                           :show-navigation-bar (utils/company-has-topics? company-data)
                                           :active :updates}))
-            (when mobile-layout
-              (oc-switch :updates))
             (if mobile-layout
               (prior-updates true nil)
               (om/build updates (merge data {:total-width-int total-width-int
