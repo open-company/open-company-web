@@ -21,14 +21,6 @@ nav.oc-navbar {
 
   @include big_web(){
     height: #{$navbar_height}px;
-
-    &.su-preview {
-      height: #{$su_preview_navbar_height}px;
-
-      div.oc-navbar-header {
-        margin-top: 10px;
-      }
-    }
   }
   @include mobile(){
     transition: 230ms;

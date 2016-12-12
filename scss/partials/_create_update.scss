@@ -89,11 +89,13 @@ div.create-update {
           margin-bottom: 30px;
 
           button.cancel {
-            margin-left: 0;
+            float: left;
+            width: 48%;
           }
 
           button.share {
-            margin-right: 0;
+            float: right;
+            width: 48%;
           }
         }
 

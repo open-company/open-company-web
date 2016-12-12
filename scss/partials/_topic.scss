@@ -49,16 +49,26 @@ div.topic {
     }
 
     &.dashboard-selected, &:hover{
-      border-top: 2px solid $oc_yellow;
-      border-bottom: 2px solid $oc_yellow;
-      border-left: 2px solid $oc_yellow;
-      border-right: 2px solid $oc_yellow;
 
       div.topic-internal {
         div.card-header.card-image {
           overflow: hidden;
         }
       }
+    }
+
+    &:hover {
+      border-top: 2px solid rgba(78,90,107,0.4);
+      border-bottom: 2px solid rgba(78,90,107,0.4);
+      border-left: 2px solid rgba(78,90,107,0.4);
+      border-right: 2px solid rgba(78,90,107,0.4);
+    }
+
+    &.dashboard-selected, &:hover.dashboard-selected {
+      border-top: 2px solid $oc_yellow;
+      border-bottom: 2px solid $oc_yellow;
+      border-left: 2px solid $oc_yellow;
+      border-right: 2px solid $oc_yellow;
     }
   }
 

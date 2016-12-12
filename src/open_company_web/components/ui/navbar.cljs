@@ -34,11 +34,6 @@
     "Select topics to share by Slack, email or link."
     "Select topics to share by email or link."))
 
-(defn- share-tooltip []
-  (if (utils/slack-share?)
-    "Share this update by Slack, email or link."
-    "Share this update by email or link."))
-
 (defcomponent navbar [{:keys [company-data
                               columns-num
                               card-width
@@ -92,7 +87,6 @@
                                          :mobile-menu-open mobile-menu-open
                                          :has-prior-updates (and (router/current-company-slug)
                                                                  (pos? (:count (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET"))))
-                                         :su-preview (utils/in? (:route @router/path) "su-snapshot-preview")
                                          :can-edit-company (and (router/current-company-slug)
                                                                 (not (:read-only (dis/company-data))))
                                          :jwt (jwt/jwt)})}
@@ -134,29 +128,6 @@
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)
             (dom/div {:class "oc-navbar-separator"})))
-        (if (responsive/is-mobile-size?)
+        (when (responsive/is-mobile-size?)
           ;; Render the menu here only on mobile so it can expand the navbar
-          (om/build menu {:mobile-menu-open mobile-menu-open})
-          ;; Render the bottom part of the navbar when not on mobile
-          (when create-update-share-button-cb
-            (dom/div {:class "oc-navbar-bottom group"
-                      :style {:width (str header-width "px")}}
-              (dom/div {:class "right"}
-                (when create-update-share-button-cb
-                  (dom/div {:class "sharing-button-container"}
-                    (dom/button {:class "btn-reset btn-outline cancel-button"
-                                 :title "Back to Dashboard."
-                                 :data-toggle "tooltip"
-                                 :data-container "body"
-                                 :data-placement "left"
-                                 :on-click #(router/nav! (oc-urls/company))} "CANCEL")
-                    (dom/button {:class "share-button btn-reset btn-solid"
-                                 :title (share-tooltip)
-                                 :data-toggle "tooltip"
-                                 :data-container "body"
-                                 :data-placement "left"
-                                 :on-click create-update-share-button-cb
-                                 :disabled create-update-share-button-disabled}
-                      (dom/i {:class "fa fa-slack"})
-                      (dom/i {:class "fa fa-envelope-o"})
-                      (dom/i {:class "fa fa-link"}))))))))))))
+          (om/build menu {:mobile-menu-open mobile-menu-open}))))))
