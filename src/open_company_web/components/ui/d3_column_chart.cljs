@@ -13,22 +13,30 @@
 (def show-data-points 4)
 (def chart-step show-data-points)
 
-(defn- max-y [data chart-keys]
-  (let [filtered-data (map #(select-keys % chart-keys) data)]
+(defn- current-data
+  "Get the subset of the data that's currently being displayed on the chart."
+  [owner]
+  (let [start (om/get-state owner :start)
+        all-data (om/get-props owner :chart-data)
+        stop (min (count all-data) (+ start show-data-points))]
+    (subvec all-data start stop)))
+
+(defn- max-y [owner data chart-keys]
+  (let [filtered-data (map #(select-keys % chart-keys) (current-data owner))]
     (apply max (vec (flatten (map vals filtered-data))))))
 
-(defn- min-y [data chart-keys]
-  (let [filtered-data (map #(select-keys % chart-keys) data)]
+(defn- min-y [owner data chart-keys]
+  (let [filtered-data (map #(select-keys % chart-keys) (current-data owner))]
     (apply min (vec (flatten (map vals filtered-data))))))
 
 (defn- get-y [y max-y]
   (+ 10 (- max-y y)))
 
 (defn- scale [owner options]
-  (let [all-data (om/get-props owner :chart-data)
+  (let [all-data (current-data owner)
         chart-keys (:chart-keys options)
-        data-min (min-y all-data chart-keys)
-        data-max (max-y all-data chart-keys)
+        data-min (min-y owner all-data chart-keys)
+        data-max (max-y owner all-data chart-keys)
         linear-fn (.. js/d3 -scale linear)
         domain-fn (.domain linear-fn #js [0 data-max])
         range-fn (.range linear-fn #js [0 (- (om/get-props owner :chart-height) 10)])]
@@ -39,14 +47,6 @@
   return the horizontal (x-axis) position of the data point."
   [chart-width i num-of-keys]
     (* i (+ (* bar-width num-of-keys) (* (/ bar-width 2) num-of-keys))))
-
-(defn- current-data 
-  "Get the subset of the data that's currently being displayed on the chart."
-  [owner]
-  (let [start (om/get-state owner :start)
-        all-data (om/get-props owner :chart-data)
-        stop (min (count all-data) (+ start show-data-points))]
-    (subvec all-data start stop)))
 
 (declare data-select)
 (defn- d3-render-chart
@@ -75,7 +75,7 @@
                          (.attr "height" chart-height)
                          (.on "click" (fn [] (.stopPropagation (.-event js/d3)))))
           scale-fn (scale owner options)
-          data-max (max-y (om/get-props owner :chart-data) chart-keys)
+          data-max (max-y owner (om/get-props owner :chart-data) chart-keys)
           max-y (scale-fn data-max)
           x-axis-labels? (:x-axis-labels options)]
 
