@@ -86,6 +86,7 @@
                                          :mobile-menu-open mobile-menu-open
                                          :has-prior-updates (and (router/current-company-slug)
                                                                  (pos? (:count (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET"))))
+                                         :su-preview (utils/in? (:route @router/path) "su-snapshot-preview")
                                          :can-edit-company (and (router/current-company-slug)
                                                                 (not (:read-only (dis/company-data))))
                                          :jwt (jwt/jwt)})}
@@ -110,42 +111,40 @@
                       (dom/div {:class "group"}
                         (dom/div {:class "dropdown right"}
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
-                          (om/build menu {})))
+                          (om/build menu {}))
+                        (when fixed-show-share-su-button
+                          (dom/div {:class "sharing-button-container"}
+                            (dom/a {:class "btn-reset sharing-button right"
+                                    :title (share-new-tooltip)
+                                    :data-toggle "tooltip"
+                                    :data-container "body"
+                                    :data-placement "left"
+                                    :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
+                              "Share new update"))))
                       (login-button)))))))
-          (when-not (responsive/is-mobile-size?)
+          (when (and (not (responsive/is-mobile-size?))
+                     create-update-share-button-cb)
             (dom/div {:class "oc-navbar-separator"})))
-        (when-not su-navbar
-          (if (responsive/is-mobile-size?)
-            ;; Render the menu here only on mobile so it can expand the navbar
-            (om/build menu {:mobile-menu-open mobile-menu-open})
-            ;; Render the bottom part of the navbar when not on mobile
-            (when show-navigation-bar
-              (dom/div {:class "oc-navbar-bottom group"
-                        :style {:width (str header-width "px")}}
-                (dom/div {:class "left"}
-                  (when should-show-left-links
-                    (dom/a {:class (when (= active :dashboard) "active")
-                            :href (oc-urls/company)
-                            :on-click #(do
-                                         (utils/event-stop %)
-                                         (router/nav! (oc-urls/company)))}
-                      "Dashboard")))
-                (dom/div {:class "right"}
-                  (when fixed-show-share-su-button
-                    (dom/div {:class "sharing-button-container"}
-                      (dom/a {:class "btn-reset sharing-button right"
-                              :title (share-new-tooltip)
-                              :data-toggle "tooltip"
-                              :data-container "body"
-                              :data-placement "left"
-                              :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
-                        "Share new update")))
-                  (when create-update-share-button-cb
-                    (dom/div {:class "sharing-button-container"}
-                      (dom/button {:class "btn-reset btn-solid"
-                                   :title (share-tooltip)
-                                   :data-toggle "tooltip"
-                                   :data-container "body"
-                                   :data-placement "left"
-                                   :on-click create-update-share-button-cb
-                                   :disabled create-update-share-button-disabled} "SHARE"))))))))))))
+        (if (responsive/is-mobile-size?)
+          ;; Render the menu here only on mobile so it can expand the navbar
+          (om/build menu {:mobile-menu-open mobile-menu-open})
+          ;; Render the bottom part of the navbar when not on mobile
+          (when create-update-share-button-cb
+            (dom/div {:class "oc-navbar-bottom group"
+                      :style {:width (str header-width "px")}}
+              (dom/div {:class "right"}
+                (when create-update-share-button-cb
+                  (dom/div {:class "sharing-button-container"}
+                    (dom/button {:class "btn-reset btn-OUTLINE"
+                                 :title "Back to Dashboard."
+                                 :data-toggle "tooltip"
+                                 :data-container "body"
+                                 :data-placement "left"
+                                 :on-click #(router/nav! (oc-urls/company))} "CANCEL")
+                    (dom/button {:class "btn-reset btn-solid"
+                                 :title (share-tooltip)
+                                 :data-toggle "tooltip"
+                                 :data-container "body"
+                                 :data-placement "left"
+                                 :on-click create-update-share-button-cb
+                                 :disabled create-update-share-button-disabled} "SHARE")))))))))))

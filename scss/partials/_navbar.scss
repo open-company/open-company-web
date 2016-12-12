@@ -21,6 +21,14 @@ nav.oc-navbar {
 
   @include big_web(){
     height: #{$navbar_height}px;
+
+    &.su-preview {
+      height: #{$su_preview_navbar_height}px;
+
+      div.oc-navbar-header {
+        margin-top: 10px;
+      }
+    }
   }
   @include mobile(){
     transition: 230ms;
@@ -115,7 +123,7 @@ nav.oc-navbar {
     position: relative;
     margin: 0 auto;
     padding: 0 28px;
-    margin-top: 10px;
+    margin-top: 20px;
 
     div.oc-navbar-header-container{
       height: 45px;
@@ -144,6 +152,33 @@ nav.oc-navbar {
         float: right;
       }
 
+      div.sharing-button-container{
+        float: right;
+        a.sharing-button {
+          font-size: 14px;
+          color: $oc_blue_dark;
+          margin-right: 20px;
+          font-family: $oc_headers_font;
+          margin-top: 24px;
+          outline: none;
+          font-weight: 400;
+          text-transform: capitalize;
+
+          &:hover {
+            color: $oc_gray_5;
+          }
+
+          &:hover, &:active, &:focus {
+            outline: none;
+            text-decoration: none;
+          }
+
+          &.active {
+            color: $oc_gray_5;
+          }
+        }
+      }
+
       button.mobile-menu {
         font-size: 24px;
         padding: 3px 20px 3px 20px;
@@ -169,8 +204,14 @@ nav.oc-navbar {
     margin: 10px auto;
     padding: 0 28px;
 
-    a.sharing-button {
-      color: $oc_blue_dark;
+    div.sharing-button-container{
+      button {
+        margin-left: 10px;
+        height: 29px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: $oc_headers_font;
+      }
     }
 
     a {
