@@ -30,6 +30,22 @@
         section-data (om/get-props owner :topic-data)]
     (dis/dispatch! [:start-foce section-kw (assoc section-data :section (name section-kw))])))
 
+(defn get-author-string [topic-data]
+  (cond
+
+    (= (count (:author topic-data)) 1)
+    (let [first-author (first (:author topic-data))]
+      (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year])))
+
+    (> (count (:author topic-data) 1))
+    (let [first-author (first (:author topic-data))
+          last-author  (last (:author topic-data))]
+      (if (= (:user-id first-author) (:user-id last-author))
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
+             "edited " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
+             "edited by " (:name last-author) " on " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))))))
+
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
@@ -89,7 +105,7 @@
                                               "top"))
                          :data-container "body"
                          :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
-                         :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
+                         :title (get-author-string topic-data)}
                 (when-not (and is-topic-view
                                is-mobile?)
                   " · ")
