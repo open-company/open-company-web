@@ -81,9 +81,10 @@
                    (not (responsive/is-mobile-size?)))
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/company-settings) :on-click company-profile-click} "Company Settings")))
-        (when (jwt/jwt)
-          (dom/li {:class "oc-menu-item"}
-            (dom/a {:href oc-urls/companies :on-click companies-click} "Companies")))
+        ;; Temp commenting this out since we need API support to know how many companies the user has
+        ; (when (jwt/jwt)
+        ;   (dom/li {:class "oc-menu-item"}
+        ;     (dom/a {:href oc-urls/companies :on-click companies-click} "Companies")))
         (when (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
