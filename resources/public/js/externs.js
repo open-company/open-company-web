@@ -48,6 +48,4 @@ location.reload = function(){};
 // EmojiAutocomplete
 var emojiAutocomplete = function(){};
 // cleanHTML
-var cleanHTML = function(){};
-var cleanHTMLOnElement = function(){};
-var replaceSelectionWithHtml = function(){};
+var recursiveAttachPasteListener = function(){};
