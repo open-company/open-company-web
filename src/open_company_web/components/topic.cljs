@@ -122,9 +122,9 @@
                 (dom/i {:class "fa fa-history"}))))
           (when (and show-editing
                      (not is-stakeholder-update)
+                     (not is-dashboard)
                      (not is-mobile?)
-                     (or is-dashboard
-                         is-topic-view)
+                     is-topic-view
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
@@ -244,10 +244,12 @@
                                                  :topic-edit is-current-foce
                                                  :dashboard-topic is-dashboard
                                                  :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
+                                                 :dashboard-share-mode (:dashboard-sharing data)
                                                  :no-foce (and foce-active (not is-current-foce))})
-                    :onClick (fn []
-                                (when is-dashboard
-                                  (dis/dispatch! [:dashboard-select-topic section-kw])))
+                    :onClick #(when is-dashboard
+                               (if (:dashboard-sharing data)
+                                 (dis/dispatch! [:dashboard-select-topic section-kw])
+                                 (router/nav! (oc-urls/company-section slug section-kw))))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
