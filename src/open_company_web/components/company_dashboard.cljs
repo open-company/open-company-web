@@ -98,7 +98,7 @@
                                   :dashboard-selected-topics (:dashboard-selected-topics data)
                                   :dashboard-sharing (:dashboard-sharing data)
                                   :show-navigation-bar (utils/company-has-topics? company-data)
-                                  :is-dashboard true}))
+                                  :is-dashboard (nil? (:selected-topic-view data))}))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
                   (dom/h3 {:class "empty-dashboard-title"}
