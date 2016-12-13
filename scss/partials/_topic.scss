@@ -48,7 +48,7 @@ div.topic {
       }
     }
 
-    &.dashboard-selected, &:hover{
+    &.dashboard-share-mode, &.dashboard-selected, &:hover{
 
       div.topic-internal {
         div.card-header.card-image {
@@ -57,14 +57,14 @@ div.topic {
       }
     }
 
-    &:hover {
+    &.dashboard-share-mode, &:hover {
       border-top: 2px solid rgba(78,90,107,0.4);
       border-bottom: 2px solid rgba(78,90,107,0.4);
       border-left: 2px solid rgba(78,90,107,0.4);
       border-right: 2px solid rgba(78,90,107,0.4);
     }
 
-    &.dashboard-selected, &:hover.dashboard-selected {
+    &.dashboard-share-mode.dashboard-selected, &.dashboard-share-mode:hover, &.dashboard-share-mode.dashboard-selected:hover {
       border-top: 2px solid $oc_yellow;
       border-bottom: 2px solid $oc_yellow;
       border-left: 2px solid $oc_yellow;
