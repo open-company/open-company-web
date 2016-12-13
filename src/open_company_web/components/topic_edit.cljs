@@ -59,6 +59,8 @@
   (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
+    ; Attach paste listener to the body and all its children
+    (js/recursiveAttachPasteListener body-el)
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (let [inner-text-count (count (.-innerText body-el))
@@ -76,18 +78,8 @@
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
+    (js/recursiveAttachPasteListener body-el)
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
-      ;; Temp comment out the paste stuff:
-      ; (.forEach (.-elements body-editor)
-      ;  (fn [element]
-      ;   (.addEventListener element "paste"
-      ;    (fn [event editable]
-      ;     (.preventDefault event)))))
-      ; (.subscribe body-editor "addElements"
-      ;  (fn [event editable]
-      ;   (.addEventListener editable "paste"
-      ;    (fn [paste-event paste-editable]
-      ;     (.preventDefault paste-event)))))
       (.subscribe body-editor
                   "editableInput"
                   (fn [event editable]
