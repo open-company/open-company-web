@@ -149,8 +149,7 @@
                                 :data-topic topic
                                 :ref topic
                                 :key topic}
-                        (:title sd) " "
-                        (dom/i {:class "fa fa-check"}))))))
+                        (:title sd))))))
               (dom/div {:class "create-update-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
