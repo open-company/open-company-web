@@ -492,3 +492,9 @@
     (if (utils/in? (:dashboard-selected-topics db) section-kw)
       (utils/vec-dissoc (:dashboard-selected-topics db) section-kw)
       (conj (:dashboard-selected-topics db) section-kw))))
+
+(defmethod dispatcher/action :dashboard-share-mode
+  [db [_ activate]]
+  (-> db
+    (assoc :dashboard-sharing activate)
+    (assoc :dashboard-selected-topics [])))
