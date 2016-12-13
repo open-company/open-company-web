@@ -154,41 +154,53 @@ var removeAttributes = [
 // Remove all attributes except
 // <a href>
 
-
 function cleanHTML(text){
+  text = $("<div/>").html(text).html();
   // Transform tags
   transformTag.forEach(function(v){
     var replacer = new RegExp(v[0], "i");
     text = text.replace(replacer, v[1]);
   });
   // Remove from to
+  // For each start string
   removeFromTo.forEach(function(v){
+    // if v = "<a" look first for "<a " and then for "<a>" to
+    // avoid getting "<area" too for example:
+    // so first look for it with a space at the end
     var matcher1 = new RegExp(v[0] + " ", "ig");
-    while( (m1 = matcher1.exec(text)) != null){
+    while( (m1 = matcher1.exec(text)) !== null){
+      // if i was able to find it
       var subText = text.substring(m1.index);
+      // look for the end of it
       var endRegExp = new RegExp(v[1], "i");
       var m2 = endRegExp.exec(subText);
       if (m2 != null) {
+        // if i was able to find the end of it
         var endIndex = m1.index + m2.index + v[1].length;
+        // remove everything is in the middle
         text = text.substring(0, m1.index) + text.substring(endIndex);
       }
     }
+    // second look for it with a > closing the tag
     matcher1 = new RegExp(v[0] + ">", "ig");
-    while( (m1 = matcher1.exec(text)) != null){
+    while( (m1 = matcher1.exec(text)) !== null){
+      // if it was found look for the closing tag
       var subText = text.substring(m1.index);
       var endRegExp = new RegExp(v[1], "i");
       var m2 = endRegExp.exec(subText);
       if (m2 != null) {
+        // if the closing tag was found
         var endIndex = m1.index + m2.index + v[1].length;
+        // cut everything is in the middle of the 2
         text = text.substring(0, m1.index) + text.substring(endIndex);
       }
     }
-
-    if (v[1] = ">"){
+    // if the clsing tag is > it means we need to look for </TAG> closing and also remove it
+    if ( v[1] == ">" ){
       // Remove also from </tag to > if v[1] was >
       var closingTag = "</" + v[0].substring(1) +  ">";
       var s = new RegExp(closingTag, "ig");
-      while( (m1 = s.exec(text)) != null) {
+      while( (m1 = s.exec(text)) !== null) {
         text = text.substring(0, m1.index) + text.substring(m1.index + closingTag.length);
       }
     }
@@ -205,13 +217,37 @@ function cleanHTML(text){
       }
     }
   });
+
+  // Remove all attributes axcept for href for Anchor tags:
+  var r = new RegExp("<a ", "ig");
+  while ( (m1 = r.exec(text)) != null) {
+    var endRegEx = new RegExp(">", "i");
+    var m2 = endRegEx.exec(text.substring(m1.index + 2));
+    if (m2 != null) {
+      middle = text.substring(m1.index + 3, m1.index + 3 + m2.index);
+      if ( middle.indexOf("href") != -1 ){
+        // we have an href attribute, let's save it
+        var aStr = text.substr(m1.index, m2.index + 1);
+        var hrefValue
+        aStr.split(" ").forEach(function(s){
+          if (s.toLowerCase().startsWith("href")) {
+            var parts = s.split("=");
+            hrefValue = parts[1];
+          }
+        });
+        text = text.substring(0, m1.index) + "<a target=\"_blank\" href=" + hrefValue + ">" + text.substring(m1.index + 3 + m2.index);
+      } else {
+        // no href attribute, cut all the attributes
+        text = text.substring(0, m1.index) + "<a>" + text.substring(m1.index + 3 + m2.index);
+      }
+    }
+  }
   return text;
 }
 
 function replaceSelectionWithHtml(html) {
     var range;
     if (window.getSelection && window.getSelection().getRangeAt) {
-        console.log("replaceSelectionWithHtml 1");
         range = window.getSelection().getRangeAt(0);
         range.deleteContents();
         var div = document.createElement("p");
@@ -222,20 +258,32 @@ function replaceSelectionWithHtml(html) {
         }
         range.insertNode(frag);
     } else if (document.selection && document.selection.createRange) {
-        console.log("replaceSelectionWithHtml 2");
         range = document.selection.createRange();
         range.pasteHTML(html);
     }
 }
 
-function cleanHTMLOnElement(el) {
-  el.addEventListener("paste",
-    function(e){
-      console.log("Paste", cleanHTML(e.clipboardData.getData("text/html")));
-      replaceSelectionWithHtml(cleanHTML(e.clipboardData.getData("text/html")));
-      // Stop data actually being pasted into div
-      e.stopPropagation();
-      e.preventDefault();
-    }
-  );
+function didPaste(e){
+  // Prevent normal paste behaviour
+  e.preventDefault();
+  e.stopPropagation();
+  // Get the paste data
+  var clipboardData, pastedData, cleanedData;
+  clipboardData = e.clipboardData || window.clipboardData;
+  // fall back to plain text or to Text
+  pastedData = clipboardData.getData('text/html') || clipboardData.getData('text/plain') || clipboardData.getData('Text');
+  // Clean the text with our function
+  cleanedData = cleanHTML(pastedData);
+  // Replace the current selected text with our text
+  replaceSelectionWithHtml(cleanedData);
+}
+
+function recursiveAttachPasteListener(el){
+  // $(el).off("paste", didPaste);
+  el.removeEventListener("paste", didPaste)
+  // $(el).on("paste", didPaste);
+  el.addEventListener("paste", didPaste)
+  if (el.hasChildNodes()){
+    el.childNodes.forEach(recursiveAttachPasteListener);
+  }
 }
