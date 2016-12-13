@@ -50,7 +50,9 @@
                               header-width
                               su-navbar
                               show-navigation-bar
-                              dashboard-selected-topics] :as data} owner options]
+                              dashboard-selected-topics
+                              dashboard-sharing
+                              is-dashboard] :as data} owner options]
 
   (did-mount [_]
     (when-not (and (responsive/is-mobile-size?)
@@ -75,6 +77,7 @@
   (render [_]
     (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
+                                          is-dashboard                               ; is looking at the dashboard
                                           (not (:read-only company-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
@@ -114,21 +117,33 @@
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {}))
                         (when fixed-show-share-su-button
-                          (dom/div {:class "sharing-button-container"}
-                            (dom/button {:class (str "btn-reset sharing-button right " (if (zero? (count dashboard-selected-topics)) "btn-link" "btn-solid"))
-                                         :title (share-new-tooltip)
-                                         :data-toggle "tooltip"
-                                         :data-container "body"
-                                         :data-placement "left"
-                                         :disabled (zero? (count dashboard-selected-topics))
-                                         :on-click (fn []
-                                                     (om/set-state! owner :su-redirect true)
-                                                     (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update company-data))}))}
-                              (when (om/get-state owner :su-redirect)
-                                (loading/small-loading))
-                              (if (pos? (count dashboard-selected-topics))
-                                (str "Share " (count dashboard-selected-topics) " topic" (when (> (count dashboard-selected-topics) 1) "s"))
-                                "Share new update")))))
+                          (if dashboard-sharing
+                            (dom/div {:class "sharing-button-container"}
+                              (dom/button {:class "btn-reset sharing-button right btn-solid"
+                                           :title (share-new-tooltip)
+                                           :data-toggle "tooltip"
+                                           :data-container "body"
+                                           :data-placement "left"
+                                           :disabled (zero? (count dashboard-selected-topics))
+                                           :on-click (fn []
+                                                       (om/set-state! owner :su-redirect true)
+                                                       (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update company-data))}))}
+                                (when (om/get-state owner :su-redirect)
+                                  (loading/small-loading))
+                                (str "Share " (count dashboard-selected-topics) " topic" (when (not= (count dashboard-selected-topics) 1) "s")))
+                              (dom/button {:class "btn-reset btn-link right sharing-cancel"
+                                           :on-click (fn []
+                                                       (dis/dispatch! [:dashboard-share-mode false]))}
+                                "Cancel"))
+                            (dom/div {:class "sharing-button-container"}
+                              (dom/button {:class "btn-reset sharing-button btn-link right"
+                                           :title (share-new-tooltip)
+                                           :data-toggle "tooltip"
+                                           :data-container "body"
+                                           :data-placement "left"
+                                           :on-click (fn []
+                                                       (dis/dispatch! [:dashboard-share-mode true]))}
+                                "Select topics")))))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)

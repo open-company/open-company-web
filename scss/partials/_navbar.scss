@@ -150,26 +150,32 @@ nav.oc-navbar {
 
         button.sharing-button {
           margin-top: 7px;
+        }
+
+        button.sharing-button.btn-link, button.sharing-cancel {
+          margin-top: 7px;
+        }
+
+        button.sharing-button, button.sharing-cancel {
           margin-right: 10px;
-          transition: 230ms;
 
           &.btn-link {
             font-size: 14px;
             color: $oc_blue_dark;
             font-family: $oc_headers_font;
-            margin-top: 11px;
             outline: none;
             font-weight: 400;
             text-transform: none;
-            font-style: none;
+            font-style: normal;
             text-decoration: none;
             opacity: 1;
+            padding: .2rem 0px .3rem .5rem;
 
             &:hover {
               color: black;
             }
 
-            [disabled=disabled]{
+            &[disabled] {
               opacity: 1;
             }
           }
