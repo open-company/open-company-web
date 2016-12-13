@@ -184,6 +184,7 @@
                              :foce-key (:foce-key props)
                              :foce-data (:foce-data props)
                              :dashboard-selected-topics (:dashboard-selected-topics props)
+                             :dashboard-sharing (:dashboard-sharing props)
                              :is-dashboard is-dashboard
                              :show-editing (and is-dashboard
                                                 (not (:read-only company-data)))

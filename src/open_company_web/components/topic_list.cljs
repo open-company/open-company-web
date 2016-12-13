@@ -245,6 +245,7 @@
                          :show-add-topic (:show-add-topic data)
                          :selected-topic-view (:selected-topic-view data)
                          :dashboard-selected-topics (:dashboard-selected-topics data)
+                         :dashboard-sharing (:dashboard-sharing data)
                          :is-dashboard (:is-dashboard data)}
               comp-opts {:opts {:topic-click (partial topic-click owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
