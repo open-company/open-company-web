@@ -143,7 +143,7 @@
                                            :data-placement "left"
                                            :on-click (fn []
                                                        (dis/dispatch! [:dashboard-share-mode true]))}
-                                "Select topics")))))
+                                "Share topics")))))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)
