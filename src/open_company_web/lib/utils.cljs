@@ -605,9 +605,8 @@
                 :placeholderText "Paste or type a link"
                 :targetCheckbox false
                 :targetCheckboxText "Open in new window"}
-   ; Tem comment out the paste extension disable
-   ; since our paste logic doesn't work yet.
-   ; :paste false
+   :paste #js {:forcePlainText false
+               :cleanPastedHTML false}
    :placeholder #js {:text (or placeholder ""), :hideOnClick hide-on-click}})
 
 (defn after [ms fn]
