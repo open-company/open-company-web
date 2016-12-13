@@ -147,12 +147,8 @@
                     (let [sd ((keyword topic) company-data)]
                       (dom/div {:class "create-update-topics-list-item oc-active"
                                 :data-topic topic
-                                :key topic
                                 :ref topic
-                                :on-click (fn [_]
-                                            (om/update-state! owner #(merge % {:su-topics (utils/vec-dissoc su-topics topic)
-                                                                               :should-update-data false}))
-                                            (patch-stakeholder-update owner))}
+                                :key topic}
                         (:title sd) " "
                         (dom/i {:class "fa fa-check"}))))))
               (dom/div {:class "create-update-content-cards right"
