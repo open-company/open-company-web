@@ -32,17 +32,15 @@
 (def headline-max-length 100)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
-(def body-max-length 1000)
-(def body-alert-limit 50)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
-(defn focus-headline []
+(defn focus-body []
   (when-let* [section-kw (dis/foce-section-key)
-              headline (sel1 [(str "div#foce-headline-" (name section-kw))])]
-    (.focus headline)
-    (utils/to-end-of-content-editable headline)))
+              body (sel1 [(str "div#foce-body-" (name section-kw))])]
+    (.focus body)
+    (utils/to-end-of-content-editable body)))
 
 (defn- scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -62,16 +60,7 @@
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el)
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (dis/dispatch! [:foce-input {:body emojied-body}]))
-    (let [inner-text-count (count (.-innerText body-el))
-          remaining-chars (- body-max-length inner-text-count)]
-      ; restore the previous body if the new one exceeds the limit
-      ; and the count is greater than the old, if it's less we let it update
-      ; to let the user cancel content to get to the limit
-      (om/update-state! owner #(merge % {:has-changes true
-                                         :char-count remaining-chars
-                                         :char-count-alert (< remaining-chars body-alert-limit)
-                                         :body-exceeds (neg? remaining-chars)})))))
+      (dis/dispatch! [:foce-input {:body emojied-body}]))))
 
 (defn- setup-body-editor [owner]
   (when-let* [section-kw   (dis/foce-section-key)
@@ -206,12 +195,6 @@
         (.focus headline-el)
         (headline-on-change owner)
         (utils/to-end-of-content-editable (.get headline-el 0)))
-      ;; if the body exceeds: focus on it with the cursor at the end, show the chart count
-      (om/get-state owner :body-exceeds)
-      (do
-        (.focus body-el)
-        (body-on-change owner)
-        (utils/to-end-of-content-editable (.get body-el 0)))
       ;; body and headline have the right number of chars, moving on with save
       :else
       (do
@@ -251,7 +234,6 @@
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0
-       :body-exceeds false
        :headline-exceeds false}))
 
   (will-unmount [_]
@@ -271,7 +253,7 @@
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (setup-body-editor owner)
-      (utils/after 100 #(focus-headline))
+      (utils/after 100 #(focus-body))
       (reset! prevent-route-dispatch true)
       (let [loc (.-location js/window)
             current-token (str (.-pathname loc) (.-search loc) (.-hash loc))
@@ -309,7 +291,7 @@
         (.focus (sel1 [:input.upload-remote-url-field])))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
-                           file-upload-state file-upload-progress upload-remote-url body-exceeds
+                           file-upload-state file-upload-progress upload-remote-url
                            headline-exceeds has-changes]}]
 
     (let [company-slug        (router/current-company-slug)
@@ -397,7 +379,7 @@
           (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
                         :id (str "foce-headline-" (name section))
                         :key "foce-headline"
-                        :placeholder "Headline"
+                        :placeholder "Optional headline"
                         :contentEditable true
                         :onKeyUp   #(check-headline-count owner % true)
                         :onKeyDown #(check-headline-count owner % true)
