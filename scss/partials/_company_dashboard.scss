@@ -1,5 +1,5 @@
 div.company-dashboard.editing-topic {
-  nav, div.left-topics-list, div.footer, div.topic:not(.topic-edit) {
+  nav > *, div.left-topics-list, div.footer, div.topic:not(.topic-edit) {
     opacity: 0.4 !important;
   }
 }
