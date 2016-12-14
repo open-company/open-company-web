@@ -21,7 +21,7 @@
       (for [sec (:new-sections (get @caches/new-sections slug))]
         (-> sec
             (assoc :section (:section-name sec))
-            (select-keys [:title :section]))))))
+            (select-keys [:title :section :body-placeholder]))))))
 
 (defn get-categories []
   (when-let* [slug       (keyword (router/current-company-slug))
@@ -49,6 +49,8 @@
        :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
                         new-topic-data {:title @(::topic-title s)
                                         :section topic-name
+                                        :was-archived false
+                                        :body-placeholder (utils/new-section-body-placeholder)
                                         :placeholder true}]
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
@@ -63,7 +65,6 @@
                                 [(keyword (:section s)) s]))
         categories (get-categories)
         show-archived (pos? (count archived-topics))]
-      (js/console.log "archived:" archived-topics)
       [:div.add-topic.group
        [:span.dimmed-gray.btn-reset.right
          {:on-click #(dis/dispatch! [:show-add-topic false])}
@@ -91,6 +92,7 @@
                                (update-active-topics-cb (:section section-data) {:title (:title section-data)
                                                                                  :section (:section section-data)
                                                                                  :placeholder true
+                                                                                 :body-placeholder (:body-placeholder section-data)
                                                                                  :was-archived archived?}))}
                   [:span.child.topic-title
                     (:title section-data)
@@ -123,6 +125,7 @@
                                (update-active-topics-cb (:section section-data) {:title (:title section-data)
                                                                                  :section (:section section-data)
                                                                                  :placeholder true
+                                                                                 :body-placeholder (:body-placeholder section-data)
                                                                                  :was-archived archived?}))}
                   [:span.child.topic-title
                     (:title section-data)
@@ -157,6 +160,7 @@
                                (update-active-topics-cb (:section section-data) {:title (:title section-data)
                                                                                  :section (:section section-data)
                                                                                  :placeholder true
+                                                                                 :body-placeholder (:body-placeholder section-data)
                                                                                  :was-archived archived?}))}
                   [:span.child.topic-title
                     (:title section-data)
