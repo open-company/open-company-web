@@ -32,6 +32,7 @@
                   :style {:cursor (if should-show-link "pointer" "default")}
                   :on-click (fn [e]
                               (.preventDefault e)
+                              (dis/dispatch! [:show-add-topic false])
                               (when should-show-link
                                 (router/nav! company-home)))}
             (dom/div {:class "company-avatar-container group"}
