@@ -1,14 +1,8 @@
-body.fixed-navbar {
-  div.left-topics-list {
-    position: fixed;
-    top: 84px;
-  }
-}
-
 div.left-topics-list {
   float: left;
   padding-left: 5px;
-  position: initial;
+  position: fixed;
+  top: 128px;
 
   div.left-topics-list-top{
     border-radius: 4px;
