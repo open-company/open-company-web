@@ -226,5 +226,7 @@
           ;; Filestack
           [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
           ;; Clean HTML input
-          [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]]})
+          [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
+          ;; Truncate html string
+          [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]]})
 
