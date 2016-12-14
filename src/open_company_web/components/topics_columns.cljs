@@ -115,7 +115,9 @@
         old-topics (:sections company-data)
         new-topics (conj old-topics new-topic)
         new-topic-kw (keyword new-topic)]
-    (om/set-state! owner :start-foce {:section new-topic-kw :title (:title section-data) :new (not (:was-archived section-data))})
+    (om/set-state! owner :start-foce {:section new-topic-kw
+                                      :title (:title section-data)
+                                      :new (not (:was-archived section-data))})
     (if (s/starts-with? new-topic "custom-")
       (api/patch-sections new-topics section-data new-topic)
       (api/patch-sections new-topics))))
@@ -166,7 +168,8 @@
         (utils/after 60 #(dis/dispatch! [:start-foce
                                           new-section
                                           (merge foce-section-data {:new (:new start-foce)
-                                                                    :body-placeholder (utils/new-section-body-placeholder)})])))
+                                                                    :body-placeholder (or (:body-placeholder start-foce)
+                                                                                          (utils/new-section-body-placeholder))})])))
       (om/set-state! owner :start-foce nil)))
 
   (render-state [_ {:keys [best-layout filtered-topics]}]
