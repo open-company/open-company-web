@@ -228,5 +228,7 @@
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; Truncate html string
-          [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]]})
+          [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]
+          ;; MediumEditorAutolist
+          [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]]})
 
