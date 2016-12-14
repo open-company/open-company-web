@@ -239,7 +239,6 @@
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))]
-    ;; PUT if we don't have an :updated-at in the topic data, PATCH else
     (if (utils/link-for (:links with-fixed-body) "partial-update" "PATCH")
       (api/partial-update-section topic with-fixed-body)
       (api/save-or-create-section with-fixed-body))
