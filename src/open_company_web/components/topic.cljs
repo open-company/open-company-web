@@ -25,6 +25,9 @@
     (dom/div #js {:className (str "topic-headline-inner group" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
+(defn html-text-exceeds-limit [html limit]
+  (> (count (.text (.html (js/$ "<div/>") html))) limit))
+
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
         section-data (om/get-props owner :topic-data)]
@@ -73,9 +76,12 @@
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           company-data        (dis/company-data)
           fixed-column        (js/parseInt column)
-          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update is-topic-view)
-                                 topic-body
-                                 (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))]
+          should-truncate-text (and (not (utils/is-test-env?))
+                                    is-dashboard
+                                    (html-text-exceeds-limit topic-body utils/topic-body-limit))
+          truncated-body      (if should-truncate-text
+                                 (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
+                                 topic-body)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
@@ -213,7 +219,8 @@
                              foce-data-editing?
                              show-editing
                              dashboard-selected-topics
-                             topic-flex-num] :as data} owner options]
+                             topic-flex-num
+                             read-only-company] :as data} owner options]
 
   (init-state [_]
     {:window-width (responsive/ww)})
@@ -256,7 +263,10 @@
                     :onClick #(when is-dashboard
                                (if (:dashboard-sharing data)
                                  (dis/dispatch! [:dashboard-select-topic section-kw])
-                                 (router/nav! (oc-urls/company-section slug section-kw))))
+                                 (when (or (not read-only-company)
+                                           (> (count (:revisions section-data)) 1)
+                                           (html-text-exceeds-limit (:body section-data) utils/topic-body-limit))
+                                  (router/nav! (oc-urls/company-section slug section-kw)))))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
@@ -269,7 +279,7 @@
                                 :currency currency
                                 :card-width card-width
                                 :foce-data-editing? foce-data-editing?
-                                :read-only-company (:read-only-company data)
+                                :read-only-company read-only-company
                                 :foce-key foce-key
                                 :foce-data foce-data
                                 :columns-num columns-num}
