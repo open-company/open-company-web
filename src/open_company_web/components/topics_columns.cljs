@@ -16,90 +16,8 @@
             [open-company-web.components.add-topic :refer (add-topic)]
             [open-company-web.components.bw-topics-list :refer (bw-topics-list)]))
 
-;; Calc best topics layout based on heights
-
-(def topic-default-height 70)
-(def data-topic-default-zero-height 74)
-(def data-topic-default-one-height 251)
-(def data-topic-default-more-height 357)
-
 (def topic-margins 20)
 (def mobile-topic-margins 3)
-
-(defn headline-body-height [headline body card-width]
-  (let [$headline (js/$ (str "<div class=\"topic\">"
-                                "<div>"
-                                  "<div class=\"topic-internal\">"
-                                    (when-not (clojure.string/blank? headline)
-                                      (str "<div class=\"topic-headline-inner\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
-                                             (utils/emojify headline true)
-                                           "</div>"))
-                                    "<div class=\"topic-body\" style=\"width: " (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px;\">"
-                                      (utils/emojify body true)
-                                    "</div>"
-                                  "</div>"
-                                "</div>"
-                              "</div>"))]
-    (.appendTo $headline (.-body js/document))
-    (let [height (.height $headline)]
-      (.detach $headline)
-      height)))
-
-(defn data-topic-height [owner topic topic-data]
-  (if (= topic :finances)
-    (cond
-      (= (count (:data topic-data)) 0)
-      data-topic-default-zero-height
-      (= (count (:data topic-data)) 1)
-      data-topic-default-one-height
-      (> (count (:data topic-data)) 1)
-      data-topic-default-more-height)
-    (let [data (:data topic-data)
-          selected-metric (or (om/get-props owner :selected-metric) (:slug (first (:metrics topic-data))))
-          metric-data (filter #(= (:slug %) selected-metric) data)]
-      (cond
-        (= (count metric-data) 0)
-        data-topic-default-zero-height
-        (= (count metric-data) 1)
-        data-topic-default-one-height
-        (> (count metric-data) 1)
-        data-topic-default-more-height))))
-
-(defn calc-column-height [owner data topics clmn]
-  (let [card-width (om/get-props owner :card-width)
-        topics-data (:topics-data data)]
-    (for [topic topics
-          :let [topic-kw (keyword topic)
-                topic-data (get topics-data topic-kw)
-                is-data-topic (#{:finances :growth} topic-kw)
-                topic-body (:body topic-data)]]
-      (cond
-        (#{:finances :growth} topic-kw)
-        (let [headline-height (headline-body-height (:headline topic-data) topic-body card-width)
-              start-height (data-topic-height owner topic topic-data)]
-          (+ start-height headline-height))
-        :else
-        (let [topic-image-height      (if (:image-url topic-data)
-                                        (utils/aspect-ration-image-height (:image-width topic-data) (:image-height topic-data) card-width)
-                                        0)
-              headline-body-height (headline-body-height (:headline topic-data) topic-body card-width)]
-          (+ topic-default-height headline-body-height topic-image-height))))))
-
-(defn get-shortest-column [owner data current-layout]
-  (let [columns-num (:columns-num data)
-        frst-clmn (apply + (calc-column-height owner data (:1 current-layout) 1))
-        scnd-clmn (apply + (calc-column-height owner data (:2 current-layout) 2))
-        thrd-clmn (apply + (calc-column-height owner data (:3 current-layout) 3))
-        min-height (if (= columns-num 3)
-                    (min frst-clmn scnd-clmn thrd-clmn)
-                    (min frst-clmn scnd-clmn))]
-    (cond
-      (= min-height frst-clmn)
-      :1
-      (= min-height scnd-clmn)
-      :2
-      (= min-height thrd-clmn)
-      :3)))
 
 (defn get-initial-layout [columns-num]
   (cond
@@ -117,9 +35,9 @@
     ; avoid to crash tests
     (utils/is-test-env?)
     (om/get-props owner :topics)
-    ; for mobile just layout the sections in :sections order
-    ; w/o caring about the height it might be
-    (responsive/is-mobile-size?)
+    ; just layout the sections in :sections order
+    ; in 2 columns
+    (= (om/get-props owner :columns-num) 2)
     (let [sections (:sections (:company-data data))]
       (loop [idx 0
              layout {:1 [] :2 []}]
@@ -130,23 +48,23 @@
                    (if (even? idx)
                       (assoc layout :1 (conj (:1 layout) topic))
                       (assoc layout :2 (conj (:2 layout) topic))))))))
-    ; on big web guess what the topic height will be and layout the topics in
-    ; the best order possible
-    :else
-    (let [columns-num (:columns-num data)
-          company-data (:company-data data)
-          topics-list (om/get-state owner :filtered-topics)
-          final-layout (loop [idx 0
-                              layout (get-initial-layout columns-num)]
-                          (let [shortest-column (get-shortest-column owner data layout)
-                                new-column (conj (get layout shortest-column) (get topics-list idx))
-                                new-layout (assoc layout shortest-column new-column)]
-                            (if (<= (inc idx) (count topics-list))
-                              (recur (inc idx)
-                                     new-layout)
-                              new-layout)))
-          clean-layout (apply merge (for [[k v] final-layout] {k (vec (remove nil? v))}))]
-      clean-layout)))
+    ; just layout the sections in :sections order
+    ; in 3 columns
+    (= (om/get-props owner :columns-num) 3)
+    (let [sections (:sections (:company-data data))]
+      (loop [idx 0
+             layout {:1 [] :2 [] :3 []}]
+        (if (= idx (count sections))
+          layout
+          (let [topic (get sections idx)]
+            (recur (inc idx)
+                   (cond
+                      (= (mod idx 3) 0)
+                      (assoc layout :1 (conj (:1 layout) topic))
+                      (= (mod idx 3) 1)
+                      (assoc layout :2 (conj (:2 layout) topic))
+                      (= (mod idx 3) 2)
+                      (assoc layout :3 (conj (:3 layout) topic))))))))))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
