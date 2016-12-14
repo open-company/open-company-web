@@ -73,7 +73,7 @@
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           company-data        (dis/company-data)
           fixed-column        (js/parseInt column)
-          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update)
+          truncated-body      (if (or (utils/is-test-env?) is-stakeholder-update is-topic-view)
                                  topic-body
                                  (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true})))]
       (dom/div #js {:className "topic-internal group"
@@ -190,7 +190,7 @@
                        (not is-mobile?))
                    (not (clojure.string/blank? truncated-body)))
           (dom/div {:class "group" :style #js {:position "relative"}}
-            (when (>= (count (.text (.html (js/$ "<div/>") (:body topic-data)))) utils/topic-body-limit)
+            (when (and is-dashboard (>= (count (.text (.html (js/$ "<div/>") (:body topic-data)))) utils/topic-body-limit))
               (dom/div {:class "search-result-card-container-fade"}))
             (dom/div #js {:className (utils/class-set {:topic-body true
                                                        :italic (:placeholder topic-data)})
