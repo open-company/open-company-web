@@ -492,6 +492,10 @@
       (utils/vec-dissoc (:dashboard-selected-topics db) section-kw)
       (conj (:dashboard-selected-topics db) section-kw))))
 
+(defmethod dispatcher/action :dashboard-select-all
+  [db [_ section-kw]]
+  (assoc db :dashboard-selected-topics (vec (map keyword (:sections (dispatcher/company-data db))))))
+
 (defmethod dispatcher/action :dashboard-share-mode
   [db [_ activate]]
   (-> db

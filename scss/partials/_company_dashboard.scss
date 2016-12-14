@@ -7,6 +7,12 @@ div.company-dashboard.editing-topic {
 div.company-dashboard {
   background-color: $oc_gray_8;
 
+  button.dashboard-sharing-select-all {
+    position: absolute;
+    right: 0px;
+    top: 101px;
+  }
+
   div.login-required {
     min-height: calc(100vh - #{$footer_height}px - 41px);
   }
