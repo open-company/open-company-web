@@ -263,7 +263,8 @@
                     :onClick #(when is-dashboard
                                (if (:dashboard-sharing data)
                                  (dis/dispatch! [:dashboard-select-topic section-kw])
-                                 (when (or (not read-only-company)
+                                 (when (or (responsive/is-mobile-size?)
+                                           (not read-only-company)
                                            (> (count (:revisions section-data)) 1)
                                            (html-text-exceeds-limit (:body section-data) utils/topic-body-limit))
                                   (router/nav! (oc-urls/company-section slug section-kw)))))
