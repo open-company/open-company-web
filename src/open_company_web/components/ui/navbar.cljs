@@ -23,12 +23,6 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
-(defn scroll-listener [e]
-  (let [body-scroll-top (gobj/get (.-body js/document) "scrollTop")]
-    (if (>= body-scroll-top 71)
-      (dommy/add-class! (sel1 [:body]) "fixed-navbar")
-      (dommy/remove-class! (sel1 [:body]) "fixed-navbar"))))
-
 (defn- share-new-tooltip []
   (if (utils/slack-share?)
     "Select topics to share by Slack, email or link."
@@ -55,11 +49,6 @@
                               is-dashboard] :as data} owner options]
 
   (did-mount [_]
-    (when-not (and (responsive/is-mobile-size?)
-                   (not su-navbar))
-      (scroll-listener nil)
-      (om/set-state! owner :scroll-listener
-        (events/listen js/window EventType/SCROLL scroll-listener)))
     (when-not (utils/is-test-env?)
       (when-not (and (responsive/is-tablet-or-mobile?)
                      (not su-navbar))
@@ -69,10 +58,6 @@
     (when (om/get-state owner :su-redirect)
       (router/nav! (oc-urls/stakeholder-update-preview))
       (om/set-state! owner :su-redirect nil)))
-
-  (will-unmount [_]
-    (when-let [scroll-listener (om/get-state owner :scroll-listener)]
-      (events/unlistenByKey scroll-listener)))
 
   (render [_]
     (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile

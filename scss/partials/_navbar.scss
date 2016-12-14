@@ -1,13 +1,5 @@
-body.fixed-navbar {
-  nav.oc-navbar{
-    position: fixed;
-    top: -71px;
-    left: 0;
-  }
-}
-
 nav.oc-navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
