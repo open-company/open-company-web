@@ -78,6 +78,10 @@
         {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
          :style {:font-size "15px"}
          :type "button"
+         :title "Add emoji"
+         :data-placement "top"
+         :data-container "body"
+         :data-toggle "tooltip"
          :on-mouse-down #(save-caret-position s)
          :on-click #(do
                       (.preventDefault %)
