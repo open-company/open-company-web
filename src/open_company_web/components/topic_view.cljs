@@ -65,7 +65,8 @@
           topic-view-width (responsive/topic-view-width card-width columns-num)
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get company-data section-kw)
-          revisions (:revisions-data topic-data)
+          is-custom-section (s/starts-with? (:section topic-data) "custom-")
+          revisions (if is-custom-section (vec (butlast (:revisions-data topic-data))) (:revisions-data topic-data))
           is-new-foce (and (= foce-key section-kw) (nil? (:updated-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:updated-at foce-data))))]
       (dom/div {:class (str "topic-view" (when (responsive/is-tablet-or-mobile?) " tablet-view"))
@@ -122,31 +123,28 @@
                                :foce-data foce-data
                                :show-editing false}
                                {:opts {:section-name selected-topic-view}})))
-          (when (or (nil? foce-data)
-                    (and (not (nil? foce-data))
-                         (not (:new foce-data))))
-            (for [idx (range (count revisions))
-                  :let [rev (get revisions idx)]]
-              (when rev
-                (dom/div {:class "revision-container group"}
-                  (when-not (and (= idx 0)
-                                 (or (responsive/is-tablet-or-mobile?)
-                                     (:read-only company-data)))
-                    (dom/hr {:class "separator-line"
-                             :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
-                  (om/build topic {:section selected-topic-view
-                                   :section-data rev
-                                   :card-width (- topic-card-width 60)
-                                   :is-stakeholder-update false
-                                   :read-only-company (:read-only company-data)
-                                   :currency (:currency company-data)
-                                   :is-topic-view true
-                                   :foce-data-editing? foce-data-editing?
-                                   :foce-key foce-key
-                                   :foce-data foce-data
-                                   :show-editing true}
-                                   {:opts {:section-name selected-topic-view}
-                                    :key (str "topic-"
-                                          (when foce-key
-                                            "foce-")
-                                          selected-topic-view "-" (:updated-at rev))}))))))))))
+          (for [idx (range (count revisions))
+                :let [rev (get revisions idx)]]
+            (when rev
+              (dom/div {:class "revision-container group"}
+                (when-not (and (= idx 0)
+                               (or (responsive/is-tablet-or-mobile?)
+                                   (:read-only company-data)))
+                  (dom/hr {:class "separator-line"
+                           :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
+                (om/build topic {:section selected-topic-view
+                                 :section-data rev
+                                 :card-width (- topic-card-width 60)
+                                 :is-stakeholder-update false
+                                 :read-only-company (:read-only company-data)
+                                 :currency (:currency company-data)
+                                 :is-topic-view true
+                                 :foce-data-editing? foce-data-editing?
+                                 :foce-key foce-key
+                                 :foce-data foce-data
+                                 :show-editing true}
+                                 {:opts {:section-name selected-topic-view}
+                                  :key (str "topic-"
+                                        (when foce-key
+                                          "foce-")
+                                        selected-topic-view "-" (:updated-at rev))})))))))))
