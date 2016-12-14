@@ -599,6 +599,7 @@
   {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
+   :extensions #js {:autolist (js/AutoList.)}
    :anchor #js {:customClassOption nil
                 :customClassOptionText "Button"
                 :linkValidation true
