@@ -8,7 +8,7 @@ div.left-topics-list {
     border-radius: 4px;
 
     &:hover {
-      background-color: rgba(78,90,107,0.1);
+      background-color: rgba(78,90,107,0.2);
     }
 
     .left-topics-list-top-title {
@@ -36,7 +36,7 @@ div.left-topics-list {
 
     &.read-only {
       div.left-topics-list-item:hover {
-        background-color: rgba(78,90,107,0.1);
+        background-color: rgba(78,90,107,0.2);
       }
     }
 
@@ -59,13 +59,13 @@ div.left-topics-list {
       }
 
       &.selected {
-        background-color: rgba(78,90,107,0.1);
+        background-color: rgba(78,90,107,0.2);
       }
 
       &.dnd {
 
         &:hover {
-          background-color: rgba(78,90,107,0.1);
+          background-color: rgba(78,90,107,0.2);
 
           &:after, &::after {
             font-size: 13px;

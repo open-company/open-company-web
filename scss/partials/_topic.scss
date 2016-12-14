@@ -58,10 +58,10 @@ div.topic {
     }
 
     &:hover {
-      border-top: 2px solid rgba(78,90,107,0.4);
-      border-bottom: 2px solid rgba(78,90,107,0.4);
-      border-left: 2px solid rgba(78,90,107,0.4);
-      border-right: 2px solid rgba(78,90,107,0.4);
+      border-top: 2px solid rgba(78,90,107,0.2);
+      border-bottom: 2px solid rgba(78,90,107,0.2);
+      border-left: 2px solid rgba(78,90,107,0.2);
+      border-right: 2px solid rgba(78,90,107,0.2);
     }
 
     &.dashboard-share-mode.dashboard-selected, &.dashboard-share-mode.dashboard-selected:hover {
