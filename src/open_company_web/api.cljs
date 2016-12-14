@@ -204,8 +204,8 @@
     (let [links (:links section-data)
           slug (router/current-company-slug)
           section (keyword (:section section-data))
-          section-data (apply dissoc section-data section-private-keys)
-          json-data (cljs->json section-data)
+          cleaned-section-data (apply dissoc section-data section-private-keys)
+          json-data (cljs->json cleaned-section-data)
           section-link (utils/link-for links "update" "PUT")]
       (api-put (:href section-link)
         { :json-params json-data
