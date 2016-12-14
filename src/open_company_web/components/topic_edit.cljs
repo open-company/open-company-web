@@ -60,7 +60,9 @@
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el)
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (dis/dispatch! [:foce-input {:body emojied-body}]))))
+      (dis/dispatch! [:foce-input {:body emojied-body}]))
+    (om/update-state! owner #(merge % {:char-count nil
+                                       :has-changes true}))))
 
 (defn- setup-body-editor [owner]
   (when-let* [section-kw   (dis/foce-section-key)
@@ -266,7 +268,7 @@
                                    (.offset topic-edit-div)
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
-                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 66)} "slow"))))))
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 88)} "slow"))))))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
