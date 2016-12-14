@@ -122,8 +122,9 @@
                                :foce-data foce-data
                                :show-editing false}
                                {:opts {:section-name selected-topic-view}})))
-          (when (and foce-data
-                     (not (:new foce-data)))
+          (when (or (nil? foce-data)
+                    (and (not (nil? foce-data))
+                         (not (:new foce-data))))
             (for [idx (range (count revisions))
                   :let [rev (get revisions idx)]]
               (when rev
