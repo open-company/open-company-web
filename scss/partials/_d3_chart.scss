@@ -25,6 +25,10 @@ div.composed-section {
     &.chart-sparklines {
       margin: 0;
       float: right;
+
+      @include big_web(){
+        margin-right: 30px;
+      }
     }
 
     svg {

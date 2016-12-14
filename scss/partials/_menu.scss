@@ -52,7 +52,7 @@ ul.menu {
       padding: 0px;
 
       @include mobile() {
-        font-size: 22px;
+        font-size: 21px;
         color: $oc_gray_7;
       }
     }

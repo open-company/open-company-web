@@ -89,24 +89,18 @@
     (vec (map #(merge % {:label (label-from-set % currency-symbol)
                          :sub-label (sub-label-from-set (:period %) sorted-data currency-symbol)}) sorted-data))))
 
-(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb editing?] :as data} owner]
+(defcomponent finances-sparklines [{:keys [finances-data currency archive-cb editing? card-width columns-num] :as data} owner]
 
   (init-state [_]
-    {:card-width (responsive/calc-card-width)
-     :chart-selected-idx (min 3 (dec (count finances-data)))
+    {:chart-selected-idx (min 3 (dec (count finances-data)))
      :fixed-sorted-metric (get-fixed-sorted-metric finances-data currency)})
 
   (will-receive-props [_ next-props]
     (when (not= finances-data (:finances-data next-props))
       (om/set-state! owner {:chart-selected-idx (min 3 (dec (count (:finances-data next-props))))
-                            :card-width (responsive/calc-card-width)
                             :fixed-sorted-metric (get-fixed-sorted-metric (:finances-data next-props) currency)})))
 
-  (did-mount [_]
-    (when-not (utils/is-test-env?)
-      (events/listen js/window EventType/RESIZE #(om/set-state! owner :card-width (responsive/calc-card-width)))))
-
-  (render-state [_ {:keys [card-width chart-selected-idx fixed-sorted-metric]}]
+  (render-state [_ {:keys [chart-selected-idx fixed-sorted-metric]}]
     (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
       (dom/div {:class "finances-sparklines-inner left group"}
         (let [sum-revenues (apply + (map utils/abs (map :revenue finances-data)))

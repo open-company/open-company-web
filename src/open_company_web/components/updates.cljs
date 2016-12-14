@@ -82,10 +82,10 @@
       (dom/div {:class "updates-inner group navbar-offset"}
         (dom/div {:class "updates-content group"
                   :style {:width total-width}}
-          (dom/div {:class "updates-content-list group right"
+          (dom/div {:class "updates-content-list group left"
                     :style {:width (str responsive/updates-content-list-width "px")}}
             (prior-updates false selected-su))
-          (dom/div {:class (str "updates-content-cards right" (when su-data " has-content"))
+          (dom/div {:class (str "updates-content-cards left" (when su-data " has-content"))
                     :style {:width (str fixed-card-width "px")}}
             (when (and selected-su
                        (not su-data))
@@ -123,10 +123,11 @@
 
   (render-state [_ {:keys [columns-num card-width]}]
     (let [company-data (dis/company-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)]
+          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          mobile-layout (<= (responsive/ww) responsive/updates-list-breakpoint)]
       (if-not (dis/stakeholder-update-list-data data)
         (dom/div {:class "oc-loading active"} (dom/i {:class "fa fa-circle-o-notch fa-spin"}))
-        (dom/div {:class "updates main-scroll group"}
+        (dom/div {:class (str "updates main-scroll group" (when mobile-layout " mobile-layout"))}
           (dom/div {:class "page"}
             (om/build navbar (merge data {:card-width card-width
                                           :columns-num columns-num
@@ -135,9 +136,10 @@
                                           :show-share-su-button (utils/can-edit-sections? company-data)
                                           :show-navigation-bar (utils/company-has-topics? company-data)
                                           :active :updates}))
-            (when (responsive/is-mobile-size?)
+            (when mobile-layout
               (oc-switch :updates))
-            (if (responsive/is-mobile-size?)
+            (if mobile-layout
               (prior-updates true nil)
-              (om/build updates (merge data {:total-width-int total-width-int}))))
+              (om/build updates (merge data {:total-width-int total-width-int
+                                             :mobile-layout mobile-layout}))))
           (om/build footer {:footer-width total-width-int}))))))

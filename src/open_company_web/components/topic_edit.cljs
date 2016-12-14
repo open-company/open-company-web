@@ -32,7 +32,7 @@
 (def headline-max-length 100)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
-(def body-max-length 500)
+(def body-max-length 1000)
 (def body-alert-limit 50)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
@@ -50,12 +50,12 @@
 
 (defn- force-hide-placeholder [owner]
   (let [editor       (om/get-state owner :body-editor)
-        section-name (name (om/get-props owner :section))
+        section-name (name (:section (dis/foce-section-data)))
         body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (utils/medium-editor-hide-placeholder editor body-el)))
 
 (defn body-on-change [owner]
-  (when-let* [section-kw   (keyword (om/get-props owner :section))
+  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
@@ -71,7 +71,7 @@
                                          :body-exceeds (neg? remaining-chars)})))))
 
 (defn- setup-edit [owner]
-  (when-let* [section-kw   (keyword (om/get-props owner :section))
+  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
@@ -181,6 +181,7 @@
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (dis/foce-section-key)]
                                (dis/dispatch! [:topic-archive section])
+                               (utils/after 1 (fn [] (router/nav! (oc-urls/company))))
                                (hide-popover nil "archive-topic-confirm"))}))
 
 (defn- add-image-tooltip [image-header]
@@ -214,6 +215,8 @@
               sections     (vec (:sections company-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
+          (when (:new topic-data)
+            (utils/after 1000 #(router/nav! (oc-urls/company))))
           (dis/dispatch! [:foce-save sections data-to-save]))))))
 
 (defn- data-editing-cb [owner value]
@@ -221,6 +224,7 @@
 
 (defcomponent topic-edit [{:keys [currency
                                   card-width
+                                  columns-num
                                   prev-rev
                                   next-rev] :as data} owner options]
 
@@ -239,13 +243,6 @@
        :file-upload-progress 0
        :body-exceeds false
        :headline-exceeds false}))
-
-  (will-receive-props [_ next-props]
-    ;; update body placeholder when receiving data from API
-    (let [topic        (dis/foce-section-key)
-          company-data (dis/company-data)
-          topic-data   (get company-data (keyword topic))]
-      (om/set-state! owner :body-placeholder (or (:body-placeholder topic-data) ""))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -266,8 +263,8 @@
       (setup-edit owner)
       (utils/after 100 #(focus-headline))
       (reset! prevent-route-dispatch true)
-      (let [win-location (.-location js/window)
-            current-token (oc-urls/company (router/current-company-slug))
+      (let [loc (.-location js/window)
+            current-token (str (.-pathname loc) (.-search loc) (.-hash loc))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                       (partial handle-navigate-event current-token owner))]
         (om/set-state! owner :history-listener-id listener))))
@@ -362,6 +359,8 @@
                                         :section section-kw
                                         :currency currency
                                         :editable? true
+                                        :card-width card-width
+                                        :columns-num columns-num
                                         :data-section-on-change #(om/set-state! owner :has-changes true)
                                         :foce-data-editing? (:foce-data-editing? data)
                                         :editing-cb (partial data-editing-cb owner)}
@@ -371,6 +370,8 @@
                                           :section section-kw
                                           :currency currency
                                           :editable? true
+                                          :card-width card-width
+                                          :columns-num columns-num
                                           :data-section-on-change #(om/set-state! owner :has-changes true)
                                           :foce-data-editing? (:foce-data-editing? data)
                                           :editing-cb (partial data-editing-cb owner)}
@@ -448,18 +449,6 @@
                            :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
                            :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
                 (dom/i {:class "fa fa-line-chart"})))
-
-            ;; Topic archive button
-            (when-not (:placeholder topic-data)
-              (dom/button {:class "btn-reset archive-button right"
-                           :title "Archive this topic"
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "top"
-                           :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-topic-click owner)}
-                  (dom/i {:class "fa fa-archive"})))
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
@@ -493,10 +482,24 @@
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress)
+                                         (not has-changes)
                                          (dis/foce-section-data-editing?))
                            :on-click #(save-topic owner)} "SAVE")
               (dom/button {:class "btn-reset btn-outline"
                            :disabled (dis/foce-section-data-editing?)
-                           :on-click #(if (:placeholder topic-data)
-                                        (dis/dispatch! [:topic-archive (name section)])
-                                        (dis/dispatch! [:start-foce nil]))} "CANCEL"))))))))
+                           :on-click #(if (:new topic-data)
+                                        (do
+                                          (dis/dispatch! [:topic-archive (name section)])
+                                          (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
+                                        (dis/dispatch! [:start-foce nil]))} "CANCEL")
+              ;; Topic archive button
+            (when-not (:new topic-data)
+              (dom/button {:class "btn-reset archive-button right"
+                           :title "Archive this topic"
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :style {:display (if (nil? file-upload-state) "block" "none")}
+                           :on-click (partial remove-topic-click owner)}
+                  (dom/i {:class "fa fa-archive"}))))))))))

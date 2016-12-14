@@ -13,6 +13,10 @@ nav.oc-navbar {
   width: 100%;
   background-color: white;
 
+  &.show-login-overlay {
+    height: 100vh !important;
+  }
+
   @include big_web(){
     height: #{$navbar_height}px;
   }

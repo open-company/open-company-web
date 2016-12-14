@@ -183,7 +183,6 @@
 ;; ===== Growth Data Editing Component =====
 
 (defcomponent growth-edit [{:keys [editing-cb
-                                   first-edit-tip-cb
                                    initial-focus
                                    new-metric?
                                    currency

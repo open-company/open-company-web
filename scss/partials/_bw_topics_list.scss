@@ -11,6 +11,12 @@ div.left-topics-list {
   position: initial;
 
   div.left-topics-list-top{
+    border-radius: 4px;
+
+    &:hover {
+      background-color: rgba(78,90,107,0.1);
+    }
+
     .left-topics-list-top-title {
       font-family: $oc_headers_font;
       font-size: 14px;
@@ -19,24 +25,48 @@ div.left-topics-list {
       color: $oc_gray_7;
       padding: 0 0 0 5px;
       margin: 0;
+      cursor: pointer;
+    }
+
+    button.left-topics-list-top-title {
+      width: 20px;
+      height: 20px;
+      font-size: 13px;
+      margin-right: 5px;
+      padding: 0;
     }
   }
 
   div.left-topics-list-items{
     cursor: pointer;
 
+    &.read-only {
+      div.left-topics-list-item:hover {
+        background-color: rgba(78,90,107,0.1);
+      }
+    }
+
     div.left-topics-list-item {
+      height: 21px;
+      padding: 0 5px 0 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      line-height: 1.5;
       font-size: 14px;
       font-family: $oc_headers_font;
       font-weight: normal;
       color: $oc_gray_7;
-      line-height: 1.5;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      border-radius:4px;
-      padding: 0 5px 0 5px;
-      cursor: pointer;
+
+      div.internal{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 125px;
+      }
+
+      &.selected {
+        background-color: rgba(78,90,107,0.1);
+      }
 
       &.dnd {
 
@@ -44,13 +74,15 @@ div.left-topics-list {
           background-color: rgba(78,90,107,0.1);
 
           &:after, &::after {
-            font-size: 14px;
+            font-size: 13px;
             font-family: FontAwesome;
-            float: right;
             font-weight: 400;
             color: $oc_gray_5;
             content: "\f0c9";
             cursor: move;
+            margin-top: -20px;
+            margin-left: 129px;
+            opacity: 0.7;
           }
         }
       }

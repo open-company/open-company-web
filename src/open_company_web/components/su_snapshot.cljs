@@ -137,7 +137,7 @@
           ;; SU Snapshot
           (when company-data
             (dom/div {:class "su-sp-content"
-                       :style {:width (str fixed-card-width "px")}}
+                      :style {:width (if (responsive/is-mobile-size?) "auto" (str fixed-card-width "px"))}}
 
               ;; Fullscreen topic
               (when selected-topic
