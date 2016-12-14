@@ -238,11 +238,12 @@
         topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
-        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))]
-    (if (utils/link-for (:links with-fixed-body) "partial-update" "PATCH")
-      (api/partial-update-section topic with-fixed-body)
-      (api/save-or-create-section with-fixed-body))
-    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) with-fixed-body)))
+        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
+        without-placeholder (dissoc with-fixed-body :placeholder)]
+    (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
+      (api/partial-update-section topic without-placeholder)
+      (api/save-or-create-section without-placeholder))
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) without-placeholder)))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
