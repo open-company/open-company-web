@@ -49,3 +49,5 @@ location.reload = function(){};
 var emojiAutocomplete = function(){};
 // cleanHTML
 var recursiveAttachPasteListener = function(){};
+// MediumEditorAutolist
+var AutoList = function(){};
