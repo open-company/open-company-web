@@ -1,0 +1,143 @@
+.js-tooltip {
+  position: fixed;
+  padding: .8em 1em;
+  top: 10px; /* Defines the spacing between tooltip and target position */
+  max-width: 200px;
+  color: #fff;
+  background: $oc_blue_dark;
+  font-family: $oc_main_font;
+  font-weight: 300;
+  border-radius: 2px;
+  text-shadow: -1px -1px 0 rgba(0,0,0,.2);
+  float: initial;
+  z-index: 999;
+}
+
+/* Arrow styles */
+.js-tooltip:after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  background: inherit;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.js-tooltip.top:after, .js-tooltip.top-left:after, .js-tooltip.top-right:after { bottom: 0; }
+.js-tooltip.bottom:after, .js-tooltip.bottom-left:after, .js-tooltip.bottom-right:after { top: 0; }
+.js-tooltip.top:after, .js-tooltip.bottom:after { left: 50%; }
+.js-tooltip.top-left:after, .js-tooltip.bottom-left:after { right: 15px; }
+.js-tooltip.top-right:after, .js-tooltip.bottom-right:after { left: 15px; }
+
+.js-tooltip.left:after, .js-tooltip.left-top:after, .js-tooltip.left-bottom:after { right: 0; }
+.js-tooltip.right:after, .js-tooltip.right-top:after, .js-tooltip.right-bottom:after { left: 0; }
+.js-tooltip.left:after, .js-tooltip.right:after { top: 50%; }
+.js-tooltip.left-top:after, .js-tooltip.right-top:after { bottom: 15px; }
+.js-tooltip.left-bottom:after, .js-tooltip.right-bottom:after { top: 15px; }
+
+/* Fade */
+.js-tooltip.fade { opacity: 0; transition: opacity 200ms ease-out; }
+.js-tooltip.fade.in { opacity: 1; transition-duration: 100ms; }
+
+/* Slide */
+.js-tooltip.slide {
+  opacity: 0;
+  transition: -webkit-transform 200ms ease-out;
+  transition: transform 200ms ease-out;
+  transition-property: -webkit-transform, opacity;
+  transition-property: transform, opacity;
+}
+.js-tooltip.slide.top,
+.js-tooltip.slide.top-left,
+.js-tooltip.slide.top-right {
+  -webkit-transform: translateY(15px);
+  transform: translateY(15px);
+}
+.js-tooltip.slide.bottom,
+.js-tooltip.slide.bottom-left,
+.js-tooltip.slide.bottom-right {
+  -webkit-transform: translateY(-15px);
+  transform: translateY(-15px);
+}
+.js-tooltip.slide.left,
+.js-tooltip.slide.left-top,
+.js-tooltip.slide.left-bottom {
+  -webkit-transform: translateX(15px);
+  transform: translateX(15px);
+}
+.js-tooltip.slide.right,
+.js-tooltip.slide.right-top,
+.js-tooltip.slide.right-bottom {
+  -webkit-transform: translateX(-15px);
+  transform: translateX(-15px);
+}
+.js-tooltip.slide.in {
+  opacity: 1;
+  -webkit-transform: none;
+  transform: none;
+  transition-duration: 100ms;
+}
+
+/* Grow */
+.js-tooltip.grow {
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  transition: -webkit-transform 200ms ease-out;
+  transition: transform 200ms ease-out;
+}
+.js-tooltip.grow.top {
+  -webkit-transform: translateY(60%) scale(0);
+  transform: translateY(60%) scale(0);
+}
+.js-tooltip.grow.top-left {
+  -webkit-transform: translateY(60%) translateX(40%) scale(0);
+  transform: translateY(60%) translateX(40%) scale(0);
+}
+.js-tooltip.grow.top-right {
+  -webkit-transform: translateY(60%) translateX(-40%) scale(0);
+  transform: translateY(60%) translateX(-40%) scale(0);
+}
+.js-tooltip.grow.bottom {
+  -webkit-transform: translateY(-60%) scale(0);
+  transform: translateY(-60%) scale(0);
+}
+.js-tooltip.grow.bottom-left {
+  -webkit-transform: translateY(-60%) translateX(40%) scale(0);
+  transform: translateY(-60%) translateX(40%) scale(0);
+}
+.js-tooltip.grow.bottom-right {
+  -webkit-transform: translateY(-60%) translateX(-40%) scale(0);
+  transform: translateY(-60%) translateX(-40%) scale(0);
+}
+.js-tooltip.grow.left {
+  -webkit-transform: translateX(53%) scale(0);
+  transform: translateX(53%) scale(0);
+}
+.js-tooltip.grow.left-top {
+  -webkit-transform: translateX(53%) translateY(40%) scale(0);
+  transform: translateX(53%) translateY(40%) scale(0);
+}
+.js-tooltip.grow.left-bottom {
+  -webkit-transform: translateX(53%) translateY(-40%) scale(0);
+  transform: translateX(53%) translateY(-40%) scale(0);
+}
+.js-tooltip.grow.right {
+  -webkit-transform: translateX(-53%) scale(0);
+  transform: translateX(-53%) scale(0);
+}
+.js-tooltip.grow.right-top {
+  -webkit-transform: translateX(-53%) translateY(40%) scale(0);
+  transform: translateX(-53%) translateY(40%) scale(0);
+}
+.js-tooltip.grow.right-bottom {
+  -webkit-transform: translateX(-53%) translateY(-40%) scale(0);
+  transform: translateX(-53%) translateY(-40%) scale(0);
+}
+.js-tooltip.grow.in {
+  -webkit-transform: none;
+  transform: none;
+  transition-duration: 100ms;
+}
