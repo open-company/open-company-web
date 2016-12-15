@@ -259,6 +259,9 @@
                                                  :dashboard-topic is-dashboard
                                                  :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
                                                  :dashboard-share-mode (:dashboard-sharing data)
+                                                 :selectable-topic (or (not read-only-company)
+                                                                       (and read-only-company
+                                                                            (> (count (:revisions section-data)) 1)))
                                                  :no-foce (and foce-active (not is-current-foce))})
                     :onClick #(when is-dashboard
                                (if (:dashboard-sharing data)
