@@ -200,6 +200,8 @@
    :body [:body
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
+          ;; Custom Tooltips
+          [:script {:type "text/javascript" :src "/lib/tooltip/tooltip.js"}]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
