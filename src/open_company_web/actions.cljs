@@ -99,7 +99,7 @@
 
 (defmethod dispatcher/action :section [db [_ {:keys [slug section body]}]]
   ;; Refresh section revisions
-  (utils/after 500 #(api/load-revisions slug section (utils/link-for (:links body) "revisions")))
+  (api/load-revisions slug section (utils/link-for (:links body) "revisions"))
   (if body
     (let [fixed-section (utils/fix-section body section)]
       (assoc-in db (dispatcher/company-section-key slug section) fixed-section))
