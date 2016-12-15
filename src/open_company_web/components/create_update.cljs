@@ -131,7 +131,9 @@
                                :data-toggle "tooltip"
                                :data-container "body"
                                :data-placement "left"
-                               :on-click #(router/nav! (oc-urls/company))} "CANCEL")
+                               :on-click #(do
+                                            (dis/dispatch! [:dashboard-share-mode false])
+                                            (router/nav! (oc-urls/company)))} "CANCEL")
                   (dom/button {:class "share btn-reset btn-solid"
                                :title (share-tooltip)
                                :data-toggle "tooltip"
@@ -140,7 +142,7 @@
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Arrange the topics in the order you’d like.")
+                  "Arrange your topics in any order.")
                 (dom/div {:class "create-update-topics-list"
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
