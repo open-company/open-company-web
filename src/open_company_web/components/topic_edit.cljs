@@ -143,6 +143,9 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
+(defn- dismiss-editing [section]
+  (dis/dispatch! [:rollback-add-topic (keyword section)]))
+
 (defn handle-navigate-event [current-token owner e]
     ;; only when the URL is changing
     (when-not (= (.-token e) current-token)
@@ -162,7 +165,9 @@
                       :success-cb #(do
                                     (hide-popover nil "leave-topic-confirm")
                                     ;; cancel any FoCE
-                                    (dis/dispatch! [:start-foce nil])
+                                    (if (:new (dis/foce-section-data))
+                                      (dismiss-editing (dis/foce-section-key))
+                                      (dis/dispatch! [:start-foce nil]))
                                     ;; Dispatch the current url
                                     (@router/route-dispatcher (router/get-token)))})
         
@@ -240,6 +245,12 @@
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
+      ; if adding a :new topic or a topic that was archived
+      ; restore the previous app-state when leaving the view
+      (when (and (dis/foce-section-key)
+                 (or (:new (dis/foce-section-data))
+                     (:was-archvied (dis/foce-section-data))))
+        (dis/dispatch! [:rollback-add-topic (dis/foce-section-key)]))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
@@ -295,7 +306,6 @@
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url
                            headline-exceeds has-changes]}]
-
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
           section-kw          (keyword section)
@@ -490,8 +500,8 @@
                            :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:new topic-data)
                                         (do
-                                          (dis/dispatch! [:topic-archive (name section)])
-                                          (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
+                                          (dismiss-editing section)
+                                          (router/nav! (oc-urls/company)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
             (when-not (:new topic-data)
