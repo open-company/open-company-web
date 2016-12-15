@@ -19,6 +19,7 @@
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
+            [open-company-web.lib.tooltip :as t]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -50,7 +51,10 @@
     (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
                                                                                          :card-width (if (responsive/is-mobile-size?)
                                                                                                        (responsive/mobile-dashboard-card-width)
-                                                                                                       (responsive/calc-card-width))})))))
+                                                                                                       (responsive/calc-card-width))}))))
+    (utils/after 1000
+      #(let [tip (t/tooltip "Hello there!" (.querySelector js/document "span.company-name") "left-bottom")]
+         (t/show tip))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
