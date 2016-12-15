@@ -126,7 +126,7 @@
                            :data-placement "top"
                            :data-container "body"
                            :data-toggle "tooltip"
-                           :title "History"
+                           :title "This topic has prior history"
                            :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))}
                 (dom/i {:class "fa fa-history"}))))
           (when (and show-editing
@@ -260,6 +260,7 @@
                                                  :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
                                                  :dashboard-share-mode (:dashboard-sharing data)
                                                  :selectable-topic (or (not read-only-company)
+                                                                       (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)
                                                                        (and read-only-company
                                                                             (> (count (:revisions section-data)) 1)))
                                                  :no-foce (and foce-active (not is-current-foce))})
