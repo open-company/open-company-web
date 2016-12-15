@@ -188,18 +188,24 @@
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
         (dissoc :loading)))))
 
+(defn start-foce [db section section-data]
+  (-> db
+    (assoc :foce-key (keyword section)) ; which topic is being FoCE
+    (assoc :foce-data section-data)     ; map of the in progress edits of the topic data
+    (assoc :foce-data-editing? false)   ; is the data portion of the topic (e.g. finance, growth) being edited
+    (dissoc :show-add-topic)))          ; remove the add topic view)
+
+(defn stop-foce [db]
+  (-> db
+    (dissoc :foce-key)
+    (dissoc :foce-data)
+    (dissoc :foce-data-editing?)))
+
 ;; Front of Card Edit section
 (defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
   (if section-key
-    (-> db
-        (assoc :foce-key section-key) ; which topic is being FoCE
-        (assoc :foce-data section-data) ; map of the in progress edits of the topic data
-        (assoc :foce-data-editing? false) ; is the data portion of the topic (e.g. finance, growth) being edited
-        (dissoc :show-add-topic)) ; remove the add topic view
-    (-> db
-        (dissoc :foce-key)
-        (dissoc :foce-data)
-        (dissoc :foce-data-editing?))))
+    (start-foce db section-key section-data)
+    (stop-foce db)))
 
 (defmethod dispatcher/action :start-foce-data-editing [db [_ value]]
   (assoc db :foce-data-editing? value))
@@ -502,3 +508,39 @@
   (-> db
     (assoc :dashboard-sharing activate)
     (assoc :dashboard-selected-topics [])))
+
+(defmethod dispatcher/action :add-topic
+  [db [_ topic topic-data]]
+  (let [company-data-key (dispatcher/company-data-key (router/current-company-slug))
+        company-data (get-in db company-data-key)
+        archived-topics (:archived company-data)
+        updated-archived (if (:was-archived topic-data)
+                            (vec (filter #(not= (:section %) (name topic)) archived-topics))
+                            archived-topics)
+        updated-sections (conj (:sections company-data) (name topic))
+        updated-company-data (-> company-data
+                                (assoc :sections updated-sections)
+                                (assoc :archived updated-archived)
+                                (assoc (keyword topic) topic-data))]
+    (-> db
+      (assoc-in company-data-key updated-company-data)
+      (start-foce topic topic-data))))
+
+(defmethod dispatcher/action :rollback-add-topic
+  [db [_ topic-kw]]
+  (let [company-data-key (dispatcher/company-data-key (router/current-company-slug))
+        company-data (get-in db (dispatcher/company-data-key (router/current-company-slug)))
+        topic-data (get company-data topic-kw)
+        archived-topics (:archived company-data)
+        updated-archived (if (:was-archived topic-data)
+                            (conj archived-topics {:section (name topic-kw)
+                                                   :title (:title topic-data)})
+                            archived-topics)
+        updated-sections (utils/vec-dissoc (:sections company-data) (name topic-kw))
+        updated-company-data (-> company-data
+                                (dissoc topic-kw)
+                                (assoc :sections updated-sections)
+                                (assoc :archived updated-archived))]
+    (-> db
+      (assoc-in company-data-key updated-company-data)
+      (stop-foce))))
