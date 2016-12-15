@@ -51,3 +51,5 @@ var emojiAutocomplete = function(){};
 var recursiveAttachPasteListener = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
+// Tooltip http://darsa.in/tooltip/
+var Tooltip = function(){};
