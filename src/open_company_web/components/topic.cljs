@@ -126,8 +126,7 @@
                            :data-placement "top"
                            :data-container "body"
                            :data-toggle "tooltip"
-                           :title "This topic has prior history"
-                           :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))}
+                           :title "This topic has prior history"}
                 (dom/i {:class "fa fa-history"}))))
           (when (and show-editing
                      (not is-stakeholder-update)
