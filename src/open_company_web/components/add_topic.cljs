@@ -24,6 +24,8 @@
             (select-keys [:title :section :body-placeholder]))))))
 
 (defn get-categories []
+  "Return the categories of the new available sections divided in columns and sorted by the
+   specified order."
   (when-let* [slug       (keyword (router/current-company-slug))
               categories (:new-sections-categories (slug @caches/new-sections))
               all-categories (vec (map :column categories))]
@@ -54,121 +56,58 @@
                                         :placeholder true}]
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
-(rum/defcs add-topic < (drv/drv :company-data)
-                       rum/static
-                       rum/reactive
-  [s update-active-topics-cb]
-  (let [company-data (drv/react s :company-data)
-        active-topics (vec (map keyword (:sections company-data)))
-        archived-topics (:archived company-data)
-        all-sections (into {} (for [s (get-all-sections)]
+(rum/defcs category < rum/static
+                      rum/reactive
+                      (drv/drv :company-data)
+  [s cat update-active-topics-cb]
+  (let [all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
-        categories (get-categories)
+        company-data (drv/react s :company-data)
+        archived-topics (:archived company-data)
         show-archived (pos? (count archived-topics))]
+    [:div
+      [:span.block.mb1.mt2.all-caps
+        {:style {:marginTop (if (clojure.string/blank? (:name cat)) "28px" "0px")}}
+        (str (:name cat) (when (:icon cat) " "))
+        (when (:icon cat)
+          [:i.fa {:class (:icon cat)}])]
+      (for [sec (:sections cat)
+            :let [section-data (get all-sections (keyword sec))
+                  archived? (some #(= (:section %) sec) archived-topics)
+                  disabled? (or (utils/in? (:sections company-data) sec)
+                                (utils/in? archived-topics sec))]]
+        [:div.mb1.btn-reset.yellow-line-hover-child
+          {:key (:section section-data)
+           :class (when disabled? "disabled")
+           :on-click #(when-not disabled?
+                       (update-active-topics-cb (:section section-data) {:title (:title section-data)
+                                                                         :section (:section section-data)
+                                                                         :placeholder true
+                                                                         :body-placeholder (:body-placeholder section-data)
+                                                                         :was-archived archived?}))}
+          [:span.child.topic-title
+            (:title section-data)
+            (when archived? " ")
+            (when archived?
+              [:i.fa.fa-archive
+                {:data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container ".add-topic"
+                 :title "Archived topic"}])]])]))
+
+(rum/defc add-topic < rum/static
+  [update-active-topics-cb]
+  (let [categories (get-categories)]
       [:div.add-topic.group
        [:span.dimmed-gray.btn-reset.right
          {:on-click #(dis/dispatch! [:show-add-topic false])}
          (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]
        [:div.mxn2.clearfix
         ;; column 1
-        [:div.col.px2.col-4
-          (for [cat (:1 categories)]
-            [:div
-              {:key (str "col-" (:name cat))}
-              [:span.block.mb1.mt2.all-caps
-                {:style {:marginTop (if (clojure.string/blank? (:name cat)) "28px" "0px")}}
-                (str (:name cat) (when (:icon cat) " "))
-                (when (:icon cat)
-                  [:i.fa {:class (:icon cat)}])]
-              (for [sec (:sections cat)
-                    :let [section-data (get all-sections (keyword sec))
-                          archived? (some #(= (:section %) sec) archived-topics)
-                          disabled? (or (utils/in? (:sections company-data) sec)
-                                        (utils/in? (:archived company-data) sec))]]
-                [:div.mb1.btn-reset.yellow-line-hover-child
-                  {:key (:section section-data)
-                   :class (when disabled? "disabled")
-                   :on-click #(when-not disabled?
-                               (update-active-topics-cb (:section section-data) {:title (:title section-data)
-                                                                                 :section (:section section-data)
-                                                                                 :placeholder true
-                                                                                 :body-placeholder (:body-placeholder section-data)
-                                                                                 :was-archived archived?}))}
-                  [:span.child.topic-title
-                    (:title section-data)
-                    (when archived? " ")
-                    (when archived?
-                      [:i.fa.fa-archive
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container ".add-topic"
-                         :title "Archived topic"}])]])])]
-        ;; column 2
-        [:div.col.px2.col-4
-          (for [cat (:2 categories)]
-            [:div
-              {:key (str "col-" (:name cat))}
-              [:span.block.mb1.mt2.all-caps
-                {:style {:marginTop (if (clojure.string/blank? (:name cat)) "28px" "0px")}}
-                (str (:name cat) (when (:icon cat) " "))
-                (when (:icon cat)
-                  [:i.fa {:class (:icon cat)}])]
-              (for [sec (:sections cat)
-                    :let [section-data (get all-sections (keyword sec))
-                          archived? (some #(= (:section %) sec) archived-topics)
-                          disabled? (or (utils/in? (:sections company-data) sec)
-                                        (utils/in? (:archived company-data) sec))]]
-                [:div.mb1.btn-reset.yellow-line-hover-child
-                  {:key (:section section-data)
-                   :class (when disabled? "disabled")
-                   :on-click #(when-not disabled?
-                               (update-active-topics-cb (:section section-data) {:title (:title section-data)
-                                                                                 :section (:section section-data)
-                                                                                 :placeholder true
-                                                                                 :body-placeholder (:body-placeholder section-data)
-                                                                                 :was-archived archived?}))}
-                  [:span.child.topic-title
-                    (:title section-data)
-                    (when archived? " ")
-                    (when archived?
-                      [:i.fa.fa-archive
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container ".add-topic"
-                         :title "Archived topic"}])]])])]
-        ;; column 3 - archived only
-        [:div.col.col-4.px2
-          {:key "col-3"
-           :style {:margin-top "-16px"}}
-          (for [cat (:3 categories)]
-            [:div
-              {:key (str "col-" (:name cat))}
-              [:span.block.mb1.mt2.all-caps
-                {:style {:marginTop (if (clojure.string/blank? (:name cat)) "28px" "0px")}}
-                (str (:name cat) (when (:icon cat) " "))
-                (when (:icon cat)
-                  [:i.fa {:class (:icon cat)}])]
-              (for [sec (:sections cat)
-                    :let [section-data (get all-sections (keyword sec))
-                          archived? (some #(= (:section %) sec) archived-topics)
-                          disabled? (or (utils/in? (:sections company-data) sec)
-                                        (utils/in? (:archived company-data) sec))]]
-                [:div.mb1.btn-reset.yellow-line-hover-child
-                  {:key (:section section-data)
-                   :class (when disabled? "disabled")
-                   :on-click #(when-not disabled?
-                               (update-active-topics-cb (:section section-data) {:title (:title section-data)
-                                                                                 :section (:section section-data)
-                                                                                 :placeholder true
-                                                                                 :body-placeholder (:body-placeholder section-data)
-                                                                                 :was-archived archived?}))}
-                  [:span.child.topic-title
-                    (:title section-data)
-                    (when archived? " ")
-                    (when archived?
-                      [:i.fa.fa-archive
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container ".add-topic"
-                         :title "Archived topic"}])]])])]]
+        (for [column (keys categories)]
+          [:div.col.px2.col-4
+            {:key (str "add-topic-col-" (name column))}
+            (for [cat (get categories column)]
+              (rum/with-key (category cat update-active-topics-cb)
+                            (str "col-" (:name cat))))])]
        (custom-topic-input #(update-active-topics-cb %1 %2))]))
