@@ -54,8 +54,8 @@
 
 (defn- share-tooltip []
   (if (utils/slack-share?)
-    "Share this update by Slack, email or link."
-    "Share this update by email or link."))
+    "Share this update by Slack, email or link"
+    "Share this update by email or link"))
 
 (defcomponent create-update [data owner]
 
@@ -127,7 +127,7 @@
                         :style {:width (str responsive/updates-content-list-width "px")}}
                 (dom/div {:class "create-update-content-buttons group"}
                   (dom/button {:class "btn-reset btn-outline cancel"
-                               :title "Back to Dashboard."
+                               :title "Back to dashboard"
                                :data-toggle "tooltip"
                                :data-container "body"
                                :data-placement "left"
