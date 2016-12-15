@@ -132,9 +132,6 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
-    (when-not (utils/is-test-env?)
-      ;; make sure when topic-list component is initialized that there is no foce active
-      (dispatcher/dispatch! [:start-foce nil]))
     (get-state owner data nil))
 
   (did-mount [_]
