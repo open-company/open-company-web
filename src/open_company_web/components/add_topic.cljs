@@ -21,7 +21,7 @@
       (for [sec (:new-sections (get @caches/new-sections slug))]
         (-> sec
             (assoc :section (:section-name sec))
-            (select-keys [:title :section :body-placeholder]))))))
+            (select-keys [:title :section :body-placeholder :links]))))))
 
 (defn get-categories []
   "Return the categories of the new available sections divided in columns and sorted by the
@@ -84,6 +84,7 @@
                                                                          :section (:section section-data)
                                                                          :placeholder true
                                                                          :body-placeholder (:body-placeholder section-data)
+                                                                         :links (:links section-data)
                                                                          :was-archived archived?}))}
           [:span.child.topic-title
             (:title section-data)
