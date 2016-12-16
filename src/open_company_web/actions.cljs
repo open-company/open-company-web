@@ -249,7 +249,9 @@
     (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
       (api/partial-update-section topic without-placeholder)
       (api/save-or-create-section without-placeholder))
-    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) without-placeholder)))
+    (-> db
+      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) without-placeholder)
+      (stop-foce))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
