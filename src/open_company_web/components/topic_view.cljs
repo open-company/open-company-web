@@ -66,7 +66,7 @@
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get company-data section-kw)
           is-custom-section (s/starts-with? (:section topic-data) "custom-")
-          revisions (if is-custom-section (vec (butlast (:revisions-data topic-data))) (:revisions-data topic-data))
+          revisions (:revisions-data topic-data)
           is-new-foce (and (= foce-key section-kw) (nil? (:updated-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:updated-at foce-data))))]
       (dom/div {:class (str "topic-view" (when (responsive/is-tablet-or-mobile?) " tablet-view"))
