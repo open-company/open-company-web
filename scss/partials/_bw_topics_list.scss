@@ -44,12 +44,14 @@ div.left-topics-list {
       height: 21px;
       padding: 0 5px 0 5px;
       border-radius: 4px;
-      cursor: pointer;
       line-height: 1.5;
       font-size: 14px;
       font-family: $oc_headers_font;
       font-weight: normal;
       color: $oc_gray_7;
+      cursor: default;
+
+      @include no-user-select();
 
       div.internal{
         white-space: nowrap;
@@ -62,22 +64,25 @@ div.left-topics-list {
         background-color: rgba(78,90,107,0.2);
       }
 
-      &.dnd {
+      &.highlight-on-hover {
+        cursor: pointer;
 
         &:hover {
           background-color: rgba(78,90,107,0.2);
+        }
+      }
 
-          &:after, &::after {
-            font-size: 13px;
-            font-family: FontAwesome;
-            font-weight: 400;
-            color: $oc_gray_5;
-            content: "\f0c9";
-            cursor: move;
-            margin-top: -20px;
-            margin-left: 129px;
-            opacity: 0.7;
-          }
+      &.dnd:hover {
+        &:after, &::after {
+          font-size: 13px;
+          font-family: FontAwesome;
+          font-weight: 400;
+          color: $oc_gray_5;
+          content: "\f0c9";
+          cursor: move;
+          margin-top: -20px;
+          margin-left: 129px;
+          opacity: 0.7;
         }
       }
     }

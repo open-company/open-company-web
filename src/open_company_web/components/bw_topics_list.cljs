@@ -35,11 +35,18 @@
                       :axis "y"})
       (.disableSelection))))
 
-(defn can-dnd? []
-  (not (:read-only (dis/company-data))))
+(defn destroy-sortable
+  "Destry the sortable to make sure the user doesn't DnD while looking a topic or adding a topic"
+  []
+  (.sortable (js/jQuery "div.left-topics-list-items") "destroy"))
 
-(defn get-topics [owner]
-  (let [company-data (om/get-props owner :company-data)]
+(defn can-dnd? [data]
+  (and (not (:read-only (:company-data data)))
+       (nil? (:show-add-topic data))
+       (nil? (:selected-topic-view data))))
+
+(defn get-topics [data]
+  (let [company-data (:company-data data)]
     (if (:read-only company-data)
       (utils/filter-placeholder-sections (:sections company-data) company-data)
       (:sections company-data))))
@@ -47,22 +54,24 @@
 (defcomponent bw-topics-list [{:keys [company-data card-width selected-topic-view show-add-topic] :as data} owner options]
 
   (init-state [_]
-    {:topics (get-topics owner)})
+    {:topics (get-topics data)})
 
   (did-mount [_]
-    (when (can-dnd?)
+    (when (can-dnd? data)
       (setup-sortable owner)))
 
-  (did-update [_ _ _]
-    (om/set-state! owner :topics (get-topics owner))
-    (when (can-dnd?)
+  (will-update [_ next-props _]
+    (om/set-state! owner :topics (get-topics next-props))
+    (when (and (can-dnd? data) (not (can-dnd? next-props)))
+      (destroy-sortable))
+    (when (and (not (can-dnd? data)) (can-dnd? next-props))
       (setup-sortable owner)))
 
   (render-state [_ {:keys [topics]}]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
         (dom/h3 {:class "left-topics-list-top-title left"
-                 :on-click #(do
+                 :on-click #(when (nil? (:foce-key data))
                               (dis/dispatch! [:show-add-topic false])
                               (router/nav! (oc-urls/company)))} "TOPICS")
         (when (and (not show-add-topic)
@@ -78,13 +87,15 @@
         (for [topic topics
               :let [sd (->> topic keyword (get company-data))]]
           (dom/div {:class (utils/class-set {:left-topics-list-item true
-                                             :dnd (can-dnd?)
+                                             :dnd (can-dnd? data)
+                                             :highlight-on-hover (nil? (:foce-key data))
                                              :group true
                                              :selected (= selected-topic-view topic)})
                     :style {:width (str (- responsive/left-topics-list-width 5) "px")}
                     :data-topic (name topic)
                     :key (str "bw-topic-list-" (name topic))
-                    :on-click #(router/nav! (oc-urls/company-section (router/current-company-slug) (name topic)))}
+                    :on-click #(when (nil? (:foce-key data))
+                                (router/nav! (oc-urls/company-section (router/current-company-slug) (name topic))))}
             (dom/div {:class "internal"
                       :key (str "bw-topic-list-" (name topic) "-internal")}
               (:title sd))))))))
