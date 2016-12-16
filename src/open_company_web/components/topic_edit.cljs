@@ -191,6 +191,11 @@
     "Add an image"
     "Replace image"))
 
+(defn remove-navigation-listener [owner]
+  (when (om/get-state owner :history-listener-id)
+    (events/unlistenByKey (om/get-state owner :history-listener-id))
+    (om/set-state! owner :history-listener-id nil)))
+
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
         body-el         (js/$ (str "#foce-body-" (name topic)))
@@ -205,6 +210,7 @@
       ;; body and headline have the right number of chars, moving on with save
       :else
       (do
+        (remove-navigation-listener owner)
         (utils/remove-ending-empty-paragraph body-el)
         (let [topic-data   (dis/foce-section-data)
               company-data (dis/company-data)
@@ -215,9 +221,7 @@
           ; go back to dashbaord if it's a brand new topic
           (when (:new topic-data)
             (reset! prevent-route-dispatch false)
-            (utils/after 10 #(router/nav! (oc-urls/company))))
-          ; dismissing foce
-          (utils/after 100 #(dis/dispatch! [:start-foce nil])))))))
+            (router/nav! (oc-urls/company))))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
@@ -256,9 +260,7 @@
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
-      (when (om/get-state owner :history-listener-id)
-        (events/unlistenByKey (om/get-state owner :history-listener-id))
-        (om/set-state! owner :history-listener-id nil))))
+      (remove-navigation-listener owner)))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
