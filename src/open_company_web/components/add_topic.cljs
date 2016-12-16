@@ -35,7 +35,7 @@
 
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
-  [s submit-fn]
+  [s custom-topic-data submit-fn]
   (let [add-disabled (clojure.string/blank? @(::topic-title s))]
     [:div.mt1.flex
      [:input.npt.mr1.p1.flex-auto.custom-topic-input
@@ -49,20 +49,20 @@
       {:class (str "btn-reset" (if add-disabled " btn-outline" " btn-solid"))
        :disabled add-disabled
        :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
+                        link           (utils/link-for (:links custom-topic-data) "create")
                         new-topic-data {:title @(::topic-title s)
                                         :section topic-name
                                         :was-archived false
-                                        :body-placeholder (utils/new-section-body-placeholder)
+                                        :body-placeholder (:body-placeholder custom-topic-data)
+                                        :links [(assoc link :href (clojure.string/replace (:href link) "custom-{4-char-UUID}" topic-name))]
                                         :placeholder true}]
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (rum/defcs category < rum/static
                       rum/reactive
                       (drv/drv :company-data)
-  [s cat update-active-topics-cb]
-  (let [all-sections (into {} (for [s (get-all-sections)]
-                                [(keyword (:section s)) s]))
-        company-data (drv/react s :company-data)
+  [s cat update-active-topics-cb all-sections]
+  (let [company-data (drv/react s :company-data)
         archived-topics (:archived company-data)
         show-archived (pos? (count archived-topics))]
     [:div
@@ -98,7 +98,9 @@
 
 (rum/defc add-topic < rum/static
   [update-active-topics-cb]
-  (let [categories (get-categories)]
+  (let [all-sections (into {} (for [s (get-all-sections)]
+                                [(keyword (:section s)) s]))
+        categories (get-categories)]
       [:div.add-topic.group
        [:span.dimmed-gray.btn-reset.right
          {:on-click #(dis/dispatch! [:show-add-topic false])}
@@ -109,6 +111,6 @@
           [:div.col.px2.col-4
             {:key (str "add-topic-col-" (name column))}
             (for [cat (get categories column)]
-              (rum/with-key (category cat update-active-topics-cb)
+              (rum/with-key (category cat update-active-topics-cb all-sections)
                             (str "col-" (:name cat))))])]
-       (custom-topic-input #(update-active-topics-cb %1 %2))]))
+       (custom-topic-input (get all-sections (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))
