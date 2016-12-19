@@ -99,9 +99,6 @@
                                   :dashboard-sharing (:dashboard-sharing data)
                                   :show-navigation-bar (utils/company-has-topics? company-data)
                                   :is-dashboard (nil? (:selected-topic-view data))}))
-              (when (:dashboard-sharing data)
-                (dom/button {:class "btn-reset btn-link dashboard-sharing-select-all"
-                             :on-click #(dis/dispatch! [:dashboard-select-all])} "Select all"))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
                   (dom/h3 {:class "empty-dashboard-title"}

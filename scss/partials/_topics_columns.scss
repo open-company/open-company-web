@@ -47,6 +47,15 @@ div.topics-columns {
   div.topics-column-container {
     padding: 40px 20px;
     margin: 0 auto;
+    position: relative;
+
+    button.dashboard-sharing-select-all {
+      position: absolute;
+      right: 25px;
+      top: 7px;
+      margin-rigth: 0px;
+      padding-right: 0px;
+    }
 
     div.topics-column {
       margin-right: 0px;
