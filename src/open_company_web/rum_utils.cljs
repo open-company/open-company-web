@@ -4,8 +4,8 @@
             [om.core :as om :include-macros true]
             [om-tools.dom :as dom :include-macros true]))
 
-(let [get-k ":org.martinklepsch.derivatives/get"
-      release-k ":org.martinklepsch.derivatives/release"]
+(let [get-k "org.martinklepsch.derivatives/get"
+      release-k "org.martinklepsch.derivatives/release"]
   (defn om-derivatives [mngr]
     (->> {:childContextTypes {get-k js/React.PropTypes.func
                               release-k js/React.PropTypes.func}
