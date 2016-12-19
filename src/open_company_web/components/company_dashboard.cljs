@@ -52,9 +52,12 @@
                                                                                          :card-width (if (responsive/is-mobile-size?)
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
-    (utils/after 1000
-      #(when-let [tip (t/tooltip "Hello there!" (.querySelector js/document "span.company-name") {:place "left-bottom"})]
-         (t/show tip))))
+    (utils/after 3000
+      #(let [tip (t/tooltip (.querySelector js/document "span.company-name") {:config {:place "left-bottom"}
+                                                                              :id "hello-there"
+                                                                              :desktop "Hello there desktop user!"
+                                                                              :mobile "Hello there mobile user!"})]
+         (t/show "hello-there"))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
