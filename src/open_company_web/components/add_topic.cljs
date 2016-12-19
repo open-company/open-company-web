@@ -6,7 +6,8 @@
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
             [open-company-web.caches :as caches]
-            [open-company-web.components.ui.icon :as i]))
+            [open-company-web.components.ui.icon :as i]
+            [open-company-web.lib.tooltip :as t]))
 
 ;; This should be defined as a derivative specifically suited to rendering the
 ;; topic adding component
@@ -57,12 +58,9 @@
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (rum/defcs category < rum/static
-                      rum/reactive
-                      (drv/drv :company-data)
-  [s cat update-active-topics-cb]
+  [s cat company-data update-active-topics-cb]
   (let [all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
-        company-data (drv/react s :company-data)
         archived-topics (:archived company-data)
         show-archived (pos? (count archived-topics))]
     [:div
@@ -95,10 +93,33 @@
                  :data-container ".add-topic"
                  :title "Archived topic"}])]])]))
 
-(rum/defc add-topic < rum/static
-  [update-active-topics-cb]
-  (let [categories (get-categories)]
+(rum/defcs add-topic < rum/static
+                       rum/reactive
+                       (drv/drv :company-data)
+                       {:did-mount (fn [s]
+                                    (let [rum-comp (:rum/react-component s)
+                                          dom-node (js/ReactDOM.findDOMNode rum-comp)]
+                                      (when (and (= (count (:archived @(drv/get-ref s :company-data))) 0)
+                                                 (= (count (:sections @(drv/get-ref s :company-data))) 0))
+                                        (t/tooltip dom-node {:config {:place "right-bottom"}
+                                                             :id "first-add-topic"
+                                                             :persistent true
+                                                             :desktop "First, choose a topic you’d like to say something about."})
+                                        (t/show "first-add-topic")))
+                                    s)
+                       :will-unmount (fn [s]
+                                      (t/hide "first-add-topic")
+                                      s)}
+  [s update-active-topics-cb]
+  (let [company-data @(drv/get-ref s :company-data)
+        categories (get-categories)]
       [:div.add-topic.group
+       [:div.gray5.mb2.open-sans
+         {:style {:font-weight "600" :font-size "14px"}}
+         (if (and (= (count (:sections (drv/react s :company-data))) 0)
+                  (= (count (:sections (drv/react s :company-data))) 0))
+           "Choose a topic to get started"
+           "Add topic")]
        [:span.dimmed-gray.btn-reset.right
          {:on-click #(dis/dispatch! [:show-add-topic false])}
          (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]
@@ -108,6 +129,6 @@
           [:div.col.px2.col-4
             {:key (str "add-topic-col-" (name column))}
             (for [cat (get categories column)]
-              (rum/with-key (category cat update-active-topics-cb)
+              (rum/with-key (category cat company-data update-active-topics-cb)
                             (str "col-" (:name cat))))])]
        (custom-topic-input #(update-active-topics-cb %1 %2))]))
