@@ -28,10 +28,25 @@
 
 (defonce tooltips (atom {}))
 
+(defn real-hide [^js/Tooltip t]
+  (.hide t))
+
+(defn- hide-tooltip
+  [tt tip-id]
+  (when (:tip tt)
+    (real-hide (:tip tt)))
+  (reset! tooltips (dissoc @tooltips tip-id))
+  (when (:once-only (:setup tt))
+    (cookie/set-cookie! tip-id true ten-years))
+  (when (fn? (:dismiss-cb (:setup tt)))
+    ((:dismiss-cb (:setup tt)))))
+
 (defn tooltip
   "Create a tooltip, attach it to the passed element at the gived position and return it"
   [el {:keys [id mobile desktop once-only dismiss-cb config] :as setup}]
   (when el
+    (when-let [tt (get @tooltips id)]
+      (hide-tooltip (:tip tt) id))
     (let [tt (js/Tooltip. (get-device-content mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
                                                                                :effect "fade in"
                                                                                :auto true
@@ -42,20 +57,11 @@
                                           :setup setup}))
     (.position tt el))))
 
-(defn- hide-tooltip
-  [tt tip-id]
-  (.hide (:tip tt))
-  (reset! tooltips (dissoc @tooltips tip-id))
-  (when (:once-only (:setup tt))
-    (cookie/set-cookie! tip-id true ten-years))
-   (when (fn? (:dismiss-cb (:setup tt)))
-      ((:dismiss-cb (:setup tt)))))
-
 (defn hide
   "Programmatically hide the passed tooltip"
   [tip-id]
   (let [tt (get @tooltips tip-id)]
-    (hide tt tip-id)))
+    (hide-tooltip tt tip-id)))
 
 (defn show
   "Show the passed tooltip. Optionally disable the hide on click."
@@ -66,7 +72,8 @@
                (not (already-shown? tip-id (:once-only (:setup tt)))))
         (let [$body (js/$ (.-body js/document))]
           (.show tip)
-          (.on $body "click" (fn []
-                               (hide-tooltip tt tip-id)
-                               (.off $body "click"))))
+          (when-not (:persistent (:setup tt))
+            (.on $body "click" (fn []
+                                 (hide-tooltip tt tip-id)
+                                 (.off $body "click")))))
         (reset! tooltips (dissoc @tooltips tip-id))))))
