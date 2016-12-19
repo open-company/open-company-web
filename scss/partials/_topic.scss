@@ -262,8 +262,8 @@ div.topic {
 
     div.search-result-card-container-fade{
 
-      background: -webkit-linear-gradient(bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
-      background: linear-gradient(to top, rgba(255,255,255,1) 0px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
+      background: -webkit-linear-gradient(bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
+      background: linear-gradient(to top, rgba(255,255,255,1) 0px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
       bottom:0;
       left:0;
       position:absolute;

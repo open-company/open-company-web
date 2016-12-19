@@ -145,7 +145,9 @@
               :compiler-options {:source-map-timestamp true
                                  :preloads '[devtools.preload]})))
 
-(deftask dev-advanced []
+(deftask dev-advanced 
+  "Advanced build to be used in development to find compilation/externs errors."
+  []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
@@ -157,7 +159,10 @@
         ;         :on-jsload 'open-company-web.core/on-js-reload)
         (cljs :optimizations :advanced
               :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]})))
+              :compiler-options {
+                :pretty-print true
+                :pseudo-names true
+                :externs ["public/js/externs.js"]})))
 
 (deftask staging-build []
   (comp (from-jars)

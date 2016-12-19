@@ -206,7 +206,7 @@
           section (keyword (:section section-data))
           cleaned-section-data (apply dissoc section-data section-private-keys)
           json-data (cljs->json cleaned-section-data)
-          section-link (utils/link-for links "update" "PUT")]
+          section-link (utils/link-for links (if (:new section-data) "create" "update") "PUT")]
       (api-put (:href section-link)
         { :json-params json-data
           :headers {

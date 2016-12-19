@@ -22,7 +22,7 @@
       (for [sec (:new-sections (get @caches/new-sections slug))]
         (-> sec
             (assoc :section (:section-name sec))
-            (select-keys [:title :section :body-placeholder]))))))
+            (select-keys [:title :section :body-placeholder :links]))))))
 
 (defn get-categories []
   "Return the categories of the new available sections divided in columns and sorted by the
@@ -36,7 +36,7 @@
 
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
-  [s submit-fn]
+  [s custom-topic-data submit-fn]
   (let [add-disabled (clojure.string/blank? @(::topic-title s))]
     [:div.mt1.flex
      [:input.npt.mr1.p1.flex-auto.custom-topic-input
@@ -50,15 +50,17 @@
       {:class (str "btn-reset" (if add-disabled " btn-outline" " btn-solid"))
        :disabled add-disabled
        :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
+                        link           (utils/link-for (:links custom-topic-data) "create")
                         new-topic-data {:title @(::topic-title s)
                                         :section topic-name
                                         :was-archived false
-                                        :body-placeholder (utils/new-section-body-placeholder)
+                                        :body-placeholder (:body-placeholder custom-topic-data)
+                                        :links [(assoc link :href (clojure.string/replace (:href link) "custom-{4-char-UUID}" topic-name))]
                                         :placeholder true}]
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (rum/defcs category < rum/static
-  [s cat company-data update-active-topics-cb]
+  [s cat company-data update-active-topics-cb all-sections]
   (let [all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
         archived-topics (:archived company-data)
@@ -82,6 +84,7 @@
                                                                          :section (:section section-data)
                                                                          :placeholder true
                                                                          :body-placeholder (:body-placeholder section-data)
+                                                                         :links (:links section-data)
                                                                          :was-archived archived?}))}
           [:span.child.topic-title
             (:title section-data)
@@ -112,6 +115,8 @@
                                       s)}
   [s update-active-topics-cb]
   (let [company-data @(drv/get-ref s :company-data)
+        all-sections (into {} (for [s (get-all-sections)]
+                                [(keyword (:section s)) s]))
         categories (get-categories)]
       [:div.add-topic.group
        [:div.gray5.mb2.open-sans
@@ -129,6 +134,6 @@
           [:div.col.px2.col-4
             {:key (str "add-topic-col-" (name column))}
             (for [cat (get categories column)]
-              (rum/with-key (category cat company-data update-active-topics-cb)
+              (rum/with-key (category cat company-data update-active-topics-cb all-sections)
                             (str "col-" (:name cat))))])]
-       (custom-topic-input #(update-active-topics-cb %1 %2))]))
+       (custom-topic-input (get all-sections (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))

@@ -143,6 +143,9 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
+(defn- dismiss-editing [section]
+  (dis/dispatch! [:rollback-add-topic (keyword section)]))
+
 (defn handle-navigate-event [current-token owner e]
     ;; only when the URL is changing
     (when-not (= (.-token e) current-token)
@@ -162,7 +165,9 @@
                       :success-cb #(do
                                     (hide-popover nil "leave-topic-confirm")
                                     ;; cancel any FoCE
-                                    (dis/dispatch! [:start-foce nil])
+                                    (if (:new (dis/foce-section-data))
+                                      (dismiss-editing (dis/foce-section-key))
+                                      (dis/dispatch! [:start-foce nil]))
                                     ;; Dispatch the current url
                                     (@router/route-dispatcher (router/get-token)))})
         
@@ -186,6 +191,11 @@
     "Add an image"
     "Replace image"))
 
+(defn remove-navigation-listener [owner]
+  (when (om/get-state owner :history-listener-id)
+    (events/unlistenByKey (om/get-state owner :history-listener-id))
+    (om/set-state! owner :history-listener-id nil)))
+
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
         body-el         (js/$ (str "#foce-body-" (name topic)))
@@ -200,6 +210,7 @@
       ;; body and headline have the right number of chars, moving on with save
       :else
       (do
+        (remove-navigation-listener owner)
         (utils/remove-ending-empty-paragraph body-el)
         (let [topic-data   (dis/foce-section-data)
               company-data (dis/company-data)
@@ -210,9 +221,7 @@
           ; go back to dashbaord if it's a brand new topic
           (when (:new topic-data)
             (reset! prevent-route-dispatch false)
-            (utils/after 10 #(router/nav! (oc-urls/company))))
-          ; dismissing foce
-          (utils/after 100 #(dis/dispatch! [:start-foce nil])))))))
+            (router/nav! (oc-urls/company))))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
@@ -240,14 +249,18 @@
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
+      ; if adding a :new topic or a topic that was archived
+      ; restore the previous app-state when leaving the view
+      (when (and (dis/foce-section-key)
+                 (or (:new (dis/foce-section-data))
+                     (:was-archvied (dis/foce-section-data))))
+        (dis/dispatch! [:rollback-add-topic (dis/foce-section-key)]))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
-      (when (om/get-state owner :history-listener-id)
-        (events/unlistenByKey (om/get-state owner :history-listener-id))
-        (om/set-state! owner :history-listener-id nil))))
+      (remove-navigation-listener owner)))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -295,7 +308,6 @@
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url
                            headline-exceeds has-changes]}]
-
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
           section-kw          (keyword section)
@@ -490,8 +502,8 @@
                            :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:new topic-data)
                                         (do
-                                          (dis/dispatch! [:topic-archive (name section)])
-                                          (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
+                                          (dismiss-editing section)
+                                          (router/nav! (oc-urls/company)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
             (when-not (:new topic-data)

@@ -110,17 +110,14 @@
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click section-name)}})))))))
 
-(defn- update-active-topics [owner new-topic section-data]
+(defn- update-active-topics [owner new-topic topic-data]
   (let [company-data (om/get-props owner :company-data)
-        old-topics (:sections company-data)
-        new-topics (conj old-topics new-topic)
-        new-topic-kw (keyword new-topic)]
-    (om/set-state! owner :start-foce {:section new-topic-kw
-                                      :title (:title section-data)
-                                      :new (not (:was-archived section-data))})
-    (if (s/starts-with? new-topic "custom-")
-      (api/patch-sections new-topics section-data new-topic)
-      (api/patch-sections new-topics))))
+        new-topic-kw (keyword new-topic)
+        fixed-topic-data (merge topic-data {:section new-topic
+                                            :new (not (:was-archived topic-data))})]
+    (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
+    ; delay switch to topic view to make sure the FoCE data are in when loading the view
+    (router/nav! (oc-urls/company-section (:slug company-data) new-topic))))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
@@ -134,7 +131,7 @@
                                       show-add-topic] :as data} owner options]
 
   (init-state [_]
-    {:best-layout nil
+    {:topics-layout nil
      :filtered-topics (if (or (:read-only company-data)
                               (responsive/is-mobile-size?))
                         (utils/filter-placeholder-sections topics topics-data)
@@ -142,7 +139,7 @@
 
   (did-mount [_]
     (when (> columns-num 1)
-      (om/set-state! owner :best-layout (calc-layout owner data))))
+      (om/set-state! owner :topics-layout (calc-layout owner data))))
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :filtered-topics (if (or (:read-only (:company-data next-props))
@@ -152,27 +149,9 @@
     (when (and (> (:columns-num next-props) 1)
                (or (not= (:topics next-props) (:topics data))
                    (not= (:columns-num next-props) (:columns-num data))))
-      (om/set-state! owner :best-layout (calc-layout owner next-props)))
-    (when-let* [start-foce (om/get-state owner :start-foce)
-                new-section (:section start-foce)
-                new-section-data (get company-data new-section)]
-      ; A new section was added, switch the topic-view when the add section is finished
-      ; and enable FoCE
-      (dis/dispatch! [:show-add-topic false])
-      (let [new-title (:title start-foce)
-            foce-section-data (utils/new-section-initial-data
-                               new-section
-                               new-title
-                               new-section-data)]
-        (utils/after 10 #(router/nav! (oc-urls/company-section (router/current-company-slug) new-section)))
-        (utils/after 60 #(dis/dispatch! [:start-foce
-                                          new-section
-                                          (merge foce-section-data {:new (:new start-foce)
-                                                                    :body-placeholder (or (:body-placeholder start-foce)
-                                                                                          (utils/new-section-body-placeholder))})])))
-      (om/set-state! owner :start-foce nil)))
+      (om/set-state! owner :topics-layout (calc-layout owner next-props))))
 
-  (render-state [_ {:keys [best-layout filtered-topics]}]
+  (render-state [_ {:keys [topics-layout filtered-topics]}]
     (let [selected-topic-view   (:selected-topic-view data)
           partial-render-topic  (partial render-topic owner options)
           columns-container-key (apply str filtered-topics)
@@ -202,6 +181,9 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
+            (when (:dashboard-sharing data)
+              (dom/button {:class "btn-reset btn-link dashboard-sharing-select-all"
+                           :on-click #(dis/dispatch! [:dashboard-select-all])} "Select all"))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             (cond
@@ -226,7 +208,7 @@
               :else
               (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
                 (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-                  (let [column (get best-layout kw)]
+                  (let [column (get topics-layout kw)]
                     (dom/div {:class (str "topics-column col-" (name kw))
                               :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
                       ; render the topics
