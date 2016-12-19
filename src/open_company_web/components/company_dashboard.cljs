@@ -52,12 +52,14 @@
                                                                                          :card-width (if (responsive/is-mobile-size?)
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
-    (utils/after 3000
-      #(let [tip (t/tooltip (.querySelector js/document "span.company-name") {:config {:place "left-bottom"}
-                                                                              :id "hello-there"
-                                                                              :desktop "Hello there desktop user!"
-                                                                              :mobile "Hello there mobile user!"})]
-         (t/show "hello-there"))))
+    (let [company-data (dis/company-data data)
+          tt-id (str "second-topic-share-" (:slug company-data))]
+      (when (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data)) (count (:archived company-data))) 2)
+        (let [tip (t/tooltip (.querySelector js/document ".user-avatar-button") {:config {:place "left-top"}
+                                                                                 :id tt-id
+                                                                                 :once-only true
+                                                                                 :desktop "Automatically assemble topics into a beautiful company update."})]
+           (t/show tt-id)))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
