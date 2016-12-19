@@ -146,13 +146,6 @@
     (utils/clean-company-caches)
     ;; save the route
     (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params :update-slug update-slug})
-    ;; load revision if needed
-    (when (:as-of query-params)
-      (api/load-revision {:updated-at (:as-of query-params)
-                          :href (str "/companies" (urls/company-section-revision (:as-of query-params)))
-                          :type (api/content-type "section")}
-                         slug
-                         section))
     (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
@@ -165,6 +158,9 @@
       (reset! dis/app-state (-> @dis/app-state
                              (assoc :loading true)
                              (dissoc (keyword slug)))))
+    (if section
+      (reset! dis/app-state (assoc @dis/app-state :selected-topic-view section))
+      (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
     ;; render component
     (drv-root component target)))
 

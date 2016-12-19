@@ -62,6 +62,7 @@
                   [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
                   :else
                   [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
+      (when-not (responsive/is-mobile-size?)
         [:div.um-invite.group
           [:div.um-invite-label
               "TEAM MEMBERS"]
@@ -71,19 +72,19 @@
             [:div.um-invite-label-2
               "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
           (when (pos? (count enumerate-users))
-            (user-invitation enumerate-users))]
-        (comment
-          [:div.my2.um-byemail-container.group
-            [:div.group
-              [:span.left.ml1.um-byemail-anyone-span
-                "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
-            [:div.mt2.um-byemail.group
-              [:span.left.um-byemail-at "@"]
-              [:input.left.um-byemail-email
-                {:type "text"
-                 :name "um-byemail-email"
-                 :placeholder "your email domain without @"}]
-              [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])]]))
+            (user-invitation enumerate-users))])
+      (comment
+        [:div.my2.um-byemail-container.group
+          [:div.group
+            [:span.left.ml1.um-byemail-anyone-span
+              "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
+          [:div.mt2.um-byemail.group
+            [:span.left.um-byemail-at "@"]
+            [:input.left.um-byemail-email
+              {:type "text"
+               :name "um-byemail-email"
+               :placeholder "your email domain without @"}]
+            [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])]]))
 
 (defcomponent user-management-wrapper [data owner]
   (render [_]
@@ -105,7 +106,7 @@
           ;; Company profile
           :else
           (dom/div {}
-            (back-to-dashboard-btn {:title "Invite and Manage Team"})
+            (back-to-dashboard-btn {:title (if (responsive/is-mobile-size?) "Invite" "Invite and Manage Team")})
             (dom/div {:class "company-settings-container"}
               (user-management))))
 

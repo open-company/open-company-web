@@ -51,6 +51,12 @@ div.um-invitations-box {
           padding: 0px;
           white-space: pre;
 
+          &.value {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+          }
+
           button.invite-row-action {
             opacity: 1;
           }

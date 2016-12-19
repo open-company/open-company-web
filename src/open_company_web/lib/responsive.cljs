@@ -84,7 +84,7 @@
 
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 20)
-(def left-topics-list-width 185)
+(def left-topics-list-width 160)
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies
@@ -129,6 +129,7 @@
 (def updates-content-cards-max-width 560)
 (def updates-content-cards-min-width 250)
 (def updates-max-total-width 1152)
+(def updates-list-breakpoint 958)
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
@@ -137,10 +138,6 @@
     (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
        (* topic-list-x-padding 2)                              ; the padding around all the columns
        (if (is-tablet-or-mobile?) 0 left-topics-list-width)))) ; the left side panel with the topics list
-
-; (- (* (+ card-width topic-total-x-padding) columns-num) ; width of each column less
-;      (if (is-mobile?) 20 10)                              ; the container padding
-;      (if (is-mobile?) 40 0)))                             ; the distance btw the columns on big web
 
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)
@@ -154,6 +151,9 @@
                             updates-content-cards-max-width
                             (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
     fixed-card-width))
+
+(defn topic-view-width [card-width columns-num]
+  (* (+ card-width topic-total-x-padding) columns-num))
 
 (when (not (.-_phantom js/window))
   (events/listen js/window EventType/RESIZE #(set-browser-type!)))

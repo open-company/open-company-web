@@ -104,6 +104,7 @@
                             :company-data company-data
                             :foce-key (:foce-key data)
                             :show-share-su-button false
+                            :show-login-overlay (:show-login-overlay data)
                             :create-update-share-button-cb #(share-clicked owner)
                             :create-update-share-button-disabled (zero? (count su-topics))
                             :active nil
@@ -135,7 +136,8 @@
                                             (om/update-state! owner #(merge % {:su-topics (utils/vec-dissoc su-topics topic)
                                                                                :should-update-data false}))
                                             (patch-stakeholder-update owner))}
-                        (:title sd))))
+                        (:title sd) " "
+                        (dom/i {:class "fa fa-check"}))))
                   (let [all-topics (:sections company-data)
                         remaining-topics (vec (first (cd/diff (set all-topics) (set su-topics))))
                         filtered-topics (utils/filter-placeholder-sections remaining-topics company-data)
@@ -158,7 +160,7 @@
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
                             :value su-title
-                            :placeholder "Update Title"
+                            :placeholder "Title"
                             :on-change (fn [e]
                                           (om/update-state! owner #(merge % {:su-title (.. e -target -value)
                                                                              :should-update-data false}))

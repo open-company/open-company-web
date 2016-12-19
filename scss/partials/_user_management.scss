@@ -3,6 +3,11 @@ div.user-management {
   background-color: rgba(78, 90, 107, 0.05);
   width: 580px;
 
+  @include mobile(){
+    width: auto;
+    margin: 10px;
+  }
+
   div.um-cta, div.vis-cta {
     font-weight: 500;
     font-family: $oc_main_font;
@@ -111,6 +116,11 @@ div.user-management {
       font-family: $oc_main_font;
       font-weight: 400;
 
+      @include mobile(){
+        width: 240px;
+        float: none;
+      }
+
       &:invalid {
         border: 1px solid rgba(215,42,70,0.3);
       }
@@ -124,6 +134,12 @@ div.user-management {
       margin-top: 3px;
       margin-left: 20px;
       float: left;
+
+      @include mobile(){
+        margin-left: 0px;
+        margin-top: 20px;
+        float: none;
+      }
     }
   }
 

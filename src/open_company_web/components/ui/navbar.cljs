@@ -82,6 +82,7 @@
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
                                          :small-navbar (or su-navbar (not show-navigation-bar))
+                                         :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
                                          :no-jwt (not (jwt/jwt))})}
         (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))

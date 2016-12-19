@@ -43,11 +43,11 @@
 
   ;; progress cases
   ([mediums :guard #(= "email" (first %)) html] 
-    (medium-for (rest mediums) (conj html [:div.medium (i/icon :email-84 {:size 13 :class "inline"})])))
+    (medium-for (rest mediums) (conj html [:div.medium [:i.fa.fa-envelope-o]])))
   ([mediums :guard #(= "slack" (first %)) html] 
-    (medium-for (rest mediums) (conj html [:div.medium [:i {:class "fa fa-slack"}]])))
+    (medium-for (rest mediums) (conj html [:div.medium [:i.fa.fa-slack]])))
   ([mediums :guard #(= "link" (first %)) html] 
-    (medium-for (rest mediums) (conj html [:div.medium (i/icon :link-72 {:size 13 :class "inline"})])))
+    (medium-for (rest mediums) (conj html [:div.medium [:i.fa.fa-link]])))
   ([mediums html] ; legacy, unknown?
     (medium-for (rest mediums) html)))
 
@@ -67,7 +67,7 @@
              (not (dispatcher/stakeholder-update-list-data)))
       [:div.prior-updates
         [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
-      [:div.prior-updates {:style {:padding 0}}
+      [:div.prior-updates
 
         [:div.prior-updates-container {}
           
@@ -111,5 +111,5 @@
                       [:a {:href link :on-click #(when-not standalone-component (.preventDefault %))}
                         title]]
                     [:div.update-details.domine author " shared"
-                                                (when-not (empty? medium) " by ") medium
+                                                (when-not (empty? medium) " ") medium
                                                 " on " human-date]]))])]])))
