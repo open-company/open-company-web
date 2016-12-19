@@ -53,7 +53,7 @@
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
     (utils/after 1000
-      #(let [tip (t/tooltip "Hello there!" (.querySelector js/document "span.company-name") "left-bottom")]
+      #(when-let [tip (t/tooltip "Hello there!" (.querySelector js/document "span.company-name") {:place "left-bottom"})]
          (t/show tip))))
 
   (will-receive-props [_ next-props]
