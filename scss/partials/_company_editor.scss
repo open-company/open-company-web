@@ -1,0 +1,36 @@
+div.company-editor {
+  div.fullscreen-page {
+    background-color: $oc_gray_1;
+
+    div.company-editor-box {
+      width: 520px;
+      margin: #{$navbar_height + 20}px auto 20px;
+      background-color: white;
+      border: 2px solid $oc_yellow;
+      border-radius: 5px;
+      padding: 25px;
+
+      label.company-editor-message {
+        display: block;
+        width: 100%;
+        font-weight: 400;
+        font-size: 16px;
+        font-family: $oc_headers_font;
+      } 
+
+      input.company-editor-input {
+        border: 1px solid rgba(78,90,107,0.4);
+        height: 42px;
+        width: 100%;
+        font-size: 14px;
+        font-family: $oc_main_font;
+        padding: 0.3rem;
+      }
+
+      button.get-started-button {
+        width: 80%;
+        text-align: center;
+      }
+    }
+  }
+}
