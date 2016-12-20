@@ -98,4 +98,18 @@ div.topics-columns {
     font-family: $oc_main_font;
     height: 200px;
   }
+
+  div.invite-others {
+    padding: 5px;
+    text-align: center;
+    font-size: 12px;
+    color: $oc_gray_5;
+    cursor: pointer;
+
+    span{
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }

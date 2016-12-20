@@ -33,6 +33,15 @@
         (om/update-state! owner :new-sections-requested not)
         (utils/after 1000 #(api/get-new-sections))))))
 
+(defn show-share-work-tooltip [owner]
+  (let [company-data (dis/company-data (om/get-props owner))
+        share-work-tip (str "share-work-" (:slug company-data))]
+    (t/tooltip (.querySelector js/document "div.invite-others") {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
+                                                                 :once-only true
+                                                                 :id share-work-tip
+                                                                 :config {:place "bottom-left"}})
+    (t/show share-work-tip)))
+
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -64,33 +73,29 @@
                                                                                    :id tt-id
                                                                                    :once-only true
                                                                                    :desktop "Automatically assemble topics into a beautiful company update."})]
-           (t/show tt-id)))))
+           (t/show tt-id)))
+      (when (and (not (om/get-state owner :showing-congrats-tt))
+                 (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1))
+        (utils/after 100
+        #(let [congrats-tip (str "congrats-tip-" (:slug company-data))]
+          (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) 120] {:config {:typeClass "no-arrow"}
+                                                                       :id congrats-tip
+                                                                       :once-only true
+                                                                       :desktop "Congratulations! Now you have one place to organize and share company updates."
+                                                                       :dismiss-cb (fn [] (show-share-work-tooltip owner))})
+          (om/set-state! owner :showing-congrats-tt true)
+          (t/show congrats-tip))))))
 
   (did-update [_ prev-props _]
     (let [company-data (dis/company-data data)]
       (when (and (:dashboard-sharing data)
                  (not (:dashboard-sharing prev-props)))
         (let [sharing-tt (str "first-sharing-tt-" (:slug company-data))]
-          (t/tooltip (.querySelector js/document "div.col-2 div.topic-row") {:desktop "Click on the topics to include, or select all."
-                                                                             :once-only true
-                                                                             :id sharing-tt
-                                                                             :config {:place "top"
-                                                                                      ; :position "200,200"
-                                                                                      }})
-          (t/show sharing-tt)))
-      ; (when (and (not (om/get-state owner :showing-congrats-tt))
-      ;            (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1))
-      ;   (let [congrats-tip (str "congrats-tip-" (:slug company-data))]
-      ;     (js/console.log "Adding congrats-tip")
-      ;     (t/tooltip ["120px" (str (/ (.-clientWidth (.-body js/document)) 2) "px")] {:config {:place "top"
-      ;                                                                                          :typeClass "no-arrow"
-      ;                                                                                          :auto true}
-      ;                                                                                 :id congrats-tip
-      ;                                                                                 :once-only true
-      ;                                                                                 :desktop "Congratulations! Now you have one place to organize and share company updates."})
-      ;     (om/set-state! owner :showing-congrats-tt true)
-      ;     (t/show congrats-tip)))
-      ))
+          (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) 120] {:desktop "Click on the topics to include, or select all."
+                                                                       :once-only true
+                                                                       :id sharing-tt
+                                                                       :config {:place "top"}})
+          (t/show sharing-tt)))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))

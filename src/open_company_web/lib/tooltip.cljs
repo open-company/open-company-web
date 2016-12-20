@@ -22,8 +22,8 @@
     false))
 
 (defn got-it-button-html [tip-id]
-  (str "<div class=\"got-it-container\">
-          <button class=\"got-it-button right\" id=\"got-it-btn-" tip-id "\">OK, GOT IT</button>
+  (str "<div class=\"got-it-container group\">
+          <button class=\"got-it-button\" id=\"got-it-btn-" tip-id "\">OK, GOT IT</button>
         </div>"))
 
 (defn get-device-content [tip-id mobile desktop]
@@ -48,7 +48,7 @@
 
 (defn tooltip
   "Create a tooltip, attach it to the passed element at the gived position and return it"
-  [el {:keys [id mobile desktop once-only dismiss-cb config] :as setup}]
+  [pos {:keys [id mobile desktop once-only dismiss-cb config] :as setup}]
   (when-let [tt (get @tooltips id)]
     (hide-tooltip (:tip tt) id))
   (let [tt (js/Tooltip. (get-device-content id mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
@@ -57,10 +57,15 @@
                                                                                 :place "bottom"}
                                                                          config)))]
   (reset! tooltips (assoc @tooltips id {:tip tt
-                                        :el el
+                                        :pos pos
                                         :setup setup}))
-  (when el
-    (.position tt el))))
+  (cond
+    (sequential? pos)
+    ;; If pos is an array display it with the coords passed
+    (.position tt (get pos 0) (get pos 1))
+    :else
+    ;; else it's an element to attach to.
+    (.position tt pos))))
 
 (defn hide
   "Programmatically hide the passed tooltip"
