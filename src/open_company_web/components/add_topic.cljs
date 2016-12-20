@@ -99,7 +99,7 @@
                        {:did-mount (fn [s]
                                     (let [rum-comp (:rum/react-component s)
                                           dom-node (js/ReactDOM.findDOMNode rum-comp)]
-                                      (when (= (count (:archived @(drv/get-ref s :company-data))) 0)
+                                      (when (= (count (:sections @(drv/get-ref s :company-data))) 0)
                                         (t/tooltip dom-node {:config {:place "right-bottom"}
                                                              :id "first-add-topic"
                                                              :persistent true
