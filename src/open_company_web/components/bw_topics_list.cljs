@@ -70,10 +70,11 @@
   (render-state [_ {:keys [topics]}]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
-        (dom/h3 {:class "left-topics-list-top-title left"
-                 :on-click #(when (nil? (:foce-key data))
-                              (dis/dispatch! [:show-add-topic false])
-                              (router/nav! (oc-urls/company)))} "TOPICS")
+        (when-not (= (count (:sections company-data)) 0)
+          (dom/h3 {:class "left-topics-list-top-title left"
+                   :on-click #(when (nil? (:foce-key data))
+                                (dis/dispatch! [:show-add-topic false])
+                                (router/nav! (oc-urls/company)))} "TOPICS"))
         (when (and (not show-add-topic)
                    (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"

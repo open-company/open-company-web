@@ -102,8 +102,7 @@
                        {:did-mount (fn [s]
                                     (let [rum-comp (:rum/react-component s)
                                           dom-node (js/ReactDOM.findDOMNode rum-comp)]
-                                      (when (and (= (count (:archived @(drv/get-ref s :company-data))) 0)
-                                                 (= (count (:sections @(drv/get-ref s :company-data))) 0))
+                                      (when (= (count (:sections @(drv/get-ref s :company-data))) 0)
                                         (t/tooltip dom-node {:config {:place "right-bottom"}
                                                              :id "first-add-topic"
                                                              :persistent true
@@ -117,17 +116,17 @@
   (let [company-data @(drv/get-ref s :company-data)
         all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
-        categories (get-categories)]
+        categories (get-categories)
+        sections-count (count (:sections (drv/react s :company-data)))]
       [:div.add-topic.group
-       [:div.gray5.mb2.open-sans
-         {:style {:font-weight "600" :font-size "14px"}}
-         (if (and (= (count (:sections (drv/react s :company-data))) 0)
-                  (= (count (:sections (drv/react s :company-data))) 0))
+       [:div.add-topic-title
+         (if (= sections-count 0)
            "Choose a topic to get started"
            "Add topic")]
-       [:span.dimmed-gray.btn-reset.right
-         {:on-click #(dis/dispatch! [:show-add-topic false])}
-         (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]
+       (when-not (= sections-count 0)
+         [:span.close-add-topic
+           {:on-click #(dis/dispatch! [:show-add-topic false])}
+           (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})])
        [:div.mxn2.clearfix
         ;; column 1
         (for [column (keys categories)]

@@ -1,0 +1,26 @@
+div.welcome-screen{
+  background-color: $oc_gray_1;
+  padding-top: #{$navbar_height}px;
+  padding-bottom: 20px;
+  width: 100%;
+  min-height: 100vh;
+
+  div.welcome-screen-box {
+    margin: 20px auto;
+    width: 520px;
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+
+    span {
+      display: block;
+      font-family: $oc_main_font;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    button.choose-first-topic-button{
+      margin-top: 20px;
+    }
+  }
+}

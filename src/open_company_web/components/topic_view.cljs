@@ -7,6 +7,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.tooltip :as t]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic :refer (topic)]
@@ -50,7 +51,15 @@
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-revisions-if-needed owner)
-    (start-foce-if-needed owner))
+    (start-foce-if-needed owner)
+    (when (and (= (count (:sections company-data)) 1)
+               (= (count (:archived company-data)) 0))
+      (let [first-foce (str "first-foce-" (:slug company-data))]
+        (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Say what you would like to say about your first topic."
+                                                                  :id first-foce
+                                                                  :once-only true
+                                                                  :config {:place "right-bottom"}})
+        (t/show first-foce))))
 
   (will-update [_ next-props _]
     (when (not= (:selected-topic-view next-props) selected-topic-view)

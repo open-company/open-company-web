@@ -8,6 +8,7 @@ button.user-avatar-button{
   width: auto;
   color: rgba(78, 90, 107, 0.5);
   height: #{$avatar_size + 10}px;
+  margin-top: 2px;
 
   &:hover {
     border-radius: 3px;

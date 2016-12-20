@@ -15,7 +15,7 @@
 }
 
 /* Arrow styles */
-.js-tooltip:after {
+.js-tooltip:not(.no-arrow):after {
   content: '';
   position: absolute;
   width: 10px;
@@ -141,4 +141,16 @@
   -webkit-transform: none;
   transform: none;
   transition-duration: 100ms;
+}
+
+div.got-it-container {
+  margin-top: 10px;
+
+  button.got-it-button {
+    border-radius: 4px;
+    background-color: white;
+    border: none;
+    outline: none;
+    color: $oc_gray_5;
+  }
 }
