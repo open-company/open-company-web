@@ -268,7 +268,7 @@
                                    (.offset topic-edit-div)
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
-                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 88)}))))))
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 128)}))))))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
