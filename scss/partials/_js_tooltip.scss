@@ -14,7 +14,7 @@
 }
 
 /* Arrow styles */
-.js-tooltip:after {
+.js-tooltip:not(.no-arrow):after {
   content: '';
   position: absolute;
   width: 10px;
