@@ -54,4 +54,4 @@
                            :on-click (partial create-company-clicked owner)}
                           (when loading
                             (loading/small-loading {:class "left mt1"}))
-                          (dom/label {:class (str "pointer mt1" (when loading " ml2"))} "GET STARTED"))))))))
+                          (dom/label {:class (str "pointer mt1" (when loading " ml2"))} "OK, LET’S GO"))))))))
