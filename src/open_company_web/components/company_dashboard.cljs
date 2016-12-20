@@ -40,8 +40,10 @@
      :editing-topic false
      :save-bt-active false
      :new-sections-requested false
-     :show-welcome-screen (and (= (count (:sections (dis/company-data data))) 0)
-                               (= (count (:archived (dis/company-data data))) 0))
+     :showing-congrats-tt false
+     :hide-welcome-screen (not (and (dis/company-data data)
+                                    (= (count (:sections (dis/company-data data))) 0)
+                                    (= (count (:archived (dis/company-data data))) 0)))
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    (responsive/calc-card-width))
@@ -64,11 +66,41 @@
                                                                                    :desktop "Automatically assemble topics into a beautiful company update."})]
            (t/show tt-id)))))
 
+  (did-update [_ prev-props _]
+    (let [company-data (dis/company-data data)]
+      (when (and (:dashboard-sharing data)
+                 (not (:dashboard-sharing prev-props)))
+        (let [sharing-tt (str "first-sharing-tt-" (:slug company-data))]
+          (t/tooltip (.querySelector js/document "div.col-2 div.topic-row") {:desktop "Click on the topics to include, or select all."
+                                                                             :once-only true
+                                                                             :id sharing-tt
+                                                                             :config {:place "top"
+                                                                                      ; :position "200,200"
+                                                                                      }})
+          (t/show sharing-tt)))
+      ; (when (and (not (om/get-state owner :showing-congrats-tt))
+      ;            (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1))
+      ;   (let [congrats-tip (str "congrats-tip-" (:slug company-data))]
+      ;     (js/console.log "Adding congrats-tip")
+      ;     (t/tooltip ["120px" (str (/ (.-clientWidth (.-body js/document)) 2) "px")] {:config {:place "top"
+      ;                                                                                          :typeClass "no-arrow"
+      ;                                                                                          :auto true}
+      ;                                                                                 :id congrats-tip
+      ;                                                                                 :once-only true
+      ;                                                                                 :desktop "Congratulations! Now you have one place to organize and share company updates."})
+      ;     (om/set-state! owner :showing-congrats-tt true)
+      ;     (t/show congrats-tip)))
+      ))
+
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
-      (get-new-sections-if-needed owner)))
+      (get-new-sections-if-needed owner))
+    (om/set-state! owner :hide-welcome-screen (and (om/get-state owner :hide-welcome-screen)
+                                                   (not (and (dis/company-data next-props)
+                                                             (= (count (:sections (dis/company-data next-props))) 0)
+                                                             (= (count (:archived (dis/company-data next-props))) 0))))))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width show-welcome-screen] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width hide-welcome-screen] :as state}]
     (let [slug (keyword (router/current-company-slug))
           company-data (dis/company-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
@@ -111,8 +143,8 @@
                                   :dashboard-sharing (:dashboard-sharing data)
                                   :show-navigation-bar (utils/company-has-topics? company-data)
                                   :is-dashboard (nil? (:selected-topic-view data))}))
-              (if show-welcome-screen
-                (welcome-screen #(om/set-state! owner :show-welcome-screen false))
+              (if-not hide-welcome-screen
+                (welcome-screen #(om/set-state! owner :hide-welcome-screen true))
                 (dom/div {}
                   (when (:dashboard-sharing data)
                     (dom/button {:class "btn-reset btn-link dashboard-sharing-select-all"
