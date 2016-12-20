@@ -22,8 +22,8 @@
     false))
 
 (defn got-it-button-html [tip-id]
-  (str "<div class='got-it-container'>
-          <button class='got-it-button right' id='got-it-btn-" tip-id "'>OK, GOT IT</button>
+  (str "<div class=\"got-it-container\">
+          <button class=\"got-it-button right\" id=\"got-it-btn-" tip-id "\">OK, GOT IT</button>
         </div>"))
 
 (defn get-device-content [tip-id mobile desktop]
@@ -49,17 +49,17 @@
 (defn tooltip
   "Create a tooltip, attach it to the passed element at the gived position and return it"
   [el {:keys [id mobile desktop once-only dismiss-cb config] :as setup}]
+  (when-let [tt (get @tooltips id)]
+    (hide-tooltip (:tip tt) id))
+  (let [tt (js/Tooltip. (get-device-content id mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
+                                                                                :effect "fade in"
+                                                                                :auto true
+                                                                                :place "bottom"}
+                                                                         config)))]
+  (reset! tooltips (assoc @tooltips id {:tip tt
+                                        :el el
+                                        :setup setup}))
   (when el
-    (when-let [tt (get @tooltips id)]
-      (hide-tooltip (:tip tt) id))
-    (let [tt (js/Tooltip. (get-device-content id mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
-                                                                               :effect "fade in"
-                                                                               :auto true
-                                                                               :place "bottom"}
-                                                                        config)))]
-    (reset! tooltips (assoc @tooltips id {:tip tt
-                                          :el el
-                                          :setup setup}))
     (.position tt el))))
 
 (defn hide
@@ -75,9 +75,10 @@
           tip (:tip tt)]
       (if (and (not (skip-on-device? (:mobile (:setup tt)) (:desktop (:setup tt))))
                (not (already-shown? tip-id (:once-only (:setup tt)))))
-        (let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
+        (do
           (.show tip)
-          (.on $btn "click" (fn []
-                             (hide-tooltip tt tip-id)
-                             (.off $btn "click"))))
+          (let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
+            (.on $btn "click" (fn []
+                               (hide-tooltip tt tip-id)
+                               (.off $btn "click")))))
         (reset! tooltips (dissoc @tooltips tip-id))))))
