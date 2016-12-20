@@ -84,9 +84,10 @@
         (when (not (utils/is-test-env?))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
-                  :style {:width (str header-width "px")}}
+                  :style {:width (if header-width (str header-width "px") "100%")}}
           (dom/div {:class "oc-navbar-header-container group"}
-            (if (utils/in? (:route @router/path) "companies")
+            (if (or (utils/in? (:route @router/path) "companies")
+                    (not company-data))
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
                 (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
               (om/build company-avatar data))
