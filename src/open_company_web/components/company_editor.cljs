@@ -7,7 +7,6 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.small-loading :as loading]
-            [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
 
@@ -37,24 +36,22 @@
 
   (render-state [_ {:keys [loading]}]
     (dom/div {:class "company-editor"}
-      (dom/div {:class (str "group fullscreen-page "  (if (jwt/jwt) "with-small-footer" "with-footer"))}
-        (dom/div {:class "col-md-7 col-md-offset-2 p0"}
-          (dom/h2 {:class "domine mb3 ml3"} "Company Setup"))
-        (dom/div {:class "col-md-7 col-md-offset-2 bg-gray p3 group"}
+      (dom/div {:class "fullscreen-page group"}
+        (om/build navbar {:hide-right-menu true :show-navigation-bar true})
+        (dom/div {:class "company-editor-box group navbar-offset"}
           (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}
-              (dom/label {:class "small-caps h6 bold block"} "COMPANY NAME")
+              (dom/label {:class "company-editor-message"} "Welcome!")
+              (dom/label {:class "company-editor-message"} "What's the name of your company?")
               (dom/input {:type "text"
-                          :class "domine h4 p2 bg-white-05 md-col-9 border-none"
+                          :class "company-editor-input domine h4"
                           :style #js {:width "100%"}
                           :placeholder "Simple name without the Inc., LLC, etc."
                           :value (-> data :company-editor :name)
                           :on-change #(dis/dispatch! [:input [:company-editor :name] (.. % -target -value)])})))
-            (dom/button {:class "btn-reset btn-solid right"
-                         :on-click (partial create-company-clicked owner)}
-                        (when loading
-                          (loading/small-loading {:class "left mt1"}))
-                        (dom/label {:class (str "mt1" (when loading " ml2"))} "NEXT →"))))
-      (let [columns-num (responsive/columns-num)
-            card-width (responsive/calc-card-width)]
-        (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))
+            (dom/div {:class "center"}
+              (dom/button {:class "btn-reset btn-solid get-started-button"
+                           :on-click (partial create-company-clicked owner)}
+                          (when loading
+                            (loading/small-loading {:class "left mt1"}))
+                          (dom/label {:class (str "pointer mt1" (when loading " ml2"))} "GET STARTED"))))))))
