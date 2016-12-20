@@ -18,6 +18,7 @@
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
+(def share-work-topic-name "--share-work")
 
 (defn get-initial-layout [columns-num]
   (cond
@@ -38,33 +39,40 @@
     ; just layout the sections in :sections order
     ; in 2 columns
     (= (om/get-props owner :columns-num) 2)
-    (let [sections (:sections (:company-data data))]
-      (loop [idx 0
-             layout {:1 [] :2 []}]
-        (if (= idx (count sections))
-          layout
-          (let [topic (get sections idx)]
-            (recur (inc idx)
-                   (if (even? idx)
-                      (assoc layout :1 (conj (:1 layout) topic))
-                      (assoc layout :2 (conj (:2 layout) topic))))))))
+    (let [sections (:sections (:company-data data))
+          layout (loop [idx 0
+                        layout {:1 [] :2 []}]
+                   (if (= idx (count sections))
+                     layout
+                     (let [topic (get sections idx)]
+                       (recur (inc idx)
+                              (if (even? idx)
+                                 (assoc layout :1 (conj (:1 layout) topic))
+                                 (assoc layout :2 (conj (:2 layout) topic)))))))]
+      (if (pos? (count sections))
+        (assoc layout :2 (conj (:2 layout) share-work-topic-name))
+        layout))
     ; just layout the sections in :sections order
     ; in 3 columns
     (= (om/get-props owner :columns-num) 3)
-    (let [sections (:sections (:company-data data))]
-      (loop [idx 0
-             layout {:1 [] :2 [] :3 []}]
-        (if (= idx (count sections))
-          layout
-          (let [topic (get sections idx)]
-            (recur (inc idx)
-                   (cond
-                      (= (mod idx 3) 0)
-                      (assoc layout :1 (conj (:1 layout) topic))
-                      (= (mod idx 3) 1)
-                      (assoc layout :2 (conj (:2 layout) topic))
-                      (= (mod idx 3) 2)
-                      (assoc layout :3 (conj (:3 layout) topic))))))))))
+    (let [sections (:sections (:company-data data))
+          layout (loop [idx 0
+                        layout {:1 [] :2 [] :3 []}]
+                   (if (= idx (count sections))
+                     layout
+                     (let [topic (get sections idx)]
+                       (recur (inc idx)
+                              (cond
+                                 (= (mod idx 3) 0)
+                                 (assoc layout :1 (conj (:1 layout) topic))
+                                 (= (mod idx 3) 1)
+                                 (assoc layout :2 (conj (:2 layout) topic))
+                                 (= (mod idx 3) 2)
+                                 (assoc layout :3 (conj (:3 layout) topic)))))))]
+      (if (pos? (count sections))
+        (let [share-work-column (if (= (count sections) 1) :2 :3)]
+          (assoc layout share-work-column (conj (get layout share-work-column) share-work-topic-name)))
+        layout))))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
@@ -234,7 +242,12 @@
                         (for [idx (range (count column))
                               :let [section-kw (get column idx)
                                     section-name (name section-kw)]]
-                          (partial-render-topic section-name (name kw))))))))))
+                          (if (not= section-kw share-work-topic-name)
+                            (partial-render-topic section-name (name kw))
+                            (dom/div {:class "invite-others"
+                                      :on-click #(router/nav! (oc-urls/company-settings-um))}
+                              (dom/i {:class "fa fa-user-plus"})
+                              " " (dom/span "Invite others to contribute")))))))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
