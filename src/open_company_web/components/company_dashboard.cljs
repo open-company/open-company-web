@@ -55,10 +55,10 @@
     (let [company-data (dis/company-data data)
           tt-id (str "second-topic-share-" (:slug company-data))]
       (when (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data)) (count (:archived company-data))) 2)
-        (let [tip (t/tooltip (.querySelector js/document ".user-avatar-button") {:config {:place "left-top"}
-                                                                                 :id tt-id
-                                                                                 :once-only true
-                                                                                 :desktop "Automatically assemble topics into a beautiful company update."})]
+        (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "left-top"}
+                                                                                   :id tt-id
+                                                                                   :once-only true
+                                                                                   :desktop "Automatically assemble topics into a beautiful company update."})]
            (t/show tt-id)))))
 
   (will-receive-props [_ next-props]
