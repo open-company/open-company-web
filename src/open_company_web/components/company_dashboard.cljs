@@ -42,6 +42,10 @@
                                                                  :config {:place "bottom-left"}})
     (t/show share-work-tip)))
 
+(defn needs-share-tooltip [company-data]
+  (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data))
+         (count (:archived company-data))) 2))
+
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -68,7 +72,7 @@
                                                                                                        (responsive/calc-card-width))}))))
     (let [company-data (dis/company-data data)
           tt-id (str "second-topic-share-" (:slug company-data))]
-      (when (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data)) (count (:archived company-data))) 2)
+      (when (needs-share-tooltip company-data)
         (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "left-top"}
                                                                                    :id tt-id
                                                                                    :once-only true
@@ -87,15 +91,21 @@
           (t/show congrats-tip))))))
 
   (did-update [_ prev-props _]
-    (let [company-data (dis/company-data data)]
+    (let [company-data (dis/company-data data)
+          sharing-tt (str "first-sharing-tt-" (:slug company-data))]
       (when (and (:dashboard-sharing data)
                  (not (:dashboard-sharing prev-props)))
-        (let [sharing-tt (str "first-sharing-tt-" (:slug company-data))]
-          (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) 120] {:desktop "Click on the topics to include, or select all."
-                                                                       :once-only true
-                                                                       :id sharing-tt
-                                                                       :config {:place "top"}})
-          (t/show sharing-tt)))))
+        (t/hide (str "second-topic-share-" (:slug company-data)))
+        (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) (/ (.-clientHeight (.-body js/document)) 2)]
+                   {:desktop "Click on the topics to include, or select all."
+                    :once-only true
+                    :id sharing-tt
+                    :config {:place "top"
+                             :typeClass "no-arrow"}})
+        (t/show sharing-tt))
+      (when (and (not= (:dashboard-selected-topics data) (:dashboard-selected-topics prev-props))
+                 (pos? (count (:dashboard-selected-topics data))))
+        (t/hide sharing-tt))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
