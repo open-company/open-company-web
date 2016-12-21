@@ -105,6 +105,11 @@
       (assoc-in db (dispatcher/company-section-key slug section) fixed-section))
     db))
 
+(defmethod dispatcher/action :section-revision [db [_ {:keys [slug section body]}]]
+  ;; Refresh section revisions
+  (api/load-revisions slug section (utils/link-for (:links body) "revisions"))
+  body)
+
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
   (cond
     success
@@ -245,12 +250,18 @@
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
-        without-placeholder (dissoc with-fixed-body :placeholder)]
+        without-placeholder (dissoc with-fixed-body :placeholder)
+        with-created-at (if (contains? without-placeholder :created-at) without-placeholder (assoc without-placeholder :created-at (utils/as-of-now)))
+        created-at (:created-at with-created-at)
+        revisions-data (:revisions-data (get (dispatcher/company-data db) topic))
+        without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
+        with-new-revision (conj without-current-revision with-created-at)
+        sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))]
     (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
-      (api/partial-update-section topic without-placeholder)
-      (api/save-or-create-section without-placeholder))
+      (api/partial-update-section topic with-created-at)
+      (api/save-or-create-section with-created-at))
     (-> db
-      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) without-placeholder)
+      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) sorted-revisions)
       (stop-foce))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
@@ -482,7 +493,8 @@
 
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [slug topic revisions]}]]
-  (assoc-in db (concat (dispatcher/company-data-key slug) [(keyword topic) :revisions-data]) (:revisions (:collection revisions))))
+  (let [sort-pred (utils/sort-by-key-pred :created-at true)]
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
 
 ((defmethod dispatcher/action :show-add-topic
   [db [_ active]]
