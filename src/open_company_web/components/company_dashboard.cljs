@@ -53,7 +53,6 @@
      :editing-topic false
      :save-bt-active false
      :new-sections-requested false
-     :showing-congrats-tt false
      :hide-welcome-screen (not (and (dis/company-data data)
                                     (= (count (:sections (dis/company-data data))) 0)
                                     (= (count (:archived (dis/company-data data))) 0)))
@@ -78,17 +77,8 @@
                                                                                    :once-only true
                                                                                    :desktop "Automatically assemble topics into a beautiful company update."})]
            (t/show tt-id)))
-      (when (and (not (om/get-state owner :showing-congrats-tt))
-                 (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1))
-        (utils/after 100
-        #(let [congrats-tip (str "congrats-tip-" (:slug company-data))]
-          (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) 120] {:config {:typeClass "no-arrow"}
-                                                                       :id congrats-tip
-                                                                       :once-only true
-                                                                       :desktop "Congratulations! Now you have one place to organize and share company updates."
-                                                                       :dismiss-cb (fn [] (show-share-work-tooltip owner))})
-          (om/set-state! owner :showing-congrats-tt true)
-          (t/show congrats-tip))))))
+      (when (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1)
+        (show-share-work-tooltip owner))))
 
   (did-update [_ prev-props _]
     (let [company-data (dis/company-data data)
