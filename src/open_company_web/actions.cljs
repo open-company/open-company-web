@@ -105,11 +105,6 @@
       (assoc-in db (dispatcher/company-section-key slug section) fixed-section))
     db))
 
-(defmethod dispatcher/action :section-revision [db [_ {:keys [slug section body]}]]
-  ;; Refresh section revisions
-  (api/load-revisions slug section (utils/link-for (:links body) "revisions"))
-  body)
-
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
   (cond
     success
