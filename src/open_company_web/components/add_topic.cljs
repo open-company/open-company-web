@@ -45,7 +45,7 @@
        :max-length 20
        :on-change #(reset! (::topic-title s) (.. % -target -value))
        :style {:font-size "16px"}
-       :placeholder "Custom topic"}]
+       :placeholder "Name your own"}]
      [:button
       {:class (str "btn-reset" (if add-disabled " btn-outline" " btn-solid"))
        :disabled add-disabled
