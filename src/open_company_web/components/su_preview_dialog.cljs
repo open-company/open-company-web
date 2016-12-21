@@ -289,15 +289,15 @@
       [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
 
 (rum/defcs modal-actions < rum/reactive (drv/drv :su-share)
-  [s send-fn cancel-fn type]
+  [s success-cb send-fn cancel-fn type]
   [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
     {:class (when-not (or (= :link type) (= :prompt type)) "mr1")
-     :on-click cancel-fn}
+     :on-click (if (= :link type) (comp success-cb cancel-fn) cancel-fn)}
     (if (= :link type) "DONE" "CANCEL")]
    (when-not (or (= :link type) (= :prompt type))
      [:button.btn-reset.btn-solid
-      {:on-click send-fn
+      {:on-click (comp success-cb send-fn)
        :disabled (when (= :email type)
                    (let [to (->> (drv/react s :su-share) :email :to)
                          subject (->> (drv/react s :su-share) :email :subject)]
@@ -358,7 +358,7 @@
     (dis/dispatch! [:input [:su-share :email :subject] (:su-title data)])
     (setup-scroll-height))
 
-  (did-update [_ _ _]
+  (did-update [_ _ prev-state]
     (setup-scroll-height))
 
   (will-unmount [_]
@@ -377,7 +377,8 @@
 
   (render-state [_ {:keys [share-via share-link sending sent] :as state}]
     (let [company-data (:company-data data)
-          cancel-fn    (:dismiss-su-preview options)]
+          success-cb   (:did-share-cb data)
+          cancel-fn    (:dismiss-su-preview data)]
       (dom/div {:class "su-preview-dialog"}
         (dom/div {:class "su-preview-window"}
           (dom/button
@@ -393,9 +394,10 @@
                                             (api/share-stakeholder-update {}))
                                           (om/set-state! owner :share-via %)))
                 :link  (link-dialog share-link)
-                :email (email-dialog {:share-link share-link})
-                :slack (slack-dialog))
+                :email (email-dialog success-cb {:share-link share-link})
+                :slack (slack-dialog success-cb))
               (modal-actions
+                success-cb
                 (if sent
                   cancel-fn
                   #(do (om/set-state! owner :sending true)
