@@ -22,7 +22,8 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.tooltip :as t]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [goog.events.EventType :as EventType]
+            [goog.object :as gobj]))
 
 (defn- get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -34,13 +35,20 @@
         (utils/after 1000 #(api/get-new-sections))))))
 
 (defn show-share-work-tooltip [owner]
-  (let [company-data (dis/company-data (om/get-props owner))
-        share-work-tip (str "share-work-" (:slug company-data))]
-    (t/tooltip (.querySelector js/document "div.invite-others") {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
-                                                                 :once-only true
-                                                                 :id share-work-tip
-                                                                 :config {:place "bottom-left"}})
-    (t/show share-work-tip)))
+  (utils/after 600
+    #(let [company-data (dis/company-data (om/get-props owner))
+           share-work-tip (str "share-work-" (:slug company-data))
+           $invite-others (js/$ (.querySelector js/document "div.invite-others"))
+           invite-others-offset (.offset $invite-others)
+           invite-others-width (.width $invite-others)
+           invite-others-height (.height $invite-others)]
+       (t/tooltip [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (+ (gobj/get invite-others-offset "top") invite-others-height 10))]
+                  {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
+                   :once-only true
+                   :id share-work-tip
+                   :config {:place "bottom-left"}})
+       (js/console.log "show congrats:" [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (gobj/get invite-others-offset "top"))])
+       (t/show share-work-tip))))
 
 (defn needs-share-tooltip [company-data]
   (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data))
@@ -77,7 +85,7 @@
                                                                                    :once-only true
                                                                                    :desktop "Automatically assemble topics into a beautiful company update."})]
            (t/show tt-id)))
-      (when (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1)
+      (when (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates")))
         (show-share-work-tooltip owner))))
 
   (did-update [_ prev-props _]
