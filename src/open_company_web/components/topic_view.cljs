@@ -54,12 +54,21 @@
     (start-foce-if-needed owner)
     (when (and (= (count (:sections company-data)) 1)
                (= (count (:archived company-data)) 0))
-      (let [first-foce (str "first-foce-" (:slug company-data))]
-        (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Say what you would like to say about your first topic."
-                                                                  :id first-foce
-                                                                  :once-only true
-                                                                  :config {:place "right-bottom"}})
-        (t/show first-foce))))
+      (utils/after 500
+        #(let [first-foce (str "first-foce-" (:slug company-data))]
+          (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "What would you like to say about this topic?"
+                                                                    :id first-foce
+                                                                    :once-only true
+                                                                    :config {:place "right-bottom"}})
+          (t/show first-foce)))))
+
+  (will-receive-props [_ next-props]
+    (when (and (:foce-key data)
+               (nil? (:foce-key next-props)))
+      (t/hide (str "first-foce-" (:slug (:company-data next-props))))))
+
+  (will-unmount [_]
+    (t/hide (str "first-foce-" (:slug company-data))))
 
   (will-update [_ next-props _]
     (when (not= (:selected-topic-view next-props) selected-topic-view)
