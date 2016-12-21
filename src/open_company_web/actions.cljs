@@ -516,6 +516,7 @@
   [db [_ activate]]
   (-> db
     (assoc :dashboard-sharing activate)
+    (dissoc :show-add-topic)
     (assoc :dashboard-selected-topics [])))
 
 (defmethod dispatcher/action :add-topic
