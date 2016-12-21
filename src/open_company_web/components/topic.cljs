@@ -33,20 +33,24 @@
         section-data (om/get-props owner :topic-data)]
     (dis/dispatch! [:start-foce section-kw (assoc section-data :section (name section-kw))])))
 
-(defn get-author-string [topic-data]
+(defn get-author-string
+  "Return the a formatted string that shows the topic creator and the last editor."
+  [topic-data]
   (cond
-
+    ; if there is only one author it means this was never changed
     (= (count (:author topic-data)) 1)
     (let [first-author (first (:author topic-data))]
-      (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year])))
-
+      (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year])))
+    ; if there are more than one record in author it means it was edited
     (> (count (:author topic-data) 1))
     (let [first-author (first (:author topic-data))
           last-author  (last (:author topic-data))]
       (if (= (:user-id first-author) (:user-id last-author))
-        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
+        ; if the last editor is the same of the first don't repeat the name
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year]) "\n"
              "edited " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))
-        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
+        ; if the last editor is different than the creator shows the name and the date of the ditor too
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year]) "\n"
              "edited by " (:name last-author) " on " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))))))
 
 (defcomponent topic-internal [{:keys [topic-data
@@ -113,12 +117,12 @@
                                               "left"
                                               "top"))
                          :data-container "body"
-                         :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
+                         :key (str "tt-attrib-" (get-author-string topic-data))
                          :title (get-author-string topic-data)}
                 (when-not (and is-topic-view
                                is-mobile?)
                   " · ")
-                (utils/time-since (:updated-at topic-data) [:short-month])))
+                (utils/time-since (:created-at topic-data) [:short-month])))
             (when (and is-dashboard
                        (not is-mobile?)
                        (> (count (:revisions topic-data)) 1))
@@ -188,7 +192,7 @@
         ;; Attribution for topic
         (when (and is-mobile? is-dashboard)
           (dom/div {:class "mobile-date"}
-            (utils/time-since (:updated-at topic-data))))
+            (utils/time-since (:created-at topic-data))))
         
         ;; Topic body
         (when (and (or (not is-dashboard)
@@ -241,7 +245,7 @@
     (let [section-kw (keyword section)
           slug (keyword (router/current-company-slug))
           foce-active (not (nil? foce-key))
-          is-current-foce (and (= foce-key section-kw) (= (:updated-at foce-data) (:updated-at section-data)))
+          is-current-foce (and (= foce-key section-kw) (= (:created-at foce-data) (:created-at section-data)))
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
@@ -274,8 +278,8 @@
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
-                    :key (str "topic-" (when is-current-foce "foce-") (name section) "-" (:updated-at section-data))
-                    :id (str "topic-" (name section) "-" (:updated-at section-data))}
+                    :key (str "topic-" (when is-current-foce "foce-") (name section) "-" (:created-at section-data))
+                    :id (str "topic-" (name section) "-" (:created-at section-data))}
         (if is-current-foce
           (om/build topic-edit {:section section
                                 :topic-data section-data
@@ -288,7 +292,7 @@
                                 :foce-data foce-data
                                 :columns-num columns-num}
                                {:opts options
-                                :key (str "topic-foce-" section "-" (:updated-at section-data))})
+                                :key (str "topic-foce-" section "-" (:created-at section-data))})
           (om/build topic-internal {:section section
                                     :topic-data section-data
                                     :is-stakeholder-update (:is-stakeholder-update data)
