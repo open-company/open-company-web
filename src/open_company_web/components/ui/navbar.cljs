@@ -46,7 +46,8 @@
                               show-navigation-bar
                               dashboard-selected-topics
                               dashboard-sharing
-                              is-dashboard] :as data} owner options]
+                              is-dashboard
+                              is-topic-view] :as data} owner options]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -64,7 +65,8 @@
   (render [_]
     (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
-                                          is-dashboard                               ; is looking at the dashboard
+                                          (or is-dashboard                           ; is looking at the dashboard
+                                              is-topic-view)
                                           (not (:read-only company-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
@@ -117,7 +119,9 @@
                                                        (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update company-data))}))}
                                 (when (om/get-state owner :su-redirect)
                                   (loading/small-loading))
-                                (str "Share " (count dashboard-selected-topics) " topic" (when (not= (count dashboard-selected-topics) 1) "s")))
+                                (if (zero? (count dashboard-selected-topics))
+                                  "0 Topics selected"
+                                  (str "Share " (count dashboard-selected-topics) " topic" (when (not= (count dashboard-selected-topics) 1) "s"))))
                               (dom/button {:class "btn-reset btn-link right sharing-cancel"
                                            :on-click (fn []
                                                        (dis/dispatch! [:dashboard-share-mode false]))}
@@ -128,8 +132,12 @@
                                            :data-toggle "tooltip"
                                            :data-container "body"
                                            :data-placement "left"
+                                           :disabled (not (nil? foce-key))
                                            :on-click (fn []
-                                                       (dis/dispatch! [:dashboard-share-mode true]))}
+                                                       (when (nil? foce-key)
+                                                         (when is-topic-view
+                                                            (router/nav! (oc-urls/company)))
+                                                         (dis/dispatch! [:dashboard-share-mode true])))}
                                 "Share topics")))))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
