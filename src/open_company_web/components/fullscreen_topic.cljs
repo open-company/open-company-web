@@ -71,7 +71,7 @@
           chart-data {:section-data (if (= topic "finances") (utils/fix-finances topic-data) topic-data)
                       :section (keyword topic)
                       :currency currency
-                      :actual-as-of (:updated-at topic-data)
+                      :actual-as-of (:created-at topic-data)
                       :selected-metric selected-metric
                       :read-only true}
           topic-body (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))]
@@ -176,7 +176,7 @@
       (.play))))
 
 (defn- rev-click [owner e revision]
-  (om/set-state! owner :transition-as-of (:updated-at revision)))
+  (om/set-state! owner :transition-as-of (:created-at revision)))
 
 (defcomponent fullscreen-topic [{:keys [section section-data selected-metric currency card-width
                                         hide-history-navigation] :as data} owner options]
@@ -188,7 +188,7 @@
                  (not (contains? company-data (keyword section)))
                  (not (contains? su-data (keyword section))))
         (router/redirect-404!)))
-    (let [actual-as-of (:updated-at section-data)
+    (let [actual-as-of (:created-at section-data)
           current-as-of (or (router/current-as-of) actual-as-of)]
       {:as-of current-as-of
        :transition-as-of nil
@@ -212,9 +212,9 @@
       (when (om/get-state owner :data-posted)
         (hide-fullscreen-topic owner options))
       (om/set-state! owner :data-posted false)
-      (when-not (= (:updated-at (:section-data next-props)) (:updated-at section-data))
-        (om/set-state! owner :as-of (:updated-at (:section-data next-props)))
-        (om/set-state! owner :actual-as-of (:updated-at (:section-data next-props))))))
+      (when-not (= (:created-at (:section-data next-props)) (:created-at section-data))
+        (om/set-state! owner :as-of (:created-at (:section-data next-props)))
+        (om/set-state! owner :actual-as-of (:created-at (:section-data next-props))))))
 
   (will-unmount [_]
     (events/unlistenByKey (om/get-state owner :esc-listener-key))
@@ -238,12 +238,12 @@
           fullscreen-width (responsive/fullscreen-topic-width card-width)]
       ; preload previous revision
       (when (and prev-rev
-                 (not (contains? revisions-list (:updated-at prev-rev))))
+                 (not (contains? revisions-list (:created-at prev-rev))))
         (api/load-revision prev-rev slug section-kw))
       ; preload next revision
-      (when (and (not= (:updated-at next-rev) actual-as-of)
+      (when (and (not= (:created-at next-rev) actual-as-of)
                   next-rev
-                  (not (contains? revisions-list (:updated-at next-rev))))
+                  (not (contains? revisions-list (:created-at next-rev))))
         (api/load-revision next-rev slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
