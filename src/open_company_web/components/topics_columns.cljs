@@ -9,6 +9,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.tooltip :as t]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
@@ -227,7 +228,9 @@
                           (if (not= section-kw share-work-topic-name)
                             (partial-render-topic section-name (name kw))
                             (dom/div {:class "invite-others"
-                                      :on-click #(router/nav! (oc-urls/company-settings-um))}
+                                      :on-click #(let [share-work-tip (str "share-work-" (:slug company-data))]
+                                                   (t/hide share-work-tip)
+                                                   (router/nav! (oc-urls/company-settings-um)))}
                               (dom/i {:class "fa fa-user-plus"})
                               " " (dom/span "Invite others to contribute")))))))))))
           ;; 1 column or default

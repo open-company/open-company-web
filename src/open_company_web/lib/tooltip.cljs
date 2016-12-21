@@ -23,7 +23,7 @@
 
 (defn got-it-button-html [tip-id]
   (str "<div class=\"got-it-container group\">
-          <button class=\"got-it-button\" id=\"got-it-btn-" tip-id "\">OK, GOT IT</button>
+          <button class=\"got-it-button\" id=\"got-it-btn-" tip-id "\">GOT IT</button>
         </div>"))
 
 (defn get-device-content [tip-id mobile desktop]
@@ -52,7 +52,7 @@
   (when-let [tt (get @tooltips id)]
     (hide-tooltip (:tip tt) id))
   (let [tt (js/Tooltip. (get-device-content id mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
-                                                                                :effect "fade in"
+                                                                                :effectClass "fade"
                                                                                 :auto true
                                                                                 :place "bottom"}
                                                                          config)))]
@@ -70,7 +70,7 @@
 (defn hide
   "Programmatically hide the passed tooltip"
   [tip-id]
-  (let [tt (get @tooltips tip-id)]
+  (when-let [tt (get @tooltips tip-id)]
     (hide-tooltip tt tip-id)))
 
 (defn show

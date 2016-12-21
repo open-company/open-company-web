@@ -12,6 +12,7 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
+            [open-company-web.lib.tooltip :as t]
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.topics-columns :refer (topics-columns)]
@@ -71,6 +72,7 @@
        :su-topics (vec su-topics)
        :su-title (:title su-data)
        :should-update-data true
+       :did-share false
        :show-su-dialog false}))
 
   (will-receive-props [_ next-props]
@@ -89,8 +91,19 @@
       (events/listen js/window EventType/RESIZE (fn [] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
                                                                                           :card-width (responsive/calc-card-width)}))))))
 
-  (did-update [_ _ _]
-    (setup-sortable owner))
+  (did-update [_ _ prev-state]
+    (setup-sortable owner)
+    (when (and (om/get-state owner :did-share)
+               (not (om/get-state owner :show-su-dialog))
+               (:show-su-dialog prev-state))
+      (let [congrats-tip (str "congrats-tip-" (:slug (dis/company-data data)))
+            $body (.-body js/document)]
+        (t/tooltip [(int (+ (/ (.-clientWidth (.-body js/document)) 2) 20)) (int (/ (.-clientHeight (.-body js/document)) 2))]
+                   {:config {:typeClass "no-arrow"}
+                    :id congrats-tip
+                    :once-only true
+                    :desktop "Congratulations! Now you have one place to organize and share company updates."})
+        (t/show congrats-tip))))
 
   (will-unmount [_]
     (when-let [resize-listener (om/get-state owner :resize-listener)]
@@ -119,8 +132,9 @@
               (om/build su-preview-dialog {:selected-topics su-topics
                                            :company-data company-data
                                            :latest-su (dis/latest-stakeholder-update)
-                                           :su-title su-title}
-                                          {:opts {:dismiss-su-preview #(om/set-state! owner :show-su-dialog false)}}))
+                                           :su-title su-title
+                                           :dismiss-su-preview #(om/set-state! owner :show-su-dialog false)
+                                           :did-share-cb #(om/set-state! owner :did-share true)}))
             (dom/div {:class "create-update-content group"
                       :style {:width total-width}}
               (dom/div {:class "create-update-content-list group right"

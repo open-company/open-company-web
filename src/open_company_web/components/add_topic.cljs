@@ -38,7 +38,7 @@
   < (rum/local "" ::topic-title)
   [s custom-topic-data submit-fn]
   (let [add-disabled (clojure.string/blank? @(::topic-title s))]
-    [:div.mt1.flex
+    [:div.mt3.flex
      [:input.npt.mr1.p1.flex-auto.custom-topic-input
       {:type "text",
        :value @(::topic-title s)
@@ -66,8 +66,8 @@
         archived-topics (:archived company-data)
         show-archived (pos? (count archived-topics))]
     [:div
-      [:span.block.mb1.mt2.all-caps
-        {:style {:marginTop (if (clojure.string/blank? (:name cat)) "28px" "0px")}}
+      [:span.block.mb1.all-caps
+        {:class (if (> (:order cat) 1) "mt3" "mt0")}
         (str (:name cat) (when (:icon cat) " "))
         (when (:icon cat)
           [:i.fa {:class (:icon cat)}])]
@@ -96,21 +96,24 @@
                  :data-container ".add-topic"
                  :title "Archived topic"}])]])]))
 
-(rum/defcs add-topic < rum/static
-                       rum/reactive
+(rum/defcs add-topic < rum/reactive
                        (drv/drv :company-data)
+                       (rum/local "" ::tt-key)
                        {:did-mount (fn [s]
                                     (let [rum-comp (:rum/react-component s)
-                                          dom-node (js/ReactDOM.findDOMNode rum-comp)]
-                                      (when (= (count (:sections @(drv/get-ref s :company-data))) 0)
-                                        (t/tooltip dom-node {:config {:place "right-bottom"}
-                                                             :id "first-add-topic"
-                                                             :persistent true
-                                                             :desktop "First, choose a topic you’d like to say something about."})
-                                        (t/show "first-add-topic")))
-                                    s)
+                                          dom-node (js/ReactDOM.findDOMNode rum-comp)
+                                          company-data @(drv/get-ref s :company-data)]
+                                      (let [tt-key (str "first-add-topic-" (:slug company-data))]
+                                        (utils/after 500
+                                         #(when (= (count (:sections company-data)) 0)
+                                          (t/tooltip dom-node {:config {:place "right-bottom"}
+                                                               :id tt-key
+                                                               :persistent true
+                                                               :desktop "See something you want everyone to know about? Click it to get started. You’ll be able to add, remove and re-arrange topics anytime."})
+                                          (t/show tt-key)))
+                                        (assoc s ::tt-key tt-key))))
                        :will-unmount (fn [s]
-                                      (t/hide "first-add-topic")
+                                       (t/hide (::tt-key s))
                                       s)}
   [s update-active-topics-cb]
   (let [company-data @(drv/get-ref s :company-data)
@@ -119,20 +122,21 @@
         categories (get-categories)
         sections-count (count (:sections (drv/react s :company-data)))]
       [:div.add-topic.group
-       [:div.add-topic-title
-         (if (= sections-count 0)
-           "Choose a topic to get started"
-           "Add topic")]
-       (when-not (= sections-count 0)
-         [:span.close-add-topic
-           {:on-click #(dis/dispatch! [:show-add-topic false])}
-           (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})])
-       [:div.mxn2.clearfix
-        ;; column 1
-        (for [column (keys categories)]
-          [:div.col.px2.col-4
-            {:key (str "add-topic-col-" (name column))}
-            (for [cat (get categories column)]
-              (rum/with-key (category cat company-data update-active-topics-cb all-sections)
-                            (str "col-" (:name cat))))])]
-       (custom-topic-input (get all-sections (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))
+        [:div.add-topic-title
+          (if (= sections-count 0)
+            "Choose a topic to get started"
+            "Add topic")]
+        [:hr]
+        (when-not (= sections-count 0)
+          [:span.close-add-topic
+            {:on-click #(dis/dispatch! [:show-add-topic false])}
+            (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})])
+        [:div.mxn2.clearfix
+          ;; column 1
+          (for [column (keys categories)]
+            [:div.col.px2.col-4
+              {:key (str "add-topic-col-" (name column))}
+              (for [cat (get categories column)]
+                (rum/with-key (category cat company-data update-active-topics-cb all-sections)
+                 (str "col-" (:name cat))))])]
+        (custom-topic-input (get all-sections (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))

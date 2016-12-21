@@ -148,10 +148,15 @@ div.got-it-container {
 
   button.got-it-button {
     border-radius: 4px;
-    background-color: white;
-    border: none;
+    border: 1px solid rgba(255,255,255,0.9);
+    background-color: $oc_blue_dark;
     outline: none;
-    color: $oc_gray_5;
+    color: rgba(255,255,255,0.9);
     float: right;
+
+    &:hover {
+      border: 1px solid rgba(255,255,255,1);
+      color: rgba(255,255,255,1);
+    }
   }
 }

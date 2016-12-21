@@ -22,7 +22,8 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.tooltip :as t]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [goog.events.EventType :as EventType]
+            [goog.object :as gobj]))
 
 (defn- get-new-sections-if-needed [owner]
   (when-not (om/get-state owner :new-sections-requested)
@@ -34,13 +35,24 @@
         (utils/after 1000 #(api/get-new-sections))))))
 
 (defn show-share-work-tooltip [owner]
-  (let [company-data (dis/company-data (om/get-props owner))
-        share-work-tip (str "share-work-" (:slug company-data))]
-    (t/tooltip (.querySelector js/document "div.invite-others") {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
-                                                                 :once-only true
-                                                                 :id share-work-tip
-                                                                 :config {:place "bottom-left"}})
-    (t/show share-work-tip)))
+  (utils/after 600
+    #(let [company-data (dis/company-data (om/get-props owner))
+           share-work-tip (str "share-work-" (:slug company-data))
+           $invite-others (js/$ (.querySelector js/document "div.invite-others"))
+           invite-others-offset (.offset $invite-others)
+           invite-others-width (.width $invite-others)
+           invite-others-height (.height $invite-others)]
+       (t/tooltip [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (+ (gobj/get invite-others-offset "top") invite-others-height 10))]
+                  {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
+                   :once-only true
+                   :id share-work-tip
+                   :config {:place "bottom-left"}})
+       (js/console.log "show congrats:" [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (gobj/get invite-others-offset "top"))])
+       (t/show share-work-tip))))
+
+(defn needs-share-tooltip [company-data]
+  (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data))
+         (count (:archived company-data))) 2))
 
 (defcomponent company-dashboard [data owner]
 
@@ -49,7 +61,6 @@
      :editing-topic false
      :save-bt-active false
      :new-sections-requested false
-     :showing-congrats-tt false
      :hide-welcome-screen (not (and (dis/company-data data)
                                     (= (count (:sections (dis/company-data data))) 0)
                                     (= (count (:archived (dis/company-data data))) 0)))
@@ -68,34 +79,31 @@
                                                                                                        (responsive/calc-card-width))}))))
     (let [company-data (dis/company-data data)
           tt-id (str "second-topic-share-" (:slug company-data))]
-      (when (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data)) (count (:archived company-data))) 2)
+      (when (needs-share-tooltip company-data)
         (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "left-top"}
                                                                                    :id tt-id
                                                                                    :once-only true
                                                                                    :desktop "Automatically assemble topics into a beautiful company update."})]
            (t/show tt-id)))
-      (when (and (not (om/get-state owner :showing-congrats-tt))
-                 (= (:count (utils/link-for (:links company-data) "stakeholder-updates")) 1))
-        (utils/after 100
-        #(let [congrats-tip (str "congrats-tip-" (:slug company-data))]
-          (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) 120] {:config {:typeClass "no-arrow"}
-                                                                       :id congrats-tip
-                                                                       :once-only true
-                                                                       :desktop "Congratulations! Now you have one place to organize and share company updates."
-                                                                       :dismiss-cb (fn [] (show-share-work-tooltip owner))})
-          (om/set-state! owner :showing-congrats-tt true)
-          (t/show congrats-tip))))))
+      (when (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates")))
+        (show-share-work-tooltip owner))))
 
   (did-update [_ prev-props _]
-    (let [company-data (dis/company-data data)]
+    (let [company-data (dis/company-data data)
+          sharing-tt (str "first-sharing-tt-" (:slug company-data))]
       (when (and (:dashboard-sharing data)
                  (not (:dashboard-sharing prev-props)))
-        (let [sharing-tt (str "first-sharing-tt-" (:slug company-data))]
-          (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) 120] {:desktop "Click on the topics to include, or select all."
-                                                                       :once-only true
-                                                                       :id sharing-tt
-                                                                       :config {:place "top"}})
-          (t/show sharing-tt)))))
+        (t/hide (str "second-topic-share-" (:slug company-data)))
+        (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) (/ (.-clientHeight (.-body js/document)) 2)]
+                   {:desktop "Click on the topics to include, or select all."
+                    :once-only true
+                    :id sharing-tt
+                    :config {:place "top"
+                             :typeClass "no-arrow"}})
+        (t/show sharing-tt))
+      (when (and (not= (:dashboard-selected-topics data) (:dashboard-selected-topics prev-props))
+                 (pos? (count (:dashboard-selected-topics data))))
+        (t/hide sharing-tt))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
