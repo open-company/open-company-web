@@ -49,10 +49,25 @@ div.add-topic {
   }
 
   input.custom-topic-input {
-    border: 1px solid rgba(78, 90, 107, 0.5) !important;
+    font-size: 16px;
+    width: 180px;
+    margin-right: 0.5rem;
+    padding: 0.5rem;
+    background-color: white;
+    border: 1px solid rgba(78, 90, 107, 0.5);
+    border-radius: 2px;
+    line-height: 1.2;
+    color: $oc_gray_5;
+    height: 37px;
+    outline: none;
+
     @include placeholder(){
       color: rgba(78,90,107,0.6);
       font-style: italic;
     }
+  }
+
+  button.custom-topic-add {
+    height: 37px;
   }
 }

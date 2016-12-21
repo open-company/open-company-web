@@ -2,6 +2,8 @@
   "Cljs wrapper for Tooltip js object that is in /lib/tooltip/tooltip.js
    Docs at https://github.com/darsain/tooltip/wiki"
   (:require [defun.core :refer (defun)]
+            [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.cookies :as cookie]
             [open-company-web.lib.responsive :as responsive]))
 
@@ -48,7 +50,7 @@
 
 (defn tooltip
   "Create a tooltip, attach it to the passed element at the gived position and return it"
-  [pos {:keys [id mobile desktop once-only dismiss-cb config] :as setup}]
+  [pos {:keys [id mobile desktop once-only dismiss-cb show-to-ro-users show-to-signed-out-users config] :as setup}]
   (when-let [tt (get @tooltips id)]
     (hide-tooltip (:tip tt) id))
   (let [tt (js/Tooltip. (get-device-content id mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
@@ -58,6 +60,8 @@
                                                                          config)))]
   (reset! tooltips (assoc @tooltips id {:tip tt
                                         :pos pos
+                                        :show-to-ro-users (or show-to-ro-users false)
+                                        :show-to-signed-out-users (or show-to-signed-out-users true)
                                         :setup setup}))
   (cond
     (sequential? pos)
@@ -79,7 +83,15 @@
     (let [tt (get @tooltips tip-id)
           tip (:tip tt)]
       (if (and (not (skip-on-device? (:mobile (:setup tt)) (:desktop (:setup tt))))
-               (not (already-shown? tip-id (:once-only (:setup tt)))))
+               (not (already-shown? tip-id (:once-only (:setup tt))))
+               (or (:show-to-signed-out-users tt)
+                   (and (not (:show-to-signed-out-users tt))
+                        (jwt/jwt)))
+               (or (and (:show-to-ro-users tt)
+                        (jwt/jwt))
+                   (and (not (:show-to-ro-users tt))
+                        (jwt/jwt)
+                        (not (:read-only (dis/company-data))))))
         (do
           (.show tip)
           (let [$btn (js/$ (str "button#got-it-btn-" tip-id))]

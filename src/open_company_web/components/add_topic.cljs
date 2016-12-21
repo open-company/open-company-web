@@ -38,17 +38,15 @@
   < (rum/local "" ::topic-title)
   [s custom-topic-data submit-fn]
   (let [add-disabled (clojure.string/blank? @(::topic-title s))]
-    [:div.mt3.flex
-     [:input.npt.mr1.p1.flex-auto.custom-topic-input
+    [:div.mt3
+     [:input.custom-topic-input
       {:type "text",
        :value @(::topic-title s)
        :max-length 20
        :on-change #(reset! (::topic-title s) (.. % -target -value))
-       :style {:font-size "16px"}
-       :placeholder "Name your own"}]
-     [:button
-      {:class (str "btn-reset" (if add-disabled " btn-outline" " btn-solid"))
-       :disabled add-disabled
+       :placeholder "Name your own topic"}]
+     [:button.btn-reset.btn-solid.custom-topic-add
+      {:disabled add-disabled
        :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
                         link           (utils/link-for (:links custom-topic-data) "create")
                         new-topic-data {:title @(::topic-title s)
@@ -68,9 +66,7 @@
     [:div
       [:span.block.mb1.all-caps
         {:class (if (> (:order cat) 1) "mt3" "mt0")}
-        (str (:name cat) (when (:icon cat) " "))
-        (when (:icon cat)
-          [:i.fa {:class (:icon cat)}])]
+        (str (:name cat) (when (:icon cat) " "))]
       (for [sec (:sections cat)
             :let [section-data (get all-sections (keyword sec))
                   archived? (some #(= (:section %) sec) archived-topics)
@@ -94,7 +90,13 @@
                 {:data-toggle "tooltip"
                  :data-placement "top"
                  :data-container ".add-topic"
-                 :title "Archived topic"}])]])]))
+                 :title "Archived topic"}])
+            (when (or (= (:section section-data) "finances")
+                      (= (:section section-data) "growth"))
+              " ")
+            (when (or (= (:section section-data) "finances")
+                      (= (:section section-data) "growth"))
+              [:i.fa.fa-line-chart])]])]))
 
 (rum/defcs add-topic < rum/reactive
                        (drv/drv :company-data)
