@@ -1,5 +1,6 @@
 (ns open-company-web.components.company-dashboard
-  (:require-macros [cljs.core.async.macros :refer (go)])
+  (:require-macros [cljs.core.async.macros :refer (go)]
+                   [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -36,12 +37,12 @@
 
 (defn show-share-work-tooltip [owner]
   (utils/after 600
-    #(let [company-data (dis/company-data (om/get-props owner))
-           share-work-tip (str "share-work-" (:slug company-data))
-           $invite-others (js/$ (.querySelector js/document "div.invite-others"))
-           invite-others-offset (.offset $invite-others)
-           invite-others-width (.width $invite-others)
-           invite-others-height (.height $invite-others)]
+    #(when-let* [company-data (dis/company-data (om/get-props owner))
+                 share-work-tip (str "share-work-" (:slug company-data))
+                 $invite-others (js/$ (.querySelector js/document "div.invite-others"))
+                 invite-others-offset (.offset $invite-others)
+                 invite-others-width (.width $invite-others)
+                 invite-others-height (.height $invite-others)]
        (t/tooltip [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (+ (gobj/get invite-others-offset "top") invite-others-height 10))]
                   {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
                    :once-only true
