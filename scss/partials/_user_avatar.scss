@@ -16,6 +16,7 @@ button.user-avatar-button{
   }
 
   &.no-image {
+    margin-top: 5px;
     i.fa.fa-ellipsis-v {
       margin-top: 11px;
     }
@@ -27,7 +28,7 @@ button.user-avatar-button{
   }
 
   div.user-avatar-name {
-    font-size: 14px;
+    font-size: 16px;
     font-family: $oc_headers_font;
     margin-top: 2px;
     margin-right: 5px;
