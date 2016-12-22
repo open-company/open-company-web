@@ -1,10 +1,13 @@
+$tooltip_bg_color: $oc_blue_dark;
+$tooltip_color: white;
+
 .js-tooltip {
   position: fixed;
   padding: .8em 1em;
   top: 10px; /* Defines the spacing between tooltip and target position */
   max-width: 200px;
   color: #fff;
-  background: $oc_blue_dark;
+  background: $tooltip_bg_color;
   font-family: $oc_main_font;
   font-size: 16px;
   font-weight: 300;
@@ -12,32 +15,76 @@
   text-shadow: -1px -1px 0 rgba(0,0,0,.2);
   float: initial;
   z-index: 999;
+  color: white;
 }
 
 /* Arrow styles */
 .js-tooltip:not(.no-arrow):after {
   content: '';
   position: absolute;
-  width: 15px;
-  height: 15px;
-  margin: -7.5px;
-  background: inherit;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
+  width: 0;
+  height: 0;
+  border: none;
 }
 
-.js-tooltip.top:after, .js-tooltip.top-left:after, .js-tooltip.top-right:after { bottom: 0; }
-.js-tooltip.bottom:after, .js-tooltip.bottom-left:after, .js-tooltip.bottom-right:after { top: 0; }
-.js-tooltip.top:after, .js-tooltip.bottom:after { left: 50%; }
-.js-tooltip.top-left:after, .js-tooltip.bottom-left:after { right: 15px; }
-.js-tooltip.top-right:after, .js-tooltip.bottom-right:after { left: 15px; }
+$side_border: 10px;
+$point_border: 15px;
 
-.js-tooltip.left:after, .js-tooltip.left-top:after, .js-tooltip.left-bottom:after { right: 0; }
-.js-tooltip.right:after, .js-tooltip.right-top:after, .js-tooltip.right-bottom:after { left: 0; }
-.js-tooltip.left:after, .js-tooltip.right:after { top: 50%; }
-.js-tooltip.left-top:after, .js-tooltip.right-top:after { bottom: 15px; }
-.js-tooltip.left-bottom:after, .js-tooltip.right-bottom:after { top: 15px; }
+.js-tooltip.top:after, .js-tooltip.top-left:after, .js-tooltip.top-right:after {
+  bottom: -$point_border;
+  border-left: $side_border solid transparent;
+  border-right: $side_border solid transparent;
+
+  border-top: $point_border solid $tooltip_bg_color;
+}
+
+.js-tooltip.bottom:after, .js-tooltip.bottom-left:after, .js-tooltip.bottom-right:after {
+  top: -$point_border;
+  border-left: $side_border solid transparent;
+  border-right: $side_border solid transparent;
+
+  border-bottom: $point_border solid $tooltip_bg_color;
+}
+
+.js-tooltip.top:after, .js-tooltip.bottom:after {
+  left: calc(50% - #{$side_border});
+}
+
+.js-tooltip.top-left:after, .js-tooltip.bottom-left:after {
+  right: $point_border;
+}
+
+.js-tooltip.top-right:after, .js-tooltip.bottom-right:after {
+  left: $point_border;
+}
+
+.js-tooltip.left:after, .js-tooltip.left-top:after, .js-tooltip.left-bottom:after {
+  right: -$point_border;
+  border-top: $side_border solid transparent;
+  border-bottom: $side_border solid transparent;
+
+  border-left: $point_border solid $tooltip_bg_color;
+}
+
+.js-tooltip.right:after, .js-tooltip.right-top:after, .js-tooltip.right-bottom:after {
+  left: -$point_border;
+  border-top: $side_border solid transparent;
+  border-bottom: $side_border solid transparent;
+
+  border-right: $point_border solid $tooltip_bg_color;
+}
+
+.js-tooltip.left:after, .js-tooltip.right:after {
+  top: calc(50% - #{$side_border});
+}
+
+.js-tooltip.left-top:after, .js-tooltip.right-top:after {
+  bottom: $point_border;
+}
+
+.js-tooltip.left-bottom:after, .js-tooltip.right-bottom:after {
+  top: $point_border;
+}
 
 /* Fade */
 .js-tooltip.fade { opacity: 0; transition: opacity 200ms ease-out; }
@@ -54,26 +101,26 @@
 .js-tooltip.slide.top,
 .js-tooltip.slide.top-left,
 .js-tooltip.slide.top-right {
-  -webkit-transform: translateY(15px);
-  transform: translateY(15px);
+  -webkit-transform: translateY($point_border);
+  transform: translateY($point_border);
 }
 .js-tooltip.slide.bottom,
 .js-tooltip.slide.bottom-left,
 .js-tooltip.slide.bottom-right {
-  -webkit-transform: translateY(-15px);
-  transform: translateY(-15px);
+  -webkit-transform: translateY(-$point_border);
+  transform: translateY(-$point_border);
 }
 .js-tooltip.slide.left,
 .js-tooltip.slide.left-top,
 .js-tooltip.slide.left-bottom {
-  -webkit-transform: translateX(15px);
-  transform: translateX(15px);
+  -webkit-transform: translateX($point_border);
+  transform: translateX($point_border);
 }
 .js-tooltip.slide.right,
 .js-tooltip.slide.right-top,
 .js-tooltip.slide.right-bottom {
-  -webkit-transform: translateX(-15px);
-  transform: translateX(-15px);
+  -webkit-transform: translateX(-$point_border);
+  transform: translateX(-$point_border);
 }
 .js-tooltip.slide.in {
   opacity: 1;
@@ -149,7 +196,7 @@ div.got-it-container {
   button.got-it-button {
     border-radius: 4px;
     border: 1px solid rgba(255,255,255,0.9);
-    background-color: $oc_blue_dark;
+    background-color: $tooltip_bg_color;
     outline: none;
     color: rgba(255,255,255,0.9);
     float: right;

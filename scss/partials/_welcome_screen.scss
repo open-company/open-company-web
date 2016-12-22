@@ -12,10 +12,14 @@ div.welcome-screen{
     padding: 20px;
     text-align: center;
 
+    span:first-child {
+      font-weight: 600;
+    }
+
     span {
       display: block;
-      font-family: $oc_main_font;
-      font-size: 14px;
+      font-family: $oc_headers_font;
+      font-size: 16px;
       font-weight: 400;
       margin-bottom: 20px;
     }
