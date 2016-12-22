@@ -56,7 +56,7 @@
                (= (count (:archived company-data)) 0))
       (utils/after 500
         #(let [first-foce (str "first-foce-" (:slug company-data))]
-          (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "What would you like to say about this topic?"
+          (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Add your information, and select text for easy formatting options. You can jazz it up with a headline, emoji or image."
                                                                     :id first-foce
                                                                     :once-only true
                                                                     :config {:place "right-bottom"}})
