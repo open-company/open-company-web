@@ -41,8 +41,8 @@
         (dom/div {:class "company-editor-box group navbar-offset"}
           (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}
-              (dom/label {:class "company-editor-message"} "Welcome!")
-              (dom/label {:class "company-editor-message"} "What's the name of your company?")
+              (dom/label {:class "company-editor-message"} (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) "!"))
+              (dom/label {:class "company-editor-message"} "What’s the name of your company?")
               (dom/input {:type "text"
                           :class "company-editor-input domine h4"
                           :style #js {:width "100%"}

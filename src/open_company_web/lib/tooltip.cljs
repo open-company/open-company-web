@@ -4,10 +4,15 @@
   (:require [defun.core :refer (defun)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.utils :refer (after)]
             [open-company-web.lib.cookies :as cookie]
             [open-company-web.lib.responsive :as responsive]))
 
 (def ten-years (* 60 60 24 365 10))
+
+(defn tooltip-already-shown? [tt-id]
+  (when tt-id
+    (cookie/get-cookie tt-id)))
 
 (defn- skip-on-device?
   "If there is no data for this device type, then return true to skip showing this tip."
@@ -50,7 +55,7 @@
 
 (defn tooltip
   "Create a tooltip, attach it to the passed element at the gived position and return it"
-  [pos {:keys [id mobile desktop once-only dismiss-cb show-to-ro-users show-to-signed-out-users config] :as setup}]
+  [pos {:keys [id mobile desktop once-only dismiss-cb got-it-cb show-to-ro-users show-to-signed-out-users config] :as setup}]
   (when-let [tt (get @tooltips id)]
     (hide-tooltip (:tip tt) id))
   (let [tt (js/Tooltip. (get-device-content id mobile desktop) (clj->js (merge {:baseClass "js-tooltip"
@@ -94,8 +99,11 @@
                         (not (:read-only (dis/company-data))))))
         (do
           (.show tip)
-          (let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
-            (.on $btn "click" (fn []
-                               (hide-tooltip tt tip-id)
-                               (.off $btn "click")))))
+          (after 100
+            #(let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
+              (.on $btn "click" (fn []
+                                 (when (fn? (:got-it-cb (:setup tt)))
+                                   ((:got-it-cb (:setup tt))))
+                                 (hide-tooltip tt tip-id)
+                                 (.off $btn "click"))))))
         (reset! tooltips (dissoc @tooltips tip-id))))))
