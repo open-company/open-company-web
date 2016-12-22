@@ -36,11 +36,13 @@
         (utils/after 1000 #(api/get-new-sections))))))
 
 (defn show-share-work-tooltip [owner]
-  (when (om/get-state owner :share-tooltip-dismissed)
+  (when-let* [share-tooltip-dismissed (om/get-state owner :share-tooltip-dismissed)
+              share-work-tooltip-show (not (om/get-state owner :share-work-tooltip-shown))
+              company-data (dis/company-data (om/get-props owner))
+              invite-others (.querySelector js/document "button.invite-others")]
+    (om/set-state! owner :share-work-tooltip-shown true)
     (utils/after 600
-      #(when-let* [company-data (dis/company-data (om/get-props owner))
-                   share-work-tip (str "share-work-" (:slug company-data))
-                   invite-others (.querySelector js/document "button.invite-others")]
+      #(let [share-work-tip (str "share-work-" (:slug company-data))]
          (t/tooltip invite-others
                     {:desktop "Delegate and save time! Invite others so you don't have to do all the work."
                      :once-only true
@@ -64,7 +66,7 @@
       (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "bottom-left"}
                                                                                  :id tt-id
                                                                                  :once-only true
-                                                                                 :got-it-cb #(show-share-work-tooltip owner)
+                                                                                 :got-it-cb (fn [] (utils/after 100 #(show-share-work-tooltip owner)))
                                                                                  :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
                                                                                  :desktop "Automatically assemble topics into a beautiful company update."})]
         (t/show tt-id)))))
@@ -77,6 +79,7 @@
      :save-bt-active false
      :share-tooltip-shown false
      :share-tooltip-dismissed false
+     :add-second-topic-tt-shown false
      :new-sections-requested false
      :hide-welcome-screen (not (and (dis/company-data data)
                                     (= (count (:sections (dis/company-data data))) 0)
@@ -95,14 +98,10 @@
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
     (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
+      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data)))))
       (show-share-work-tooltip owner)))
 
-  (will-update [_ next-props next-state]
-    (when (and (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data next-props))))
-               (not (:share-tooltip-dismissed next-state)))
-      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data next-props)))))))
-
-  (did-update [_ prev-props _]
+  (did-update [_ prev-props prev-state]
     (let [company-data (dis/company-data data)]
       (when (and (:dashboard-sharing data)
                  (not (:dashboard-sharing prev-props)))
@@ -111,8 +110,10 @@
                  (:show-add-topic data))
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
           (t/hide add-second-topic-tt)))
-      (when (and (not (:selected-topic-view data))
+      (when (and (not (om/get-state owner :add-second-topic-tt-shown))
+                 (not (:selected-topic-view data))
                  (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1))
+        (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
           (t/tooltip [(int (/ (.-clientWidth (.-body js/document)) 2)) (int (- (/ (.-clientHeight (.-body js/document)) 2) 100))]
                       {:desktop "Awesome! Click on the + to add more topics to put together a complete update on the company."
@@ -121,6 +122,8 @@
                        :config {:effectClass "no-arrow"}})
           (t/show add-second-topic-tt)))
       (show-share-tooltip-if-needed owner)
+      (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
+        (show-share-work-tooltip owner))
       (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
         (show-share-work-tooltip owner))))
 
