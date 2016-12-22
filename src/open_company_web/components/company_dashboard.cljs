@@ -48,7 +48,6 @@
                    :once-only true
                    :id share-work-tip
                    :config {:place "bottom-left"}})
-       (js/console.log "show congrats:" [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (gobj/get invite-others-offset "top"))])
        (t/show share-work-tip))))
 
 (defn needs-share-tooltip [company-data]
