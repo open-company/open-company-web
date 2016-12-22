@@ -17,9 +17,9 @@
 .js-tooltip:not(.no-arrow):after {
   content: '';
   position: absolute;
-  width: 10px;
-  height: 10px;
-  margin: -5px;
+  width: 15px;
+  height: 15px;
+  margin: -7.5px;
   background: inherit;
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
