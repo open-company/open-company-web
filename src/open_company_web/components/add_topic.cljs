@@ -105,7 +105,7 @@
                                           (t/tooltip dom-node {:config {:place "right-bottom"}
                                                                :id tt-key
                                                                :persistent true
-                                                               :desktop "See something you want everyone to know about? Click it to get started. You’ll be able to add, remove and re-arrange topics anytime."})
+                                                               :desktop "See something you want everyone to know about? Click it to get started. Or you can name your own topic."})
                                           (t/show tt-key)))
                                         (assoc s ::tt-key tt-key))))
                        :will-unmount (fn [s]
