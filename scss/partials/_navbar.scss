@@ -137,6 +137,11 @@ nav.oc-navbar {
         float: right;
       }
 
+      button.invite-others {
+        margin-top: 11px;
+
+      }
+
       div.sharing-button-container{
         float: right;
 
@@ -144,11 +149,8 @@ nav.oc-navbar {
           margin-top: 11px;
         }
 
-        button.sharing-button.btn-link, button.sharing-cancel {
+        button.share-selected-topics-button, button.sharing-cancel {
           margin-top: 12px;
-        }
-
-        button.sharing-button, button.sharing-cancel {
           margin-right: 10px;
 
           &.btn-link {

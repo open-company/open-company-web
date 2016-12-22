@@ -11,6 +11,7 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.tooltip :as t]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.icon :as i]
@@ -104,10 +105,20 @@
                         (dom/div {:class "dropdown right"}
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {}))
+                        (when (and (not dashboard-sharing) (not (:read-only company-data)))
+                          (dom/button {:class "btn-reset invite-others right"
+                                       :title "Invite others"
+                                       :data-toggle "tooltip"
+                                       :data-container "body"
+                                       :data-placement "bottom"
+                                       :on-click #(let [share-work-tip (str "share-work-" (:slug company-data))]
+                                                   (t/hide share-work-tip)
+                                                   (router/nav! (oc-urls/company-settings-um)))}
+                            (dom/i {:class "fa fa-user-plus"})))
                         (when fixed-show-share-su-button
                           (if dashboard-sharing
                             (dom/div {:class "sharing-button-container"}
-                              (dom/button {:class "btn-reset sharing-button right btn-solid"
+                              (dom/button {:class "btn-reset share-selected-topics-button right btn-solid"
                                            :title (share-new-tooltip)
                                            :data-toggle "tooltip"
                                            :data-container "body"
@@ -124,14 +135,14 @@
                                                        (dis/dispatch! [:dashboard-share-mode false]))}
                                 "Cancel"))
                             (dom/div {:class "sharing-button-container"}
-                              (dom/button {:class "btn-reset sharing-button btn-link right"
+                              (dom/button {:class "btn-reset sharing-button right"
                                            :title (share-new-tooltip)
                                            :data-toggle "tooltip"
                                            :data-container "body"
                                            :data-placement "left"
                                            :on-click (fn []
                                                        (dis/dispatch! [:dashboard-share-mode true]))}
-                                "Share topics")))))
+                                (dom/i {:class "fa fa-share"}))))))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)
