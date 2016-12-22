@@ -4,6 +4,7 @@
   (:require [defun.core :refer (defun)]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.jwt :as jwt]
+            [open-company-web.lib.utils :refer (after)]
             [open-company-web.lib.cookies :as cookie]
             [open-company-web.lib.responsive :as responsive]))
 
@@ -98,10 +99,11 @@
                         (not (:read-only (dis/company-data))))))
         (do
           (.show tip)
-          (let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
-            (.on $btn "click" (fn []
-                               (when (fn? (:got-it-cb (:setup tt)))
-                                 ((:got-it-cb (:setup tt))))
-                               (hide-tooltip tt tip-id)
-                               (.off $btn "click")))))
+          (after 100
+            #(let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
+              (.on $btn "click" (fn []
+                                 (when (fn? (:got-it-cb (:setup tt)))
+                                   ((:got-it-cb (:setup tt))))
+                                 (hide-tooltip tt tip-id)
+                                 (.off $btn "click"))))))
         (reset! tooltips (dissoc @tooltips tip-id))))))
