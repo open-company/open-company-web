@@ -92,18 +92,7 @@
                                                                                           :card-width (responsive/calc-card-width)}))))))
 
   (did-update [_ _ prev-state]
-    (setup-sortable owner)
-    (when (and (om/get-state owner :did-share)
-               (not (om/get-state owner :show-su-dialog))
-               (:show-su-dialog prev-state))
-      (let [congrats-tip (str "congrats-tip-" (:slug (dis/company-data data)))
-            $body (.-body js/document)]
-        (t/tooltip [(int (+ (/ (.-clientWidth (.-body js/document)) 2) 20)) (int (/ (.-clientHeight (.-body js/document)) 2))]
-                   {:config {:typeClass "no-arrow"}
-                    :id congrats-tip
-                    :once-only true
-                    :desktop "Congratulations! Now you have one place to organize and share company updates."})
-        (t/show congrats-tip))))
+    (setup-sortable owner))
 
   (will-unmount [_]
     (when-let [resize-listener (om/get-state owner :resize-listener)]
