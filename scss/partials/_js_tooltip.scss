@@ -1,10 +1,12 @@
 $tooltip_bg_color: $oc_blue_dark;
 $tooltip_color: white;
+$side_border: 10px;
+$point_border: 15px;
 
 .js-tooltip {
   position: fixed;
   padding: .8em 1em;
-  top: 10px; /* Defines the spacing between tooltip and target position */
+  top: $point_border; /* Defines the spacing between tooltip and target position */
   max-width: 200px;
   color: #fff;
   background: $tooltip_bg_color;
@@ -25,9 +27,6 @@ $tooltip_color: white;
   height: 0;
   border: none;
 }
-
-$side_border: 10px;
-$point_border: 15px;
 
 .js-tooltip.top:after, .js-tooltip.top-left:after, .js-tooltip.top-right:after {
   bottom: -$point_border;
