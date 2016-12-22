@@ -9,7 +9,6 @@
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
             [open-company-web.dispatcher :as dis]
-            [open-company-web.lib.tooltip :as t]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.topic :refer (topic)]
@@ -19,7 +18,6 @@
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
-(def share-work-topic-name "--share-work")
 
 (defn get-initial-layout [columns-num]
   (cond
@@ -50,9 +48,7 @@
                               (if (even? idx)
                                  (assoc layout :1 (conj (:1 layout) topic))
                                  (assoc layout :2 (conj (:2 layout) topic)))))))]
-      (if (pos? (count sections))
-        (assoc layout :2 (conj (:2 layout) share-work-topic-name))
-        layout))
+      layout)
     ; just layout the sections in :sections order
     ; in 3 columns
     (= (om/get-props owner :columns-num) 3)
@@ -70,10 +66,7 @@
                                  (assoc layout :2 (conj (:2 layout) topic))
                                  (= (mod idx 3) 2)
                                  (assoc layout :3 (conj (:3 layout) topic)))))))]
-      (if (pos? (count sections))
-        (let [share-work-column (if (= (count sections) 1) :2 :3)]
-          (assoc layout share-work-column (conj (get layout share-work-column) share-work-topic-name)))
-        layout))))
+      layout)))
 
 (defn render-topic [owner options section-name & [column]]
   (when section-name
@@ -225,14 +218,7 @@
                         (for [idx (range (count column))
                               :let [section-kw (get column idx)
                                     section-name (name section-kw)]]
-                          (if (not= section-kw share-work-topic-name)
-                            (partial-render-topic section-name (name kw))
-                            (dom/div {:class "invite-others"
-                                      :on-click #(let [share-work-tip (str "share-work-" (:slug company-data))]
-                                                   (t/hide share-work-tip)
-                                                   (router/nav! (oc-urls/company-settings-um)))}
-                              (dom/i {:class "fa fa-user-plus"})
-                              " " (dom/span "Invite others to contribute")))))))))))
+                          (partial-render-topic section-name (name kw))))))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"

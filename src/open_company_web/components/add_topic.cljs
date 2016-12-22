@@ -58,45 +58,41 @@
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (rum/defcs category < rum/static
-  [s cat company-data update-active-topics-cb all-sections]
-  (let [all-sections (into {} (for [s (get-all-sections)]
-                                [(keyword (:section s)) s]))
-        archived-topics (:archived company-data)
-        show-archived (pos? (count archived-topics))]
+  [s cat company-data update-active-topics-cb all-sections is-archived]
+  (let [archived-topics (:archived company-data)
+        all-sections (into {} (if is-archived
+                                (for [a archived-topics]
+                                  [(keyword (:section a)) a])
+                                (for [s (get-all-sections)]
+                                  [(keyword (:section s)) s])))]
     [:div
       [:span.block.mb1.all-caps
         {:class (if (> (:order cat) 1) "mt3" "mt0")}
         (str (:name cat) (when (:icon cat) " "))]
       (for [sec (:sections cat)
+            :when (or is-archived
+                      (and (not (utils/in? (:sections company-data) sec))
+                           (not (utils/in? archived-topics sec))))
             :let [section-data (get all-sections (keyword sec))
-                  archived? (some #(= (:section %) sec) archived-topics)
-                  disabled? (or (utils/in? (:sections company-data) sec)
-                                (utils/in? archived-topics sec))]]
+                  section-kw (keyword (:section section-data))]]
         [:div.mb1.btn-reset.yellow-line-hover-child
-          {:key (:section section-data)
-           :class (when disabled? "disabled")
-           :on-click #(when-not disabled?
-                       (update-active-topics-cb (:section section-data) {:title (:title section-data)
-                                                                         :section (:section section-data)
-                                                                         :placeholder true
-                                                                         :body-placeholder (:body-placeholder section-data)
-                                                                         :links (:links section-data)
-                                                                         :was-archived archived?}))}
+          {:key (str "section-" sec)
+           :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data)
+                                                                        :section (:section section-data)
+                                                                        :placeholder true
+                                                                        :body-placeholder (:body-placeholder section-data)
+                                                                        :links (:links section-data)
+                                                                        :was-archived is-archived})}
           [:span.child.topic-title
             (:title section-data)
-            (when archived? " ")
-            (when archived?
-              [:i.fa.fa-archive
-                {:data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container ".add-topic"
-                 :title "Archived topic"}])
-            (when (or (= (:section section-data) "finances")
-                      (= (:section section-data) "growth"))
+            (when (#{:finances :growth} section-kw)
               " ")
-            (when (or (= (:section section-data) "finances")
-                      (= (:section section-data) "growth"))
+            (when (#{:finances :growth} section-kw)
               [:i.fa.fa-line-chart])]])]))
+
+(defn is-active-or-archived [section active-sections archived-sections]
+  (and (not (utils/in? active-sections section))
+       (not (utils/in? archived-sections section))))
 
 (rum/defcs add-topic < rum/reactive
                        (drv/drv :company-data)
@@ -118,27 +114,43 @@
                                        (t/hide (::tt-key s))
                                       s)}
   [s update-active-topics-cb]
-  (let [company-data @(drv/get-ref s :company-data)
+  (let [company-data (drv/react s :company-data)
         all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
         categories (get-categories)
-        sections-count (count (:sections (drv/react s :company-data)))]
+        sections (:sections company-data)
+        archived (vec (map :section (:archived company-data)))
+        archived-category {:name "Archived" :order 2 :sections archived}]
       [:div.add-topic.group
         [:div.add-topic-title
-          (if (= sections-count 0)
+          (if (count sections)
             "Choose a topic to get started"
-            "Add topic")]
+            "Add another topic")]
         [:hr]
-        (when-not (= sections-count 0)
+        (when (pos? (count sections))
           [:span.close-add-topic
             {:on-click #(dis/dispatch! [:show-add-topic false])}
             (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})])
         [:div.mxn2.clearfix
           ;; column 1
-          (for [column (keys categories)]
+          (for [column (keys categories)
+                :let [all-categories (get categories column)
+                      filter-categories (filter (fn [c]
+                                                  (pos? (count (vec (filter
+                                                                     #(is-active-or-archived % sections archived)
+                                                                     (:sections c))))))
+                                         all-categories)]
+                :when (pos? (count filter-categories))]
             [:div.col.px2.col-4
               {:key (str "add-topic-col-" (name column))}
-              (for [cat (get categories column)]
-                (rum/with-key (category cat company-data update-active-topics-cb all-sections)
+              (for [cat (get categories column)
+                    :let [filtered-sections (vec (filter #(is-active-or-archived % sections archived) (:sections cat)))]
+                    :when (pos? (count filtered-sections))]
+                (rum/with-key (category (assoc cat :sections filtered-sections) company-data update-active-topics-cb all-sections false)
                  (str "col-" (:name cat))))])]
+        [:div.mxn2.clearfix
+          (when (pos? (count archived))
+            [:div.col.px2.col-12
+              (rum/with-key (category archived-category company-data update-active-topics-cb all-sections true)
+               (str "col-Archived"))])]
         (custom-topic-input (get all-sections (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))

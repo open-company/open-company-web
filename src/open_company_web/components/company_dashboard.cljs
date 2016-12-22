@@ -39,16 +39,12 @@
   (utils/after 600
     #(when-let* [company-data (dis/company-data (om/get-props owner))
                  share-work-tip (str "share-work-" (:slug company-data))
-                 $invite-others (js/$ (.querySelector js/document "div.invite-others"))
-                 invite-others-offset (.offset $invite-others)
-                 invite-others-width (.width $invite-others)
-                 invite-others-height (.height $invite-others)]
-       (t/tooltip [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (+ (gobj/get invite-others-offset "top") invite-others-height 10))]
+                 invite-others (.querySelector js/document "button.invite-others")]
+       (t/tooltip invite-others
                   {:desktop "Spread the work and save time! Invite others to add topics they know best so you don’t have to do it all."
                    :once-only true
                    :id share-work-tip
                    :config {:place "bottom-left"}})
-       (js/console.log "show congrats:" [(int (+ (gobj/get invite-others-offset "left") (/ invite-others-width 2))) (int (gobj/get invite-others-offset "top"))])
        (t/show share-work-tip))))
 
 (defn needs-share-tooltip [company-data]
