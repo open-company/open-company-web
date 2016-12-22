@@ -123,7 +123,7 @@
         [:div.add-topic-title
           (if (count sections)
             "Choose a topic to get started"
-            "Add topic")]
+            "Add another topic")]
         [:hr]
         (when (pos? (count sections))
           [:span.close-add-topic
