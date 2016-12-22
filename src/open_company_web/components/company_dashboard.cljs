@@ -86,18 +86,10 @@
         (show-share-work-tooltip owner))))
 
   (did-update [_ prev-props _]
-    (let [company-data (dis/company-data data)
-          sharing-tt (str "first-sharing-tt-" (:slug company-data))]
+    (let [company-data (dis/company-data data)]
       (when (and (:dashboard-sharing data)
                  (not (:dashboard-sharing prev-props)))
-        (t/hide (str "second-topic-share-" (:slug company-data)))
-        (t/tooltip [(/ (.-clientWidth (.-body js/document)) 2) (/ (.-clientHeight (.-body js/document)) 2)]
-                   {:desktop "Click on the topics to include, or select all."
-                    :once-only true
-                    :id sharing-tt
-                    :config {:place "top"
-                             :typeClass "no-arrow"}})
-        (t/show sharing-tt))
+        (t/hide (str "second-topic-share-" (:slug company-data))))
       (when (and (not= (:dashboard-selected-topics data) (:dashboard-selected-topics prev-props))
                  (pos? (count (:dashboard-selected-topics data))))
         (t/hide sharing-tt))))
