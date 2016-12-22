@@ -210,9 +210,7 @@
           ; go back to dashbaord if it's a brand new topic
           (when (:new topic-data)
             (reset! prevent-route-dispatch false)
-            (utils/after 10 #(router/nav! (oc-urls/company))))
-          ; dismissing foce
-          (utils/after 100 #(dis/dispatch! [:start-foce nil])))))))
+            (router/nav! (oc-urls/company))))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
