@@ -83,7 +83,15 @@
                                                                                    :desktop "Automatically assemble topics into a beautiful company update."})]
            (t/show tt-id)))
       (when (pos? (:count (utils/link-for (:links company-data) "stakeholder-updates")))
-        (show-share-work-tooltip owner))))
+        (show-share-work-tooltip owner))
+      (when (= (count (:sections company-data)) 1)
+        (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
+          (t/tooltip [(int (/ (.-clientWidth (.-body js/document)) 2)) (int (/ (.-clientHeight (.-body js/document)) 2))]
+                      {:desktop "Awesome! Add more topics to put together a complete update on the company."
+                       :once-only true
+                       :id add-second-topic-tt
+                       :config {:effectClass "no-arrow"}})
+          (t/show add-second-topic-tt)))))
 
   (did-update [_ prev-props _]
     (let [company-data (dis/company-data data)]
@@ -92,7 +100,10 @@
         (t/hide (str "second-topic-share-" (:slug company-data))))
       (when (and (not= (:dashboard-selected-topics data) (:dashboard-selected-topics prev-props))
                  (pos? (count (:dashboard-selected-topics data))))
-        (t/hide sharing-tt))))
+        (t/hide sharing-tt))
+      (when (:show-add-topic data)
+        (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
+          (t/hide add-second-topic-tt)))))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
