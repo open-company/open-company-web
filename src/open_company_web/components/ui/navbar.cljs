@@ -111,7 +111,7 @@
                                        :data-toggle "tooltip"
                                        :data-container "body"
                                        :data-placement "bottom"
-                                       :on-click #(let [share-work-tip (str "share-work-" (:slug company-data))]
+                                       :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/company-data)))]
                                                    (t/hide share-work-tip)
                                                    (router/nav! (oc-urls/company-settings-um)))}
                             (dom/i {:class "fa fa-user-plus"})))
