@@ -63,13 +63,15 @@
                    (count (:archived company-data))) 2)
                (.querySelector js/document "button.sharing-button"))
       (om/set-state! owner :share-tooltip-shown true)
-      (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "bottom-left"}
-                                                                                 :id tt-id
-                                                                                 :once-only true
-                                                                                 :got-it-cb (fn [] (utils/after 100 #(show-share-work-tooltip owner)))
-                                                                                 :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
-                                                                                 :desktop "Automatically assemble topics into a beautiful company update."})]
-        (t/show tt-id)))))
+      (utils/after 500
+        (fn []
+          (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "bottom-left"}
+                                                                                     :id tt-id
+                                                                                     :once-only true
+                                                                                     :got-it-cb (fn [] (utils/after 100 #(show-share-work-tooltip owner)))
+                                                                                     :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
+                                                                                     :desktop "Automatically assemble your topics to share a beautiful company update."})]
+            (t/show tt-id)))))))
 
 (defcomponent company-dashboard [data owner]
 

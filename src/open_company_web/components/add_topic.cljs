@@ -99,15 +99,20 @@
                        (rum/local "" ::tt-key)
                        {:did-mount (fn [s]
                                     (let [rum-comp (:rum/react-component s)
-                                          dom-node (js/ReactDOM.findDOMNode rum-comp)
+                                          add-topic-node (js/ReactDOM.findDOMNode rum-comp)
+                                          $add-topic (js/$ add-topic-node)
+                                          add-topic-offset (.offset $add-topic)
+                                          add-topic-width (.width $add-topic)
+                                          add-topic-height (.width $add-topic)
+                                          coords [(+ (.-left add-topic-offset) add-topic-width 42) (+ (.-top add-topic-offset) 60)]
                                           company-data @(drv/get-ref s :company-data)]
                                       (let [tt-key (str "first-add-topic-" (:slug company-data))]
                                         (utils/after 500
                                          #(when (= (count (:sections company-data)) 0)
-                                          (t/tooltip dom-node {:config {:place "right-bottom"}
-                                                               :id tt-key
-                                                               :persistent true
-                                                               :desktop "See something you want everyone to know about? Click it to get started. Or you can name your own topic."})
+                                          (t/tooltip coords {:config {:place "right-bottom"}
+                                                             :id tt-key
+                                                             :persistent true
+                                                             :desktop "See something you want everyone to know about? Click it to get started. Or you can name your own topic."})
                                           (t/show tt-key)))
                                         (assoc s ::tt-key tt-key))))
                        :will-unmount (fn [s]
