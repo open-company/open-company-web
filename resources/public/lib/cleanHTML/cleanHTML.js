@@ -278,12 +278,14 @@ function didPaste(e){
   replaceSelectionWithHtml(cleanedData);
 }
 
-function recursiveAttachPasteListener(el){
-  // $(el).off("paste", didPaste);
-  el.removeEventListener("paste", didPaste)
-  // $(el).on("paste", didPaste);
-  el.addEventListener("paste", didPaste)
+function recursiveAttachPasteListener(el, cb){
+  // Attach the didPaste function with the passed cb to call both when the paste event happen
+  var pasteCb = function(e) {didPaste(e); if(typeof cb === "function"){cb();}};
+  el.removeEventListener("paste", pasteCb);
+  el.addEventListener("paste", pasteCb);
   if (el.hasChildNodes()){
-    el.childNodes.forEach(recursiveAttachPasteListener);
+    el.childNodes.forEach(function(el_child){
+      recursiveAttachPasteListener(el_child, cb);
+    });
   }
 }
