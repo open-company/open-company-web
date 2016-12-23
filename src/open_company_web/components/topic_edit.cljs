@@ -58,7 +58,7 @@
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
     ; Attach paste listener to the body and all its children
-    (js/recursiveAttachPasteListener body-el)
+    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder (om/get-state owner :body-editor) body-el) #(utils/to-end-of-content-editable body-el)))
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (om/update-state! owner #(merge % {:char-count nil
@@ -69,13 +69,13 @@
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
-    (js/recursiveAttachPasteListener body-el)
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe body-editor
                   "editableInput"
                   (fn [event editable]
                     (body-on-change owner)))
-      (om/set-state! owner :body-editor body-editor))
+      (om/set-state! owner :body-editor body-editor)
+      (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder body-editor body-el) #(utils/to-end-of-content-editable body-el))))
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
@@ -188,8 +188,8 @@
 
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
-        body-el         (js/$ (str "#foce-body-" (name topic)))
-        headline-el     (js/$ (str "#foce-headline-" (name topic)))]
+        body-el         (js/$ (str "#foce-body-" topic))
+        headline-el     (js/$ (str "#foce-headline-" topic))]
     (cond
       ;; if the headline exceeds: focus on it with the cursor at the end, show the chart count
       (om/get-state owner :headline-exceeds)
@@ -211,6 +211,23 @@
           (when (:new topic-data)
             (reset! prevent-route-dispatch false)
             (router/nav! (oc-urls/company))))))))
+
+(defn headline-on-paste
+  "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
+  [owner e]
+  ; Prevent the normal paste behaviour
+  (utils/event-stop e)
+  (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
+        pasted-data (.getData clipboardData "text/plain")
+        topic           (name (dis/foce-section-key))
+        headline-el     (.querySelector js/document (str "#foce-headline-" topic))]
+    ; replace the selected text of headline with the text/plain data of the clipboard
+    ; (set! (.-innerText headline-el) pasted-data)
+    (js/replaceSelectedText pasted-data)
+    ; call the headline-on-change to check for content length
+    (headline-on-change owner)
+    ; move cursor at the end
+    (utils/to-end-of-content-editable headline-el)))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
@@ -266,7 +283,7 @@
                                    (.offset topic-edit-div)
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
-                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 128)}))))))
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
@@ -381,6 +398,7 @@
                         :key "foce-headline"
                         :placeholder "Optional headline"
                         :contentEditable true
+                        :onPaste #(headline-on-paste owner %)
                         :onKeyUp   #(check-headline-count owner % true)
                         :onKeyDown #(check-headline-count owner % true)
                         :onFocus    #(check-headline-count owner % false)
