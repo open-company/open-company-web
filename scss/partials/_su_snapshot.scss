@@ -1,5 +1,6 @@
 div.su-snapshot {
   background-color: $oc_gray_8;
+  min-height: 100vh;
   @include big_web(){
     border-top: 4px solid $oc_yellow;
   }
@@ -67,7 +68,6 @@ div.su-snapshot {
   div.su-sp-content {
     position: relative;
     content: "";
-    min-height: calc(100vh - #{$footer_small_height}px);
     background-color: white;
     @include big_web(){
       margin: 50px auto;
