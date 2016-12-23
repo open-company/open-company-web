@@ -1,105 +1,115 @@
-div.topic-view {
+div.topic-view-container{
   overflow-x: hidden;
   overflow-y: scroll;
   float: right;
-  background-color: white;
-  border: 1px solid rgba(78,90,107,0.05);
   margin: 0 0 0 50px;
-  padding: 0 30px;
 
-  &.tablet-view{
-    padding: 0px;
-    margin: 0px;
+  div.topic-view {
+    background-color: white;
+    border: 1px solid rgba(78,90,107,0.05);
+    padding: 0 30px;
 
-    min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_height}px);
+    &.tablet-view{
+      padding: 0px;
+      margin: 0px;
+
+      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_height}px);
+
+      div.topic-view-internal {
+        float: none;
+        padding: 0px;
+        margin-top: #{$mobile_navbar_height}px;
+      }
+    }
+
+    div.topic-view-navbar {
+      width: 100%;
+      height: #{$mobile_navbar_height}px;
+      font-size: 22px;
+      font-family: $oc_headers_font;
+      font-weight: 700;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: white;
+      z-index: 1;
+      box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(78,90,107,0.1);
+
+      div.topic-view-navbar-title {
+        padding: 20px 10px;
+        width: 80%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-left: 20px;
+      }
+
+      div.topic-view-navbar-close {
+        padding: 20px 0 0 20px;
+      }
+    }
 
     div.topic-view-internal {
-      float: none;
-      padding: 0px;
-      margin-top: #{$mobile_navbar_height}px;
-    }
-  }
+      margin: 0 auto;
+      padding: 20px 0px;
+      float: left;
 
-  div.topic-view-navbar {
-    width: 100%;
-    height: #{$mobile_navbar_height}px;
-    font-size: 22px;
-    font-family: $oc_headers_font;
-    font-weight: 700;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: white;
-    z-index: 1;
-    box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(78,90,107,0.1);
+      div.fake-textarea {
+        padding: 20px;
 
-    div.topic-view-navbar-title {
-      padding: 20px 10px;
-      width: 80%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-left: 20px;
-    }
+        &.disabled {
+          opacity: 0.4;
+        }
 
-    div.topic-view-navbar-close {
-      padding: 20px 0 0 20px;
-    }
-  }
+        div.topic {
+          border: none;
+          box-shadow: none;
+          float: left;
+          background-color: transparent;
+        }
 
-  div.topic-view-internal {
-    margin: 0 auto;
-    padding: 20px 0px;
-    float: left;
-
-    div.fake-textarea {
-      padding: 20px;
-
-      &.disabled {
-        opacity: 0.4;
+        div.fake-textarea-internal {
+          cursor: text;
+          border: 1px solid rgba(78,90,107,0.2);
+          border-radius: 8px;
+          height: 46px;
+          color: $oc_blue_dark;
+          padding: 12px;
+          font-weight: 400;
+          font-family: $oc_headers_font;
+          font-size: 14px;
+          font-style: italic;
+        }
       }
 
-      div.topic {
-        border: none;
-        box-shadow: none;
-        float: left;
-        background-color: transparent;
-      }
-
-      div.fake-textarea-internal {
-        cursor: text;
-        border: 1px solid rgba(78,90,107,0.2);
-        border-radius: 8px;
-        height: 46px;
-        color: $oc_blue_dark;
-        padding: 12px;
-        font-weight: 400;
-        font-family: $oc_headers_font;
-        font-size: 14px;
-        font-style: italic;
-      }
-    }
-
-    div.revision-container{
-      margin: 20px 0px;
-
-      hr.separator-line {
+      div.revision-container{
         margin: 20px 0px;
-        padding: 0;
-        height: 1px;
-        background-color: rgba(78,90,107,0.2);
-      }
 
-      div.topic {
-        border: none;
-        box-shadow: none;
-        float: left;
-        background-color: transparent;
+        hr.separator-line {
+          margin: 20px 0px;
+          padding: 0;
+          height: 1px;
+          background-color: rgba(78,90,107,0.2);
+        }
 
-        div.card-image {
-          margin-top: 12px;
+        div.topic {
+          border: none;
+          box-shadow: none;
+          float: left;
+          background-color: transparent;
+
+          div.card-image {
+            margin-top: 12px;
+          }
         }
       }
     }
+  }
+
+  button.archive-topic {
+    padding: 0;
+    margin: 0;
+    margin-top: 10px;
+    text-transform: none;
   }
 }
