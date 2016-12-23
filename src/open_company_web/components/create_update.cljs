@@ -145,7 +145,7 @@
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Arrange your topics in any order.")
+                  "Arrange your topics in any order before you share them.")
                 (dom/div {:class "create-update-topics-list"
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
