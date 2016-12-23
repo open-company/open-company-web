@@ -119,6 +119,7 @@
         new-topic-kw (keyword new-topic)]
     (om/set-state! owner :start-foce {:section new-topic-kw
                                       :title (:title section-data)
+                                      :was-archived (:was-archived section-data)
                                       :new (not (:was-archived section-data))})
     (if (s/starts-with? new-topic "custom-")
       (api/patch-sections new-topics section-data new-topic)
@@ -167,11 +168,12 @@
                                new-title
                                new-section-data)]
         (utils/after 10 #(router/nav! (oc-urls/company-section (router/current-company-slug) new-section)))
-        (utils/after 60 #(dis/dispatch! [:start-foce
-                                          new-section
-                                          (merge foce-section-data {:new (:new start-foce)
-                                                                    :body-placeholder (or (:body-placeholder start-foce)
-                                                                                          (utils/new-section-body-placeholder))})])))
+        (when-not (:was-archived start-foce)
+          (utils/after 60 #(dis/dispatch! [:start-foce
+                                            new-section
+                                            (merge foce-section-data {:new (:new start-foce)
+                                                                      :body-placeholder (or (:body-placeholder start-foce)
+                                                                                            (utils/new-section-body-placeholder))})]))))
       (om/set-state! owner :start-foce nil)))
 
   (render-state [_ {:keys [best-layout filtered-topics]}]
