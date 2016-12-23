@@ -531,10 +531,11 @@
         updated-company-data (-> company-data
                                 (assoc :sections updated-sections)
                                 (assoc :archived updated-archived)
-                                (assoc (keyword topic) topic-data))]
-    (-> db
-      (assoc-in company-data-key updated-company-data)
-      (start-foce topic topic-data))))
+                                (assoc (keyword topic) topic-data))
+        next-db (assoc-in db company-data-key updated-company-data)]
+    (if (:was-archived topic-data)
+     next-db
+     (start-foce next-db topic topic-data))))
 
 (defmethod dispatcher/action :rollback-add-topic
   [db [_ topic-kw]]

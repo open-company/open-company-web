@@ -34,7 +34,6 @@
 (def headline-alert-limit 10)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
-(def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
 (defn focus-body []
   (when-let* [section-kw (dis/foce-section-key)
@@ -179,7 +178,7 @@
 
 (defn- remove-topic-click [owner e]
   (add-popover {:container-id "archive-topic-confirm"
-                :message before-archive-message
+                :message utils/before-archive-message
                 :height "170px"
                 :cancel-title "KEEP"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
@@ -527,7 +526,7 @@
                                           (router/nav! (oc-urls/company)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
-            (when-not (:new topic-data)
+            (when (:show-archive-button data)
               (dom/button {:class "btn-reset archive-button right"
                            :title "Archive this topic"
                            :type "button"

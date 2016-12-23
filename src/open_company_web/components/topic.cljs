@@ -290,6 +290,7 @@
                                 :read-only-company read-only-company
                                 :foce-key foce-key
                                 :foce-data foce-data
+                                :show-archive-button (:show-archive-button data)
                                 :columns-num columns-num}
                                {:opts options
                                 :key (str "topic-foce-" section "-" (:created-at section-data))})

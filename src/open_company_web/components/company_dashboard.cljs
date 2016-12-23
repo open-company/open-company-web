@@ -35,21 +35,6 @@
         (om/update-state! owner :new-sections-requested not)
         (utils/after 1000 #(api/get-new-sections))))))
 
-(defn show-share-work-tooltip [owner]
-  (when-let* [share-tooltip-dismissed (om/get-state owner :share-tooltip-dismissed)
-              share-work-tooltip-show (not (om/get-state owner :share-work-tooltip-shown))
-              company-data (dis/company-data (om/get-props owner))
-              invite-others (.querySelector js/document "button.invite-others")]
-    (om/set-state! owner :share-work-tooltip-shown true)
-    (utils/after 600
-      #(let [share-work-tip (str "share-work-" (:slug company-data))]
-         (t/tooltip invite-others
-                    {:desktop "Delegate and save time! Invite others so you don't have to do all the work."
-                     :once-only true
-                     :id share-work-tip
-                     :config {:place "bottom-left"}})
-         (t/show share-work-tip)))))
-
 (defn share-tooltip-id [slug]
   (str "second-topic-share-" slug))
 
@@ -68,9 +53,8 @@
           (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "bottom-left"}
                                                                                      :id tt-id
                                                                                      :once-only true
-                                                                                     :got-it-cb (fn [] (utils/after 100 #(show-share-work-tooltip owner)))
                                                                                      :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
-                                                                                     :desktop "Automatically assemble your topics to share a beautiful company update."})]
+                                                                                     :desktop "You can invite others to your dashboard, or you can share topics via email or a private URL."})]
             (t/show tt-id)))))))
 
 (defcomponent company-dashboard [data owner]
@@ -100,8 +84,7 @@
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
     (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
-      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data)))))
-      (show-share-work-tooltip owner)))
+      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data)))))))
 
   (did-update [_ prev-props prev-state]
     (let [company-data (dis/company-data data)]
@@ -123,11 +106,7 @@
                        :id add-second-topic-tt
                        :config {:effectClass "no-arrow"}})
           (t/show add-second-topic-tt)))
-      (show-share-tooltip-if-needed owner)
-      (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
-        (show-share-work-tooltip owner))
-      (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
-        (show-share-work-tooltip owner))))
+      (show-share-tooltip-if-needed owner)))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
