@@ -126,15 +126,17 @@ div.create-update {
               border: 1px solid rgba(78,90,107,0.2);
               border-radius: 2px;
 
-              &:after, &::after {
-                font-size: 13px;
-                font-family: FontAwesome;
-                float: right;
-                font-weight: 400;
-                color: $oc_gray_5;
-                content: "\f0c9";
-                cursor: move;
-                opacity: 0.7;
+              &.dnd{
+                &:after, &::after {
+                  font-size: 13px;
+                  font-family: FontAwesome;
+                  float: right;
+                  font-weight: 400;
+                  color: $oc_gray_5;
+                  content: "\f0c9";
+                  cursor: move;
+                  opacity: 0.7;
+                }
               }
             }
 

@@ -150,7 +150,7 @@
                           :key (clojure.string/join "-" su-topics)}
                   (for [topic su-topics]
                     (let [sd ((keyword topic) company-data)]
-                      (dom/div {:class "create-update-topics-list-item oc-active"
+                      (dom/div {:class (str "create-update-topics-list-item oc-active" (when (> (count su-topics) 1) " dnd"))
                                 :data-topic topic
                                 :ref topic
                                 :key topic}
