@@ -49,6 +49,7 @@ location.reload = function(){};
 var emojiAutocomplete = function(){};
 // cleanHTML
 var recursiveAttachPasteListener = function(){};
+var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
 // Tooltip http://darsa.in/tooltip/
