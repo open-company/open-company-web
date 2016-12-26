@@ -79,7 +79,7 @@
           {:key (str "section-" sec)
            :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data)
                                                                         :section (:section section-data)
-                                                                        :placeholder true
+                                                                        :placeholder (not is-archived)
                                                                         :body-placeholder (:body-placeholder section-data)
                                                                         :links (:links section-data)
                                                                         :was-archived is-archived})}
