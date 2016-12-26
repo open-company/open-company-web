@@ -116,7 +116,11 @@
   (let [company-data (om/get-props owner :company-data)
         new-topic-kw (keyword new-topic)
         fixed-topic-data (merge topic-data {:section new-topic
-                                            :new (not (:was-archived topic-data))})]
+                                            :new (not (:was-archived topic-data))
+                                            :loading (:was-archived topic-data)})
+        new-topics (conj (:sections company-data) new-topic)]
+    (when (:was-archived topic-data)
+      (api/patch-sections new-topics))
     (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
     (router/nav! (oc-urls/company-section (:slug company-data) new-topic))))
