@@ -9,7 +9,8 @@
             [open-company-web.router :as router]
             [open-company-web.caches :as cache]
             [open-company-web.api :as api]
-            [open-company-web.local-settings :as ls]))
+            [open-company-web.local-settings :as ls]
+            [open-company-web.lib.responsive :as responsive]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -68,7 +69,7 @@
     (let [slug (:slug body)
           response (:response body)]
       (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
-      (swap! cache/new-sections assoc-in [(keyword slug) :categories] (:categories response))
+      (swap! cache/new-sections assoc-in [(keyword slug) :new-sections-categories] (:categories response))
       ;; signal to the app-state that the new-sections have been loaded
       (-> db
         (assoc-in [(keyword slug) :new-sections] (:templates response))
@@ -98,7 +99,7 @@
 
 (defmethod dispatcher/action :section [db [_ {:keys [slug section body]}]]
   ;; Refresh section revisions
-  (utils/after 500 #(api/load-revisions slug section (utils/link-for (:links body) "revisions")))
+  (api/load-revisions slug section (utils/link-for (:links body) "revisions"))
   (if body
     (let [fixed-section (utils/fix-section body section)]
       (assoc-in db (dispatcher/company-section-key slug section) fixed-section))
@@ -187,18 +188,24 @@
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
         (dissoc :loading)))))
 
+(defn start-foce [db section section-data]
+  (-> db
+    (assoc :foce-key (keyword section)) ; which topic is being FoCE
+    (assoc :foce-data section-data)     ; map of the in progress edits of the topic data
+    (assoc :foce-data-editing? false)   ; is the data portion of the topic (e.g. finance, growth) being edited
+    (dissoc :show-add-topic)))          ; remove the add topic view)
+
+(defn stop-foce [db]
+  (-> db
+    (dissoc :foce-key)
+    (dissoc :foce-data)
+    (dissoc :foce-data-editing?)))
+
 ;; Front of Card Edit section
 (defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
   (if section-key
-    (-> db
-        (assoc :foce-key section-key) ; which topic is being FoCE
-        (assoc :foce-data section-data) ; map of the in progress edits of the topic data
-        (assoc :foce-data-editing? false) ; is the data portion of the topic (e.g. finance, growth) being edited
-        (dissoc :show-add-topic)) ; remove the add topic view
-    (-> db
-        (dissoc :foce-key)
-        (dissoc :foce-data)
-        (dissoc :foce-data-editing?))))
+    (start-foce db section-key section-data)
+    (stop-foce db)))
 
 (defmethod dispatcher/action :start-foce-data-editing [db [_ value]]
   (assoc db :foce-data-editing? value))
@@ -237,16 +244,20 @@
         topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
-        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))]
-    ;; PUT if we don't have an :updated-at in the topic data, PATCH else
-    (if (utils/link-for (:links with-fixed-body) "partial-update" "PATCH")
-      (api/partial-update-section topic with-fixed-body)
-      (api/save-or-create-section with-fixed-body))
+        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
+        without-placeholder (dissoc with-fixed-body :placeholder)
+        with-created-at (if (contains? without-placeholder :created-at) without-placeholder (assoc without-placeholder :created-at (utils/as-of-now)))
+        created-at (:created-at with-created-at)
+        revisions-data (:revisions-data (get (dispatcher/company-data db) topic))
+        without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
+        with-new-revision (conj without-current-revision with-created-at)
+        sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))]
+    (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
+      (api/partial-update-section topic with-created-at)
+      (api/save-or-create-section with-created-at))
     (-> db
-        (dissoc :foce-key)
-        (dissoc :foce-data)
-        (dissoc :foce-data-editing?)
-        (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) with-fixed-body))))
+      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) sorted-revisions)
+      (stop-foce))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
   (if topic
@@ -466,7 +477,9 @@
 
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
-  (assoc db :mobile-menu-open (not (:mobile-menu-open db))))
+  (if (responsive/is-mobile-size?)
+    (assoc db :mobile-menu-open (not (:mobile-menu-open db)))
+    db))
 
 (defmethod dispatcher/action :reset-su-list
   [db [_]]
@@ -475,7 +488,8 @@
 
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [slug topic revisions]}]]
-  (assoc-in db (concat (dispatcher/company-data-key slug) [(keyword topic) :revisions-data]) (:revisions (:collection revisions))))
+  (let [sort-pred (utils/sort-by-key-pred :created-at true)]
+    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
 
 ((defmethod dispatcher/action :show-add-topic
   [db [_ active]]
@@ -486,3 +500,57 @@
         (assoc :show-add-topic true)
         (dissoc :selected-topic-view)))
     (dissoc db :show-add-topic))))
+
+(defmethod dispatcher/action :dashboard-select-topic
+  [db [_ section-kw]]
+  (assoc db :dashboard-selected-topics
+    (if (utils/in? (:dashboard-selected-topics db) section-kw)
+      (utils/vec-dissoc (:dashboard-selected-topics db) section-kw)
+      (conj (:dashboard-selected-topics db) section-kw))))
+
+(defmethod dispatcher/action :dashboard-select-all
+  [db [_ section-kw]]
+  (assoc db :dashboard-selected-topics (vec (map keyword (:sections (dispatcher/company-data db))))))
+
+(defmethod dispatcher/action :dashboard-share-mode
+  [db [_ activate]]
+  (-> db
+    (assoc :dashboard-sharing activate)
+    (dissoc :show-add-topic)
+    (assoc :dashboard-selected-topics [])))
+
+(defmethod dispatcher/action :add-topic
+  [db [_ topic topic-data]]
+  (let [company-data-key (dispatcher/company-data-key (router/current-company-slug))
+        company-data (get-in db company-data-key)
+        archived-topics (:archived company-data)
+        updated-archived (if (:was-archived topic-data)
+                            (vec (filter #(not= (:section %) (name topic)) archived-topics))
+                            archived-topics)
+        updated-sections (conj (:sections company-data) (name topic))
+        updated-company-data (-> company-data
+                                (assoc :sections updated-sections)
+                                (assoc :archived updated-archived)
+                                (assoc (keyword topic) topic-data))]
+    (-> db
+      (assoc-in company-data-key updated-company-data)
+      (start-foce topic topic-data))))
+
+(defmethod dispatcher/action :rollback-add-topic
+  [db [_ topic-kw]]
+  (let [company-data-key (dispatcher/company-data-key (router/current-company-slug))
+        company-data (get-in db (dispatcher/company-data-key (router/current-company-slug)))
+        topic-data (get company-data topic-kw)
+        archived-topics (:archived company-data)
+        updated-archived (if (:was-archived topic-data)
+                            (conj archived-topics {:section (name topic-kw)
+                                                   :title (:title topic-data)})
+                            archived-topics)
+        updated-sections (utils/vec-dissoc (:sections company-data) (name topic-kw))
+        updated-company-data (-> company-data
+                                (dissoc topic-kw)
+                                (assoc :sections updated-sections)
+                                (assoc :archived updated-archived))]
+    (-> db
+      (assoc-in company-data-key updated-company-data)
+      (stop-foce))))

@@ -68,8 +68,8 @@
                 :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
                 :data-container "body"
                 :data-placement "top"
-                :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
-        (time-ago (:updated-at topic-data))))
+                :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:created-at topic-data)) [:year]))}
+        (time-ago (:created-at topic-data))))
       (when read-more-cb
         (dom/div {:class "right"}
           (om/build topic-read-more data))))))

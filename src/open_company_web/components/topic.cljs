@@ -25,10 +25,33 @@
     (dom/div #js {:className (str "topic-headline-inner group" (when (:placeholder data) " italic"))
                   :dangerouslySetInnerHTML (utils/emojify (:headline data))})))
 
+(defn html-text-exceeds-limit [html limit]
+  (> (count (.text (.html (js/$ "<div/>") html))) limit))
+
 (defn start-foce-click [owner]
   (let [section-kw (keyword (om/get-props owner :section))
         section-data (om/get-props owner :topic-data)]
     (dis/dispatch! [:start-foce section-kw (assoc section-data :section (name section-kw))])))
+
+(defn get-author-string
+  "Return the a formatted string that shows the topic creator and the last editor."
+  [topic-data]
+  (cond
+    ; if there is only one author it means this was never changed
+    (= (count (:author topic-data)) 1)
+    (let [first-author (first (:author topic-data))]
+      (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year])))
+    ; if there are more than one record in author it means it was edited
+    (> (count (:author topic-data) 1))
+    (let [first-author (first (:author topic-data))
+          last-author  (last (:author topic-data))]
+      (if (= (:user-id first-author) (:user-id last-author))
+        ; if the last editor is the same of the first don't repeat the name
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year]) "\n"
+             "edited " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))
+        ; if the last editor is different than the creator shows the name and the date of the ditor too
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year]) "\n"
+             "edited by " (:name last-author) " on " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))))))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       section
@@ -56,7 +79,13 @@
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
           company-data        (dis/company-data)
-          fixed-column        (js/parseInt column)]
+          fixed-column        (js/parseInt column)
+          should-truncate-text (and (not (utils/is-test-env?))
+                                    is-dashboard
+                                    (html-text-exceeds-limit topic-body utils/topic-body-limit))
+          truncated-body      (if should-truncate-text
+                                 (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
+                                 topic-body)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
@@ -88,22 +117,34 @@
                                               "left"
                                               "top"))
                          :data-container "body"
-                         :key (str "tt-attrib-" (:name (:author topic-data)) (:updated-at topic-data))
-                         :title (str "by " (:name (:author topic-data)) " on " (utils/date-string (utils/js-date (:updated-at topic-data)) [:year]))}
+                         :key (str "tt-attrib-" (get-author-string topic-data))
+                         :title (get-author-string topic-data)}
                 (when-not (and is-topic-view
                                is-mobile?)
                   " · ")
-                (utils/time-since (:updated-at topic-data) [:short-month]))))
+                (utils/time-since (:created-at topic-data) [:short-month])))
+            (when (and is-dashboard
+                       (not is-mobile?)
+                       (> (count (:revisions topic-data)) 1))
+              (dom/button {:class "topic-history-button btn-reset"
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-toggle "tooltip"
+                           :title "This topic has prior history"}
+                (dom/i {:class "fa fa-history"}))))
           (when (and show-editing
                      (not is-stakeholder-update)
-                     (or (not is-mobile?)
-                         (not is-dashboard))
+                     (not is-dashboard)
+                     (not is-mobile?)
+                     is-topic-view
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
                      (not foce-active))
             (dom/button {:class (str "topic-pencil-button btn-reset")
-                         :on-click #(start-foce-click owner)}
+                         :on-click #(if is-dashboard
+                                      (router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))
+                                      (start-foce-click owner))}
               (dom/i {:class "fa fa-pencil"
                       :title "Edit"
                       :data-toggle "tooltip"
@@ -151,15 +192,19 @@
         ;; Attribution for topic
         (when (and is-mobile? is-dashboard)
           (dom/div {:class "mobile-date"}
-            (utils/time-since (:updated-at topic-data))))
+            (utils/time-since (:created-at topic-data))))
         
         ;; Topic body
         (when (and (or (not is-dashboard)
                        (not is-mobile?))
-                   (not (clojure.string/blank? topic-body)))
-          (dom/div #js {:className (str "topic-body" (when (:placeholder topic-data) " italic"))
-                        :ref "topic-body"
-                        :dangerouslySetInnerHTML (utils/emojify topic-body)}))))))
+                   (not (clojure.string/blank? truncated-body)))
+          (dom/div {:class "group" :style #js {:position "relative"}}
+            (when (and is-dashboard (>= (count (.text (.html (js/$ "<div/>") (:body topic-data)))) utils/topic-body-limit))
+              (dom/div {:class "search-result-card-container-fade"}))
+            (dom/div #js {:className (utils/class-set {:topic-body true
+                                                       :italic (:placeholder topic-data)})
+                          :ref "topic-body"
+                          :dangerouslySetInnerHTML (utils/emojify truncated-body)})))))))
 
 (defcomponent topic [{:keys [active-topics
                              section-data
@@ -176,7 +221,9 @@
                              foce-data
                              foce-data-editing?
                              show-editing
-                             topic-flex-num] :as data} owner options]
+                             dashboard-selected-topics
+                             topic-flex-num
+                             read-only-company] :as data} owner options]
 
   (init-state [_]
     {:window-width (responsive/ww)})
@@ -198,7 +245,7 @@
     (let [section-kw (keyword section)
           slug (keyword (router/current-company-slug))
           foce-active (not (nil? foce-key))
-          is-current-foce (and (= foce-key section-kw) (= (:updated-at foce-data) (:updated-at section-data)))
+          is-current-foce (and (= foce-key section-kw) (= (:created-at foce-data) (:created-at section-data)))
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
@@ -213,15 +260,26 @@
                                                  :no-tablet (not (responsive/is-tablet-or-mobile?))
                                                  :topic-edit is-current-foce
                                                  :dashboard-topic is-dashboard
+                                                 :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
+                                                 :dashboard-share-mode (:dashboard-sharing data)
+                                                 :selectable-topic (or (not read-only-company)
+                                                                       (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)
+                                                                       (and read-only-company
+                                                                            (> (count (:revisions section-data)) 1)))
                                                  :no-foce (and foce-active (not is-current-foce))})
-                    :onClick (fn []
-                                (when is-dashboard
-                                  (router/nav! (oc-urls/company-section (router/current-company-slug) section))))
+                    :onClick #(when is-dashboard
+                               (if (:dashboard-sharing data)
+                                 (dis/dispatch! [:dashboard-select-topic section-kw])
+                                 (when (or (responsive/is-mobile-size?)
+                                           (not read-only-company)
+                                           (> (count (:revisions section-data)) 1)
+                                           (html-text-exceeds-limit (:body section-data) utils/topic-body-limit))
+                                  (router/nav! (oc-urls/company-section slug section-kw)))))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
-                    :key (str "topic-" (when is-current-foce "foce-") (name section) "-" (:updated-at section-data))
-                    :id (str "topic-" (name section) "-" (:updated-at section-data))}
+                    :key (str "topic-" (when is-current-foce "foce-") (name section) "-" (:created-at section-data))
+                    :id (str "topic-" (name section) "-" (:created-at section-data))}
         (if is-current-foce
           (om/build topic-edit {:section section
                                 :topic-data section-data
@@ -229,12 +287,12 @@
                                 :currency currency
                                 :card-width card-width
                                 :foce-data-editing? foce-data-editing?
-                                :read-only-company (:read-only-company data)
+                                :read-only-company read-only-company
                                 :foce-key foce-key
                                 :foce-data foce-data
                                 :columns-num columns-num}
                                {:opts options
-                                :key (str "topic-foce-" section "-" (:updated-at section-data))})
+                                :key (str "topic-foce-" section "-" (:created-at section-data))})
           (om/build topic-internal {:section section
                                     :topic-data section-data
                                     :is-stakeholder-update (:is-stakeholder-update data)

@@ -132,9 +132,6 @@
 (defcomponent topic-list [data owner options]
 
   (init-state [_]
-    (when-not (utils/is-test-env?)
-      ;; make sure when topic-list component is initialized that there is no foce active
-      (dispatcher/dispatch! [:start-foce nil]))
     (get-state owner data nil))
 
   (did-mount [_]
@@ -244,6 +241,8 @@
                          :foce-data (:foce-data data)
                          :show-add-topic (:show-add-topic data)
                          :selected-topic-view (:selected-topic-view data)
+                         :dashboard-selected-topics (:dashboard-selected-topics data)
+                         :dashboard-sharing (:dashboard-sharing data)
                          :is-dashboard (:is-dashboard data)}
               comp-opts {:opts {:topic-click (partial topic-click owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]

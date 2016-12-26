@@ -8,31 +8,31 @@
               [om.dom :as dom :include-macros true]
               [open-company-web.router :as router]))
 
-(enable-console-print!)
+; (enable-console-print!)
 
-; dynamic mount point for components
-(def ^:dynamic c)
+; ; dynamic mount point for components
+; (def ^:dynamic c)
 
-(def company-symbol "OPEN")
+; (def company-symbol "OPEN")
 
-(def test-atom {
-  :OPEN {
-    :symbol company-symbol
-    :links [
-      {
-        :rel "report"
-        :href "/companies/OPEN/reports/2015/Q1"
-      }
-    ]
-  }
-})
+; (def test-atom {
+;   :OPEN {
+;     :symbol company-symbol
+;     :links [
+;       {
+;         :rel "report"
+;         :href "/companies/OPEN/reports/2015/Q1"
+;       }
+;     ]
+;   }
+; })
 
-(deftest test-navbar-component
-  (testing "Navbar component"
-    (router/set-route! ["companies" company-symbol] {:slug company-symbol})
-    (let [c (tu/new-container!)
-          app-state (atom test-atom)
-          _ (om/root navbar app-state {:target c})
-          navbar-node (sel c [:div#navbar])]
-      (is (not (nil? navbar-node)))
-      (tu/unmount! c))))
+; (deftest test-navbar-component
+;   (testing "Navbar component"
+;     (router/set-route! ["companies" company-symbol] {:slug company-symbol})
+;     (let [c (tu/new-container!)
+;           app-state (atom test-atom)
+;           _ (om/root navbar app-state {:target c})
+;           navbar-node (sel c [:div#navbar])]
+;       (is (not (nil? navbar-node)))
+;       (tu/unmount! c))))

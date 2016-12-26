@@ -6,6 +6,7 @@
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [open-company-web.api :as api]
             [open-company-web.dispatcher :as dis]
             [open-company-web.urls :as oc-urls]
             [open-company-web.router :as router]
@@ -22,21 +23,10 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
-(defn scroll-listener [e]
-  (let [body-scroll-top (gobj/get (.-body js/document) "scrollTop")]
-    (if (>= body-scroll-top 71)
-      (dommy/add-class! (sel1 [:body]) "fixed-navbar")
-      (dommy/remove-class! (sel1 [:body]) "fixed-navbar"))))
-
 (defn- share-new-tooltip []
   (if (utils/slack-share?)
     "Select topics to share by Slack, email or link."
     "Select topics to share by email or link."))
-
-(defn- share-tooltip []
-  (if (utils/slack-share?)
-    "Share this update by Slack, email or link."
-    "Share this update by email or link."))
 
 (defcomponent navbar [{:keys [company-data
                               columns-num
@@ -53,26 +43,30 @@
                               mobile-menu-open
                               header-width
                               su-navbar
-                              show-navigation-bar] :as data} owner options]
+                              show-navigation-bar
+                              dashboard-selected-topics
+                              dashboard-sharing
+                              is-dashboard
+                              is-topic-view] :as data} owner options]
 
   (did-mount [_]
-    (when-not (and (responsive/is-mobile-size?)
-                   (not su-navbar))
-      (scroll-listener nil)
-      (om/set-state! owner :scroll-listener
-        (events/listen js/window EventType/SCROLL scroll-listener)))
     (when-not (utils/is-test-env?)
       (when-not (and (responsive/is-tablet-or-mobile?)
                      (not su-navbar))
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (will-unmount [_]
-    (when-let [scroll-listener (om/get-state owner :scroll-listener)]
-      (events/unlistenByKey scroll-listener)))
+  (will-receive-props [_ _]
+    (when (om/get-state owner :su-redirect)
+      (om/set-state! owner :su-redirect nil)
+      ; Delay the navigation to updates preview to avoid conflicts
+      ; when in data updates
+      (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview)))))
 
   (render [_]
     (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
+                                          (or is-dashboard                           ; is looking at the dashboard
+                                              is-topic-view)
                                           (not (:read-only company-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
@@ -84,8 +78,12 @@
                                          :small-navbar (or su-navbar (not show-navigation-bar))
                                          :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
-                                         :no-jwt (not (jwt/jwt))})}
-        (when (and (not (jwt/jwt)) (not (utils/is-test-env?)))
+                                         :has-prior-updates (and (router/current-company-slug)
+                                                                 (pos? (:count (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET"))))
+                                         :can-edit-company (and (router/current-company-slug)
+                                                                (not (:read-only (dis/company-data))))
+                                         :jwt (jwt/jwt)})}
+        (when (not (utils/is-test-env?))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
                   :style {:width (str header-width "px")}}
@@ -106,50 +104,45 @@
                       (dom/div {:class "group"}
                         (dom/div {:class "dropdown right"}
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
-                          (om/build menu {})))
+                          (om/build menu {}))
+                        (when fixed-show-share-su-button
+                          (if dashboard-sharing
+                            (dom/div {:class "sharing-button-container"}
+                              (dom/button {:class "btn-reset sharing-button right btn-solid"
+                                           :title (share-new-tooltip)
+                                           :data-toggle "tooltip"
+                                           :data-container "body"
+                                           :data-placement "left"
+                                           :disabled (zero? (count dashboard-selected-topics))
+                                           :on-click (fn []
+                                                       (om/set-state! owner :su-redirect true)
+                                                       (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update company-data))}))}
+                                (when (om/get-state owner :su-redirect)
+                                  (loading/small-loading))
+                                (if (zero? (count dashboard-selected-topics))
+                                  "0 Topics selected"
+                                  (str "Share " (count dashboard-selected-topics) " topic" (when (not= (count dashboard-selected-topics) 1) "s"))))
+                              (dom/button {:class "btn-reset btn-link right sharing-cancel"
+                                           :on-click (fn []
+                                                       (dis/dispatch! [:dashboard-share-mode false]))}
+                                "Cancel"))
+                            (dom/div {:class "sharing-button-container"}
+                              (dom/button {:class "btn-reset sharing-button btn-link right"
+                                           :title (share-new-tooltip)
+                                           :data-toggle "tooltip"
+                                           :data-container "body"
+                                           :data-placement "left"
+                                           :disabled (not (nil? foce-key))
+                                           :on-click (fn []
+                                                       (when (nil? foce-key)
+                                                         (when is-topic-view
+                                                            (router/nav! (oc-urls/company)))
+                                                         (dis/dispatch! [:dashboard-share-mode true])))}
+                                "Share topics")))))
                       (login-button)))))))
-          (when-not (responsive/is-mobile-size?)
+          (when (and (not (responsive/is-mobile-size?))
+                     create-update-share-button-cb)
             (dom/div {:class "oc-navbar-separator"})))
-        (when-not su-navbar
-          (if (responsive/is-mobile-size?)
-            ;; Render the menu here only on mobile so it can expand the navbar
-            (om/build menu {:mobile-menu-open mobile-menu-open})
-            ;; Render the bottom part of the navbar when not on mobile
-            (when show-navigation-bar
-              (dom/div {:class "oc-navbar-bottom group"
-                        :style {:width (str header-width "px")}}
-                (dom/div {:class "left"}
-                  (when should-show-left-links
-                    (dom/a {:class (when (= active :dashboard) "active")
-                            :href (oc-urls/company)
-                            :on-click #(do
-                                         (utils/event-stop %)
-                                         (router/nav! (oc-urls/company)))}
-                      "Dashboard"))
-                  (when should-show-left-links
-                    (dom/a {:class (when (= active :updates) "active")
-                            :href (oc-urls/stakeholder-update-list)
-                            :on-click (fn [e]
-                                        (utils/event-stop e)
-                                        (dis/dispatch! [:reset-su-list])
-                                        (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-list))))}
-                      "Updates")))
-                (dom/div {:class "right"}
-                  (when fixed-show-share-su-button
-                    (dom/div {:class "sharing-button-container"}
-                      (dom/a {:class "btn-reset sharing-button right"
-                              :title (share-new-tooltip)
-                              :data-toggle "tooltip"
-                              :data-container "body"
-                              :data-placement "left"
-                              :on-click #(router/nav! (oc-urls/stakeholder-update-preview))}
-                        "Share new update")))
-                  (when create-update-share-button-cb
-                    (dom/div {:class "sharing-button-container"}
-                      (dom/button {:class "btn-reset btn-solid"
-                                   :title (share-tooltip)
-                                   :data-toggle "tooltip"
-                                   :data-container "body"
-                                   :data-placement "left"
-                                   :on-click create-update-share-button-cb
-                                   :disabled create-update-share-button-disabled} "SHARE"))))))))))))
+        (when (responsive/is-mobile-size?)
+          ;; Render the menu here only on mobile so it can expand the navbar
+          (om/build menu {:mobile-menu-open mobile-menu-open}))))))

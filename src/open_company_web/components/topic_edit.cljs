@@ -32,16 +32,15 @@
 (def headline-max-length 100)
 (def title-alert-limit 3)
 (def headline-alert-limit 10)
-(def body-max-length 1000)
-(def body-alert-limit 50)
 
 (def before-unload-message "You have unsaved edits. Are you sure you want to leave this topic?")
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 
-(defn focus-headline []
-  (when-let [headline (sel1 [(str "div#foce-headline-" (name (dis/foce-section-key)))])]
-    (.focus headline)
-    (utils/to-end-of-content-editable headline)))
+(defn focus-body []
+  (when-let* [section-kw (dis/foce-section-key)
+              body (sel1 [(str "div#foce-body-" (name section-kw))])]
+    (.focus body)
+    (utils/to-end-of-content-editable body)))
 
 (defn- scroll-to-topic-top [topic]
   (let [body-scroll (.-scrollTop (.-body js/document))
@@ -55,26 +54,22 @@
     (utils/medium-editor-hide-placeholder editor body-el)))
 
 (defn body-on-change [owner]
-  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
+  (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
+    ; Attach paste listener to the body and all its children
+    (js/recursiveAttachPasteListener body-el)
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
-    (let [inner-text-count (count (.-innerText body-el))
-          remaining-chars (- body-max-length inner-text-count)]
-      ; restore the previous body if the new one exceeds the limit
-      ; and the count is greater than the old, if it's less we let it update
-      ; to let the user cancel content to get to the limit
-      (om/update-state! owner #(merge % {:has-changes true
-                                         :char-count remaining-chars
-                                         :char-count-alert (< remaining-chars body-alert-limit)
-                                         :body-exceeds (neg? remaining-chars)})))))
+    (om/update-state! owner #(merge % {:char-count nil
+                                       :has-changes true}))))
 
-(defn- setup-edit [owner]
-  (when-let* [section-kw   (keyword (:section (dis/foce-section-data)))
+(defn- setup-body-editor [owner]
+  (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
               body-el      (sel1 [body-id])]
+    (js/recursiveAttachPasteListener body-el)
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe body-editor
                   "editableInput"
@@ -84,7 +79,8 @@
     (js/emojiAutocomplete)))
 
 (defn- headline-on-change [owner]
-  (when-let [headline        (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+  (when-let* [section-kw     (dis/foce-section-key)
+              headline       (sel1 (str "div#foce-headline-" (name section-kw)))]
     (let [headline-innerHTML (.-innerHTML headline)
           emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))
           remaining-chars    (- headline-max-length (count (.-innerText headline)))]
@@ -95,7 +91,8 @@
                                          :has-changes true})))))
 
 (defn- check-headline-count [owner e has-changes]
-  (when-let [headline (sel1 (str "div#foce-headline-" (name (dis/foce-section-key))))]
+  (when-let* [section-kw   (dis/foce-section-key)
+              headline (sel1 (str "div#foce-headline-" (name section-kw)))]
     (let [headline-value (.-innerText headline)]
       (when (and e
                  (not= (.-keyCode e) 8)
@@ -146,6 +143,9 @@
       file
       (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
 
+(defn- dismiss-editing [section]
+  (dis/dispatch! [:rollback-add-topic (keyword section)]))
+
 (defn handle-navigate-event [current-token owner e]
     ;; only when the URL is changing
     (when-not (= (.-token e) current-token)
@@ -165,7 +165,9 @@
                       :success-cb #(do
                                     (hide-popover nil "leave-topic-confirm")
                                     ;; cancel any FoCE
-                                    (dis/dispatch! [:start-foce nil])
+                                    (if (:new (dis/foce-section-data))
+                                      (dismiss-editing (dis/foce-section-key))
+                                      (dis/dispatch! [:start-foce nil]))
                                     ;; Dispatch the current url
                                     (@router/route-dispatcher (router/get-token)))})
         
@@ -189,6 +191,11 @@
     "Add an image"
     "Replace image"))
 
+(defn remove-navigation-listener [owner]
+  (when (om/get-state owner :history-listener-id)
+    (events/unlistenByKey (om/get-state owner :history-listener-id))
+    (om/set-state! owner :history-listener-id nil)))
+
 (defn- save-topic [owner]
   (let [topic           (name (dis/foce-section-key))
         body-el         (js/$ (str "#foce-body-" (name topic)))
@@ -200,24 +207,21 @@
         (.focus headline-el)
         (headline-on-change owner)
         (utils/to-end-of-content-editable (.get headline-el 0)))
-      ;; if the body exceeds: focus on it with the cursor at the end, show the chart count
-      (om/get-state owner :body-exceeds)
-      (do
-        (.focus body-el)
-        (body-on-change owner)
-        (utils/to-end-of-content-editable (.get body-el 0)))
       ;; body and headline have the right number of chars, moving on with save
       :else
       (do
+        (remove-navigation-listener owner)
         (utils/remove-ending-empty-paragraph body-el)
         (let [topic-data   (dis/foce-section-data)
               company-data (dis/company-data)
               sections     (vec (:sections company-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
+          (dis/dispatch! [:foce-save sections data-to-save])
+          ; go back to dashbaord if it's a brand new topic
           (when (:new topic-data)
-            (utils/after 1000 #(router/nav! (oc-urls/company))))
-          (dis/dispatch! [:foce-save sections data-to-save]))))))
+            (reset! prevent-route-dispatch false)
+            (router/nav! (oc-urls/company))))))))
 
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
@@ -234,40 +238,50 @@
           body       (:body topic-data)
           has-data?  (not-empty (:data topic-data))]
       {:initial-headline (utils/emojify (:headline topic-data))
-       :body-placeholder (or (:body-placeholder topic-data) "")
+       :body-placeholder (if (:new topic-data) (:body-placeholder topic-data) (utils/new-section-body-placeholder))
        :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
        :char-count nil
        :char-count-alert false
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0
-       :body-exceeds false
        :headline-exceeds false}))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
+      ; if adding a :new topic or a topic that was archived
+      ; restore the previous app-state when leaving the view
+      (when (and (dis/foce-section-key)
+                 (or (:new (dis/foce-section-data))
+                     (:was-archvied (dis/foce-section-data))))
+        (dis/dispatch! [:rollback-add-topic (dis/foce-section-key)]))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
       (set! (.-onbeforeunload js/window) nil)
       ; remove history change listener
-      (when (om/get-state owner :history-listener-id)
-        (events/unlistenByKey (om/get-state owner :history-listener-id))
-        (om/set-state! owner :history-listener-id nil))))
+      (remove-navigation-listener owner)))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (js/filepicker.setKey ls/filestack-key)
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-      (setup-edit owner)
-      (utils/after 100 #(focus-headline))
+      (setup-body-editor owner)
+      (utils/after 100 #(focus-body))
       (reset! prevent-route-dispatch true)
       (let [loc (.-location js/window)
             current-token (str (.-pathname loc) (.-search loc) (.-hash loc))
             listener (events/listen @router/history HistoryEventType/NAVIGATE
                       (partial handle-navigate-event current-token owner))]
-        (om/set-state! owner :history-listener-id listener))))
+        (om/set-state! owner :history-listener-id listener))
+      ;; scroll to top of this div
+      (utils/after 10 #(let [topic-edit-div (js/$ "div.topic-edit")]
+                        (when (and topic-edit-div
+                                   (.offset topic-edit-div)
+                                   (.-top (.offset topic-edit-div)))
+                          (.animate (js/$ "html, body")
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 88)}))))))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
@@ -292,9 +306,8 @@
         (.focus (sel1 [:input.upload-remote-url-field])))))
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
-                           file-upload-state file-upload-progress upload-remote-url body-exceeds
+                           file-upload-state file-upload-progress upload-remote-url
                            headline-exceeds has-changes]}]
-
     (let [company-slug        (router/current-company-slug)
           section             (dis/foce-section-key)
           section-kw          (keyword section)
@@ -380,7 +393,7 @@
           (dom/div #js {:className "topic-headline-inner emoji-autocomplete emojiable"
                         :id (str "foce-headline-" (name section))
                         :key "foce-headline"
-                        :placeholder "Headline"
+                        :placeholder "Optional headline"
                         :contentEditable true
                         :onKeyUp   #(check-headline-count owner % true)
                         :onKeyDown #(check-headline-count owner % true)
@@ -489,8 +502,8 @@
                            :disabled (dis/foce-section-data-editing?)
                            :on-click #(if (:new topic-data)
                                         (do
-                                          (dis/dispatch! [:topic-archive (name section)])
-                                          (utils/after 1 (fn [] (router/nav! (oc-urls/company)))))
+                                          (dismiss-editing section)
+                                          (router/nav! (oc-urls/company)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
             (when-not (:new topic-data)

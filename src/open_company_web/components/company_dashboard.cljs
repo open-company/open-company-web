@@ -15,7 +15,6 @@
             [open-company-web.components.ui.footer :refer (footer)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.loading :refer (loading)]
-            [open-company-web.components.ui.oc-switch :refer (oc-switch)]
             [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.utils :as utils]
@@ -70,6 +69,7 @@
                                            :selected-topic-view (:selected-topic-view data)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :small-navbar (not (utils/company-has-topics? company-data))
+                                           :editing-topic (not (nil? (:foce-key data)))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
                      (get-in data [(keyword (router/current-company-slug)) :error]))
@@ -95,11 +95,11 @@
                                   :mobile-menu-open (:mobile-menu-open data)
                                   :auth-settings (:auth-settings data)
                                   :active :dashboard
-                                  :show-navigation-bar (utils/company-has-topics? company-data)}))
-              (when (and (responsive/is-mobile-size?)
-                         (utils/company-has-topics? company-data)
-                         (not (:selected-topic-view data)))
-                (oc-switch :dashboard))
+                                  :dashboard-selected-topics (:dashboard-selected-topics data)
+                                  :dashboard-sharing (:dashboard-sharing data)
+                                  :show-navigation-bar (utils/company-has-topics? company-data)
+                                  :is-topic-view (not (nil? (:selected-topic-view data)))
+                                  :is-dashboard (nil? (:selected-topic-view data))}))
               (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                 (dom/div {:class "empty-dashboard"}
                   (dom/h3 {:class "empty-dashboard-title"}
@@ -123,6 +123,8 @@
                              :foce-data (:foce-data data)
                              :show-add-topic (:show-add-topic data)
                              :selected-topic-view (:selected-topic-view data)
+                             :dashboard-selected-topics (:dashboard-selected-topics data)
+                             :dashboard-sharing (:dashboard-sharing data)
                              :is-dashboard true}))
               ;;Footer
               (om/build footer {:footer-width total-width-int}))))))))

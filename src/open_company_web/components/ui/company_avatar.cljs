@@ -24,7 +24,7 @@
             should-show-link (if su-navbar
                                   (utils/link-for (:links (dis/stakeholder-update-data)) "company" "GET")
                                   true)
-            show-company-avatar? (and su-navbar (not (clojure.string/blank? company-logo)))
+            show-company-avatar? (not (clojure.string/blank? company-logo))
             company-home (if should-show-link (oc-urls/company) "")]
         (dom/div {:class (utils/class-set {:company-avatar true
                                            :navbar-brand (:navbar-brand data)})}
@@ -32,6 +32,7 @@
                   :style {:cursor (if should-show-link "pointer" "default")}
                   :on-click (fn [e]
                               (.preventDefault e)
+                              (dis/dispatch! [:show-add-topic false])
                               (when should-show-link
                                 (router/nav! company-home)))}
             (dom/div {:class "company-avatar-container group"}

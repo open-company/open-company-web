@@ -36,6 +36,7 @@ $.height = function(){};
 $.last = function(){};
 $.text = function(){};
 $.remove = function(){};
+$.animate = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -46,3 +47,7 @@ var location = {};
 location.reload = function(){};
 // EmojiAutocomplete
 var emojiAutocomplete = function(){};
+// cleanHTML
+var recursiveAttachPasteListener = function(){};
+// MediumEditorAutolist
+var AutoList = function(){};

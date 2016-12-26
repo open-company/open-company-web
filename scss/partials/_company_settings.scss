@@ -4,7 +4,7 @@ body.small-footer {
   div.main-company-settings {
     div.company-settings-container {
       /* 138px is the total height above and below the settings */
-      min-height: calc(100vh - 115px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
+      min-height: calc(100vh - #{$navbar_height}px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
     }
   }
 }

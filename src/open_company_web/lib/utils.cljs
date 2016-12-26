@@ -265,12 +265,15 @@
 (defn fix-section 
   "Add `:section` name and `:as-of` keys to the section map"
   [section-body section-name & [read-only force-write]]
-  (let [with-updated-at (if (contains? section-body :updated-at)
+  (let [with-created-at (if (contains? section-body :created-at)
                           section-body
-                          (assoc section-body :updated-at (as-of-now)))
+                          (assoc section-body :created-at (as-of-now)))
+        with-updated-at (if (contains? with-created-at :updated-at)
+                          with-created-at
+                          (assoc with-created-at :updated-at (as-of-now)))
         with-keys       (-> with-updated-at
                           (assoc :section (name section-name))
-                          (assoc :as-of (:updated-at section-body))
+                          (assoc :as-of (:created-at section-body))
                           (assoc :read-only (readonly? (:links section-body))))]
     (if (= section-name :finances)
       (fix-finances with-keys)
@@ -288,7 +291,7 @@
     with-fixed-sections))
 
 (defn sort-revisions [revisions]
-  (let [sort-pred (sort-by-key-pred :updated-at)]
+  (let [sort-pred (sort-by-key-pred :created-at true)]
     (vec (sort sort-pred revisions))))
 
 (defn revision-next
@@ -297,7 +300,7 @@
   (when (pos? (count revisions))
     (first (remove nil? (map
                           (fn [r]
-                            (when (= (:updated-at r) as-of)
+                            (when (= (:created-at r) as-of)
                               (let [idx (.indexOf (to-array revisions) r)]
                                 (get revisions (inc idx)))))
                           revisions)))))
@@ -308,7 +311,7 @@
   (when (pos? (count revisions))
     (first (remove nil? (map
                           (fn [r]
-                            (when (= (:updated-at r) as-of)
+                            (when (= (:created-at r) as-of)
                               (let [idx (.indexOf (to-array revisions) r)]
                                 (get revisions (dec idx)))))
                           revisions)))))
@@ -320,7 +323,7 @@
   (when (and section-data section (or as-of (:placeholder section-data)))
     (let [slug (keyword (router/current-company-slug))]
       (if (or (not (contains? (slug @caches/revisions) section))
-              (= as-of (:updated-at section-data)))
+              (= as-of (:created-at section-data)))
         section-data
         (((keyword section) (slug @caches/revisions)) as-of)))))
 
@@ -599,12 +602,15 @@
   {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
+   :extensions #js {:autolist (js/AutoList.)}
    :anchor #js {:customClassOption nil
                 :customClassOptionText "Button"
                 :linkValidation true
                 :placeholderText "Paste or type a link"
                 :targetCheckbox false
                 :targetCheckboxText "Open in new window"}
+   :paste #js {:forcePlainText false
+               :cleanPastedHTML false}
    :placeholder #js {:text (or placeholder ""), :hideOnClick hide-on-click}})
 
 (defn after [ms fn]

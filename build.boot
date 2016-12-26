@@ -33,9 +33,9 @@
     [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
-    [cljsjs/raven "3.8.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
+    [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "3.5.16-0"] ; d3 externs https://clojars.org/cljsjs/d3
-    [cljsjs/medium-editor "5.15.0-1"] ; Medium editor https://clojars.org/cljsjs/medium-editor
+    [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
@@ -144,7 +144,9 @@
               :compiler-options {:source-map-timestamp true
                                  :preloads '[devtools.preload]})))
 
-(deftask dev-advanced []
+(deftask dev-advanced 
+  "Advanced build to be used in development to find compilation/externs errors."
+  []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
@@ -156,7 +158,10 @@
         ;         :on-jsload 'open-company-web.core/on-js-reload)
         (cljs :optimizations :advanced
               :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]})))
+              :compiler-options {
+                :pretty-print true
+                :pseudo-names true
+                :externs ["public/js/externs.js"]})))
 
 (deftask staging-build []
   (comp (from-jars)

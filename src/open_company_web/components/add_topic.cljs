@@ -1,4 +1,5 @@
 (ns open-company-web.components.add-topic
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [open-company-web.lib.utils :as utils]
@@ -20,104 +21,96 @@
       (for [sec (:new-sections (get @caches/new-sections slug))]
         (-> sec
             (assoc :section (:section-name sec))
-            (select-keys [:title :section]))))))
+            (select-keys [:title :section :body-placeholder :links]))))))
 
 (defn get-categories []
-  (let [slug       (keyword (router/current-company-slug))
-        categories (-> @caches/new-sections slug :categories)]
-    {:1 (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) 1) categories))
-     :2 (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) 2) categories))}))
+  "Return the categories of the new available sections divided in columns and sorted by the
+   specified order."
+  (when-let* [slug       (keyword (router/current-company-slug))
+              categories (:new-sections-categories (slug @caches/new-sections))
+              all-categories (vec (map :column categories))]
+    (apply merge
+      (for [idx (range 1 (inc (apply max all-categories)))]
+        (hash-map (keyword (str idx)) (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) idx) categories)))))))
 
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
-  [s submit-fn]
+  [s custom-topic-data submit-fn]
   (let [add-disabled (clojure.string/blank? @(::topic-title s))]
     [:div.mt1.flex
-     [:input.npt.mr1.p1.flex-auto
+     [:input.npt.mr1.p1.flex-auto.custom-topic-input
       {:type "text",
        :value @(::topic-title s)
        :max-length 20
        :on-change #(reset! (::topic-title s) (.. % -target -value))
        :style {:font-size "16px"}
-       :placeholder "Custom topic"}]
+       :placeholder "Name your own"}]
      [:button
       {:class (str "btn-reset" (if add-disabled " btn-outline" " btn-solid"))
        :disabled add-disabled
        :on-click #(let [topic-name     (str "custom-" (utils/my-uuid))
+                        link           (utils/link-for (:links custom-topic-data) "create")
                         new-topic-data {:title @(::topic-title s)
                                         :section topic-name
+                                        :was-archived false
+                                        :body-placeholder (:body-placeholder custom-topic-data)
+                                        :links [(assoc link :href (clojure.string/replace (:href link) "custom-{4-char-UUID}" topic-name))]
                                         :placeholder true}]
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
-(rum/defcs add-topic < (drv/drv :company-data)
-                       rum/static
-                       rum/reactive
-  [s update-active-topics-cb]
+(rum/defcs category < rum/static
+                      rum/reactive
+                      (drv/drv :company-data)
+  [s cat update-active-topics-cb all-sections]
   (let [company-data (drv/react s :company-data)
-        active-topics (vec (map keyword (:sections company-data)))
         archived-topics (:archived company-data)
-        all-sections (into {} (for [s (get-all-sections)]
+        show-archived (pos? (count archived-topics))]
+    [:div
+      [:span.block.mb1.mt2.all-caps
+        {:style {:marginTop (if (clojure.string/blank? (:name cat)) "28px" "0px")}}
+        (str (:name cat) (when (:icon cat) " "))
+        (when (:icon cat)
+          [:i.fa {:class (:icon cat)}])]
+      (for [sec (:sections cat)
+            :let [section-data (get all-sections (keyword sec))
+                  archived? (some #(= (:section %) sec) archived-topics)
+                  disabled? (or (utils/in? (:sections company-data) sec)
+                                (utils/in? archived-topics sec))]]
+        [:div.mb1.btn-reset.yellow-line-hover-child
+          {:key (:section section-data)
+           :class (when disabled? "disabled")
+           :on-click #(when-not disabled?
+                       (update-active-topics-cb (:section section-data) {:title (:title section-data)
+                                                                         :section (:section section-data)
+                                                                         :placeholder true
+                                                                         :body-placeholder (:body-placeholder section-data)
+                                                                         :links (:links section-data)
+                                                                         :was-archived archived?}))}
+          [:span.child.topic-title
+            (:title section-data)
+            (when archived? " ")
+            (when archived?
+              [:i.fa.fa-archive
+                {:data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container ".add-topic"
+                 :title "Archived topic"}])]])]))
+
+(rum/defc add-topic < rum/static
+  [update-active-topics-cb]
+  (let [all-sections (into {} (for [s (get-all-sections)]
                                 [(keyword (:section s)) s]))
-        categories (get-categories)
-        show-archived (pos? (count (:archived company-data)))]
+        categories (get-categories)]
       [:div.add-topic.group
        [:span.dimmed-gray.btn-reset.right
          {:on-click #(dis/dispatch! [:show-add-topic false])}
          (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})]
        [:div.mxn2.clearfix
         ;; column 1
-        [:div.col.px2
-          {:class (if show-archived "col-4" "col-6")}
-          (for [cat (:1 categories)]
-            [:div
-              {:key (str "col-" (:name cat))}
-              [:span.block.mb1.mt2.all-caps
-                (str (:name cat) (when (:icon cat) " "))
-                (when (:icon cat)
-                  [:i.fa {:class (:icon cat)}])]
-              (for [sec (:sections cat)
-                    :let [section-data (get all-sections (keyword sec))
-                          disabled? (or (utils/in? (:sections company-data) sec)
-                                        (utils/in? (:archived company-data) sec))]]
-                [:div.mb1.btn-reset.yellow-line-hover-child
-                  {:key (:section section-data)
-                   :class (when disabled? "disabled")
-                   :on-click #(when-not disabled?
-                               (update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :placeholder true}))}
-                  [:span.child (:title section-data)]])])]
-        ;; column 2
-        [:div.col.px2
-          {:class (if show-archived "col-4" "col-5")}
-          (for [cat (:2 categories)]
-            [:div
-              {:key (str "col-" (:name cat))}
-              [:span.block.mb1.mt2.all-caps
-                (str (:name cat) (when (:icon cat) " "))
-                (when (:icon cat)
-                  [:i.fa {:class (:icon cat)}])]
-              (for [sec (:sections cat)
-                    :let [section-data (get all-sections (keyword sec))
-                          disabled? (or (utils/in? (:sections company-data) sec)
-                                        (utils/in? (:archived company-data) sec))]]
-                [:div.mb1.btn-reset.yellow-line-hover-child
-                  {:key (:section section-data)
-                   :class (when disabled? "disabled")
-                   :on-click #(when-not disabled?
-                               (update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :placeholder true}))}
-                  [:span.child (:title section-data)]])])]
-        ;; column 3 - archived only
-        (if show-archived
-          [:div.col.col-4.px2
-            {:key "col-3"
-             :style {:margin-top "-16px"}}
-            [:span.block.mb1.mt2.all-caps
-              {:key (str "col-archived")}
-              "Archived"]
-            (for [sec (:archived company-data)
-                  :let [section-data (get all-sections (keyword (:section sec)))]]
-              [:div.mb1.btn-reset.yellow-line-hover-child
-                {:key (:section section-data)
-                 :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data) :section (:section section-data) :was-archived true})}
-                [:span.child
-                  (:title section-data)]])])]
-       (custom-topic-input #(update-active-topics-cb %1 %2))]))
+        (for [column (keys categories)]
+          [:div.col.px2.col-4
+            {:key (str "add-topic-col-" (name column))}
+            (for [cat (get categories column)]
+              (rum/with-key (category cat update-active-topics-cb all-sections)
+                            (str "col-" (:name cat))))])]
+       (custom-topic-input (get all-sections (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))

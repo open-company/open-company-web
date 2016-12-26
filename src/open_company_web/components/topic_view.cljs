@@ -35,7 +35,7 @@
       (let [section-kw (keyword selected-topic-view)
             topic-data (get company-data section-kw)]
         (when (:placeholder topic-data)
-          (dis/dispatch! [:start-foce section-kw (dissoc topic-data :updated-at)]))))))
+          (dis/dispatch! [:start-foce section-kw (dissoc topic-data :created-at)]))))))
 
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
@@ -65,9 +65,10 @@
           topic-view-width (responsive/topic-view-width card-width columns-num)
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get company-data section-kw)
+          is-custom-section (s/starts-with? (:section topic-data) "custom-")
           revisions (:revisions-data topic-data)
-          is-new-foce (and (= foce-key section-kw) (nil? (:updated-at foce-data)))
-          is-another-foce (and (not (nil? foce-key)) (not (nil? (:updated-at foce-data))))]
+          is-new-foce (and (= foce-key section-kw) (nil? (:created-at foce-data)))
+          is-another-foce (and (not (nil? foce-key)) (not (nil? (:created-at foce-data))))]
       (dom/div {:class (str "topic-view" (when (responsive/is-tablet-or-mobile?) " tablet-view"))
                 :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str topic-card-width "px"))
                         :margin-right (if (responsive/is-tablet-or-mobile?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
@@ -143,4 +144,7 @@
                                  :foce-data foce-data
                                  :show-editing true}
                                  {:opts {:section-name selected-topic-view}
-                                  :key (str "topic-" (when foce-key "foce-") selected-topic-view "-" (:updated-at rev))})))))))))
+                                  :key (str "topic-"
+                                        (when foce-key
+                                          "foce-")
+                                        selected-topic-view "-" (:created-at rev))})))))))))

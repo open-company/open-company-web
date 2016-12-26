@@ -1,20 +1,14 @@
-body.fixed-navbar {
-  nav.oc-navbar{
-    position: fixed;
-    top: -71px;
-    left: 0;
-  }
-}
-
 nav.oc-navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   background-color: white;
 
-  &.show-login-overlay {
-    height: 100vh !important;
+  @include mobile(){
+    &.show-login-overlay {
+      height: 100vh !important;
+    }
   }
 
   @include big_web(){
@@ -25,19 +19,35 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
 
-    &.no-jwt.mobile-menu-open {
-      height: #{$mobile_navbar_height + $mobile_menu_signout_height}px;
-    }
-
     &.mobile-menu-open {
-      height: #{$mobile_navbar_height + ($mobile_menu_item_height * $mobile_menu_items_num)}px;
+      height: #{$mobile_navbar_height + $mobile_menu_item_height}px;
+
+      &.jwt {
+        height: #{$mobile_navbar_height + ($mobile_menu_item_height * 2)}px;
+
+        &.has-prior-updates {
+          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
+        }
+
+        &.can-edit-company {
+          height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
+
+          &.has-prior-updates {
+            height: #{$mobile_navbar_height + ($mobile_menu_item_height * 4)}px;
+          }
+        }
+      }
+
+      &.has-prior-updates {
+        height: #{$mobile_navbar_height + ($mobile_menu_item_height * 2)}px;
+      }
     }
   }
   z-index: 1030;
   background-color: white;
   border-top: 4px solid $oc_yellow;
   margin: 0px;
-  box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 2px -2px rgba(78,90,107,0.2);
 
   &.small-navbar:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
@@ -97,7 +107,7 @@ nav.oc-navbar {
     position: relative;
     margin: 0 auto;
     padding: 0 28px;
-    margin-top: 10px;
+    margin-top: 20px;
 
     div.oc-navbar-header-container{
       height: 45px;
@@ -116,6 +126,7 @@ nav.oc-navbar {
 
     @media screen and (max-width: 683px){
       padding: 0px;
+      margin-top: 10px;
     }
 
     ul.navbar-right {
@@ -124,6 +135,43 @@ nav.oc-navbar {
 
       div.user-avatar {
         float: right;
+      }
+
+      div.sharing-button-container{
+        float: right;
+
+        button.sharing-button {
+          margin-top: 11px;
+        }
+
+        button.sharing-button.btn-link, button.sharing-cancel {
+          margin-top: 12px;
+        }
+
+        button.sharing-button, button.sharing-cancel {
+          margin-right: 10px;
+
+          &.btn-link {
+            font-size: 14px;
+            color: $oc_blue_dark;
+            font-family: $oc_headers_font;
+            outline: none;
+            font-weight: 400;
+            text-transform: none;
+            font-style: normal;
+            text-decoration: none;
+            opacity: 1;
+            padding: .2rem 0px .3rem .5rem;
+
+            &:hover {
+              color: black;
+            }
+
+            &[disabled] {
+              opacity: 1;
+            }
+          }
+        }
       }
 
       button.mobile-menu {
@@ -148,11 +196,24 @@ nav.oc-navbar {
 
   div.oc-navbar-bottom {
     position: relative;
-    margin: 10px auto;
+    margin: 7px auto;
     padding: 0 28px;
 
-    a.sharing-button {
-      color: $oc_blue_dark;
+    div.sharing-button-container{
+
+      button {
+        width: 128px;
+        margin-left: 10px;
+        height: 33px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: $oc_headers_font;
+      }
+
+      button.share-button {
+        font-size: 16px;
+        padding-top: 3px;
+      }
     }
 
     a {

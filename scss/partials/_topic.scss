@@ -18,6 +18,13 @@ div.topic {
     border-right: 2px solid transparent;
     border-top: 2px solid transparent;
 
+    &.dashboard-selected {
+      border-bottom: 2px solid $oc_yellow;
+      border-left: 2px solid $oc_yellow;
+      border-right: 2px solid $oc_yellow;
+      border-top: 2px solid $oc_yellow;
+    }
+
     div.topic-internal {
       & > div{
         padding-left: 16px;
@@ -41,17 +48,27 @@ div.topic {
       }
     }
 
-    &:hover{
-      border-top: 2px solid $oc_yellow;
-      border-bottom: 2px solid $oc_yellow;
-      border-left: 2px solid $oc_yellow;
-      border-right: 2px solid $oc_yellow;
+    &.dashboard-selected, &:hover{
 
       div.topic-internal {
         div.card-header.card-image {
           overflow: hidden;
         }
       }
+    }
+
+    &.selectable-topic:hover {
+      border-top: 2px solid rgba(78,90,107,0.2);
+      border-bottom: 2px solid rgba(78,90,107,0.2);
+      border-left: 2px solid rgba(78,90,107,0.2);
+      border-right: 2px solid rgba(78,90,107,0.2);
+    }
+
+    &.dashboard-share-mode.dashboard-selected, &.dashboard-share-mode.dashboard-selected:hover {
+      border-top: 2px solid $oc_yellow;
+      border-bottom: 2px solid $oc_yellow;
+      border-left: 2px solid $oc_yellow;
+      border-right: 2px solid $oc_yellow;
     }
   }
 
@@ -125,6 +142,14 @@ div.topic {
   div.topic-internal{
     position: relative;
     height: auto;
+
+    button.topic-history-button {
+      cursor: default;
+      color: rgba(78, 90, 107, 0.7);
+      &:hover {
+        color: rgba(78, 90, 107, 1);
+      }
+    }
 
     &:hover {
       button.topic-pencil-button {
@@ -233,6 +258,18 @@ div.topic {
       padding: 0px;
       margin: 0px;
       opacity: 0;
+    }
+
+    div.search-result-card-container-fade{
+
+      background: -webkit-linear-gradient(bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
+      background: linear-gradient(to top, rgba(255,255,255,1) 0px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
+      bottom:0;
+      left:0;
+      position:absolute;
+      right:0;
+      top:0;
+      z-index: 2
     }
 
     div.topic-body {

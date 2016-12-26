@@ -40,6 +40,17 @@ div.create-update {
           }
         }
 
+        div.create-update-content-cards-no-topics{
+          font-size: 17px;
+          font-family: $oc_headers_font;
+          font-weight: 600;
+          color: $oc_gray_5;
+          opacity: 0.5;
+          text-align: center;
+          font-style: italic;
+          margin: 100px 0 150px;
+        }
+
         div.topics-column-container{
           padding-top: 0px;
 
@@ -55,6 +66,7 @@ div.create-update {
               div.topic {
                 margin-left: 0px;
                 margin-right: 0px;
+                padding-bottom: 22px;
                 border: none;
                 box-shadow: none;
                 border-bottom: 1px solid rgba(78,90,107,0.1);
@@ -78,11 +90,13 @@ div.create-update {
           margin-bottom: 30px;
 
           button.cancel {
-            margin-left: 0;
+            float: left;
+            width: 48%;
           }
 
           button.share {
-            margin-right: 0;
+            float: right;
+            width: 48%;
           }
         }
 
@@ -105,7 +119,6 @@ div.create-update {
             font-weight: 400;
             text-transform: capitalize;
             padding: 3px 10px 3px 10px;
-            cursor: pointer;
             margin-bottom: 2px;
 
             &.oc-active {

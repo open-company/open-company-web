@@ -56,7 +56,8 @@
         metric-name (if (= data-key :costs) "Expenses" (s/capital (s/human data-key)))
         period (utils/get-period-string (:period data-set) "monthly" [:force-year])
         fixed-cur-unit currency-symbol]
-    (when actual-val
+    (when (and actual-val
+               (not (clojure.string/blank? actual-val)))
       (dom/span {:class "open-sans"}
         (dom/span {:class "bold"}
           (dom/span fixed-cur-unit (oc-lib/with-size-label actual-val))
