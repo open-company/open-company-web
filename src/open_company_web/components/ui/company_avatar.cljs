@@ -9,7 +9,7 @@
             [open-company-web.lib.utils :as utils]))
 
 (defcomponent company-avatar [data owner]
-  (render [_]
+  (render-state [_ {:keys [img-load-failed]}]
     (when (:company-data data)
       (let [company-data (:company-data data)
             slug (router/current-company-slug)
@@ -24,7 +24,8 @@
             should-show-link (if su-navbar
                                   (utils/link-for (:links (dis/stakeholder-update-data)) "company" "GET")
                                   true)
-            show-company-avatar? (not (clojure.string/blank? company-logo))
+            show-company-avatar? (and (not img-load-failed)
+                                      (not (clojure.string/blank? company-logo)))
             company-home (if should-show-link (oc-urls/company) "")]
         (dom/div {:class (utils/class-set {:company-avatar true
                                            :navbar-brand (:navbar-brand data)})}
@@ -41,5 +42,6 @@
                   (dom/span {:class "helper"})
                   (dom/img {:src company-logo
                             :class "company-avatar-img"
+                            :on-error #(om/set-state! owner :img-load-failed true)
                             :title company-name})))
               (dom/span {:class (str "company-name " (when-not show-company-avatar? "no-logo"))} company-name))))))))
