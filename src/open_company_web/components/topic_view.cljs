@@ -107,7 +107,10 @@
                 :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str topic-card-width "px"))
                         :margin-right (if (responsive/is-tablet-or-mobile?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
                 :key (str "topic-view-inner-" selected-topic-view)}
-        (dom/div {:class (str "topic-view group" (when (responsive/is-tablet-or-mobile?) " tablet-view"))}
+        (dom/div {:class (utils/class-set {:topic-view true
+                                           :group true
+                                           :tablet-view (responsive/is-tablet-or-mobile?)
+                                           :topic-404 (nil? topic-data)})}
           (when (responsive/is-tablet-or-mobile?)
             (dom/div {:class "topic-view-navbar"}
               (dom/div {:class "topic-view-navbar-close left"
@@ -115,8 +118,7 @@
               (dom/div {:class "topic-view-navbar-title left"} (:title topic-data))))
           (cond
             (nil? topic-data)
-            (dom/div {:class "topic-view-internal"}
-              (dom/div {:class "topic-404"} "No data found."))
+            (dom/div {:class "topic-view-internal"} "No data found.")
             (or (:loading company-data)
                 loading-topic-data)
             (dom/div {:class "topic-view-internal loading group"}
