@@ -49,6 +49,18 @@ div.topic-view-container{
       }
     }
 
+    &.topic-404 {
+      @include mobile(){
+        background-color: transparent;
+      }
+
+      div.topic-view-internal {
+        @include mobile(){
+          padding: 20px 0;
+        }
+      }
+    }
+
     div.topic-view-internal {
       margin: 0 auto;
       padding: 20px 0px;
