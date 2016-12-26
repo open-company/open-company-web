@@ -38,6 +38,10 @@ div.topic-list{
   @include big_web(){
     padding-top: #{$navbar_height}px;
   }
+
+  @include mobile(){
+    min-height: calc(100vh - #{$footer_small_height}px);
+  }
 }
 
 div.company-dashboard.small-navbar {
