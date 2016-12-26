@@ -4,6 +4,10 @@ div.topic-view-container{
   float: right;
   margin: 0 0 0 50px;
 
+  @include mobile(){
+    margin: 0;
+  }
+
   div.topic-view {
     background-color: white;
     border: 1px solid rgba(78,90,107,0.05);
@@ -56,7 +60,7 @@ div.topic-view-container{
 
       div.topic-view-internal {
         @include mobile(){
-          padding: 20px 0;
+          padding: 20px;
         }
       }
     }
