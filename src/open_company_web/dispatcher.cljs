@@ -13,19 +13,25 @@
 
 ;; Derived Data ================================================================
 
-(defn drv-spec [db]
+(defn drv-spec [db route-db]
   {:base               [[] db]
+   :route              [[] route-db]
+   :company-slug       [[:route] (fn [route] (:slug route))]
    :su-share           [[:base] (fn [base] (:su-share base))]
-   :su-list            [[:base] (fn [base] (when (router/current-company-slug)
-                                              (-> ((keyword (router/current-company-slug)) base)
-                                                  :su-list :collection :stakeholder-updates)))]
-   :um-invite          [[:base] (fn [base] (:um-invite base))]
+   :su-list            [[:base :company-slug] (fn [base company-slug]
+                                                (when company-slug
+                                                  (-> company-slug keyword base :su-list :collection :stakeholder-updates)))]
+   :user-management    [[:base] (fn [base]
+                                 {:um-invite (:um-invite base)
+                                  :enumerate-users (:enumerate-users base)
+                                  :invite-by-email-error (:invite-by-email-error base)})]
    :jwt                [[:base] (fn [base] (:jwt base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
    :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data   [[:base] (fn [base] (:rum-popover-data base))]
-   :company-data       [[:base] (fn [base] (when (router/current-company-slug)
-                                             (-> ((keyword (router/current-company-slug)) base) :company-data)))]})
+   :company-data       [[:base :company-slug] (fn [base company-slug]
+                                                (when company-slug
+                                                  (-> company-slug keyword base :company-data)))]})
 
 ;; Action Loop =================================================================
 

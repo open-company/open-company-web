@@ -66,7 +66,7 @@
                        ; render the popover component
                        (ru/drv-root {:state dis/app-state
                                      :component #(om/component (component))
-                                     :drv-spec (dis/drv-spec dis/app-state)
+                                     :drv-spec (dis/drv-spec dis/app-state router/path)
                                      :target (sel1 (str "#" container-id))})
                        (.addClass body "no-scroll")
                        ; add the close action

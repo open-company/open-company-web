@@ -7,29 +7,29 @@
               [open-company-web.components.list-companies :refer [list-companies]]
               [om.dom :as dom :include-macros true]))
 
-(enable-console-print!)
+; (enable-console-print!)
 
-; dynamic mount point for components
-(def ^:dynamic c)
+; ; dynamic mount point for components
+; (def ^:dynamic c)
 
-(def test-atom {
-  :companies [
-    {
-      :slug "OPEN"
-      :name "OpenCompany"
-    }
-    {
-      :slug "BUFF"
-      :name "Buffer Inc."
-    }
-  ]
-})
+; (def test-atom {
+;   :companies [
+;     {
+;       :slug "OPEN"
+;       :name "OpenCompany"
+;     }
+;     {
+;       :slug "BUFF"
+;       :name "Buffer Inc."
+;     }
+;   ]
+; })
 
-(deftest test-list-companies-component
-  (testing "List companies component"
-    (let [c (tu/new-container!)
-          app-state (atom test-atom)
-          _ (om/root list-companies app-state {:target c})
-          companies-node (sel1 c [:ul])]
-      (is (not (nil? companies-node)))
-      (tu/unmount! c))))
+; (deftest test-list-companies-component
+;   (testing "List companies component"
+;     (let [c (tu/new-container!)
+;           app-state (atom test-atom)
+;           _ (om/root list-companies app-state {:target c})
+;           companies-node (sel1 c [:ul])]
+;       (is (not (nil? companies-node)))
+;       (tu/unmount! c))))
