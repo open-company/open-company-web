@@ -40,7 +40,7 @@
 
 (defn drv-root [om-component target]
   (ru/drv-root {:state dis/app-state
-                :drv-spec (dis/drv-spec dis/app-state)
+                :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component om-component
                 :target target}))
 
