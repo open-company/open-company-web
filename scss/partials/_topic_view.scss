@@ -53,6 +53,18 @@ div.topic-view-container{
       margin: 0 auto;
       padding: 20px 0px;
       float: left;
+      position: relative;
+      min-height: 80px;
+
+      &.loading {
+        width: 100%;
+        float: none;
+        background-color: transparent;
+
+        div.oc-loading {
+          background-color: transparent;
+        }
+      }
 
       div.fake-textarea {
         padding: 20px;
