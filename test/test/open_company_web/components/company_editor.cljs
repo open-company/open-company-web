@@ -7,19 +7,19 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.router :as router]))
 
-(enable-console-print!)
+; (enable-console-print!)
 
-; dynamic mount point for components
-(def ^:dynamic c)
+; ; dynamic mount point for components
+; (def ^:dynamic c)
 
-(def test-atom {:loading false})
+; (def test-atom {:loading false})
 
-(deftest test-company-editor-component
-  (testing "Company editor component"
-    (router/set-route! ["create-company"] {})
-    (let [c (tu/new-container!)
-          app-state (atom test-atom)
-          _ (om/root company-editor app-state {:target c})
-          company-editor-node (sel1 c [:div.company-editor])]
-      (is (not (nil? company-editor-node)))
-      (tu/unmount! c))))
+; (deftest test-company-editor-component
+;   (testing "Company editor component"
+;     (router/set-route! ["create-company"] {})
+;     (let [c (tu/new-container!)
+;           app-state (atom test-atom)
+;           _ (om/root company-editor app-state {:target c})
+;           company-editor-node (sel1 c [:div.company-editor])]
+;       (is (not (nil? company-editor-node)))
+;       (tu/unmount! c))))
