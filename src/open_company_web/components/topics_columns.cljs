@@ -187,6 +187,11 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
+            (when (:dashboard-sharing data)
+              (dom/div {:class "dashboard-sharing-select-all"}
+                (dom/span "Click topics to include or")
+                (dom/button {:class "btn-reset btn-link"
+                             :on-click #(dis/dispatch! [:dashboard-select-all])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             (cond

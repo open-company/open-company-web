@@ -163,9 +163,6 @@
               (if-not hide-welcome-screen
                 (welcome-screen #(om/set-state! owner :hide-welcome-screen true))
                 (dom/div {}
-                  (when (:dashboard-sharing data)
-                    (dom/button {:class "btn-reset btn-link dashboard-sharing-select-all"
-                                 :on-click #(dis/dispatch! [:dashboard-select-all])} "Select all"))
                   (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
                     (dom/div {:class "empty-dashboard"}
                       (dom/h3 {:class "empty-dashboard-title"}
