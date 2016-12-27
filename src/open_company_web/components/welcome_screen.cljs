@@ -6,9 +6,7 @@
   [choose-topic-cb]
   [:div.welcome-screen
     [:div.welcome-screen-box
-      [:span (str "Welcome to your dashboard!")]
-      [:span "Your dashboard is the place for key information you want everyone to know."]
-      [:span "At any time you can share selected topics into company updates for employees, investors or customers."]
+      [:span "This is your dashboard, the place for key information you want everyone to know."]
       [:button.choose-first-topic-button.btn-reset.btn-solid
         {:on-click choose-topic-cb}
         "Choose Your First Topic"]]])

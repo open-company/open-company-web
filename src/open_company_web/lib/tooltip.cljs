@@ -63,18 +63,18 @@
                                                                                 :auto true
                                                                                 :place "bottom"}
                                                                          config)))]
-  (reset! tooltips (assoc @tooltips id {:tip tt
-                                        :pos pos
-                                        :show-to-ro-users (or show-to-ro-users false)
-                                        :show-to-signed-out-users (or show-to-signed-out-users true)
-                                        :setup setup}))
-  (cond
-    (sequential? pos)
-    ;; If pos is an array display it with the coords passed
-    (.position tt (get pos 0) (get pos 1))
-    :else
-    ;; else it's an element to attach to.
-    (.position tt pos))))
+    (reset! tooltips (assoc @tooltips id {:tip tt
+                                          :pos pos
+                                          :show-to-ro-users (or show-to-ro-users false)
+                                          :show-to-signed-out-users (or show-to-signed-out-users true)
+                                          :setup setup}))
+    (cond
+      (sequential? pos)
+      ;; If pos is an array display it with the coords passed
+      (.position tt (get pos 0) (get pos 1))
+      :else
+      ;; else it's an element to attach to.
+      (.position tt pos))))
 
 (defn hide
   "Programmatically hide the passed tooltip"

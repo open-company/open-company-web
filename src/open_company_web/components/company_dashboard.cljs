@@ -100,11 +100,11 @@
                  (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1))
         (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
-          (t/tooltip [(int (/ (.-clientWidth (.-body js/document)) 2)) (int (- (/ (.-clientHeight (.-body js/document)) 2) 100))]
-                      {:desktop "Awesome! Click on the + to add more topics to put together a complete update on the company."
+          (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
+                      {:desktop "Nice! Click on the + to add more topics and put together a complete company update."
                        :once-only true
                        :id add-second-topic-tt
-                       :config {:effectClass "no-arrow"}})
+                       :config {:typeClass "add-more-tooltip" :place "bottom-left"}})
           (t/show add-second-topic-tt)))
       (show-share-tooltip-if-needed owner)))
 

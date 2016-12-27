@@ -180,7 +180,7 @@
   (add-popover {:container-id "archive-topic-confirm"
                 :message utils/before-archive-message
                 :height "170px"
-                :cancel-title "KEEP"
+                :cancel-title "KEEP IT"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (dis/foce-section-key)]

@@ -20,7 +20,7 @@
   (add-popover {:container-id "archive-topic-confirm"
                 :message utils/before-archive-message
                 :height "170px"
-                :cancel-title "KEEP"
+                :cancel-title "KEEP IT"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (om/get-props owner :selected-topic-view)]
@@ -70,7 +70,7 @@
                (= (count (:archived company-data)) 0))
       (utils/after 500
         #(let [first-foce (str "first-foce-" (:slug company-data))]
-          (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Add your information, and select text for easy formatting options. You can jazz it up with a headline, emoji or image."
+          (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
                                                                     :id first-foce
                                                                     :once-only true
                                                                     :config {:place "right-bottom"}})

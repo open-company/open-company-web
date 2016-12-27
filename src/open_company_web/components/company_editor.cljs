@@ -2,13 +2,22 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [cuerdas.core :as s]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.lib.oc-colors :as occ]
             [open-company-web.lib.responsive :as responsive]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [open-company-web.components.ui.navbar :refer (navbar)]
             [open-company-web.components.ui.small-loading :as loading]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]))
+
+(defn- create-company-alert []
+  (add-popover {:container-id "create-company-alert"
+                :message "Please enter a company name."
+                :height "120px"
+                :success-title "GOT IT"
+                :success-cb #(hide-popover nil "create-company-alert")}))
 
 (defn create-company-clicked [owner e]
   (utils/event-stop e)
@@ -16,7 +25,7 @@
     (let [data         (om/get-props owner)
           company-name (-> data :company-editor :name)]
       (if (clojure.string/blank? company-name)
-        (js/alert "Please insert a company name")
+        (create-company-alert)
         (do
           (om/set-state! owner :loading true)
           (dis/dispatch! [:company-submit]))))))
@@ -41,7 +50,7 @@
         (dom/div {:class "company-editor-box group navbar-offset"}
           (dom/form {:on-submit (partial create-company-clicked owner)}
             (dom/div {:class "form-group"}
-              (dom/label {:class "company-editor-message"} (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) "!"))
+              (dom/label {:class "company-editor-message"} (str "Hi" (when (jwt/jwt) (str " " (s/capital (jwt/get-key :name)))) "!"))
               (dom/label {:class "company-editor-message"} "What’s the name of your company?")
               (dom/input {:type "text"
                           :class "company-editor-input domine h4"

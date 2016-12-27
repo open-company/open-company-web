@@ -112,7 +112,7 @@
                                           (t/tooltip coords {:config {:place "right-bottom"}
                                                              :id tt-key
                                                              :persistent true
-                                                             :desktop "See something you want everyone to know about? Click it to get started. Or you can name your own topic."})
+                                                             :desktop "Is there something you want everyone to know about? Click it to get started. Or you can name your own topic."})
                                           (t/show tt-key)))
                                         (assoc s ::tt-key tt-key))))
                        :will-unmount (fn [s]
