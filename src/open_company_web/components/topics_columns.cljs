@@ -187,9 +187,6 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
-            (when (:dashboard-sharing data)
-              (dom/button {:class "btn-reset btn-link dashboard-sharing-select-all"
-                           :on-click #(dis/dispatch! [:dashboard-select-all])} "Select all"))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             (cond
