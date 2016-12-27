@@ -48,8 +48,6 @@
   (when (:tip tt)
     (real-hide (:tip tt)))
   (reset! tooltips (dissoc @tooltips tip-id))
-  (when (:once-only (:setup tt))
-    (cookie/set-cookie! tip-id true ten-years))
   (when (fn? (:dismiss-cb (:setup tt)))
     ((:dismiss-cb (:setup tt)))))
 
@@ -105,5 +103,7 @@
                                  (when (fn? (:got-it-cb (:setup tt)))
                                    ((:got-it-cb (:setup tt))))
                                  (hide-tooltip tt tip-id)
-                                 (.off $btn "click"))))))
+                                 (.off $btn "click")))))
+          (when (:once-only (:setup tt))
+            (cookie/set-cookie! tip-id true ten-years)))
         (reset! tooltips (dissoc @tooltips tip-id))))))
