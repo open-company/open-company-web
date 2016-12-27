@@ -54,7 +54,7 @@
                                                                                      :id tt-id
                                                                                      :once-only true
                                                                                      :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
-                                                                                     :desktop "You can invite others to your dashboard, or you can share topics via email or a private URL."})]
+                                                                                     :desktop "When you’re ready, you can share a beautiful company update with these topics."})]
             (t/show tt-id)))))))
 
 (defcomponent company-dashboard [data owner]
