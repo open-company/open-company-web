@@ -44,7 +44,7 @@
     (when (and (not (om/get-state owner :share-tooltip-shown))
                (not (om/get-state owner :share-tooltip-dismissed))
                company-data
-               (>= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data))
+               (= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data))
                    (count (:archived company-data))) 2)
                (.querySelector js/document "button.sharing-button"))
       (om/set-state! owner :share-tooltip-shown true)
