@@ -101,7 +101,7 @@
         (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
           (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
-                      {:desktop "Nice! Click on the + to add more topics and put together a complete company update."
+                      {:desktop "Click on the + to add more topics and put together a complete company update."
                        :once-only true
                        :id add-second-topic-tt
                        :config {:typeClass "add-more-tooltip" :place "bottom-left"}})
