@@ -112,7 +112,7 @@
                                           (t/tooltip coords {:config {:place "right-bottom"}
                                                              :id tt-key
                                                              :persistent true
-                                                             :desktop "Is there something you want everyone to know about? Click it to get started. Or you can name your own topic."})
+                                                             :desktop "Select a topic you want everyone to know about, or you can name your own."})
                                           (t/show tt-key)))
                                         (assoc s ::tt-key tt-key))))
                        :will-unmount (fn [s]
@@ -128,7 +128,7 @@
         archived-category {:name "Archived" :order 2 :sections archived}]
       [:div.add-topic.group
         [:div.add-topic-title
-          (if (count sections)
+          (if (pos? (count sections))
             "Choose a topic to get started"
             "Add another topic")]
         [:hr]
