@@ -44,13 +44,21 @@
 (defn start-foce-if-needed [owner]
   (let [{:keys [foce-key
                 company-data
-                selected-topic-view]} (om/get-props owner)]
-    (when (and (nil? foce-key)
-               (not (:read-only company-data)))
+                selected-topic-view
+                new-sections]} (om/get-props owner)]
+    (when (nil? foce-key)
       (let [section-kw (keyword selected-topic-view)
-            topic-data (get company-data section-kw)]
-        (when (:placeholder topic-data)
-          (dis/dispatch! [:start-foce section-kw (dissoc topic-data :created-at)]))))))
+            sections-contains-topic (utils/in? (:sections company-data) selected-topic-view)]
+        (when (not sections-contains-topic)
+          (if (:read-only company-data)
+            (router/redirect! (oc-urls/company (:slug company-data)))
+            ; look for the urls in the new sections
+            (when new-sections
+              (let [new-section (first (filter #(= (:section-name %) selected-topic-view) new-sections))
+                    new-section-data (utils/new-section-initial-data section-kw (:title new-section) {:links (:links new-section)})]
+                (if (and new-section (contains? new-section :links))
+                  (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
+                  (router/redirect! (oc-urls/company (:slug company-data))))))))))))
 
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
@@ -116,14 +124,10 @@
               (dom/div {:class "topic-view-navbar-close left"
                         :on-click #(router/nav! (oc-urls/company))} "<")
               (dom/div {:class "topic-view-navbar-title left"} (:title topic-data))))
-          (cond
-            (nil? topic-data)
-            (dom/div {:class "topic-view-internal"} "No data found.")
-            (or (:loading company-data)
-                loading-topic-data)
+          (if (or (:loading company-data)
+                  loading-topic-data)
             (dom/div {:class "topic-view-internal loading group"}
               (om/build loading {:loading true}))
-            :else
             (dom/div {:class "topic-view-internal"
                       :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str topic-card-width "px"))}}
               (when (and (not (:read-only company-data))
@@ -151,7 +155,8 @@
                                 :style {:width (str (- topic-card-width 100) "px")}}
                         "Start a new entry...")))))
               ;; Render the topic from the company data only until the revisions are loaded.
-              (when (and (not revisions)
+              (when (and (not foce-key)
+                         (not revisions)
                          (not (:placeholder topic-data)))
                 (dom/div {:class "revision-container group"}
                   (when (and (not (:read-only company-data))
