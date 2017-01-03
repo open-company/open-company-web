@@ -197,7 +197,9 @@
                            :revisions-data
                            :new
                            :placeholder
-                           :was-archived])
+                           :was-archived
+                           :created-at
+                           :updated-at])
 
 (defn save-or-create-section [section-data]
   (when section-data
