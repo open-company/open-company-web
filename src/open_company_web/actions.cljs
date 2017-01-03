@@ -122,7 +122,8 @@
               (:force-remove-loading with-company-data))
           (dissoc with-open-add-topic :loading :force-remove-loading)
           with-open-add-topic))
-    (= 403 status)
+    (or (= 403 status)
+        (= 401 status))
     (-> db
         (assoc-in [(keyword slug) :error] :forbidden)
         (dissoc :loading))
@@ -368,7 +369,7 @@
 (defmethod dispatcher/action :signup-with-email/success
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (.reload js/location)
+  (router/redirect! oc-urls/home)
   db)
 
 (defmethod dispatcher/action :get-auth-settings
