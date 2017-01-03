@@ -44,7 +44,6 @@
                                (= (utils/get-month period interval) "DEC")))
           flags [:short (when needs-year? :force-year)]
           period-string (utils/get-period-string period interval flags)]
-      (js/console.log "growth-edit-row period" period "flags" flags "period string" period-string "needs-year?" (:needs-year data) "idx" (:idx data))
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
           (dom/th {:class "no-cell"}
