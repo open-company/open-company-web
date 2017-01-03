@@ -44,7 +44,7 @@
         prior-metric (when prior-contiguous?
                         (first (filter #(= (:period %) (second contiguous-periods)) periods)))
         prior-value (when prior-metric (:value prior-metric))
-        metric-delta (when (and value prior-value) (- value prior-value))
+        metric-delta (when (and value prior-value (not= prior-value 0)) (- value prior-value))
         metric-delta-percent (when metric-delta (* 100 (float (/ metric-delta prior-value))))
         formatted-metric-delta (when metric-delta-percent (format-delta metric-delta-percent))]
     ;; Format output
