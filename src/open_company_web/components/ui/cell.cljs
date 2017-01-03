@@ -150,6 +150,7 @@
             (dom/input #js {
                        :ref "edit-field"
                        :placeholder (:placeholder data)
+                       :type "text"
                        :value value
                        :onFocus #(let [input (om/get-ref owner "edit-field")]
                                    (set! (.-value input) (.-value input)))
