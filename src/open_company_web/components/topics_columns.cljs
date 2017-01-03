@@ -211,6 +211,7 @@
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)
+                                    :new-sections (:new-sections data)
                                     :selected-topic-view selected-topic-view})
               ; for each column key contained in best layout
               :else
