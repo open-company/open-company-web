@@ -148,7 +148,7 @@
                           with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
                                 :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])}
-                        (str (:title topic-data) " · LATEST")
+                        (:title topic-data)
                         (dom/br)
                         (dom/span {:class "new-entry"} "Start a new entry..."))))))
               ;; Render the topic from the company data only until the revisions are loaded.
