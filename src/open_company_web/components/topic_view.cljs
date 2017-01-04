@@ -128,7 +128,7 @@
                       :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str topic-card-width "px"))}}
               (when (and (not (:read-only company-data))
                          (not (responsive/is-tablet-or-mobile?)))
-                (dom/div {:class (str "fake-textarea " (when is-another-foce "disabled"))}
+                (dom/div {:class (str "fake-textarea group " (when is-another-foce "disabled"))}
                   (if is-new-foce
                     (dom/div {:class "topic topic-edit"
                               :style {:width (str (- topic-card-width 120) "px")}}
@@ -147,17 +147,14 @@
                           with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                           with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
-                                :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
-                                :style {:width (str (- topic-card-width 100) "px")}}
-                        "Start a new entry...")))))
+                                :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])}
+                        (str (:title topic-data) " · LATEST")
+                        (dom/br)
+                        (dom/span {:class "new-entry"} "Start a new entry..."))))))
               ;; Render the topic from the company data only until the revisions are loaded.
               (when (and (not revisions)
                          (not (:placeholder topic-data)))
                 (dom/div {:class "revision-container group"}
-                  (when (and (not (:read-only company-data))
-                             (not (responsive/is-tablet-or-mobile?)))
-                    (dom/hr {:class "separator-line"
-                             :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 80) "px"))}}))
                   (om/build topic {:section selected-topic-view
                                    :section-data topic-data
                                    :card-width (- topic-card-width 60)
@@ -174,9 +171,7 @@
                     :let [rev (get revisions idx)]]
                 (when rev
                   (dom/div {:class "revision-container group"}
-                    (when-not (and (= idx 0)
-                                   (or (responsive/is-tablet-or-mobile?)
-                                       (:read-only company-data)))
+                    (when-not (= idx 0)
                       (dom/hr {:class "separator-line"
                                :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
                     (om/build topic {:section selected-topic-view
