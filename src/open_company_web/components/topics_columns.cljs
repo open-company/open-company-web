@@ -14,7 +14,9 @@
             [open-company-web.components.topic :refer (topic)]
             [open-company-web.components.topic-view :refer (topic-view)]
             [open-company-web.components.add-topic :refer (add-topic)]
-            [open-company-web.components.bw-topics-list :refer (bw-topics-list)]))
+            [open-company-web.components.bw-topics-list :refer (bw-topics-list)]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
@@ -145,7 +147,18 @@
 
   (did-mount [_]
     (when (> columns-num 1)
-      (om/set-state! owner :topics-layout (calc-layout owner data))))
+      (om/set-state! owner :topics-layout (calc-layout owner data)))
+    (js/console.log "topics-columns/did-mount" (sel1 [:div.topics-column-container]))
+    (events/listen (sel1 [:div.topics-column-container]) EventType/CLICK
+     (fn [e]
+      (when (and (not (responsive/is-mobile-size?))
+                 (not (nil? (:selected-topic-view data)))
+                 (not (:dashboard-sharing data))
+                 (nil? (:foce-key data))
+                 (not (utils/event-inside? e (sel1 [:div.topic-view-container])))
+                 (not (utils/event-inside? e (sel1 [:div.left-topics-list])))
+                 (not (utils/event-inside? e (sel1 [:div.add-topic]))))
+        (router/nav! (oc-urls/company (router/current-company-slug)))))))
 
   (will-receive-props [_ next-props]
     (om/set-state! owner :filtered-topics (if (or (:read-only (:company-data next-props))
@@ -175,14 +188,7 @@
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
                                          :group true
-                                         :content-loaded content-loaded})
-                :on-click #(when (and (not (responsive/is-mobile-size?))
-                                      (not (nil? (:selected-topic-view data)))
-                                      (not (:dashboard-sharing data))
-                                      (nil? (:foce-key data))
-                                      (not (utils/event-inside? % (sel1 [:div.topic-view-container])))
-                                      (not (utils/event-inside? % (sel1 [:div.left-topics-list]))))
-                             (router/nav! (oc-urls/company (router/current-company-slug))))}
+                                         :content-loaded content-loaded})}
         (cond
           ;; render 2 or 3 column layout
           (> columns-num 1)
