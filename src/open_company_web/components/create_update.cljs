@@ -145,7 +145,7 @@
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Arrange your topics in any order before you share them."))
+                  "Tip: You can drag topics into any order before you share them."))
               (dom/div {:class "create-update-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
