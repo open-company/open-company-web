@@ -175,7 +175,14 @@
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
                                          :group true
-                                         :content-loaded content-loaded})}
+                                         :content-loaded content-loaded})
+                :on-click #(when (and (not (responsive/is-mobile-size?))
+                                      (not (nil? (:selected-topic-view data)))
+                                      (not (:dashboard-sharing data))
+                                      (nil? (:foce-key data))
+                                      (not (utils/event-inside? % (sel1 [:div.topic-view-container])))
+                                      (not (utils/event-inside? % (sel1 [:div.left-topics-list]))))
+                             (router/nav! (oc-urls/company (router/current-company-slug))))}
         (cond
           ;; render 2 or 3 column layout
           (> columns-num 1)

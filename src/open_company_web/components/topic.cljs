@@ -274,7 +274,8 @@
                                            (not read-only-company)
                                            (> (count (:revisions section-data)) 1)
                                            (html-text-exceeds-limit (:body section-data) utils/topic-body-limit))
-                                  (router/nav! (oc-urls/company-section slug section-kw)))))
+                                  (router/nav! (oc-urls/company-section slug section-kw))
+                                  (utils/event-stop %))))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)
