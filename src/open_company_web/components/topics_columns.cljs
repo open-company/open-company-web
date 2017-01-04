@@ -187,11 +187,6 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
-            (when (:dashboard-sharing data)
-              (dom/div {:class "dashboard-sharing-select-all"}
-                (dom/span "Click topics to include or")
-                (dom/button {:class "btn-reset btn-link"
-                             :on-click #(dis/dispatch! [:dashboard-select-all])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             (cond
@@ -215,6 +210,11 @@
               ; for each column key contained in best layout
               :else
               (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
+                (when (:dashboard-sharing data)
+                  (dom/div {:class "dashboard-sharing-select-all"}
+                    (dom/span "Click topics to include or")
+                    (dom/button {:class "btn-reset btn-link"
+                                 :on-click #(dis/dispatch! [:dashboard-select-all])} "select all")))
                 (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
                   (let [column (get topics-layout kw)]
                     (dom/div {:class (str "topics-column col-" (name kw))

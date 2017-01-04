@@ -50,11 +50,8 @@ div.topics-columns {
     position: relative;
 
     div.dashboard-sharing-select-all {
-      
-      position: absolute;
-      right: 2px;
-      top: 13px;
-      padding-top: 5px;
+      text-align: center;
+      margin-top: -25px;
       
       span {
         font-family: $oc_headers_font;
