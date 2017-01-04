@@ -503,10 +503,12 @@
 
 (defmethod dispatcher/action :dashboard-select-topic
   [db [_ section-kw]]
-  (assoc db :dashboard-selected-topics
-    (if (utils/in? (:dashboard-selected-topics db) section-kw)
-      (utils/vec-dissoc (:dashboard-selected-topics db) section-kw)
-      (conj (:dashboard-selected-topics db) section-kw))))
+  (if (utils/in? (:dashboard-selected-topics db) section-kw)
+    (assoc db :dashboard-selected-topics (utils/vec-dissoc (:dashboard-selected-topics db) section-kw))
+    (let [sections (to-array (:sections (dispatcher/company-data db)))
+          all-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) section-kw))
+          next-selected-topics (vec (map keyword (filter #(utils/in? all-selected-topics (keyword %)) sections)))]
+      (assoc db :dashboard-selected-topics next-selected-topics))))
 
 (defmethod dispatcher/action :dashboard-select-all
   [db [_ section-kw]]
