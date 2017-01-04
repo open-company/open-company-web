@@ -74,9 +74,7 @@
           (dom/h3 {:class "left-topics-list-top-title left"
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
-                                (do
-                                  (router/nav! (oc-urls/company))
-                                  (utils/event-stop %)))} "TOPICS"))
+                                (router/nav! (oc-urls/company)))} "TOPICS"))
         (when (and (not show-add-topic)
                    (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
@@ -99,8 +97,7 @@
                     :data-topic (name topic)
                     :key (str "bw-topic-list-" (name topic))
                     :on-click #(when (nil? (:foce-key data))
-                                 (router/nav! (oc-urls/company-section (router/current-company-slug) (name topic)))
-                                 (utils/event-stop %))}
+                                 (router/nav! (oc-urls/company-section (router/current-company-slug) (name topic))))}
             (dom/div {:class "internal"
                       :key (str "bw-topic-list-" (name topic) "-internal")}
               (:title sd))))))))
