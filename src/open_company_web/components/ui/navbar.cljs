@@ -110,7 +110,8 @@
                           (om/build menu {}))
                         (when (and (not dashboard-sharing)
                                    (not (:read-only company-data))
-                                   (not is-update-preview))
+                                   (not is-update-preview)
+                                   (pos? (count (:sections company-data))))
                           (dom/button {:class "btn-reset invite-others right"
                                        :title "Invite others"
                                        :data-toggle "tooltip"
