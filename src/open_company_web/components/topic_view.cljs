@@ -25,8 +25,8 @@
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (om/get-props owner :selected-topic-view)]
                                (dis/dispatch! [:topic-archive section])
-                               (utils/after 1 (fn [] (router/nav! (oc-urls/company))))
-                               (hide-popover nil "archive-topic-confirm"))}))
+                               (hide-popover nil "archive-topic-confirm")
+                               (router/nav! (oc-urls/company)))}))
 
 (defn load-revisions-if-needed [owner]
   (when (not (om/get-state owner :revisions-requested))

@@ -231,13 +231,17 @@
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         old-sections (:sections company-data)
-        new-sections (utils/vec-dissoc old-sections (name topic))]
+        new-sections (utils/vec-dissoc old-sections (name topic))
+        old-archived (:archived company-data)
+        new-archived (vec (conj old-archived {:title (:title ((keyword topic) company-data)) :section (name topic)}))
+        company-key (dispatcher/company-data-key slug)]
     (api/patch-sections new-sections)
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
       (dissoc :foce-data-editing?)
-      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
+      (assoc-in (conj company-key :sections) new-sections)
+      (assoc-in (conj company-key :archived) new-archived))))
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
   (let [slug (keyword (router/current-company-slug))

@@ -185,8 +185,8 @@
                 :success-title "ARCHIVE"
                 :success-cb #(let [section (dis/foce-section-key)]
                                (dis/dispatch! [:topic-archive section])
-                               (utils/after 1 (fn [] (router/nav! (oc-urls/company))))
-                               (hide-popover nil "archive-topic-confirm"))}))
+                               (hide-popover nil "archive-topic-confirm")
+                               (router/nav! (oc-urls/company)))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
