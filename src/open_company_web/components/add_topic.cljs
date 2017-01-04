@@ -55,6 +55,7 @@
                                         :body-placeholder (:body-placeholder custom-topic-data)
                                         :links [(assoc link :href (clojure.string/replace (:href link) "custom-{4-char-UUID}" topic-name))]
                                         :placeholder true}]
+                    (utils/event-stop %)
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (rum/defcs category < rum/static
@@ -77,12 +78,14 @@
                   section-kw (keyword (:section section-data))]]
         [:div.mb1.btn-reset.yellow-line-hover-child
           {:key (str "section-" sec)
-           :on-click #(update-active-topics-cb (:section section-data) {:title (:title section-data)
-                                                                        :section (:section section-data)
-                                                                        :placeholder (not is-archived)
-                                                                        :body-placeholder (:body-placeholder section-data)
-                                                                        :links (:links section-data)
-                                                                        :was-archived is-archived})}
+           :on-click #(do
+                        (utils/event-stop %)
+                        (update-active-topics-cb (:section section-data) {:title (:title section-data)
+                                                                          :section (:section section-data)
+                                                                          :placeholder (not is-archived)
+                                                                          :body-placeholder (:body-placeholder section-data)
+                                                                          :links (:links section-data)
+                                                                          :was-archived is-archived}))}
           [:span.child.topic-title
             (:title section-data)
             (when (#{:finances :growth} section-kw)
@@ -134,7 +137,9 @@
         [:hr]
         (when (pos? (count sections))
           [:span.close-add-topic
-            {:on-click #(dis/dispatch! [:show-add-topic false])}
+            {:on-click #(do
+                          (utils/event-stop %)
+                          (dis/dispatch! [:show-add-topic false]))}
             (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})])
         [:div.mxn2.clearfix
           ;; column 1
