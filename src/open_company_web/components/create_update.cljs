@@ -22,7 +22,7 @@
 (defn ordered-topics-list
   "Return the list of active topics in the order the user moved them."
   []
-  (let [topics (sel [:div.create-update-topics-list :div.oc-active])
+  (let [topics (sel [:div.topics-columns :div.topic-row])
         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
     (vec (remove nil? topics-list))))
 
@@ -35,11 +35,11 @@
 (defn setup-sortable
   "Setup the jQuery UI Sortable on the create-update-topics-list div"
   [owner]
-  (when-let [list-node (js/jQuery "div.create-update-topics-list")]
+  (when-let [list-node (js/jQuery "div.topics-columns")]
     (-> list-node
       (.sortable #js {:scroll true
                       :forcePlaceholderSize true
-                      :items ".oc-active"
+                      :items ".topic-row"
                       :stop (fn [event ui]
                               ; the user stopped ordering, save the current order
                               (when-let [dragged-item (gobj/get ui "item")]
@@ -145,22 +145,14 @@
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
-                  "Arrange your topics in any order before you share them.")
-                (dom/div {:class "create-update-topics-list"
-                          :key (clojure.string/join "-" su-topics)}
-                  (for [topic su-topics]
-                    (let [sd ((keyword topic) company-data)]
-                      (dom/div {:class (str "create-update-topics-list-item oc-active" (when (> (count su-topics) 1) " dnd"))
-                                :data-topic topic
-                                :ref topic
-                                :key topic}
-                        (:title sd))))))
+                  "Arrange your topics in any order before you share them."))
               (dom/div {:class "create-update-content-cards right"
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
                             :value su-title
                             :placeholder "Title"
+                            :style #js {:width (str (- fixed-card-width 60) "px")}
                             :on-change (fn [e]
                                           (om/update-state! owner #(merge % {:su-title (.. e -target -value)
                                                                              :should-update-data false}))
@@ -168,8 +160,8 @@
                 (if (zero? (count su-topics))
                   (dom/div {:class "create-update-content-cards-no-topics"} "No Topics Selected")
                   (om/build topics-columns {:columns-num 1
-                                            :card-width (- fixed-card-width 60) ; remove 60 padding around it
-                                            :total-width (- fixed-card-width 60)
+                                            :card-width fixed-card-width ; remove 60 padding around it
+                                            :total-width fixed-card-width
                                             :is-stakeholder-update true
                                             :content-loaded (not (:loading data))
                                             :topics su-topics
