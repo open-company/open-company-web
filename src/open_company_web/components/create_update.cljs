@@ -115,7 +115,8 @@
                             :active nil
                             :show-navigation-bar (utils/company-has-topics? company-data)
                             :mobile-menu-open (:mobile-menu-open data)
-                            :auth-settings (:auth-settings data)})
+                            :auth-settings (:auth-settings data)
+                            :is-update-preview true})
           (dom/div {:class "create-update-inner group navbar-offset"}
             (when show-su-dialog
               (om/build su-preview-dialog {:selected-topics su-topics
