@@ -70,6 +70,11 @@ div.topic-view-container{
       position: relative;
       min-height: 80px;
 
+      @include mobile(){
+        background-color: white;
+        min-height: calc(100vh - #{$footer_small_height}px - #{$back_to_dashboard_row_height}px);
+      }
+
       &.loading {
         width: 100%;
         float: none;
