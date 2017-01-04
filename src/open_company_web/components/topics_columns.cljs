@@ -148,7 +148,6 @@
   (did-mount [_]
     (when (> columns-num 1)
       (om/set-state! owner :topics-layout (calc-layout owner data)))
-    (js/console.log "topics-columns/did-mount" (sel1 [:div.topics-column-container]))
     (events/listen (sel1 [:div.topics-column-container]) EventType/CLICK
      (fn [e]
       (when (and (not (responsive/is-mobile-size?))
