@@ -58,6 +58,12 @@
                                                                                      :desktop "When you’re ready, you can share a beautiful company update with these topics."})]
             (t/show tt-id)))))))
 
+(defn should-hide-welcome-screen [data]
+  (or (responsive/is-tablet-or-mobile?)
+      (not (dis/company-data data))
+      (not= (count (:sections (dis/company-data data))) 0)
+      (not= (count (:archived (dis/company-data data))) 0)))
+
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -68,9 +74,7 @@
      :share-tooltip-dismissed false
      :add-second-topic-tt-shown false
      :new-sections-requested false
-     :hide-welcome-screen (not (and (dis/company-data data)
-                                    (= (count (:sections (dis/company-data data))) 0)
-                                    (= (count (:archived (dis/company-data data))) 0)))
+     :hide-welcome-screen (should-hide-welcome-screen data)
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    (responsive/calc-card-width))
@@ -113,9 +117,7 @@
     (when-not (:read-only (dis/company-data next-props))
       (get-new-sections-if-needed owner))
     (om/set-state! owner :hide-welcome-screen (and (om/get-state owner :hide-welcome-screen)
-                                                   (not (and (dis/company-data next-props)
-                                                             (= (count (:sections (dis/company-data next-props))) 0)
-                                                             (= (count (:archived (dis/company-data next-props))) 0))))))
+                                                   (should-hide-welcome-screen next-props))))
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width hide-welcome-screen] :as state}]
     (let [slug (keyword (router/current-company-slug))
@@ -164,7 +166,7 @@
               (if-not hide-welcome-screen
                 (welcome-screen #(om/set-state! owner :hide-welcome-screen true))
                 (dom/div {}
-                  (if (and (empty? (:sections company-data)) (responsive/is-mobile-size?))
+                  (if (and (empty? (:sections company-data)) (responsive/is-tablet-or-mobile?))
                     (dom/div {:class "empty-dashboard"}
                       (dom/h3 {:class "empty-dashboard-title"}
                         "No topics have been created.")
