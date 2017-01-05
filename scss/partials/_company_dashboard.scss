@@ -8,7 +8,7 @@ div.company-dashboard {
   background-color: $oc_gray_8;
 
   div.login-required {
-    min-height: calc(100vh - #{$footer_height}px - 41px);
+    min-height: calc(100vh - #{$footer_small_height}px - 40px);
   }
 
   &.selected-topic-view.mobile-or-tablet {
