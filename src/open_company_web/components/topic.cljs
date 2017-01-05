@@ -122,7 +122,7 @@
                 (when-not (and is-topic-view
                                is-mobile?)
                   " · ")
-                (utils/time-since (if is-topic-view (:updated-at topic-data) (:created-at topic-data)) [:short-month])))
+                (utils/time-since (if is-topic-view (:created-at topic-data) (:updated-at topic-data)) [:short-month])))
             (when (and is-dashboard
                        (not is-mobile?)
                        (> (count (:revisions topic-data)) 1))
