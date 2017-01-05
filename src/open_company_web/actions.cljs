@@ -111,7 +111,8 @@
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)
           with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)
-          with-open-add-topic (if (zero? (count (:sections updated-body)))
+          with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
+                                       (zero? (count (:sections updated-body))))
                                (assoc with-company-data :show-add-topic true)
                                with-company-data)]
       ; async preload the SU list
