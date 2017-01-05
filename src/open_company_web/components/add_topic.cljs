@@ -108,7 +108,8 @@
                                           company-data @(drv/get-ref s :company-data)]
                                       (let [tt-key (str "first-add-topic-" (:slug company-data))]
                                         (utils/after 500
-                                         #(when (= (count (:sections company-data)) 0)
+                                         #(when (and (= (count (:sections company-data)) 0)
+                                                     (= (count (:archived company-data)) 0))
                                           (t/tooltip coords {:config {:place "right-bottom"}
                                                              :id tt-key
                                                              :persistent true
