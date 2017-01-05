@@ -1,6 +1,11 @@
 div.company-editor {
+
   div.fullscreen-page {
     background-color: $oc_gray_1;
+
+    @include mobile(){
+      background-color: white;
+    }
 
     div.company-editor-box {
       width: 520px;
@@ -9,6 +14,13 @@ div.company-editor {
       border: 2px solid $oc_yellow;
       border-radius: 5px;
       padding: 25px;
+
+      @include mobile(){
+        width: auto;
+        border: 0px;
+        margin: 0;
+        padding: #{$navbar_height + 20}px 20px 20px;
+      }
 
       label.company-editor-message {
         display: block;
