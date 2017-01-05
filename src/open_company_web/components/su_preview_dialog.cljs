@@ -310,7 +310,7 @@
 
 (rum/defc confirmation < rum/static
                          {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
-  [type cancel-fn]
+  [type back-to-dashboard-cb]
   [:div
    (case type
      :email (modal-title "Email Sent!" :email-84)
@@ -327,8 +327,8 @@
                   (str "This update has been shared with #" ch-name "."))))]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
-      {:on-click cancel-fn}
-      "DONE"]]]])
+      {:on-click back-to-dashboard-cb}
+      "RETURN TO DASHBOARD"]]]])
 
 (defn reset-scroll-height []
   (let [main-scroll (gdom/getElementByClass "main-scroll")]
@@ -387,7 +387,7 @@
                :on-click #(cancel-fn)}
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
           (if sent
-            (confirmation share-via cancel-fn)
+            (confirmation share-via back-to-dashboard-cb)
             (dom/div {:class "su-preview-box"}
               (case share-via
                 :prompt (prompt-dialog #(do
