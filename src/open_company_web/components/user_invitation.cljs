@@ -12,7 +12,12 @@
   [invitation show-email?]
   (let [user-links (:links invitation)]
     [:tr
-      [:td [:div.value (:email invitation)]]
+      [:td [:div.value
+             {:title (if (>= (count (:email invitation)) 20) (:email invitation) "")
+              :data-toggle "tooltip"
+              :data-placement "top"
+              :data-container "body"}
+             (:email invitation)]]
       (when show-email?
         [:td (when-not (clojure.string/blank? (:real-name invitation)) [:div.value (:real-name invitation)])])
       [:td [:div (let [upper-status (clojure.string/upper-case (:status invitation))]
