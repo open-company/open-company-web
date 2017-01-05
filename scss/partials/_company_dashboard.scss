@@ -32,7 +32,7 @@ div.company-dashboard {
 
     div.empty-dashboard {
       min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px - #{$top_border_height}px + 30px);
-      padding: 40px 20px;
+      padding: 80px 20px;
       margin-top: -20px;
 
       h3.empty-dashboard-title {
@@ -48,7 +48,11 @@ div.company-dashboard {
 div.company-dashboard.small-navbar {
   div.page {
     div.empty-dashboard {
-      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px - #{$top_border_height}px + 24px);
+      min-height: calc(100vh - #{$footer_small_height}px - #{$top_border_height}px + 24px);
+
+      @include mobile(){
+        min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px - #{$top_border_height}px + 24px);
+      }
     }
   }
 }
