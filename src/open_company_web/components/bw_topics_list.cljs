@@ -71,7 +71,7 @@
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
         (when-not (= (count (:sections company-data)) 0)
-          (dom/h3 {:class "left-topics-list-top-title left"
+          (dom/h3 {:class "left-topics-list-top-title"
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
                                 (router/nav! (oc-urls/company)))} "TOPICS"))
