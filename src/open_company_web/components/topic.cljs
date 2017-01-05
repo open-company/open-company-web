@@ -253,7 +253,7 @@
                                        (utils/in? (:route @router/path) "su-list")
                                        (responsive/is-mobile-size?))
                                  with-order
-                                 (merge with-order {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})))]
+                                 (merge with-order {:width (if (responsive/is-tablet-or-mobile?) "auto" (str card-width "px"))})))]
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)
