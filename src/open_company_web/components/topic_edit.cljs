@@ -185,7 +185,7 @@
                 :success-title "REMOVE"
                 :success-cb #(let [section (dis/foce-section-key)
                                    company-data (dis/company-data)]
-                               (dis/dispatch! [:revision-remove section (:created-at (dis/foce-section-data))])
+                               (dis/dispatch! [:remove-revision section (:created-at (dis/foce-section-data))])
                                (hide-popover nil "remove-revision-confirm")
                                (when (= (count (:revisions-data (section company-data))) 1)
                                   (router/nav! (oc-urls/company))))}))
