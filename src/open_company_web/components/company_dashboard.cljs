@@ -43,6 +43,7 @@
         tt-id (share-tooltip-id (:slug company-data))]
     (when (and (not (om/get-state owner :share-tooltip-shown))
                (not (om/get-state owner :share-tooltip-dismissed))
+               (not= (om/get-props owner :show-login-overlay) :collect-name-password)
                company-data
                (zero? (:count (utils/link-for (:links company-data) "stakeholder-updates")))
                (= (+ (count (utils/filter-placeholder-sections (:sections company-data) company-data))
