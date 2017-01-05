@@ -289,12 +289,12 @@
       [:span.left.ml1.gray5.h6 {} "SHARE A LINK"]]]]])
 
 (rum/defcs modal-actions < rum/reactive (drv/drv :su-share)
-  [s success-cb send-fn cancel-fn type]
+  [s back-to-dashboard-cb success-cb send-fn cancel-fn type]
   [:div.px3.pb3.right-align
    [:button.btn-reset.btn-outline
     {:class (when-not (or (= :link type) (= :prompt type)) "mr1")
-     :on-click (if (= :link type) (comp success-cb cancel-fn) cancel-fn)}
-    (if (= :link type) "DONE" "CANCEL")]
+     :on-click (if (= :link type) back-to-dashboard-cb cancel-fn)}
+    (if (= :link type) "RETURN TO DASHBOARD" "CANCEL")]
    (when-not (or (= :link type) (= :prompt type))
      [:button.btn-reset.btn-solid
       {:on-click (comp success-cb send-fn)
@@ -378,6 +378,7 @@
   (render-state [_ {:keys [share-via share-link sending sent] :as state}]
     (let [company-data (:company-data data)
           success-cb   (:did-share-cb data)
+          back-to-dashboard-cb (:back-to-dashboard-cb data)
           cancel-fn    (:dismiss-su-preview data)]
       (dom/div {:class "su-preview-dialog"}
         (dom/div {:class "su-preview-window"}
@@ -397,6 +398,7 @@
                 :email (email-dialog success-cb {:share-link share-link})
                 :slack (slack-dialog success-cb))
               (modal-actions
+                back-to-dashboard-cb
                 success-cb
                 (if sent
                   cancel-fn
