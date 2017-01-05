@@ -34,10 +34,10 @@
   (cond
     ; avoid to crash tests
     (utils/is-test-env?)
-    (om/get-props owner :topics)
+    (:topics data)
     ; just layout the sections in :sections order
     ; in 2 columns
-    (= (om/get-props owner :columns-num) 2)
+    (= (:columns-num data) 2)
     (let [sections (:sections (:company-data data))
           layout (loop [idx 0
                         layout {:1 [] :2 []}]
@@ -51,7 +51,7 @@
       layout)
     ; just layout the sections in :sections order
     ; in 3 columns
-    (= (om/get-props owner :columns-num) 3)
+    (= (:columns-num data) 3)
     (let [sections (:sections (:company-data data))
           layout (loop [idx 0
                         layout {:1 [] :2 [] :3 []}]
@@ -154,7 +154,8 @@
                                             (:topics next-props)))
     (when (and (> (:columns-num next-props) 1)
                (or (not= (:topics next-props) (:topics data))
-                   (not= (:columns-num next-props) (:columns-num data))))
+                   (not= (:columns-num next-props) (:columns-num data))
+                   (not= (:card-width next-props) (:card-width data))))
       (om/set-state! owner :topics-layout (calc-layout owner next-props))))
 
   (render-state [_ {:keys [topics-layout filtered-topics]}]
@@ -211,6 +212,7 @@
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)
+                                    :new-sections (:new-sections data)
                                     :selected-topic-view selected-topic-view})
               ; for each column key contained in best layout
               :else

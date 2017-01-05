@@ -7,14 +7,12 @@ div.user-profile {
     @include big_web(){
       width: 580px;
     }
-    @include mobile{
-      padding: 20px 20px 20px 20px;
-    }
     /* 29px is the height below the user info */
-    min-height: calc(100vh - 29px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
+    min-height: calc(100vh - 114px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
 
     @include mobile(){
       /* 9px on mobile */
+      padding: 20px 20px 20px 20px;
       min-height: calc(100vh - 9px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
     }
 

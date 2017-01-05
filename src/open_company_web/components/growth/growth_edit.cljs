@@ -23,7 +23,7 @@
   (when-let [ch (utils/get-channel (str period k))]
     (put! ch {:period period :key k})))
 
-(defcomponent growth-edit-row [{:keys [interval is-last change-cb next-period prefix suffix] :as data} owner]
+(defcomponent growth-edit-row [{:keys [interval change-cb next-period prefix suffix] :as data} owner]
 
 
   (render [_]
@@ -40,28 +40,27 @@
                        (signal-tab next-period :value))))
           needs-year? (or (:needs-year data)
                           (and (not= interval "weekly")
-                               (= (utils/get-month period interval) "JAN")))
+                               (= (utils/get-month period interval) "JAN")
+                               (= (utils/get-month period interval) "DEC")))
           flags [:short (when needs-year? :force-year)]
           period-string (utils/get-period-string period interval flags)]
-
       (dom/tbody {}
         (dom/tr {:class "growth-edit-row"}
           (dom/th {:class "no-cell"}
             period-string)
           (dom/td {}
-            (when-not is-last
-              (om/build
-                cell
-                {:value value
-                 :positive-only false
-                 :placeholder "Value"
-                 :cell-state cell-state
-                 :draft-cb #(change-cb :value %)
-                 :prefix prefix
-                 :suffix suffix
-                 :period period
-                 :key :value
-                 :tab-cb tab-cb}))))))))
+            (om/build
+             cell
+             {:value value
+              :positive-only false
+              :placeholder "Value"
+              :cell-state cell-state
+              :draft-cb #(change-cb :value %)
+              :prefix prefix
+              :suffix suffix
+              :period period
+              :key :value
+              :tab-cb tab-cb})))))))
 
 ;; ===== Growth Metric Metadata Functions =====
 
@@ -256,8 +255,7 @@
                           ;; A table row for this period
                           (om/build growth-edit-row {:cursor row-data
                                                      :next-period next-period
-                                                     :is-last (= idx 0)
-                                                     :needs-year (or (= idx 0) (= idx (dec stop)))
+                                                     :needs-year (or (= idx 1) (= idx (dec stop)))
                                                      :prefix prefix
                                                      :suffix suffix
                                                      :interval interval

@@ -40,17 +40,17 @@
     ; if there is only one author it means this was never changed
     (= (count (:author topic-data)) 1)
     (let [first-author (first (:author topic-data))]
-      (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year])))
+      (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year])))
     ; if there are more than one record in author it means it was edited
     (> (count (:author topic-data) 1))
     (let [first-author (first (:author topic-data))
           last-author  (last (:author topic-data))]
       (if (= (:user-id first-author) (:user-id last-author))
         ; if the last editor is the same of the first don't repeat the name
-        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year]) "\n"
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
              "edited " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))
         ; if the last editor is different than the creator shows the name and the date of the ditor too
-        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:created-at first-author)) [:year]) "\n"
+        (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
              "edited by " (:name last-author) " on " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))))))
 
 (defcomponent topic-internal [{:keys [topic-data

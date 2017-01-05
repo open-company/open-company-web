@@ -122,7 +122,8 @@
               (:force-remove-loading with-company-data))
           (dissoc with-open-add-topic :loading :force-remove-loading)
           with-open-add-topic))
-    (= 403 status)
+    (or (= 403 status)
+        (= 401 status))
     (-> db
         (assoc-in [(keyword slug) :error] :forbidden)
         (dissoc :loading))
@@ -230,13 +231,17 @@
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         old-sections (:sections company-data)
-        new-sections (utils/vec-dissoc old-sections (name topic))]
+        new-sections (utils/vec-dissoc old-sections (name topic))
+        old-archived (:archived company-data)
+        new-archived (vec (conj old-archived {:title (:title ((keyword topic) company-data)) :section (name topic)}))
+        company-key (dispatcher/company-data-key slug)]
     (api/patch-sections new-sections)
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
       (dissoc :foce-data-editing?)
-      (assoc-in (conj (dispatcher/company-data-key slug) :sections) new-sections))))
+      (assoc-in (conj company-key :sections) new-sections)
+      (assoc-in (conj company-key :archived) new-archived))))
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
   (let [slug (keyword (router/current-company-slug))
@@ -248,15 +253,16 @@
         without-placeholder (dissoc with-fixed-body :placeholder)
         with-created-at (if (contains? without-placeholder :created-at) without-placeholder (assoc without-placeholder :created-at (utils/as-of-now)))
         created-at (:created-at with-created-at)
-        revisions-data (:revisions-data (get (dispatcher/company-data db) topic))
+        revisions-data (or (:revisions-data (get (dispatcher/company-data db) topic)) [])
         without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
         with-new-revision (conj without-current-revision with-created-at)
-        sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))]
+        sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))
+        complete-topic-data (merge with-created-at {:revisions-data sorted-revisions})]
     (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
       (api/partial-update-section topic with-created-at)
       (api/save-or-create-section with-created-at))
     (-> db
-      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) sorted-revisions)
+      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) complete-topic-data)
       (stop-foce))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
@@ -368,7 +374,7 @@
 (defmethod dispatcher/action :signup-with-email/success
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (.reload js/location)
+  (router/redirect! oc-urls/home)
   db)
 
 (defmethod dispatcher/action :get-auth-settings
