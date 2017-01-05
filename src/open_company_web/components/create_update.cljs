@@ -146,8 +146,9 @@
                                :data-placement "left"
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
-                (dom/div {:class "create-update-content-cta"}
-                  "Tip: You can drag topics into any order before you share them."))
+                (when (> (count su-topics) 1)
+                  (dom/div {:class "create-update-content-cta"}
+                    "Tip: You can drag topics into any order before you share them.")))
               (dom/div {:class (str "create-update-content-cards right" (when (> (count su-topics) 1) " dnd"))
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
