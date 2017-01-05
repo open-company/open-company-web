@@ -48,6 +48,26 @@ div.create-update {
           margin: 100px 0 150px;
         }
 
+        &.dnd {
+          div.topics-column-container div.topics-column div.topic-row{
+            cursor: move;
+
+            &:hover{
+              div.topic:after {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: $oc_gray_5;
+                font-size: 13px;
+                display: block;
+                font-family: FontAwesome;
+                content: "\f047";
+                opacity: 0.5;
+              }
+            }
+          }
+        }
+
         div.topics-column-container{
           padding-top: 0px;
 
@@ -59,21 +79,6 @@ div.create-update {
             div.topic-row{
               margin-left: 0px;
               margin-right: 0px;
-              cursor: move;
-
-              &:hover{
-                div.topic:after {
-                  position: absolute;
-                  right: 10px;
-                  top: 10px;
-                  color: $oc_gray_5;
-                  font-size: 13px;
-                  display: block;
-                  font-family: FontAwesome;
-                  content: "\f047";
-                  opacity: 0.5;
-                }
-              }
 
               div.topic {
                 margin-left: 0px;

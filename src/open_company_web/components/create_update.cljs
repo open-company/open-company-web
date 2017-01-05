@@ -35,19 +35,20 @@
 (defn setup-sortable
   "Setup the jQuery UI Sortable on the create-update-topics-list div"
   [owner]
-  (when-let [list-node (js/jQuery "div.topics-columns")]
-    (-> list-node
-      (.sortable #js {:scroll true
-                      :forcePlaceholderSize true
-                      :items ".topic-row"
-                      :stop (fn [event ui]
-                              ; the user stopped ordering, save the current order
-                              (when-let [dragged-item (gobj/get ui "item")]
-                                (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
-                                                                   :should-update-data false}))
-                                (patch-stakeholder-update owner)))
-                      :axis "y"})
-      (.disableSelection))))
+  (when (> (count (om/get-state owner :su-topics)) 1)
+    (when-let [list-node (js/jQuery "div.topics-columns")]
+      (-> list-node
+        (.sortable #js {:scroll true
+                        :forcePlaceholderSize true
+                        :items ".topic-row"
+                        :stop (fn [event ui]
+                                ; the user stopped ordering, save the current order
+                                (when-let [dragged-item (gobj/get ui "item")]
+                                  (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
+                                                                     :should-update-data false}))
+                                  (patch-stakeholder-update owner)))
+                        :axis "y"})
+        (.disableSelection)))))
 
 (defn share-clicked [owner]
   (patch-stakeholder-update owner)
@@ -147,7 +148,7 @@
                                :disabled (zero? (count su-topics))} "SHARE"))
                 (dom/div {:class "create-update-content-cta"}
                   "Tip: You can drag topics into any order before you share them."))
-              (dom/div {:class "create-update-content-cards right"
+              (dom/div {:class (str "create-update-content-cards right" (when (> (count su-topics) 1) " dnd"))
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
