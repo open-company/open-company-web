@@ -75,7 +75,8 @@
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
                                 (router/nav! (oc-urls/company)))} "TOPICS"))
-        (when (and (not show-add-topic)
+        (when (and (not (responsive/is-tablet-or-mobile?))
+                   (not show-add-topic)
                    (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
                        :on-click #(when (nil? (:foce-key data))
