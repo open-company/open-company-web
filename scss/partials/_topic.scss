@@ -48,7 +48,7 @@ div.topic {
       }
     }
 
-    &.dashboard-selected, &:hover{
+    &.dashboard-selected, &:hover, &.sticky-borders{
 
       div.topic-internal {
         div.card-header.card-image {
@@ -57,7 +57,7 @@ div.topic {
       }
     }
 
-    &.selectable-topic:hover {
+    &.selectable-topic:hover, &.sticky-borders {
       border-top: 2px solid rgba(78,90,107,0.2);
       border-bottom: 2px solid rgba(78,90,107,0.2);
       border-left: 2px solid rgba(78,90,107,0.2);
@@ -136,6 +136,12 @@ div.topic {
           @include emoji-size(13px);
         }
       }
+    }
+  }
+
+  &.sticky-borders {
+    div.topic-internal button.top-right-button {
+      opacity: 1;
     }
   }
 
