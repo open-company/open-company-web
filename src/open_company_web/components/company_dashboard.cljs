@@ -4,6 +4,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer (sel1)]
             [rum.core :as rum]
             [cljs.core.async :refer (chan <!)]
             [open-company-web.api :as api]
@@ -83,6 +84,11 @@
                                                                                          :card-width (if (responsive/is-mobile-size?)
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
+    (events/listen js/window EventType/CLICK (fn[e]
+                                               (when (and (:show-top-menu @dis/app-state)
+                                                          (not (utils/event-inside? e (sel1 [(str "div.topic[data-section=" (name (:show-top-menu @dis/app-state)) "]")]))))
+                                                 (utils/event-stop e)
+                                                 (dis/dispatch! [:show-top-menu nil]))))
     (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
       (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data)))))))
 
@@ -188,6 +194,7 @@
                                  :selected-topic-view (:selected-topic-view data)
                                  :dashboard-selected-topics (:dashboard-selected-topics data)
                                  :dashboard-sharing (:dashboard-sharing data)
-                                 :is-dashboard true}))
+                                 :is-dashboard true
+                                 :show-top-menu (:show-top-menu data)}))
                   ;;Footer
                   (om/build footer {:footer-width total-width-int}))))))))))
