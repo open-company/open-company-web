@@ -237,11 +237,16 @@ div.topic {
         width:  80px;
         background-color: transparent;
         opacity: 0;
-        z-index: 100;
         transition: 230ms;
         padding: 0 !important;
         margin: 0 !important;
         cursor: pointer;
+        pointer-events: none;
+
+        &.active {
+          opacity: 1;
+          pointer-events: auto;
+        }
 
         &.left-column {
           right: -67px;
@@ -251,7 +256,6 @@ div.topic {
           }
 
           &.active {
-            opacity: 1;
             right: -87px;
           }
         }
@@ -264,7 +268,6 @@ div.topic {
           }
 
           &.active {
-            opacity: 1;
             left: -87px;
           }
         }
