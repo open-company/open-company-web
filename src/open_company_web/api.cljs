@@ -573,7 +573,6 @@
   (when (and topic revision-data)
     (let [links (:links revision-data)
           delete-link (utils/link-for links "delete")]
-      (js/console.log "api/delete-revision" links delete-link)
       (when delete-link
         (api-delete (:href delete-link)
           {:headers {
@@ -582,5 +581,4 @@
             ; custom content type
             "content-type" (:type delete-link)
             "accept" (:type delete-link)}}
-          (fn [{:keys [status body success]}]
-            (js/console.log "Delete revision" topic (:created-at revision-data) "status" status "success" success)))))))
+          (fn [_]))))))
