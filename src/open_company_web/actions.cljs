@@ -250,14 +250,20 @@
         revisions (:revisions-data old-topic-data)
         revision-data (first (filter #(= (:created-at %) as-of) revisions))
         new-revisions (vec (filter #(not= (:created-at %) as-of) revisions))
-        should-remove-section (zero? (count new-revisions))
-        new-sections (if should-remove-section (utils/vec-dissoc (:sections company-data) (name topic)) (:sections company-data))
+        should-remove-section? (zero? (count new-revisions))
+        should-update-section? (= (:created-at old-topic-data) as-of)
+        new-sections (if should-remove-section? (utils/vec-dissoc (:sections company-data) (name topic)) (:sections company-data))
         company-key (dispatcher/company-data-key slug)
-        new-topic-data (assoc old-topic-data :revisions-data new-revisions)
+        new-topic-data (if should-update-section?
+                          (merge (first new-revisions) {:revisions (:revisions old-topic-data)
+                                                        :links (:links old-topic-data)
+                                                        :revisions-data new-revisions
+                                                        :section (:section old-topic-data)})
+                          (assoc old-topic-data :revisions-data new-revisions))
         with-sections (assoc company-data :sections new-sections)
-        with-fixed-topics (if should-remove-section
+        with-fixed-topics (if should-remove-section?
                             (dissoc with-sections (keyword topic))
-                            (assoc-in with-sections [(keyword topic) :revisions-data] new-revisions))]
+                            (assoc with-sections (keyword topic) new-topic-data))]
     (api/delete-revision topic revision-data)
     (-> db
       (stop-foce)
