@@ -50,9 +50,9 @@
                 :success-cb (fn []
                               (hide-popover nil "archive-metric-confirm")
                               (dispatcher/dispatch! [:foce-input {:data []}])
+                              ((:data-section-on-change data))
                               (om/update-state! owner #(merge % {:finances-raw-data {}
-                                                                 :table-key (str (rand 4))
-                                                                 :has-changes? true})))}))
+                                                                 :table-key (str (rand 4))})))}))
 
 (defcomponent finances-popover [{:keys [currency finances-raw-data section-data hide-popover-cb table-key data-section-on-change width height] :as data} owner options]
   (render [_]

@@ -82,7 +82,9 @@
                 :cancel-cb #(hide-popover nil "archive-metric-confirm")
                 :success-title "REMOVE"
                 :z-index-offset 1
-                :success-cb #(archive-metric-cb owner editing-cb metric-slug)}))
+                :success-cb #(do
+                                (archive-metric-cb owner editing-cb metric-slug)
+                                ((om/get-props owner :data-section-on-change)))}))
 
 (defcomponent growth-popover [{:keys [initial-focus
                                       new-metric?
