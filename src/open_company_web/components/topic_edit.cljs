@@ -176,17 +176,17 @@
         ; no changes, so dispatch the current url
         (@router/route-dispatcher (router/get-token)))))
 
-(defn- remove-revision-click [owner e]
-  (add-popover {:container-id "remove-revision-confirm"
+(defn- delete-revision-click [owner e]
+  (add-popover {:container-id "delete-revision-confirm"
                 :message utils/before-removing-revision-message
                 :height "130px"
                 :cancel-title "KEEP IT"
-                :cancel-cb #(hide-popover nil "remove-revision-confirm")
-                :success-title "REMOVE"
+                :cancel-cb #(hide-popover nil "delete-revision-confirm")
+                :success-title "DELETE"
                 :success-cb #(let [section (dis/foce-section-key)
                                    company-data (dis/company-data)]
-                               (dis/dispatch! [:remove-revision section (:created-at (dis/foce-section-data))])
-                               (hide-popover nil "remove-revision-confirm")
+                               (dis/dispatch! [:delete-revision section (:created-at (dis/foce-section-data))])
+                               (hide-popover nil "delete-revision-confirm")
                                (when (= (count (:revisions-data (section company-data))) 1)
                                   (router/nav! (oc-urls/company))))}))
 
@@ -530,11 +530,11 @@
               ;; Topic archive button
             (when (:show-delete-entry-button data)
               (dom/button {:class "btn-reset archive-button right"
-                           :title "Archive this topic"
+                           :title "Delete this entry"
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-revision-click owner)}
+                           :on-click (partial delete-revision-click owner)}
                   (dom/i {:class "fa fa-trash"}))))))))))

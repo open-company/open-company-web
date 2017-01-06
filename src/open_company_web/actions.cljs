@@ -243,7 +243,7 @@
       (assoc-in (conj company-key :sections) new-sections)
       (assoc-in (conj company-key :archived) new-archived))))
 
-(defmethod dispatcher/action :remove-revision [db [_ topic as-of]]
+(defmethod dispatcher/action :delete-revision [db [_ topic as-of]]
   (let [slug (keyword (router/current-company-slug))
         company-data (dispatcher/company-data)
         old-topic-data ((keyword topic) company-data)
