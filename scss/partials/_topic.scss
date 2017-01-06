@@ -242,6 +242,7 @@ div.topic {
         margin: 0 !important;
         cursor: pointer;
         pointer-events: none;
+        z-index: 100;
 
         &.active {
           opacity: 1;
