@@ -152,12 +152,12 @@ div.topic {
     }
 
     &:hover {
-      button.topic-pencil-button {
+      button.top-right-button {
         opacity: 1;
       }
     }
 
-    button.topic-pencil-button {
+    button.top-right-button {
       width: 30px;
       height: 20px;
       float: right;
@@ -228,18 +228,76 @@ div.topic {
       }
     }
 
-    div.topic-title {
-      padding-top: 12px;
-      opacity: 0.5;
-      font-size: 13px;
-      line-height: 1.5;
-      letter-spacing: 1px;
-      color: $oc_gray_5;
-      text-transform: uppercase;
-      font-family: $oc_headers_font;
-      font-weight: 700;
-      float: left;
-      width: auto;
+    div.topic-title-container {
+      position: relative;
+
+      div.topic-top-menu {
+        position: absolute;
+        top: 0px;
+        width:  80px;
+        background-color: transparent;
+        opacity: 0;
+        z-index: 100;
+        transition: 230ms;
+        padding: 0 !important;
+        margin: 0 !important;
+        cursor: pointer;
+
+        &.left-column {
+          right: -67px;
+
+          button.topic-top-menu-btn {
+            float: left;
+          }
+
+          &.active {
+            opacity: 1;
+            right: -87px;
+          }
+        }
+
+        &.right-column {
+          left: -67px;
+
+          button.topic-top-menu-btn {
+            float: right;
+          }
+
+          &.active {
+            opacity: 1;
+            left: -87px;
+          }
+        }
+
+        button.topic-top-menu-btn {
+          padding: 2px 5px;
+          margin: 1px 0;
+          background-color: white;
+          color: rgba(78,90,107,0.6);
+          font-size: 12px;
+          font-weight: 300;
+          font-family: $oc_main_font;
+          white-space: pre;
+
+          &:hover {
+            color: rgba(78,90,107,0.8);
+          }
+        }
+      }
+
+      div.topic-title {
+        padding-top: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: rgba(78,90,107,0.5);
+        text-transform: uppercase;
+        font-family: $oc_headers_font;
+        font-weight: 700;
+        float: left;
+        width: auto;
+      }
+
     }
 
     div.topic-headline-inner {

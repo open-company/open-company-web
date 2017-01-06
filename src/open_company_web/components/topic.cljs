@@ -10,6 +10,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.topic-edit :refer (topic-edit)]
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
+            [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events.EventType :as EventType]
             [goog.events :as events]
@@ -53,6 +54,17 @@
         (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
              "edited by " (:name last-author) " on " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))))))
 
+(defn- assign-topic-click []
+  (add-popover {:container-id "assign-topic-wip"
+                :message "This feature isn't available yet, but will allow you to assign topics to the person responsible for keeping it up to date."
+                :height "180px"
+                :success-title "Ok, got it."
+                :success-cb #(do
+                              (dis/dispatch! [:show-top-menu nil])
+                              (hide-popover nil "assign-topic-wip"))
+                :cancel-title nil
+                :cancel-cb nil}))
+
 (defcomponent topic-internal [{:keys [topic-data
                                       section
                                       currency
@@ -66,7 +78,8 @@
                                       foce-active
                                       topic-click
                                       show-editing
-                                      column] :as data} owner options]
+                                      column
+                                      show-top-menu] :as data} owner options]
 
   (render [_]
     (let [section-kw          (keyword section)
@@ -85,7 +98,8 @@
                                     (html-text-exceeds-limit topic-body utils/topic-body-limit))
           truncated-body      (if should-truncate-text
                                  (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
-                                 topic-body)]
+                                 topic-body)
+          showing-menu (= show-top-menu section)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name section))
                     :ref "topic-internal"}
@@ -100,8 +114,27 @@
             (om/build topic-image-header {:image-header image-header :image-size image-header-size} {:opts options})))
 
         ;; Topic title
-        (dom/div {:class "group"}
+        (dom/div {:class "topic-title-container group"}
+          (when is-dashboard
+            (dom/div {:class (utils/class-set {:topic-top-menu true
+                                               :active showing-menu
+                                               :left-column (not= fixed-column columns-num)
+                                               :right-column (= fixed-column columns-num)})}
+              (dom/button {:class "topic-top-menu-btn btn-reset"
+                           :on-click #(dis/dispatch! [:start-foce section-kw {:placeholder true
+                                                                              :title (:title topic-data)
+                                                                              :data (:data topic-data)
+                                                                              :metrics (:metrics topic-data)}])}
+                (dom/i {:class "fa fa-plus"})" New")
+              (dom/button {:class "topic-top-menu-btn btn-reset"
+                           :on-click #(dis/dispatch! [:start-foce section-kw topic-data])}
+                (dom/i {:class "fa fa-pencil"})" Edit")
+              (dom/button {:class "topic-top-menu-btn btn-reset"
+                           :on-click #(assign-topic-click)}
+                (dom/i {:class "fa fa-user"})" Assign")))
+
           (dom/div {:class "topic-title"}
+
             (when-not (and is-topic-view
                        is-mobile?)
               (:title topic-data))
@@ -141,7 +174,7 @@
                      (not (:read-only topic-data))
                      (not read-only-company)
                      (not foce-active))
-            (dom/button {:class (str "topic-pencil-button btn-reset")
+            (dom/button {:class "top-right-button topic-pencil-button btn-reset"
                          :on-click #(if is-dashboard
                                       (router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))
                                       (start-foce-click owner))}
@@ -149,7 +182,21 @@
                       :title "Edit"
                       :data-toggle "tooltip"
                       :data-container "body"
-                      :data-placement "top"}))))
+                      :data-placement "top"})))
+          (when (and show-editing
+                     (not is-stakeholder-update)
+                     is-dashboard
+                     (not is-mobile?)
+                     (not is-topic-view)
+                     (responsive/can-edit?)
+                     (not (:read-only topic-data))
+                     (not read-only-company)
+                     (not foce-active))
+            (dom/button {:class "top-right-button topic-top-menu-button btn-reset"
+                         :on-click #(do
+                                      (utils/event-stop %)
+                                      (dis/dispatch! [:show-top-menu (if showing-menu nil section)]))}
+              (dom/i {:class "fa fa-ellipsis-v"}))))
 
         ;; Topic image for dashboard
         (when (and image-header
@@ -245,7 +292,8 @@
     (let [section-kw (keyword section)
           slug (keyword (router/current-company-slug))
           foce-active (not (nil? foce-key))
-          is-current-foce (and (= foce-key section-kw) (= (:created-at foce-data) (:created-at section-data)))
+          is-current-foce (or (and (= foce-key section-kw) (= (:created-at foce-data) (:created-at section-data)))
+                              (and is-dashboard (= foce-key section-kw) (= (:created-at foce-data) nil)))
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
@@ -262,12 +310,17 @@
                                                  :dashboard-topic is-dashboard
                                                  :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
                                                  :dashboard-share-mode (:dashboard-sharing data)
-                                                 :selectable-topic (or (not read-only-company)
-                                                                       (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)
-                                                                       (and read-only-company
-                                                                            (> (count (:revisions section-data)) 1)))
-                                                 :no-foce (and foce-active (not is-current-foce))})
-                    :onClick #(when is-dashboard
+                                                 :selectable-topic (and (not is-current-foce)
+                                                                        (or (not read-only-company)
+                                                                            (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)
+                                                                            (and read-only-company
+                                                                                 (> (count (:revisions section-data)) 1))))
+                                                 :no-foce (or (and (not (nil? (:show-top-menu data)))
+                                                                   (not= (:show-top-menu data) section))
+                                                              (and foce-active (not is-current-foce)))})
+                    :onClick #(when (and is-dashboard
+                                         (not is-current-foce)
+                                         (nil? (:show-top-menu data)))
                                (if (:dashboard-sharing data)
                                  (dis/dispatch! [:dashboard-select-topic section-kw])
                                  (when (or (responsive/is-mobile-size?)
@@ -307,6 +360,7 @@
                                     :is-dashboard is-dashboard
                                     :is-topic-view is-topic-view
                                     :show-editing show-editing
-                                    :column column}
+                                    :column column
+                                    :show-top-menu (:show-top-menu data)}
                                    {:opts options
                                     :key (str "topic-" section)}))))))
