@@ -58,7 +58,7 @@
   (add-popover {:container-id "assign-topic-wip"
                 :message "This feature isn't available yet, but will allow you to assign topics to the person responsible for keeping it up to date."
                 :height "180px"
-                :success-title "Ok, got it."
+                :success-title "Ok, got it"
                 :success-cb #(do
                               (dis/dispatch! [:show-top-menu nil])
                               (hide-popover nil "assign-topic-wip"))
