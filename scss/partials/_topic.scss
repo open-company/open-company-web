@@ -310,7 +310,13 @@ div.topic {
         font-family: $oc_headers_font;
         font-weight: 700;
         float: left;
-        width: 85%;
+        @include big_web(){
+          width: 85%;
+        }
+
+        @include mobile(){
+          float: none;
+        }
       }
 
     }

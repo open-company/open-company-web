@@ -115,7 +115,8 @@
 
         ;; Topic title
         (dom/div {:class "topic-title-container group"}
-          (when is-dashboard
+          (when (and is-dashboard
+                     (not (responsive/is-tablet-or-mobile?)))
             (dom/div {:class (utils/class-set {:topic-top-menu true
                                                :active showing-menu
                                                :left-column (not= fixed-column columns-num)
@@ -191,7 +192,8 @@
                      (responsive/can-edit?)
                      (not (:read-only topic-data))
                      (not read-only-company)
-                     (not foce-active))
+                     (not foce-active)
+                     (not (responsive/is-tablet-or-mobile?)))
             (dom/button {:class "top-right-button topic-top-menu-button btn-reset"
                          :on-click #(do
                                       (utils/event-stop %)
