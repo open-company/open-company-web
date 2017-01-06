@@ -194,6 +194,7 @@
     (assoc :foce-key (keyword section)) ; which topic is being FoCE
     (assoc :foce-data section-data)     ; map of the in progress edits of the topic data
     (assoc :foce-data-editing? false)   ; is the data portion of the topic (e.g. finance, growth) being edited
+    (assoc :show-top-menu nil)          ; dismiss top menu
     (dissoc :show-add-topic)))          ; remove the add topic view)
 
 (defn stop-foce [db]
@@ -561,3 +562,6 @@
     (-> db
       (assoc-in company-data-key updated-company-data)
       (stop-foce))))
+
+(defmethod dispatcher/action :show-top-menu [db [_ topic]]
+  (assoc db :show-top-menu topic))
