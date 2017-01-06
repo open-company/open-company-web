@@ -307,6 +307,7 @@
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)
                                                  :no-tablet (not (responsive/is-tablet-or-mobile?))
                                                  :topic-edit is-current-foce
+                                                 :topic-with-menu-open (= (:show-top-menu data) section)
                                                  :dashboard-topic is-dashboard
                                                  :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
                                                  :dashboard-share-mode (:dashboard-sharing data)

@@ -1,6 +1,10 @@
 div.company-dashboard.editing-topic {
-  nav > *, div.left-topics-list, div.footer, div.topic:not(.topic-edit) {
-    opacity: 0.4 !important;
+  nav > *, div.left-topics-list, div.footer{
+    opacity: 0.2 !important;
+  }
+
+  div.topic.topic-edit, div.topic-topic-with-menu-open {
+    opacity: 1 !important;
   }
 }
 

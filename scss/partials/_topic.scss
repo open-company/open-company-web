@@ -277,17 +277,19 @@ div.topic {
           padding: 2px 5px;
           margin: 1px 0;
           background-color: white;
-          color: rgba(78,90,107,0.7);
+          color: rgba(78,90,107,0.8);
           font-size: 14px;
           font-weight: 300;
           font-family: $oc_main_font;
           white-space: pre;
-          border: 1px solid rgba(78,90,107,0.3);
+          border: 1px solid rgba(78,90,107,0.1);
           border-radius: 3px;
+          min-width: 58px;
+          text-align: left;
 
           &:hover {
             color: rgba(78,90,107,1);
-            border: 1px solid rgba(78,90,107,0.5);
+            border: 1px solid rgba(78,90,107,0.3);
           }
         }
       }
