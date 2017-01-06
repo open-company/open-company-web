@@ -68,7 +68,7 @@
                                  (assoc layout :3 (conj (:3 layout) topic)))))))]
       layout)))
 
-(defn render-topic [owner options section-name & [column]]
+(defn render-topic [owner options section-name column]
   (when section-name
     (let [props                 (om/get-props owner)
           company-data          (:company-data props)
@@ -108,7 +108,8 @@
                              :is-dashboard is-dashboard
                              :show-editing (and is-dashboard
                                                 (not (:read-only company-data)))
-                             :column column}
+                             :column column
+                             :show-top-menu (:show-top-menu props)}
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click section-name)}})))))))
 
