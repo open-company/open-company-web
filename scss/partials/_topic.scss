@@ -73,7 +73,7 @@ div.topic {
   }
 
   &.no-foce {
-    opacity: 0.4;
+    opacity: 0.2;
   }
 
   &.mobile-dashboard-topic {
@@ -238,8 +238,8 @@ div.topic {
         background-color: transparent;
         opacity: 0;
         transition: 230ms;
-        padding: 0 !important;
         margin: 0 !important;
+        padding: 0 5px 0 5px !important;
         cursor: pointer;
         pointer-events: none;
         z-index: 100;
@@ -250,26 +250,26 @@ div.topic {
         }
 
         &.left-column {
-          right: -67px;
+          right: -62px;
 
           button.topic-top-menu-btn {
             float: left;
           }
 
           &.active {
-            right: -87px;
+            right: -82px;
           }
         }
 
         &.right-column {
-          left: -67px;
+          left: -62px;
 
           button.topic-top-menu-btn {
             float: right;
           }
 
           &.active {
-            left: -87px;
+            left: -82px;
           }
         }
 
@@ -282,9 +282,12 @@ div.topic {
           font-weight: 300;
           font-family: $oc_main_font;
           white-space: pre;
+          border: 1px solid rgba(78,90,107,0.3);
+          border-radius: 3px;
 
           &:hover {
-            color: rgba(78,90,107,0.8);
+            color: rgba(78,90,107,1);
+            border: 1px solid rgba(78,90,107,0.5);
           }
         }
       }
