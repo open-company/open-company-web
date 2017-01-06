@@ -123,9 +123,11 @@
                                                :right-column (= fixed-column columns-num)})}
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(dis/dispatch! [:start-foce section-kw {:placeholder true
+                                                                              :section (name section-kw)
                                                                               :title (:title topic-data)
                                                                               :data (:data topic-data)
-                                                                              :metrics (:metrics topic-data)}])}
+                                                                              :metrics (:metrics topic-data)
+                                                                              :links (:links topic-data)}])}
                 (dom/i {:class "fa fa-plus"})" New")
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(dis/dispatch! [:start-foce section-kw topic-data])}
