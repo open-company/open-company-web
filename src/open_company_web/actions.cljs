@@ -328,10 +328,21 @@
     (assoc db :show-login-overlay show-login-overlay)))
 
 (defmethod dispatcher/action :login-with-slack
-  [db [_ primary-scope?]]
+  [db [_]]
   (let [current (router/get-token)
-        slack-ref (if primary-scope? "authenticate" "authenticate-retry")
-        auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) slack-ref)]
+        auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) "authenticate")]
+    (when (and (not (.startsWith current oc-urls/login))
+               (not (.startsWith current oc-urls/sign-up))
+               (not (cook/get-cookie :login-redirect)))
+        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    (router/redirect! (:href auth-url)))
+  db)
+
+(defmethod dispatcher/action :auth-bot
+  [db [_]]
+  (let [current (router/get-token)
+        auth-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "bot")]
+    (js/console.log "auth-urls" (:links (:auth-settings @dispatcher/app-state)) "->" auth-url)
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
