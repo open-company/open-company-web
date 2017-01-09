@@ -124,7 +124,8 @@
       (api/patch-sections new-topics))
     (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
-    (router/nav! (oc-urls/company-section (:slug company-data) new-topic))))
+    (when (:was-archived topic-data)
+      (router/nav! (oc-urls/company-section (:slug company-data) new-topic)))))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
