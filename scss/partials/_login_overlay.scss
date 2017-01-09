@@ -215,8 +215,46 @@ div.login-overlay-container {
       }
     }
 
+    div.login-overlay-content {
+      div.slack-disclaimer {
+        font-family: $oc_headers_font;
+        font-size: 14px;
+        font-weight: normal;
+        letter-spacing: 0.4px;
+        text-align: center;
+        color: $oc_gray_5;
+        padding: 20px 20px 0;
+      }
+    }
+
     button.login-button {
-      margin-top: 50px;
+      margin-top: 37px;
+
+      &.with-slack {
+        height: 40px;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: $oc_headers_font;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid rgba(78,90,107,0.4);
+
+        &:before {
+          content: "";
+          background-image: url("/img/slack.png");
+          background-position: 0px 0px;
+          background-size: 20px 20px;
+          width: 20px;
+          height: 20px;
+          display: inline-block;
+          margin-right: 5px;
+          margin-bottom: -4px;
+        }
+
+        span.slack {
+          font-weight: 700;
+        }
+      }
     }
 
     div.login-overlay-footer {
