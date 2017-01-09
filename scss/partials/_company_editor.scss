@@ -9,6 +9,17 @@ div.company-editor {
       border: 2px solid $oc_yellow;
       border-radius: 5px;
       padding: 25px;
+      text-align: center;
+
+      div.slack-disclaimer {
+        margin-bottom: 23px;
+        text-align: center;
+        font-family: $oc_headers_font;
+        font-size: 14px;
+        font-weight: normal;
+        letter-spacing: 0.4px;
+        color: $oc_gray_5;
+      }
 
       label.company-editor-message {
         display: block;
