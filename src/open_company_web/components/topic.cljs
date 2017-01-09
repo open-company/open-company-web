@@ -56,7 +56,7 @@
 
 (defn- assign-topic-click []
   (add-popover {:container-id "assign-topic-wip"
-                :message "This feature isn't available yet, but will allow you to assign topics to the person responsible for keeping it up to date."
+                :message "Coming soon. Assign someone to keep this topic up to date."
                 :height "180px"
                 :success-title "Ok, got it"
                 :success-cb #(do
@@ -128,7 +128,7 @@
                                                                               :data (:data topic-data)
                                                                               :metrics (:metrics topic-data)
                                                                               :links (:links topic-data)}])}
-                (dom/i {:class "fa fa-plus"})" New")
+                (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(dis/dispatch! [:start-foce section-kw topic-data])}
                 (dom/i {:class "fa fa-pencil"})" Edit")
