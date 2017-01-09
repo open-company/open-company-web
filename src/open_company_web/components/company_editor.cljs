@@ -50,9 +50,8 @@
   (init-state [_]
     {:loading false
      :skip-bot (or (not (jwt/is-slack-org?))
-                  (not
                    (and (jwt/is-slack-org?)
-                        (map? (:bot (jwt/get-contents))))))})
+                        (map? (:bot (jwt/get-contents)))))})
 
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Company")
