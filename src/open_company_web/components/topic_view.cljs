@@ -60,6 +60,18 @@
                   (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
                   (router/redirect! (oc-urls/company (:slug company-data))))))))))))
 
+(defn show-edit-tt [owner]
+  (when (and (= (count (:sections (om/get-props owner :company-data))) 1)
+             (= (count (:archived (om/get-props owner :company-data))) 0)
+             (om/get-props owner :foce-key))
+    (utils/after 500
+      #(let [first-foce (str "first-foce-" (:slug (om/get-props owner :company-data)))]
+        (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
+                                                                  :id first-foce
+                                                                  :once-only true
+                                                                  :config {:place "right-bottom"}})
+        (t/show first-foce)))))
+
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
                                   selected-topic-view
@@ -74,15 +86,7 @@
     (dis/dispatch! [:show-add-topic false])
     (load-revisions-if-needed owner)
     (start-foce-if-needed owner)
-    (when (and (= (count (:sections company-data)) 1)
-               (= (count (:archived company-data)) 0))
-      (utils/after 500
-        #(let [first-foce (str "first-foce-" (:slug company-data))]
-          (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
-                                                                    :id first-foce
-                                                                    :once-only true
-                                                                    :config {:place "right-bottom"}})
-          (t/show first-foce)))))
+    (show-edit-tt owner))
 
   (will-receive-props [_ next-props]
     (when (and (:foce-key data)
@@ -98,7 +102,8 @@
 
   (did-update [_ _ _]
     (load-revisions-if-needed owner)
-    (start-foce-if-needed owner))
+    (start-foce-if-needed owner)
+    (show-edit-tt owner))
 
   (render [_]
     (let [section-kw (keyword selected-topic-view)
@@ -132,7 +137,7 @@
                       :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str topic-card-width "px"))}}
               (when (and (not (:read-only company-data))
                          (not (responsive/is-tablet-or-mobile?)))
-                (dom/div {:class (str "fake-textarea " (when is-another-foce "disabled"))}
+                (dom/div {:class (str "fake-textarea group " (when is-another-foce "disabled"))}
                   (if is-new-foce
                     (dom/div {:class "topic topic-edit"
                               :style {:width (str (- topic-card-width 120) "px")}}
@@ -151,18 +156,15 @@
                           with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                           with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
-                                :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
-                                :style {:width (str (- topic-card-width 100) "px")}}
-                        "Start a new entry...")))))
+                                :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])}
+                        (:title topic-data)
+                        (dom/br)
+                        (dom/span {:class "new-entry"} "Start a new entry..."))))))
               ;; Render the topic from the company data only until the revisions are loaded.
               (when (and (not foce-key)
                          (not revisions)
                          (not (:placeholder topic-data)))
                 (dom/div {:class "revision-container group"}
-                  (when (and (not (:read-only company-data))
-                             (not (responsive/is-tablet-or-mobile?)))
-                    (dom/hr {:class "separator-line"
-                             :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 80) "px"))}}))
                   (om/build topic {:section selected-topic-view
                                    :section-data topic-data
                                    :card-width (- topic-card-width 60)
@@ -179,9 +181,7 @@
                     :let [rev (get revisions idx)]]
                 (when rev
                   (dom/div {:class "revision-container group"}
-                    (when-not (and (= idx 0)
-                                   (or (responsive/is-tablet-or-mobile?)
-                                       (:read-only company-data)))
+                    (when-not (= idx 0)
                       (dom/hr {:class "separator-line"
                                :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
                     (om/build topic {:section selected-topic-view

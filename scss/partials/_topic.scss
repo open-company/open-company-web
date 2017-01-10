@@ -48,7 +48,7 @@ div.topic {
       }
     }
 
-    &.dashboard-selected, &:hover, &.sticky-borders{
+    &.dashboard-selected, &:hover, &.sticky-borders, &.selectable-topic:hover{
 
       div.topic-internal {
         div.card-header.card-image {

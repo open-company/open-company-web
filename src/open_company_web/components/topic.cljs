@@ -158,7 +158,7 @@
                 (when-not (and is-topic-view
                                is-mobile?)
                   " · ")
-                (utils/time-since (:updated-at topic-data) [:short-month])))
+                (utils/time-since (if is-topic-view (:created-at topic-data) (:updated-at topic-data)) [:short-month])))
             (when (and is-dashboard
                        (not is-mobile?)
                        (> (count (:revisions topic-data)) 1))
@@ -305,7 +305,7 @@
                                        (utils/in? (:route @router/path) "su-list")
                                        (responsive/is-mobile-size?))
                                  with-order
-                                 (merge with-order {:width (if (responsive/window-exceeds-breakpoint) (str card-width "px") "auto")})))]
+                                 (merge with-order {:width (if (responsive/is-tablet-or-mobile?) "auto" (str card-width "px"))})))]
       (dom/div #js {:className (utils/class-set {:topic true
                                                  :group true
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)

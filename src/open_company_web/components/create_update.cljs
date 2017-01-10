@@ -22,7 +22,7 @@
 (defn ordered-topics-list
   "Return the list of active topics in the order the user moved them."
   []
-  (let [topics (sel [:div.create-update-topics-list :div.oc-active])
+  (let [topics (sel [:div.topics-columns :div.topic-row])
         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
     (vec (remove nil? topics-list))))
 
@@ -35,19 +35,20 @@
 (defn setup-sortable
   "Setup the jQuery UI Sortable on the create-update-topics-list div"
   [owner]
-  (when-let [list-node (js/jQuery "div.create-update-topics-list")]
-    (-> list-node
-      (.sortable #js {:scroll true
-                      :forcePlaceholderSize true
-                      :items ".oc-active"
-                      :stop (fn [event ui]
-                              ; the user stopped ordering, save the current order
-                              (when-let [dragged-item (gobj/get ui "item")]
-                                (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
-                                                                   :should-update-data false}))
-                                (patch-stakeholder-update owner)))
-                      :axis "y"})
-      (.disableSelection))))
+  (when (> (count (om/get-state owner :su-topics)) 1)
+    (when-let [list-node (js/jQuery "div.topics-columns")]
+      (-> list-node
+        (.sortable #js {:scroll true
+                        :forcePlaceholderSize true
+                        :items ".topic-row"
+                        :stop (fn [event ui]
+                                ; the user stopped ordering, save the current order
+                                (when-let [dragged-item (gobj/get ui "item")]
+                                  (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
+                                                                     :should-update-data false}))
+                                  (patch-stakeholder-update owner)))
+                        :axis "y"})
+        (.disableSelection)))))
 
 (defn share-clicked [owner]
   (patch-stakeholder-update owner)
@@ -102,7 +103,10 @@
     (let [company-data (dis/company-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           total-width (str total-width-int "px")
-          fixed-card-width (responsive/calc-update-width columns-num)]
+          fixed-card-width (responsive/calc-update-width columns-num)
+          back-to-dashboard-fn #(do
+                                  (dis/dispatch! [:dashboard-share-mode false])
+                                  (router/nav! (oc-urls/company)))]
       (dom/div {:class "create-update main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
@@ -115,7 +119,8 @@
                             :active nil
                             :show-navigation-bar (utils/company-has-topics? company-data)
                             :mobile-menu-open (:mobile-menu-open data)
-                            :auth-settings (:auth-settings data)})
+                            :auth-settings (:auth-settings data)
+                            :is-update-preview true})
           (dom/div {:class "create-update-inner group navbar-offset"}
             (when show-su-dialog
               (om/build su-preview-dialog {:selected-topics su-topics
@@ -123,6 +128,7 @@
                                            :latest-su (dis/latest-stakeholder-update)
                                            :su-title su-title
                                            :dismiss-su-preview #(om/set-state! owner :show-su-dialog false)
+                                           :back-to-dashboard-cb back-to-dashboard-fn
                                            :did-share-cb #(om/set-state! owner :did-share true)}))
             (dom/div {:class "create-update-content group"
                       :style {:width total-width}}
@@ -134,9 +140,7 @@
                                :data-toggle "tooltip"
                                :data-container "body"
                                :data-placement "left"
-                               :on-click #(do
-                                            (dis/dispatch! [:dashboard-share-mode false])
-                                            (router/nav! (oc-urls/company)))} "CANCEL")
+                               :on-click back-to-dashboard-fn} "CANCEL")
                   (dom/button {:class "share btn-reset btn-solid"
                                :title (share-tooltip)
                                :data-toggle "tooltip"
@@ -144,23 +148,16 @@
                                :data-placement "left"
                                :on-click #(share-clicked owner)
                                :disabled (zero? (count su-topics))} "SHARE"))
-                (dom/div {:class "create-update-content-cta"}
-                  "Arrange your topics in any order before you share them.")
-                (dom/div {:class "create-update-topics-list"
-                          :key (clojure.string/join "-" su-topics)}
-                  (for [topic su-topics]
-                    (let [sd ((keyword topic) company-data)]
-                      (dom/div {:class (str "create-update-topics-list-item oc-active" (when (> (count su-topics) 1) " dnd"))
-                                :data-topic topic
-                                :ref topic
-                                :key topic}
-                        (:title sd))))))
-              (dom/div {:class "create-update-content-cards right"
+                (when (> (count su-topics) 1)
+                  (dom/div {:class "create-update-content-cta"}
+                    "Tip: You can drag topics into any order before you share them.")))
+              (dom/div {:class (str "create-update-content-cards right" (when (> (count su-topics) 1) " dnd"))
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
                             :value su-title
                             :placeholder "Title"
+                            :style #js {:width (str (- fixed-card-width 60) "px")}
                             :on-change (fn [e]
                                           (om/update-state! owner #(merge % {:su-title (.. e -target -value)
                                                                              :should-update-data false}))
@@ -168,8 +165,8 @@
                 (if (zero? (count su-topics))
                   (dom/div {:class "create-update-content-cards-no-topics"} "No Topics Selected")
                   (om/build topics-columns {:columns-num 1
-                                            :card-width (- fixed-card-width 60) ; remove 60 padding around it
-                                            :total-width (- fixed-card-width 60)
+                                            :card-width fixed-card-width ; remove 60 padding around it
+                                            :total-width fixed-card-width
                                             :is-stakeholder-update true
                                             :content-loaded (not (:loading data))
                                             :topics su-topics

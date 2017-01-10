@@ -3,19 +3,11 @@
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
             [open-company-web.urls :as oc-urls]
-            [open-company-web.lib.jwt :as jwt]
-            [open-company-web.lib.responsive :as responsive]
-            [open-company-web.components.ui.icon :refer (icon)]))
+            [open-company-web.lib.responsive :as responsive]))
 
 (defcomponent footer [{:keys [su-preview footer-width] :as data} owner options]
   (render [_]
     (dom/div {:class "footer"}
-      (when-not (jwt/jwt)
-        (dom/div {:class "footer-cta"}
-          (when su-preview
-            (dom/div {}
-              (dom/a {:class "com-link"
-                      :href "https://opencompany.com/"} "LEARN MORE ➞")))))
       (dom/div {:class "footer-internal"}
         (dom/div {:class "footer-bottom"
                   :style #js {:width (str footer-width "px")}}
