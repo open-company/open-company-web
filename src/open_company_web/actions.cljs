@@ -114,14 +114,19 @@
           with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
                                        (zero? (count (:sections updated-body))))
                                (assoc with-company-data :show-add-topic true)
-                               with-company-data)]
+                               with-company-data)
+          with-welcome-screen (if (and (not (responsive/is-tablet-or-mobile?))
+                                       (zero? (count (:sections updated-body)))
+                                       (zero? (count (:archived updated-body))))
+                                (assoc with-open-add-topic :show-welcome-screen true)
+                                with-open-add-topic)]
       ; async preload the SU list
       (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
               (pos? (count (:sections updated-body)))
               (:force-remove-loading with-company-data))
-          (dissoc with-open-add-topic :loading :force-remove-loading)
-          with-open-add-topic))
+          (dissoc with-welcome-screen :loading :force-remove-loading)
+          with-welcome-screen))
     (or (= 403 status)
         (= 401 status))
     (-> db
@@ -197,10 +202,13 @@
     (dissoc :show-add-topic)))          ; remove the add topic view)
 
 (defn stop-foce [db]
-  (-> db
-    (dissoc :foce-key)
-    (dissoc :foce-data)
-    (dissoc :foce-data-editing?)))
+  (let [company-data (dispatcher/company-data db)
+        show-add-topic (zero? (count (:sections company-data)))]
+    (-> db
+      (dissoc :foce-key)
+      (dissoc :foce-data)
+      (assoc :show-add-topic show-add-topic)
+      (dissoc :foce-data-editing?))))
 
 ;; Front of Card Edit section
 (defmethod dispatcher/action :start-foce [db [_ section-key section-data]]
@@ -563,3 +571,7 @@
     (-> db
       (assoc-in company-data-key updated-company-data)
       (stop-foce))))
+
+(defmethod dispatcher/action :hide-welcome-screen
+  [db [_]]
+  (dissoc db :show-welcome-screen))
