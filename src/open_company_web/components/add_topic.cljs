@@ -109,15 +109,15 @@
                                           company-data @(drv/get-ref s :company-data)
                                           tt-key (str "first-add-topic-" (:slug company-data))
                                           place {:place "left-bottom"}]
-                                        (utils/after 500
-                                         #(when (and (= (count (:sections company-data)) 0)
-                                                     (= (count (:archived company-data)) 0))
-                                          (t/tooltip coords {:config {:place "left-bottom"}
-                                                             :id tt-key
-                                                             :persistent true
-                                                             :desktop "Select a topic you want everyone to know about, or you can name your own."})
-                                          (t/show tt-key)))
-                                        (assoc s ::tt-key tt-key)))
+                                      (utils/after 500
+                                       #(when (and (= (count (:sections company-data)) 0)
+                                                   (= (count (:archived company-data)) 0))
+                                        (t/tooltip coords {:config {:place "left-bottom"}
+                                                           :id tt-key
+                                                           :persistent true
+                                                           :desktop "Select a topic you want everyone to know about, or you can name your own."})
+                                        (t/show tt-key)))
+                                      (assoc s ::tt-key tt-key)))
                        :will-unmount (fn [s]
                                        (t/hide (::tt-key s))
                                       s)}
