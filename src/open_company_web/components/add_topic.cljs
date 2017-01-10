@@ -103,19 +103,21 @@
                                           $add-topic (js/$ add-topic-node)
                                           add-topic-offset (.offset $add-topic)
                                           add-topic-width (.width $add-topic)
-                                          add-topic-height (.width $add-topic)
-                                          coords [(+ (.-left add-topic-offset) add-topic-width 42) (+ (.-top add-topic-offset) 60)]
-                                          company-data @(drv/get-ref s :company-data)]
-                                      (let [tt-key (str "first-add-topic-" (:slug company-data))]
+                                          add-topic-height (.height $add-topic)
+                                          coords [(.-left add-topic-offset)
+                                                  (+ (.-top add-topic-offset) 60)]
+                                          company-data @(drv/get-ref s :company-data)
+                                          tt-key (str "first-add-topic-" (:slug company-data))
+                                          place {:place "left-bottom"}]
                                         (utils/after 500
                                          #(when (and (= (count (:sections company-data)) 0)
                                                      (= (count (:archived company-data)) 0))
-                                          (t/tooltip coords {:config {:place "right-bottom"}
+                                          (t/tooltip coords {:config {:place "left-bottom"}
                                                              :id tt-key
                                                              :persistent true
                                                              :desktop "Select a topic you want everyone to know about, or you can name your own."})
                                           (t/show tt-key)))
-                                        (assoc s ::tt-key tt-key))))
+                                        (assoc s ::tt-key tt-key)))
                        :will-unmount (fn [s]
                                        (t/hide (::tt-key s))
                                       s)}
