@@ -99,7 +99,8 @@
           (.show tip)
           (after 100
             #(let [$btn (js/$ (str "button#got-it-btn-" tip-id))]
-              (.on $btn "click" (fn []
+              (.on $btn "click" (fn [e]
+                                 (.stopPropagation e)
                                  (when (fn? (:got-it-cb (:setup tt)))
                                    ((:got-it-cb (:setup tt))))
                                  (hide-tooltip tt tip-id)

@@ -9,15 +9,15 @@ div.welcome-screen{
     margin: 20px auto;
     width: 520px;
     background-color: white;
-    padding: 25px;
     text-align: center;
     border: 2px solid $oc_yellow;
     border-radius: 5px;
+    padding: 25px;
 
     span {
       display: block;
       font-family: $oc_headers_font;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 400;
       margin-bottom: 20px;
     }

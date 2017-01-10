@@ -603,6 +603,7 @@
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :extensions #js {:autolist (js/AutoList.)}
+   :autoLink true
    :anchor #js {:customClassOption nil
                 :customClassOptionText "Button"
                 :linkValidation true

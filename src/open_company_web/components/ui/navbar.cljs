@@ -48,7 +48,8 @@
                               dashboard-selected-topics
                               dashboard-sharing
                               is-dashboard
-                              is-topic-view] :as data} owner options]
+                              is-topic-view
+                              is-update-preview] :as data} owner options]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -107,7 +108,10 @@
                         (dom/div {:class "dropdown right"}
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {}))
-                        (when (and (not dashboard-sharing) (not (:read-only company-data)))
+                        (when (and (not dashboard-sharing)
+                                   (not (:read-only company-data))
+                                   (not is-update-preview)
+                                   (pos? (count (:sections company-data))))
                           (dom/button {:class "btn-reset invite-others right"
                                        :title "Invite others"
                                        :data-toggle "tooltip"
