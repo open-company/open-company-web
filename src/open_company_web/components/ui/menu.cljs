@@ -70,16 +70,16 @@
         (when-let [su-link (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET")]
           (when (and (router/current-company-slug)
                      (pos? (:count su-link)))
-            (dom/li {:class "oc-menu-item"}
-              (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "Prior Updates"))))
+            (dom/li {:class "oc-menu-item menu-separator"}
+              (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "View Shared Updates"))))
         (when (and (router/current-company-slug)
                    (not (:read-only (dis/company-data))))
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} (if (responsive/is-mobile-size?) "Invite Team Members" "Invite and Manage Team"))))
+            (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} "Manage Team")))
         (when (and (router/current-company-slug)
                    (not (:read-only (dis/company-data)))
                    (not (responsive/is-mobile-size?)))
-          (dom/li {:class "oc-menu-item"}
+          (dom/li {:class "oc-menu-item menu-separator"}
             (dom/a {:href (oc-urls/company-settings) :on-click company-profile-click} "Company Settings")))
         ;; Temp commenting this out since we need API support to know how many companies the user has
         ; (when (jwt/jwt)

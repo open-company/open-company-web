@@ -1,6 +1,11 @@
 div.company-editor {
+
   div.fullscreen-page {
     background-color: $oc_gray_1;
+
+    @include mobile(){
+      background-color: white;
+    }
 
     div.company-editor-box {
       width: 520px;
@@ -10,11 +15,18 @@ div.company-editor {
       border-radius: 5px;
       padding: 25px;
 
+      @include mobile(){
+        width: auto;
+        border: 0px;
+        margin: 0;
+        padding: #{$navbar_height + 20}px 20px 20px;
+      }
+
       label.company-editor-message {
         display: block;
         width: 100%;
         font-weight: 400;
-        font-size: 16px;
+        font-size: 18px;
         font-family: $oc_headers_font;
       } 
 
@@ -28,7 +40,6 @@ div.company-editor {
       }
 
       button.get-started-button {
-        width: 80%;
         text-align: center;
       }
     }
