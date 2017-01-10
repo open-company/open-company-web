@@ -71,7 +71,7 @@
         [:div.login-overlay-content.pt2.pl3.pr3.group.center
           (if @(::sign-up-slack-clicked state)
             [:div
-              [:div.slack-disclaimer "If you’re not signed in on the Web, Slack will prompt you to " [:span.bold "sign in"] ", or if your correct team doesn’t appear in the team list, choose the " [:span.bold "“sign in to another team link”"] "."]
+              [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
               (when (:slack-access (rum/react dis/app-state)) slack-error)
               [:button.btn-reset.btn-solid.login-button
                 {:on-click #(do
@@ -81,7 +81,7 @@
                  :disabled (not (:auth-settings (rum/react dis/app-state)))}
                 "GOT IT"]]
             [:div
-              [:div.slack-disclaimer "Sign up with Slack and your teammates can also easily signup to view your OpenCompany dashboard."]
+              [:div.slack-disclaimer [:span.bold "Slack sign up"] " makes it " [:span.bold "easy for your teammates"] " to signup to view your OpenCompany dashboard."]
               (when (:slack-access (rum/react dis/app-state)) slack-error)
               [:button.btn-reset.mt2.login-button.with-slack
                 {:on-click #(reset! (::sign-up-slack-clicked state) true)}

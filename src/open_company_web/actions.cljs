@@ -342,7 +342,6 @@
   [db [_]]
   (let [current (router/get-token)
         auth-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "bot")]
-    (js/console.log "auth-urls" (:links (:auth-settings @dispatcher/app-state)) "->" auth-url)
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
