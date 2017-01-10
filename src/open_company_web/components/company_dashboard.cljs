@@ -59,12 +59,6 @@
                                                                                      :desktop "When you’re ready, you can share a beautiful company update with these topics."})]
             (t/show tt-id)))))))
 
-(defn should-hide-welcome-screen [data]
-  (or (responsive/is-tablet-or-mobile?)
-      (not (dis/company-data data))
-      (not= (count (:sections (dis/company-data data))) 0)
-      (not= (count (:archived (dis/company-data data))) 0)))
-
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -75,7 +69,6 @@
      :share-tooltip-dismissed false
      :add-second-topic-tt-shown false
      :new-sections-requested false
-     :hide-welcome-screen (should-hide-welcome-screen data)
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    (responsive/calc-card-width))
@@ -103,7 +96,8 @@
           (t/hide add-second-topic-tt)))
       (when (and (not (om/get-state owner :add-second-topic-tt-shown))
                  (not (:selected-topic-view data))
-                 (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1))
+                 (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1)
+                 (nil? (:show-login-overlay data)))
         (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
           (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
@@ -116,11 +110,9 @@
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/company-data next-props))
-      (get-new-sections-if-needed owner))
-    (om/set-state! owner :hide-welcome-screen (and (om/get-state owner :hide-welcome-screen)
-                                                   (should-hide-welcome-screen next-props))))
+      (get-new-sections-if-needed owner)))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width hide-welcome-screen] :as state}]
+  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [slug (keyword (router/current-company-slug))
           company-data (dis/company-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
@@ -164,8 +156,8 @@
                                   :show-navigation-bar (utils/company-has-topics? company-data)
                                   :is-topic-view (not (nil? (:selected-topic-view data)))
                                   :is-dashboard (nil? (:selected-topic-view data))}))
-              (if-not hide-welcome-screen
-                (welcome-screen #(om/set-state! owner :hide-welcome-screen true))
+              (if (:show-welcome-screen data)
+                (welcome-screen)
                 (dom/div {}
                   (if (and (empty? (:sections company-data)) (responsive/is-tablet-or-mobile?))
                     (dom/div {:class "empty-dashboard"}
