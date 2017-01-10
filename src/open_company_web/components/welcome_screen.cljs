@@ -9,4 +9,4 @@
       [:span "This is your dashboard, the place for key information you want everyone to know."]
       [:button.choose-first-topic-button.btn-reset.btn-solid
         {:on-click choose-topic-cb}
-        "Choose Your First Topic"]]])
+        [:label.pointer.mt1 "Choose Your First Topic"]]]])

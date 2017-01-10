@@ -9,8 +9,10 @@ div.welcome-screen{
     margin: 20px auto;
     width: 520px;
     background-color: white;
-    padding: 20px;
     text-align: center;
+    border: 2px solid $oc_yellow;
+    border-radius: 5px;
+    padding: 25px;
 
     span {
       display: block;
