@@ -9,6 +9,7 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.tooltip :as t]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.medium-editor-exts :as editor]
@@ -245,6 +246,19 @@
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
+(defn show-edit-tt [owner]
+  (let [company-data (dis/company-data)]
+    (when (and (= (count (:sections company-data)) 1)
+               (= (count (:archived company-data)) 0)
+               (om/get-props owner :foce-key))
+      (utils/after 500
+        #(let [first-foce (str "first-foce-" (:slug company-data))]
+          (t/tooltip (.querySelector js/document "div.topic-edit") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
+                                                                    :id first-foce
+                                                                    :once-only true
+                                                                    :config {:place "right-bottom"}})
+          (t/show first-foce))))))
+
 (defcomponent topic-edit [{:keys [currency
                                   card-width
                                   columns-num
@@ -300,7 +314,9 @@
                                    (.offset topic-edit-div)
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
-                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))))
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))
+      (show-edit-tt owner)
+      ))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
@@ -317,7 +333,8 @@
           (.tooltip "hide"))
         (doto add-chart-el
           (.tooltip "fixTitle")
-          (.tooltip "hide"))))
+          (.tooltip "hide")))
+      (show-edit-tt owner))
     (let [file-upload-state (om/get-state owner :file-upload-state)
           old-file-upload-state (:file-upload-state prev-state)]
       (when (and (= file-upload-state :show-url-field)

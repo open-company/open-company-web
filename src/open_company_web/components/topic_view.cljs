@@ -60,18 +60,6 @@
                   (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
                   (router/redirect! (oc-urls/company (:slug company-data))))))))))))
 
-(defn show-edit-tt [owner]
-  (when (and (= (count (:sections (om/get-props owner :company-data))) 1)
-             (= (count (:archived (om/get-props owner :company-data))) 0)
-             (om/get-props owner :foce-key))
-    (utils/after 500
-      #(let [first-foce (str "first-foce-" (:slug (om/get-props owner :company-data)))]
-        (t/tooltip (.querySelector js/document "div.topic-view") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
-                                                                  :id first-foce
-                                                                  :once-only true
-                                                                  :config {:place "right-bottom"}})
-        (t/show first-foce)))))
-
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
                                   selected-topic-view
@@ -85,8 +73,7 @@
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-revisions-if-needed owner)
-    (start-foce-if-needed owner)
-    (show-edit-tt owner))
+    (start-foce-if-needed owner))
 
   (will-receive-props [_ next-props]
     (when (and (:foce-key data)
@@ -102,8 +89,7 @@
 
   (did-update [_ _ _]
     (load-revisions-if-needed owner)
-    (start-foce-if-needed owner)
-    (show-edit-tt owner))
+    (start-foce-if-needed owner))
 
   (render [_]
     (let [section-kw (keyword selected-topic-view)
