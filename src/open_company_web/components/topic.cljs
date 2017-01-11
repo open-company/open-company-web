@@ -131,10 +131,11 @@
                 (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(dis/dispatch! [:start-foce section-kw topic-data])}
-                (dom/i {:class "fa fa-pencil"})" Edit")
-              (dom/button {:class "topic-top-menu-btn btn-reset"
-                           :on-click #(assign-topic-click)}
-                (dom/i {:class "fa fa-user"})" Assign")))
+                (dom/i {:class "fa fa-pencil"})" Edit")))
+              ; Assign action, disabled for now
+              ; (dom/button {:class "topic-top-menu-btn btn-reset"
+              ;              :on-click #(assign-topic-click)}
+              ;   (dom/i {:class "fa fa-user"})" Assign")))
 
           (dom/div {:class "topic-title"}
 
