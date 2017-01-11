@@ -80,9 +80,6 @@
                (nil? (:foce-key next-props)))
       (t/hide (str "first-foce-" (:slug (:company-data next-props))))))
 
-  (will-unmount [_]
-    (t/hide (str "first-foce-" (:slug company-data))))
-
   (will-update [_ next-props _]
     (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :revisions-requested false)))

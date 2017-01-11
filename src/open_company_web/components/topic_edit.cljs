@@ -288,6 +288,8 @@
                  (or (:new (dis/foce-section-data))
                      (:was-archvied (dis/foce-section-data))))
         (dis/dispatch! [:rollback-add-topic (dis/foce-section-key)]))
+      ; hide FoCE editing tooltip
+      (t/hide (str "first-foce-" (:slug (dis/company-data))))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
