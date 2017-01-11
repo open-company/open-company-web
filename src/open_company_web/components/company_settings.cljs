@@ -308,7 +308,7 @@
           (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (name slug)))
 
           ;; Company logo
-          (dom/div {:class "settings-form-input-label"} "A SQUARE COMPANY LOGO URL (approx. 160px per side)")
+          (dom/div {:class "settings-form-input-label"} "COMPANY LOGO (square works best, approx. 160px per side)")
           (om/build company-logo-setup {:logo logo
                                         :logo-did-change-cb #(do
                                                               (om/set-state! owner :has-changes true)

@@ -38,19 +38,14 @@ div.su-snapshot {
 
     button.close-su-btn {
       position: absolute;
-      top: 0px;
-      right: -30px;
+      left: 8px;
+      top: 12px;
       width: 30px;
       height: 30px;
       font-weight: 400;
       font-family: $oc_headers_font;
       font-size: 28px;
       color: $oc_gray_7;
-
-      @include mobile(){
-        left: 8px;
-        top: 12px;
-      }
     }
   }
 
