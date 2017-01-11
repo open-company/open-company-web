@@ -41,24 +41,24 @@
         (om/set-state! owner :revisions-requested true)
         (api/load-revisions (router/current-company-slug) topic-name revisions-link)))))
 
-(defn start-foce-if-needed [owner]
-  (let [{:keys [foce-key
-                company-data
-                selected-topic-view
-                new-sections]} (om/get-props owner)]
-    (when (nil? foce-key)
-      (let [section-kw (keyword selected-topic-view)
-            sections-contains-topic (utils/in? (:sections company-data) selected-topic-view)]
-        (when (not sections-contains-topic)
-          (if (:read-only company-data)
-            (router/redirect! (oc-urls/company (:slug company-data)))
-            ; look for the urls in the new sections
-            (when new-sections
-              (let [new-section (first (filter #(= (:section-name %) selected-topic-view) new-sections))
-                    new-section-data (utils/new-section-initial-data section-kw (:title new-section) {:links (:links new-section)})]
-                (if (and new-section (contains? new-section :links))
-                  (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
-                  (router/redirect! (oc-urls/company (:slug company-data))))))))))))
+(defn start-foce-if-needed [{:keys [foce-key
+                                    company-data
+                                    selected-topic-view
+                                    new-sections]
+                             :as data} ]
+  (when (nil? foce-key)
+    (let [section-kw (keyword selected-topic-view)
+          sections-contains-topic (utils/in? (:sections company-data) selected-topic-view)]
+      (when (not sections-contains-topic)
+        (if (:read-only company-data)
+          (router/redirect! (oc-urls/company (:slug company-data)))
+          ; look for the urls in the new sections
+          (when new-sections
+            (let [new-section (first (filter #(= (:section-name %) selected-topic-view) new-sections))
+                  new-section-data (utils/new-section-initial-data section-kw (:title new-section) {:links (:links new-section)})]
+              (if (and new-section (contains? new-section :links))
+                (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
+                (router/redirect! (oc-urls/company (:slug company-data)))))))))))
 
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
@@ -73,7 +73,7 @@
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-revisions-if-needed owner)
-    (start-foce-if-needed owner)
+    (start-foce-if-needed data)
     (when (and (= (count (:sections company-data)) 1)
                (= (count (:archived company-data)) 0))
       (utils/after 500
@@ -93,12 +93,12 @@
     (t/hide (str "first-foce-" (:slug company-data))))
 
   (will-update [_ next-props _]
+    (start-foce-if-needed next-props)
     (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :revisions-requested false)))
 
   (did-update [_ _ _]
-    (load-revisions-if-needed owner)
-    (start-foce-if-needed owner))
+    (load-revisions-if-needed owner))
 
   (render [_]
     (let [section-kw (keyword selected-topic-view)
@@ -133,7 +133,8 @@
               (when (and (not (:read-only company-data))
                          (not (responsive/is-tablet-or-mobile?)))
                 (dom/div {:class (str "fake-textarea " (when is-another-foce "disabled"))}
-                  (if is-new-foce
+                  (cond
+                    is-new-foce
                     (dom/div {:class "topic topic-edit"
                               :style {:width (str (- topic-card-width 120) "px")}}
                       (om/build topic-edit {:is-stakeholder-update false
@@ -147,17 +148,21 @@
                                             :foce-data foce-data}
                                            {:opts options
                                             :key (str "topic-foce-" selected-topic-view "-new")}))
+                    (utils/in? (:sections company-data) selected-topic-view)
                     (let [initial-data (utils/new-section-initial-data selected-topic-view (:title topic-data) topic-data)
                           with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                           with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
                                 :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])
                                 :style {:width (str (- topic-card-width 100) "px")}}
-                        "Start a new entry...")))))
+                        "Start a new entry..."))
+                    :else
+                    (om/build loading {:loading true}))))
               ;; Render the topic from the company data only until the revisions are loaded.
               (when (and (not foce-key)
                          (not revisions)
-                         (not (:placeholder topic-data)))
+                         (not (:placeholder topic-data))
+                         (utils/in? (:sections company-data) selected-topic-view))
                 (dom/div {:class "revision-container group"}
                   (when (and (not (:read-only company-data))
                              (not (responsive/is-tablet-or-mobile?)))
