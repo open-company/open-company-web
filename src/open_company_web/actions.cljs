@@ -199,6 +199,7 @@
     (assoc :foce-key (keyword section)) ; which topic is being FoCE
     (assoc :foce-data section-data)     ; map of the in progress edits of the topic data
     (assoc :foce-data-editing? false)   ; is the data portion of the topic (e.g. finance, growth) being edited
+    (assoc :show-top-menu nil)          ; dismiss top menu
     (dissoc :show-add-topic)))          ; remove the add topic view)
 
 (defn stop-foce [db]
@@ -251,6 +252,33 @@
       (assoc-in (conj company-key :sections) new-sections)
       (assoc-in (conj company-key :archived) new-archived))))
 
+(defmethod dispatcher/action :delete-revision [db [_ topic as-of]]
+  (let [slug (keyword (router/current-company-slug))
+        company-data (dispatcher/company-data)
+        old-topic-data ((keyword topic) company-data)
+        revisions (:revisions-data old-topic-data)
+        revision-data (first (filter #(= (:created-at %) as-of) revisions))
+        new-revisions (vec (filter #(not= (:created-at %) as-of) revisions))
+        should-remove-section? (zero? (count new-revisions))
+        should-update-section? (= (:created-at old-topic-data) as-of)
+        new-sections (if should-remove-section? (utils/vec-dissoc (:sections company-data) (name topic)) (:sections company-data))
+        company-key (dispatcher/company-data-key slug)
+        new-topic-data (if should-update-section?
+                          (merge (first new-revisions) {:revisions (:revisions old-topic-data)
+                                                        :links (:links old-topic-data)
+                                                        :revisions-data new-revisions
+                                                        :section (:section old-topic-data)})
+                          (assoc old-topic-data :revisions-data new-revisions))
+        with-sections (assoc company-data :sections new-sections)
+        with-fixed-topics (if should-remove-section?
+                            (dissoc with-sections (keyword topic))
+                            (assoc with-sections (keyword topic) new-topic-data))]
+    (api/delete-revision topic revision-data)
+    (-> db
+      (stop-foce)
+      (assoc-in company-key with-fixed-topics))))
+
+
 (defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
@@ -258,15 +286,14 @@
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
-        without-placeholder (dissoc with-fixed-body :placeholder)
-        with-created-at (if (contains? without-placeholder :created-at) without-placeholder (assoc without-placeholder :created-at (utils/as-of-now)))
+        with-created-at (if (contains? with-fixed-body :created-at) with-fixed-body (assoc with-fixed-body :created-at (utils/as-of-now)))
         created-at (:created-at with-created-at)
         revisions-data (or (:revisions-data (get (dispatcher/company-data db) topic)) [])
         without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
         with-new-revision (conj without-current-revision with-created-at)
         sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))
         complete-topic-data (merge with-created-at {:revisions-data sorted-revisions})]
-    (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
+    (if (not (:placeholder topic-data))
       (api/partial-update-section topic with-created-at)
       (api/save-or-create-section with-created-at))
     (-> db
@@ -581,6 +608,9 @@
     (-> db
       (assoc-in company-data-key updated-company-data)
       (stop-foce))))
+
+(defmethod dispatcher/action :show-top-menu [db [_ topic]]
+  (assoc db :show-top-menu topic))
 
 (defmethod dispatcher/action :hide-welcome-screen
   [db [_]]

@@ -9,6 +9,7 @@
             [open-company-web.dispatcher :as dis]
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.utils :as utils]
+            [open-company-web.lib.tooltip :as t]
             [open-company-web.lib.oc-colors :as oc-colors]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.medium-editor-exts :as editor]
@@ -176,17 +177,19 @@
         ; no changes, so dispatch the current url
         (@router/route-dispatcher (router/get-token)))))
 
-(defn- remove-topic-click [owner e]
-  (add-popover {:container-id "archive-topic-confirm"
-                :message utils/before-archive-message
-                :height "170px"
+(defn- delete-revision-click [owner e]
+  (add-popover {:container-id "delete-revision-confirm"
+                :message utils/before-removing-revision-message
+                :height "130px"
                 :cancel-title "KEEP IT"
-                :cancel-cb #(hide-popover nil "archive-topic-confirm")
-                :success-title "ARCHIVE"
-                :success-cb #(let [section (dis/foce-section-key)]
-                               (dis/dispatch! [:topic-archive section])
-                               (hide-popover nil "archive-topic-confirm")
-                               (router/nav! (oc-urls/company)))}))
+                :cancel-cb #(hide-popover nil "delete-revision-confirm")
+                :success-title "DELETE"
+                :success-cb #(let [section (dis/foce-section-key)
+                                   company-data (dis/company-data)]
+                               (dis/dispatch! [:delete-revision section (:created-at (dis/foce-section-data))])
+                               (hide-popover nil "delete-revision-confirm")
+                               (when (= (count (:revisions-data (section company-data))) 1)
+                                  (router/nav! (oc-urls/company))))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
@@ -245,6 +248,21 @@
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
+(defn show-edit-tt [owner]
+  (let [company-data (dis/company-data)]
+    (when (and (not (om/get-state owner :first-foce-tt-shown))
+               (= (count (:sections company-data)) 1)
+               (= (count (:archived company-data)) 0)
+               (om/get-props owner :foce-key))
+      (om/set-state! owner :first-foce-tt-shown true)
+      (utils/after 500
+        #(let [first-foce (str "first-foce-" (:slug company-data))]
+          (t/tooltip (.querySelector js/document "div.topic-edit") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
+                                                                    :id first-foce
+                                                                    :once-only true
+                                                                    :config {:place "right-bottom"}})
+          (t/show first-foce))))))
+
 (defcomponent topic-edit [{:keys [currency
                                   card-width
                                   columns-num
@@ -264,7 +282,8 @@
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0
-       :headline-exceeds false}))
+       :headline-exceeds false
+       :first-foce-tt-shown false}))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -274,6 +293,8 @@
                  (or (:new (dis/foce-section-data))
                      (:was-archvied (dis/foce-section-data))))
         (dis/dispatch! [:rollback-add-topic (dis/foce-section-key)]))
+      ; hide FoCE editing tooltip
+      (t/hide (str "first-foce-" (:slug (dis/company-data))))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
@@ -300,7 +321,8 @@
                                    (.offset topic-edit-div)
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
-                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))))
+                           #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))
+      (show-edit-tt owner)))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
@@ -317,7 +339,8 @@
           (.tooltip "hide"))
         (doto add-chart-el
           (.tooltip "fixTitle")
-          (.tooltip "hide"))))
+          (.tooltip "hide")))
+      (show-edit-tt owner))
     (let [file-upload-state (om/get-state owner :file-upload-state)
           old-file-upload-state (:file-upload-state prev-state)]
       (when (and (= file-upload-state :show-url-field)
@@ -526,13 +549,13 @@
                                           (router/nav! (oc-urls/company)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
-            (when (:show-archive-button data)
+            (when (:show-delete-entry-button data)
               (dom/button {:class "btn-reset archive-button right"
-                           :title "Archive this topic"
+                           :title "Delete this entry"
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-topic-click owner)}
-                  (dom/i {:class "fa fa-archive"}))))))))))
+                           :on-click (partial delete-revision-click owner)}
+                  (dom/i {:class "fa fa-trash"}))))))))))

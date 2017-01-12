@@ -68,7 +68,7 @@
                                  (assoc layout :3 (conj (:3 layout) topic)))))))]
       layout)))
 
-(defn render-topic [owner options section-name & [column]]
+(defn render-topic [owner options section-name column]
   (when section-name
     (let [props                 (om/get-props owner)
           company-data          (:company-data props)
@@ -108,7 +108,8 @@
                              :is-dashboard is-dashboard
                              :show-editing (and is-dashboard
                                                 (not (:read-only company-data)))
-                             :column column}
+                             :column column
+                             :show-top-menu (:show-top-menu props)}
                              {:opts {:section-name section-name
                                      :topic-click (partial topic-click section-name)}})))))))
 
@@ -123,7 +124,8 @@
       (api/patch-sections new-topics))
     (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
-    (router/nav! (oc-urls/company-section (:slug company-data) new-topic))))
+    (when (:was-archived topic-data)
+      (router/nav! (oc-urls/company-section (:slug company-data) new-topic)))))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded

@@ -4,6 +4,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [dommy.core :refer (sel1)]
             [rum.core :as rum]
             [cljs.core.async :refer (chan <!)]
             [open-company-web.api :as api]
@@ -82,6 +83,11 @@
                                                                                          :card-width (if (responsive/is-mobile-size?)
                                                                                                        (responsive/mobile-dashboard-card-width)
                                                                                                        (responsive/calc-card-width))}))))
+    (events/listen js/window EventType/CLICK (fn[e]
+                                               (when (and (:show-top-menu @dis/app-state)
+                                                          (not (utils/event-inside? e (sel1 [(str "div.topic[data-section=" (name (:show-top-menu @dis/app-state)) "]")]))))
+                                                 (utils/event-stop e)
+                                                 (dis/dispatch! [:show-top-menu nil]))))
     (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
       (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data)))))))
 
@@ -97,7 +103,7 @@
       (when (and (not (om/get-state owner :add-second-topic-tt-shown))
                  (not (:selected-topic-view data))
                  (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1)
-                 (nil? (:show-login-overlay data)))
+                 (not (:show-login-overlay data)))
         (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
           (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
@@ -125,7 +131,8 @@
                                            :selected-topic-view (:selected-topic-view data)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :small-navbar (not (utils/company-has-topics? company-data))
-                                           :editing-topic (not (nil? (:foce-key data)))
+                                           :editing-topic (or (not (nil? (:foce-key data)))
+                                                              (not (nil? (:show-top-menu data))))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
                      (get-in data [(keyword (router/current-company-slug)) :error]))
@@ -184,6 +191,7 @@
                                  :selected-topic-view (:selected-topic-view data)
                                  :dashboard-selected-topics (:dashboard-selected-topics data)
                                  :dashboard-sharing (:dashboard-sharing data)
-                                 :is-dashboard true}))
+                                 :is-dashboard true
+                                 :show-top-menu (:show-top-menu data)}))
                   ;;Footer
                   (om/build footer {:footer-width total-width-int}))))))))))

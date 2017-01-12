@@ -49,6 +49,7 @@
                 :z-index-offset 1
                 :success-cb (fn []
                               (hide-popover nil "archive-metric-confirm")
+                              ((om/get-props owner :data-section-on-change))
                               (dispatcher/dispatch! [:foce-input {:data []}])
                               ((:data-section-on-change data))
                               (om/update-state! owner #(merge % {:finances-raw-data {}

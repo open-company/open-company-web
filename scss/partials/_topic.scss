@@ -48,7 +48,7 @@ div.topic {
       }
     }
 
-    &.dashboard-selected, &.selectable-topic:hover{
+    &.dashboard-selected, &:hover, &.sticky-borders, &.selectable-topic:hover{
 
       div.topic-internal {
         div.card-header.card-image {
@@ -57,7 +57,7 @@ div.topic {
       }
     }
 
-    &.selectable-topic:hover {
+    &.selectable-topic:hover, &.sticky-borders {
       border-top: 2px solid rgba(78,90,107,0.2);
       border-bottom: 2px solid rgba(78,90,107,0.2);
       border-left: 2px solid rgba(78,90,107,0.2);
@@ -73,7 +73,7 @@ div.topic {
   }
 
   &.no-foce {
-    opacity: 0.5;
+    opacity: 0.2;
   }
 
   &.mobile-dashboard-topic {
@@ -100,17 +100,20 @@ div.topic {
         width: 100%;
       }
 
-      div.topic-title {
-        text-transform: none;
-        opacity: 1;
-        color: $oc_gray_7;
-        float: none;
-        font-weight: 700;
-        font-size: 15px;
-        padding-left: 0px;
-        padding-right: 0px;
-        margin-left: 0px;
-        margin-right: 0px;
+      div.topic-title-container {
+
+        div.topic-title {
+          text-transform: none;
+          opacity: 1;
+          color: $oc_gray_7;
+          float: none;
+          font-weight: 700;
+          font-size: 15px;
+          padding-left: 0px;
+          padding-right: 0px;
+          margin-left: 0px;
+          margin-right: 0px;
+        }
       }
 
       div.mobile-date {
@@ -139,6 +142,12 @@ div.topic {
     }
   }
 
+  &.sticky-borders {
+    div.topic-internal button.top-right-button {
+      opacity: 1;
+    }
+  }
+
   div.topic-internal{
     position: relative;
     height: auto;
@@ -152,19 +161,19 @@ div.topic {
     }
 
     &:hover {
-      button.topic-pencil-button {
+      button.top-right-button {
         opacity: 1;
       }
     }
 
-    button.topic-pencil-button {
+    button.top-right-button {
       width: 30px;
       height: 20px;
       float: right;
       opacity: 0;
       transition: 230ms;
       color: rgba(78, 90, 107, 0.5);
-      margin-top: 9px;
+      margin-top: 6px;
       margin-right: 0px;
       padding-right: 0px;
 
@@ -228,18 +237,91 @@ div.topic {
       }
     }
 
-    div.topic-title {
-      padding-top: 12px;
-      opacity: 0.5;
-      font-size: 13px;
-      line-height: 1.5;
-      letter-spacing: 1px;
-      color: $oc_gray_5;
-      text-transform: uppercase;
-      font-family: $oc_headers_font;
-      font-weight: 700;
-      float: left;
-      width: auto;
+    div.topic-title-container {
+      position: relative;
+
+      div.topic-top-menu {
+        position: absolute;
+        top: 0px;
+        width:  80px;
+        background-color: transparent;
+        opacity: 0;
+        transition: 230ms;
+        margin: 0 !important;
+        padding: 0 5px 0 5px !important;
+        cursor: pointer;
+        pointer-events: none;
+        z-index: 100;
+
+        &.active {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        &.left-column {
+          right: -62px;
+
+          button.topic-top-menu-btn {
+            float: left;
+          }
+
+          &.active {
+            right: -82px;
+          }
+        }
+
+        &.right-column {
+          left: -62px;
+
+          button.topic-top-menu-btn {
+            float: right;
+          }
+
+          &.active {
+            left: -82px;
+          }
+        }
+
+        button.topic-top-menu-btn {
+          padding: 2px 5px;
+          margin: 1px 0;
+          background-color: white;
+          color: rgba(78,90,107,0.8);
+          font-size: 14px;
+          font-weight: 300;
+          font-family: $oc_main_font;
+          white-space: pre;
+          border: 1px solid rgba(78,90,107,0.1);
+          border-radius: 3px;
+          min-width: 58px;
+          text-align: left;
+
+          &:hover {
+            color: rgba(78,90,107,1);
+            border: 1px solid rgba(78,90,107,0.3);
+          }
+        }
+      }
+
+      div.topic-title {
+        padding-top: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: rgba(78,90,107,0.5);
+        text-transform: uppercase;
+        font-family: $oc_headers_font;
+        font-weight: 700;
+        float: left;
+        @include big_web(){
+          width: 85%;
+        }
+
+        @include mobile(){
+          float: none;
+        }
+      }
+
     }
 
     div.topic-headline-inner {

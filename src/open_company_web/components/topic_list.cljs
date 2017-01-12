@@ -243,7 +243,8 @@
                          :selected-topic-view (:selected-topic-view data)
                          :dashboard-selected-topics (:dashboard-selected-topics data)
                          :dashboard-sharing (:dashboard-sharing data)
-                         :is-dashboard (:is-dashboard data)}
+                         :is-dashboard (:is-dashboard data)
+                         :show-top-menu (:show-top-menu data)}
               comp-opts {:opts {:topic-click (partial topic-click owner)}}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
           (om/build sub-component comp-data comp-opts))))))

@@ -65,9 +65,8 @@
                                   [(keyword (:section a)) a])
                                 (for [s (get-all-sections)]
                                   [(keyword (:section s)) s])))]
-    [:div
-      [:span.block.mb1.all-caps
-        {:class (if (> (:order cat) 1) "mt3" "mt0")}
+    [:div.category
+      [:span.block.mb1.all-caps.category-title
         (str (:name cat) (when (:icon cat) " "))]
       (for [sec (:sections cat)
             :when (or is-archived

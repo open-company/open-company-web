@@ -73,6 +73,7 @@
       (utils/remove-company-cache-key focus-cache-key))
     (hide-popover nil "archive-metric-confirm")
     (dis/dispatch! [:foce-input {:metrics fewer-metrics}])
+    ((om/get-props owner :data-section-on-change))
     (data-editing-toggle owner editing-cb false))) ; no longer data editing
 
 (defn- show-archive-confirm-popover [owner editing-cb metric-slug]

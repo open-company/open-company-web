@@ -11,6 +11,18 @@ div.add-topic {
   box-shadow:  1px 2px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 3px 0 #ffffff;
   padding: 20px;
 
+  div.category {
+    span.category-title {
+      margin-top: 2rem;
+    }
+
+    &:first-child {
+      span.category-title {
+        margin-top: 0;
+      }
+    }
+  }
+
   div.add-topic-title {
     width: 70%;
     font-family: $oc_headers_font;
