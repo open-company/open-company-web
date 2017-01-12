@@ -334,7 +334,9 @@
           ;; let's scroll to the top to simulate a navigation
           (js/window.scrollTo 0 0))
         ;; dispatch on the token
-        (route-dispatch! (router/get-token)))))
+        (route-dispatch! (router/get-token))
+        ; remove all the tooltips
+        (utils/after 100 #(utils/remove-tooltips)))))
   (sentry/capture-message "Error: div#app is not defined!"))
 
 (defn init []

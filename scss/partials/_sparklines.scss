@@ -5,6 +5,7 @@ div.sparklines{
     border: 1px solid transparent;
     border-radius: 8px;
     padding: 6px 12px;
+    overflow: hidden;
 
     div.finances-sparklines-inner {
       width: 90%;
@@ -19,7 +20,7 @@ div.sparklines{
 
         div.center-box {
           width: 100%;
-          overflow: hidden;
+          overflow: visible;
         }
       }
     }
@@ -71,10 +72,11 @@ div.sparklines{
       border: 1px solid transparent;
       border-radius: 8px;
       margin-bottom: 0.3rem;
+      overflow: hidden;
 
       div.center-box {
         float: left;
-        overflow: hidden;
+        overflow: visible;
       }
 
       div.actions {
