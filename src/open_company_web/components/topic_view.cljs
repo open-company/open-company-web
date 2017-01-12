@@ -75,11 +75,6 @@
     (load-revisions-if-needed owner)
     (start-foce-if-needed owner))
 
-  (will-receive-props [_ next-props]
-    (when (and (:foce-key data)
-               (nil? (:foce-key next-props)))
-      (t/hide (str "first-foce-" (:slug (:company-data next-props))))))
-
   (will-update [_ next-props _]
     (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :revisions-requested false)))
