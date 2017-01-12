@@ -317,8 +317,7 @@
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
                            #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))
-      (show-edit-tt owner)
-      ))
+      (show-edit-tt owner)))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
