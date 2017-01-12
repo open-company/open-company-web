@@ -286,15 +286,14 @@
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
-        without-placeholder (dissoc with-fixed-body :placeholder)
-        with-created-at (if (contains? without-placeholder :created-at) without-placeholder (assoc without-placeholder :created-at (utils/as-of-now)))
+        with-created-at (if (contains? with-fixed-body :created-at) with-fixed-body (assoc with-fixed-body :created-at (utils/as-of-now)))
         created-at (:created-at with-created-at)
         revisions-data (or (:revisions-data (get (dispatcher/company-data db) topic)) [])
         without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
         with-new-revision (conj without-current-revision with-created-at)
         sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))
         complete-topic-data (merge with-created-at {:revisions-data sorted-revisions})]
-    (if (utils/link-for (:links without-placeholder) "partial-update" "PATCH")
+    (if (not (:placeholder topic-data))
       (api/partial-update-section topic with-created-at)
       (api/save-or-create-section with-created-at))
     (-> db
