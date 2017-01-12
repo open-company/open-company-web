@@ -103,7 +103,7 @@
       (when (and (not (om/get-state owner :add-second-topic-tt-shown))
                  (not (:selected-topic-view data))
                  (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1)
-                 (nil? (:show-login-overlay data)))
+                 (not (:show-login-overlay data)))
         (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
           (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
