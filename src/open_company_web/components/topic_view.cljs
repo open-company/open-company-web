@@ -126,7 +126,7 @@
                                             :is-topic-view true
                                             :foce-data-editing? foce-data-editing?
                                             :foce-key foce-key
-                                            :show-archive-button false
+                                            :show-delete-entry-button false
                                             :foce-data foce-data}
                                            {:opts options
                                             :key (str "topic-foce-" selected-topic-view "-new")}))
@@ -172,7 +172,7 @@
                                      :foce-data-editing? foce-data-editing?
                                      :foce-key foce-key
                                      :foce-data foce-data
-                                     :show-archive-button (= (count revisions) 1)
+                                     :show-delete-entry-button true
                                      :show-editing true}
                                      {:opts {:section-name selected-topic-view}
                                       :key (str "topic-"
@@ -181,7 +181,6 @@
                                             selected-topic-view "-" (:updated-at rev))})))))))
         (when (and (not loading-topic-data)
                    (not (responsive/is-tablet-or-mobile?))
-                   (not (:read-only company-data))
-                   (> (count revisions) 1))
+                   (not (:read-only company-data)))
           (dom/button {:class "btn-reset btn-link archive-topic"
                        :on-click (partial remove-topic-click owner)} "Archive this topic"))))))

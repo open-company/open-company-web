@@ -177,17 +177,19 @@
         ; no changes, so dispatch the current url
         (@router/route-dispatcher (router/get-token)))))
 
-(defn- remove-topic-click [owner e]
-  (add-popover {:container-id "archive-topic-confirm"
-                :message utils/before-archive-message
-                :height "170px"
+(defn- delete-revision-click [owner e]
+  (add-popover {:container-id "delete-revision-confirm"
+                :message utils/before-removing-revision-message
+                :height "130px"
                 :cancel-title "KEEP IT"
-                :cancel-cb #(hide-popover nil "archive-topic-confirm")
-                :success-title "ARCHIVE"
-                :success-cb #(let [section (dis/foce-section-key)]
-                               (dis/dispatch! [:topic-archive section])
-                               (hide-popover nil "archive-topic-confirm")
-                               (router/nav! (oc-urls/company)))}))
+                :cancel-cb #(hide-popover nil "delete-revision-confirm")
+                :success-title "DELETE"
+                :success-cb #(let [section (dis/foce-section-key)
+                                   company-data (dis/company-data)]
+                               (dis/dispatch! [:delete-revision section (:created-at (dis/foce-section-data))])
+                               (hide-popover nil "delete-revision-confirm")
+                               (when (= (count (:revisions-data (section company-data))) 1)
+                                  (router/nav! (oc-urls/company))))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
@@ -547,13 +549,13 @@
                                           (router/nav! (oc-urls/company)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
-            (when (:show-archive-button data)
+            (when (:show-delete-entry-button data)
               (dom/button {:class "btn-reset archive-button right"
-                           :title "Archive this topic"
+                           :title "Delete this entry"
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial remove-topic-click owner)}
-                  (dom/i {:class "fa fa-archive"}))))))))))
+                           :on-click (partial delete-revision-click owner)}
+                  (dom/i {:class "fa fa-trash"}))))))))))

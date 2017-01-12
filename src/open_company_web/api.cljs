@@ -97,6 +97,7 @@
 (def ^:private api-post (partial req api-endpoint http/post))
 (def ^:private api-put (partial req api-endpoint http/put))
 (def ^:private api-patch (partial req api-endpoint http/patch))
+(def ^:private api-delete (partial req api-endpoint http/delete))
 
 (def ^:private auth-get (partial req auth-endpoint http/get))
 (def ^:private auth-post (partial req auth-endpoint http/post))
@@ -567,3 +568,17 @@
             (update-jwt-cookie! body)
             (dispatcher/dispatch! [:jwt (j/get-contents)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
+
+(defn delete-revision [topic revision-data]
+  (when (and topic revision-data)
+    (let [links (:links revision-data)
+          delete-link (utils/link-for links "delete")]
+      (when delete-link
+        (api-delete (:href delete-link)
+          {:headers {
+            ; required by Chrome
+            "Access-Control-Allow-Headers" "Content-Type"
+            ; custom content type
+            "content-type" (:type delete-link)
+            "accept" (:type delete-link)}}
+          (fn [_]))))))

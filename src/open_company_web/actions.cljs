@@ -252,6 +252,33 @@
       (assoc-in (conj company-key :sections) new-sections)
       (assoc-in (conj company-key :archived) new-archived))))
 
+(defmethod dispatcher/action :delete-revision [db [_ topic as-of]]
+  (let [slug (keyword (router/current-company-slug))
+        company-data (dispatcher/company-data)
+        old-topic-data ((keyword topic) company-data)
+        revisions (:revisions-data old-topic-data)
+        revision-data (first (filter #(= (:created-at %) as-of) revisions))
+        new-revisions (vec (filter #(not= (:created-at %) as-of) revisions))
+        should-remove-section? (zero? (count new-revisions))
+        should-update-section? (= (:created-at old-topic-data) as-of)
+        new-sections (if should-remove-section? (utils/vec-dissoc (:sections company-data) (name topic)) (:sections company-data))
+        company-key (dispatcher/company-data-key slug)
+        new-topic-data (if should-update-section?
+                          (merge (first new-revisions) {:revisions (:revisions old-topic-data)
+                                                        :links (:links old-topic-data)
+                                                        :revisions-data new-revisions
+                                                        :section (:section old-topic-data)})
+                          (assoc old-topic-data :revisions-data new-revisions))
+        with-sections (assoc company-data :sections new-sections)
+        with-fixed-topics (if should-remove-section?
+                            (dissoc with-sections (keyword topic))
+                            (assoc with-sections (keyword topic) new-topic-data))]
+    (api/delete-revision topic revision-data)
+    (-> db
+      (stop-foce)
+      (assoc-in company-key with-fixed-topics))))
+
+
 (defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
   (let [slug (keyword (router/current-company-slug))
         topic (:foce-key db)
