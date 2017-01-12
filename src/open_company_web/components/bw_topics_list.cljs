@@ -72,14 +72,16 @@
       (dom/div {:class "left-topics-list-top group"}
         (when (or (not= (count (:sections company-data)) 0)
                    (not= (count (:archived company-data)) 0))
-          (dom/h3 {:class "left-topics-list-top-title left"
+          (dom/h3 {:class "left-topics-list-top-title"
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
                                 (router/nav! (oc-urls/company)))} "TOPICS"))
-        (when (and (not show-add-topic)
+        (when (and (not (responsive/is-tablet-or-mobile?))
+                   (not show-add-topic)
                    (not (:read-only company-data)))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
-                       :on-click #(dis/dispatch! [:show-add-topic true])
+                       :on-click #(when (nil? (:foce-key data))
+                                    (dis/dispatch! [:show-add-topic true]))
                        :title "Add a topic"
                        :data-placement "top"
                        :data-toggle "tooltip"
@@ -97,7 +99,7 @@
                     :data-topic (name topic)
                     :key (str "bw-topic-list-" (name topic))
                     :on-click #(when (nil? (:foce-key data))
-                                (router/nav! (oc-urls/company-section (router/current-company-slug) (name topic))))}
+                                 (router/nav! (oc-urls/company-section (router/current-company-slug) (name topic))))}
             (dom/div {:class "internal"
                       :key (str "bw-topic-list-" (name topic) "-internal")}
               (:title sd))))))))

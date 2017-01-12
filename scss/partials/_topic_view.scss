@@ -9,9 +9,7 @@ div.topic-view-container{
   }
 
   div.topic-view {
-    background-color: white;
-    border: 1px solid rgba(78,90,107,0.05);
-    padding: 0 30px;
+    padding: 0;
 
     &.tablet-view{
       padding: 0px;
@@ -72,6 +70,11 @@ div.topic-view-container{
       position: relative;
       min-height: 80px;
 
+      @include mobile(){
+        background-color: white;
+        min-height: calc(100vh - #{$footer_small_height}px - #{$back_to_dashboard_row_height}px);
+      }
+
       &.loading {
         width: 100%;
         float: none;
@@ -83,7 +86,9 @@ div.topic-view-container{
       }
 
       div.fake-textarea {
-        padding: 20px;
+        padding: 10px 30px;
+        background-color: white;
+        margin-bottom: 20px;
 
         &.disabled {
           opacity: 0.4;
@@ -98,23 +103,35 @@ div.topic-view-container{
 
         div.fake-textarea-internal {
           cursor: text;
-          border: 1px solid rgba(78,90,107,0.2);
-          border-radius: 8px;
-          height: 46px;
-          color: $oc_blue_dark;
+          color: $oc_gray_5;
           padding: 12px;
-          font-weight: 400;
+          font-size: 13px;
           font-family: $oc_headers_font;
-          font-size: 14px;
-          font-style: italic;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          line-height: 1.5;
+          font-weight: 700;
+          opacity: 0.5;
+
+          span.new-entry{
+            font-weight: 400;
+            font-size: 14px;
+            font-style: italic;
+            text-transform: none;
+          }
         }
       }
 
       div.revision-container{
-        margin: 20px 0px;
+        padding: 20px 20px 0px;
+        background-color: white;
+
+        &:last-child {
+          padding-bottom: 20px;
+        }
 
         hr.separator-line {
-          margin: 20px 0px;
+          margin: 0px 0px 20px 0px;
           padding: 0;
           height: 1px;
           background-color: rgba(78,90,107,0.2);

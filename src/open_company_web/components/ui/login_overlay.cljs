@@ -56,59 +56,57 @@
       (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color close-color :accent-color close-color}))])
 
 (rum/defcs login-signup-with-slack < rum/reactive
+                                     (rum/local false ::sign-up-slack-clicked)
                                      dont-scroll
   [state]
-  [:div.login-overlay-container.group
-    {:on-click (partial close-overlay)}
-    (close-button)
-    [:div.login-overlay.login-with-slack
-      {:on-click #(utils/event-stop %)}
-      [:div.login-overlay-cta.pl2.pr2.group
-        (cond
-          (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-          [:div.sign-in-cta.left "Sign Up"]
-          :else
-          [:div.sign-in-cta.left "Sign In"])]
-      [:div.pt2.pl3.pr3.group.center
-        (cond
-          (= (:slack-access (rum/react dis/app-state)) "denied")
-          [:div.block.red
-            "OpenCompany requires verification with your Slack team. Please allow access."
-            [:p.my2.h5 "If Slack did not allow you to authorize OpenCompany, try "
-              [:button.p0.btn-reset.underline
-                {:on-click #(do (utils/event-stop %)
-                                (dis/dispatch! [:login-with-slack false]))}
-                "this link instead."]]]
-          (:slack-access (rum/react dis/app-state))
-          [:span.block.red
-            "There is a temporary error validating with Slack. Please try again later."])
-        [:button.btn-reset.mt2.login-button
-          {:on-click #(do
-                        (.preventDefault %)
-                        (when (:auth-settings @dis/app-state)
-                          (dis/dispatch! [:login-with-slack true])))
-           :disabled (not (:auth-settings (rum/react dis/app-state)))}
-          [:img {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
-          (when-not (:auth-settings (rum/react dis/app-state))
-            (small-loading))]
-        [:div.login-with-email.domine.underline.bold
-          [:a {:on-click #(do (utils/event-stop %)
-                              (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
+  (let [action-title (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) "Sign Up" "Sign In")
+        slack-error [:span.block.red "There is a temporary error validating with Slack. Please try again later."]]
+    [:div.login-overlay-container.group
+      {:on-click (partial close-overlay)}
+      (close-button)
+      [:div.login-overlay.login-with-slack
+        {:on-click #(utils/event-stop %)}
+        [:div.login-overlay-cta.pl2.pr2.group
+          [:div.sign-in-cta.left action-title]]
+        [:div.login-overlay-content.pt2.pl3.pr3.group.center
+          (if @(::sign-up-slack-clicked state)
+            [:div
+              [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
+              (when (:slack-access (rum/react dis/app-state)) slack-error)
+              [:button.btn-reset.btn-solid.login-button
+                {:on-click #(do
+                              (.preventDefault %)
+                              (when (:auth-settings @dis/app-state)
+                                (dis/dispatch! [:login-with-slack])))
+                 :disabled (not (:auth-settings (rum/react dis/app-state)))}
+                "GOT IT"]]
+            [:div
+              [:div.slack-disclaimer [:span.bold "Slack sign up"] " makes it " [:span.bold "easy for your teammates"] " to signup to view your OpenCompany dashboard."]
+              (when (:slack-access (rum/react dis/app-state)) slack-error)
+              [:button.btn-reset.mt2.login-button.with-slack
+                {:on-click #(reset! (::sign-up-slack-clicked state) true)}
+                (str action-title " with ")
+                [:span.slack "Slack"]
+                (when-not (:auth-settings (rum/react dis/app-state))
+                  (small-loading))]])
+          [:div.login-with-email.domine.underline.bold
+            [:a {:on-click #(do (utils/event-stop %)
+                                (dis/dispatch! [:show-login-overlay (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
+              (cond
+                (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
+                "OR SIGN UP VIA EMAIL"
+                :else
+                "OR SIGN IN VIA EMAIL")]]]
+          [:div.login-overlay-footer.py2.px3.mt1.group
             (cond
-              (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-              "OR SIGN UP VIA EMAIL"
-              :else
-              "OR SIGN IN VIA EMAIL")]]]
-        [:div.login-overlay-footer.py2.px3.mt1.group
-          (cond
-              (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-              [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])}
-                "Already have an account? "
-                 [:span.underline "SIGN IN NOW."]]
-              :else
-              [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-email])}
-                "Don't have an account? "
-                 [:span.underline "SIGN UP NOW."]])]]])
+                (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
+                [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])}
+                  "Already have an account? "
+                   [:span.underline "SIGN IN NOW."]]
+                :else
+                [:a.left {:on-click #(dis/dispatch! [:show-login-overlay :signup-with-email])}
+                  "Don't have an account? "
+                   [:span.underline "SIGN UP NOW."]])]]]))
 
 (rum/defcs login-with-email < rum/reactive
                               (merge dont-scroll
