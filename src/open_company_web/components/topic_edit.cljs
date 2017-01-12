@@ -248,9 +248,11 @@
 
 (defn show-edit-tt [owner]
   (let [company-data (dis/company-data)]
-    (when (and (= (count (:sections company-data)) 1)
+    (when (and (not (om/get-state owner :first-foce-tt-shown))
+               (= (count (:sections company-data)) 1)
                (= (count (:archived company-data)) 0)
                (om/get-props owner :foce-key))
+      (om/set-state! owner :first-foce-tt-shown true)
       (utils/after 500
         #(let [first-foce (str "first-foce-" (:slug company-data))]
           (t/tooltip (.querySelector js/document "div.topic-edit") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
@@ -278,7 +280,8 @@
        :has-changes false
        :file-upload-state nil
        :file-upload-progress 0
-       :headline-exceeds false}))
+       :headline-exceeds false
+       :first-foce-tt-shown false}))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
