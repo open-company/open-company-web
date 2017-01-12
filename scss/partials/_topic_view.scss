@@ -99,6 +99,10 @@ div.topic-view-container{
           box-shadow: none;
           float: left;
           background-color: transparent;
+
+          @include mobile(){
+            float: none;
+          }
         }
 
         div.fake-textarea-internal {
@@ -142,6 +146,10 @@ div.topic-view-container{
           box-shadow: none;
           float: left;
           background-color: transparent;
+
+          @include mobile(){
+            float: none;
+          }
 
           div.card-image {
             margin-top: 12px;
