@@ -275,7 +275,7 @@
           body       (:body topic-data)
           has-data?  (not-empty (:data topic-data))]
       {:initial-headline (utils/emojify (:headline topic-data))
-       :body-placeholder (if (:new topic-data) (:body-placeholder topic-data) (utils/new-section-body-placeholder))
+       :body-placeholder (if (:new topic-data) (str "What would you like to say? For example, " (:body-placeholder topic-data)) (utils/new-section-body-placeholder))
        :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
        :char-count nil
        :char-count-alert false
