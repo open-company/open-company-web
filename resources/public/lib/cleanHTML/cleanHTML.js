@@ -263,19 +263,25 @@ function replaceSelectionWithHtml(html) {
     }
 }
 
+window.pasteHandled = {};
+
 function didPaste(e){
   // Prevent normal paste behaviour
   e.preventDefault();
   e.stopPropagation();
-  // Get the paste data
-  var clipboardData, pastedData, cleanedData;
-  clipboardData = e.clipboardData || window.clipboardData;
-  // fall back to plain text or to Text
-  pastedData = clipboardData.getData('text/html') || clipboardData.getData('text/plain') || clipboardData.getData('Text');
-  // Clean the text with our function
-  cleanedData = cleanHTML(pastedData);
-  // Replace the current selected text with our text
-  replaceSelectionWithHtml(cleanedData);
+  // If the current paste event wasn't already handled:
+  if (!(e.timeStamp in pasteHandled)){
+    // Get the paste data
+    var clipboardData, pastedData, cleanedData;
+    clipboardData = e.clipboardData || window.clipboardData;
+    // fall back to plain text or to Text
+    pastedData = clipboardData.getData('text/html') || clipboardData.getData('text/plain') || clipboardData.getData('Text');
+    // Clean the text with our function
+    cleanedData = cleanHTML(pastedData);
+    // Replace the current selected text with our text
+    replaceSelectionWithHtml(cleanedData);
+    pasteHandled[e.timeStamp] = true;
+  }
 }
 
 function recursiveAttachPasteListener(el, cb){
