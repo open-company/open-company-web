@@ -16,9 +16,8 @@ button.user-avatar-button{
   }
 
   &.no-image {
-    margin-top: 5px;
-    i.fa.fa-ellipsis-v {
-      margin-top: 11px;
+    img {
+      margin-top: 5px;
     }
   }
 
@@ -28,31 +27,27 @@ button.user-avatar-button{
   }
 
   div.user-avatar-name {
-    font-size: 16px;
+    width: #{$avatar_size}px;
+    height: #{$avatar_size}px;
+    font-size: 22px;
     font-family: $oc_headers_font;
-    margin-top: 2px;
-    margin-right: 5px;
+    padding: 0px 7px 7px 5px;
     color: rgba(78, 90, 107, 1);
     font-weight: 400;
+    float: left;
+    margin-right: 5px;
+
+    background-color: rgba(78, 90, 107, 0.2);
+
+    // White with yellow border version
+    // background-color: white;
+    // border: 2px solid $oc_yellow;
+    // border-radius: 2px;
   }
 
   img.user-avatar-img {
     max-width: #{$avatar_size}px;
     max-height: #{$avatar_size}px;
     margin-right: 5px;
-  }
-
-  i.fa.fa-ellipsis-v {
-    font-size: 24px;
-    margin-top: 6px;
-    padding-right: 10px;
-    transition: 230ms;
-    color: rgba(78, 90, 107, 0.8);
-  }
-
-  &:hover {
-    i.fa.fa-ellipsis-v {
-      color: rgba(78, 90, 107, 1);
-    }
   }
 }

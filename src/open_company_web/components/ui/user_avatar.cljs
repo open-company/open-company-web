@@ -19,7 +19,10 @@
        :aria-haspopup true
        :aria-expanded false}
       (if-not has-avatar
-        [:div.user-avatar-name.left (or (get-in (rum/react dis/app-state) [:jwt :first-name]) (get-in (rum/react dis/app-state) [:jwt :last-name]))]
+        [:div.user-avatar-name
+          (let [avatar-name (clojure.string/upper-case (str (first (get-in (rum/react dis/app-state) [:jwt :first-name]))
+                                                            (first (get-in (rum/react dis/app-state) [:jwt :last-name]))))]
+            [:span.user-avatar-name-span avatar-name])]
         [:img.user-avatar-img
           {:src (jwt/get-key :avatar)
            :title (get-in (rum/react dis/app-state) [:jwt :real-name])}])
