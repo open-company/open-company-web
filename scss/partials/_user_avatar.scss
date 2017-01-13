@@ -37,12 +37,13 @@ button.user-avatar-button{
     float: left;
     margin-right: 5px;
 
-    background-color: rgba(78, 90, 107, 0.2);
+    background-color: $oc_gray_8;
+  }
 
-    // White with yellow border version
-    // background-color: white;
-    // border: 2px solid $oc_yellow;
-    // border-radius: 2px;
+  &:hover {
+    div.user-avatar-name {
+      background-color: rgba(78, 90, 107, 0.2);
+    }
   }
 
   img.user-avatar-img {
