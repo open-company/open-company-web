@@ -74,6 +74,7 @@
                                       is-stakeholder-update
                                       is-mobile?
                                       is-dashboard
+                                      dashboard-sharing
                                       is-topic-view
                                       foce-active
                                       topic-click
@@ -190,6 +191,7 @@
           (when (and show-editing
                      (not is-stakeholder-update)
                      is-dashboard
+                     (not dashboard-sharing)
                      (not is-mobile?)
                      (not is-topic-view)
                      (responsive/can-edit?)
@@ -366,6 +368,7 @@
                                     :foce-active foce-active
                                     :is-mobile? is-mobile?
                                     :is-dashboard is-dashboard
+                                    :dashboard-sharing (:dashboard-sharing data)
                                     :is-topic-view is-topic-view
                                     :show-editing show-editing
                                     :column column
