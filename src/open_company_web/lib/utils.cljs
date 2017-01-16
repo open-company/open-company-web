@@ -745,9 +745,9 @@
   "Remove the last p tag if it's empty."
   [body-el]
   (when-not (is-test-env?)
-    (while (and (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
-                (= (.-length (.find (js/$ body-el) ">p img")) 0)
-                (pos? (.-length (.find (js/$ body-el) ">p"))))
+    (while (and (pos? (.-length (.find (js/$ body-el) ">p:last-child")))
+                (= (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))) 0)
+                (= (.-length (.find (js/$ body-el) ">p:last-child img")) 0))
       (.remove (js/$ ">p:last-child" (js/$ body-el))))))
 
 (defn data-topic-has-data [section section-data]
