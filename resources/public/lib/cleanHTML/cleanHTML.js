@@ -266,21 +266,28 @@ function replaceSelectionWithHtml(html) {
 window.pasteHandled = {};
 
 function didPaste(e){
-  // Prevent normal paste behaviour
-  e.preventDefault();
-  e.stopPropagation();
   // If the current paste event wasn't already handled:
   if (!(e.timeStamp in pasteHandled)){
-    // Get the paste data
-    var clipboardData, pastedData, cleanedData;
-    clipboardData = e.clipboardData || window.clipboardData;
-    // fall back to plain text or to Text
-    pastedData = clipboardData.getData('text/html') || clipboardData.getData('text/plain') || clipboardData.getData('Text');
-    // Clean the text with our function
-    cleanedData = cleanHTML(pastedData);
-    // Replace the current selected text with our text
-    replaceSelectionWithHtml(cleanedData);
+    // avoid to handle again the same paste event
     pasteHandled[e.timeStamp] = true;
+    e.stopPropagation();
+    // check if the paste is of plain text or not:
+    var clipboardData = e.clipboardData || window.clipboardData;
+    // get the rich text to paste and fall back to the plain or default paste text
+    var pastedData = clipboardData.getData('text/html') || clipboardData.getData('text/plain') || clipboardData.getData('Text');
+    // get the plain or default paste text
+    var plainTextData = clipboardData.getData('text/plain') || clipboardData.getData('Text');
+    // if the rich text has the same length of the plain text let the browser perform the paste
+    if (pastedData.length != plainTextData.length){
+      // Prevent normal paste behaviour
+      e.preventDefault();
+      // Get the paste data
+      var cleanedData;
+      // Clean the text with our function
+      cleanedData = cleanHTML(pastedData);
+      // Replace the current selected text with our text
+      replaceSelectionWithHtml(cleanedData);
+    }
   }
 }
 
