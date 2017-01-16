@@ -85,7 +85,6 @@
     (headline-on-change owner)))
 
 (defn body-on-change [owner]
-  (js/console.log "body-on-change")
   (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
@@ -97,7 +96,6 @@
                                        :has-changes true}))))
 
 (defn- setup-body-editor [owner]
-  (js/console.log "setup-body-editor")
   (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
