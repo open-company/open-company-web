@@ -28,18 +28,21 @@
                                (hide-popover nil "archive-topic-confirm")
                                (router/nav! (oc-urls/company)))}))
 
-(defn load-revisions-if-needed [owner]
-  (when (not (om/get-state owner :revisions-requested))
-    (when-let* [topic-name (om/get-props owner :selected-topic-view)
+(defn load-revisions [owner]
+  (when-let* [topic-name (om/get-props owner :selected-topic-view)
                 company-data (om/get-props owner :company-data)
                 topic-data (->> topic-name keyword (get company-data))
                 revisions-link (utils/link-for (:links topic-data) "revisions" "GET")]
-      ; Do not request old revisions if there is the :new key
-      ; since it was newly added from the add topic component
-      ; and also it's not an archived topic being reactivated
-      (when-not (:placeholder topic-data)
-        (om/set-state! owner :revisions-requested true)
-        (api/load-revisions (router/current-company-slug) topic-name revisions-link)))))
+    ; Do not request old revisions if there is the :new key
+    ; since it was newly added from the add topic component
+    ; and also it's not an archived topic being reactivated
+    (when-not (:placeholder topic-data)
+      (om/set-state! owner :revisions-requested true)
+      (api/load-revisions (router/current-company-slug) topic-name revisions-link))))
+
+(defn load-revisions-if-needed [owner]
+  (when (not (om/get-state owner :revisions-requested))
+    (load-revisions owner)))
 
 (defn start-foce-if-needed [{:keys [foce-key
                                     company-data
@@ -73,7 +76,8 @@
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-revisions-if-needed owner)
-    (start-foce-if-needed owner))
+    (start-foce-if-needed owner)
+    (om/set-state! owner :revisions-reload-interval (js/setInterval #(load-revisions owner) (* 60 1000))))
 
   (will-update [_ next-props _]
     (start-foce-if-needed next-props)
@@ -83,6 +87,10 @@
   (did-update [_ _ _]
     (load-revisions-if-needed owner)
     (start-foce-if-needed owner))
+
+  (will-unmount [_]
+    (when (om/get-state owner :revisions-reload-interval)
+      (js/clearInterval (om/get-state owner :revisions-reload-interval))))
 
   (render [_]
     (let [section-kw (keyword selected-topic-view)
