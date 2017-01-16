@@ -85,17 +85,19 @@
     (headline-on-change owner)))
 
 (defn body-on-change [owner]
+  (js/console.log "body-on-change")
   (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
     ; Attach paste listener to the body and all its children
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder (om/get-state owner :body-editor) body-el) #(utils/to-end-of-content-editable body-el)))
+    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder (om/get-state owner :body-editor) body-el) #(body-on-change owner)))
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (om/update-state! owner #(merge % {:char-count nil
                                        :has-changes true}))))
 
 (defn- setup-body-editor [owner]
+  (js/console.log "setup-body-editor")
   (when-let* [section-kw   (dis/foce-section-key)
               section-name (name section-kw)
               body-id      (str "div#foce-body-" section-name)
@@ -108,7 +110,7 @@
                   (fn [event editable]
                     (body-on-change owner)))
       (om/set-state! owner :body-editor body-editor)
-      (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder body-editor body-el) #(utils/to-end-of-content-editable body-el))))
+      (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder body-editor body-el) #(body-on-change owner))))
     (events/listen headline-el EventType/INPUT #(headline-on-change owner))
     (js/emojiAutocomplete)))
 
