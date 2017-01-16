@@ -60,6 +60,10 @@
                                                                                      :desktop "When you’re ready, you can share a beautiful company update with these topics."})]
             (t/show tt-id)))))))
 
+(defn refresh-company-data [owner]
+  (when (nil? (om/get-props owner :selected-topic-view))
+    (api/get-company (router/current-company-slug))))
+
 (defcomponent company-dashboard [data owner]
 
   (init-state [_]
@@ -79,17 +83,30 @@
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
     (when-not (:read-only (dis/company-data data))
       (get-new-sections-if-needed owner))
-    (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
-                                                                                         :card-width (if (responsive/is-mobile-size?)
-                                                                                                       (responsive/mobile-dashboard-card-width)
-                                                                                                       (responsive/calc-card-width))}))))
-    (events/listen js/window EventType/CLICK (fn[e]
-                                               (when (and (:show-top-menu @dis/app-state)
-                                                          (not (utils/event-inside? e (sel1 [(str "div.topic[data-section=" (name (:show-top-menu @dis/app-state)) "]")]))))
-                                                 (utils/event-stop e)
-                                                 (dis/dispatch! [:show-top-menu nil]))))
+    (om/set-state! owner :resize-listener
+      (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
+                                                                                           :card-width (if (responsive/is-mobile-size?)
+                                                                                                         (responsive/mobile-dashboard-card-width)
+                                                                                                         (responsive/calc-card-width))})))))
+    (om/set-state! owner :window-click-listener
+      (events/listen js/window EventType/CLICK (fn[e]
+                                                 (when (and (:show-top-menu @dis/app-state)
+                                                            (not (utils/event-inside? e (sel1 [(str "div.topic[data-section=" (name (:show-top-menu @dis/app-state)) "]")]))))
+                                                   (utils/event-stop e)
+                                                   (dis/dispatch! [:show-top-menu nil])))))
     (when (pos? (:count (utils/link-for (:links (dis/company-data data)) "stakeholder-updates")))
-      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data)))))))
+      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/company-data data))))))
+    (refresh-company-data owner)
+    (om/set-state! owner :company-refresh-interval
+      (js/setInterval #(refresh-company-data owner) (* 60 1000))))
+
+  (will-unmount [_]
+    (when (om/get-state owner :company-refresh-interval)
+      (js/clearInterval (om/get-state owner :company-refresh-interval)))
+    (when (om/get-state owner :window-click-listener)
+      (events/unlistenByKey (om/get-state owner :window-click-listener)))
+    (when (om/get-state owner :resize-listener)
+      (events/unlistenByKey (om/get-state owner :resize-listener))))
 
   (did-update [_ prev-props prev-state]
     (let [company-data (dis/company-data data)]
