@@ -265,16 +265,10 @@
 (defn fix-section 
   "Add `:section` name and `:as-of` keys to the section map"
   [section-body section-name & [read-only force-write]]
-  (let [with-created-at (if (contains? section-body :created-at)
-                          section-body
-                          (assoc section-body :created-at (as-of-now)))
-        with-updated-at (if (contains? with-created-at :updated-at)
-                          with-created-at
-                          (assoc with-created-at :updated-at (as-of-now)))
-        with-keys       (-> with-updated-at
-                          (assoc :section (name section-name))
-                          (assoc :as-of (:created-at section-body))
-                          (assoc :read-only (readonly? (:links section-body))))]
+  (let [with-keys (-> section-body
+                      (assoc :section (name section-name))
+                      (assoc :as-of (:created-at section-body))
+                      (assoc :read-only (readonly? (:links section-body))))]
     (if (= section-name :finances)
       (fix-finances with-keys)
       with-keys)))
