@@ -85,7 +85,7 @@
 (defn get-fixed-sorted-metric [finances-data currency]
   (let [currency-symbol (utils/get-symbol-for-currency-code currency)
         filled-finances-data (vals (finance-utils/fill-gap-months finances-data))
-        sort-pred (utils/sort-by-key-pred :period)
+        sort-pred (utils/sort-by-key-pred :period false)
         sorted-data (vec (sort sort-pred filled-finances-data))]
     (vec (map #(merge % {:label (label-from-set % currency-symbol)
                          :sub-label (sub-label-from-set (:period %) sorted-data currency-symbol)}) sorted-data))))

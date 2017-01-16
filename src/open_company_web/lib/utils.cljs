@@ -33,8 +33,8 @@
 
 (def oc-animation-duration 300)
 
-(defn sort-by-key-pred [k & invert]
-  (if-not (first invert)
+(defn sort-by-key-pred [k invert]
+  (if-not invert
     (fn [a b] (compare (k a) (k b)))
     (fn [a b] (compare (k b) (k a)))))
 
@@ -138,7 +138,7 @@
   [finances-data]
   (if (empty? finances-data)
     finances-data
-    (let [sort-pred (sort-by-key-pred :period)
+    (let [sort-pred (sort-by-key-pred :period false)
           sorted-data (vec (sort sort-pred finances-data))]
       (vec (map
               (fn [data]
