@@ -104,7 +104,7 @@
   (render-state [_ {:keys [chart-selected-idx fixed-sorted-metric]}]
     (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
       (dom/div {:class "finances-sparklines-inner left group"}
-        (let [sum-revenues (apply + (filter #(and (not (nil? %)) (not (= % ""))) (map (comp :revenue utils/abs) finances-data)))
+        (let [sum-revenues (utils/sum-revenues finances-data)
               post-revenue? (pos? sum-revenues)
               filled-metric-data (finance-utils/fill-gap-months finances-data)
               actual-set (first finances-data)

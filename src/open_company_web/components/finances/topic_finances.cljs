@@ -125,7 +125,7 @@
           (dom/div {:class "composed-section finances group"}
             (let [sort-pred (utils/sort-by-key-pred :period)
                   sorted-finances (sort sort-pred finances-raw-data)
-                  sum-revenues (apply + (map utils/abs (map :revenue finances-raw-data)))
+                  sum-revenues (utils/sum-revenues finances-raw-data)
                   cur-symbol (utils/get-symbol-for-currency-code currency)
                   chart-opts {:chart-type "bordered-chart"
                               :chart-height 112

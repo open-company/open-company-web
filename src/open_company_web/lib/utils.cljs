@@ -799,3 +799,9 @@
 
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 (def before-removing-revision-message "Are you sure you want to delete this entry?")
+
+(defn sum-revenues [finances-data]
+  (let [filtered-revenues (map (comp :revenue abs) finances-data)
+        cleaned-revenues (filter #(and (not (nil? %))
+                                       (not= (s/trim %) "")) filtered-revenues)]
+    (apply + cleaned-revenues)))
