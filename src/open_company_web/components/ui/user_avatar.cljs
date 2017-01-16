@@ -1,4 +1,5 @@
 (ns open-company-web.components.ui.user-avatar
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.dispatcher :as dis]
@@ -20,9 +21,13 @@
        :aria-expanded false}
       (if-not has-avatar
         [:div.user-avatar-name
-          (let [avatar-name (clojure.string/upper-case (str (first (get-in (rum/react dis/app-state) [:jwt :first-name]))
-                                                            (first (get-in (rum/react dis/app-state) [:jwt :last-name]))))]
-            [:span.user-avatar-name-span avatar-name])]
+          (when (or (get-in (rum/react dis/app-state) [:jwt :first-name])
+                    (get-in (rum/react dis/app-state) [:jwt :last-name]))
+            (let [first-name-initial (or (first (get-in (rum/react dis/app-state) [:jwt :first-name])) "")
+                  last-name-initial (or (first (get-in (rum/react dis/app-state) [:jwt :last-name])) "")
+                  avatar-name (clojure.string/upper-case (str first-name-initial
+                                                              last-name-initial))]
+              [:span.user-avatar-name-span avatar-name]))]
         [:img.user-avatar-img
           {:src (jwt/get-key :avatar)
            :title (get-in (rum/react dis/app-state) [:jwt :real-name])}])

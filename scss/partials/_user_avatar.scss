@@ -38,6 +38,13 @@ button.user-avatar-button{
     margin-right: 5px;
 
     background-color: $oc_gray_8;
+
+    &:empty {
+      width: 0px;
+      height: 0px;
+      margin: 0;
+      padding: 0;
+    }
   }
 
   &:hover {
