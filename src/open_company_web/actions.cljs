@@ -110,7 +110,8 @@
     success
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)
-          with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)
+          company-data-key (dispatcher/company-data-key (:slug updated-body))
+          with-company-data (assoc-in db company-data-key updated-body)
           with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
                                        (zero? (count (:sections updated-body))))
                                (assoc with-company-data :show-add-topic true)
@@ -119,14 +120,18 @@
                                        (zero? (count (:sections updated-body)))
                                        (zero? (count (:archived updated-body))))
                                 (assoc with-open-add-topic :show-welcome-screen true)
-                                with-open-add-topic)]
+                                with-open-add-topic)
+          section-revisions-data-key (concat company-data-key [(keyword (:selected-topic-view db)) :revisions-data])
+          keeping-revisions (if (:selected-topic-view db)
+                              (assoc-in with-welcome-screen section-revisions-data-key (get-in db section-revisions-data-key))
+                              with-welcome-screen)]
       ; async preload the SU list
       (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
               (pos? (count (:sections updated-body)))
               (:force-remove-loading with-company-data))
-          (dissoc with-welcome-screen :loading :force-remove-loading)
-          with-welcome-screen))
+          (dissoc keeping-revisions :loading :force-remove-loading)
+          keeping-revisions))
     (or (= 403 status)
         (= 401 status))
     (-> db
