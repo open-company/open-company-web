@@ -16,7 +16,7 @@
        :class (str classes (when-not has-avatar " no-image"))
        :id "dropdown-toggle-menu"
        :data-toggle (when not-mobile? "dropdown")
-       :click-cb (when (fn? click-cb) (click-cb))
+       :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
       (if-not has-avatar
