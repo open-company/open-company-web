@@ -392,13 +392,13 @@
                                         :accent-color "white"}))))
           ;; Topic title
           (dom/input {:class "topic-title"
-                      :value (:title topic-data)
+                      :value (or (:title topic-data) "")
                       :max-length title-max-length
                       :placeholder (:name topic-data)
                       :type "text"
                       :on-blur #(om/set-state! owner :char-count nil)
                       :on-change (fn [e]
-                                    (let [v (.. e -target -value)
+                                    (let [v (or (.. e -target -value) "")
                                           remaining-chars (- title-max-length (count v))]
                                       (dis/dispatch! [:foce-input {:title v}])
                                       (om/update-state! owner #(merge % {:has-changes true
@@ -518,9 +518,9 @@
               (dom/input {:type "text"
                           :class "upload-remote-url-field"
                           :style {:width (str (- card-width 122 50) "px")}
-                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :on-change #(om/set-state! owner :upload-remote-url (or (-> % .-target .-value) ""))
                           :placeholder "http://site.com/img.png"
-                          :value upload-remote-url})
+                          :value (or upload-remote-url "")})
               (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                            :class "btn-reset btn-solid"
                            :disabled (string/blank? upload-remote-url)
