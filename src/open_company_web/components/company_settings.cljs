@@ -180,7 +180,7 @@
                           :class "npt col-7 p1 mb3"
                           :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
                           :placeholder "http://site.com/img.png"
-                          :value upload-remote-url})
+                          :value (or upload-remote-url "")})
               (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                            :class "btn-reset btn-solid"
                            :disabled (string/blank? upload-remote-url)
@@ -278,7 +278,7 @@
           (dom/input {:class "npt col-8 p1 mb3"
                       :type "text"
                       :id "name"
-                      :value company-name
+                      :value (or company-name "")
                       :on-change #(do
                                    (om/set-state! owner :has-changes true)
                                    (om/set-state! owner :company-name (.. % -target -value)))})

@@ -77,7 +77,7 @@
                             :class "company-editor-input domine h4"
                             :style #js {:width "100%"}
                             :placeholder "Simple name without the Inc., LLC, etc."
-                            :value (-> data :company-editor :name)
+                            :value (or (-> data :company-editor :name) "")
                             :on-change #(dis/dispatch! [:input [:company-editor :name] (.. % -target -value)])})))
               (dom/div {:class "center"}
                 (dom/button {:class "btn-reset btn-solid get-started-button"

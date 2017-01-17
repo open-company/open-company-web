@@ -64,7 +64,9 @@
                             (when state
                               {:right 0}))}
       (dom/div {:class "flex"}
-        (dom/input {:id "file-upload-ui--select-trigger" :style {:display "none"} :type "file"
+        (dom/input {:id "file-upload-ui--select-trigger"
+                    :style {:display "none"}
+                    :type "file"
                     :on-change #(upload-file! editor owner (-> % .-target .-files (aget 0)))})
         (dom/button {:class "btn-reset p0 file-upload-btn"
                      :style {:margin-right "13px"
@@ -105,9 +107,9 @@
             (str "Uploading... " (om/get-state owner :progress) "%"))
           (dom/div {:style {:background-color "white" :margin-left "30px" :margin-top "-4px" :display (if (= state :show-url-field) "block" "none")}}
             (dom/input {:type "text"
-                               :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
-                               :on-change #(do (om/set-state! owner :url (-> % .-target .-value)) true)
-                               :value url})
+                        :style {:height "32px" :margin-top "1px" :outline "none" :border "1px solid rgba(78, 90, 107, 0.5)"}
+                        :on-change #(om/set-state! owner :url (-> % .-target .-value))
+                        :value (or url "")})
             (dom/button {:style {:height "32px" :font-size "14px" :margin-left "5px" :padding "0.3rem"}
                          :class "btn-reset btn-solid"
                          :disabled (clojure.string/blank? url)

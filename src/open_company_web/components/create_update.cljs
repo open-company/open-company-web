@@ -155,7 +155,7 @@
                         :style {:width (str fixed-card-width "px")}}
                 (dom/input {:class "create-update-content-cards-title"
                             :type "text"
-                            :value su-title
+                            :value (or su-title "")
                             :placeholder "Title"
                             :style #js {:width (str (- fixed-card-width 60) "px")}
                             :on-change (fn [e]
