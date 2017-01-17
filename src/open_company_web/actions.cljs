@@ -118,7 +118,7 @@
           already-loaded? (get-in db company-already-loaded-key)
           with-company-data (assoc-in db company-data-key updated-body)
           with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
-                                       (zero? (count (get-in db company-sections-key)))
+                                       (zero? (count (:sections updated-body)))
                                        (not already-loaded?))
                                 (assoc with-company-data :show-add-topic true)
                                 with-company-data)
