@@ -269,6 +269,7 @@
       (dissoc :foce-key)
       (dissoc :foce-data)
       (dissoc :foce-data-editing?)
+      (assoc-in :show-add-topic (zero? (count (:sections company-data))))
       (assoc-in (conj company-key :sections) new-sections)
       (assoc-in (conj company-key :archived) new-archived))))
 
