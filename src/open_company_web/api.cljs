@@ -579,6 +579,5 @@
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
-            "content-type" (:type delete-link)
-            "accept" (:type delete-link)}}
+            "content-type" (:type delete-link)}}
           (fn [_]))))))
