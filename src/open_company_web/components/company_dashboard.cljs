@@ -60,6 +60,8 @@
                                                                                      :desktop "When you’re ready, you can share a beautiful company update with these topics."})]
             (t/show tt-id)))))))
 
+(def add-second-topic-tt-prefix "add-second-topic-")
+
 (defn refresh-company-data [owner]
   (when (nil? (om/get-props owner :selected-topic-view))
     (api/get-company (router/current-company-slug))))
@@ -106,23 +108,26 @@
     (when (om/get-state owner :window-click-listener)
       (events/unlistenByKey (om/get-state owner :window-click-listener)))
     (when (om/get-state owner :resize-listener)
-      (events/unlistenByKey (om/get-state owner :resize-listener))))
+      (events/unlistenByKey (om/get-state owner :resize-listener)))
+    (let [company-data (dis/company-data (om/get-props owner))]
+      (t/hide (str add-second-topic-tt-prefix (:slug company-data)))
+      (t/hide (share-tooltip-id (:slug company-data)))))
 
   (did-update [_ prev-props prev-state]
     (let [company-data (dis/company-data data)]
       (when (and (:dashboard-sharing data)
                  (not (:dashboard-sharing prev-props)))
-        (t/hide (str "second-topic-share-" (:slug company-data))))
+        (t/hide (share-tooltip-id (:slug company-data))))
       (when (and (not (:show-add-topic prev-props))
                  (:show-add-topic data))
-        (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
+        (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug company-data))]
           (t/hide add-second-topic-tt)))
       (when (and (not (om/get-state owner :add-second-topic-tt-shown))
                  (not (:selected-topic-view data))
                  (= (count (utils/filter-placeholder-sections (:sections company-data) company-data)) 1)
                  (not (:show-login-overlay data)))
         (om/set-state! owner :add-second-topic-tt-shown true)
-        (let [add-second-topic-tt (str "add-second-topic-" (:slug company-data))]
+        (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug company-data))]
           (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
                       {:desktop "Click on the + to add more topics and put together a complete company update."
                        :once-only true
