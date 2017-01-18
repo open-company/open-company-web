@@ -795,7 +795,6 @@
 (def before-removing-revision-message "Are you sure you want to delete this entry?")
 
 (defn sum-revenues [finances-data]
-  (let [filtered-revenues (map (comp :revenue abs) finances-data)
-        cleaned-revenues (filter #(and (not (nil? %))
-                                       (not= (s/trim %) "")) filtered-revenues)]
-    (apply + cleaned-revenues)))
+  (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
+        filtered-revenues (filter number? cleaned-revenues)]
+    (apply + filtered-revenues)))
