@@ -10,7 +10,7 @@
 
     [org.omcljs/om "1.0.0-alpha47" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
-    [rum "0.10.8" :exclusions [[cljsjs/react]]] ; https://github.com/tonsky/rum
+    [rum "0.10.8" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
 
     [org.martinklepsch/derivatives "0.2.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
 
@@ -30,8 +30,8 @@
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
 
     ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
-    [cljsjs/react "15.4.2-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [cljsjs/react-dom "15.4.2-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
     [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-2"] ; d3 externs https://clojars.org/cljsjs/d3
