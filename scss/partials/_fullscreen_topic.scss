@@ -175,9 +175,7 @@ div.fullscreen-topic {
             color: $oc_gray_7;
             padding: 0px #{$lightbox_side_padding}px;
 
-            .emojione {
-              @include emoji-size(#{$lightbox_side_padding}px);
-            }
+            @include emoji-size(#{$lightbox_side_padding}px);
           }
 
           div.topic-snippet{

@@ -199,9 +199,7 @@ div.topic.topic-edit {
         outline: none;
       }
 
-      .emojione {
-        @include emoji-size(18px);
-      }
+      @include emoji-size(18px);
     }
 
     div.hidden-topic-body {
@@ -235,9 +233,7 @@ div.topic.topic-edit {
         padding-top: 0px;
       }
 
-      .emojione {
-        @include emoji-size(14px);
-      }
+      @include emoji-size(14px);
 
       *{
         font-weight: 400;

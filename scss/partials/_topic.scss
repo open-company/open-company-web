@@ -135,9 +135,7 @@ div.topic {
         font-weight: 400;
         line-height: normal;
 
-        .emojione {
-          @include emoji-size(13px);
-        }
+        @include emoji-size(13px);
       }
     }
   }
@@ -330,9 +328,7 @@ div.topic {
       line-height: 25px;
       color: $oc_gray_7;
 
-      .emojione {
-        @include emoji-size(18px);
-      }
+      @include emoji-size(18px);
     }
 
     div.hidden-topic-body {
@@ -362,9 +358,7 @@ div.topic {
       font-size: 14px;
       line-height: 22px;
 
-      .emojione {
-        @include emoji-size(14px);
-      }
+      @include emoji-size(14px);
 
       *{
         font-size: 14px;
