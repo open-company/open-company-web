@@ -333,10 +333,11 @@
                                          (nil? (:show-top-menu data)))
                                (if (:dashboard-sharing data)
                                  (dis/dispatch! [:dashboard-select-topic section-kw])
-                                 (when (or (responsive/is-mobile-size?)
-                                           (not read-only-company)
-                                           (> (count (:revisions section-data)) 1)
-                                           (html-text-exceeds-limit (:body section-data) utils/topic-body-limit))
+                                 (when (and (nil? (:foce-key data))
+                                            (or (responsive/is-mobile-size?)
+                                                (not read-only-company)
+                                                (> (count (:revisions section-data)) 1)
+                                                (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)))
                                   (router/nav! (oc-urls/company-section slug section-kw)))))
                     :style topic-style
                     :ref "topic"
