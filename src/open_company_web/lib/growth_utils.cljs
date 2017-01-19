@@ -129,7 +129,7 @@
 
 (defn fill-gap-months [growth-data slug interval]
   (let [data-map (growth-data-map growth-data)
-        sort-pred (utils/sort-by-key-pred :period false)
+        sort-pred (fn [a b] (compare (:period a) (:period b)))
         sorted-data (vec (sort sort-pred growth-data))
         first-data (first sorted-data)
         last-data (last sorted-data)

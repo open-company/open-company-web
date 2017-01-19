@@ -177,7 +177,7 @@
 
 (defn fill-gap-months [finances-data]
   (let [data-map (finances-data-map finances-data)
-        sort-pred (utils/sort-by-key-pred :period false)
+        sort-pred (fn [a b] (compare (:period a) (:period b)))
         sorted-data (vec (sort sort-pred finances-data))
         first-data (first sorted-data)
         last-data (last sorted-data)

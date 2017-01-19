@@ -33,11 +33,6 @@
 
 (def oc-animation-duration 300)
 
-(defn sort-by-key-pred [k invert]
-  (if-not invert
-    (fn [a b] (compare (k a) (k b)))
-    (fn [a b] (compare (k b) (k a)))))
-
 (defn display [show]
   (if show
     #js {}
@@ -138,7 +133,7 @@
   [finances-data]
   (if (empty? finances-data)
     finances-data
-    (let [sort-pred (sort-by-key-pred :period false)
+    (let [sort-pred (fn [a b] (compare (:period a) (:period b)))
           sorted-data (vec (sort sort-pred finances-data))]
       (vec (map
               (fn [data]
@@ -257,7 +252,7 @@
 (defn fix-finances [section-body]
   (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
-        sort-pred (sort-by-key-pred :period true)
+        sort-pred (fn [a b] (compare (:period b) (:period a)))
         sorted-finances (sort sort-pred fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)]
     fixed-section))
@@ -285,7 +280,7 @@
     with-fixed-sections))
 
 (defn sort-revisions [revisions]
-  (let [sort-pred (sort-by-key-pred :created-at true)]
+  (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
     (vec (sort sort-pred revisions))))
 
 (defn revision-next

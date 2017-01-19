@@ -560,7 +560,7 @@
 
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [slug topic revisions]}]]
-  (let [sort-pred (utils/sort-by-key-pred :created-at true)]
+  (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
     (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
 
 ((defmethod dispatcher/action :show-add-topic

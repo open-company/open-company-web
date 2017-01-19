@@ -87,7 +87,7 @@
     (let [{:keys [slug interval] :as metric-info} (:metric-info data)
           metric-data (:metric-data data)
           filled-metric-data (growth-utils/fill-gap-months metric-data slug interval)
-          sort-pred (utils/sort-by-key-pred :period false)
+          sort-pred (fn [a b] (compare (:period a) (:period b)))
           sorted-metric (vec (sort sort-pred (vals filled-metric-data)))
           actual-idx (growth-utils/get-actual sorted-metric)
           actual-set (sorted-metric actual-idx)
