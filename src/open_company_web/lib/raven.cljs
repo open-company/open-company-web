@@ -12,7 +12,11 @@
 
 (defn raven-setup []
   (when (and (exists? js/Raven) ls/local-dsn)
-    (.. js/Raven (config ls/local-dsn (ravenParameters)) install)))
+    (.. js/Raven (config ls/local-dsn (ravenParameters)) install)
+    (when (jwt/jwt)
+      (.setUserContext js/Raven (clj->js {:user-id (jwt/get-key :user-id)
+                                          :first-name (jwt/get-key :first-name)
+                                          :last-name (jwt/get-key :last-name)})))))
 
 (defn test-raven []
   (js/setTimeout #(.captureMessage js/Raven "Message from clojure" 1000))
