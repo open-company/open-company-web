@@ -171,31 +171,28 @@
     padding-left: 0em;
     list-style-type: none;
 
-    li {
+    &>li {
       padding-left: 0em;
-      &:before {
-        content: '';
-      }
     }
+  }
+
+  li:before{
+    /* Unicode bullet symbol */
+    content: '\25A0 ';
+    /* Bullet color */
+    color: $oc_yellow;
+    left: 0;
+    position: absolute;
   }
 
   &>ul, div>ul, p>ul {
     padding-left: 1.5em;
     list-style-type: none;
 
-    li{
+    &>li{
       overflow: visible;
       padding-left: 1.5em;
       position: relative;
-
-      &:before{
-        /* Unicode bullet symbol */
-        content: '\25A0 ';
-        /* Bullet color */
-        color: $oc_yellow;
-        left: 0;
-        position: absolute;
-      }
     }
   }
 
