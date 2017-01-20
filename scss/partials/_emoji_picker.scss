@@ -17,3 +17,16 @@ div.emoji-picker {
     display: none;
   }
 }
+
+div.picker-container {
+  div.emoji-dialog {
+    li, li div, li div span {
+      outline: none;
+    }
+
+    li div span {
+      font-size: 20px;
+      margin: auto;
+    }
+  }
+}

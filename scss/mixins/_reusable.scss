@@ -106,11 +106,23 @@
 }
 
 @mixin emoji-size($size: 16px){
-  width: $size;
-  height: $size;
-  font-size: $size;
-  min-width: initial;
-  min-height: initial;
+  .emojione {
+    display: inline-block;
+    font-size: $size;
+  }
+  span.emojione {
+    width: initial;
+    height: initial;
+    min-width: $size;
+    min-height: $size;
+  }
+  img.emojione, svg.emojione {
+    width: $size;
+    height: $size;
+    font-size: $size;
+    min-width: initial;
+    min-height: initial;
+  }
 }
 
 @mixin rich-editor-body($text_color: #444444, $font_size: 18px){
@@ -157,9 +169,7 @@
     }
   }
 
-  .emojione {
-    @include emoji-size($font_size);
-  }
+  @include emoji-size($font_size);
 
   h1, h2, h3, h4, h5 {
     font-weight: 700;

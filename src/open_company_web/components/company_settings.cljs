@@ -317,7 +317,7 @@
           ;; Currency
           (dom/div {:class "settings-form-input-label"} "DISPLAY CURRENCY IN CHARTS AS")
           (dom/select {:id "currency"
-                       :value currency
+                       :value (or currency "")
                        :on-change #(do
                                     (om/set-state! owner :has-changes true)
                                     (om/set-state! owner :currency (.. % -target -value)))
