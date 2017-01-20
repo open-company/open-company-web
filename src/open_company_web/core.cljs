@@ -28,6 +28,7 @@
             [open-company-web.components.home :refer (home)]
             [open-company-web.components.list-companies :refer (list-companies)]
             [open-company-web.components.user-profile :refer (user-profile)]
+            [open-company-web.components.edit-user-profile :refer (edit-user-profile)]
             [open-company-web.components.login :refer (login)]
             [open-company-web.components.ui.loading :refer (loading)]
             [open-company-web.components.sign-up :refer (sign-up)]
@@ -255,9 +256,13 @@
       (list-companies-handler target params))
 
     (defroute user-profile-route urls/user-profile {:as params}
+      (when-not (jwt/jwt)
+        (router/redirect! urls/home))
       (utils/clean-company-caches)
       (pre-routing (:query-params params))
-      (drv-root user-profile target))
+      (if (= (jwt/get-key :auth-source) "slack")
+        (drv-root user-profile target)
+        (drv-root edit-user-profile target)))
 
     (defroute company-settings-route (urls/company-settings ":slug") {:as params}
       ; add force-remove-loading to avoid inifinte spinner if the company
