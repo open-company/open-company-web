@@ -29,9 +29,8 @@
     [medley "0.8.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
 
-    ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
-    [cljsjs/react "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [cljsjs/react-dom "0.14.7-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react "15.4.2-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react-dom "15.4.2-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
     [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-2"] ; d3 externs https://clojars.org/cljsjs/d3
@@ -101,14 +100,19 @@
 ;; these edn files can hold additional information about the page such
 ;; as it's permalink identifier (`:page` key) or the page's title etc.
 
-(deftask test! []
+(deftask test!
+  "Run tests."
+  []
   (set-env! :source-paths #(conj % "test")
-            :dependencies #(into % '[[cljs-react-test "0.1.4-SNAPSHOT" :scope "test" :exclusions [cljsjs/react-with-addons]]
-                                     [cljsjs/react-with-addons "0.14.7-0"]]))
+            :dependencies #(into % '[[cljs-react-test "0.1.4-SNAPSHOT" :scope "test" :exclusions [cljsjs/react-with-addons]]]))
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true
-             :namespaces #{"test.open-company-web.*"}))
+             :namespaces #{"test.open-company-web.*"}
+             :cljs-opts {:optimizations :whitespace
+                         :foreign-libs [{:provides ["cljsjs.react"]
+                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.js"
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js"}]}))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
@@ -130,7 +134,9 @@
                       :page "app-shell.html"
                       :filterer identity)))
 
-(deftask dev []
+(deftask dev
+  "OC Development build"
+  []
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
@@ -163,7 +169,9 @@
                 :pseudo-names true
                 :externs ["public/js/externs.js"]})))
 
-(deftask staging-build []
+(deftask staging-build
+  "OC Staging build."
+  []
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-site)
@@ -172,7 +180,9 @@
               :compiler-options {:externs ["public/js/externs.js"]
                                  :preloads '[devtools.preload]})))
 
-(deftask prod-build []
+(deftask prod-build
+  "OC Production build."
+  []
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-site)
