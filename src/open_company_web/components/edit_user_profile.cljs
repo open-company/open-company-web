@@ -13,18 +13,21 @@
       (dom/div {:class "edit-user-profile-internal mx-auto my4"}
         (dom/div {:class "edit-user-profile-content group"}
           (dom/div {:class "left-column"}
-            (dom/div {:class "edit-user-profile-name-title data-title"} "NAME")
-            (let [real-name (get-in data [:jwt :real-name])
-                  first-name (get-in data [:jwt :first-name])
-                  last-name (get-in data [:jwt :last-name])]
-              (dom/div {:class "edit-user-profile-name"} (or real-name (str first-name " " last-name))))
+            (dom/div {:class "user-profile-name-title data-title"} "FIRST NAME")
+            (dom/input {:class "user-profile-name"
+                        :value (or (get-in data [:jwt :first-name]) "")})
+            (dom/div {:class "user-profile-name-title data-title"} "LAST NAME")
+            (dom/input {:class "user-profile-name"
+                        :value (or (get-in data [:jwt :last-name]) "")})
             (dom/div {:class "edit-user-profile-email-title data-title"} "EMAIL")
-            (dom/div {:class "edit-user-profile-email"} (get-in data [:jwt :email])))
+            (dom/input {:class "user-profile-email"
+                        :value (or (get-in data [:jwt :email]) "")}))
           (dom/div {:class "right-column"}
-            (when (get-in data [:jwt :avatar])
-              (dom/div {:class "edit-user-profile-avatar-title data-title"} "AVATAR"))
-            (when (get-in data [:jwt :avatar])
-              (dom/img {:class "edit-user-profile-avatar" :src (get-in data [:jwt :avatar])})))))
+            (let [avatar (get-in data [:jwt :avatar])]
+              (when avatar
+                (dom/div {:class "edit-user-profile-avatar-title data-title"} "AVATAR"))
+              (when avatar
+                (dom/img {:class "edit-user-profile-avatar" :src avatar}))))))
       (let [columns-num (responsive/columns-num)
             card-width (responsive/calc-card-width)]
         (om/build footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num)))))))
