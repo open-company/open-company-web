@@ -386,7 +386,7 @@
 (defmethod dispatcher/action :login-with-slack
   [db [_]]
   (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:slack (:auth-settings @dispatcher/app-state))) "authenticate")]
+        auth-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "authenticate" "GET" {:auth-source "slack"})]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
