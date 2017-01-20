@@ -89,7 +89,7 @@
               section-name (name section-kw)
               body-el      (sel1 [(str "div#foce-body-" section-name)])]
     ; Attach paste listener to the body and all its children
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder (om/get-state owner :body-editor) body-el) #(utils/to-end-of-content-editable body-el)))
+    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder (om/get-state owner :body-editor) body-el) #(body-on-change owner)))
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:foce-input {:body emojied-body}]))
     (om/update-state! owner #(merge % {:char-count nil
@@ -108,7 +108,7 @@
                   (fn [event editable]
                     (body-on-change owner)))
       (om/set-state! owner :body-editor body-editor)
-      (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder body-editor body-el) #(utils/to-end-of-content-editable body-el))))
+      (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder body-editor body-el) #(body-on-change owner))))
     (events/listen headline-el EventType/INPUT #(headline-on-change owner))
     (js/emojiAutocomplete)))
 
@@ -273,9 +273,11 @@
     (let [topic      (dis/foce-section-key)
           topic-data (dis/foce-section-data)
           body       (:body topic-data)
-          has-data?  (not-empty (:data topic-data))]
+          has-data?  (not-empty (:data topic-data))
+          body-placeholder (:body-placeholder topic-data)
+          fixed-body-placeholder (str (string/lower-case (first body-placeholder)) (subs body-placeholder 1))]
       {:initial-headline (utils/emojify (:headline topic-data))
-       :body-placeholder (if (:new topic-data) (:body-placeholder topic-data) (utils/new-section-body-placeholder))
+       :body-placeholder (if (:new topic-data) (str "What would you like to say? For example, " fixed-body-placeholder) (utils/new-section-body-placeholder))
        :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
        :char-count nil
        :char-count-alert false
@@ -392,13 +394,13 @@
                                         :accent-color "white"}))))
           ;; Topic title
           (dom/input {:class "topic-title"
-                      :value (:title topic-data)
+                      :value (or (:title topic-data) "")
                       :max-length title-max-length
                       :placeholder (:name topic-data)
                       :type "text"
                       :on-blur #(om/set-state! owner :char-count nil)
                       :on-change (fn [e]
-                                    (let [v (.. e -target -value)
+                                    (let [v (or (.. e -target -value) "")
                                           remaining-chars (- title-max-length (count v))]
                                       (dis/dispatch! [:foce-input {:title v}])
                                       (om/update-state! owner #(merge % {:has-changes true
@@ -518,9 +520,9 @@
               (dom/input {:type "text"
                           :class "upload-remote-url-field"
                           :style {:width (str (- card-width 122 50) "px")}
-                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
+                          :on-change #(om/set-state! owner :upload-remote-url (or (-> % .-target .-value) ""))
                           :placeholder "http://site.com/img.png"
-                          :value upload-remote-url})
+                          :value (or upload-remote-url "")})
               (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
                            :class "btn-reset btn-solid"
                            :disabled (string/blank? upload-remote-url)

@@ -24,7 +24,7 @@
   (testing "Company Settings component"
     (let [c (tu/new-container!)]
       (ru/drv-root {:state test-atom
-                    :drv-spec (dis/drv-spec test-atom)
+                    :drv-spec (dis/drv-spec test-atom (atom {}))
                     :target c
                     :component cs/company-settings})
       (is (not (nil? (sel1 c [:div.settings-container]))))

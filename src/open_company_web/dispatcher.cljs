@@ -136,3 +136,5 @@
 
 (defn foce-section-data-editing? []
   (:foce-data-editing? @app-state))
+
+(set! (.-OCDispatcherPrintAppState js/window) print-app-state)

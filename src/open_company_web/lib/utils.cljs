@@ -33,11 +33,6 @@
 
 (def oc-animation-duration 300)
 
-(defn sort-by-key-pred [k & invert]
-  (if-not (first invert)
-    (fn [a b] (compare (k a) (k b)))
-    (fn [a b] (compare (k b) (k a)))))
-
 (defn display [show]
   (if show
     #js {}
@@ -138,7 +133,7 @@
   [finances-data]
   (if (empty? finances-data)
     finances-data
-    (let [sort-pred (sort-by-key-pred :period)
+    (let [sort-pred (fn [a b] (compare (:period a) (:period b)))
           sorted-data (vec (sort sort-pred finances-data))]
       (vec (map
               (fn [data]
@@ -257,7 +252,7 @@
 (defn fix-finances [section-body]
   (let [finances-data (if (contains? section-body :data) (:data section-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
-        sort-pred (sort-by-key-pred :period true)
+        sort-pred (fn [a b] (compare (:period b) (:period a)))
         sorted-finances (sort sort-pred fixed-finances)
         fixed-section (assoc section-body :data sorted-finances)]
     fixed-section))
@@ -265,16 +260,10 @@
 (defn fix-section 
   "Add `:section` name and `:as-of` keys to the section map"
   [section-body section-name & [read-only force-write]]
-  (let [with-created-at (if (contains? section-body :created-at)
-                          section-body
-                          (assoc section-body :created-at (as-of-now)))
-        with-updated-at (if (contains? with-created-at :updated-at)
-                          with-created-at
-                          (assoc with-created-at :updated-at (as-of-now)))
-        with-keys       (-> with-updated-at
-                          (assoc :section (name section-name))
-                          (assoc :as-of (:created-at section-body))
-                          (assoc :read-only (readonly? (:links section-body))))]
+  (let [with-keys (-> section-body
+                      (assoc :section (name section-name))
+                      (assoc :as-of (:created-at section-body))
+                      (assoc :read-only (readonly? (:links section-body))))]
     (if (= section-name :finances)
       (fix-finances with-keys)
       with-keys)))
@@ -291,7 +280,7 @@
     with-fixed-sections))
 
 (defn sort-revisions [revisions]
-  (let [sort-pred (sort-by-key-pred :created-at true)]
+  (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
     (vec (sort sort-pred revisions))))
 
 (defn revision-next
@@ -745,9 +734,9 @@
   "Remove the last p tag if it's empty."
   [body-el]
   (when-not (is-test-env?)
-    (while (and (= (count (clojure.string/trim (.text (.last (.find (js/$ body-el) ">p"))))) 0)
-                (= (.-length (.find (js/$ body-el) ">p img")) 0)
-                (pos? (.-length (.find (js/$ body-el) ">p"))))
+    (while (and (pos? (.-length (.find (js/$ body-el) ">p:last-child")))
+                (= (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))) 0)
+                (= (.-length (.find (js/$ body-el) ">p:last-child img")) 0))
       (.remove (js/$ ">p:last-child" (js/$ body-el))))))
 
 (defn data-topic-has-data [section section-data]
@@ -799,3 +788,8 @@
 
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
 (def before-removing-revision-message "Are you sure you want to delete this entry?")
+
+(defn sum-revenues [finances-data]
+  (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
+        filtered-revenues (filter number? cleaned-revenues)]
+    (apply + filtered-revenues)))

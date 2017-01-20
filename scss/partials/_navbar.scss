@@ -103,6 +103,12 @@ nav.oc-navbar {
     }
   }
 
+  &.small-navbar {
+    div.oc-navbar-header {
+      margin-top: 10px;
+    }
+  }
+
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;

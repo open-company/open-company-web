@@ -110,23 +110,43 @@
     success
     ;; add section name inside each section
     (let [updated-body (utils/fix-sections body)
-          with-company-data (assoc-in db (dispatcher/company-data-key (:slug updated-body)) updated-body)
+          company-data-key (dispatcher/company-data-key (:slug updated-body))
+          company-sections-key (conj company-data-key :sections)
+          section-revisions-data-key (when (:selected-topic-view db) (concat company-data-key [(keyword (:selected-topic-view db)) :revisions-data]))
+          company-editing-section-key (when (:foce-key db) (conj company-data-key (keyword (:foce-key db))))
+          company-already-loaded-key (conj company-data-key :company-data-loaded)
+          already-loaded? (get-in db company-already-loaded-key)
+          with-company-data (assoc-in db company-data-key updated-body)
           with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
-                                       (zero? (count (:sections updated-body))))
-                               (assoc with-company-data :show-add-topic true)
-                               with-company-data)
-          with-welcome-screen (if (and (not (responsive/is-tablet-or-mobile?))
                                        (zero? (count (:sections updated-body)))
-                                       (zero? (count (:archived updated-body))))
+                                       (not already-loaded?))
+                                (assoc with-company-data :show-add-topic true)
+                                with-company-data)
+          with-welcome-screen (if (and (not (responsive/is-tablet-or-mobile?))
+                                       (not (:foce-key db))
+                                       (zero? (count (:sections updated-body)))
+                                       (zero? (count (:archived updated-body)))
+                                       (not already-loaded?))
                                 (assoc with-open-add-topic :show-welcome-screen true)
-                                with-open-add-topic)]
+                                with-open-add-topic)
+          keep-sections-edits (if (not (nil? (:foce-key db)))
+                                (assoc-in with-welcome-screen company-sections-key (get-in db company-sections-key))
+                                with-welcome-screen)
+          keep-editing-section (if (and (not (nil? (:foce-key db)))
+                                        (get-in db company-editing-section-key))
+                                  (assoc-in keep-sections-edits company-editing-section-key (get-in db company-editing-section-key))
+                                  keep-sections-edits)
+          keeping-revisions (if (:selected-topic-view db)
+                              (assoc-in keep-editing-section section-revisions-data-key (get-in db section-revisions-data-key))
+                              keep-editing-section)
+          with-already-loaded (assoc-in keeping-revisions company-already-loaded-key true)]
       ; async preload the SU list
       (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
               (pos? (count (:sections updated-body)))
               (:force-remove-loading with-company-data))
-          (dissoc with-welcome-screen :loading :force-remove-loading)
-          with-welcome-screen))
+          (dissoc with-already-loaded :loading :force-remove-loading)
+          with-already-loaded))
     (or (= 403 status)
         (= 401 status))
     (-> db
@@ -249,6 +269,7 @@
       (dissoc :foce-key)
       (dissoc :foce-data)
       (dissoc :foce-data-editing?)
+      (assoc :show-add-topic (zero? (count new-sections)))
       (assoc-in (conj company-key :sections) new-sections)
       (assoc-in (conj company-key :archived) new-archived))))
 
@@ -539,7 +560,7 @@
 
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [slug topic revisions]}]]
-  (let [sort-pred (utils/sort-by-key-pred :created-at true)]
+  (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
     (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
 
 ((defmethod dispatcher/action :show-add-topic

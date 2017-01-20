@@ -70,8 +70,7 @@
   (render-state [_ {:keys [topics]}]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
-        (when (or (not= (count (:sections company-data)) 0)
-                   (not= (count (:archived company-data)) 0))
+        (when (not= (count (:sections company-data)) 0)
           (dom/h3 {:class "left-topics-list-top-title"
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])

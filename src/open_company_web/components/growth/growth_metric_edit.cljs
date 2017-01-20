@@ -132,16 +132,16 @@
           (dom/label {:class "small-caps col-3 mt1 left"
                       :style {:padding-top "3px"}} "CHART LABEL")
           (dom/input {:class "npt col-9 p1 mb2"
-            :type "text"
-            :value metric-name
-            :max-length 10
-            :on-change (fn [e]
-                        (let [v (.. e -target -value)
-                              on-change-cb (om/get-props owner :metadata-on-change-cb)]
-                          (om/set-state! owner :metric-name v)
-                          (on-change-cb :name v)))
-            :id "mtr-name"
-            :placeholder "Short label e.g. DAU"}))
+                      :type "text"
+                      :value (or metric-name "")
+                      :max-length 10
+                      :on-change (fn [e]
+                                  (let [v (.. e -target -value)
+                                        on-change-cb (om/get-props owner :metadata-on-change-cb)]
+                                    (om/set-state! owner :metric-name v)
+                                    (on-change-cb :name v)))
+                      :id "mtr-name"
+                      :placeholder "Short label e.g. DAU"}))
 
         ;; description
         (dom/div {:class "group" :style {:white-space "nowrap" :text-align "left"}}
@@ -149,7 +149,7 @@
                       :style {:padding-top "3px"}} "DESCRIPTION")
           (dom/input {:class "npt col-9 p1 mb2"
                       :type "text"
-                      :value description
+                      :value (or description "")
                       :placeholder "Description - e.g. Daily Active Users"
                       :on-change (fn [e]
                                     (let [v (.. e -target -value)

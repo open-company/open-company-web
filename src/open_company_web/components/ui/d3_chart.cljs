@@ -31,7 +31,7 @@
         chart-keys (:chart-keys options)
         data-min (min-y all-data chart-keys)
         data-max (max-y all-data chart-keys)
-        linear-fn (.. js/d3 -scale linear)
+        linear-fn (.scaleLinear js/d3)
         domain-fn (.domain linear-fn #js [0 data-max])
         range-fn (.range linear-fn #js [0 (- (om/get-props owner :chart-height) 10)])]
     range-fn))

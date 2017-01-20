@@ -54,3 +54,5 @@ var replaceSelectedText = function(){};
 var AutoList = function(){};
 // Tooltip http://darsa.in/tooltip/
 var Tooltip = function(){};
+// Print app state
+var OCDispatcherPrintAppState = function(){};

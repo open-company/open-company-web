@@ -74,6 +74,7 @@
                                       is-stakeholder-update
                                       is-mobile?
                                       is-dashboard
+                                      dashboard-sharing
                                       is-topic-view
                                       foce-active
                                       topic-click
@@ -190,6 +191,7 @@
           (when (and show-editing
                      (not is-stakeholder-update)
                      is-dashboard
+                     (not dashboard-sharing)
                      (not is-mobile?)
                      (not is-topic-view)
                      (responsive/can-edit?)
@@ -331,10 +333,11 @@
                                          (nil? (:show-top-menu data)))
                                (if (:dashboard-sharing data)
                                  (dis/dispatch! [:dashboard-select-topic section-kw])
-                                 (when (or (responsive/is-mobile-size?)
-                                           (not read-only-company)
-                                           (> (count (:revisions section-data)) 1)
-                                           (html-text-exceeds-limit (:body section-data) utils/topic-body-limit))
+                                 (when (and (nil? (:foce-key data))
+                                            (or (responsive/is-mobile-size?)
+                                                (not read-only-company)
+                                                (> (count (:revisions section-data)) 1)
+                                                (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)))
                                   (router/nav! (oc-urls/company-section slug section-kw)))))
                     :style topic-style
                     :ref "topic"
@@ -366,6 +369,7 @@
                                     :foce-active foce-active
                                     :is-mobile? is-mobile?
                                     :is-dashboard is-dashboard
+                                    :dashboard-sharing (:dashboard-sharing data)
                                     :is-topic-view is-topic-view
                                     :show-editing show-editing
                                     :column column

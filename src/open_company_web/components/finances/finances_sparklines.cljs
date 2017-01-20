@@ -85,7 +85,7 @@
 (defn get-fixed-sorted-metric [finances-data currency]
   (let [currency-symbol (utils/get-symbol-for-currency-code currency)
         filled-finances-data (vals (finance-utils/fill-gap-months finances-data))
-        sort-pred (utils/sort-by-key-pred :period)
+        sort-pred (fn [a b] (compare (:period a) (:period b)))
         sorted-data (vec (sort sort-pred filled-finances-data))]
     (vec (map #(merge % {:label (label-from-set % currency-symbol)
                          :sub-label (sub-label-from-set (:period %) sorted-data currency-symbol)}) sorted-data))))
@@ -104,7 +104,7 @@
   (render-state [_ {:keys [chart-selected-idx fixed-sorted-metric]}]
     (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
       (dom/div {:class "finances-sparklines-inner left group"}
-        (let [sum-revenues (apply + (filter #(and (not (nil? %)) (not (= % ""))) (map (comp :revenue utils/abs) finances-data)))
+        (let [sum-revenues (utils/sum-revenues finances-data)
               post-revenue? (pos? sum-revenues)
               filled-metric-data (finance-utils/fill-gap-months finances-data)
               actual-set (first finances-data)
