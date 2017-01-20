@@ -18,10 +18,8 @@
                   first-name (get-in data [:jwt :first-name])
                   last-name (get-in data [:jwt :last-name])]
               (dom/div {:class "user-profile-name"} (or real-name (str first-name " " last-name))))
-            (when (= (get-in data [:jwt :auth-source]) "slack")
-              (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION"))
-            (when (= (get-in data [:jwt :auth-source]) "slack")
-              (dom/div {:class "user-profile-org"} (get-in data [:jwt :org-name])))
+            (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION")
+            (dom/div {:class "user-profile-org"} (get-in data [:jwt :org-name]))
             (dom/div {:class "user-profile-email-title data-title"} "EMAIL")
             (dom/div {:class "user-profile-email"} (get-in data [:jwt :email])))
           (dom/div {:class "right-column"}
@@ -29,9 +27,11 @@
               (dom/div {:class "user-profile-avatar-title data-title"} "AVATAR"))
             (when (get-in data [:jwt :avatar])
               (dom/img {:class "user-profile-avatar" :src (get-in data [:jwt :avatar])}))))
-        (when (= (get-in data [:jwt :auth-source]) "slack")
-          (dom/div {:class "user-profile-disclaimer"}
-            "User information is from your Slack account.")))
+        (dom/div {:class "user-profile-disclaimer"}
+          "User information is from your Slack account."
+          (dom/div {:class "right"}
+            (dom/button {:class "btn-reset btn-outline"
+                         :on-click #(dis/dispatch! [:login-with-slack])} "Refresh"))))
       (let [columns-num (responsive/columns-num)
             card-width (responsive/calc-card-width)]
         (om/build footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num)))))))
