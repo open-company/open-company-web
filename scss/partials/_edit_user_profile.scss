@@ -1,0 +1,105 @@
+div.edit-user-profile {
+
+  div.edit-user-profile-internal {
+    position: relative;
+    padding: 2rem;
+
+    @include big_web(){
+      width: 580px;
+    }
+    /* 29px is the height below the user info */
+    min-height: calc(100vh - 114px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
+
+    @include mobile(){
+      /* 9px on mobile */
+      padding: 20px 20px 20px 20px;
+      min-height: calc(100vh - 9px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
+    }
+
+    div.edit-user-profile-title {
+      height: 74px;
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: $oc_gray_5;
+    }
+
+    div.edit-user-profile-disclaimer {
+      @include big_web(){
+        width: 580px;
+      }
+      height: 64px;
+      font-size: 18px;
+      line-height: 1.8;
+      color: $oc_gray_5;
+      margin-top: 32px;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    div.edit-user-profile-content {
+      padding: 28px;
+      background-color: rgba(78, 90, 107, 0.05);
+      margin-bottom: 20px;
+
+      .data-title {
+        font-family: $oc_headers_font;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: $oc_gray_5;
+      }
+
+      div.left-column{
+        @include big_web(){
+          width: 70%;
+          float: left;
+        }
+
+        div.edit-user-profile-name {
+          margin-top: 6px;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+        }
+
+        div.edit-user-profile-org-title {
+          margin-top: 25px;
+        }
+
+        div.edit-user-profile-org {
+          margin-top: 6px;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+        }
+
+        div.edit-user-profile-email-title {
+          margin-top: 25px;
+        }
+
+        div.edit-user-profile-email {
+          margin-top: 6px;
+          font-size: 18px;
+          line-height: 1.8;
+          color: $oc_gray_5;
+        }
+      }
+
+      div.right-column {
+        @include big_web(){
+          float: left;
+          width: 30%;
+          padding-left: 25px;
+        }
+
+        img.edit-user-profile-avatar {
+          margin-top: 11px;
+          max-width: 100px;
+          max-height: 100px;
+        }
+      }
+    }
+  }
+}
