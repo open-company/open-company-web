@@ -424,8 +424,8 @@
 
 (defn auth-with-email [email pswd]
   (when (and email pswd)
-    (let [email-links (:links (:email (:auth-settings @dispatcher/app-state)))
-          auth-url (utils/link-for email-links "authenticate" "GET")]
+    (let [email-links (:links (:auth-settings @dispatcher/app-state))
+          auth-url (utils/link-for email-links "authenticate" "GET" {:auth-source "email"})]
       (auth-get (:href auth-url)
         {:basic-auth {
           :username email
@@ -446,8 +446,8 @@
 
 (defn signup-with-email [first-name last-name email pswd]
   (when (and first-name last-name email pswd)
-    (let [email-links (:links (:email (:auth-settings @dispatcher/app-state)))
-          auth-url (utils/link-for email-links "create" "POST")]
+    (let [email-links (:links (:auth-settings @dispatcher/app-state))
+          auth-url (utils/link-for email-links "create" "POST" {:auth-source "email"})]
       (auth-post (:href auth-url)
         {:json-params {:first-name first-name
                        :last-name last-name
@@ -531,7 +531,7 @@
           (dispatcher/dispatch! [:user-invitation-action/complete]))))))
 
 (defn confirm-invitation [token]
-  (let [auth-link (utils/link-for (:links (:email (:auth-settings @dispatcher/app-state))) "authenticate")]
+  (let [auth-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "authenticate" "GET" {:auth-source "email"})]
     (when (and token auth-link)
       (auth-get (:href auth-link)
         {:headers {
