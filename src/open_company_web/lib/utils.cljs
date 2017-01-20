@@ -236,8 +236,16 @@
   (vec (map keyword (:sections company-data))))
 
 (defn link-for
-  ([links rel] (some #(when (= (:rel %) rel) %) links))
-  ([links rel method] (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links)))
+  ([links rel]
+   (some #(when (= (:rel %) rel) %) links))
+  ([links rel method]
+   (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links))
+  ([links rel method params]
+   (some (fn [link]
+          (when (and (= (:method link) method)
+                        (= (:rel link) rel)
+                        (every? #(= (% params) (% link)) (keys params)))
+            link)) links)))
 
 (defn readonly? [links]
   (let [update (link-for links "update" "PUT")
