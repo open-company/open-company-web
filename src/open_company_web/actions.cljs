@@ -639,3 +639,28 @@
 (defmethod dispatcher/action :hide-welcome-screen
   [db [_]]
   (dissoc db :show-welcome-screen))
+
+(defmethod dispatcher/action :reset-user-profile
+  [db [_]]
+  (assoc db :edit-user-profile (assoc (:current-user-data db) :password "")))
+
+(defmethod dispatcher/action :get-current-user
+  [db [_]]
+  (if (:auth-settings db)
+    (api/get-current-user (:auth-settings db))
+    (utils/after 1000 #(dispatcher/dispatch! [:get-current-user])))
+  db)
+
+(defmethod dispatcher/action :user-data
+  [db [_ user-data]]
+  (-> db
+      (assoc :current-user-data user-data)
+      (assoc :edit-user-profile user-data)))
+
+(defmethod dispatcher/action :save-user-profile
+  [db [_ password-changed]]
+  (let [data-to-save (if password-changed
+                        (dissoc (:edit-user-profile db) :password)
+                        (:edit-user-profile db))]
+    (api/patch-user-profile (:current-user-data db) data-to-save))
+  db)
