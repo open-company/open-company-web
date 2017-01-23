@@ -49,12 +49,15 @@
         (and first (not second))        (router/nav! (oc-urls/company (slug first)))
         ; if the user has more than one company send him to the companies page
         (and first second)              (router/nav! oc-urls/companies)))
-    (if (utils/in? (:route @router/path) "create-company")
-      (dissoc db :loading)
-      db)))
+    (assoc
+      (if (utils/in? (:route @router/path) "create-company")
+        (dissoc db :loading)
+        db)
+      :api-entry-point
+      links)))
 
 (defmethod dispatcher/action :company-submit [db _]
-  (api/post-company (:company-editor db))
+  (api/create-company (:company-editor db))
   db)
 
 (defmethod dispatcher/action :company-created [db [_ body]]
