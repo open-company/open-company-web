@@ -227,6 +227,7 @@
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-company"] {:query-params (:query-params params)})
+          (api/get-entry-point)
           (drv-root company-editor target))
         (login-handler target params)))
 
