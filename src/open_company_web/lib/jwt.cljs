@@ -21,4 +21,4 @@
     (= expire (gd/min (js/Date.) expire))))
 
 (defn is-slack-org? []
-  (.startsWith (str (get-key :org-id)) "slack-"))
+  (= (get-key :source) "slack"))
