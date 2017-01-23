@@ -23,10 +23,10 @@
 (rum/defcs user-avatar-image < rum/static
                                rum/reactive
                                (drv/drv :jwt)
-  [s]
-  (if-let [has-avatar (not (clojure.string/blank? (:avatar (drv/react s :jwt))))]
+  [s avatar-url]
+  (if-not (clojure.string/blank? avatar-url)
     [:img.user-avatar-img
-      {:src (:avatar (drv/react s :jwt))
+      {:src avatar-url
        :title (:real-name (drv/react s :jwt))}]
     (avatar-with-initials)))
 
@@ -43,5 +43,5 @@
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image)
+      (user-avatar-image (:avatar (drv/react s :jwt)))
       [:img {:src "/img/vert-ellipsis.svg" :width 5 :height 24}]]))
