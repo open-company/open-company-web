@@ -18,7 +18,6 @@
             [open-company-web.components.growth.topic-growth :refer (topic-growth)]
             [open-company-web.components.finances.topic-finances :refer (topic-finances)]
             [open-company-web.components.ui.icon :as i]
-            [open-company-web.components.ui.filestack-uploader :refer (filestack-uploader)]
             [open-company-web.components.ui.emoji-picker :refer (emoji-picker)]
             [open-company-web.components.ui.popover :refer (add-popover hide-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
