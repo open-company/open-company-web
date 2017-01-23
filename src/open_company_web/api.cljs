@@ -161,7 +161,6 @@
           create-company-link (utils/link-for links "company-create" "POST")
           data-with-org-id (assoc data :org-id (first (j/get-key :teams)))
           post-data (cljs->json data-with-org-id)]
-      (js/console.log "data:" data "with org-id" data-with-org-id "post-data" post-data)
       (api-post (:href create-company-link)
         {:json-params post-data}
         #(dispatch-body :company-created %)))))
@@ -589,3 +588,29 @@
             ; custom content type
             "content-type" (:type delete-link)}}
           (fn [_]))))))
+
+(defn get-current-user [auth-links]
+  (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
+    (auth-get (:href user-link)
+      {:headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type user-link)}}
+      (fn [{:keys [status body success]}]
+        (dispatcher/dispatch! [:user-data (json->cljs body)])))))
+
+(defn patch-user-profile [old-user-data new-user-data]
+  (when (and (:links old-user-data)
+             (map? new-user-data))
+    (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")]
+      (auth-patch (:href user-update-link)
+        {:headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type user-update-link)}
+         :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
+         (fn [{:keys [status body success]}]
+           (when success
+              (dispatcher/dispatch! [:user-data (json->cljs body)])))))))
