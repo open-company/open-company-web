@@ -16,27 +16,6 @@ div.edit-user-profile {
       min-height: calc(100vh - 9px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
     }
 
-    div.edit-user-profile-title {
-      height: 74px;
-      font-size: 26px;
-      font-weight: 400;
-      line-height: 1.4;
-      color: $oc_gray_5;
-    }
-
-    div.edit-user-profile-disclaimer {
-      @include big_web(){
-        width: 580px;
-      }
-      height: 64px;
-      font-size: 18px;
-      line-height: 1.8;
-      color: $oc_gray_5;
-      margin-top: 32px;
-      margin-bottom: 20px;
-      font-weight: 400;
-    }
-
     div.edit-user-profile-content {
       padding: 28px;
       background-color: rgba(78, 90, 107, 0.05);
@@ -51,39 +30,28 @@ div.edit-user-profile {
         color: $oc_gray_5;
       }
 
+      div.edit-user-profile-title {
+        font-size: 16px;
+        font-weight: 400;
+        color: $oc_gray_5;
+        margin-top: 25px;
+
+        &:first-child {
+          margin-top: 0px;
+        }
+      }
+
+      input.edit-user-profile {
+        margin-top: 6px;
+        font-size: 16px;
+        line-height: 1.8;
+        color: $oc_gray_5;
+      }
+
       div.left-column{
         @include big_web(){
           width: 70%;
           float: left;
-        }
-
-        div.edit-user-profile-name {
-          margin-top: 6px;
-          font-size: 18px;
-          line-height: 1.8;
-          color: $oc_gray_5;
-        }
-
-        div.edit-user-profile-org-title {
-          margin-top: 25px;
-        }
-
-        div.edit-user-profile-org {
-          margin-top: 6px;
-          font-size: 18px;
-          line-height: 1.8;
-          color: $oc_gray_5;
-        }
-
-        div.edit-user-profile-email-title {
-          margin-top: 25px;
-        }
-
-        div.edit-user-profile-email {
-          margin-top: 6px;
-          font-size: 18px;
-          line-height: 1.8;
-          color: $oc_gray_5;
         }
       }
 
@@ -94,7 +62,7 @@ div.edit-user-profile {
           padding-left: 25px;
         }
 
-        img.edit-user-profile-avatar {
+        img.user-avatar-img {
           margin-top: 11px;
           max-width: 100px;
           max-height: 100px;
