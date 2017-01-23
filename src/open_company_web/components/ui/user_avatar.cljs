@@ -1,34 +1,47 @@
 (ns open-company-web.components.ui.user-avatar
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
+            [org.martinklepsch.derivatives :as drv]
             [open-company-web.lib.jwt :as jwt]
             [open-company-web.dispatcher :as dis]
             [open-company-web.components.ui.icon :as i]
             [open-company-web.lib.responsive :as responsive]))
 
-(rum/defc user-avatar < rum/static
-                        rum/reactive
-  [{:keys [classes click-cb]}]
-  (let [has-avatar (not (clojure.string/blank? (get-in (rum/react dis/app-state) [:jwt :avatar])))
-        not-mobile? (not (responsive/is-mobile-size?))]
+(rum/defcs avatar-with-initials < rum/static
+                                 rum/reactive
+                                 (drv/drv :jwt)
+  [s]
+  [:div.user-avatar-name
+    (when (or (:first-name (drv/react s :jwt))
+              (:last-name (drv/react s :jwt)))
+      (let [first-name-initial (or (first (:first-name (drv/react s :jwt))) "")
+            last-name-initial (or (first (:last-name (drv/react s :jwt))) "")
+            avatar-name (clojure.string/upper-case (str first-name-initial
+                                                        last-name-initial))]
+        [:span.user-avatar-name-span avatar-name]))])
+
+(rum/defcs user-avatar-image < rum/static
+                               rum/reactive
+                               (drv/drv :jwt)
+  [s]
+  (if-let [has-avatar true]; (not (clojure.string/blank? (:avatar (drv/react s :jwt))))]
+    [:img.user-avatar-img
+      {:src "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0022-192.png" ;(:avatar (drv/react s :jwt))
+       :title (:real-name (drv/react s :jwt))}]
+    (avatar-with-initials)))
+
+(rum/defcs user-avatar < rum/static
+                         rum/reactive
+                         (drv/drv :jwt)
+  [s {:keys [classes click-cb]}]
+  (let [not-mobile? (not (responsive/is-mobile-size?))]
     [:button.user-avatar-button.group
       {:type "button"
-       :class (str classes (when-not has-avatar " no-image"))
+       :class (str classes (when (clojure.string/blank? (:avatar (drv/react s :jwt))) " no-image"))
        :id "dropdown-toggle-menu"
        :data-toggle (when not-mobile? "dropdown")
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (if-not has-avatar
-        [:div.user-avatar-name
-          (when (or (get-in (rum/react dis/app-state) [:jwt :first-name])
-                    (get-in (rum/react dis/app-state) [:jwt :last-name]))
-            (let [first-name-initial (or (first (get-in (rum/react dis/app-state) [:jwt :first-name])) "")
-                  last-name-initial (or (first (get-in (rum/react dis/app-state) [:jwt :last-name])) "")
-                  avatar-name (clojure.string/upper-case (str first-name-initial
-                                                              last-name-initial))]
-              [:span.user-avatar-name-span avatar-name]))]
-        [:img.user-avatar-img
-          {:src (jwt/get-key :avatar)
-           :title (get-in (rum/react dis/app-state) [:jwt :real-name])}])
+      (user-avatar-image)
       [:img {:src "/img/vert-ellipsis.svg" :width 5 :height 24}]]))
