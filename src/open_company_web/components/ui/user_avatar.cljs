@@ -24,9 +24,9 @@
                                rum/reactive
                                (drv/drv :jwt)
   [s]
-  (if-let [has-avatar true]; (not (clojure.string/blank? (:avatar (drv/react s :jwt))))]
+  (if-let [has-avatar (not (clojure.string/blank? (:avatar (drv/react s :jwt))))]
     [:img.user-avatar-img
-      {:src "https://secure.gravatar.com/avatar/98b5456ea1c562024f41501ffd7bc3c6.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2F7fa9%2Fimg%2Favatars%2Fava_0022-192.png" ;(:avatar (drv/react s :jwt))
+      {:src (:avatar (drv/react s :jwt))
        :title (:real-name (drv/react s :jwt))}]
     (avatar-with-initials)))
 
