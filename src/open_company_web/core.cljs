@@ -261,7 +261,7 @@
         (router/redirect! urls/home))
       (utils/clean-company-caches)
       (pre-routing (:query-params params))
-      (if (= (jwt/get-key :auth-source) "slack")
+      (if (jwt/is-slack-org?)
         (drv-root user-profile target)
         (drv-root edit-user-profile target)))
 
