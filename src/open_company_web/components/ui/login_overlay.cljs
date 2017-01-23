@@ -169,7 +169,7 @@
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
-                               (nil? (-> dis/app-state rum/react :auth-settings :email)))
+                               (nil? (utils/link-for (:links (:auth-settings (rum/react dis/app-state))) "authenticate" "GET" {:auth-source "email"})))
                  :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
