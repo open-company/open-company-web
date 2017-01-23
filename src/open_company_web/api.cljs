@@ -155,8 +155,16 @@
                                                 :status status
                                                 :body (when success (json->cljs body))}])))))
 
-(defn post-company [data]
-  (api-post "/companies" {:json-params data} #(dispatch-body :company-created %)))
+(defn create-company [data]
+  (when data
+    (let [links (:api-entry-point @dispatcher/app-state)
+          create-company-link (utils/link-for links "company-create" "POST")
+          data-with-org-id (assoc data :org-id (first (j/get-key :teams)))
+          post-data (cljs->json data-with-org-id)]
+      (js/console.log "data:" data "with org-id" data-with-org-id "post-data" post-data)
+      (api-post (:href create-company-link)
+        {:json-params post-data}
+        #(dispatch-body :company-created %)))))
 
 (defn patch-company [slug data]
   (when data
