@@ -471,7 +471,7 @@
             (dispatcher/dispatch! [:signup-with-email/failed status])))))))
 
 (defn enumerate-users []
-  (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "users" "GET")]
+  (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "collection" "GET")]
     (auth-get (:href enumerate-link)
       {:headers {
         ; required by Chrome
@@ -481,7 +481,20 @@
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:enumerate-users/success (-> fixed-body :collection :users)])))))))
+            (dispatcher/dispatch! [:enumerate-users/teams (-> fixed-body :collection :teams)])))))))
+
+(defn enumerate-team-users [team-id team-link]
+  (when (and team-id team-link)
+    (auth-get (:href team-link)
+      {:headers {
+        ; required by Chrome
+        "Access-Control-Allow-Headers" "Content-Type"
+        ; custom content type
+        "content-type" (:type team-link)}}
+      (fn [{:keys [success body status]}]
+        (let [fixed-body (if success (json->cljs body) {})]
+          (if success
+            (dispatcher/dispatch! [:enumerate-users/success team-id (-> fixed-body :collection :users)])))))))
 
 (defn enumerate-channels []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]
