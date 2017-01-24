@@ -65,7 +65,7 @@
                      (fn []
                        ; render the popover component
                        (ru/drv-root {:state dis/app-state
-                                     :component #(om/component (component))
+                                     :component #(om/component (component {:hide-popover-cb (fn [] (hide-popover nil container-id))}))
                                      :drv-spec (dis/drv-spec dis/app-state router/path)
                                      :target (sel1 (str "#" container-id))})
                        (.addClass body "no-scroll")
