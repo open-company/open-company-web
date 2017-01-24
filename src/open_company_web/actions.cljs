@@ -150,8 +150,7 @@
               (:force-remove-loading with-company-data))
           (dissoc with-already-loaded :loading :force-remove-loading)
           with-already-loaded))
-    (or (= 403 status)
-        (= 401 status))
+    (= 401 status)
     (-> db
         (assoc-in [(keyword slug) :error] :forbidden)
         (dissoc :loading))
