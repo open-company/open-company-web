@@ -11,6 +11,7 @@
             [open-company-web.local-settings :as ls]
             [open-company-web.lib.jwt :as j]
             [open-company-web.router :as router]
+            [open-company-web.urls :as oc-urls]
             [open-company-web.lib.utils :as utils]
             [open-company-web.lib.raven :as sentry]
             [open-company-web.caches :refer (revisions)]))
@@ -78,6 +79,10 @@
               (dispatcher/dispatch! [:logout])))))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
+        ; when a request get a 401 logout the user since his using an old token, need to repeat auth process
+        ; no token refresh
+        (when (= status 401)
+          (router/redirect! oc-urls/logout))
         ; report all 5xx to sentry
         (when (or (= status 0)
                   (and (>= status 500) (<= status 599))
@@ -509,12 +514,14 @@
           (if success
             (dispatcher/dispatch! [:enumerate-channels/success (-> fixed-body :collection :channels)])))))))
 
-(defn send-invitation [email]
+(defn send-invitation [email user-type]
   (let [company-data (dispatcher/company-data)]
     (when (and email company-data)
       (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")]
         (auth-post (:href invitation-link)
           {:json-params {:email email
+                         :admin (or (= user-type :admin)
+                                    (= user-type :author))
                          :company-name (:name company-data)
                          :logo (or (:logo company-data) "")}
            :headers {
