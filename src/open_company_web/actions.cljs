@@ -492,7 +492,8 @@
 (defmethod dispatcher/action :invite-by-email
   [db [_]]
   (let [email (:email (:um-invite db))
-        user  (first (filter #(= (:email %) email) (:enumerate-users db)))]
+        first-team (first (:teams (:jwt db)))
+        user  (first (filter #(= (:email %) email) (:users (get (:enumerate-users db) first-team))))]
     (if user
       (if (= (:status user) "pending")
         ;resend invitation since user was invited and didn't accept
