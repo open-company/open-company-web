@@ -15,7 +15,17 @@
             [open-company-web.components.ui.footer :as footer]
             [open-company-web.components.ui.login-required :refer (login-required)]
             [open-company-web.components.user-invitation :refer (user-invitation)]
-            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
+            [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
+            [open-company-web.components.team-disclaimer-popover :refer (team-disclaimer-popover)]
+            [open-company-web.components.ui.popover :as popover :refer (add-popover-with-rum-component hide-popover)]))
+
+(defn show-team-disclaimer-popover []
+  (add-popover-with-rum-component team-disclaimer-popover {:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
+                                                           :width 422
+                                                           :height 230
+                                                           :hide-on-click-out true
+                                                           :z-index-popover 0
+                                                           :container-id "team-disclaimer-popover"}))
 
 (rum/defcs user-management < rum/static
                              rum/reactive
@@ -51,19 +61,25 @@
                    :placeholder "Email address"}]
                 [:div.user-type-picker
                   (when (= user-type :viewer)
-                    [:span.user-type-disc.viewer "VIEWER " [:i.fa.fa-question-circle]])
+                    [:span.user-type-disc.viewer
+                      {:on-click #(show-team-disclaimer-popover)}
+                      "VIEWER " [:i.fa.fa-question-circle]])
                   [:button.user-type-picker-btn.btn-reset
                     {:class (if (= user-type :viewer) "active" "")
                      :on-click #(dis/dispatch! [:invite-by-email-change :user-type :viewer])}
                     [:i.fa.fa-user]]
                   (when (= user-type :author)
-                    [:span.user-type-disc.author "AUTHOR " [:i.fa.fa-question-circle]])
+                    [:span.user-type-disc.author
+                      {:on-click #(show-team-disclaimer-popover)}
+                      "AUTHOR " [:i.fa.fa-question-circle]])
                   [:button.user-type-picker-btn.btn-reset
                     {:class (if (= user-type :author) "active" "")
                      :on-click #(dis/dispatch! [:invite-by-email-change :user-type :author])}
                     [:i.fa.fa-pencil]]
                   (when (= user-type :admin)
-                    [:span.user-type-disc.admin "ADMIN " [:i.fa.fa-question-circle]])
+                    [:span.user-type-disc.admin
+                      {:on-click #(show-team-disclaimer-popover)}
+                      "ADMIN " [:i.fa.fa-question-circle]])
                   [:button.user-type-picker-btn.btn-reset
                     {:class (if (= user-type :admin) "active" "")
                      :on-click #(dis/dispatch! [:invite-by-email-change :user-type :admin])}
