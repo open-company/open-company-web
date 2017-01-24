@@ -773,7 +773,7 @@
 (defn slack-share? []
   (if-let [jwt (:jwt @dis/app-state)]
     (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
-         (not (nil? (-> jwt :bot :token)))))) ; with an installed Slack bot
+         (not (nil? (:token (first (:bots jwt)))))))) ; with an installed Slack bot
 
 (defn new-section-body-placeholder []
   "What would you like to say...")

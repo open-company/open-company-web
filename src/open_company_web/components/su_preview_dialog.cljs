@@ -264,7 +264,7 @@
                     (let [jwt (:jwt @dis/app-state)]
                       ;; Decide if we should ask for Slack channels (pro-actively so they are already loaded)
                       (when (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
-                                 (not (nil? (-> jwt :bot :token))) ; with an installed Slack bot
+                                 (not (nil? (:token (first (:bots jwt))))) ; with an installed Slack bot
                                  (:auth-settings @dis/app-state) ; know where Auth APIs are
                                  (not (:enumerate-channels-requested @dis/app-state))) ; haven't already requested
                         ;; Ask for public Slack channels
