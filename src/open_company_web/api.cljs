@@ -488,8 +488,8 @@
           (if success
             (dispatcher/dispatch! [:enumerate-users/teams (-> fixed-body :collection :teams)])))))))
 
-(defn enumerate-team-users [team-id team-link]
-  (when (and team-id team-link)
+(defn enumerate-team-users [team-link]
+  (when team-link
     (auth-get (:href team-link)
       {:headers {
         ; required by Chrome
@@ -499,7 +499,7 @@
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:enumerate-users/success team-id (-> fixed-body :collection :users)])))))))
+            (dispatcher/dispatch! [:enumerate-users/success fixed-body])))))))
 
 (defn enumerate-channels []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]
