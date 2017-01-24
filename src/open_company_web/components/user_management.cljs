@@ -31,7 +31,9 @@
                                           s)}
   [s]
   (let [{:keys [um-invite enumerate-users invite-by-email-error] :as user-man} (drv/react s :user-management)
-        ro-user-man @(drv/get-ref s :user-management)]
+        ro-user-man @(drv/get-ref s :user-management)
+        user-type (:user-type um-invite)
+        valid-email? (utils/valid-email? (:email um-invite))]
     [:div.user-management.mx-auto.p3.my4.group
       [:div
         [:div.mb3.um-invite.group
@@ -45,10 +47,30 @@
                    :autoCapitalize "none"
                    :value (:email um-invite)
                    :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-                   :on-change #(dis/dispatch! [:invite-by-email-change (.. % -target -value)])
+                   :on-change #(dis/dispatch! [:invite-by-email-change :email (.. % -target -value)])
                    :placeholder "Email address"}]
+                [:div.user-type-picker
+                  (when (= user-type :viewer)
+                    [:span.user-type-disc.viewer "VIEWER " [:i.fa.fa-question-circle]])
+                  [:button.user-type-picker-btn.btn-reset
+                    {:class (if (= user-type :viewer) "active" "")
+                     :on-click #(dis/dispatch! [:invite-by-email-change :user-type :viewer])}
+                    [:i.fa.fa-user]]
+                  (when (= user-type :author)
+                    [:span.user-type-disc.author "AUTHOR " [:i.fa.fa-question-circle]])
+                  [:button.user-type-picker-btn.btn-reset
+                    {:class (if (= user-type :author) "active" "")
+                     :on-click #(dis/dispatch! [:invite-by-email-change :user-type :author])}
+                    [:i.fa.fa-pencil]]
+                  (when (= user-type :admin)
+                    [:span.user-type-disc.admin "ADMIN " [:i.fa.fa-question-circle]])
+                  [:button.user-type-picker-btn.btn-reset
+                    {:class (if (= user-type :admin) "active" "")
+                     :on-click #(dis/dispatch! [:invite-by-email-change :user-type :admin])}
+                    [:i.fa.fa-gear]]]
                 [:button.right.btn-reset.btn-solid.um-invite-send
-                  {:disabled (not (utils/valid-email? (:email um-invite)))
+                  {:disabled (or (not valid-email?)
+                                 (not user-type))
                    :on-click #(let [email (:email (:um-invite ro-user-man))]
                                 (if (utils/valid-email? email)
                                   (dis/dispatch! [:invite-by-email email])
@@ -66,8 +88,6 @@
         [:div.um-invite.group
           [:div.um-invite-label
               "TEAM MEMBERS"]
-          [:div.um-invite-label-2
-            "The following people can view, edit and share information:"]
           (when (jwt/is-slack-org?)
             [:div.um-invite-label-2
               "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
