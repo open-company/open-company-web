@@ -55,6 +55,24 @@ div.um-invitations-box {
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 180px;
+
+            button.user-type-btn {
+              width: 80px;
+              &:after {
+                color: $oc_gray_5;
+                font-size: 13px;
+                font-family: FontAwesome;
+                content: "\f078";
+                margin-left: 5px;
+                opacity: 0;
+              }
+
+              &:hover {
+                &:after {
+                  opacity: 1;
+                }
+              }
+            }
           }
 
           button.invite-row-action {

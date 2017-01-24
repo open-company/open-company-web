@@ -9,21 +9,32 @@
   (dis/dispatch! [:user-invitation-action invitation action payload]))
 
 (rum/defc invite-row
-  [invitation show-email?]
+  [invitation]
   (let [user-links (:links invitation)]
     [:tr
+      [:td
+        [:div.value
+          [:button.btn-reset.user-type-btn
+            {:on-click #()}
+            (cond
+              (:admin invitation)
+              [:i.fa.fa-gear]
+              (not (:admin invitation))
+              [:i.fa.fa-user]
+              ;; used for author users but not yet implemented
+              :else
+              [:i.fa.fa-pencil])]]]
       [:td [:div.value
-             {:title (if (>= (count (:email invitation)) 20) (:email invitation) "")
+             {:title (if (pos? (count (:email invitation))) (:email invitation) "")
               :data-toggle "tooltip"
               :data-placement "top"
               :data-container "body"}
-             (:email invitation)]]
-      (when show-email?
-        [:td (when-not (clojure.string/blank? (:real-name invitation)) [:div.value (:real-name invitation)])])
-      [:td [:div (let [upper-status (clojure.string/upper-case (:status invitation))]
-                    (if (= upper-status "UNVERIFIED")
-                      "ACTIVE"
-                      upper-status))]]
+             (or (str (:first-name invitation) " " (:last-name invitation)) (:email invitation))]]
+      [:td [:div (when (:status invitation)
+                   (let [upper-status (clojure.string/upper-case (:status invitation))]
+                     (if (= upper-status "UNVERIFIED")
+                       "ACTIVE"
+                       upper-status)))]]
       [:td {:style {:text-align "center"}}
         (if (:loading invitation)
           ; if it's loading show the spinner
@@ -46,7 +57,7 @@
                 [:i.fa.fa-share]])
             ; if it has a delete link
             (when (utils/link-for (:links invitation) "delete")
-              (if (= (clojure.string/lower-case (:status invitation)) "pending")
+              (if (and (:status invitation) (= (clojure.string/lower-case (:status invitation))) "pending")
                 ; and it's pending show a cancel invite button
                 [:button.btn-reset.invite-row-action
                   {:data-placement "top"
@@ -69,16 +80,14 @@
                                           (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                         s)}
   [invitations]
-  (let [show-name? (some #(not (clojure.string/blank? (:real-name %))) invitations)]
-    [:div.mt3.um-invitations-box.col-12.group
-      [:table.table
-        [:thead
-          [:tr
-            [:th "EMAIL"]
-            (when show-name?
-              [:th "NAME"])
-            [:th "STATUS"]
-            [:th {:style {:text-align "center"}} "ACTIONS"]]]
-        [:tbody
-          (for [invitation (filter #(contains? % :status) invitations)]
-            (rum/with-key (invite-row invitation show-name?) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]]))
+  [:div.mt3.um-invitations-box.col-12.group
+    [:table.table
+      [:thead
+        [:tr
+          [:th "ACCESS"]
+          [:th "NAME"]
+          [:th "STATUS"]
+          [:th {:style {:text-align "center"}} "ACTIONS"]]]
+      [:tbody
+        (for [invitation invitations]
+          (rum/with-key (invite-row invitation) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]])
