@@ -70,8 +70,8 @@
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
-      (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
-        (when (and jwt (j/expired?) refresh-url)
+      (when (and jwt (j/expired?))
+        (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
           (let [res (<! (refresh-jwt (:href refresh-url)))]
             (if (:success res)
               (update-jwt-cookie! (:body res))
@@ -613,4 +613,12 @@
          :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
          (fn [{:keys [status body success]}]
            (when success
+              (utils/after 1000
+                (fn []
+                  (go
+                    (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
+                      (let [res (<! (refresh-jwt (:href refresh-url)))]
+                        (if (:success res)
+                          (update-jwt-cookie! (:body res))
+                          (dispatcher/dispatch! [:logout])))))))
               (dispatcher/dispatch! [:user-data (json->cljs body)])))))))
