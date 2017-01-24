@@ -461,13 +461,13 @@
   (let [first-team (first teams)
         team-links (:links first-team)
         team-link (utils/link-for team-links "item" "GET")]
-    (api/enumerate-team-users (:team-id first-team) team-link))
+    (api/enumerate-team-users team-link))
   (assoc-in db [:enumerate-users :teams] teams))
 
 (defmethod dispatcher/action :enumerate-users/success
-  [db [_ team-id users]]
-  (if (and team-id users)
-    (assoc-in db [:enumerate-users team-id] users)
+  [db [_ team-data]]
+  (if team-data
+    (assoc-in db [:enumerate-users (:team-id team-data)] team-data)
     db))
 
 (defmethod dispatcher/action :enumerate-channels
