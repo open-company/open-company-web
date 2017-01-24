@@ -456,11 +456,20 @@
   (api/enumerate-users)
   (assoc db :enumerate-users-requested true))
 
+(defmethod dispatcher/action :enumerate-users/teams
+  [db [_ teams]]
+  ; Load only the first team for the moment:
+  (let [first-team (first teams)
+        team-links (:links first-team)
+        team-link (utils/link-for team-links "item" "GET")]
+    (api/enumerate-team-users (:team-id first-team) team-link))
+  (assoc-in db [:enumerate-users :teams] teams))
+
 (defmethod dispatcher/action :enumerate-users/success
-  [db [_ users]]
-  (if users
-    (assoc db :enumerate-users users)
-    (dissoc db :enumerate-users)))
+  [db [_ team-id users]]
+  (if (and team-id users)
+    (assoc-in db [:enumerate-users team-id] users)
+    db))
 
 (defmethod dispatcher/action :enumerate-channels
   [db [_]]
@@ -476,9 +485,9 @@
     (dissoc db :enumerate-channels)))
 
 (defmethod dispatcher/action :invite-by-email-change
-  [db [_ email]]
+  [db [_ k v]]
   (-> db
-    (assoc-in [:um-invite :email] email)
+    (assoc-in [:um-invite k] v)
     (dissoc :invite-by-email-error)))
 
 (defmethod dispatcher/action :invite-by-email
@@ -504,7 +513,9 @@
   [db [_ email]]
   ; refresh the users list once the invitation succeded
   (api/enumerate-users)
-  (assoc-in db [:um-invite :email] ""))
+  (-> db
+      (assoc-in [:um-invite :email] "")
+      (assoc-in [:um-invite :user-type] nil)))
 
 (defmethod dispatcher/action :invite-by-email/failed
   [db [_ email]]
