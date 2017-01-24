@@ -107,8 +107,9 @@
           (when (jwt/is-slack-org?)
             [:div.um-invite-label-2
               "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
-          (when (pos? (count enumerate-users))
-            (user-invitation enumerate-users))])
+          (let [first-team (first (jwt/get-key :teams))]
+            (when (contains? enumerate-users first-team)
+              (user-invitation (:users (get enumerate-users first-team)))))])
       (comment
         [:div.my2.um-byemail-container.group
           [:div.group
