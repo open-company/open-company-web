@@ -95,17 +95,18 @@ div.user-management {
 
     input.um-invite-field {
       width: 200px;
-      height: 34px;
+      height: 36px;
       margin: 0px;
       padding: .5rem;
-      background-color: white;
-      border: 1px solid rgba(78, 90, 107, 0.1);
-      border-radius: 2px;
       font-size: 14px;
       line-height: 1.2;
       color: #4E5A6B;
       font-family: $oc_main_font;
       font-weight: 400;
+      border-radius: 3px;
+      background-color: #ffffff;
+      box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5);
+      border: solid 1px #979797;
 
       @include mobile(){
         width: 240px;
@@ -130,10 +131,10 @@ div.user-management {
 
       button.user-type-picker-btn {
         margin-right: 0.2rem;
-        opacity: 0.2;
+        opacity: 0.4;
         border: solid 1px rgba(78, 90, 107, 0.5);
         width: 40px;
-        height: 30px;
+        height: 36px;
         font-size: 14px;
 
         &.active {
@@ -173,8 +174,8 @@ div.user-management {
     }
 
     button.um-invite-send {
-      margin-top: 3px;
       float: left;
+      height: 36px;
 
       @include mobile(){
         margin-left: 0px;

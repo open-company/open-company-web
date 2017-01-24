@@ -34,6 +34,9 @@
                                                (when (and (:auth-settings @dis/app-state)
                                                           (not (:enumerate-users-requested @dis/app-state)))
                                                  (dis/dispatch! [:enumerate-users]))
+                                               (when (and (nil? (:user-type (:um-invite @(drv/get-ref s :user-management))))
+                                                          (utils/valid-email? (:email (:um-invite @(drv/get-ref s :user-management)))))
+                                                  (dis/dispatch! [:invite-by-email-change :user-type :viewer]))
                                                s)
                              :did-mount (fn [s]
                                           (when-not (utils/is-test-env?)
@@ -89,7 +92,7 @@
                                  (not user-type))
                    :on-click #(let [email (:email (:um-invite ro-user-man))]
                                 (if (utils/valid-email? email)
-                                  (dis/dispatch! [:invite-by-email email])
+                                  (dis/dispatch! [:invite-by-email])
                                   (dis/dispatch! [:input [:invite-by-email-error] true])))}
                  "SEND INVITE"]]
             (when invite-by-email-error
