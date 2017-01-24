@@ -66,7 +66,7 @@
     {:file-upload-state nil
      :upload-remote-url ""
      :file-upload-progress nil
-     :password-did-change false
+     :email-did-change false
      :has-changes false})
 
   (did-mount [_]
@@ -76,7 +76,7 @@
     (when-not (utils/is-test-env?)
       (js/filepicker.setKey ls/filestack-key)))
 
-  (render-state [_ {:keys [file-upload-progress file-upload-state upload-remote-url has-changes]}]
+  (render-state [_ {:keys [file-upload-progress file-upload-state upload-remote-url has-changes email-did-change]}]
     (let [columns-num (responsive/columns-num)
           card-width (responsive/calc-card-width)]
       (dom/div {:class "edit-user-profile fullscreen-page"}
@@ -99,15 +99,19 @@
                   (dom/div {:class "edit-user-profile-title data-title"} "PASSWORD")
                   (dom/input {:class "edit-user-profile"
                               :name "password"
-                              :on-change #(do
-                                            (change! owner :password (.. % -target -value))
-                                            (om/set-state! :password-did-change true))
+                              :min-length 5
+                              :on-change #(change! owner :password (.. % -target -value))
                               :type "password"
-                              :value (or (:password (:edit-user-profile data)) "********")})
+                              :pattern ".{4,}"
+                              :placeholder "at least 5 characters"
+                              :value (or (:password (:edit-user-profile data)) "")})
                   (dom/div {:class "edit-user-profile-title data-title"} "EMAIL")
                   (dom/input {:class "edit-user-profile"
                               :name "email"
-                              :on-change #(change! owner :email (.. % -target -value))
+                              :type "email"
+                              :on-change #(do
+                                            (change! owner :email (.. % -target -value))
+                                            (om/set-state! owner :email-did-change true))
                               :value (or (:email (:edit-user-profile data)) "")}))
                 (dom/div {:class "right-column"}
                   (dom/div {:class "edit-user-profile-title data-title"} "AVATAR")
@@ -148,6 +152,11 @@
                 (dom/button {:class "btn-reset btn-outline mr2"
                              :on-click #(reset-user-profile-data owner %)} "CANCEL")
                 (dom/button {:class "btn-reset btn-solid"
-                             :disabled (not has-changes)
+                             :disabled (or (not has-changes)
+                                           (and (pos? (count (:password (:edit-user-profile data))))
+                                                (< (count (:password (:edit-user-profile data))) 5))
+                                            (and email-did-change
+                                                 (or (not email-did-change)
+                                                     (not (utils/valid-email? (:email (:edit-user-profile data)))))))
                              :on-click #(save-user-profile-data owner %)} "SAVE")))))
         (om/build footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num)))))))

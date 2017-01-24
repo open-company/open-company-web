@@ -669,9 +669,18 @@
       (assoc :edit-user-profile user-data)))
 
 (defmethod dispatcher/action :save-user-profile
-  [db [_ password-changed]]
-  (let [data-to-save (if password-changed
-                        (dissoc (:edit-user-profile db) :password)
-                        (:edit-user-profile db))]
-    (api/patch-user-profile (:current-user-data db) data-to-save))
+  [db [_]]
+  (let [new-password (:password (:edit-user-profile db))
+        password-did-change (pos? (count new-password))
+        with-pswd (if (and password-did-change
+                           (>= (count new-password) 5))
+                    (:edit-user-profile db)
+                    (dissoc (:edit-user-profile db) :password))
+        new-email (:email (:edit-user-profile db))
+        email-did-change (not= new-email (:email (:current-user-data db)))
+        with-email (if (and email-did-change
+                            (utils/valid-email? new-email))
+                     (assoc with-pswd :email (:email (:current-user-data db)))
+                     (assoc with-pswd :email new-email))]
+    (api/patch-user-profile (:current-user-data db) with-email))
   db)
