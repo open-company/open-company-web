@@ -505,7 +505,7 @@
         ; user is already in, send error message
         (assoc db :invite-by-email-error :user-exists))
       (do ; looks like a new user, sending invitation
-        (api/send-invitation (:email (:um-invite db)))
+        (api/send-invitation (:email (:um-invite db)) (:user-type (:um-invite db)))
         (dissoc db :invite-by-email-error)))))
 
 (defmethod dispatcher/action :invite-by-email/success
