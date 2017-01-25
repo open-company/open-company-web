@@ -457,10 +457,8 @@
 
 (defmethod dispatcher/action :enumerate-users/teams
   [db [_ teams]]
-  ; Load only the first team for the moment:
-  (let [first-team (first teams)
-        team-links (:links first-team)
-        team-link (utils/link-for team-links "item" "GET")]
+  (doseq [team teams
+          :let [team-link (utils/link-for (:links team) "item" "GET")]]
     (api/enumerate-team-users team-link))
   (assoc-in db [:enumerate-users :teams] teams))
 
