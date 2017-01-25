@@ -32,9 +32,14 @@ div.um-invitations-box {
         font-size: 14px;
         font-weight: 700;
         line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        margin: 5px;
+        letter-spacing: 1.2px;
+        color: rgba(78, 90, 107, 0.5);
+      }
+
+      &:hover {
+        td {
+          background-color: #1e81c4;
+        }
       }
 
       td {

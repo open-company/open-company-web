@@ -80,7 +80,7 @@
                                           (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                         s)}
   [invitations]
-  [:div.mt3.um-invitations-box.col-12.group
+  [:div.um-invitations-box.col-12.group
     [:table.table
       [:thead
         [:tr
