@@ -81,7 +81,8 @@
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         ; when a request get a 401 logout the user since his using an old token, need to repeat auth process
         ; no token refresh
-        (when (= status 401)
+        (when (and (j/jwt)
+                   (= status 401))
           (router/redirect! oc-urls/logout))
         ; report all 5xx to sentry
         (when (or (= status 0)
