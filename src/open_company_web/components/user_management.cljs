@@ -19,7 +19,8 @@
             [open-company-web.components.team-disclaimer-popover :refer (team-disclaimer-popover)]
             [open-company-web.components.ui.popover :as popover :refer (add-popover-with-rum-component hide-popover)]))
 
-(defn show-team-disclaimer-popover []
+(defn show-team-disclaimer-popover [e]
+  (.stopPropagation e)
   (add-popover-with-rum-component team-disclaimer-popover {:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
                                                            :width 422
                                                            :height 230
@@ -27,7 +28,7 @@
                                                            :z-index-popover 0
                                                            :container-id "team-disclaimer-popover"}))
 
-(rum/defcs user-management < rum/static
+(rum/defcs user-management < (rum/local nil ::last-user-type)
                              rum/reactive
                              (drv/drv :user-management)
                              {:before-render (fn [s]
@@ -63,29 +64,40 @@
                    :on-change #(dis/dispatch! [:invite-by-email-change :email (.. % -target -value)])
                    :placeholder "Email address"}]
                 [:div.user-type-picker
-                  (when (= user-type :viewer)
-                    [:span.user-type-disc.viewer
-                      {:on-click #(show-team-disclaimer-popover)}
-                      "VIEWER " [:i.fa.fa-question-circle]])
-                  [:button.user-type-picker-btn.btn-reset
+                  {:on-mouse-out #(let [el (or (.-toElement %) (.-relatedTarget %))]
+                                    ; mouseOut event is triggerend also when the mouse enter a child so we need to
+                                    ; check that it's not entering a child of this
+                                    (when (not (utils/is-parent? (sel1 [:div.user-type-picker]) el))
+                                      ; reset the user-type to what was before the user enter this div with the mouse
+                                      (dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])))}
+                  [:button.user-type-picker-btn.btn-reset.viewer
                     {:class (if (= user-type :viewer) "active" "")
-                     :on-click #(dis/dispatch! [:invite-by-email-change :user-type :viewer])}
+                     :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :viewer])
+                     :on-click #(do (reset! (::last-user-type s) :viewer) (dis/dispatch! [:invite-by-email-change :user-type :viewer]))}
+                    (when (= user-type :viewer)
+                      [:span.user-type-disc.viewer
+                        {:on-click #(show-team-disclaimer-popover %)}
+                        "VIEWER " [:i.fa.fa-question-circle]])
                     [:i.fa.fa-user]]
-                  (when (= user-type :author)
-                    [:span.user-type-disc.author
-                      {:on-click #(show-team-disclaimer-popover)}
-                      "AUTHOR " [:i.fa.fa-question-circle]])
-                  [:button.user-type-picker-btn.btn-reset
+                  [:button.user-type-picker-btn.btn-reset.author
                     {:class (if (= user-type :author) "active" "")
-                     :on-click #(dis/dispatch! [:invite-by-email-change :user-type :author])}
+                     :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :author])
+                     ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
+                     :on-click #(do (reset! (::last-user-type s) :author) (dis/dispatch! [:invite-by-email-change :user-type :author]))}
+                    (when (= user-type :author)
+                      [:span.user-type-disc.author
+                        {:on-click #(show-team-disclaimer-popover %)}
+                        "AUTHOR " [:i.fa.fa-question-circle]])
                     [:i.fa.fa-pencil]]
-                  (when (= user-type :admin)
-                    [:span.user-type-disc.admin
-                      {:on-click #(show-team-disclaimer-popover)}
-                      "ADMIN " [:i.fa.fa-question-circle]])
-                  [:button.user-type-picker-btn.btn-reset
+                  [:button.user-type-picker-btn.btn-reset.admin
                     {:class (if (= user-type :admin) "active" "")
-                     :on-click #(dis/dispatch! [:invite-by-email-change :user-type :admin])}
+                     :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :admin])
+                     ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
+                     :on-click #(do (reset! (::last-user-type s) :admin) (dis/dispatch! [:invite-by-email-change :user-type :admin]))}
+                    (when (= user-type :admin)
+                      [:span.user-type-disc.admin
+                        {:on-click #(show-team-disclaimer-popover %)}
+                        "ADMIN " [:i.fa.fa-question-circle]])
                     [:i.fa.fa-gear]]]
                 [:button.right.btn-reset.btn-solid.um-invite-send
                   {:disabled (or (not valid-email?)

@@ -678,6 +678,14 @@
         (recur (.-parentElement element)))
       false)))
 
+(defn is-parent? [el child]
+  (loop [element child]
+    (if element
+      (if (= element el)
+        true
+        (recur (.-parentElement element)))
+      false)))
+
 (defn to-end-of-content-editable [content-editable-element]
   (if (.-createRange js/document)
     (let [rg (.createRange js/document)]
