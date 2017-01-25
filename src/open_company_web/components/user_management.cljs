@@ -41,82 +41,84 @@
                                                s)
                              :did-mount (fn [s]
                                           (when-not (utils/is-test-env?)
-                                            (dis/dispatch! [:input [:um-invite :email] ""]))
+                                            (dis/dispatch! [:input [:um-invite :email] ""])
+                                            (dis/dispatch! [:input [:um-invite :user-type] nil])
+                                            (dis/dispatch! [:input [:um-domain-invite :email] ""]))
                                           s)}
   [s]
-  (let [{:keys [um-invite enumerate-users invite-by-email-error] :as user-man} (drv/react s :user-management)
+  (let [{:keys [um-invite um-domain-invite enumerate-users invite-by-email-error] :as user-man} (drv/react s :user-management)
         ro-user-man @(drv/get-ref s :user-management)
         user-type (:user-type um-invite)
-        valid-email? (utils/valid-email? (:email um-invite))]
+        valid-email? (utils/valid-email? (:email um-invite))
+        valid-domain-email? (utils/valid-email? (:email um-domain-invite))]
     [:div.user-management.mx-auto.p3.my4.group
-      [:div
-        [:div.mb3.um-invite.group
-          [:div.um-invite-label
-            "INVITE TEAM MEMBERS"]
+      [:div.um-invite.group.mb3
+        [:div.um-invite-label
+          "INVITE TEAM MEMBERS"]
+        [:div
+          [:div.group
+            [:input.left.um-invite-field.email
+              {:name "um-invite"
+               :type "email"
+               :autoCapitalize "none"
+               :value (:email um-invite)
+               :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+               :on-change #(dis/dispatch! [:invite-by-email-change :email (.. % -target -value)])
+               :placeholder "Email address"}]
+            [:div.user-type-picker
+              {:on-mouse-out #(let [el (or (.-toElement %) (.-relatedTarget %))]
+                                ; mouseOut event is triggerend also when the mouse enter a child so we need to
+                                ; check that it's not entering a child of this
+                                (when (not (utils/is-parent? (sel1 [:div.user-type-picker]) el))
+                                  ; reset the user-type to what was before the user enter this div with the mouse
+                                  (dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])))}
+              [:button.user-type-picker-btn.btn-reset.viewer
+                {:class (if (= user-type :viewer) "active" "")
+                 :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :viewer])
+                 :on-click #(do (reset! (::last-user-type s) :viewer) (dis/dispatch! [:invite-by-email-change :user-type :viewer]))}
+                (when (= user-type :viewer)
+                  [:span.user-type-disc.viewer
+                    {:on-click #(show-team-disclaimer-popover %)}
+                    "VIEWER " [:i.fa.fa-question-circle]])
+                [:i.fa.fa-user]]
+              [:button.user-type-picker-btn.btn-reset.author
+                {:class (if (= user-type :author) "active" "")
+                 :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :author])
+                 ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
+                 :on-click #(do (reset! (::last-user-type s) :author) (dis/dispatch! [:invite-by-email-change :user-type :author]))}
+                (when (= user-type :author)
+                  [:span.user-type-disc.author
+                    {:on-click #(show-team-disclaimer-popover %)}
+                    "AUTHOR " [:i.fa.fa-question-circle]])
+                [:i.fa.fa-pencil]]
+              [:button.user-type-picker-btn.btn-reset.admin
+                {:class (if (= user-type :admin) "active" "")
+                 :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :admin])
+                 ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
+                 :on-click #(do (reset! (::last-user-type s) :admin) (dis/dispatch! [:invite-by-email-change :user-type :admin]))}
+                (when (= user-type :admin)
+                  [:span.user-type-disc.admin
+                    {:on-click #(show-team-disclaimer-popover %)}
+                    "ADMIN " [:i.fa.fa-question-circle]])
+                [:i.fa.fa-gear]]]
+            [:button.right.btn-reset.btn-solid.um-invite-send
+              {:disabled (or (not valid-email?)
+                             (not user-type))
+               :on-click #(let [email (:email (:um-domain-invite ro-user-man))]
+                            (if (utils/valid-email? email)
+                              (dis/dispatch! [:invite-by-email-domain])
+                              (dis/dispatch! [:input [:invite-by-email-domain-error] true])))}
+             "SEND INVITE"]]
+          (when invite-by-email-error
             [:div
-              [:div.group
-                [:input.left.um-invite-field.email
-                  {:name "um-invite"
-                   :type "email"
-                   :autoCapitalize "none"
-                   :value (:email um-invite)
-                   :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-                   :on-change #(dis/dispatch! [:invite-by-email-change :email (.. % -target -value)])
-                   :placeholder "Email address"}]
-                [:div.user-type-picker
-                  {:on-mouse-out #(let [el (or (.-toElement %) (.-relatedTarget %))]
-                                    ; mouseOut event is triggerend also when the mouse enter a child so we need to
-                                    ; check that it's not entering a child of this
-                                    (when (not (utils/is-parent? (sel1 [:div.user-type-picker]) el))
-                                      ; reset the user-type to what was before the user enter this div with the mouse
-                                      (dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])))}
-                  [:button.user-type-picker-btn.btn-reset.viewer
-                    {:class (if (= user-type :viewer) "active" "")
-                     :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :viewer])
-                     :on-click #(do (reset! (::last-user-type s) :viewer) (dis/dispatch! [:invite-by-email-change :user-type :viewer]))}
-                    (when (= user-type :viewer)
-                      [:span.user-type-disc.viewer
-                        {:on-click #(show-team-disclaimer-popover %)}
-                        "VIEWER " [:i.fa.fa-question-circle]])
-                    [:i.fa.fa-user]]
-                  [:button.user-type-picker-btn.btn-reset.author
-                    {:class (if (= user-type :author) "active" "")
-                     :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :author])
-                     ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
-                     :on-click #(do (reset! (::last-user-type s) :author) (dis/dispatch! [:invite-by-email-change :user-type :author]))}
-                    (when (= user-type :author)
-                      [:span.user-type-disc.author
-                        {:on-click #(show-team-disclaimer-popover %)}
-                        "AUTHOR " [:i.fa.fa-question-circle]])
-                    [:i.fa.fa-pencil]]
-                  [:button.user-type-picker-btn.btn-reset.admin
-                    {:class (if (= user-type :admin) "active" "")
-                     :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :admin])
-                     ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
-                     :on-click #(do (reset! (::last-user-type s) :admin) (dis/dispatch! [:invite-by-email-change :user-type :admin]))}
-                    (when (= user-type :admin)
-                      [:span.user-type-disc.admin
-                        {:on-click #(show-team-disclaimer-popover %)}
-                        "ADMIN " [:i.fa.fa-question-circle]])
-                    [:i.fa.fa-gear]]]
-                [:button.right.btn-reset.btn-solid.um-invite-send
-                  {:disabled (or (not valid-email?)
-                                 (not user-type))
-                   :on-click #(let [email (:email (:um-invite ro-user-man))]
-                                (if (utils/valid-email? email)
-                                  (dis/dispatch! [:invite-by-email])
-                                  (dis/dispatch! [:input [:invite-by-email-error] true])))}
-                 "SEND INVITE"]]
-            (when invite-by-email-error
-              [:div
-                (cond
-                  (and (= invite-by-email-error :user-exists)
-                       (:email um-invite))
-                  [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
-                  :else
-                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
+              (cond
+                (and (= invite-by-email-error :user-exists)
+                     (:email um-invite))
+                [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
+                :else
+                [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
       (when-not (responsive/is-mobile-size?)
-        [:div.um-invite.group
+        [:div.mb3.um-invite.group
           [:div.um-invite-label
               "TEAM MEMBERS"]
           (when (jwt/is-slack-org?)
@@ -125,6 +127,35 @@
           (let [first-team (first (jwt/get-key :teams))]
             (when (contains? enumerate-users first-team)
               (user-invitation (:users (get enumerate-users first-team)))))])
+      (when-not (responsive/is-mobile-size?)
+        [:div.mb3.um-invite.group
+          [:div.um-invite-label
+              "TEAM EMAIL DOMAINS"]
+          [:div.um-invite-label-2
+            "People with email addresses in the specified domains can join your team as viewers."]
+          (for [team-id (filter #(string? %) enumerate-users)
+                :let [team-data (get enumerate-users team-id)]
+                :when (= (:type team-data) "email-domain")]
+            [:div
+              [:span (:domain team-data)]
+              [:button.btn-reset
+                [:i.fa.fa-trash-o]]])
+          [:div.group
+            [:input.left.um-invite-field.email
+              {:name "um-domain-invite"
+               :type "email"
+               :autoCapitalize "none"
+               :value (:email um-domain-invite)
+               :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+               :on-change #(dis/dispatch! [:input [:um-domain-invite :email] (.. % -target -value)])
+               :placeholder "Email address"}]
+            [:button.right.btn-reset.btn-solid.um-invite-send
+              {:disabled (not valid-domain-email?)
+               :on-click #(let [email (:email (:um-domain-invite ro-user-man))]
+                            (if (utils/valid-email? email)
+                              (dis/dispatch! [:invite-by-email])
+                              (dis/dispatch! [:input [:invite-by-email-error] true])))}
+             "ADD"]]])
       (comment
         [:div.my2.um-byemail-container.group
           [:div.group
@@ -136,7 +167,7 @@
               {:type "text"
                :name "um-byemail-email"
                :placeholder "your email domain without @"}]
-            [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])]]))
+            [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])]))
 
 (defcomponent user-management-wrapper [data owner]
   (render [_]
