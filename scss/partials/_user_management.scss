@@ -68,6 +68,27 @@ div.user-management {
       margin-bottom: 10px;
     }
 
+    div.team-list {
+      div.email-domain, div.slack-domain {
+        margin-bottom: 10px;
+        span {
+          font-family: $oc_headers_font;
+          font-size: 14px;
+          font-weight: normal;
+          letter-spacing: 1.2px;
+          color: $oc_gray_5;
+          display: block;
+          width: 150px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          float: left;
+        }
+        button.btn-reset {
+          float: left;
+        }
+      }
+    }
+
     div.item-input-container {
       div.item-input {
         min-height: 44px;

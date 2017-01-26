@@ -43,14 +43,16 @@
                                           (when-not (utils/is-test-env?)
                                             (dis/dispatch! [:input [:um-invite :email] ""])
                                             (dis/dispatch! [:input [:um-invite :user-type] nil])
-                                            (dis/dispatch! [:input [:um-domain-invite :email] ""]))
+                                            (dis/dispatch! [:input [:um-domain-invite :domain] ""]))
                                           s)}
   [s]
-  (let [{:keys [um-invite um-domain-invite enumerate-users invite-by-email-error] :as user-man} (drv/react s :user-management)
+  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error invite-by-email-error] :as user-man} (drv/react s :user-management)
         ro-user-man @(drv/get-ref s :user-management)
         user-type (:user-type um-invite)
         valid-email? (utils/valid-email? (:email um-invite))
-        valid-domain-email? (utils/valid-email? (:email um-domain-invite))]
+        valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
+        first-team (first (:teams enumerate-users))
+        team-data (get enumerate-users (:team-id first-team))]
     [:div.user-management.mx-auto.p3.my4.group
       [:div.um-invite.group.mb3
         [:div.um-invite-label
@@ -84,7 +86,6 @@
               [:button.user-type-picker-btn.btn-reset.author
                 {:class (if (= user-type :author) "active" "")
                  :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :author])
-                 ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
                  :on-click #(do (reset! (::last-user-type s) :author) (dis/dispatch! [:invite-by-email-change :user-type :author]))}
                 (when (= user-type :author)
                   [:span.user-type-disc.author
@@ -94,7 +95,6 @@
               [:button.user-type-picker-btn.btn-reset.admin
                 {:class (if (= user-type :admin) "active" "")
                  :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :admin])
-                 ; :on-mouse-out #(dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])
                  :on-click #(do (reset! (::last-user-type s) :admin) (dis/dispatch! [:invite-by-email-change :user-type :admin]))}
                 (when (= user-type :admin)
                   [:span.user-type-disc.admin
@@ -126,36 +126,62 @@
               "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
           (let [first-team (first (jwt/get-key :teams))]
             (when (contains? enumerate-users first-team)
-              (user-invitation (:users (get enumerate-users first-team)))))])
+              (user-invitation (:team-id first-team) (:users (get enumerate-users first-team)))))])
+      (when-not (responsive/is-mobile-size?)
+        [:div.mb3.um-invite.group
+          [:div.um-invite-label
+              "SLACK TEAMS"]
+          [:div.um-invite-label-2
+            "Connect with Slack to seamlessly onboard your Stack teammates as viewers."]
+          [:div.team-list
+            (for [team (:slack-teams team-data)]
+              [:div.slack-domain.group
+                [:span (:name team)]
+                [:button.btn-reset
+                  {:on-click #(api/user-invitation-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                   :title "Remove Slack team"}
+                  [:i.fa.fa-trash]]])]
+          [:div.group
+            ; Add Slack team button goes here
+            ]])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
             "People with email addresses in the specified domains can join your team as viewers."]
-          (for [team-id (filter #(string? %) enumerate-users)
-                :let [team-data (get enumerate-users team-id)]
-                :when (= (:type team-data) "email-domain")]
-            [:div
-              [:span (:domain team-data)]
-              [:button.btn-reset
-                [:i.fa.fa-trash-o]]])
+          [:div.team-list
+            (for [team (:email-domains team-data)]
+              [:div.email-domain.group
+                [:span (str "@" (:domain team))]
+                [:button.btn-reset
+                  {:on-click #(api/user-invitation-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                   :title "Remove email domain team"}
+                  [:i.fa.fa-trash]]])]
           [:div.group
             [:input.left.um-invite-field.email
               {:name "um-domain-invite"
-               :type "email"
+               :type "text"
                :autoCapitalize "none"
-               :value (:email um-domain-invite)
-               :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-               :on-change #(dis/dispatch! [:input [:um-domain-invite :email] (.. % -target -value)])
-               :placeholder "Email address"}]
+               :value (:domain um-domain-invite)
+               :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+               :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
+               :placeholder "Email domain"}]
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (not valid-domain-email?)
-               :on-click #(let [email (:email (:um-domain-invite ro-user-man))]
-                            (if (utils/valid-email? email)
-                              (dis/dispatch! [:invite-by-email])
-                              (dis/dispatch! [:input [:invite-by-email-error] true])))}
-             "ADD"]]])
+               :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
+                            (if (utils/valid-domain? domain)
+                              (dis/dispatch! [:add-email-domain-team])
+                              (dis/dispatch! [:input [:add-email-domain-team-error] true])))}
+             "ADD"]
+            (when add-email-domain-team-error
+              [:div
+                (cond
+                  (and (= add-email-domain-team-error :domain-exists)
+                       (:domain um-domain-invite))
+                  [:span.small-caps.red.mt1.left (str (:domain um-domain-invite) " was already added.")]
+                  :else
+                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
       (comment
         [:div.my2.um-byemail-container.group
           [:div.group
