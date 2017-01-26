@@ -768,7 +768,14 @@
     :else
     false))
 
-(defn valid-email? [addr] (when addr (email/isValidAddress addr)))
+(defn valid-email? [addr]
+  (when addr
+    (email/isValidAddress addr)))
+
+(defn valid-domain? [domain]
+  (when (string? domain)
+    (let [re (js/RegExp "^@?[a-z0-9.-]+\\.[a-z]{2,4}$" "i")]
+      (pos? (count (.match domain re))))))
 
 (defn remove-tooltips []
   (.remove (js/$ "div.tooltip")))
