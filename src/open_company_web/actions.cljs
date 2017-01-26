@@ -522,8 +522,10 @@
   (assoc db :invite-by-email-error true))
 
 (defmethod dispatcher/action :user-invitation-action
-  [db [_ invitation action payload]]
-  (let [idx (.indexOf (:enumerate-users db) invitation)]
+  [db [_ team-id invitation action payload]]
+  (let [teams (:enumerate-users db)
+        team-data (get teams team-id)
+        idx (.indexOf (:users team-data) invitation)]
     (api/user-invitation-action (utils/link-for (:links invitation) action) payload)
     (assoc-in db [:enumerate-users idx :loading] true)))
 
@@ -682,3 +684,18 @@
                      (assoc with-pswd :email new-email))]
     (api/patch-user-profile (:current-user-data db) with-email))
   db)
+
+(defmethod dispatcher/action :add-email-domain-team
+  [db [_]]
+  (let [domain (:domain (:um-domain-invite db))]
+    (when (utils/valid-domain? domain))
+      (api/add-email-domain (if (.startsWith domain "@") (subs domain 1) domain)))
+  (assoc db :add-email-domain-team-error false))
+
+(defmethod dispatcher/action :add-email-domain-team/finish
+  [db [_ success]]
+  (when success
+    (api/enumerate-users))
+  (-> db
+      (assoc-in [:um-domain-invite :domain] (if success "" (:domain (:um-domain-invite db))))
+      (assoc :add-email-domain-team-error (if success false true))))
