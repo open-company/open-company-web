@@ -24,7 +24,9 @@
    :user-management    [[:base] (fn [base]
                                  {:um-invite (:um-invite base)
                                   :enumerate-users (:enumerate-users base)
-                                  :invite-by-email-error (:invite-by-email-error base)})]
+                                  :um-domain-invite (:um-domain-invite base)
+                                  :invite-by-email-error (:invite-by-email-error base)
+                                  :add-email-domain-team-error (:add-email-domain-team-error base)})]
    :jwt                [[:base] (fn [base] (:jwt base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
    :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
