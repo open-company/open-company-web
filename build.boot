@@ -29,7 +29,6 @@
     [medley "0.8.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
 
-    ;; --- DO NOT UPDATE REACT, the 15.x.x code requires changes on our part
     [cljsjs/react "15.4.2-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 

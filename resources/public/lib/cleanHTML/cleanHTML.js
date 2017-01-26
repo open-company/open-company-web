@@ -297,9 +297,12 @@ function recursiveAttachPasteListener(el, cb){
   el.removeEventListener("paste", pasteCb);
   el.addEventListener("paste", pasteCb);
   if (el.hasChildNodes()){
-    el.childNodes.forEach(function(el_child){
-      recursiveAttachPasteListener(el_child, cb);
-    });
+    var allChildren = Array.prototype.slice.call(el.childNodes);
+    if (allChildren.length > 0){
+      allChildren.forEach(function(el_child){
+        recursiveAttachPasteListener(el_child, cb);
+      });
+    }
   }
 }
 
