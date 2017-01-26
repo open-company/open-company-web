@@ -4,18 +4,23 @@
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
-(defn user-invitation-action [invitation action & [payload]]
+(defn user-invitation-action [team-id invitation action & [payload]]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
-  (dis/dispatch! [:user-invitation-action invitation action payload]))
+  (dis/dispatch! [:user-invitation-action team-id invitation action payload]))
 
 (rum/defc invite-row
-  [invitation]
-  (let [user-links (:links invitation)]
+  [team-id invitation]
+  (let [user-links (:links invitation)
+        user-dropdown-id (str "invite-row-user-" (:user-id invitation))]
     [:tr
       [:td
-        [:div.value
-          [:button.btn-reset.user-type-btn
-            {:on-click #()}
+        [:div.dropdown
+          [:button.btn-reset.user-type-btn.dropdown-toggle
+            {:on-click #()
+             :id user-dropdown-id
+             :data-toggle "dropdown"
+             :aria-haspopup true
+             :aria-expanded false}
             (cond
               (:admin invitation)
               [:i.fa.fa-gear]
@@ -23,7 +28,18 @@
               [:i.fa.fa-user]
               ;; used for author users but not yet implemented
               :else
-              [:i.fa.fa-pencil])]]]
+              [:i.fa.fa-pencil])]
+          [:ul.dropdown-menu.user-type-dropdown-menu
+            {:aria-labelledby user-dropdown-id}
+            [:li
+              {:class (when (not (:admin invitation)) "active")}
+              [:i.fa.fa-user] " Viewer"]
+            [:li
+              {:class (when (:author invitation) "active")}
+              [:i.fa.fa-pencil] " Author"]
+            [:li
+              {:class (when (:admin invitation) "active")}
+              [:i.fa.fa-gear] " Admin"]]]]
       [:td [:div.value
              {:title (if (pos? (count (:email invitation))) (:email invitation) "")
               :data-toggle "tooltip"
@@ -49,6 +65,7 @@
                  :title "RESEND INVITE"
                  :on-click #(let [company-data (dis/company-data)]
                               (user-invitation-action
+                                team-id
                                 invitation
                                 "invite"
                                 {:email (:email invitation)
@@ -79,7 +96,7 @@
                                         (when-not (utils/is-test-env?)
                                           (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                         s)}
-  [invitations]
+  [team-id invitations]
   [:div.um-invitations-box.col-12.group
     [:table.table
       [:thead
@@ -90,4 +107,4 @@
           [:th {:style {:text-align "center"}} "ACTIONS"]]]
       [:tbody
         (for [invitation invitations]
-          (rum/with-key (invite-row invitation) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]])
+          (rum/with-key (invite-row team-id invitation) (str "invitation-tr-" (:href (utils/link-for (:links invitation) "self")))))]]])

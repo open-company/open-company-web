@@ -38,7 +38,13 @@ div.um-invitations-box {
 
       &:hover {
         td {
-          background-color: #1e81c4;
+          background-color: $oc_blue_dark;
+          color: white;
+
+          div button.user-type-btn:after {
+            color: white;
+            opacity: 1;
+          }
         }
       }
 
@@ -56,28 +62,48 @@ div.um-invitations-box {
           padding: 0px;
           white-space: pre;
 
+          button.user-type-btn {
+            width: 80px;
+            &:after {
+              color: $oc_gray_5;
+              font-size: 13px;
+              font-family: FontAwesome;
+              content: "\f078";
+              margin-left: 5px;
+              opacity: 0;
+            }
+          }
+
+          &.dropdown{
+            position: relative;
+
+            ul.user-type-dropdown-menu {
+              padding: 0;
+              font-family: $oc_main_font;
+              font-size: 14px;
+              color: $oc_gray_5;
+              background-color: white;
+              padding: 0.5rem 0;
+              position: absolute;
+              top: 24px;
+              left: 20px;
+
+              li {
+                padding: 0 0.5rem;
+                cursor: pointer;
+
+                &:hover, &.active {
+                  background-color: $oc_blue_dark;
+                  color: white;
+                }
+              }
+            }
+          }
+
           &.value {
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 180px;
-
-            button.user-type-btn {
-              width: 80px;
-              &:after {
-                color: $oc_gray_5;
-                font-size: 13px;
-                font-family: FontAwesome;
-                content: "\f078";
-                margin-left: 5px;
-                opacity: 0;
-              }
-
-              &:hover {
-                &:after {
-                  opacity: 1;
-                }
-              }
-            }
           }
 
           button.invite-row-action {
