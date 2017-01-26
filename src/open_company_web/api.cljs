@@ -643,3 +643,19 @@
                           (update-jwt-cookie! (:body res))
                           (dispatcher/dispatch! [:logout])))))))
               (dispatcher/dispatch! [:user-data (json->cljs body)])))))))
+
+(defn add-email-domain [domain]
+  (when domain
+    (let [teams-data (:enumerate-users @dispatcher/app-state)
+          first-team (first (:teams teams-data))
+          team-data (get teams-data (:team-id first-team))
+          add-domain-team-link (utils/link-for (:links team-data) "add" "POST")]
+      (auth-post (:href add-domain-team-link)
+        {:headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+          ; custom content type
+          "content-type" (:type add-domain-team-link)}
+         :body domain}
+        (fn [{:keys [status body success]}]
+          (dispatcher/dispatch! [:add-email-domain-team/finish (= status 204)]))))))
