@@ -196,7 +196,9 @@
           ;; Emojione Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css?oc_deploy_key"}]
           ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]
+          ;; Filestack
+          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
@@ -227,8 +229,6 @@
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
-          ;; Filestack
-          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; MediumEditorAutolist
