@@ -57,26 +57,41 @@
 
 (defn save-user-profile-data [owner e]
   (.preventDefault e)
-  (dis/dispatch! [:save-user-profile]))
+  (om/set-state! owner :will-save true)
+  (dis/dispatch! [:save-user-profile (om/get-state owner :email-did-change)]))
+
+(def initial-state
+  {:file-upload-state nil
+   :upload-remote-url ""
+   :file-upload-progress nil
+   :email-did-change false
+   :will-save false
+   :first-name "iac"
+   :has-changes false})
 
 (defcomponent edit-user-profile [data owner]
 
   (init-state [_]
     (dis/dispatch! [:reset-user-profile])
-    {:file-upload-state nil
-     :upload-remote-url ""
-     :file-upload-progress nil
-     :email-did-change false
-     :has-changes false})
+    initial-state)
 
   (did-mount [_]
+    (when-not (responsive/is-tablet-or-mobile?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
     (dis/dispatch! [:get-current-user]))
 
   (did-update [_ _ _]
     (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
       (js/filepicker.setKey ls/filestack-key)))
 
-  (render-state [_ {:keys [file-upload-progress file-upload-state upload-remote-url has-changes email-did-change]}]
+  (will-receive-props [_ _]
+    (when (and (not (utils/is-test-env?))
+               (om/get-state owner :will-save))
+      (dis/dispatch! [:reset-user-profile])
+      (om/update-state! owner #(merge % initial-state))))
+
+  (render-state [_ {:keys [first-name file-upload-progress file-upload-state upload-remote-url has-changes email-did-change] :as st}]
     (let [columns-num (responsive/columns-num)
           card-width (responsive/calc-card-width)]
       (dom/div {:class "edit-user-profile fullscreen-page"}
@@ -88,11 +103,13 @@
                 (dom/div {:class "left-column"}
                   (dom/div {:class "edit-user-profile-title data-title"} "FIRST NAME")
                   (dom/input {:class "edit-user-profile"
+                              :type "text"
                               :name "first-name"
                               :on-change #(change! owner :first-name (.. % -target -value))
                               :value (or (:first-name (:edit-user-profile data)) "")})
                   (dom/div {:class "edit-user-profile-title data-title"} "LAST NAME")
                   (dom/input {:class "edit-user-profile"
+                              :type "text"
                               :name "last-name"
                               :on-change #(change! owner :last-name (.. % -target -value))
                               :value (or (:last-name (:edit-user-profile data)) "")})
@@ -115,9 +132,18 @@
                               :value (or (:email (:edit-user-profile data)) "")}))
                 (dom/div {:class "right-column"}
                   (dom/div {:class "edit-user-profile-title data-title"} "AVATAR")
-                  (user-avatar-image (:avatar-url (:edit-user-profile data)))
+                  (dom/div {:class "user-avatar-container"}
+                    (when (pos? (count (:avatar-url (:edit-user-profile data))))
+                      (dom/button {:class "btn-reset remove-user-avatar"
+                                   :on-click #(do (utils/event-stop %) (change! owner :avatar-url nil))
+                                   :title "Remove avatar"
+                                   :data-toggle "tooltip"
+                                   :data-container "body"
+                                   :data-placement "top"}
+                        (dom/i {:class "fa fa-remove"})))
+                    (user-avatar-image (:avatar-url (:edit-user-profile data))))
                   (dom/button {:class "btn-reset camera left"
-                               :title "Add a profile image"
+                               :title (if (zero? (count (:avatar-url (:edit-user-profile data)))) "Add a profile avatar" "Change the profile avatar")
                                :type "button"
                                :data-toggle "tooltip"
                                :data-container "body"

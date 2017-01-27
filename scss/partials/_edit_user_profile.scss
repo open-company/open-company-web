@@ -62,6 +62,25 @@ div.edit-user-profile {
           padding-left: 25px;
         }
 
+        div.user-avatar-container {
+          position: relative;
+          &:hover{
+            button.remove-user-avatar{
+              color: rgba(78,90,107,0.8);
+            }  
+          }
+          button.remove-user-avatar{
+            position: absolute;
+            color: rgba(78,90,107,0.4);
+            top: 7px;
+            right: 10px;
+
+            i.fa {
+              font-weight: 300;
+            }
+          }
+        }
+
         img.user-avatar-img {
           margin-top: 11px;
           max-width: 100px;
