@@ -104,10 +104,11 @@
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (or (not valid-email?)
                              (not user-type))
-               :on-click #(let [email (:email (:um-domain-invite ro-user-man))]
-                            (if (utils/valid-email? email)
-                              (dis/dispatch! [:invite-by-email-domain])
-                              (dis/dispatch! [:input [:invite-by-email-domain-error] true])))}
+               :on-click #(let [email (:email (:um-invite ro-user-man))]
+                            (if (and (utils/valid-email? email)
+                                     (not (nil? (:user-type (:um-invite ro-user-man)))))
+                              (dis/dispatch! [:invite-by-email])
+                              (dis/dispatch! [:input [:invite-by-email-error] true])))}
              "SEND INVITE"]]
           (when invite-by-email-error
             [:div
