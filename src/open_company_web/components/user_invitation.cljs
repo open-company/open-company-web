@@ -8,7 +8,7 @@
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
   (dis/dispatch! [:user-invitation-action team-id invitation action payload]))
 
-(rum/defc invite-row
+(rum/defc invite-row < rum/static
   [team-id invitation]
   (let [user-links (:links invitation)
         user-dropdown-id (str "invite-row-user-" (:user-id invitation))]
@@ -73,28 +73,22 @@
                                  :logo (or (:logo company-data) "")}))}
                 [:i.fa.fa-share]])
             ; if it has a delete link
-            (when (utils/link-for (:links invitation) "delete")
-              (if (and (:status invitation) (= (clojure.string/lower-case (:status invitation))) "pending")
-                ; and it's pending show a cancel invite button
+            (when (utils/link-for (:links invitation) "remove")
+              (let [pending? (and (:status invitation) (= (clojure.string/lower-case (:status invitation)) "pending"))]
                 [:button.btn-reset.invite-row-action
                   {:data-placement "top"
                    :data-toggle "tooltip"
                    :data-container "body"
-                   :title "CANCEL INVITE"
-                   :on-click #(user-invitation-action team-id invitation "delete")}
-                  [:i.fa.fa-times]]
-                ; if it's not pending show a remove user button
-                [:button.btn-reset.invite-row-action
-                  {:data-placement "top"
-                   :data-toggle "tooltip"
-                   :data-container "body"
-                   :title "REMOVE USER"
-                   :on-click #(user-invitation-action team-id invitation "delete")}
-                  [:i.fa.fa-trash-o]]))])]]))
+                   :title (if pending? "CANCEL INVITE" "REMOVE USER")
+                   :on-click #(user-invitation-action team-id invitation "remove")}
+                  (if pending?
+                    [:i.fa.fa-times]
+                    [:i.fa.fa-trash-o])]))])]]))
 
-(rum/defc user-invitation < {:did-mount (fn [s]
-                                        (when-not (utils/is-test-env?)
-                                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+(rum/defc user-invitation < rum/static
+                            {:did-mount (fn [s]
+                                          (when-not (utils/is-test-env?)
+                                            (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                         s)}
   [team-id invitations]
   [:div.um-invitations-box.col-12.group
