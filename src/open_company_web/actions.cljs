@@ -681,8 +681,8 @@
         email-did-change (not= new-email (:email (:current-user-data db)))
         with-email (if (and email-did-change
                             (utils/valid-email? new-email))
-                     (assoc with-pswd :email (:email (:current-user-data db)))
-                     (assoc with-pswd :email new-email))]
+                     (assoc with-pswd :email new-email)
+                     (assoc with-pswd :email (:email (:current-user-data db))))]
     (api/patch-user-profile (:current-user-data db) with-email))
   db)
 
