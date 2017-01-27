@@ -83,7 +83,7 @@
             [:div
               [:div.slack-disclaimer [:span.bold "Slack sign up"] " makes it " [:span.bold "easy for your teammates"] " to signup to view your OpenCompany dashboard."]
               (when (:slack-access (rum/react dis/app-state)) slack-error)
-              [:button.btn-reset.mt2.login-button.with-slack
+              [:button.btn-reset.mt2.login-button.slack-button
                 {:on-click #(reset! (::sign-up-slack-clicked state) true)}
                 (str action-title " with ")
                 [:span.slack "Slack"]
