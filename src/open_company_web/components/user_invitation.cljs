@@ -81,7 +81,7 @@
                    :data-toggle "tooltip"
                    :data-container "body"
                    :title "CANCEL INVITE"
-                   :on-click #(user-invitation-action invitation "delete")}
+                   :on-click #(user-invitation-action team-id invitation "delete")}
                   [:i.fa.fa-times]]
                 ; if it's not pending show a remove user button
                 [:button.btn-reset.invite-row-action
@@ -89,7 +89,7 @@
                    :data-toggle "tooltip"
                    :data-container "body"
                    :title "REMOVE USER"
-                   :on-click #(user-invitation-action invitation "delete")}
+                   :on-click #(user-invitation-action team-id invitation "delete")}
                   [:i.fa.fa-trash-o]]))])]]))
 
 (rum/defc user-invitation < {:did-mount (fn [s]
