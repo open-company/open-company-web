@@ -32,13 +32,16 @@
           [:ul.dropdown-menu.user-type-dropdown-menu
             {:aria-labelledby user-dropdown-id}
             [:li
-              {:class (when (not (:admin invitation)) "active")}
+              {:class (when (not (:admin invitation)) "active")
+               :on-click #(user-invitation-action team-id invitation "partial-update" {:admin false})}
               [:i.fa.fa-user] " Viewer"]
             [:li
-              {:class (when (:author invitation) "active")}
+              {:class (when (:author invitation) "active")
+               :on-click #(user-invitation-action team-id invitation "partial-update" {:admin true})}
               [:i.fa.fa-pencil] " Author"]
             [:li
-              {:class (when (:admin invitation) "active")}
+              {:class (when (:admin invitation) "active")
+               :on-click #(user-invitation-action team-id invitation "partial-update" {:admin true})}
               [:i.fa.fa-gear] " Admin"]]]]
       [:td [:div.value
              {:title (if (pos? (count (:email invitation))) (:email invitation) "")
