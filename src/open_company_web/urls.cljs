@@ -1,5 +1,6 @@
 (ns open-company-web.urls
   (:require [open-company-web.router :as router]
+            [open-company-web.lib.jwt :as j]
             [clojure.string :as clj-str]))
 
 (defn params->query-string [m]
@@ -71,9 +72,9 @@
 (defn company-settings-um
   "Company profile url"
   ([]
-    (company-settings-um (router/current-company-slug)))
-  ([slug]
-    (str (company-settings slug) "/user-management")))
+    (company-settings-um (j/team-id)))
+  ([team-id]
+    (str "/" team-id "/settings/user-management")))
 
 (defn company-section
   "Section url"
