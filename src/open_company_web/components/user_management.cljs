@@ -46,13 +46,13 @@
                                             (dis/dispatch! [:input [:um-domain-invite :domain] ""]))
                                           s)}
   [s]
-  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error invite-by-email-error] :as user-man} (drv/react s :user-management)
+  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error add-slack-team-error invite-by-email-error] :as user-man} (drv/react s :user-management)
         ro-user-man @(drv/get-ref s :user-management)
         user-type (:user-type um-invite)
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
-        first-team (first (:teams enumerate-users))
-        team-data (get enumerate-users (:team-id first-team))]
+        team-id (router/current-team-id)
+        team-data (get enumerate-users team-id)]
     [:div.user-management.mx-auto.p3.my4.group
       [:div.um-invite.group.mb3
         [:div.um-invite-label
@@ -127,7 +127,7 @@
               "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
           (let [first-team (first (jwt/get-key :teams))]
             (when (contains? enumerate-users first-team)
-              (user-invitation (:team-id first-team) (:users (get enumerate-users first-team)))))])
+              (user-invitation team-id (:users (get enumerate-users first-team)))))])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
@@ -143,8 +143,18 @@
                    :title "Remove Slack team"}
                   [:i.fa.fa-trash]]])]
           [:div.group
-            ; Add Slack team button goes here
-            ]])
+            [:button.btn-reset.mt2.add-slack-team.slack-button
+                {:on-click #(dis/dispatch! [:add-slack-team])}
+                "Add "
+                [:span.slack "Slack"]
+                " Team"]
+            (when add-slack-team-error
+              [:div
+                (cond
+                  (= add-slack-team-error :team-exists)
+                  [:span.small-caps.red.mt1.left "This team was already added."]
+                  :else
+                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
