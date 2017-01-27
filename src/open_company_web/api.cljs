@@ -136,10 +136,10 @@
       "content-type" "text/plain"}}
     (fn [_])))
 
-(defn get-entry-point []
+(defn get-entry-point [& [redirect-if-necessary]]
   (api-get "/" nil (fn [response]
                      (let [body (if (:success response) (:body response) {})]
-                       (dispatcher/dispatch! [:entry body])))))
+                       (dispatcher/dispatch! [:entry body (if (nil? redirect-if-necessary) true redirect-if-necessary)])))))
 
 (defn get-subscription [company-uuid]
   (pay-get (str "/subscriptions/" company-uuid)
@@ -515,26 +515,33 @@
           (if success
             (dispatcher/dispatch! [:enumerate-channels/success (-> fixed-body :collection :channels)])))))))
 
-(defn send-invitation [email user-type]
-  (let [company-data (dispatcher/company-data)]
-    (when (and email company-data)
-      (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")]
-        (auth-post (:href invitation-link)
-          {:json-params {:email email
-                         :admin (or (= user-type :admin)
-                                    (= user-type :author))
-                         :company-name (:name company-data)
-                         :logo (or (:logo company-data) "")}
-           :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type invitation-link)
-            "accept" (:type invitation-link)}}
-          (fn [{:keys [success body status]}]
-            (if success
-              (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
-              (dispatcher/dispatch! [:invite-by-email/failed]))))))))
+(defn send-invitation
+  "Give a user email and type of user send an invitation to the team.
+   If the team has only one company, checked via API entry point links, send the company name of that.
+   Add the logo of the company if possible
+   TODO: review the company name and logo"
+   ;; TODO: review the company name and logo
+  [email user-type]
+  (when email
+    (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")
+          api-entry-point-links (:api-entry-point @dispatcher/app-state)
+          companies (count (filter #(= (:rel %) "company") api-entry-point-links))]
+      (auth-post (:href invitation-link)
+        {:json-params {:email email
+                       :admin (or (= user-type :admin)
+                                  (= user-type :author))
+                       :company-name (if (= (count companies) 1) (:name (utils/link-for api-entry-point-links "company")) "")
+                       :logo-url nil}
+         :headers {
+          ; required by Chrome
+          "Access-Control-Allow-Headers" "Content-Type"
+          ; custom content type
+          "content-type" (:type invitation-link)
+          "accept" (:type invitation-link)}}
+        (fn [{:keys [success body status]}]
+          (if success
+            (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
+            (dispatcher/dispatch! [:invite-by-email/failed])))))))
 
 (defn user-invitation-action [action-link payload]
   (when (and action-link)
