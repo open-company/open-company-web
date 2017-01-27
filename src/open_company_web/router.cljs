@@ -109,3 +109,6 @@
 
 (defn current-as-of []
   (:as-of (:query-params @path)))
+
+(defn current-team-id []
+  (:team-id @path))
