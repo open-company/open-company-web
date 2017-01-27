@@ -700,3 +700,13 @@
   (-> db
       (assoc-in [:um-domain-invite :domain] (if success "" (:domain (:um-domain-invite db))))
       (assoc :add-email-domain-team-error (if success false true))))
+
+(defmethod dispatcher/action :add-slack-team
+  [db [_]]
+  (let [teams-data (:enumerate-users db)
+        first-team (first (:teams teams-data))
+        team-data (get teams-data (:team-id first-team))
+        add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})]
+    (when add-slack-team-link
+      (router/redirect! (:href add-slack-team-link))))
+  db)
