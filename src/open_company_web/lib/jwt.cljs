@@ -22,3 +22,6 @@
 
 (defn is-slack-org? []
   (= (get-key :auth-source) "slack"))
+
+(defn team-id []
+  (first (get-key :teams)))
