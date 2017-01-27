@@ -165,6 +165,21 @@
     ;; render component
     (drv-root component target)))
 
+;; Component specific to a team settings
+(defn team-handler [route target component params]
+  (let [team-id (:team-id (:params params))
+        query-params (:query-params params)]
+    (pre-routing query-params)
+    (utils/clean-company-caches)
+    (api/get-entry-point false)
+    ;; save the route
+    (router/set-route! [team-id route] {:team-id team-id :query-params query-params})
+    (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+    ;; render component
+    (drv-root component target)))
+
 ;; Component specific to a stakeholder update
 (defn stakeholder-update-handler [target component params]
   (let [slug (:slug (:params params))
@@ -271,11 +286,11 @@
       (swap! dis/app-state assoc :force-remove-loading true)
       (company-handler "profile" target company-settings params))
 
-    (defroute company-settings-um-route (urls/company-settings-um ":slug") {:as params}
+    (defroute company-settings-um-route (urls/company-settings-um ":team-id") {:as params}
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no sections and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
-      (company-handler "user-management" target user-management-wrapper params))
+      (team-handler "user-management" target user-management-wrapper params))
 
     (defroute company-route (urls/company ":slug") {:as params}
       (company-handler "dashboard" target company-dashboard params))
