@@ -518,26 +518,29 @@
 (defn send-invitation
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
-   Add the logo of the company if possible
-   TODO: review the company name and logo"
-   ;; TODO: review the company name and logo
-  [email user-type]
-  (when email
-    (let [invitation-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "invite")
+   Add the logo of the company if possible"
+  [email user-type first-name last-name]
+  (when (and email user-type)
+    (let [team-data (get (:enumerate-users @dispatcher/app-state) (router/current-team-id))
+          invitation-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.invite.v1"})
           api-entry-point-links (:api-entry-point @dispatcher/app-state)
-          companies (count (filter #(= (:rel %) "company") api-entry-point-links))]
-      (auth-post (:href invitation-link)
-        {:json-params {:email email
+          companies (count (filter #(= (:rel %) "company") api-entry-point-links))
+          json-params {:email email
+                       :first-name first-name
+                       :last-name last-name
                        :admin (or (= user-type :admin)
-                                  (= user-type :author))
-                       :company-name (if (= (count companies) 1) (:name (utils/link-for api-entry-point-links "company")) "")
-                       :logo-url nil}
+                                  (= user-type :author))}
+          with-company-name (if (= companies 1)
+                              (assoc json-params :company-name (:name (utils/link-for api-entry-point-links "company")))
+                              json-params)]
+      (auth-post (:href invitation-link)
+        {:json-params (cljs->json with-company-name)
          :headers {
           ; required by Chrome
           "Access-Control-Allow-Headers" "Content-Type"
           ; custom content type
           "content-type" (:type invitation-link)
-          "accept" (:type invitation-link)}}
+          "accept" "application/vnd.open-company.user.v1+json"}}
         (fn [{:keys [success body status]}]
           (if success
             (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
@@ -656,7 +659,7 @@
     (let [teams-data (:enumerate-users @dispatcher/app-state)
           first-team (first (:teams teams-data))
           team-data (get teams-data (:team-id first-team))
-          add-domain-team-link (utils/link-for (:links team-data) "add" "POST")]
+          add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.email-domain.v1"})]]
       (auth-post (:href add-domain-team-link)
         {:headers {
           ; required by Chrome
