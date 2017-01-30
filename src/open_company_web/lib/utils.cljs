@@ -816,3 +816,7 @@
   (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
         filtered-revenues (filter number? cleaned-revenues)]
     (apply + filtered-revenues)))
+
+(defn parse-input-email [email-address]
+  (let [parsed-email (email/parse email-address)]
+    {:name (.getName parsed-email) :address (.getAddress parsed-email)}))
