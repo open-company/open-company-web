@@ -61,10 +61,9 @@
           [:div.group
             [:input.left.um-invite-field.email
               {:name "um-invite"
-               :type "email"
+               :type "text"
                :autoCapitalize "none"
                :value (:email um-invite)
-               :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
                :on-change #(dis/dispatch! [:invite-by-email-change :email (.. % -target -value)])
                :placeholder "Email address"}]
             [:div.user-type-picker
