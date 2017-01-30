@@ -27,21 +27,18 @@
              :aria-haspopup true
              :aria-expanded false}
             (cond
-              (:admin invitation)
+              remove-admin-link
               [:i.fa.fa-gear]
-              (not (:admin invitation))
-              [:i.fa.fa-user]
-              ;; used for author users but not yet implemented
               :else
-              [:i.fa.fa-pencil])]
+              [:i.fa.fa-user])]
           [:ul.dropdown-menu.user-type-dropdown-menu
             {:aria-labelledby user-dropdown-id}
             [:li
-              {:class (when remove-admin-link "active")
+              {:class (when add-admin-link "active")
                :on-click #(user-invitation-action team-id invitation "remove" "DELETE" admin-type nil)}
               [:i.fa.fa-user] " Viewer"]
             [:li
-              {:class (when add-admin-link "active")
+              {:class (when (not add-admin-link) "active")
                :on-click #(user-invitation-action team-id invitation "add" "PUT" admin-type nil)}
               [:i.fa.fa-gear] " Admin"]]]]
       [:td [:div.value
