@@ -389,7 +389,7 @@
 (defmethod dispatcher/action :login-with-slack
   [db [_]]
   (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "authenticate" "GET" {:auth-source "slack"})]
+        auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
@@ -400,7 +400,7 @@
 (defmethod dispatcher/action :auth-bot
   [db [_]]
   (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "bot")]
+        auth-url (utils/link-for (:links (:auth-settings db)) "bot")]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
@@ -488,24 +488,47 @@
     (assoc-in [:um-invite k] v)
     (dissoc :invite-by-email-error)))
 
+(defn resend-invitation [db user]
+  (let [api-entry-point-links (:api-entry-point db)
+        companies (count (filter #(= (:rel %) "company") api-entry-point-links))
+        idx (.indexOf (:enumerate-users db) user)
+        json-params {:email (:email user)}
+        with-first-name (if (:first-name user) (assoc json-params :first-name (:first-name user)) json-params)
+        with-last-name (if (:last-name user) (assoc with-first-name :last-name (:last-name user)) with-first-name)
+        with-company-name (if (= companies 1) (assoc with-last-name :company-name (:name (utils/link-for api-entry-point-links "company"))) with-last-name)]
+    (api/user-invitation-action (utils/link-for (:links user) "invite") with-company-name)
+    (assoc-in db [:enumerate-users idx :loading] true)))
+
+(defmethod dispatcher/action :resend-invitation
+  [db [_ user]]
+  (resend-invitation db user))
+
 (defmethod dispatcher/action :invite-by-email
   [db [_]]
   (let [email (:email (:um-invite db))
-        first-team (first (:teams (:jwt db)))
-        user  (first (filter #(= (:email %) email) (:users (get (:enumerate-users db) first-team))))]
+        parsed-email (utils/parse-input-email email)
+        email-name (:name parsed-email)
+        email-address (:address parsed-email)
+        user  (first (filter #(= (:email %) email-address) (:users (get (:enumerate-users db) (router/current-team-id)))))]
     (if user
       (if (= (:status user) "pending")
         ;resend invitation since user was invited and didn't accept
-        (let [company-data (dispatcher/company-data)
-              idx (.indexOf (:enumerate-users db) user)]
-          (api/user-invitation-action (utils/link-for (:links user) "invite") {:email (:email user)
-                                                                               :company-name (:name company-data)
-                                                                               :logo (:logo company-data)})
-          (assoc-in db [:enumerate-users idx :loading] true))
+        (resend-invitation db user)
         ; user is already in, send error message
         (assoc db :invite-by-email-error :user-exists))
-      (do ; looks like a new user, sending invitation
-        (api/send-invitation (:email (:um-invite db)) (:user-type (:um-invite db)))
+      ; looks like a new user, sending invitation
+      (let [splitted-name (string/split email-name #"\s")
+            name-size (count splitted-name)
+            splittable-name? (= name-size 2)
+            first-name (cond
+                        (= name-size 1) email-name
+                        splittable-name? (first splitted-name)
+                        :else "")
+            last-name (cond
+                        splittable-name? (second splitted-name)
+                        :else "")
+            first-team (first (:teams (:jwt db)))]
+        (api/send-invitation email-address (:user-type (:um-invite db)) first-name last-name)
         (dissoc db :invite-by-email-error)))))
 
 (defmethod dispatcher/action :invite-by-email/success
@@ -523,11 +546,11 @@
   (assoc db :invite-by-email-error true))
 
 (defmethod dispatcher/action :user-invitation-action
-  [db [_ team-id invitation action payload]]
+  [db [_ team-id invitation action method other-link-params payload]]
   (let [teams (:enumerate-users db)
         team-data (get teams team-id)
         idx (.indexOf (:users team-data) invitation)]
-    (api/user-invitation-action (utils/link-for (:links invitation) action) payload)
+    (api/user-invitation-action (utils/link-for (:links invitation) action method other-link-params) payload)
     (assoc-in db [:enumerate-users idx :loading] true)))
 
 (defmethod dispatcher/action :user-invitation-action/complete
