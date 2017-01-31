@@ -68,6 +68,12 @@
     (= method http/put)
     "PUT"))
 
+(defn headers-for-link [link]
+ (let [acah-headers (if (nil? (:access-control-allow-headers link)) {} {"Access-Control-Allow-Headers" "Content-Type, Authorization"})
+       with-content-type (if (:content-type link) (assoc acah-headers "content-type" (:content-type link)) acah-headers)
+       with-accept (if (:accept link) (assoc with-content-type "accept" (:accept link)) with-content-type)]
+  with-accept))
+
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
@@ -129,11 +135,7 @@
 
 (defn auth-500-test [with-response]
   (auth-get (if with-response "/---error-test---" "/---500-test---")
-    {:headers {
-      ; required by Chrome
-      "Access-Control-Allow-Headers" "Content-Type"
-      ; custom content type
-      "content-type" "text/plain"}}
+    {:headers (headers-for-link {:content-type "text/plain"})}
     (fn [_])))
 
 (defn get-entry-point [& [redirect-if-necessary]]
@@ -192,7 +194,7 @@
 
 (defn get-auth-settings []
   (auth-get "/"
-    {:headers {"content-type" "application/json"}}
+    {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
     (fn [response]
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
@@ -443,11 +445,7 @@
         {:basic-auth {
           :username email
           :password pswd}
-         :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type auth-url)}}
+         :headers (headers-for-link auth-url)}
         (fn [{:keys [success body status]}]
          (if success
             (dispatcher/dispatch! [:login-with-email/success body])
@@ -466,11 +464,7 @@
                        :last-name last-name
                        :email email
                        :password pswd}
-         :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type auth-url)}}
+         :headers (headers-for-link auth-url)}
         (fn [{:keys [success body status]}]
          (if success
             (dispatcher/dispatch! [:signup-with-email/success body])
@@ -479,11 +473,7 @@
 (defn enumerate-users []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "collection" "GET")]
     (auth-get (:href enumerate-link)
-      {:headers {
-        ; required by Chrome
-        "Access-Control-Allow-Headers" "Content-Type"
-        ; custom content type
-        "content-type" (:type enumerate-link)}}
+      {:headers (headers-for-link enumerate-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
@@ -492,11 +482,7 @@
 (defn enumerate-team-users [team-link]
   (when team-link
     (auth-get (:href team-link)
-      {:headers {
-        ; required by Chrome
-        "Access-Control-Allow-Headers" "Content-Type"
-        ; custom content type
-        "content-type" (:type team-link)}}
+      {:headers (headers-for-link team-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
@@ -505,11 +491,7 @@
 (defn enumerate-channels []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]
     (auth-get (:href enumerate-link)
-      {:headers {
-        ; required by Chrome
-        "Access-Control-Allow-Headers" "Content-Type"
-        ; custom content type
-        "content-type" (:type enumerate-link)}}
+      {:headers (headers-for-link enumerate-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
@@ -535,31 +517,21 @@
                               json-params)]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)
-         :headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type"
-          ; custom content type
-          "content-type" (:type invitation-link)
-          "accept" "application/vnd.open-company.user.v1+json"}}
+         :headers (headers-for-link invitation-link)}
         (fn [{:keys [success body status]}]
           (if success
             (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
             (dispatcher/dispatch! [:invite-by-email/failed])))))))
 
 (defn user-invitation-action [action-link payload]
-  (when (and action-link)
+  (when action-link
     (let [auth-req (case (:method action-link)
                       "POST" auth-post
                       "PUT" auth-put
                       "PATCH" auth-patch
                       "DELETE" auth-delete
                       auth-get) ; default to GET
-          headers {:headers {
-                    ; required by Chrome
-                    "Access-Control-Allow-Headers" "Content-Type"
-                    ; custom content type
-                    "content-type" (:type action-link)
-                    "accept" (:type action-link)}}
+          headers {:headers (headers-for-link action-link)}
           with-payload (if payload
                           (assoc headers :json-params payload)
                           headers)]
@@ -572,14 +544,10 @@
   (let [auth-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "authenticate" "GET" {:auth-source "email"})]
     (when (and token auth-link)
       (auth-get (:href auth-link)
-        {:headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type, Authorization"
-          ; custom content type
-          "content-type" (:type auth-link)
-          "accept" (:type auth-link)
-          ; pass the token as Authorization
-          "Authorization" (str "Bearer " token)}}
+        {:headers (merge (headers-for-link auth-link)
+                         {; required by Chrome
+                          "Access-Control-Allow-Headers" "Content-Type, Authorization"
+                          "Authorization" (str "Bearer " token)})}
         (fn [{:keys [status body success]}]
           (when success
             (update-jwt-cookie! body)
@@ -595,12 +563,7 @@
           :last-name lastname
           :password pswd
          }
-         :headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type, Authorization"
-          ; custom content type
-          "content-type" (:type update-link)
-          "accept" (:type update-link)}}
+         :headers (headers-for-link update-link)}
         (fn [{:keys [status body success]}]
           (when success
             (update-jwt-cookie! body)
@@ -623,11 +586,7 @@
 (defn get-current-user [auth-links]
   (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
     (auth-get (:href user-link)
-      {:headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type, Authorization"
-          ; custom content type
-          "content-type" (:type user-link)}}
+      {:headers (headers-for-link user-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:user-data (json->cljs body)])))))
 
@@ -636,11 +595,7 @@
              (map? new-user-data))
     (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")]
       (auth-patch (:href user-update-link)
-        {:headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type, Authorization"
-          ; custom content type
-          "content-type" (:type user-update-link)}
+        {:headers (headers-for-link user-update-link)
          :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
          (fn [{:keys [status body success]}]
            (when success
@@ -661,11 +616,7 @@
           team-data (get teams-data (:team-id first-team))
           add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.email-domain.v1"})]
       (auth-post (:href add-domain-team-link)
-        {:headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type, Authorization"
-          ; custom content type
-          "content-type" (:type add-domain-team-link)}
+        {:headers (headers-for-link add-domain-team-link)
          :body domain}
         (fn [{:keys [status body success]}]
           (dispatcher/dispatch! [:add-email-domain-team/finish (= status 204)]))))))
