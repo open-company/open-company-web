@@ -491,13 +491,15 @@
 (defn resend-invitation [db user]
   (let [api-entry-point-links (:api-entry-point db)
         companies (count (filter #(= (:rel %) "company") api-entry-point-links))
-        idx (.indexOf (:enumerate-users db) user)
+        team-data (get (:enumerate-users db) (router/current-team-id))
+        idx (.indexOf (:users team-data) user)
         json-params {:email (:email user)}
         with-first-name (if (:first-name user) (assoc json-params :first-name (:first-name user)) json-params)
         with-last-name (if (:last-name user) (assoc with-first-name :last-name (:last-name user)) with-first-name)
-        with-company-name (if (= companies 1) (assoc with-last-name :company-name (:name (utils/link-for api-entry-point-links "company"))) with-last-name)]
-    (api/user-invitation-action (utils/link-for (:links user) "invite") with-company-name)
-    (assoc-in db [:enumerate-users idx :loading] true)))
+        with-company-name (if (= companies 1) (assoc with-last-name :company-name (:name (utils/link-for api-entry-point-links "company"))) with-last-name)
+        with-admin (assoc with-company-name :admin (or (:admin user) false))]
+    (api/user-action (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"}) with-admin)
+    (assoc-in db [:enumerate-users (router/current-team-id) :users idx :loading] true)))
 
 (defmethod dispatcher/action :resend-invitation
   [db [_ user]]
@@ -545,15 +547,15 @@
   (api/enumerate-users)
   (assoc db :invite-by-email-error true))
 
-(defmethod dispatcher/action :user-invitation-action
+(defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]
   (let [teams (:enumerate-users db)
         team-data (get teams team-id)
         idx (.indexOf (:users team-data) invitation)]
-    (api/user-invitation-action (utils/link-for (:links invitation) action method other-link-params) payload)
+    (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload)
     (assoc-in db [:enumerate-users idx :loading] true)))
 
-(defmethod dispatcher/action :user-invitation-action/complete
+(defmethod dispatcher/action :user-action/complete
   [db [_]]
   ; refresh the list of users once the invitation action complete
   (api/enumerate-users)
