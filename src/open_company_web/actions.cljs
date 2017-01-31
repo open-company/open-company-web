@@ -568,9 +568,9 @@
 
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
-  (when (= status 200)
+  (when (= status 201)
     (cook/set-cookie! :show-login-overlay "collect-name-password"))
-  (assoc db :email-confirmed (= status 200)))
+  (assoc db :email-confirmed (= status 201)))
 
 (defmethod dispatcher/action :collect-name-pswd
   [db [_]]
