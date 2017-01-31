@@ -69,7 +69,10 @@
     "PUT"))
 
 (defn headers-for-link [link]
- (let [acah-headers (if (nil? (:access-control-allow-headers link)) {} {"Access-Control-Allow-Headers" "Content-Type, Authorization"})
+ (let [acah-headers (if (and (contains? link :access-control-allow-headers)
+                             (nil? (:access-control-allow-headers link)))
+                      {}
+                      {"Access-Control-Allow-Headers" "Content-Type, Authorization"})
        with-content-type (if (:content-type link) (assoc acah-headers "content-type" (:content-type link)) acah-headers)
        with-accept (if (:accept link) (assoc with-content-type "accept" (:accept link)) with-content-type)]
   with-accept))
