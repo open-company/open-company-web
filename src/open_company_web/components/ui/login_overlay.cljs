@@ -20,7 +20,7 @@
 (def dont-scroll
   {:will-mount (fn [s]
                 (when-not (contains? @dis/app-state :auth-settings)
-                  (dis/dispatch! [:get-auth-settings]))
+                  (utils/after 100 #(dis/dispatch! [:get-auth-settings])))
                 s)
    :before-render (fn [s]
                     (if (responsive/is-mobile-size?)
@@ -322,9 +322,10 @@
                                      dont-scroll
                                      {:did-mount (fn [s]
                                                    ; initialise the keys to string to avoid jumps in UI focus
-                                                   (dis/dispatch! [:input [:collect-name-pswd :firstname] (or (:firstname (:collect-name-pswd @dis/app-state)) "")])
-                                                   (dis/dispatch! [:input [:collect-name-pswd :lastname] (or (:lastname (:collect-name-pswd @dis/app-state)) "")])
-                                                   (dis/dispatch! [:input [:collect-name-pswd :pswd] (or (:pswd (:collect-name-pswd @dis/app-state)) "")])
+                                                   (utils/after 100
+                                                      #(dis/dispatch! [:input [:collect-name-pswd] {:firstname (or (:firstname (:collect-name-pswd @dis/app-state)) "")
+                                                                                                    :lastname (or (:lastname (:collect-name-pswd @dis/app-state)) "")
+                                                                                                    :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
                                                    (utils/after 100 #(.focus (sel1 [:input.firstname])))
                                                    s)})
   [state]
