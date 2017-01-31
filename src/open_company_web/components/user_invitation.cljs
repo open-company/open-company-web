@@ -13,7 +13,7 @@
   (let [user-links (:links invitation)
         user-dropdown-id (str "invite-row-user-" (:user-id invitation))
         add-link (utils/link-for user-links "add" "PUT")
-        admin-type {:type "application/vnd.open-company.team.admin.v1"}
+        admin-type {:ref "application/vnd.open-company.team.admin.v1"}
         remove-admin-link (utils/link-for user-links "remove" "DELETE" admin-type)
         add-admin-link (utils/link-for user-links "add" "PUT" admin-type)
         kick-off-team (utils/link-for user-links "remove" "DELETE")]
