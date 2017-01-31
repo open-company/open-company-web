@@ -23,6 +23,8 @@
             [cljsjs.emojione]) ; pulled in for cljsjs externs
   (:import  [goog.i18n NumberFormat]))
 
+(def user-admin-type "application/vnd.open-company.team.admin.v1")
+
 (defn abs
   "(abs n) is the absolute value of n"
   [n]
