@@ -1,21 +1,32 @@
 (ns open-company-web.components.users-list
   (:require [rum.core :as rum]
+            [cuerdas.core :as s]
             [open-company-web.dispatcher :as dis]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
-(defn user-action [team-id invitation action method other-link-params & [payload]]
+(defn user-action [team-id user action method other-link-params & [payload]]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
-  (dis/dispatch! [:user-action team-id invitation action method other-link-params payload]))
+  (dis/dispatch! [:user-action team-id user action method other-link-params payload]))
 
 (rum/defc user-row < rum/static
-  [team-id invitation]
-  (let [user-links (:links invitation)
-        user-dropdown-id (str "user-row-" (:user-id invitation))
+  [team-id user]
+  (let [user-links (:links user)
+        user-dropdown-id (str "user-row-" (:user-id user))
         add-link (utils/link-for user-links "add" "PUT")
-        is-admin? (:admin invitation)
+        is-admin? (:admin user)
         admin-type {:ref "application/vnd.open-company.team.admin.v1"}
-        kick-off-team (utils/link-for user-links "remove" "DELETE")]
+        kick-off-team (utils/link-for user-links "remove" "DELETE")
+        visualized-name (cond
+                          (and (not (s/blank? (:first-name user)))
+                               (not (s/blank? (:last-name user))))
+                          (str (:first-name user) " " (:last-name user))
+                          (not (s/blank? (:first-name user)))
+                          (:first-name user)
+                          (not (s/blank? (:last-name user)))
+                          (:last-name user)
+                          :else
+                          (:email user))]
     [:tr
       [:td
         [:div.dropdown
@@ -34,25 +45,25 @@
             {:aria-labelledby user-dropdown-id}
             [:li
               {:class (when (not is-admin?) "active")
-               :on-click #(user-action team-id invitation "remove" "DELETE" admin-type nil)}
+               :on-click #(user-action team-id user "remove" "DELETE" admin-type nil)}
               [:i.fa.fa-user] " Viewer"]
             [:li
               {:class (when is-admin? "active")
-               :on-click #(user-action team-id invitation "add" "PUT" admin-type nil)}
+               :on-click #(user-action team-id user "add" "PUT" admin-type nil)}
               [:i.fa.fa-gear] " Admin"]]]]
       [:td [:div.value
-             {:title (if (pos? (count (:email invitation))) (:email invitation) "")
+             {:title (if (pos? (count (:email user))) (:email user) "")
               :data-toggle "tooltip"
               :data-placement "top"
               :data-container "body"}
-             (or (str (:first-name invitation) " " (:last-name invitation)) (:email invitation))]]
-      [:td [:div (when (:status invitation)
-                   (let [upper-status (clojure.string/upper-case (:status invitation))]
+             visualized-name]]
+      [:td [:div (when (:status user)
+                   (let [upper-status (clojure.string/upper-case (:status user))]
                      (if (= upper-status "UNVERIFIED")
                        "ACTIVE"
                        upper-status)))]]
       [:td {:style {:text-align "center"}}
-        (if (:loading invitation)
+        (if (:loading user)
           ; if it's loading show the spinner
           [:div (small-loading)]
           [:div
@@ -63,7 +74,7 @@
                  :data-toggle "tooltip"
                  :data-container "body"
                  :title "RESEND INVITE"
-                 :on-click #(dis/dispatch! [:resend-invitation invitation])}
+                 :on-click #(dis/dispatch! [:resend-invite user])}
                 [:i.fa.fa-share]])
             ; if it has a delete link
             (when kick-off-team
@@ -73,7 +84,7 @@
                    :data-toggle "tooltip"
                    :data-container "body"
                    :title (if pending? "CANCEL INVITE" "REMOVE USER")
-                   :on-click #(user-action team-id invitation "remove" "DELETE" nil nil)}
+                   :on-click #(user-action team-id user "remove" "DELETE" nil nil)}
                   (if pending?
                     [:i.fa.fa-times]
                     [:i.fa.fa-trash-o])]))])]]))
@@ -83,7 +94,7 @@
                                           (when-not (utils/is-test-env?)
                                             (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                         s)}
-  [team-id invitations]
+  [team-id users]
   [:div.um-users-box.col-12.group
     [:table.table
       [:thead
@@ -93,5 +104,5 @@
           [:th "STATUS"]
           [:th {:style {:text-align "center"}} "ACTIONS"]]]
       [:tbody
-        (for [invitation invitations]
-          (rum/with-key (user-row team-id invitation) (str "invitation-tr-" team-id "-" (:user-id invitation))))]]])
+        (for [user users]
+          (rum/with-key (user-row team-id user) (str "user-tr-" team-id "-" (:user-id user))))]]])
