@@ -16,9 +16,6 @@
         is-admin? (:admin invitation)
         admin-type {:ref utils/user-admin-type}
         kick-off-team (utils/link-for user-links "remove" "DELETE")]
-    (js/console.log "user-row user:" invitation)
-    (js/console.log "   user-links" user-links)
-    (js/console.log "   kick-off-team" kick-off-team)
     [:tr
       [:td
         [:div.dropdown
