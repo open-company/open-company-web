@@ -513,8 +513,7 @@
           json-params {:email email
                        :first-name first-name
                        :last-name last-name
-                       :admin (or (= user-type :admin)
-                                  (= user-type :author))}
+                       :admin (= user-type :admin)}
           with-company-name (if (= companies 1)
                               (assoc json-params :company-name (:name (utils/link-for api-entry-point-links "company")))
                               json-params)]
