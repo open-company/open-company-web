@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [open-company-web.dispatcher :as dis]
+            [open-company-web.lib.jwt :as j]
             [open-company-web.lib.utils :as utils]
             [open-company-web.components.ui.small-loading :refer (small-loading)]))
 
@@ -13,10 +14,12 @@
   [team-id user]
   (let [user-links (:links user)
         user-dropdown-id (str "user-row-" (:user-id user))
-        add-link (utils/link-for user-links "add" "PUT")
+        add-link (utils/link-for user-links "add" "PUT" {:ref "application/vnd.open-company.user.v1+json"})
         is-admin? (:admin user)
         admin-type {:ref "application/vnd.open-company.team.admin.v1"}
-        kick-off-team (utils/link-for user-links "remove" "DELETE")
+        remove-user (utils/link-for user-links "remove" "DELETE" {:ref "application/vnd.open-company.user.v1+json"})
+        pending? (= (:status user) "pending")
+        is-self? (= (j/get-key :user-id) (:user-id user))
         visualized-name (cond
                           (and (not (s/blank? (:first-name user)))
                                (not (s/blank? (:last-name user))))
@@ -68,7 +71,8 @@
           [:div (small-loading)]
           [:div
             ; if it has an invite link show a resend invite button
-            (when add-link
+            (when (and pending?
+                       (not is-self?))
               [:button.btn-reset.user-row-action
                 {:data-placement "top"
                  :data-toggle "tooltip"
@@ -77,17 +81,16 @@
                  :on-click #(dis/dispatch! [:resend-invite user])}
                 [:i.fa.fa-share]])
             ; if it has a delete link
-            (when kick-off-team
-              (let [pending? (not (nil? add-link))]
-                [:button.btn-reset.user-row-action
-                  {:data-placement "top"
-                   :data-toggle "tooltip"
-                   :data-container "body"
-                   :title (if pending? "CANCEL INVITE" "REMOVE USER")
-                   :on-click #(user-action team-id user "remove" "DELETE" nil nil)}
-                  (if pending?
-                    [:i.fa.fa-times]
-                    [:i.fa.fa-trash-o])]))])]]))
+            (when remove-user
+              [:button.btn-reset.user-row-action
+                {:data-placement "top"
+                 :data-toggle "tooltip"
+                 :data-container "body"
+                 :title (if (and pending? (not is-self?)) "CANCEL INVITE" "REMOVE USER")
+                 :on-click #(user-action team-id user "remove" "DELETE"  nil)}
+                (if (and pending? (not is-self?))
+                  [:i.fa.fa-times]
+                  [:i.fa.fa-trash-o])])])]]))
 
 (rum/defc users-list < rum/static
                             {:did-mount (fn [s]
