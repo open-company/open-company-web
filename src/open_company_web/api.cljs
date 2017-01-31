@@ -659,7 +659,7 @@
     (let [teams-data (:enumerate-users @dispatcher/app-state)
           first-team (first (:teams teams-data))
           team-data (get teams-data (:team-id first-team))
-          add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.email-domain.v1"})]]
+          add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.email-domain.v1"})]
       (auth-post (:href add-domain-team-link)
         {:headers {
           ; required by Chrome
