@@ -488,7 +488,7 @@
     (assoc-in [:um-invite k] v)
     (dissoc :invite-by-email-error)))
 
-(defn resend-invitation [db user]
+(defn resend-invite [db user]
   (let [api-entry-point-links (:api-entry-point db)
         companies (count (filter #(= (:rel %) "company") api-entry-point-links))
         team-data (get (:enumerate-users db) (router/current-team-id))
@@ -501,9 +501,9 @@
     (api/user-action (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"}) with-admin)
     (assoc-in db [:enumerate-users (router/current-team-id) :users idx :loading] true)))
 
-(defmethod dispatcher/action :resend-invitation
+(defmethod dispatcher/action :resend-invite
   [db [_ user]]
-  (resend-invitation db user))
+  (resend-invite db user))
 
 (defmethod dispatcher/action :invite-by-email
   [db [_]]
@@ -515,7 +515,7 @@
     (if user
       (if (= (:status user) "pending")
         ;resend invitation since user was invited and didn't accept
-        (resend-invitation db user)
+        (resend-invite db user)
         ; user is already in, send error message
         (assoc db :invite-by-email-error :user-exists))
       ; looks like a new user, sending invitation
