@@ -14,7 +14,7 @@
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.components.ui.footer :as footer]
             [open-company-web.components.ui.login-required :refer (login-required)]
-            [open-company-web.components.user-invitation :refer (user-invitation)]
+            [open-company-web.components.users-list :refer (users-list)]
             [open-company-web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [open-company-web.components.team-disclaimer-popover :refer (team-disclaimer-popover)]
             [open-company-web.components.ui.popover :as popover :refer (add-popover-with-rum-component hide-popover)]))
@@ -126,7 +126,7 @@
               "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
           (let [first-team (first (jwt/get-key :teams))]
             (when (contains? enumerate-users first-team)
-              (user-invitation team-id (:users (get enumerate-users first-team)))))])
+              (users-list team-id (:users (get enumerate-users first-team)))))])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
@@ -138,7 +138,7 @@
               [:div.slack-domain.group
                 [:span (:name team)]
                 [:button.btn-reset
-                  {:on-click #(api/user-invitation-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                  {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                    :title "Remove Slack team"}
                   [:i.fa.fa-trash]]])]
           [:div.group
@@ -165,7 +165,7 @@
               [:div.email-domain.group
                 [:span (str "@" (:domain team))]
                 [:button.btn-reset
-                  {:on-click #(api/user-invitation-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                  {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                    :title "Remove email domain team"}
                   [:i.fa.fa-trash]]])]
           [:div.group
