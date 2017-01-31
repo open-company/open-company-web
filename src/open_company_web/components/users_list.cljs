@@ -14,7 +14,7 @@
         user-dropdown-id (str "user-row-" (:user-id invitation))
         add-link (utils/link-for user-links "add" "PUT")
         is-admin? (:admin invitation)
-        admin-type {:ref utils/user-admin-type}
+        admin-type {:ref "application/vnd.open-company.team.admin.v1"}
         kick-off-team (utils/link-for user-links "remove" "DELETE")]
     [:tr
       [:td
