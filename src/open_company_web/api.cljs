@@ -523,7 +523,7 @@
             (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
             (dispatcher/dispatch! [:invite-by-email/failed])))))))
 
-(defn user-invitation-action [action-link payload]
+(defn user-action [action-link payload]
   (when action-link
     (let [auth-req (case (:method action-link)
                       "POST" auth-post
@@ -538,7 +538,7 @@
       (auth-req (:href action-link)
         with-payload
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:user-invitation-action/complete]))))))
+          (dispatcher/dispatch! [:user-action/complete]))))))
 
 (defn confirm-invitation [token]
   (let [auth-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "authenticate" "GET" {:auth-source "email"})]
