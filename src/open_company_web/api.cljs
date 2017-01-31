@@ -504,7 +504,7 @@
   [email user-type first-name last-name]
   (when (and email user-type)
     (let [team-data (get (:enumerate-users @dispatcher/app-state) (router/current-team-id))
-          invitation-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.invite.v1"})
+          invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
           api-entry-point-links (:api-entry-point @dispatcher/app-state)
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
           json-params {:email email
@@ -614,7 +614,7 @@
     (let [teams-data (:enumerate-users @dispatcher/app-state)
           first-team (first (:teams teams-data))
           team-data (get teams-data (:team-id first-team))
-          add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:type "application/vnd.open-company.team.email-domain.v1"})]
+          add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.email-domain.v1"})]
       (auth-post (:href add-domain-team-link)
         {:headers (headers-for-link add-domain-team-link)
          :body domain}
