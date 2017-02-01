@@ -28,10 +28,9 @@
             (when (get-in data [:jwt :avatar-url])
               (dom/img {:class "user-profile-avatar" :src (get-in data [:jwt :avatar-url])}))))
         (dom/div {:class "user-profile-disclaimer"}
-          "User information is from your Slack account."
-          (dom/div {:class "right"}
-            (dom/button {:class "btn-reset btn-link"
-                         :on-click #(dis/dispatch! [:refresh-slack-user])} "Refresh"))))
+          (dom/span {:class "left"} "User information is from your Slack account.")
+          (dom/button {:class "btn-reset btn-link left"
+                       :on-click #(dis/dispatch! [:refresh-slack-user])} "Refresh")))
       (let [columns-num (responsive/columns-num)
             card-width (responsive/calc-card-width)]
         (om/build footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num)))))))
