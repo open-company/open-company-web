@@ -37,11 +37,11 @@
   (let [not-mobile? (not (responsive/is-mobile-size?))]
     [:button.user-avatar-button.group
       {:type "button"
-       :class (str classes (when (clojure.string/blank? (:avatar (drv/react s :jwt))) " no-image"))
+       :class (str classes (when (clojure.string/blank? (:avatar-url (drv/react s :jwt))) " no-image"))
        :id "dropdown-toggle-menu"
        :data-toggle (when not-mobile? "dropdown")
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image (:avatar (drv/react s :jwt)))
+      (user-avatar-image (:avatar-url (drv/react s :jwt)))
       [:img {:src "/img/vert-ellipsis.svg" :width 5 :height 24}]]))
