@@ -735,3 +735,8 @@
     (when add-slack-team-link
       (router/redirect! (:href add-slack-team-link))))
   db)
+
+(defmethod dispatcher/action :refresh-slack-user
+  [db [_]]
+  (api/refresh-slack-user)
+  db)
