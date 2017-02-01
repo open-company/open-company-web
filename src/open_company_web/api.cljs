@@ -622,3 +622,12 @@
          :body domain}
         (fn [{:keys [status body success]}]
           (dispatcher/dispatch! [:add-email-domain-team/finish (= status 204)]))))))
+
+(defn refresh-slack-user []
+  (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh" "GET")]
+    (auth-get (:href refresh-url)
+      {:headers (headers-for-link refresh-url)}
+      (fn [{:keys [status body success]}]
+        (js/console.log "status" status)
+        (js/console.log "body" (json->cljs body))
+        (js/console.log "success" success)))))
