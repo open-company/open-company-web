@@ -119,11 +119,7 @@
                 [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
-          [:div.um-invite-label
-              "TEAM MEMBERS"]
-          (when (jwt/is-slack-org?)
-            [:div.um-invite-label-2
-              "Members of your " [:img {:src "/img/Slack_Icon.png" :width 14 :height 14}] " Slack team (not guests)."])
+          [:div.um-invite-label "TEAM MEMBERS"]
           (let [first-team (first (jwt/get-key :teams))]
             (when (contains? enumerate-users first-team)
               (users-list team-id (:users (get enumerate-users first-team)))))])
