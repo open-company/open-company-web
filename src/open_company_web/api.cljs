@@ -628,6 +628,5 @@
     (auth-get (:href refresh-url)
       {:headers (headers-for-link refresh-url)}
       (fn [{:keys [status body success]}]
-        (js/console.log "status" status)
-        (js/console.log "body" (json->cljs body))
-        (js/console.log "success" success)))))
+        (update-jwt-cookie! body)
+        (dispatcher/dispatch! [:jwt body])))))
