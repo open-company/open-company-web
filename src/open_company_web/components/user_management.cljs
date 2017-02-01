@@ -134,12 +134,24 @@
           [:div.um-invite-label-2
             "Connect with Slack to seamlessly onboard your Stack teammates as viewers."]
           [:div.team-list
-            (for [team (:slack-teams team-data)]
+            (for [team (:slack-orgs team-data)]
               [:div.slack-domain.group
+                {:key (str "slack-org-" (:slack-org-id team))}
                 [:span (:name team)]
+                (when (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})
+                  [:button.btn-reset
+                    {:on-click #(router/redirect! (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"}))
+                     :title "Add Slack bot to this team"
+                     :data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-container "body"}
+                     [:i.fa.fa-slack]])
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                   :title "Remove Slack team"}
+                   :title "Remove Slack team"
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"}
                   [:i.fa.fa-trash]]])]
           [:div.group
             [:button.btn-reset.mt2.add-slack-team.slack-button
