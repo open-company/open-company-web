@@ -515,7 +515,7 @@
                        :last-name last-name
                        :admin (= user-type :admin)}
           with-company-name (if (= companies 1)
-                              (assoc json-params :company-name (:name (utils/link-for api-entry-point-links "company")))
+                              (assoc json-params :org-name (:name (utils/link-for api-entry-point-links "company")))
                               json-params)]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)

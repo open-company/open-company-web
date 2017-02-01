@@ -496,7 +496,7 @@
         json-params {:email (:email user)}
         with-first-name (if (:first-name user) (assoc json-params :first-name (:first-name user)) json-params)
         with-last-name (if (:last-name user) (assoc with-first-name :last-name (:last-name user)) with-first-name)
-        with-company-name (if (= companies 1) (assoc with-last-name :company-name (:name (utils/link-for api-entry-point-links "company"))) with-last-name)
+        with-company-name (if (= companies 1) (assoc with-last-name :org-name (:name (utils/link-for api-entry-point-links "company"))) with-last-name)
         with-admin (assoc with-company-name :admin (or (:admin user) false))]
     (api/user-action (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"}) with-admin)
     (assoc-in db [:enumerate-users (router/current-team-id) :users idx :loading] true)))
