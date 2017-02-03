@@ -83,10 +83,12 @@
 (defmethod dispatcher/action :auth-settings [db [_ body]]
   (if body
     ; auth settings loaded
-    (when (and (utils/in? (:route @router/path) "confirm-invitation")
-                 (contains? (:query-params @router/path) :token))
-      ; call confirm-invitation if needed
-      (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+    (do
+      (api/get-current-user body)
+      (when (and (utils/in? (:route @router/path) "confirm-invitation")
+                   (contains? (:query-params @router/path) :token))
+        ; call confirm-invitation if needed
+        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path))))))
     ; if the auth-settings call failed retry it in 2 seconds
     (utils/after 2000 #(api/get-auth-settings)))
   (assoc db :auth-settings body))
@@ -684,13 +686,6 @@
 (defmethod dispatcher/action :reset-user-profile
   [db [_]]
   (assoc db :edit-user-profile (assoc (:current-user-data db) :password "")))
-
-(defmethod dispatcher/action :get-current-user
-  [db [_]]
-  (if (:auth-settings db)
-    (api/get-current-user (:auth-settings db))
-    (utils/after 1000 #(dispatcher/dispatch! [:get-current-user])))
-  db)
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]
