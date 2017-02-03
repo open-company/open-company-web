@@ -515,7 +515,9 @@
                        :last-name last-name
                        :admin (= user-type :admin)}
           with-company-name (if (= companies 1)
-                              (assoc json-params :org-name (:name (utils/link-for api-entry-point-links "company")))
+                              (let [company-link (utils/link-for api-entry-point-links "company")]
+                                (merge json-params {:org-name (:name company-link)
+                                                    :logo-url (:logo-url company-link)}))
                               json-params)]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)
@@ -628,5 +630,8 @@
     (auth-get (:href refresh-url)
       {:headers (headers-for-link refresh-url)}
       (fn [{:keys [status body success]}]
-        (update-jwt-cookie! body)
-        (dispatcher/dispatch! [:jwt body])))))
+        (if success
+          (do
+            (update-jwt-cookie! body)
+            (dispatcher/dispatch! [:jwt body]))
+          (router/redirect! oc-urls/logout))))))
