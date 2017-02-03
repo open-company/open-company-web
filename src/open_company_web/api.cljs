@@ -559,7 +559,7 @@
           (utils/after 100 #(dispatcher/dispatch! [:invitation-confirmed status])))))))
 
 (defn collect-name-password [firstname lastname pswd]
-  (let [update-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "partial-update" "PATCH")]
+  (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
     (when (and (or firstname lastname) pswd update-link)
       (auth-patch (:href update-link)
         {:json-params {
@@ -570,8 +570,7 @@
          :headers (headers-for-link update-link)}
         (fn [{:keys [status body success]}]
           (when success
-            (update-jwt-cookie! body)
-            (dispatcher/dispatch! [:jwt (j/get-contents)]))
+            (dispatcher/dispatch! [:user-data (json->cljs body)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
 
 (defn delete-revision [topic revision-data]
