@@ -74,7 +74,7 @@
                                   ; reset the user-type to what was before the user enter this div with the mouse
                                   (dis/dispatch! [:invite-by-email-change :user-type @(::last-user-type s)])))}
               [:button.user-type-picker-btn.btn-reset.viewer
-                {:class (if (= user-type :viewer) "active" "")
+                {:class (str "" (when-not valid-email? "disabled") (when (= user-type :viewer) " active"))
                  :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :viewer])
                  :on-click #(do (reset! (::last-user-type s) :viewer) (dis/dispatch! [:invite-by-email-change :user-type :viewer]))}
                 (when (= user-type :viewer)
@@ -83,7 +83,7 @@
                     "VIEWER " [:i.fa.fa-question-circle]])
                 [:i.fa.fa-user]]
               [:button.user-type-picker-btn.btn-reset.author
-                {:class (if (= user-type :author) "active" "")
+                {:class (str "" (when-not valid-email? "disabled") (when (= user-type :author) " active"))
                  :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :author])
                  :on-click #(do (reset! (::last-user-type s) :author) (dis/dispatch! [:invite-by-email-change :user-type :author]))}
                 (when (= user-type :author)
@@ -92,7 +92,7 @@
                     "AUTHOR " [:i.fa.fa-question-circle]])
                 [:i.fa.fa-pencil]]
               [:button.user-type-picker-btn.btn-reset.admin
-                {:class (if (= user-type :admin) "active" "")
+                {:class (str "" (when-not valid-email? "disabled") (when (= user-type :admin) " active"))
                  :on-mouse-over #(dis/dispatch! [:invite-by-email-change :user-type :admin])
                  :on-click #(do (reset! (::last-user-type s) :admin) (dis/dispatch! [:invite-by-email-change :user-type :admin]))}
                 (when (= user-type :admin)
