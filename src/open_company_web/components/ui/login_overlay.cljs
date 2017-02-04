@@ -322,9 +322,9 @@
                                      dont-scroll
                                      {:did-mount (fn [s]
                                                    ; initialise the keys to string to avoid jumps in UI focus
-                                                   (utils/after 100
-                                                      #(dis/dispatch! [:input [:collect-name-pswd] {:firstname (or (:firstname (:collect-name-pswd @dis/app-state)) "")
-                                                                                                    :lastname (or (:lastname (:collect-name-pswd @dis/app-state)) "")
+                                                   (utils/after 500
+                                                      #(dis/dispatch! [:input [:collect-name-pswd] {:firstname (or (:first-name (:current-user-data @dis/app-state)) "")
+                                                                                                    :lastname (or (:last-name (:current-user-data @dis/app-state)) "")
                                                                                                     :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
                                                    (utils/after 100 #(.focus (sel1 [:input.firstname])))
                                                    s)})
