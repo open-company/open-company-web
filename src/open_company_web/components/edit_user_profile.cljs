@@ -140,7 +140,7 @@
                                    :data-container "body"
                                    :data-placement "top"}
                         (dom/i {:class "fa fa-remove"})))
-                    (user-avatar-image (:avatar-url (:edit-user-profile data))))
+                    (user-avatar-image (:edit-user-profile data)))
                   (dom/button {:class "btn-reset camera left"
                                :title (if (zero? (count (:avatar-url (:edit-user-profile data)))) "Add a profile avatar" "Change the profile avatar")
                                :type "button"

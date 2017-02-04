@@ -7,28 +7,24 @@
             [open-company-web.components.ui.icon :as i]
             [open-company-web.lib.responsive :as responsive]))
 
-(rum/defcs avatar-with-initials < rum/static
-                                 rum/reactive
-                                 (drv/drv :current-user-data)
-  [s]
+(rum/defc avatar-with-initials < rum/static
+  [user-data]
   [:div.user-avatar-name
-    (when (or (:first-name (drv/react s :current-user-data))
-              (:last-name (drv/react s :current-user-data)))
-      (let [first-name-initial (or (first (:first-name (drv/react s :current-user-data))) "")
-            last-name-initial (or (first (:last-name (drv/react s :current-user-data))) "")
+    (when (or (:first-name user-data)
+              (:last-name user-data))
+      (let [first-name-initial (or (first (:first-name user-data)) "")
+            last-name-initial (or (first (:last-name user-data)) "")
             avatar-name (clojure.string/upper-case (str first-name-initial
                                                         last-name-initial))]
         [:span.user-avatar-name-span avatar-name]))])
 
-(rum/defcs user-avatar-image < rum/static
-                               rum/reactive
-                               (drv/drv :current-user-data)
-  [s avatar-url]
-  (if-not (clojure.string/blank? avatar-url)
+(rum/defc user-avatar-image < rum/static
+  [user-data]
+  (if-not (clojure.string/blank? (:avatar-url user-data))
     [:img.user-avatar-img
-      {:src avatar-url
-       :title (:real-name (drv/react s :current-user-data))}]
-    (avatar-with-initials)))
+      {:src (:avatar-url user-data)
+       :title (str (:first-name user-data) " " (:last-name user-data))}]
+    (avatar-with-initials user-data)))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive
@@ -43,5 +39,5 @@
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image (:avatar-url (drv/react s :current-user-data)))
+      (user-avatar-image (drv/react s :current-user-data))
       [:img {:src "/img/vert-ellipsis.svg" :width 5 :height 24}]]))
