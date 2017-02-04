@@ -15,18 +15,18 @@
         (dom/div {:class "user-profile-content group"}
           (dom/div {:class "left-column"}
             (dom/div {:class "user-profile-name-title data-title"} "FIRST NAME")
-            (dom/div {:class "user-profile-name"} (get-in data [:jwt :first-name]))
+            (dom/div {:class "user-profile-name"} (get-in data [:current-user-data :first-name]))
             (dom/div {:class "user-profile-name-title data-title"} "LAST NAME")
-            (dom/div {:class "user-profile-name"} (get-in data [:jwt :last-name]))
+            (dom/div {:class "user-profile-name"} (get-in data [:current-user-data :last-name]))
             (dom/div {:class "user-profile-org-title data-title"} "SLACK ORGANIZATION")
-            (dom/div {:class "user-profile-org"} (get-in data [:jwt :org-name]))
+            (dom/div {:class "user-profile-org"} (get-in data [:current-user-data :org-name]))
             (dom/div {:class "user-profile-email-title data-title"} "EMAIL")
-            (dom/div {:class "user-profile-email"} (get-in data [:jwt :email])))
+            (dom/div {:class "user-profile-email"} (get-in data [:current-user-data :email])))
           (dom/div {:class "right-column"}
-            (when (get-in data [:jwt :avatar-url])
+            (when (get-in data [:current-user-data :avatar-url])
               (dom/div {:class "user-profile-avatar-title data-title"} "AVATAR"))
-            (when (get-in data [:jwt :avatar-url])
-              (dom/img {:class "user-profile-avatar" :src (get-in data [:jwt :avatar-url])}))))
+            (when (get-in data [:current-user-data :avatar-url])
+              (dom/img {:class "user-profile-avatar" :src (get-in data [:current-user-data :avatar-url])}))))
         (dom/div {:class "user-profile-disclaimer"}
           (dom/span {:class "left"} "User information is from your Slack account.")
           (dom/button {:class "btn-reset btn-link left"
