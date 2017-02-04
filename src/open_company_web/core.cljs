@@ -92,7 +92,7 @@
   (router/set-route! ["companies"] {})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
-  (api/get-entry-point)
+  (api/get-entry-point false)
   (api/get-companies)
   ;; render component
   (drv-root list-companies target))
@@ -242,7 +242,7 @@
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-company"] {:query-params (:query-params params)})
-          (api/get-entry-point)
+          (api/get-entry-point false)
           (drv-root company-editor target))
         (login-handler target params)))
 
