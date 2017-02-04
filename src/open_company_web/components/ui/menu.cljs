@@ -73,7 +73,7 @@
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "View Shared Updates"))))
         (when (and (router/current-company-slug)
-                   (jwt/get-key :admin)
+                   (jwt/is-admin?)
                    (not (:read-only (dis/company-data))))
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} "Manage Team")))
