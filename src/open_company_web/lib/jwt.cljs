@@ -25,3 +25,8 @@
 
 (defn team-id []
   (first (get-key :teams)))
+
+(defn is-admin? []
+  (let [current-team (open-company-web.router/current-team-id)
+        admins (get-key :admin)]
+    (some #{current-team} admins)))
