@@ -615,8 +615,7 @@
 (defn add-email-domain [domain]
   (when domain
     (let [teams-data (:enumerate-users @dispatcher/app-state)
-          first-team (first (:teams teams-data))
-          team-data (get teams-data (:team-id first-team))
+          team-data (get teams-data (router/current-team-id))
           add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.email-domain.v1"})]
       (auth-post (:href add-domain-team-link)
         {:headers (headers-for-link add-domain-team-link)
