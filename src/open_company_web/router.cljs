@@ -5,7 +5,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
-            [open-company-web.lib.raven :as raven]))
+            [open-company-web.lib.raven :as raven]
+            [open-company-web.lib.jwt :as jwt]))
 
 (def path (atom {}))
 
@@ -111,4 +112,5 @@
   (:as-of (:query-params @path)))
 
 (defn current-team-id []
-  (:team-id @path))
+  ;; TODO: use the team switch system to get the current team if none is specified in the URL
+  (or (:team-id @path) (first (jwt/get-key :teams))))
