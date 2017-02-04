@@ -534,8 +534,7 @@
                         :else "")
             last-name (cond
                         splittable-name? (second splitted-name)
-                        :else "")
-            first-team (first (:teams (:jwt db)))]
+                        :else "")]
         (api/send-invitation email-address (:user-type (:um-invite db)) first-name last-name)
         (dissoc db :invite-by-email-error)))))
 
@@ -728,8 +727,7 @@
 (defmethod dispatcher/action :add-slack-team
   [db [_]]
   (let [teams-data (:enumerate-users db)
-        first-team (first (:teams teams-data))
-        team-data (get teams-data (:team-id first-team))
+        team-data (get teams-data (router/current-team-id))
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})]
     (when add-slack-team-link
       (router/redirect! (:href add-slack-team-link))))
