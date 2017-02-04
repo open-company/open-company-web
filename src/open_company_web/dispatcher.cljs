@@ -28,6 +28,7 @@
                                   :invite-by-email-error (:invite-by-email-error base)
                                   :add-email-domain-team-error (:add-email-domain-team-error base)})]
    :jwt                [[:base] (fn [base] (:jwt base))]
+   :current-user-data  [[:base] (fn [base] (:current-user-data base))]
    :subscription       [[:base] (fn [base] (:subscription base))]
    :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data   [[:base] (fn [base] (:rum-popover-data base))]
