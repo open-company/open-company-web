@@ -120,15 +120,15 @@
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label "TEAM MEMBERS"]
-          (let [first-team (first (jwt/get-key :teams))]
-            (when (contains? enumerate-users first-team)
-              (users-list team-id (:users (get enumerate-users first-team)))))])
+          (let [team-id (router/current-team-id)]
+            (when (contains? enumerate-users team-id)
+              (users-list team-id (:users (get enumerate-users team-id)))))])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
               "SLACK TEAMS"]
           [:div.um-invite-label-2
-            "Connect with Slack to seamlessly onboard your Stack teammates as viewers."]
+            "Connect with Slack to seamlessly onboard your Slack teammates as viewers."]
           [:div.team-list
             (for [team (:slack-orgs team-data)]
               [:div.slack-domain.group
@@ -167,7 +167,7 @@
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
-            "People with email addresses in the specified domains can join your team as viewers."]
+            "Anyone who signs up with this email domain will be a viewer on your team."]
           [:div.team-list
             (for [team (:email-domains team-data)]
               [:div.email-domain.group
