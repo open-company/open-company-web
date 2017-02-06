@@ -144,7 +144,7 @@
 (defn get-entry-point [& [redirect-if-necessary]]
   (api-get "/" nil (fn [response]
                      (let [body (if (:success response) (:body response) {})]
-                       (dispatcher/dispatch! [:entry body (if (nil? redirect-if-necessary) true redirect-if-necessary)])))))
+                       (dispatcher/dispatch! [:entry (json->cljs body) (if (nil? redirect-if-necessary) true redirect-if-necessary)])))))
 
 (defn get-subscription [company-uuid]
   (pay-get (str "/subscriptions/" company-uuid)
@@ -153,18 +153,19 @@
              (let [body (if (:success response) (:body response) {})]
                (dispatcher/dispatch! [:subscription body])))))
 
-(defn get-companies []
-  (api-get "/companies" nil #(dispatch-body :companies %)))
+(defn get-org [org-data & [redirect-if-necessary]]
+  (when-let [org-link (utils/link-for (:links org-data) "item" "GET")]
+    (api-get (:href org-link)
+      {:headers (headers-for-link org-link)}
+      (fn [{:keys [status body success]}]
+        (dispatcher/dispatch! [:org (json->cljs body) (if (nil? redirect-if-necessary) true redirect-if-necessary)])))))
 
-(defn get-company [slug]
-  (when slug
-    (api-get (str "/companies/" slug)
-             nil
-             (fn [{:keys [success body status]}]
-               (dispatcher/dispatch! [:company {:slug slug
-                                                :success success
-                                                :status status
-                                                :body (when success (json->cljs body))}])))))
+(defn get-board [board-data]
+  (when-let [board-link (utils/link-for (:links board-data) "item" "GET")]
+    (api-get (:href board-link)
+      {:headers (headers-for-link board-link)}
+      (fn [{:keys [status body success]}]
+        (dispatcher/dispatch! [:board (json->cljs body)])))))
 
 (defn create-company [data]
   (when data
@@ -180,7 +181,7 @@
   (when data
     (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded :revisions :section)
           json-data (cljs->json company-data)
-          links (:links (dispatcher/company-data))
+          links (:links (dispatcher/board-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href company-link)
         { :json-params json-data
@@ -223,7 +224,7 @@
 (defn save-or-create-section [section-data]
   (when section-data
     (let [links (:links section-data)
-          slug (router/current-company-slug)
+          slug (router/current-board-slug)
           section (keyword (:section section-data))
           cleaned-section-data (apply dissoc section-data section-private-keys)
           json-data (cljs->json cleaned-section-data)
@@ -256,7 +257,7 @@
   "PATCH a section, dispatching the results with a `:section` action."
   ([section section-data]
   (when (and section section-data)
-    (let [slug (keyword (router/current-company-slug))
+    (let [slug (keyword (router/current-board-slug))
           section-kw (keyword section)
           partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")
           cleaned-section-data (apply dissoc section-data section-private-keys)
@@ -294,7 +295,7 @@
 (defn update-finances-data[finances-data]
   (when finances-data
     (let [links (:links finances-data)
-          slug (router/current-company-slug)
+          slug (router/current-board-slug)
           data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only :revisions-data) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
@@ -314,8 +315,8 @@
 
 (defn patch-sections [sections & [new-section section-name]]
   (when sections
-    (let [slug (keyword (router/current-company-slug))
-          company-data (dispatcher/company-data)
+    (let [slug (keyword (router/current-board-slug))
+          company-data (dispatcher/board-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           payload (if (and new-section section-name)
                     {:sections sections
@@ -336,8 +337,8 @@
 
 (defn patch-stakeholder-update [stakeholder-update]
   (when stakeholder-update
-    (let [slug (keyword (router/current-company-slug))
-          company-data (dispatcher/company-data)
+    (let [slug (keyword (router/current-board-slug))
+          company-data (dispatcher/board-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
           json-data (cljs->json {:stakeholder-update stakeholder-update})]
       (api-patch (:href company-patch-link)
@@ -354,8 +355,8 @@
 
 (defn remove-section [section-name]
   (when (and section-name)
-    (let [slug (keyword (router/current-company-slug))
-          company-data (dispatcher/company-data)
+    (let [slug (keyword (router/current-board-slug))
+          company-data (dispatcher/board-data)
           sections (:sections company-data)
           new-sections (apply merge (map (fn [[k v]]
                                            {k (utils/vec-dissoc v section-name)})
@@ -369,8 +370,8 @@
    It's possible to force the load passing an optional boolean parameter."
   (when (or force-load (not @new-sections-requested))
     (reset! new-sections-requested true)
-    (let [slug (keyword (router/current-company-slug))
-          company-data (dispatcher/company-data)
+    (let [slug (keyword (router/current-board-slug))
+          company-data (dispatcher/board-data)
           links (:links company-data)
           add-section-link (utils/link-for links "section-list" "GET")]
       (when add-section-link
@@ -387,8 +388,8 @@
               (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
 
 (defn share-stakeholder-update [{:keys [email slack]}]
-  (let [slug         (keyword (router/current-company-slug))
-        company-data (dispatcher/company-data)
+  (let [slug         (keyword (router/current-board-slug))
+        company-data (dispatcher/board-data)
         links        (:links company-data)
         post-data    (cond email (assoc email :email true)
                            slack (assoc slack :slack true))
@@ -405,8 +406,8 @@
             (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
 
 (defn get-su-list []
-  (let [slug (keyword (router/current-company-slug))
-        company-data (dispatcher/company-data)
+  (let [slug (keyword (router/current-board-slug))
+        company-data (dispatcher/board-data)
         links (:links company-data)
         su-link (utils/link-for links "stakeholder-updates" "GET")]
     (when su-link
