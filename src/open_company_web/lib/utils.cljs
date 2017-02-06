@@ -502,7 +502,7 @@
         cc (slug @company-cache)]
     (swap! company-cache update-in [slug] dissoc k)))
 
-(defn clean-company-caches []
+(defn clean-org-caches []
   (reset! company-cache {}))
 
 (defn thousands-separator

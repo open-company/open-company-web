@@ -54,11 +54,14 @@
 
 (def companies-key [:companies])
 
-(defn company-data-key [company-slug]
-  [(keyword company-slug) :company-data])
+(defn org-data-key [org-slug]
+  [(keyword org-slug) :org-data])
 
-(defn company-section-key [company-slug section]
-  [(keyword company-slug) :company-data (keyword section)])
+(defn board-data-key [org-slug board-slug]
+  [(keyword org-slug) :boards (keyword board-slug) :board-data])
+
+(defn board-topic-key [org-slug board-slug topic-slug]
+  (conj (board-data-key org-slug board-slug) (keyword topic-slug)))
 
 (defn su-list-key [company-slug]
   [(keyword company-slug) :su-list])
@@ -78,13 +81,23 @@
 (defn revision-key [slug section as-of]
   (vec (conj (section-revisions-key slug section) (str as-of))))
 
-(defn company-data
+(defn org-data
   ([]
     (company-data @app-state))
   ([data]
-    (company-data data (router/current-company-slug)))
-  ([data company-slug]
-    (get-in data (company-data-key company-slug))))
+    (company-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (org-data-key org-slug))))
+
+(defn board-data
+  ([]
+    (board-data @app-state))
+  ([data]
+    (board-data data (router/current-org-slug) (router/current-board-slug)))
+  ([data org-slug]
+    (board-data data org-slug (router/current-board-slug)))
+  ([data org-slug board-slug]
+    (get-in data (board-data-key org-slug board-slug))))
 
 (defn latest-stakeholder-update
   ([]
