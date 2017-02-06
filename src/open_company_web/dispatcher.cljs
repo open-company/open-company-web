@@ -83,9 +83,9 @@
 
 (defn org-data
   ([]
-    (company-data @app-state))
+    (org-data @app-state))
   ([data]
-    (company-data data (router/current-org-slug)))
+    (org-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
 
@@ -103,7 +103,7 @@
   ([]
     (latest-stakeholder-update @app-state))
   ([data]
-    (latest-stakeholder-update data (router/current-company-slug)))
+    (latest-stakeholder-update data (router/current-board-slug)))
   ([data company-slug]
     (get-in data (latest-stakeholder-update-key company-slug))))
 
@@ -111,7 +111,7 @@
   ([]
     (stakeholder-update-list-data @app-state))
   ([data]
-    (stakeholder-update-list-data data (router/current-company-slug)))
+    (stakeholder-update-list-data data (router/current-board-slug)))
   ([data company-slug]
     (get-in data (su-list-key company-slug))))
 
@@ -119,18 +119,12 @@
   ([]
     (stakeholder-update-data @app-state))
   ([data]
-    (stakeholder-update-data data (router/current-company-slug) (router/current-stakeholder-update-slug)))
+    (stakeholder-update-data data (router/current-board-slug) (router/current-stakeholder-update-slug)))
   ([data company-slug update-slug]
     (get-in data (stakeholder-update-key company-slug update-slug))))
 
 (defn force-edit-topic []
   (:force-edit-topic @app-state))
-
-(defn save-last-company-slug []
-  (swap! app-state assoc :last-slug (router/current-company-slug)))
-
-(defn last-company-slug []
-  (:last-slug @app-state))
 
 (defn revision
   ([slug section as-of] (revision slug section as-of @app-state))
