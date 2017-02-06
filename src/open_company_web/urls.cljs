@@ -54,7 +54,7 @@
   ([org-slug]
     (str "/" (name org-slug))))
 
-;; Companies
+;; Boards
 
 (defn boards
   ([]
@@ -90,10 +90,10 @@
   ([org-slug board-slug]
     (str (board-settings org-slug board-slug) "/logo")))
 
-(defn board-settings-um
-  "Board profile url"
+(defn team-settings-um
+  "Team settings url"
   ([]
-    (board-settings-um (j/team-id)))
+    (team-settings-um (j/team-id)))
   ([team-id]
     (str "/" team-id "/settings/user-management")))
 
