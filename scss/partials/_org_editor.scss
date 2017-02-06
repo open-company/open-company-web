@@ -1,4 +1,4 @@
-div.company-editor {
+div.org-editor {
 
   div.fullscreen-page {
     background-color: $oc_gray_1;
@@ -7,7 +7,7 @@ div.company-editor {
       background-color: white;
     }
 
-    div.company-editor-box {
+    div.org-editor-box {
       width: 520px;
       margin: #{$navbar_height + 20}px auto 20px;
       background-color: white;
@@ -33,7 +33,7 @@ div.company-editor {
         padding: #{$navbar_height + 20}px 20px 20px;
       }
 
-      label.company-editor-message {
+      label.org-editor-message {
         display: block;
         width: 100%;
         font-weight: 400;
@@ -42,7 +42,7 @@ div.company-editor {
         text-align: left;
       } 
 
-      input.company-editor-input {
+      input.org-editor-input {
         border: 1px solid rgba(78,90,107,0.4);
         height: 42px;
         width: 100%;
