@@ -145,7 +145,7 @@
         (build-site)
         (cljs-repl)
         (reload :asset-path "/public"
-                :on-jsload 'open-company-web.core/on-js-reload)
+                :on-jsload 'oc.web.core/on-js-reload)
         (cljs :optimizations :none
               :compiler-options {:source-map-timestamp true
                                  :preloads '[devtools.preload]})))
@@ -161,7 +161,7 @@
         (build-site)
         ; reload is broken with simple/advanced compilation https://github.com/adzerk-oss/boot-reload/issues/89
         ; (reload :asset-path "/public"
-        ;         :on-jsload 'open-company-web.core/on-js-reload)
+        ;         :on-jsload 'oc.web.core/on-js-reload)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {
