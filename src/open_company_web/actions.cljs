@@ -33,29 +33,48 @@
   (router/redirect! "/")
   (dissoc db :jwt))
 
-(defmethod dispatcher/action :entry [db [_ {:keys [links]} redirect-if-necessary]]
-  (let [create-link    (med/find-first #(= (:rel %) "company-create") links)
-        slug           (fn [co] (last (string/split (:href co) #"/")))
-        [first second] (filter #(= (:rel %) "company") links)]
-    (when redirect-if-necessary
+(defmethod dispatcher/action :entry [db [_ {:keys [collection]} redirect-if-necessary]]
+  (let [orgs (:orgs collection)]
+    (cond redirect-if-necessary
       (let [login-redirect (cook/get-cookie :login-redirect)]
         (cond
           ; redirect to create-company if the user has no companies
-          (and create-link (not first))   (router/nav! oc-urls/create-company)
+          (zero? (count orgs))   (router/nav! oc-urls/create-org)
           ; if there is a login-redirect use it
           (and (jwt/jwt) login-redirect)  (do
                                             (cook/remove-cookie! :login-redirect)
                                             (router/redirect! login-redirect))
           ; if the user has only one company, send him to the company dashboard
-          (and first (not second))        (router/nav! (oc-urls/company (slug first)))
+          (= (count orgs) 1)        (router/nav! (oc-urls/boards (:slug (first orgs))))
           ; if the user has more than one company send him to the companies page
-          (and first second)              (router/nav! oc-urls/companies))))
-    (assoc
-      (if (utils/in? (:route @router/path) "create-company")
-        (dissoc db :loading)
-        db)
-      :api-entry-point
-      links)))
+          (> (count orgs) 1)        (router/nav! oc-urls/orgs)))
+      (:load-org-data db)
+      (api/get-org (first (filter #(= (:slug %) (router/current-org-slug)) orgs))))
+    (-> db
+        (dissoc :loading)
+        (assoc :orgs orgs)
+        (assoc :api-entry-point (:links collection)))))
+
+(defmethod dispatcher/action :org [db [_ org-data refirect-if-necessary]]
+  (let [boards (:boards org-data)]
+    (cond
+      (and refirect-if-necessary
+           (nil? (router/current-board-slug)))
+      (cond
+        ;; Redirect to create board if no board are present
+        (zero? (count boards))
+        (router/nav! (oc-urls/create-board (router/current-org-slug)))
+        ;; Redirect to the first board if only one is presnet
+        (= (count boards) 1)
+        (router/nav! (oc-urls/board (router/current-org-slug) (:slug (first boards)))))
+      (and (:load-board-data db)
+           (router/current-board-slug))
+      (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
+        (api/get-board board-data))))
+  (assoc-in db (dispatcher/org-data-key (:slug org-data)) org-data))
+
+(defmethod dispatcher/action :board [db [_ board-data]]
+  (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) board-data))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/create-company (:company-editor db))
@@ -64,19 +83,18 @@
 (defmethod dispatcher/action :company-created [db [_ body]]
   (if (:links body)
     (let [updated (utils/fix-sections body)]
-      (router/redirect! (oc-urls/company (:slug updated)))
-      (assoc-in db (dispatcher/company-data-key (:slug updated)) updated))
+      (router/redirect! (oc-urls/board (:slug updated)))
+      (assoc-in db (dispatcher/org-data-key (:slug updated)) updated))
     db))
 
 (defmethod dispatcher/action :new-section [db [_ body]]
   (if body
-    (let [slug (:slug body)
-          response (:response body)]
-      (swap! cache/new-sections assoc-in [(keyword slug) :new-sections] (:templates response))
-      (swap! cache/new-sections assoc-in [(keyword slug) :new-sections-categories] (:categories response))
+    (let [response (:response body)]
+      (swap! cache/new-sections assoc-in [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :new-sections] (:templates response))
+      (swap! cache/new-sections assoc-in [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :new-sections-categories] (:categories response))
       ;; signal to the app-state that the new-sections have been loaded
       (-> db
-        (assoc-in [(keyword slug) :new-sections] (:templates response))
+        (assoc-in [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :new-sections] (:templates response))
         (dissoc :loading)))
     db))
 
@@ -108,26 +126,29 @@
   (api/load-revisions slug section (utils/link-for (:links body) "revisions"))
   (if body
     (let [fixed-section (utils/fix-section body section)]
-      (assoc-in db (dispatcher/company-section-key slug section) fixed-section))
+      (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) section) fixed-section))
     db))
 
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
   (cond
     success
     ;; add section name inside each section
-    (let [updated-body (utils/fix-sections body)
-          company-data-key (dispatcher/company-data-key (:slug updated-body))
-          company-sections-key (conj company-data-key :sections)
-          section-revisions-data-key (when (:selected-topic-view db) (concat company-data-key [(keyword (:selected-topic-view db)) :revisions-data]))
-          company-editing-section-key (when (:foce-key db) (conj company-data-key (keyword (:foce-key db))))
-          company-already-loaded-key (conj company-data-key :company-data-loaded)
-          already-loaded? (get-in db company-already-loaded-key)
-          with-company-data (assoc-in db company-data-key updated-body)
+    (let [org (router/current-org-slug)
+          board (router/current-board-slug)
+          updated-body (utils/fix-sections body)
+          board-data-key (dispatcher/board-data-key org board)
+          board-topics-key (conj board-data-key :sections)
+          section-revisions-data-key (when (:selected-topic-view db)
+                                        (concat board-data-key [(keyword (:selected-topic-view db)) :revisions-data]))
+          board-editing-section-key (when (:foce-key db) (conj board-data-key (keyword (:foce-key db))))
+          board-already-loaded-key (conj board-data-key :board-data-loaded)
+          already-loaded? (get-in db board-already-loaded-key)
+          with-board-data (assoc-in db board-data-key updated-body)
           with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
                                        (zero? (count (:sections updated-body)))
                                        (not already-loaded?))
-                                (assoc with-company-data :show-add-topic true)
-                                with-company-data)
+                                (assoc with-board-data :show-add-topic true)
+                                with-board-data)
           with-welcome-screen (if (and (not (responsive/is-tablet-or-mobile?))
                                        (not (:foce-key db))
                                        (zero? (count (:sections updated-body)))
@@ -136,26 +157,26 @@
                                 (assoc with-open-add-topic :show-welcome-screen true)
                                 with-open-add-topic)
           keep-sections-edits (if (not (nil? (:foce-key db)))
-                                (assoc-in with-welcome-screen company-sections-key (get-in db company-sections-key))
+                                (assoc-in with-welcome-screen board-topics-key (get-in db board-topics-key))
                                 with-welcome-screen)
           keep-editing-section (if (and (not (nil? (:foce-key db)))
-                                        (get-in db company-editing-section-key))
-                                  (assoc-in keep-sections-edits company-editing-section-key (get-in db company-editing-section-key))
+                                        (get-in db board-editing-section-key))
+                                  (assoc-in keep-sections-edits board-editing-section-key (get-in db board-editing-section-key))
                                   keep-sections-edits)
           keeping-revisions (if (:selected-topic-view db)
                               (assoc-in keep-editing-section section-revisions-data-key (get-in db section-revisions-data-key))
                               keep-editing-section)
-          with-already-loaded (assoc-in keeping-revisions company-already-loaded-key true)]
+          with-already-loaded (assoc-in keeping-revisions board-already-loaded-key true)]
       ; async preload the SU list
       (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
               (pos? (count (:sections updated-body)))
-              (:force-remove-loading with-company-data))
+              (:force-remove-loading with-board-data))
           (dissoc with-already-loaded :loading :force-remove-loading)
           with-already-loaded))
     (= 401 status)
     (-> db
-        (assoc-in [(keyword slug) :error] :forbidden)
+        (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) :error) :forbidden)
         (dissoc :loading))
     (= 404 status)
     (do
@@ -190,29 +211,29 @@
     (assoc :su-list-loaded true)
     (assoc-in (dispatcher/su-list-key slug) response)))
 
-(defmethod dispatcher/action :su-edit [db [_ {:keys [slug su-date su-slug]}]]
-  (let [su-url   (oc-urls/stakeholder-update slug (utils/su-date-from-created-at su-date) su-slug)
-        latest-su-key (dispatcher/latest-stakeholder-update-key slug)
-        company-data-links (:links (dispatcher/company-data))
-        updates-list-link (utils/link-for company-data-links "stakeholder-updates")
+(defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug]}]]
+  (let [su-url   (oc-urls/stakeholder-update (router/current-board-slug) (utils/su-date-from-created-at su-date) su-slug)
+        latest-su-key (dispatcher/latest-stakeholder-update-key (router/current-board-slug))
+        board-data-links (:links (dispatcher/board-data))
+        updates-list-link (utils/link-for board-data-links "stakeholder-updates")
         updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
-        new-links (conj (utils/vec-dissoc company-data-links updates-list-link) updated-link)]
+        new-links (conj (utils/vec-dissoc board-data-links updates-list-link) updated-link)]
     (-> db
       (assoc-in latest-su-key su-url)
       (dissoc :loading)
-      (assoc-in (conj (dispatcher/company-data-key slug) :links) new-links)
+      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) :links) new-links)
       ; refresh the su list
       (get-su-list))))
 
-(defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-company-data]}]]
-  (let [company-data-keys [:logo :logo-width :logo-height :name :slug :currency :public :promoted]
-        company-data      (select-keys response company-data-keys)]
-    ; load-company-data is used to save the subset of company data that is returned with a stakeholder-update data
-    (if load-company-data
+(defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-board-data]}]]
+  (let [board-data-keys [:logo :logo-width :logo-height :name :slug :currency :public :promoted]
+        board-data      (select-keys response board-data-keys)]
+    ; load-board-data is used to save the subset of company data that is returned with a stakeholder-update data
+    (if load-board-data
       ; save the company data returned with the SU data
       (-> db
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
-        (assoc-in (dispatcher/company-data-key slug) (utils/fix-sections company-data))
+        (assoc-in (dispatcher/board-data-key (router/current-org-slug) slug) (utils/fix-sections board-data))
         (dissoc :loading))
       ; save only the SU data
       (-> db
@@ -228,8 +249,8 @@
     (dissoc :show-add-topic)))          ; remove the add topic view)
 
 (defn stop-foce [db]
-  (let [company-data (dispatcher/company-data db)
-        show-add-topic (zero? (count (:sections company-data)))]
+  (let [board-data (dispatcher/board-data db (router/current-org-slug) (router/current-board-slug))
+        show-add-topic (zero? (count (:sections board-data)))]
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
@@ -257,18 +278,17 @@
   (assoc-in db path value))
 
 (defmethod dispatcher/action :new-sections [db [_ new-sections]]
-  (let [slug (keyword (router/current-company-slug))]
+  (let [board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
     (api/patch-sections new-sections)
-    (assoc-in db (conj (dispatcher/company-data-key slug) :sections) new-sections)))
+    (assoc-in db (conj board-data-key :sections) new-sections)))
 
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
-  (let [slug (keyword (router/current-company-slug))
-        company-data (dispatcher/company-data)
-        old-sections (:sections company-data)
+  (let [board-data (dispatcher/board-data)
+        old-sections (:sections board-data)
         new-sections (utils/vec-dissoc old-sections (name topic))
-        old-archived (:archived company-data)
-        new-archived (vec (conj old-archived {:title (:title ((keyword topic) company-data)) :section (name topic)}))
-        company-key (dispatcher/company-data-key slug)]
+        old-archived (:archived board-data)
+        new-archived (vec (conj old-archived {:title (:title ((keyword topic) board-data)) :section (name topic)}))
+        company-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
     (api/patch-sections new-sections)
     (-> db
       (dissoc :foce-key)
@@ -279,42 +299,40 @@
       (assoc-in (conj company-key :archived) new-archived))))
 
 (defmethod dispatcher/action :delete-revision [db [_ topic as-of]]
-  (let [slug (keyword (router/current-company-slug))
-        company-data (dispatcher/company-data)
-        old-topic-data ((keyword topic) company-data)
+  (let [board-data (dispatcher/board-data)
+        old-topic-data ((keyword topic) board-data)
         revisions (:revisions-data old-topic-data)
         revision-data (first (filter #(= (:created-at %) as-of) revisions))
         new-revisions (vec (filter #(not= (:created-at %) as-of) revisions))
         should-remove-section? (zero? (count new-revisions))
         should-update-section? (= (:created-at old-topic-data) as-of)
-        new-sections (if should-remove-section? (utils/vec-dissoc (:sections company-data) (name topic)) (:sections company-data))
-        company-key (dispatcher/company-data-key slug)
+        new-sections (if should-remove-section? (utils/vec-dissoc (:sections board-data) (name topic)) (:sections board-data))
+        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         new-topic-data (if should-update-section?
                           (merge (first new-revisions) {:revisions (:revisions old-topic-data)
                                                         :links (:links old-topic-data)
                                                         :revisions-data new-revisions
                                                         :section (:section old-topic-data)})
                           (assoc old-topic-data :revisions-data new-revisions))
-        with-sections (assoc company-data :sections new-sections)
+        with-sections (assoc board-data :sections new-sections)
         with-fixed-topics (if should-remove-section?
                             (dissoc with-sections (keyword topic))
                             (assoc with-sections (keyword topic) new-topic-data))]
     (api/delete-revision topic revision-data)
     (-> db
       (stop-foce)
-      (assoc-in company-key with-fixed-topics))))
+      (assoc-in board-data-key with-fixed-topics))))
 
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-sections topic-data]]]
-  (let [slug (keyword (router/current-company-slug))
-        topic (:foce-key db)
+  (let [topic (:foce-key db)
         topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
         body (:body topic-data)
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         with-created-at (if (contains? with-fixed-body :created-at) with-fixed-body (assoc with-fixed-body :created-at (utils/as-of-now)))
         created-at (:created-at with-created-at)
-        revisions-data (or (:revisions-data (get (dispatcher/company-data db) topic)) [])
+        revisions-data (or (:revisions-data (get (dispatcher/board-data db) topic)) [])
         without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
         with-new-revision (conj without-current-revision with-created-at)
         sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))
@@ -323,7 +341,7 @@
       (api/partial-update-section topic with-created-at)
       (api/save-or-create-section with-created-at))
     (-> db
-      (assoc-in (conj (dispatcher/company-data-key slug) (keyword topic)) complete-topic-data)
+      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) complete-topic-data)
       (stop-foce))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
@@ -332,11 +350,10 @@
     (dissoc db :force-edit-topic)))
 
 (defn- save-topic [db topic topic-data]
-  (let [slug (keyword (router/current-company-slug))
-        old-section-data (get (dispatcher/company-data db slug) (keyword topic))
+  (let [old-section-data (get (dispatcher/board-data db) (keyword topic))
         new-data (dissoc (merge old-section-data topic-data) :placeholder)]
     (api/partial-update-section topic (dissoc topic-data :placeholder))
-    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic)) new-data)))
+    (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) new-data)))
 
 (defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
   (save-topic db topic topic-data))
@@ -604,15 +621,15 @@
   (dissoc db :su-list-loaded))
 
 (defmethod dispatcher/action :revisions-loaded
-  [db [_ {:keys [slug topic revisions]}]]
+  [db [_ {:keys [topic revisions]}]]
   (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
-    (assoc-in db (conj (dispatcher/company-data-key slug) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
+    (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
 
 ((defmethod dispatcher/action :show-add-topic
   [db [_ active]]
   (if active
     (do
-      (utils/after 100 #(router/nav! (oc-urls/company)))
+      (utils/after 100 #(router/nav! (oc-urls/board)))
       (-> db
         (assoc :show-add-topic true)
         (dissoc :selected-topic-view)))
@@ -622,14 +639,14 @@
   [db [_ section-kw]]
   (if (utils/in? (:dashboard-selected-topics db) section-kw)
     (assoc db :dashboard-selected-topics (utils/vec-dissoc (:dashboard-selected-topics db) section-kw))
-    (let [sections (to-array (:sections (dispatcher/company-data db)))
+    (let [sections (to-array (:sections (dispatcher/board-data db)))
           all-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) section-kw))
           next-selected-topics (vec (map keyword (filter #(utils/in? all-selected-topics (keyword %)) sections)))]
       (assoc db :dashboard-selected-topics next-selected-topics))))
 
 (defmethod dispatcher/action :dashboard-select-all
   [db [_ section-kw]]
-  (assoc db :dashboard-selected-topics (vec (map keyword (:sections (dispatcher/company-data db))))))
+  (assoc db :dashboard-selected-topics (vec (map keyword (:sections (dispatcher/board-data db))))))
 
 (defmethod dispatcher/action :dashboard-share-mode
   [db [_ activate]]
@@ -640,39 +657,39 @@
 
 (defmethod dispatcher/action :add-topic
   [db [_ topic topic-data]]
-  (let [company-data-key (dispatcher/company-data-key (router/current-company-slug))
-        company-data (get-in db company-data-key)
-        archived-topics (:archived company-data)
+  (let [board-data (dispatcher/board-data)
+        archived-topics (:archived board-data)
         updated-archived (if (:was-archived topic-data)
                             (vec (filter #(not= (:section %) (name topic)) archived-topics))
                             archived-topics)
-        updated-sections (conj (:sections company-data) (name topic))
-        updated-company-data (-> company-data
+        updated-sections (conj (:sections board-data) (name topic))
+        updated-board-data (-> board-data
                                 (assoc :sections updated-sections)
                                 (assoc :archived updated-archived)
                                 (assoc (keyword topic) topic-data))
-        next-db (assoc-in db company-data-key updated-company-data)]
+        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        next-db (assoc-in db board-data-key updated-board-data)]
     (if (:was-archived topic-data)
      next-db
      (start-foce next-db topic topic-data))))
 
 (defmethod dispatcher/action :rollback-add-topic
   [db [_ topic-kw]]
-  (let [company-data-key (dispatcher/company-data-key (router/current-company-slug))
-        company-data (get-in db (dispatcher/company-data-key (router/current-company-slug)))
-        topic-data (get company-data topic-kw)
-        archived-topics (:archived company-data)
+  (let [board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-data-key)
+        topic-data (get board-data topic-kw)
+        archived-topics (:archived board-data)
         updated-archived (if (:was-archived topic-data)
                             (conj archived-topics {:section (name topic-kw)
                                                    :title (:title topic-data)})
                             archived-topics)
-        updated-sections (utils/vec-dissoc (:sections company-data) (name topic-kw))
-        updated-company-data (-> company-data
+        updated-sections (utils/vec-dissoc (:sections board-data) (name topic-kw))
+        updated-board-data (-> board-data
                                 (dissoc topic-kw)
                                 (assoc :sections updated-sections)
                                 (assoc :archived updated-archived))]
     (-> db
-      (assoc-in company-data-key updated-company-data)
+      (assoc-in board-data-key updated-board-data)
       (stop-foce))))
 
 (defmethod dispatcher/action :show-top-menu [db [_ topic]]
