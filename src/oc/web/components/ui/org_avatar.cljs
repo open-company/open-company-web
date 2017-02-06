@@ -10,8 +10,8 @@
 
 (defcomponent org-avatar [data owner]
   (render-state [_ {:keys [img-load-failed]}]
-    (when (:company-data data)
-      (let [org-data (:company-data data)
+    (when (:board-data data)
+      (let [org-data (dis/org-data)
             org-slug (router/current-org-slug)
             org-name (if (contains? org-data :name)
                            (:name org-data)
@@ -23,7 +23,7 @@
                                   (utils/link-for (:links (dis/stakeholder-update-data)) "company" "GET")
                                   true)
             show-org-avatar? (and (not img-load-failed)
-                                      (not (clojure.string/blank? org-logo)))
+                                  (not (clojure.string/blank? org-logo)))
             avatar-link (if should-show-link
                           (if (router/current-board-slug)
                             (oc-urls/org)
