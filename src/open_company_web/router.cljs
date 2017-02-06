@@ -90,17 +90,20 @@
     (reset! history h)))
 
 ;; Path components retrieve
-(defn current-company-slug []
-  (:slug @path))
+(defn current-org-slug []
+  (:org @path))
+
+(defn current-board-slug []
+  (:board @path))
+
+(defn current-topic-slug []
+  (:topic @path))
 
 (defn current-stakeholder-update-date []
   (:update-date @path))
 
 (defn current-stakeholder-update-slug []
   (:update-slug @path))
-
-(defn current-section []
-  (:section @path))
 
 (defn query-params []
   (:query-params @path))
