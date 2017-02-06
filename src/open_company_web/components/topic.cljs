@@ -30,9 +30,9 @@
   (> (count (.text (.html (js/$ "<div/>") html))) limit))
 
 (defn start-foce-click [owner]
-  (let [section-kw (keyword (om/get-props owner :section))
+  (let [topic-kw (keyword (om/get-props owner :section))
         section-data (om/get-props owner :topic-data)]
-    (dis/dispatch! [:start-foce section-kw (assoc section-data :section (name section-kw))])))
+    (dis/dispatch! [:start-foce topic-kw (assoc section-data :section (name topic-kw))])))
 
 (defn get-author-string
   "Return the a formatted string that shows the topic creator and the last editor."
@@ -83,16 +83,15 @@
                                       show-top-menu] :as data} owner options]
 
   (render [_]
-    (let [section-kw          (keyword section)
+    (let [topic-kw          (keyword section)
           chart-opts          {:chart-size {:width 230}
                                :hide-nav true}
-          is-growth-finances? (#{:growth :finances} section-kw)
+          is-growth-finances? (#{:growth :finances} topic-kw)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           image-header        (:image-url topic-data)
           image-header-size   {:width (:image-width topic-data)
                                :height (:image-height topic-data)}
           topic-body          (if (:placeholder topic-data) (:body-placeholder topic-data) (:body topic-data))
-          company-data        (dis/company-data)
           fixed-column        (js/parseInt column)
           should-truncate-text (and (not (utils/is-test-env?))
                                     is-dashboard
@@ -123,15 +122,15 @@
                                                :left-column (not= fixed-column columns-num)
                                                :right-column (= fixed-column columns-num)})}
               (dom/button {:class "topic-top-menu-btn btn-reset"
-                           :on-click #(dis/dispatch! [:start-foce section-kw {:placeholder true
-                                                                              :section (name section-kw)
-                                                                              :title (:title topic-data)
-                                                                              :data (:data topic-data)
-                                                                              :metrics (:metrics topic-data)
-                                                                              :links (:links topic-data)}])}
+                           :on-click #(dis/dispatch! [:start-foce topic-kw {:placeholder true
+                                                                            :section (name topic-kw)
+                                                                            :title (:title topic-data)
+                                                                            :data (:data topic-data)
+                                                                            :metrics (:metrics topic-data)
+                                                                            :links (:links topic-data)}])}
                 (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
-                           :on-click #(dis/dispatch! [:start-foce section-kw topic-data])}
+                           :on-click #(dis/dispatch! [:start-foce topic-kw topic-data])}
                 (dom/i {:class "fa fa-pencil"})" Edit")))
               ; Assign action, disabled for now
               ; (dom/button {:class "topic-top-menu-btn btn-reset"
@@ -181,7 +180,7 @@
                      (not foce-active))
             (dom/button {:class "top-right-button topic-pencil-button btn-reset"
                          :on-click #(if is-dashboard
-                                      (router/nav! (oc-urls/company-section (router/current-company-slug) section-kw))
+                                      (router/nav! (oc-urls/topic (router/current-org-slug) (router/current-board-slug) topic-kw))
                                       (start-foce-click owner))}
               (dom/i {:class "fa fa-pencil"
                       :title "Edit"
@@ -296,11 +295,12 @@
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {:keys [editing as-of window-width] :as state}]
-    (let [section-kw (keyword section)
-          slug (keyword (router/current-company-slug))
+    (let [topic-kw (keyword section)
+          org-slug (keyword (router/current-org-slug))
+          board-slug (keyword (router/current-board-slug))
           foce-active (not (nil? foce-key))
-          is-current-foce (or (and (= foce-key section-kw) (= (:created-at foce-data) (:created-at section-data)))
-                              (and is-dashboard (= foce-key section-kw) (= (:created-at foce-data) nil)))
+          is-current-foce (or (and (= foce-key topic-kw) (= (:created-at foce-data) (:created-at section-data)))
+                              (and is-dashboard (= foce-key topic-kw) (= (:created-at foce-data) nil)))
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
@@ -317,7 +317,7 @@
                                                  :sticky-borders (or (= (:show-top-menu data) section) (and is-dashboard
                                                                                                             is-current-foce))
                                                  :dashboard-topic is-dashboard
-                                                 :dashboard-selected (utils/in? dashboard-selected-topics section-kw)
+                                                 :dashboard-selected (utils/in? dashboard-selected-topics topic-kw)
                                                  :dashboard-share-mode (:dashboard-sharing data)
                                                  :selectable-topic (and (not is-current-foce)
                                                                         (nil? (:show-top-menu data))
@@ -332,13 +332,13 @@
                                          (not is-current-foce)
                                          (nil? (:show-top-menu data)))
                                (if (:dashboard-sharing data)
-                                 (dis/dispatch! [:dashboard-select-topic section-kw])
+                                 (dis/dispatch! [:dashboard-select-topic topic-kw])
                                  (when (and (nil? (:foce-key data))
                                             (or (responsive/is-mobile-size?)
                                                 (not read-only-company)
                                                 (> (count (:revisions section-data)) 1)
                                                 (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)))
-                                  (router/nav! (oc-urls/company-section slug section-kw)))))
+                                  (router/nav! (oc-urls/topic org-slug board-slug topic-kw)))))
                     :style topic-style
                     :ref "topic"
                     :data-section (name section)

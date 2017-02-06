@@ -72,8 +72,9 @@
       (om/update-state! owner :select2-initialized (fn [_]true)))))
 
 (defn- get-presets [data]
-  (let [slug (keyword (router/current-company-slug))
-        all-sections (:new-sections (slug @new-sections)) ; get new sections templates from cache
+  (let [org-slug   (keyword (router/current-org-slug))
+        board-slug (keyword (router/current-board-slug))
+        all-sections (:new-sections (board-slug (org-slug @new-sections))) ; get new sections templates from cache
         growth-defaults (first (filter #(= (:section-name %) "growth") all-sections))]
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)}))

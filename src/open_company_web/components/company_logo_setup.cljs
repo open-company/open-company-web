@@ -25,26 +25,26 @@
         (js/alert "Please insert a logo image")
         (do
           (om/set-state! owner :redirect-to-company true)
-          (api/patch-company (router/current-company-slug) {:logo-width (js/parseInt logo-width)
-                                                            :logo-height (js/parseInt logo-height)
+          (api/patch-company (router/current-board-slug) {:logo-width (js/parseInt logo-width)
+                                                          :logo-height (js/parseInt logo-height)
                                                           :logo logo}))))))
 
 (defcomponent company-logo-setup [data owner]
 
   (init-state [_]
-    (let [company-data (dis/company-data data)]
+    (let [board-data (dis/board-data data)]
       {:loading false
-       :logo (:logo company-data)
-       :logo-width (:logo-width company-data)
-       :logo-height (:logo-height company-data)
+       :logo (:logo board-data)
+       :logo-width (:logo-width board-data)
+       :logo-height (:logo-height board-data)
        :redirect-to-company false}))
 
   (will-receive-props [_ next-props]
-    (let [company-data (dis/company-data next-props)]
-      (when (not= (:logo company-data) (om/get-state owner :logo))
-        (om/update-state! owner #(merge % {:logo (:logo company-data)
-                                           :logo-width (:logo-width company-data)
-                                           :logo-height (:logo-height company-data)})))
+    (let [board-data (dis/board-data next-props)]
+      (when (not= (:logo board-data) (om/get-state owner :logo))
+        (om/update-state! owner #(merge % {:logo (:logo board-data)
+                                           :logo-width (:logo-width board-data)
+                                           :logo-height (:logo-height board-data)})))
       (when (om/get-state owner :redirect-to-company)
         (router/nav! (oc-urls/company)))))
 

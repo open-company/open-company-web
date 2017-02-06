@@ -94,7 +94,7 @@
                         (jwt/jwt))
                    (and (not (:show-to-ro-users tt))
                         (jwt/jwt)
-                        (not (:read-only (dis/company-data))))))
+                        (not (:read-only (dis/board-data))))))
         (do
           (.show tip)
           (after 100

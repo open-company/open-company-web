@@ -17,7 +17,7 @@
         (dom/div {:class "email-confirmation-center center group"}
           (dom/h1 {:class "email-confirmation-cta"} "Email Confirmed!")
           (dom/button {:class "btn-reset btn-solid email-confirmation-get-started"
-                       :on-click #(router/nav! oc-urls/create-company)}
+                       :on-click #(router/nav! (oc-urls/create-org))}
             "OK! LET'S GET STARTED →"))
         (dom/div {:class "mt5 center group"}
           (dom/img {:src "/img/oc-logo-gold.png"})

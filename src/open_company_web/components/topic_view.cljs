@@ -26,7 +26,7 @@
                 :success-cb #(let [section (om/get-props owner :selected-topic-view)]
                                (dis/dispatch! [:topic-archive section])
                                (hide-popover nil "archive-topic-confirm")
-                               (router/nav! (oc-urls/company)))}))
+                               (router/nav! (oc-urls/board)))}))
 
 (defn load-revisions [owner]
   (when-let* [topic-name (om/get-props owner :selected-topic-view)
@@ -38,7 +38,7 @@
     ; and also it's not an archived topic being reactivated
     (when-not (:placeholder topic-data)
       (om/set-state! owner :revisions-requested true)
-      (api/load-revisions (router/current-company-slug) topic-name revisions-link))))
+      (api/load-revisions (router/current-board-slug) topic-name revisions-link))))
 
 (defn load-revisions-if-needed [owner]
   (when (not (om/get-state owner :revisions-requested))
@@ -54,14 +54,14 @@
           sections-contains-topic (utils/in? (:sections company-data) selected-topic-view)]
       (when (not sections-contains-topic)
         (if (:read-only company-data)
-          (router/redirect! (oc-urls/company (:slug company-data)))
+          (router/redirect! (oc-urls/board (router/current-org-slug) (:slug company-data)))
           ; look for the urls in the new sections
           (when new-sections
             (let [new-section (first (filter #(= (:section-name %) selected-topic-view) new-sections))
                   new-section-data (utils/new-section-initial-data section-kw (:title new-section) {:links (:links new-section)})]
               (if (and new-section (contains? new-section :links))
                 (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
-                (router/redirect! (oc-urls/company (:slug company-data)))))))))))
+                (router/redirect! (oc-urls/board (router/current-org-slug) (:slug company-data)))))))))))
 
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
@@ -114,7 +114,7 @@
           (when (responsive/is-tablet-or-mobile?)
             (dom/div {:class "topic-view-navbar"}
               (dom/div {:class "topic-view-navbar-close left"
-                        :on-click #(router/nav! (oc-urls/company))} "<")
+                        :on-click #(router/nav! (oc-urls/board))} "<")
               (dom/div {:class "topic-view-navbar-title left"} (:title topic-data))))
           (if (or (:loading company-data)
                   loading-topic-data)

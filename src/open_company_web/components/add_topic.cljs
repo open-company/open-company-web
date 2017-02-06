@@ -15,11 +15,12 @@
   "Return all sections for the current company no matter it's state (archived, active, inactive)
    e.g {:section a-string :title a-string}"
   []
-  (let [company-data (dis/company-data)
-        slug         (keyword (router/current-company-slug))]
+  (let [board-data (dis/board-data)
+        org-slug   (keyword (router/current-org-slug))
+        board-slug (keyword (router/current-board-slug))]
     (into
-      (:archived company-data)
-      (for [sec (:new-sections (get @caches/new-sections slug))]
+      (:archived board-data)
+      (for [sec (:new-sections (board-slug (org-slug @caches/new-sections)))]
         (-> sec
             (assoc :section (:section-name sec))
             (select-keys [:title :section :body-placeholder :links]))))))
@@ -27,8 +28,9 @@
 (defn get-categories []
   "Return the categories of the new available sections divided in columns and sorted by the
    specified order."
-  (when-let* [slug       (keyword (router/current-company-slug))
-              categories (:new-sections-categories (slug @caches/new-sections))
+  (when-let* [org-slug       (keyword (router/current-org-slug))
+              board-slug     (keyword (router/current-board-slug))
+              categories     (:new-sections-categories (board-slug (org-slug @caches/new-sections)))
               all-categories (vec (map :column categories))]
     (apply merge
       (for [idx (range 1 (inc (apply max all-categories)))]

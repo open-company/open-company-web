@@ -66,7 +66,7 @@
          "Subscribe"])])])
 
 (defn- save-company-data [company-data logo logo-width logo-height]
-  (let [slug (router/current-company-slug)
+  (let [slug (router/current-board-slug)
         fixed-logo (or logo "")
         fixed-logo-width (or logo-width 0)
         fixed-logo-height (or logo-height 0)]
@@ -96,7 +96,7 @@
 
 (defn save-company-clicked [owner]
   (let [logo             (om/get-state owner :logo)
-        old-company-data (dis/company-data (om/get-props owner))
+        old-company-data (dis/board-data (om/get-props owner))
         new-company-data {:name (om/get-state owner :company-name)
                           :currency (om/get-state owner :currency)
                           :public (om/get-state owner :public)}]
@@ -221,7 +221,7 @@
           (str file-upload-progress "%"))))))
 
 (defn get-state [data current-state]
-  (let [company-data (dis/company-data data)]
+  (let [company-data (dis/board-data data)]
     {:uuid (:uuid company-data)
      :initial-logo (:logo data)
      :logo (or (:logo current-state) (:logo company-data))
@@ -261,7 +261,7 @@
                     file-upload-progress :file-upload-progress
                     show-save-successful :show-save-successful
                     has-changes :has-changes}]
-    (let [slug (keyword (router/current-company-slug))]
+    (let [slug (keyword (router/current-board-slug))]
 
       (utils/update-page-title (str "OpenCompany - " company-name))
 
@@ -362,10 +362,10 @@
 (defcomponent company-settings [data owner]
 
   (render [_]
-    (let [company-data (dis/company-data data)]
+    (let [company-data (dis/board-data data)]
 
       (when (:read-only company-data)
-        (router/redirect! (oc-urls/company)))
+        (router/redirect! (oc-urls/board)))
 
       (dom/div {:class "main-company-settings fullscreen-page"}
 
@@ -374,7 +374,7 @@
           (:loading data)
           (dom/div (dom/h4 "Loading data..."))
 
-          (get-in data [(keyword (router/current-company-slug)) :error])
+          (get-in data [(keyword (router/current-board-slug)) :error])
           (login-required)
 
           ;; Company profile

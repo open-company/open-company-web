@@ -29,7 +29,7 @@
         (if (jwt/jwt)
           [:button.btn-reset.logout.mt2
             {:on-click #(do
-                          (cook/set-cookie! :login-redirect (oc-urls/company))
+                          (cook/set-cookie! :login-redirect (oc-urls/board))
                           (cook/set-cookie! :show-login-overlay "login-with-slack")
                           (cook/remove-cookie! :jwt)
                           (router/redirect! oc-urls/home))}

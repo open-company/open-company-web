@@ -25,7 +25,7 @@
       (om/set-state! owner :selected-su (:slug last-su)))))
 
 (defn load-su-list-if-needed [owner data]
-  (when (and (dis/company-data (om/get-props owner))
+  (when (and (dis/board-data (om/get-props owner))
              (not (:su-list-loading data))
              (not (:su-list-loaded data))
              (not (om/get-state owner :su-list-loading)))
@@ -37,7 +37,7 @@
   (init-state [_]
     (let [current-update-slug (router/current-stakeholder-update-slug)]
       (when current-update-slug
-        (api/get-stakeholder-update (router/current-company-slug) current-update-slug false))
+        (api/get-stakeholder-update (router/current-board-slug) current-update-slug false))
       {:columns-num (responsive/columns-num)
        :card-width (responsive/calc-card-width)
        :su-list (dis/stakeholder-update-list-data)
@@ -65,17 +65,17 @@
     ; if we had a selected-su and it changed let's load the new update data
     ; if selected-su was empty there is no need to load
     (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
-      (api/get-stakeholder-update (router/current-company-slug) (om/get-state owner :selected-su) false)))
+      (api/get-stakeholder-update (router/current-board-slug) (om/get-state owner :selected-su) false)))
 
   (render-state [_ {:keys [columns-num card-width su-list selected-su]}]
-    (let [company-data (dis/company-data data)
+    (let [company-data (dis/board-data data)
           total-width-int (:total-width-int data)
           total-width (str total-width-int "px")
           fixed-card-width (responsive/calc-update-width columns-num)
           su-data (dis/stakeholder-update-data data (:slug company-data) selected-su)
           update-title (if su-data
                           (if (clojure.string/blank? (:title su-data))
-                            (str (:name (dis/company-data)) " Update")
+                            (str (:name (dis/board-data)) " Update")
                             (:title su-data))
                           "")]
       (dom/div {:class "updates-inner group navbar-offset"}
@@ -121,7 +121,7 @@
       (events/unlistenByKey resize-listener)))
 
   (render-state [_ {:keys [columns-num card-width]}]
-    (let [company-data (dis/company-data data)
+    (let [company-data (dis/board-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           mobile-layout (<= (responsive/ww) responsive/updates-list-breakpoint)]
       (if-not (dis/stakeholder-update-list-data data)

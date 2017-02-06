@@ -131,13 +131,6 @@
   (when (= (.-keyCode e) 27)
     (hide-fullscreen-topic owner options)))
 
-(defn- revision-navigation [owner as-of]
-  (let [actual-as-of (om/get-state owner :actual-as-of)
-        section (name (om/get-props owner :section))]
-    (if (= as-of actual-as-of)
-      (.pushState js/history nil section (oc-urls/company-section (router/current-company-slug) (om/get-props owner :section)))
-      (.pushState js/history nil (str section " revision " as-of) (oc-urls/company-section-revision (router/current-company-slug) (om/get-props owner :section) as-of)))))
-
 (defn- animate-transition [owner]
   (let [cur-topic (om/get-ref owner "cur-topic")
         tr-topic (om/get-ref owner "tr-topic")
@@ -168,7 +161,6 @@
       (events/listen
         AnimationEventType/FINISH
         (fn []
-          (revision-navigation owner (:transition-as-of current-state))
           (om/set-state! owner (merge current-state
                                     {:as-of (:transition-as-of current-state)
                                      :transition-as-of nil}))
@@ -182,10 +174,10 @@
                                         hide-history-navigation] :as data} owner options]
 
   (init-state [_]
-    (let [company-data (dis/company-data)
+    (let [board-data (dis/board-data)
           su-data      (dis/stakeholder-update-data)]
-      (when (and company-data
-                 (not (contains? company-data (keyword section)))
+      (when (and board-data
+                 (not (contains? board-data (keyword section)))
                  (not (contains? su-data (keyword section))))
         (router/redirect-404!)))
     (let [actual-as-of (:created-at section-data)
@@ -229,8 +221,9 @@
           revisions (utils/sort-revisions (:revisions section-data))
           prev-rev (utils/revision-prev revisions as-of)
           next-rev (utils/revision-next revisions as-of)
-          slug (keyword (router/current-company-slug))
-          revisions-list (get (slug @cache/revisions) section-kw)
+          org-slug (keyword (router/current-board-slug))
+          board-slug (keyword (router/current-board-slug))
+          revisions-list (get (board-slug (org-slug @cache/revisions)) section-kw)
           topic-data (utils/select-section-data section-data section-kw as-of)
           is-actual? (= as-of actual-as-of)
           fullscreen-topic-opts (merge options {:rev-click (partial rev-click owner)
@@ -239,12 +232,12 @@
       ; preload previous revision
       (when (and prev-rev
                  (not (contains? revisions-list (:created-at prev-rev))))
-        (api/load-revision prev-rev slug section-kw))
+        (api/load-revision prev-rev board-slug section-kw))
       ; preload next revision
       (when (and (not= (:created-at next-rev) actual-as-of)
                   next-rev
                   (not (contains? revisions-list (:created-at next-rev))))
-        (api/load-revision next-rev slug section-kw))
+        (api/load-revision next-rev board-slug section-kw))
       (dom/div #js {:className (str "fullscreen-topic" (when (:animate data) " initial"))
                     :ref "fullscreen-topic"}
         (dom/div #js {:className "fullscreen-topic-transition group"

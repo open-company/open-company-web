@@ -168,52 +168,50 @@
     (om/set-state! owner :finances-data (:finances-data next-props)))
 
   (render-state [_ {:keys [finances-data stop has-changes?]}]
-    (let [company-slug (router/current-company-slug)]
+    (dom/div {:class "finances" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
+      (dom/div {:class "composed-section-edit finances-body edit"
+                :style {:height (str (- (:main-height data) 63) "px")
+                        :width (str (:main-width data) "px")
+                        :overflow-y "scroll"
+                        :overflow-x "hidden"}}
+        (dom/div {:class "group"}
+          (dom/h3 {:class "left pt3 pb2 px2 group"} (if (zero? (count finances-data)) "Add Finances" "Edit Finances")))
+        (dom/div {:class "table-container my2 px3 group"}
+          (dom/table {:class "table"
+                      :key table-key}
+            (dom/thead {}
+              (dom/tr {}
+                (dom/th {} "")
+                (dom/th {} "REVENUE")
+                (dom/th {} "EXPENSES")
+                (dom/th {} "CASH")))
+            (let [current-period (utils/current-finance-period)]
+              (for [idx (range stop)]
+                (let [period (finance-utils/get-past-period current-period idx)
+                      has-value (contains? finances-data period)
+                      row-data (if has-value
+                                  (get finances-data period)
+                                  (finance-utils/placeholder-data period {:new true}))
+                      next-period (finance-utils/get-past-period current-period (inc idx))]
+                  (om/build finances-edit-row {:cursor row-data
+                                               :next-period next-period
+                                               :is-last (= idx 0)
+                                               :needs-year (or (= idx 0) (= idx (dec stop)))
+                                               :currency currency
+                                               :change-cb #(replace-row-in-data owner row-data %1 %2)}))))
+            (dom/tfoot {}
+              (dom/tr {}
+                (dom/th {:class "earlier" :col-span 2}
+                  (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
+                (dom/td {})
+                (dom/td {}))))))
 
-      (dom/div {:class "finances" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
-        (dom/div {:class "composed-section-edit finances-body edit"
-                  :style {:height (str (- (:main-height data) 63) "px")
-                          :width (str (:main-width data) "px")
-                          :overflow-y "scroll"
-                          :overflow-x "hidden"}}
-          (dom/div {:class "group"}
-            (dom/h3 {:class "left pt3 pb2 px2 group"} (if (zero? (count finances-data)) "Add Finances" "Edit Finances")))
-          (dom/div {:class "table-container my2 px3 group"}
-            (dom/table {:class "table"
-                        :key table-key}
-              (dom/thead {}
-                (dom/tr {}
-                  (dom/th {} "")
-                  (dom/th {} "REVENUE")
-                  (dom/th {} "EXPENSES")
-                  (dom/th {} "CASH")))
-              (let [current-period (utils/current-finance-period)]
-                (for [idx (range stop)]
-                  (let [period (finance-utils/get-past-period current-period idx)
-                        has-value (contains? finances-data period)
-                        row-data (if has-value
-                                    (get finances-data period)
-                                    (finance-utils/placeholder-data period {:new true}))
-                        next-period (finance-utils/get-past-period current-period (inc idx))]
-                    (om/build finances-edit-row {:cursor row-data
-                                                 :next-period next-period
-                                                 :is-last (= idx 0)
-                                                 :needs-year (or (= idx 0) (= idx (dec stop)))
-                                                 :currency currency
-                                                 :change-cb #(replace-row-in-data owner row-data %1 %2)}))))
-              (dom/tfoot {}
-                (dom/tr {}
-                  (dom/th {:class "earlier" :col-span 2}
-                    (dom/a {:class "small-caps underline bold dimmed-gray" :on-click #(more-months owner)} "Earlier..."))
-                  (dom/td {})
-                  (dom/td {}))))))
-
-        (dom/div {:class "topic-foce-footer group"}
-          (dom/div {:class "topic-foce-footer-right"}
-            (dom/button {:class "btn-reset btn-solid btn-data-save"
-                         :disabled (not has-changes?)
-                         :on-click  #(do
-                                      (save-data owner)
-                                      (editing-cb false))} (if (zero? (count finances-data)) "ADD" "UPDATE"))
-            (dom/button {:class "btn-reset btn-outline"
-                         :on-click #(editing-cb false)} "CANCEL")))))))
+      (dom/div {:class "topic-foce-footer group"}
+        (dom/div {:class "topic-foce-footer-right"}
+          (dom/button {:class "btn-reset btn-solid btn-data-save"
+                       :disabled (not has-changes?)
+                       :on-click  #(do
+                                    (save-data owner)
+                                    (editing-cb false))} (if (zero? (count finances-data)) "ADD" "UPDATE"))
+          (dom/button {:class "btn-reset btn-outline"
+                       :on-click #(editing-cb false)} "CANCEL"))))))

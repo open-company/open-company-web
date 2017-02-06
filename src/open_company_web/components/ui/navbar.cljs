@@ -19,7 +19,7 @@
             [open-company-web.components.ui.user-avatar :refer (user-avatar)]
             [open-company-web.components.ui.login-button :refer (login-button)]
             [open-company-web.components.ui.small-loading :as loading]
-            [open-company-web.components.ui.company-avatar :refer (company-avatar)]
+            ; [open-company-web.components.ui.company-avatar :refer (company-avatar)]
             [open-company-web.components.ui.login-overlay :refer (login-overlays-handler)]
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
@@ -73,28 +73,28 @@
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
                                             true))
-          should-show-left-links (and (router/current-company-slug)
+          should-show-left-links (and (router/current-board-slug)
                                       show-navigation-bar)]
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
                                          :small-navbar (or su-navbar (not show-navigation-bar))
                                          :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
-                                         :has-prior-updates (and (router/current-company-slug)
-                                                                 (pos? (:count (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET"))))
-                                         :can-edit-company (and (router/current-company-slug)
-                                                                (not (:read-only (dis/company-data))))
+                                         :has-prior-updates (and (router/current-board-slug)
+                                                                 (pos? (:count (utils/link-for (:links (dis/board-data)) "stakeholder-updates" "GET"))))
+                                         :can-edit-company (and (router/current-board-slug)
+                                                                (not (:read-only (dis/board-data))))
                                          :jwt (jwt/jwt)})}
         (when (not (utils/is-test-env?))
           (login-overlays-handler))
         (dom/div {:class "oc-navbar-header group"
                   :style {:width (if header-width (str header-width "px") "100%")}}
           (dom/div {:class "oc-navbar-header-container group"}
-            (if (or (utils/in? (:route @router/path) "companies")
-                    (not company-data))
-              (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
-                (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
-              (om/build company-avatar data))
+            ; (if (or (utils/in? (:route @router/path) "companies")
+            ;         (not company-data))
+            ;   (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
+            ;     (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
+            ;   (om/build company-avatar data))
             (when-not (:hide-right-menu data)
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}
@@ -117,9 +117,9 @@
                                        :data-toggle "tooltip"
                                        :data-container "body"
                                        :data-placement "bottom"
-                                       :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/company-data)))]
+                                       :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/board-data)))]
                                                    (t/hide share-work-tip)
-                                                   (router/nav! (oc-urls/company-settings-um)))}
+                                                   (router/nav! (oc-urls/team-settings-um)))}
                             (dom/i {:class "fa fa-user-plus"})))
                         (when fixed-show-share-su-button
                           (if dashboard-sharing
@@ -152,7 +152,7 @@
                                            :on-click (fn []
                                                        (when (nil? foce-key)
                                                          (when is-topic-view
-                                                            (router/nav! (oc-urls/company)))
+                                                            (router/nav! (oc-urls/board)))
                                                          (dis/dispatch! [:dashboard-share-mode true])))}
                                 (dom/i {:class "fa fa-share"}))))))
                       (login-button)))))))

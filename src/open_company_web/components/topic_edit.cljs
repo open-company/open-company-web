@@ -184,11 +184,11 @@
                 :cancel-cb #(hide-popover nil "delete-revision-confirm")
                 :success-title "DELETE"
                 :success-cb #(let [section (dis/foce-section-key)
-                                   company-data (dis/company-data)]
+                                   board-data (dis/board-data)]
                                (dis/dispatch! [:delete-revision section (:created-at (dis/foce-section-data))])
                                (hide-popover nil "delete-revision-confirm")
-                               (when (= (count (:revisions-data (section company-data))) 1)
-                                  (router/nav! (oc-urls/company))))}))
+                               (when (= (count (:revisions-data (section board-data))) 1)
+                                  (router/nav! (oc-urls/board))))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
@@ -217,15 +217,15 @@
         (remove-navigation-listener owner)
         (utils/remove-ending-empty-paragraph body-el)
         (let [topic-data   (dis/foce-section-data)
-              company-data (dis/company-data)
-              sections     (vec (:sections company-data))
+              board-data   (dis/board-data)
+              sections     (vec (:sections board-data))
               fixed-body   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.html body-el)) "__html"))
               data-to-save {:body fixed-body}]
           (dis/dispatch! [:foce-save sections data-to-save])
           ; go back to dashbaord if it's a brand new topic
           (when (:new topic-data)
             (reset! prevent-route-dispatch false)
-            (router/nav! (oc-urls/company))))))))
+            (router/nav! (oc-urls/board))))))))
 
 (defn headline-on-paste
   "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
@@ -248,14 +248,14 @@
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
 (defn show-edit-tt [owner]
-  (let [company-data (dis/company-data)]
+  (let [board-data (dis/board-data)]
     (when (and (not (om/get-state owner :first-foce-tt-shown))
-               (= (count (:sections company-data)) 1)
-               (= (count (:archived company-data)) 0)
+               (= (count (:sections board-data)) 1)
+               (= (count (:archived board-data)) 0)
                (om/get-props owner :foce-key))
       (om/set-state! owner :first-foce-tt-shown true)
       (utils/after 500
-        #(let [first-foce (str "first-foce-" (:slug company-data))]
+        #(let [first-foce (str "first-foce-" (:slug board-data))]
           (t/tooltip (.querySelector js/document "div.topic-edit") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
                                                                     :id first-foce
                                                                     :once-only true
@@ -295,7 +295,7 @@
                      (:was-archvied (dis/foce-section-data))))
         (dis/dispatch! [:rollback-add-topic (dis/foce-section-key)]))
       ; hide FoCE editing tooltip
-      (t/hide (str "first-foce-" (:slug (dis/company-data))))
+      (t/hide (str "first-foce-" (:slug (dis/board-data))))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
@@ -351,7 +351,7 @@
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url
                            headline-exceeds has-changes]}]
-    (let [company-slug        (router/current-company-slug)
+    (let [board-slug        (router/current-board-slug)
           section             (dis/foce-section-key)
           section-kw          (keyword section)
           topic-data          (dis/foce-section-data)
@@ -547,7 +547,7 @@
                            :on-click #(if (:new topic-data)
                                         (do
                                           (dismiss-editing section)
-                                          (router/nav! (oc-urls/company)))
+                                          (router/nav! (oc-urls/board)))
                                         (dis/dispatch! [:start-foce nil]))} "CANCEL")
               ;; Topic archive button
             (when (:show-delete-entry-button data)

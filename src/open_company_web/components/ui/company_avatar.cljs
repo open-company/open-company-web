@@ -12,7 +12,7 @@
   (render-state [_ {:keys [img-load-failed]}]
     (when (:company-data data)
       (let [company-data (:company-data data)
-            slug (router/current-company-slug)
+            slug (router/current-org-slug)
             company-name (if (contains? company-data :name)
                            (:name company-data)
                            (utils/camel-case-str slug))

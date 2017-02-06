@@ -63,7 +63,7 @@
 
   (init-state [_]
     (dis/dispatch! [:start-foce nil])
-    (let [company-data (dis/company-data data)
+    (let [company-data (dis/board-data data)
           su-data   (:stakeholder-update company-data)
           su-topics (if (empty? (:sections su-data))
                         (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
@@ -78,7 +78,7 @@
 
   (will-receive-props [_ next-props]
     (when (om/get-state owner :should-update-data)
-      (let [company-data (dis/company-data next-props)
+      (let [company-data (dis/board-data next-props)
             su-data (:stakeholder-update company-data)
             su-topics (if (and (not (contains? su-data :sections)) (empty? (:sections su-data)))
                         (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
@@ -100,13 +100,13 @@
       (events/unlistenByKey resize-listener)))
 
   (render-state [_ {:keys [columns-num card-width su-title su-topics show-su-dialog]}]
-    (let [company-data (dis/company-data data)
+    (let [company-data (dis/board-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           total-width (str total-width-int "px")
           fixed-card-width (responsive/calc-update-width columns-num)
           back-to-dashboard-fn #(do
                                   (dis/dispatch! [:dashboard-share-mode false])
-                                  (router/nav! (oc-urls/company)))]
+                                  (router/nav! (oc-urls/board)))]
       (dom/div {:class "create-update main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width

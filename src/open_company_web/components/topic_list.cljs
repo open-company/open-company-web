@@ -38,13 +38,13 @@
 ;; ===== Events =====
 
 (defn- topic-click [owner topic selected-metric & [force-edit]]
-  (let [company-slug (router/current-company-slug)]
-    (.pushState js/history nil (name topic) (oc-urls/company-section company-slug (name topic))))
+  (let [company-slug (router/current-board-slug)]
+    (.pushState js/history nil (name topic) (oc-urls/topic (router/current-org-slug) company-slug (name topic))))
   (om/set-state! owner :selected-topic topic)
   (om/set-state! owner :selected-metric selected-metric))
 
 (defn- close-overlay-cb [owner]
-  (.pushState js/history nil "Dashboard" (oc-urls/company (router/current-company-slug)))
+  (.pushState js/history nil "Dashboard" (oc-urls/board (router/current-org-slug) (router/current-board-slug)))
   (om/set-state! owner (merge (om/get-state owner) {:transitioning false
                                                     :selected-topic nil
                                                     :selected-metric nil})))
@@ -80,7 +80,7 @@
 
 (defn- animation-finished [owner]
   (let [cur-state (om/get-state owner)]
-    (.pushState js/history nil (name (:tr-selected-topic cur-state)) (oc-urls/company-section (router/current-company-slug) (:tr-selected-topic cur-state)))
+    (.pushState js/history nil (name (:tr-selected-topic cur-state)) (oc-urls/topic (router/current-org-slug) (router/current-board-slug) (:tr-selected-topic cur-state)))
     (om/set-state! owner (merge cur-state {:selected-topic (:tr-selected-topic cur-state)
                                            :transitioning true
                                            :tr-selected-topic nil}))))
@@ -176,7 +176,7 @@
                            transitioning
                            redirect-to-preview
                            rerender]}]
-    (let [company-slug    (router/current-company-slug)
+    (let [company-slug    (router/current-board-slug)
           company-data    (:company-data data)
           company-topics  (vec (map keyword (:sections company-data)))
           card-width      (:card-width data)
@@ -202,7 +202,7 @@
                             :style #js {:opacity 1}}
                 (om/build fullscreen-topic {:section selected-topic
                                             :section-data (->> selected-topic keyword (get company-data))
-                                            :revision-updates (dispatcher/section-revisions company-slug (router/current-section))
+                                            :revision-updates (dispatcher/section-revisions company-slug (router/current-topic-slug))
                                             :selected-metric selected-metric
                                             :read-only (:read-only company-data)
                                             :card-width card-width

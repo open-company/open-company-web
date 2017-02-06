@@ -74,7 +74,7 @@
 (defcomponent su-snapshot [data owner options]
 
   (init-state [_]
-    {:selected-topic (router/current-section)
+    {:selected-topic (router/current-topic-slug)
      :selected-metric nil
      :topic-navigation true
      :transitioning false
@@ -100,12 +100,12 @@
 
   (render-state [_ {:keys [selected-topic tr-selected-topic selected-metric transitioning columns-num prior-list]}]
 
-    (let [company-data (dis/company-data data)
+    (let [board-data (dis/board-data data)
           su-data      (dis/stakeholder-update-data)
           mobile?      (responsive/is-tablet-or-mobile?)
           fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
-                          (str (:name company-data) " Update")
+                          (str (:name board-data) " Update")
                           (:title su-data))
           card-width   (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:su-snapshot true
@@ -113,13 +113,13 @@
                                          :group true
                                          :has-navbar (not prior-list)})}
         (dom/div {:class "page"}
-          (when (and company-data
+          (when (and board-data
                      (not prior-list))
             ;; Navbar
             (om/build navbar {:card-width card-width
                               :header-width (responsive/total-layout-width-int card-width columns-num)
                               :columns-num columns-num
-                              :company-data company-data
+                              :company-data board-data
                               :foce-key nil
                               :show-share-su-button false
                               :mobile-menu-open false
@@ -135,7 +135,7 @@
                 (dom/i {:class "fa fa-angle-left"}))))
 
           ;; SU Snapshot
-          (when company-data
+          (when board-data
             (dom/div {:class "su-sp-content"
                       :style {:width (if (responsive/is-mobile-size?) "auto" (str fixed-card-width "px"))}}
 
@@ -152,7 +152,7 @@
                                                 :selected-metric selected-metric
                                                 :read-only true
                                                 :card-width fixed-card-width
-                                                :currency (:currency company-data)
+                                                :currency (:currency board-data)
                                                 :hide-history-navigation true
                                                 :animate (not transitioning)}
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
@@ -166,9 +166,9 @@
                     (om/build fullscreen-topic {:section tr-selected-topic
                                                 :section-data (->> tr-selected-topic keyword (get su-data))
                                                 :selected-metric selected-metric
-                                                :read-only (:read-only company-data)
+                                                :read-only (:read-only board-data)
                                                 :card-width fixed-card-width
-                                                :currency (:currency company-data)
+                                                :currency (:currency board-data)
                                                 :hide-history-navigation true
                                                 :animate false}
                                                {:opts {:close-overlay-cb #(close-overlay-cb owner)
@@ -181,7 +181,7 @@
                                         :content-loaded (not (:loading data))
                                         :topics (:sections su-data)
                                         :topics-data su-data
-                                        :company-data company-data
+                                        :company-data board-data
                                         :hide-add-topic true
                                         :is-stakeholder-update true}
                                        {:opts {:topic-click (partial topic-click owner)}})

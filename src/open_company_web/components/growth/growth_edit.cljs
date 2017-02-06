@@ -207,8 +207,7 @@
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {:keys [growth-data metrics metric-slug stop has-changes?] :as state}]
-    (let [company-slug (router/current-company-slug)
-          {slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
+    (let [{slug :slug interval :interval metric-name :name unit :unit description :description :as metric-info} (current-metric-info owner metric-slug)
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code currency) "")
           suffix (when (= unit "%") "%")]
       (dom/div {:class "growth" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}

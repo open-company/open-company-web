@@ -11,7 +11,7 @@
             [open-company-web.lib.responsive :as responsive]))
 
 (defn patch-company [topics-list]
-  (api/patch-company (router/current-company-slug) {:sections topics-list}))
+  (api/patch-company (router/current-board-slug) {:sections topics-list}))
 
 (defn ordered-topics-list
   "Return the list of active topics in the order the user moved them."
@@ -74,7 +74,7 @@
           (dom/h3 {:class "left-topics-list-top-title"
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
-                                (router/nav! (oc-urls/company)))} "TOPICS"))
+                                (router/nav! (oc-urls/board)))} "TOPICS"))
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (not show-add-topic)
                    (not (:read-only company-data)))
@@ -98,7 +98,7 @@
                     :data-topic (name topic)
                     :key (str "bw-topic-list-" (name topic))
                     :on-click #(when (nil? (:foce-key data))
-                                 (router/nav! (oc-urls/company-section (router/current-company-slug) (name topic))))}
+                                 (router/nav! (oc-urls/topic (router/current-org-slug) (router/current-board-slug) (name topic))))}
             (dom/div {:class "internal"
                       :key (str "bw-topic-list-" (name topic) "-internal")}
               (:title sd))))))))

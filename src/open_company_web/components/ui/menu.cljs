@@ -27,26 +27,25 @@
   (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
   (dis/dispatch! [:logout]))
 
-(defn companies-click [e]
+(defn boards-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/companies)))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/boards (router/current-org-slug)))))
 
 (defn user-profile-click [e]
   (utils/event-stop e)
-  (dis/save-last-company-slug)
   (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
-(defn company-profile-click [e]
+(defn board-settings-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/board-settings))))
 
 (defn um-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/company-settings-um))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/team-settings-um))))
 
 (defn updates-click [e]
   (utils/event-stop e)
@@ -67,25 +66,26 @@
                             " dropdown-menu"))]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
-        (when-let [su-link (utils/link-for (:links (dis/company-data)) "stakeholder-updates" "GET")]
-          (when (and (router/current-company-slug)
+        (when-let [su-link (utils/link-for (:links (dis/board-data)) "stakeholder-updates" "GET")]
+          (when (and (router/current-org-slug)
+                     (router/current-board-slug)
                      (pos? (:count su-link)))
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "View Shared Updates"))))
-        (when (and (router/current-company-slug)
-                   (jwt/is-admin?)
-                   (not (:read-only (dis/company-data))))
+        (when (and (jwt/is-admin?)
+                   (not (:read-only (dis/board-data))))
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/company-settings-um) :on-click um-click} "Manage Team")))
-        (when (and (router/current-company-slug)
-                   (not (:read-only (dis/company-data)))
+            (dom/a {:href (oc-urls/team-settings-um) :on-click um-click} "Manage Team")))
+        (when (and (router/current-org-slug)
+                   (router/current-board-slug)
+                   (not (:read-only (dis/board-data)))
                    (not (responsive/is-mobile-size?)))
           (dom/li {:class "oc-menu-item menu-separator"}
-            (dom/a {:href (oc-urls/company-settings) :on-click company-profile-click} "Company Settings")))
+            (dom/a {:href (oc-urls/board-settings) :on-click board-settings-click} "Board Settings")))
         ;; Temp commenting this out since we need API support to know how many companies the user has
         ; (when (jwt/jwt)
         ;   (dom/li {:class "oc-menu-item"}
-        ;     (dom/a {:href oc-urls/companies :on-click companies-click} "Companies")))
+        ;     (dom/a {:href (oc-urls/boards (router/current-org-slug)) :on-click companies-click} "Companies")))
         (when (jwt/jwt)
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))

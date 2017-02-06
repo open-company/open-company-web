@@ -26,7 +26,7 @@
   (router/nav! link))
 
 (defn load-prior-updates-if-needed []
-  (when (and (dispatcher/company-data)
+  (when (and (dispatcher/board-data)
              (not (:su-list-loading @dispatcher/app-state))
              (not (:su-list-loaded @dispatcher/app-state)))
     (dispatcher/dispatch! [:get-su-list])))
@@ -56,11 +56,11 @@
     (drv/drv :jwt)
     rum/reactive
   [s standalone-component current-update]
-  (let [company-slug (router/current-company-slug)
+  (let [board-slug (router/current-board-slug)
         updates (reverse (drv/react s :su-list))
         none? (empty? updates)
         mobile? (responsive/is-mobile-size?)
-        company-data (dispatcher/company-data)]
+        board-data (dispatcher/board-data)]
     (when standalone-component
       (load-prior-updates-if-needed))
     (if (and standalone-component
@@ -75,9 +75,9 @@
 
             [:div.message-container.pt2
               [:h3.message "No company updates have been shared."]
-              (when-not (:read-only company-data)
+              (when-not (:read-only board-data)
                 [:p.message
-                  (if (>= (count (utils/filter-placeholder-sections (vec (map keyword (:sections company-data))) company-data)) 2)
+                  (if (>= (count (utils/filter-placeholder-sections (vec (map keyword (:sections board-data))) board-data)) 2)
                     "As updates are shared by email, Slack or URL, they show up here so they are easy to find and read."
                     "This is where you’ll find company updates once you’ve shared with others. Create some topics on your dashboard first, then you’ll be able to give it a try.")])]
 
@@ -96,11 +96,11 @@
                       link-date (str year "-" (utils/add-zero month) "-" (utils/add-zero day))
                       human-date (str month-string " " day (when needs-year (str ", " year)))
                       update-slug (:slug update)
-                      list-link (urls/stakeholder-update-list company-slug update-slug)
-                      link-url (urls/stakeholder-update company-slug link-date update-slug)
+                      list-link (urls/stakeholder-update-list board-slug update-slug)
+                      link-url (urls/stakeholder-update board-slug link-date update-slug)
                       link (if mobile? (str link-url "?list=true") link-url)
                       title (if (clojure.string/blank? (:title update))
-                              (str (:name (dispatcher/company-data)) " Update")
+                              (str (:name (dispatcher/board-data)) " Update")
                               (:title update))
                       author (if same-user? "You" (-> update :author :name))
                       medium (medium-for (:medium update))]
