@@ -17,16 +17,18 @@
             [open-company-web.lib.raven :as sentry]
             [open-company-web.lib.responsive :as responsive]
             [open-company-web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
-            [open-company-web.components.company-editor :refer (company-editor)]
-            [open-company-web.components.company-logo-setup :refer (company-logo-setup)]
-            [open-company-web.components.company-dashboard :refer (company-dashboard)]
+            [open-company-web.components.org-editor :refer (org-editor)]
+            [open-company-web.components.board-editor :refer (board-editor)]
+            ; [open-company-web.components.board-logo-setup :refer (board-logo-setup)]
+            [open-company-web.components.org-dashboard :refer (org-dashboard)]
             [open-company-web.components.company-settings :refer (company-settings)]
             [open-company-web.components.user-management :refer (user-management-wrapper)]
             [open-company-web.components.create-update :refer (create-update)]
             [open-company-web.components.su-snapshot :refer (su-snapshot)]
             [open-company-web.components.updates :refer (updates-responsive-switcher)]
             [open-company-web.components.home :refer (home)]
-            [open-company-web.components.list-companies :refer (list-companies)]
+            [open-company-web.components.list-orgs :refer (list-orgs)]
+            [open-company-web.components.list-boards :refer (list-boards)]
             [open-company-web.components.user-profile :refer (user-profile)]
             [open-company-web.components.edit-user-profile :refer (edit-user-profile)]
             [open-company-web.components.login :refer (login)]
@@ -73,34 +75,49 @@
 (defn home-handler [target params]
   (pre-routing (:query-params params))
   ;; clean the caches
-  (utils/clean-company-caches)
+  (utils/clean-org-caches)
   ;; save route
   (router/set-route! ["home"] {})
   (when (jwt/jwt)
+    ;; load data from api
+    (api/get-entry-point)
     (swap! dis/app-state assoc :loading true))
-  ;; load data from api
-  (api/get-entry-point)
   ;; render component
   (drv-root home target))
 
-;; Company list
-(defn list-companies-handler [target params]
+;; Orgs list
+(defn list-orgs-handler [target params]
   (pre-routing (:query-params params))
   ;; clean the caches
-  (utils/clean-company-caches)
+  (utils/clean-org-caches)
   ;; save route
-  (router/set-route! ["companies"] {})
+  (router/set-route! ["orgs"] {})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
-  (api/get-entry-point false)
-  (api/get-companies)
+  (api/get-entry-point)
   ;; render component
-  (drv-root list-companies target))
+  (drv-root list-orgs target))
+
+;; Company list
+(defn list-boards-handler [target params]
+  (let [org (:org (:params params))
+        query-params (:query-params params)]
+    (pre-routing query-params)
+    ;; clean the caches
+    (utils/clean-org-caches)
+    ;; save route
+    (router/set-route! [org "boards"] {:org org})
+    ;; load data from api
+    (swap! dis/app-state assoc :loading true)
+    (swap! dis/app-state assoc :load-org-data true)
+    (api/get-entry-point false)
+    ;; render component
+    (drv-root list-boards target)))
 
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
   (pre-routing (:query-params params))
-  (utils/clean-company-caches)
+  (utils/clean-org-caches)
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -118,7 +135,7 @@
 
 (defn simple-handler [component route-name target params]
   (pre-routing (:query-params params))
-  (utils/clean-company-caches)
+  (utils/clean-org-caches)
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -137,30 +154,30 @@
       (drv-root #(om/component (component)) target))))
 
 ;; Component specific to a company
-(defn company-handler [route target component params]
-  (let [slug (:slug (:params params))
-        update-slug (:update-slug (:params params))
-        section (:section (:params params))
-        edit?   (= route "section-edit")
+(defn board-handler [route target component params]
+  (let [org (:org (:params params))
+        board (:board (:params params))
+        topic (:topic (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
-    (utils/clean-company-caches)
+    (utils/clean-org-caches)
     ;; save the route
-    (router/set-route! (vec (remove nil? [slug (when section section) route (when edit? "edit")])) {:slug slug :section section :edit edit? :query-params query-params :update-slug update-slug})
+    (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
     (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     ;; do we have the company data already?
-    (when (or (not (dis/company-data))              ;; if the company data are not present
-              (not (:sections (dis/company-data)))) ;; or the section key is missing that means we have only
+    (when (or (not (dis/board-data))              ;; if the company data are not present
+              (not (:sections (dis/board-data)))) ;; or the section key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
-      ;; load the company data from the API
-      (api/get-company slug)
+      (api/get-entry-point false)
       (reset! dis/app-state (-> @dis/app-state
                              (assoc :loading true)
-                             (dissoc (keyword slug)))))
-    (if section
-      (reset! dis/app-state (assoc @dis/app-state :selected-topic-view section))
+                             (assoc :load-org-data true)
+                             (assoc :load-board-data true)
+                             (dissoc (keyword org)))))
+    (if topic
+      (reset! dis/app-state (assoc @dis/app-state :selected-topic-view topic))
       (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
     ;; render component
     (drv-root component target)))
@@ -170,7 +187,7 @@
   (let [team-id (:team-id (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
-    (utils/clean-company-caches)
+    (utils/clean-org-caches)
     (api/get-entry-point false)
     ;; save the route
     (router/set-route! [team-id route] {:team-id team-id :query-params query-params})
@@ -189,7 +206,7 @@
         query-params (:query-params params)
         su-key (dis/stakeholder-update-key slug update-slug)]
     (pre-routing query-params)
-    (utils/clean-company-caches)
+    (utils/clean-org-caches)
     ;; save the route
     (router/set-route! [slug "su-snapshot" "updates" update-date update-slug update-section] {:slug slug :update-slug update-slug :update-date update-date :query-params query-params :section update-section})
     ;; do we have the company data already?
@@ -218,102 +235,118 @@
       (simple-handler pricing "pricing" target params))
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
-      (utils/clean-company-caches)
+      (utils/clean-org-caches)
       (pre-routing (:query-params params))
       (drv-root email-confirmation target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (when (jwt/jwt)
         (router/redirect! urls/home))
-      (utils/clean-company-caches)
+      (utils/clean-org-caches)
       (pre-routing query-params)
       (router/set-route! ["confirm-invitation"] {:query-params query-params})
       (drv-root confirm-invitation target))
 
-    (defroute subscription-callback-route urls/subscription-callback {}
-      (when-let [s (cook/get-cookie :subscription-callback-slug)]
-        (router/redirect! (urls/company-settings s))))
+    ; (defroute subscription-callback-route urls/subscription-callback {}
+    ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
+    ;     (router/redirect! (urls/board-settings s))))
 
     (defroute home-page-route urls/home {:as params}
       (home-handler target params))
 
-    (defroute company-create-route urls/create-company {:as params}
+    (defroute org-list-route urls/orgs {:as params}
+      (list-orgs-handler target params))
+
+    (defroute org-create-route urls/create-org {:as params}
+      (if (jwt/jwt)
+        (do
+          (pre-routing (:query-params params))
+          (router/set-route! ["create-org"] {:query-params (:query-params params)})
+          (api/get-entry-point false)
+          (drv-root org-editor target))
+        (login-handler target params)))
+
+    (defroute board-create-route (urls/create-board ":org") {:as params}
       (if (jwt/jwt)
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-company"] {:query-params (:query-params params)})
           (api/get-entry-point false)
-          (drv-root company-editor target))
+          (drv-root board-editor target))
         (login-handler target params)))
 
-    (defroute company-logo-setup-route (urls/company-logo-setup ":slug") {:as params}
-      (let [slug (:slug (:params params))
-            query-params (:query-params params)]
-        (pre-routing query-params)
-        (utils/clean-company-caches)
-        ;; save the route
-        (router/set-route! [slug "settings" "logo"] {:slug slug :query-params query-params})
-        ;; do we have the company data already?
-        (when-not (dis/company-data)
-          ;; load the company data from the API
-          (api/get-company slug)
-          (swap! dis/app-state assoc :loading true))
-      (drv-root company-logo-setup target)))
+    ; (defroute board-logo-setup-route (urls/board-logo-setup ":org" ":board") {:as params}
+    ;   (let [org (:org (:params params))
+    ;         board (:board (:params params))
+    ;         query-params (:query-params params)]
+    ;     (pre-routing query-params)
+    ;     (utils/clean-org-caches)
+    ;     ;; save the route
+    ;     (router/set-route! [org company "settings" "logo"] {:org org :board board :query-params query-params})
+    ;     ;; do we have the company data already?
+    ;     (when-not (dis/board-data)
+    ;       ;; load the company data from the API
+    ;       (api/get-company company)
+    ;       (swap! dis/app-state assoc :loading true))
+    ;   (drv-root board-logo-setup target)))
 
     (defroute logout-route urls/logout {:as params}
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :login-redirect)
       (router/redirect! urls/home))
 
-    (defroute list-page-route urls/companies {:as params}
-      (list-companies-handler target params))
+    (defroute org-page-route (urls/org ":org") {:as params}
+      (list-boards-handler target params))
 
-    (defroute list-page-route-slash (str urls/companies "/") {:as params}
-      (list-companies-handler target params))
+    (defroute board-list-page-route (urls/boards ":org") {:as params}
+      (list-boards-handler target params))
+
+    (defroute board-list-page-route-slash (str (urls/boards ":org") "/") {:as params}
+      (list-boards-handler target params))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (when-not (jwt/jwt)
         (router/redirect! urls/home))
-      (utils/clean-company-caches)
+      (utils/clean-org-caches)
       (pre-routing (:query-params params))
       (if (jwt/is-slack-org?)
         (drv-root user-profile target)
         (drv-root edit-user-profile target)))
 
-    (defroute company-settings-route (urls/company-settings ":slug") {:as params}
+    (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no sections and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
-      (company-handler "profile" target company-settings params))
+      (board-handler "profile" target company-settings params))
 
-    (defroute company-settings-um-route (urls/company-settings-um ":team-id") {:as params}
+    (defroute team-settings-route (urls/team-settings-um ":team-id") {:as params}
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no sections and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
       (team-handler "user-management" target user-management-wrapper params))
 
-    (defroute company-route (urls/company ":slug") {:as params}
-      (company-handler "dashboard" target company-dashboard params))
+    (defroute board-route (urls/board ":org" ":board") {:as params}
+      (board-handler "dashboard" target org-dashboard params))
 
-    (defroute company-route-slash (str (urls/company ":slug") "/") {:as params}
-      (company-handler "dashboard" target company-dashboard params))
+    (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
+      (board-handler "dashboard" target org-dashboard params))
 
     (defroute create-update-route (urls/stakeholder-update-preview ":slug") {:as params}
-      (company-handler "su-snapshot-preview" target create-update params))
+      (board-handler "su-snapshot-preview" target create-update params))
 
     (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
-      (company-handler "su-list" target updates-responsive-switcher params))
+      (board-handler "su-list" target updates-responsive-switcher params))
 
     (defroute su-list-update-route (urls/stakeholder-update-list ":slug" ":update-slug") {:as params}
       (if (responsive/is-mobile-size?)
         (stakeholder-update-handler target su-snapshot params)
-        (company-handler "su-list" target updates-responsive-switcher params)))
+        (board-handler "su-list" target updates-responsive-switcher params)))
 
     (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-date" ":update-slug") {:as params}
       (stakeholder-update-handler target su-snapshot params))
 
-    (defroute company-section-route (urls/company-section ":slug" ":section") {:as params}
-      (company-handler "section" target company-dashboard params))
+    (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
+      (board-handler "section" target org-dashboard params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -326,22 +359,25 @@
                                  pricing-route
                                  email-confirmation-route
                                  confirm-invitation-route
-                                 subscription-callback-route
+                                 ; subscription-callback-route
                                  home-page-route
-                                 list-page-route-slash
-                                 list-page-route
-                                 company-create-route
-                                 company-logo-setup-route
+                                 org-list-route
+                                 org-page-route
+                                 board-list-page-route-slash
+                                 board-list-page-route
+                                 org-create-route
+                                 board-create-route
+                                 ; board-logo-setup-route
                                  logout-route
                                  user-profile-route
-                                 company-settings-route
-                                 company-settings-um-route
-                                 company-route
-                                 company-route-slash
+                                 board-settings-route
+                                 team-settings-route
+                                 board-route
+                                 board-route-slash
                                  create-update-route
                                  su-list-route
                                  su-list-update-route
-                                 company-section-route
+                                 topic-route
                                  stakeholder-update-route
                                  not-found-route]))
 
