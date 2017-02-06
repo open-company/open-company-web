@@ -22,10 +22,10 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.list-orgs :refer (list-orgs)]
             [oc.web.components.user-management :refer (user-management-wrapper)]
+            [oc.web.components.org-dashboard :refer (org-dashboard)]
             ; [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.board-editor :refer (board-editor)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
-            ; [oc.web.components.org-dashboard :refer (org-dashboard)]
             ; [oc.web.components.company-settings :refer (company-settings)]
             ; [oc.web.components.create-update :refer (create-update)]
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
@@ -154,34 +154,34 @@
 ;       ;; render component
 ;       (drv-root #(om/component (component)) target))))
 
-; ;; Component specific to a company
-; (defn board-handler [route target component params]
-;   (let [org (:org (:params params))
-;         board (:board (:params params))
-;         topic (:topic (:params params))
-;         query-params (:query-params params)]
-;     (pre-routing query-params)
-;     (utils/clean-org-caches)
-;     ;; save the route
-;     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
-;     (when (contains? (:query-params params) :access)
-;         ;login went bad, add the error message to the app-state
-;         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
-;     ;; do we have the company data already?
-;     (when (or (not (dis/board-data))              ;; if the company data are not present
-;               (not (:sections (dis/board-data)))) ;; or the section key is missing that means we have only
-;                                                     ;; a subset of the company data loaded with a SU
-;       (api/get-entry-point false)
-;       (reset! dis/app-state (-> @dis/app-state
-;                              (assoc :loading true)
-;                              (assoc :load-org-data true)
-;                              (assoc :load-board-data true)
-;                              (dissoc (keyword org)))))
-;     (if topic
-;       (reset! dis/app-state (assoc @dis/app-state :selected-topic-view topic))
-;       (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
-;     ;; render component
-;     (drv-root component target)))
+;; Component specific to a company
+(defn board-handler [route target component params]
+  (let [org (:org (:params params))
+        board (:board (:params params))
+        topic (:topic (:params params))
+        query-params (:query-params params)]
+    (pre-routing query-params)
+    (utils/clean-org-caches)
+    ;; save the route
+    (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
+    (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+    ;; do we have the company data already?
+    (when (or (not (dis/board-data))              ;; if the company data are not present
+              (not (:sections (dis/board-data)))) ;; or the section key is missing that means we have only
+                                                    ;; a subset of the company data loaded with a SU
+      (api/get-entry-point false)
+      (reset! dis/app-state (-> @dis/app-state
+                             (assoc :loading true)
+                             (assoc :load-org-data true)
+                             (assoc :load-board-data true)
+                             (dissoc (keyword org)))))
+    (if topic
+      (reset! dis/app-state (assoc @dis/app-state :selected-topic-view topic))
+      (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
+    ;; render component
+    (drv-root component target)))
 
 ;; Component specific to a team settings
 (defn team-handler [route target component params]
@@ -320,11 +320,11 @@
       (swap! dis/app-state assoc :force-remove-loading true)
       (team-handler "user-management" target user-management-wrapper params))
 
-    ; (defroute board-route (urls/board ":org" ":board") {:as params}
-    ;   (board-handler "dashboard" target org-dashboard params))
+    (defroute board-route (urls/board ":org" ":board") {:as params}
+      (board-handler "dashboard" target org-dashboard params))
 
-    ; (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
-    ;   (board-handler "dashboard" target org-dashboard params))
+    (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
+      (board-handler "dashboard" target org-dashboard params))
 
     ; (defroute create-update-route (urls/stakeholder-update-preview ":slug") {:as params}
     ;   (board-handler "su-snapshot-preview" target create-update params))
@@ -366,8 +366,8 @@
                                  ; user-profile-route
                                  ; board-settings-route
                                  team-settings-route
-                                 ; board-route
-                                 ; board-route-slash
+                                 board-route
+                                 board-route-slash
                                  ; create-update-route
                                  ; su-list-route
                                  ; su-list-update-route
