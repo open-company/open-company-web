@@ -1,18 +1,18 @@
 body.small-footer {
-  div.list-companies {
+  div.list-orgs {
     div.navbar-offset {
       min-height: calc(100vh - #{$footer_small_height}px + 1px);
     }
   }
 }
 
-div.list-companies {
+div.list-orgs {
 
   div.navbar-offset {
     padding-top: #{$mobile_navbar_height}px;
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
 
-    ul.companies {
+    ul.orgs {
       list-style-type: none;
       margin-top: 20px;
 
@@ -38,7 +38,7 @@ div.list-companies {
           display: inline-block;
           width: 100%;
 
-          img.company-logo{
+          img.org-logo{
             min-width: 20px;
             max-width: 65px;
             height: 20px;
@@ -46,7 +46,7 @@ div.list-companies {
             margin-left: 10px;
           }
 
-          span.company-logo{
+          span.org-logo{
             font-size: 24px;
             line-height: 0.7;
           }

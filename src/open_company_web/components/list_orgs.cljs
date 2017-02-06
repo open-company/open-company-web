@@ -1,4 +1,4 @@
-(ns open-company-web.components.list-companies
+(ns open-company-web.components.list-orgs
     (:require [om.core :as om :include-macros true]
               [om-tools.core :as om-core :refer-macros (defcomponent)]
               [om-tools.dom :as dom :include-macros true]
@@ -14,25 +14,25 @@
 (defcomponent list-page-item [data owner]
   (render [_]
     (dom/li
-      (dom/a {:href (oc-urls/company (:slug data))
+      (dom/a {:href (oc-urls/org (:slug data))
               :on-click (fn [e]
                           (.preventDefault e)
-                          (router/nav! (oc-urls/company (:slug data))))}
+                          (router/nav! (oc-urls/org (:slug data))))}
         (when-not (clojure.string/blank? (:logo data))
-          (dom/img {:class "company-logo" :src (:logo data)}))
-        (:name data)))))
+          (dom/img {:class "org-logo" :src (:logo data)}))
+        (or (:name data) (:slug data))))))
 
-(defcomponent list-companies [{:keys [mobile-menu-open] :as data} owner]
+(defcomponent list-orgs [{:keys [mobile-menu-open] :as data} owner]
 
   (init-state[_]
     {:columns-num (responsive/columns-num)})
 
   (render-state [_ {:keys [columns-num]}]
     (utils/update-page-title "OpenCompany - Startup Transparency Made Simple")
-    (when (:companies data)
-      (let [company-list (:companies data)
+    (when (:orgs data)
+      (let [orgs-list (:orgs data)
             card-width (responsive/calc-card-width)]
-        (dom/div {:class "list-companies"}
+        (dom/div {:class "list-orgs"}
           ;show login overlays if needed
           (when-not (utils/is-test-env?)
             (login-overlays-handler))
@@ -45,9 +45,9 @@
                               :auth-settings (:auth-settings data)})
             (dom/div {:class "navbar-offset group"}
               (if (:loading data)
-                (dom/h4 "Loading companies...")
-                (if (pos? (count company-list))
-                  (dom/ul {:class "companies"}
-                    (om/build-all list-page-item company-list))
-                  (dom/h2 "No companies found."))))
+                (dom/h4 "Loading Organizations...")
+                (if (pos? (count orgs-list))
+                  (dom/ul {:class "orgs"}
+                    (om/build-all list-page-item orgs-list))
+                  (dom/h2 "No organizations found."))))
             (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))))
