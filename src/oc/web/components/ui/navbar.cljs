@@ -29,7 +29,7 @@
     "Select topics to share by Slack, email or link."
     "Select topics to share by email or link."))
 
-(defcomponent navbar [{:keys [company-data
+(defcomponent navbar [{:keys [board-data
                               columns-num
                               card-width
                               latest-su
@@ -69,7 +69,7 @@
                                           (jwt/jwt)                                  ; the user is logged in
                                           (or is-dashboard                           ; is looking at the dashboard
                                               is-topic-view)
-                                          (not (:read-only company-data))            ; it's not a read-only cmp
+                                          (not (:read-only board-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
                                             true))
@@ -82,7 +82,7 @@
                                          :mobile-menu-open mobile-menu-open
                                          :has-prior-updates (and (router/current-board-slug)
                                                                  (pos? (:count (utils/link-for (:links (dis/board-data)) "stakeholder-updates" "GET"))))
-                                         :can-edit-company (and (router/current-board-slug)
+                                         :can-edit-board (and (router/current-board-slug)
                                                                 (not (:read-only (dis/board-data))))
                                          :jwt (jwt/jwt)})}
         (when (not (utils/is-test-env?))
@@ -92,7 +92,7 @@
           (dom/div {:class "oc-navbar-header-container group"}
             (if (or (utils/in? (:route @router/path) "orgs")
                     (not (router/current-org-slug))
-                    (not company-data))
+                    (not board-data))
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
                 (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
               (om/build org-avatar data))
@@ -110,9 +110,9 @@
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {}))
                         (when (and (not dashboard-sharing)
-                                   (not (:read-only company-data))
+                                   (not (:read-only board-data))
                                    (not is-update-preview)
-                                   (pos? (count (:sections company-data))))
+                                   (pos? (count (:sections board-data))))
                           (dom/button {:class "btn-reset invite-others right"
                                        :title "Invite others"
                                        :data-toggle "tooltip"
@@ -133,7 +133,7 @@
                                            :disabled (zero? (count dashboard-selected-topics))
                                            :on-click (fn []
                                                        (om/set-state! owner :su-redirect true)
-                                                       (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update company-data))}))}
+                                                       (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update board-data))}))}
                                 (when (om/get-state owner :su-redirect)
                                   (loading/small-loading))
                                 (if (zero? (count dashboard-selected-topics))
