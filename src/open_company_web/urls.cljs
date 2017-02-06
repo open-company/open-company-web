@@ -41,56 +41,81 @@
 
 (def user-profile "/profile")
 
+;; Organizations
+
+(def orgs "/orgs")
+
+(def create-org "/create-org")
+
+(defn org
+  "Org url"
+  ([]
+    (org (router/current-org-slug)))
+  ([org-slug]
+    (str "/" (name org-slug))))
+
 ;; Companies
 
-(def companies "/companies")
-
-;; Company
-
-(def create-company "/create-company")
-
-(defn company
-  "Company url"
+(defn boards
   ([]
-    (company (router/current-company-slug)))
-  ([slug]
-   (str "/" (name slug))))
+    (boards (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/boards")))
 
-(defn company-settings
-  "Company profile url"
+(defn create-board
   ([]
-    (company-settings (router/current-company-slug)))
-  ([slug]
-    (str "/" (name slug) "/settings")))
+    (create-board (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/create-board")))
 
-(defn company-logo-setup
+(defn board
+  "Board url"
   ([]
-    (company-logo-setup (router/current-company-slug)))
-  ([slug]
-    (str (company-settings slug) "/logo")))
+    (board (router/current-org-slug) (router/current-board-slug)))
+  ([org-slug]
+    (board org-slug (router/current-board-slug)))
+  ([org-slug board-slug]
+   (str (org org-slug) "/" (name board-slug))))
 
-(defn company-settings-um
-  "Company profile url"
+(defn board-settings
+  "Board settings url"
   ([]
-    (company-settings-um (j/team-id)))
+    (board-settings (router/current-org-slug) (router/current-board-slug)))
+  ([org-slug board-slug]
+    (str (board org-slug board-slug) "/settings")))
+
+(defn board-logo-setup
+  ([]
+    (board-logo-setup (router/current-org-slug) (router/current-board-slug)))
+  ([org-slug board-slug]
+    (str (board-settings org-slug board-slug) "/logo")))
+
+(defn board-settings-um
+  "Board profile url"
+  ([]
+    (board-settings-um (j/team-id)))
   ([team-id]
     (str "/" team-id "/settings/user-management")))
 
-(defn company-section
-  "Section url"
-  ([] (company-section (router/current-company-slug) (router/current-section)))
-  ([company-slug section-name] (str "/" (name company-slug) "/" (name section-name))))
+;; Topics
 
-(defn company-section-revision
-  ([] (company-section (router/current-company-slug) (router/current-section)))
-  ([revision] (str (company-section (router/current-company-slug) (router/current-section)) "?as-of=" revision))
-  ([company-slug section-name revision] (str (company-section company-slug section-name) "?as-of=" revision)))
+(defn topic
+  "Topic url"
+  ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
+  ([topic-slug] (topic (router/current-org-slug) (router/current-board-slug) topic-slug))
+  ([board-slug topic-slug] (topic (router/current-org-slug) board-slug topic-slug))
+  ([org-slug board-slug topic-slug] (str (board org-slug board-slug) "/" (name topic-slug))))
+
+(defn topic-revision
+  ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
+  ([revision] (str (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)) "?as-of=" revision))
+  ([org-slug board-slug topic-slug revision] (str (topic org-slug board-slug topic-slug) "?as-of=" revision)))
 
 ;; Stakeholder update
 
 (defn stakeholder-update-list
   ([]
-    (stakeholder-update-list (router/current-company-slug)))
+    (stakeholder-update-list (router/current-board-slug)))
   ([slug]
     (str "/" (name slug) "/updates"))
   ([slug update-slug]
@@ -98,14 +123,14 @@
 
 (defn stakeholder-update-preview
   ([]
-    (stakeholder-update-preview (router/current-company-slug)))
+    (stakeholder-update-preview (router/current-board-slug)))
   ([slug]
     (str "/" (name slug) "/updates/preview")))
 
 (defn stakeholder-update
   ([]
-    (stakeholder-update (router/current-company-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
+    (stakeholder-update (router/current-board-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
   ([update-date update-slug]
-    (stakeholder-update (router/current-company-slug) update-date update-slug))
+    (stakeholder-update (router/current-board-slug) update-date update-slug))
   ([slug update-date update-slug]
     (str "/" (name slug) "/updates/" (name update-date) "/" (name update-slug))))
