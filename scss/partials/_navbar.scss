@@ -29,7 +29,7 @@ nav.oc-navbar {
           height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
         }
 
-        &.can-edit-company {
+        &.can-edit-board {
           height: #{$mobile_navbar_height + ($mobile_menu_item_height * 3)}px;
 
           &.has-prior-updates {
