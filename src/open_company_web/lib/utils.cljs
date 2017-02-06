@@ -318,7 +318,7 @@
 
 (defn select-section-data [section-data section as-of]
   (when (and section-data section (or as-of (:placeholder section-data)))
-    (let [slug (keyword (router/current-company-slug))]
+    (let [slug (keyword (router/current-board-slug))]
       (if (or (not (contains? (slug @caches/revisions) section))
               (= as-of (:created-at section-data)))
         section-data
@@ -491,16 +491,18 @@
       (str year "-" (add-zero month)))))
 
 (defn company-cache-key [k & [v]]
-  (let [slug (keyword (router/current-company-slug))
-        cc (slug @company-cache)]
+  (let [org-slug (keyword (router/current-org-slug))
+        board-slug (keyword (router/current-board-slug))
+        cc (board-slug (org-slug @company-cache))]
     (when v
-      (swap! company-cache assoc-in [slug k] v))
+      (swap! company-cache assoc-in [org-slug board-slug k] v))
     (get cc k nil)))
 
 (defn remove-company-cache-key [k]
-  (let [slug (keyword (router/current-company-slug))
-        cc (slug @company-cache)]
-    (swap! company-cache update-in [slug] dissoc k)))
+  (let [org-slug (keyword (router/current-org-slug))
+        board-slug (keyword (router/current-board-slug))
+        cc (board-slug (org-slug @company-cache))]
+    (swap! company-cache update-in [org-slug board-slug] dissoc k)))
 
 (defn clean-org-caches []
   (reset! company-cache {}))
