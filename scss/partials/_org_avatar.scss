@@ -1,4 +1,4 @@
-div.company-avatar {
+div.org-avatar {
   float: left;
 
   @include mobile(){
@@ -9,9 +9,9 @@ div.company-avatar {
     text-decoration: none;
   }
 
-  div.company-avatar-container {
+  div.org-avatar-container {
 
-    div.company-avatar-border {
+    div.org-avatar-border {
       width: 45px;
       height: 45px;
       padding: 5px;
@@ -19,7 +19,7 @@ div.company-avatar {
       white-space: nowrap;
       text-align: center;
 
-      img.company-avatar-img{
+      img.org-avatar-img{
         max-width: 35px;
         max-height: 35px;
         vertical-align: middle;
@@ -31,7 +31,7 @@ div.company-avatar {
         vertical-align: middle;
       }
 
-      span.company-avatar-initial {
+      span.org-avatar-initial {
         font-size: 19px;
         color: $oc_gray_5;
         line-height: 1.1;
@@ -39,7 +39,7 @@ div.company-avatar {
       }
     }
 
-    span.company-name {
+    span.org-name {
       font-weight: 700;
       font-size: 22px;
       line-height: 1.2;
