@@ -53,6 +53,9 @@
       (utils/filter-placeholder-topics (:topics board-data) board-data)
       (:topics board-data))))
 
+(defn sorted-boards [boards]
+  (into [] (sort #(compare (utils/js-date (:created-at %1)) (utils/js-date (:created-at %2))) boards)))
+
 (defcomponent bw-topics-list [{:keys [board-data card-width selected-topic-view show-add-topic] :as data} owner options]
 
   (init-state [_]
@@ -75,7 +78,7 @@
         (dom/h3 {:class "left-topics-list-top-title"} "BOARDS"))
       (let [org-data (dis/org-data)]
         (dom/div {:class (str "left-topics-list-items group")}
-          (for [board (:boards org-data)]
+          (for [board (sorted-boards (:boards org-data))]
             (dom/div {:class (utils/class-set {:left-topics-list-item true
                                                :highlight-on-hover (nil? (:foce-key data))
                                                :group true
