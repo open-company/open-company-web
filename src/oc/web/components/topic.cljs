@@ -10,8 +10,8 @@
             [oc.web.lib.responsive :as responsive]
             ; [open-company-web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
-            ; [open-company-web.components.growth.topic-growth :refer (topic-growth)]
-            ; [open-company-web.components.finances.topic-finances :refer (topic-finances)]
+            [oc.web.components.growth.topic-growth :refer (topic-growth)]
+            [oc.web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events.EventType :as EventType]
             [goog.events :as events]
             [cljsjs.react.dom]))
@@ -216,25 +216,25 @@
                    (not (clojure.string/blank? (:headline topic-data))))
           (om/build topic-headline topic-data))
 
-        ; ;; Topic data
-        ; (when (and (or (not is-dashboard)
-        ;                (not is-mobile?))
-        ;            is-growth-finances?
-        ;            (utils/data-topic-has-data section topic-data))
-        ;   (dom/div {:class ""}
-        ;     (cond
-        ;       (= section "growth")
-        ;       (om/build topic-growth {:section-data topic-data
-        ;                               :section section
-        ;                               :card-width card-width
-        ;                               :columns-num columns-num
-        ;                               :currency currency} {:opts chart-opts})
-        ;       (= section "finances")
-        ;       (om/build topic-finances {:section-data (utils/fix-finances topic-data)
-        ;                                 :section section
-        ;                                 :card-width card-width
-        ;                                 :columns-num columns-num
-        ;                                 :currency currency} {:opts chart-opts}))))
+        ;; Topic data
+        (when (and (or (not is-dashboard)
+                       (not is-mobile?))
+                   is-growth-finances?
+                   (utils/data-topic-has-data section topic-data))
+          (dom/div {:class ""}
+            (cond
+              (= section "growth")
+              (om/build topic-growth {:section-data topic-data
+                                      :section section
+                                      :card-width card-width
+                                      :columns-num columns-num
+                                      :currency currency} {:opts chart-opts})
+              (= section "finances")
+              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
+                                        :section section
+                                        :card-width card-width
+                                        :columns-num columns-num
+                                        :currency currency} {:opts chart-opts}))))
 
         ;; Topic headline
         (when (and (or (not is-mobile?) (not is-dashboard))
