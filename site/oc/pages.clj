@@ -10,10 +10,10 @@
 
 (defn index [options]
   [:div
-   [:div.container.outer.section
+   [:div.container.outer.topic
     [:div.container.inner
-     [:div.section-box
-      [:div.section-text.team-text
+     [:div.topic-box
+      [:div.topic-text.team-text
        [:h2 "Make Employees Great"]
        [:p
         "Everyone is on the same page with open access to company information."]
@@ -24,10 +24,10 @@
         " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
       [:div.team-image]]]]
    [:hr]
-   [:div.container.outer.section
+   [:div.container.outer.topic
     [:div.container.inner
-     [:div.section-box.even
-      [:div.section-text.update-text
+     [:div.topic-box.even
+      [:div.topic-text.update-text
        [:h2 "Impress Investors and Advisors"]
        [:p
         "Send regular investor updates that follow best practices and increase engagement."]
@@ -36,10 +36,10 @@
         "Stakeholder updates are generated from your company's content for your approval."]]
       [:div.update-image]]]]
    [:hr]
-   [:div.container.outer.section
+   [:div.container.outer.topic
     [:div.container.inner
-     [:div.section-box
-      [:div.section-text.public-text
+     [:div.topic-box
+      [:div.topic-text.public-text
        [:h2 "Go Public!"]
        [:p
         "Share publicly to build trust and attract new investors, employees, and customers."]
@@ -48,7 +48,7 @@
         "Keep crowd supporters and investors informed of your progress."]]
       [:div.public-image]]]]
    [:hr]
-   [:div.container.outer.section
+   [:div.container.outer.topic
     [:div.row.features
      [:div.col-md-4
       [:div.col-sm-2.feature-icon
@@ -72,7 +72,7 @@
        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
 
 (defn pricing [options]
-   [:div.container.outer.section.content
+   [:div.container.outer.topic.content
     [:div.row
      [:div.col-md-12.pricing-header
       [:h2 "Simple Pricing"]
@@ -120,7 +120,7 @@
      ]])
 
 (defn about [options]
-  [:div.container.outer.section.content.about
+  [:div.container.outer.topic.content.about
    [:div.container.inner
     [:div.row
      [:div.col-md-12
@@ -133,7 +133,7 @@
       [:p "We’re also looking for awesome people that are interested in startup transparency. We are a fully distributed team working from our home offices around the world. Join us."]]]]])
 
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.section.not-found
+  [:div.container.outer.topic.not-found
    [:div.container.inner
     [:div.row
      [:div.col-md-12
@@ -149,7 +149,7 @@
        [:script {:src "/js/set-path.js"}]]]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.section.server-error
+  [:div.container.outer.topic.server-error
    [:div.container.inner
     [:div.row
      [:div.col-md-12
