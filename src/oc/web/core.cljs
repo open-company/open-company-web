@@ -340,8 +340,8 @@
     ; (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-date" ":update-slug") {:as params}
     ;   (stakeholder-update-handler target su-snapshot params))
 
-    ; (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
-    ;   (board-handler "topic" target org-dashboard params))
+    (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
+      (board-handler "topic" target org-dashboard params))
 
     (defroute not-found-route "*" []
       ;; render component
@@ -371,7 +371,7 @@
                                  ; create-update-route
                                  ; su-list-route
                                  ; su-list-update-route
-                                 ; topic-route
+                                 topic-route
                                  ; stakeholder-update-route
                                  not-found-route
                                  ]))
