@@ -95,7 +95,7 @@
   (router/set-route! ["orgs"] {})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
-  (api/get-entry-point false)
+  (api/get-entry-point)
   ;; render component
   (drv-root list-orgs target))
 
@@ -109,9 +109,8 @@
     ;; save route
     (router/set-route! [org "boards"] {:org org})
     ;; load data from api
-    (swap! dis/app-state assoc :loading true)
-    (swap! dis/app-state assoc :load-org-data true)
-    (api/get-entry-point false)
+    (swap! dis/app-state merge {:loading true})
+    (api/get-entry-point)
     ;; render component
     (drv-root #(om/component) target)))
 
@@ -160,6 +159,7 @@
         board (:board (:params params))
         topic (:topic (:params params))
         query-params (:query-params params)]
+    (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6))
     (pre-routing query-params)
     (utils/clean-org-caches)
     ;; save the route
@@ -171,12 +171,10 @@
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
-      (api/get-entry-point false)
+      (api/get-entry-point)
       (reset! dis/app-state (-> @dis/app-state
-                             (assoc :loading true)
-                             (assoc :load-org-data true)
-                             (assoc :load-board-data true)
-                             (dissoc (keyword org)))))
+                               (assoc :loading true)
+                               (dissoc (keyword org)))))
     (if topic
       (reset! dis/app-state (assoc @dis/app-state :selected-topic-view topic))
       (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
@@ -189,7 +187,6 @@
         query-params (:query-params params)]
     (pre-routing query-params)
     (utils/clean-org-caches)
-    (api/get-entry-point false)
     ;; save the route
     (router/set-route! [team-id route] {:team-id team-id :query-params query-params})
     (when (contains? (:query-params params) :access)
