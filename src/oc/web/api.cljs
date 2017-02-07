@@ -141,10 +141,10 @@
     {:headers (headers-for-link {:content-type "text/plain"})}
     (fn [_])))
 
-(defn get-entry-point [& [redirect-if-necessary]]
+(defn get-entry-point []
   (api-get "/" nil (fn [response]
                      (let [body (if (:success response) (:body response) {})]
-                       (dispatcher/dispatch! [:entry (json->cljs body) (if (nil? redirect-if-necessary) true redirect-if-necessary)])))))
+                       (dispatcher/dispatch! [:entry (json->cljs body)])))))
 
 (defn get-subscription [company-uuid]
   (pay-get (str "/subscriptions/" company-uuid)
@@ -153,12 +153,12 @@
              (let [body (if (:success response) (:body response) {})]
                (dispatcher/dispatch! [:subscription body])))))
 
-(defn get-org [org-data & [redirect-if-necessary]]
+(defn get-org [org-data]
   (when-let [org-link (utils/link-for (:links org-data) "item" "GET")]
     (api-get (:href org-link)
       {:headers (headers-for-link org-link)}
       (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:org (json->cljs body) (if (nil? redirect-if-necessary) true redirect-if-necessary)])))))
+        (dispatcher/dispatch! [:org (json->cljs body)])))))
 
 (defn get-board [board-data]
   (when-let [board-link (utils/link-for (:links board-data) "item" "GET")]
