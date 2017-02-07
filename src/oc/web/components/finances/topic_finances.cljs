@@ -49,15 +49,15 @@
                 :z-index-offset 1
                 :success-cb (fn []
                               (hide-popover nil "archive-metric-confirm")
-                              ((om/get-props owner :data-section-on-change))
+                              ((om/get-props owner :data-topic-on-change))
                               (dispatcher/dispatch! [:foce-input {:data []}])
-                              ((:data-section-on-change data))
+                              ((:data-topic-on-change data))
                               (om/update-state! owner #(merge % {:finances-raw-data {}
                                                                  :table-key (str (rand 4))})))}))
 
-; (defcomponent finances-popover [{:keys [currency finances-raw-data section-data hide-popover-cb table-key data-section-on-change width height] :as data} owner options]
+; (defcomponent finances-popover [{:keys [currency finances-raw-data topic-data hide-popover-cb table-key data-topic-on-change width height] :as data} owner options]
 ;   (render [_]
-;     (dom/div {:class "oc-popover-container-internal finances composed-section"
+;     (dom/div {:class "oc-popover-container-internal finances composed-topic"
 ;               :style {:width "100%" :height "100vh"}}
 ;       (dom/button {:class "close-button"
 ;                    :on-click #(hide-popover-cb)
@@ -82,20 +82,20 @@
 ;                                  :table-key table-key
 ;                                  :data-on-change-cb (:finances-data-on-change data)
 ;                                  :editing-cb (:editing-cb data)
-;                                  :data-section-on-change data-section-on-change
+;                                  :data-topic-on-change data-topic-on-change
 ;                                  :main-height height
 ;                                  :main-width width}
-;                                 {:key (:created-at section-data)})))))
+;                                 {:key (:created-at topic-data)})))))
 
-(defcomponent topic-finances [{:keys [section section-data currency editable? foce-data-editing? editing-cb table-key data-section-on-change card-width columns-num] :as data} owner options]
+(defcomponent topic-finances [{:keys [topic topic-data currency editable? foce-data-editing? editing-cb table-key data-topic-on-change card-width columns-num] :as data} owner options]
 
   (init-state [_]
-    {:finances-raw-data (:data section-data)
+    {:finances-raw-data (:data topic-data)
      :table-key (str (rand 4))})
 
   (will-receive-props [_ next-props]
     (when-not (= next-props data)
-      (om/set-state! owner {:finances-raw-data (-> next-props :section-data :data)})))
+      (om/set-state! owner {:finances-raw-data (-> next-props :topic-data :data)})))
 
   ; (did-update [_ prev-props prev-state]
   ;   (when (and (not (:foce-data-editing? prev-props))
@@ -106,7 +106,7 @@
   ;                                                                  :archive-data-cb #(show-archive-confirm-popover owner data)
   ;                                                                  :hide-popover-cb #(editing-cb false)
   ;                                                                  :editing-cb (partial data-editing-toggle owner editing-cb)
-  ;                                                                  :data-section-on-change data-section-on-change
+  ;                                                                  :data-topic-on-change data-topic-on-change
   ;                                                                  :width 400
   ;                                                                  :height (min 380 (.-clientHeight (.-body js/document)))
   ;                                                                  :z-index-popover 0
@@ -119,10 +119,10 @@
     (let [no-data (or (empty? finances-raw-data) (utils/no-finances-data? finances-raw-data))]
 
       (when (not no-data)
-        (dom/div {:id "section-finances" :class (utils/class-set {:section-container true
+        (dom/div {:id "topic-finances" :class (utils/class-set {:topic-container true
                                                                   :editing foce-data-editing?})}
 
-          (dom/div {:class "composed-section finances group"}
+          (dom/div {:class "composed-topic finances group"}
             (let [sort-pred (fn [a b] (compare (:period a) (:period b)))
                   sorted-finances (sort sort-pred finances-raw-data)
                   sum-revenues (utils/sum-revenues finances-raw-data)

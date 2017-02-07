@@ -23,8 +23,8 @@
                 :cancel-title "KEEP IT"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
-                :success-cb #(let [section (om/get-props owner :selected-topic-view)]
-                               (dis/dispatch! [:topic-archive section])
+                :success-cb #(let [topic (om/get-props owner :selected-topic-view)]
+                               (dis/dispatch! [:topic-archive topic])
                                (hide-popover nil "archive-topic-confirm")
                                (router/nav! (oc-urls/board)))}))
 
@@ -47,20 +47,20 @@
 (defn start-foce-if-needed [{:keys [foce-key
                                     company-data
                                     selected-topic-view
-                                    new-sections]
+                                    new-topics]
                              :as data} ]
   (when (nil? foce-key)
-    (let [section-kw (keyword selected-topic-view)
-          sections-contains-topic (utils/in? (:sections company-data) selected-topic-view)]
-      (when (not sections-contains-topic)
+    (let [topic-kw (keyword selected-topic-view)
+          topics-contains-topic (utils/in? (:topics company-data) selected-topic-view)]
+      (when (not topics-contains-topic)
         (if (:read-only company-data)
           (router/redirect! (oc-urls/board (router/current-org-slug) (:slug company-data)))
-          ; look for the urls in the new sections
-          (when new-sections
-            (let [new-section (first (filter #(= (:section-name %) selected-topic-view) new-sections))
-                  new-section-data (utils/new-section-initial-data section-kw (:title new-section) {:links (:links new-section)})]
-              (if (and new-section (contains? new-section :links))
-                (dis/dispatch! [:add-topic section-kw (assoc new-section-data :new true)])
+          ; look for the urls in the new topics
+          (when new-topics
+            (let [new-topic (first (filter #(= (:topic-name %) selected-topic-view) new-topics))
+                  new-topic-data (utils/new-topic-initial-data topic-kw (:title new-topic) {:links (:links new-topic)})]
+              (if (and new-topic (contains? new-topic :links))
+                (dis/dispatch! [:add-topic topic-kw (assoc new-topic-data :new true)])
                 (router/redirect! (oc-urls/board (router/current-org-slug) (:slug company-data)))))))))))
 
 (defcomponent topic-view [{:keys [card-width
@@ -93,15 +93,15 @@
       (js/clearInterval (om/get-state owner :revisions-reload-interval))))
 
   (render [_]
-    (let [section-kw (keyword selected-topic-view)
+    (let [topic-kw (keyword selected-topic-view)
           topic-view-width (responsive/topic-view-width card-width columns-num)
           topic-card-width (responsive/calc-update-width columns-num)
-          topic-data (get company-data section-kw)
-          is-custom-section (s/starts-with? (:section topic-data) "custom-")
+          topic-data (get company-data topic-kw)
+          is-custom-topic (s/starts-with? (:topic topic-data) "custom-")
           revisions (:revisions-data topic-data)
-          is-new-foce (and (= foce-key section-kw) (nil? (:created-at foce-data)))
+          is-new-foce (and (= foce-key topic-kw) (nil? (:created-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:created-at foce-data))))
-          loading-topic-data (and (contains? company-data section-kw)
+          loading-topic-data (and (contains? company-data topic-kw)
                                   (:loading topic-data))]
       (dom/div {:class "topic-view-container group"
                 :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str topic-card-width "px"))
@@ -140,12 +140,12 @@
                     ;                         :foce-data foce-data}
                     ;                        {:opts options
                     ;                         :key (str "topic-foce-" selected-topic-view "-new")}))
-                    (utils/in? (:sections company-data) selected-topic-view)
-                    (let [initial-data (utils/new-section-initial-data selected-topic-view (:title topic-data) topic-data)
-                          with-data (if (#{:growth :finances} section-kw) (assoc initial-data :data (:data topic-data)) initial-data)
-                          with-metrics (if (= :growth section-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
+                    (utils/in? (:topics company-data) selected-topic-view)
+                    (let [initial-data (utils/new-topic-initial-data selected-topic-view (:title topic-data) topic-data)
+                          with-data (if (#{:growth :finances} topic-kw) (assoc initial-data :data (:data topic-data)) initial-data)
+                          with-metrics (if (= :growth topic-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
-                                :on-click #(dis/dispatch! [:start-foce section-kw with-metrics])}
+                                :on-click #(dis/dispatch! [:start-foce topic-kw with-metrics])}
                         (:title topic-data)
                         (dom/br)
                         (dom/span {:class "new-entry"} "Start a new entry...")))
@@ -155,10 +155,10 @@
               (when (and (not foce-key)
                          (not revisions)
                          (not (:placeholder topic-data))
-                         (utils/in? (:sections company-data) selected-topic-view))
+                         (utils/in? (:topics company-data) selected-topic-view))
                 (dom/div {:class "revision-container group"}
-                  (om/build topic {:section selected-topic-view
-                                   :section-data topic-data
+                  (om/build topic {:topic selected-topic-view
+                                   :topic-data topic-data
                                    :card-width (- topic-card-width 60)
                                    :is-stakeholder-update false
                                    :read-only-company (:read-only company-data)
@@ -168,7 +168,7 @@
                                    :foce-key foce-key
                                    :foce-data foce-data
                                    :show-editing false}
-                                   {:opts {:section-name selected-topic-view}})))
+                                   {:opts {:topic-name selected-topic-view}})))
               (for [idx (range (count revisions))
                     :let [rev (get revisions idx)]]
                 (when rev
@@ -176,8 +176,8 @@
                     (when-not (= idx 0)
                       (dom/hr {:class "separator-line"
                                :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
-                    (om/build topic {:section selected-topic-view
-                                     :section-data rev
+                    (om/build topic {:topic selected-topic-view
+                                     :topic-data rev
                                      :card-width (- topic-card-width 60)
                                      :is-stakeholder-update false
                                      :read-only-company (:read-only company-data)
@@ -188,7 +188,7 @@
                                      :foce-data foce-data
                                      :show-delete-entry-button true
                                      :show-editing true}
-                                     {:opts {:section-name selected-topic-view}
+                                     {:opts {:topic-name selected-topic-view}
                                       :key (str "topic-"
                                             (when foce-key
                                               "foce-")

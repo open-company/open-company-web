@@ -27,15 +27,15 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-(defn- get-new-sections-if-needed [owner]
-  (when-not (om/get-state owner :new-sections-requested)
+(defn- get-new-topics-if-needed [owner]
+  (when-not (om/get-state owner :new-topics-requested)
     (let [org-slug (keyword (router/current-org-slug))
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data)]
-      (when (and (empty? (get (get @caches/new-sections board-slug) org-slug))
+      (when (and (empty? (get (get @caches/new-topics board-slug) org-slug))
                  (seq board-data))
-        (om/update-state! owner :new-sections-requested not)
-        (utils/after 1000 #(api/get-new-sections))))))
+        (om/update-state! owner :new-topics-requested not)
+        (utils/after 1000 #(api/get-new-topics))))))
 
 (defn share-tooltip-id [slug]
   (str "second-topic-share-" slug))
@@ -48,7 +48,7 @@
                (not= (om/get-props owner :show-login-overlay) :collect-name-password)
                board-data
                (zero? (:count (utils/link-for (:links board-data) "stakeholder-updates")))
-               (= (+ (count (utils/filter-placeholder-sections (:sections board-data) board-data))
+               (= (+ (count (utils/filter-placeholder-topics (:topics board-data) board-data))
                    (count (:archived board-data))) 2)
                (.querySelector js/document "button.sharing-button"))
       (om/set-state! owner :share-tooltip-shown true)
@@ -76,7 +76,7 @@
      :share-tooltip-shown false
      :share-tooltip-dismissed false
      :add-second-topic-tt-shown false
-     :new-sections-requested false
+     :new-topics-requested false
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    (responsive/calc-card-width))
@@ -85,7 +85,7 @@
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
     (when-not (:read-only (dis/board-data data))
-      (get-new-sections-if-needed owner))
+      (get-new-topics-if-needed owner))
     (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
                                                                                            :card-width (if (responsive/is-mobile-size?)
@@ -94,7 +94,7 @@
     (om/set-state! owner :window-click-listener
       (events/listen js/window EventType/CLICK (fn[e]
                                                  (when (and (:show-top-menu @dis/app-state)
-                                                            (not (utils/event-inside? e (sel1 [(str "div.topic[data-section=" (name (:show-top-menu @dis/app-state)) "]")]))))
+                                                            (not (utils/event-inside? e (sel1 [(str "div.topic[data-topic=" (name (:show-top-menu @dis/app-state)) "]")]))))
                                                    (utils/event-stop e)
                                                    (dis/dispatch! [:show-top-menu nil])))))
     (when (pos? (:count (utils/link-for (:links (dis/board-data data)) "stakeholder-updates")))
@@ -125,7 +125,7 @@
           (t/hide add-second-topic-tt)))
       (when (and (not (om/get-state owner :add-second-topic-tt-shown))
                  (not (:selected-topic-view data))
-                 (= (count (utils/filter-placeholder-sections (:sections board-data) board-data)) 1)
+                 (= (count (utils/filter-placeholder-topics (:topics board-data) board-data)) 1)
                  (not (:show-login-overlay data)))
         (om/set-state! owner :add-second-topic-tt-shown true)
         (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug board-data))]
@@ -139,7 +139,7 @@
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/board-data next-props))
-      (get-new-sections-if-needed owner)))
+      (get-new-topics-if-needed owner)))
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
@@ -177,7 +177,7 @@
                                   :header-width total-width-int
                                   :columns-num columns-num
                                   :foce-key (:foce-key data)
-                                  :show-share-su-button (utils/can-edit-sections? board-data)
+                                  :show-share-su-button (utils/can-edit-topics? board-data)
                                   :show-login-overlay (:show-login-overlay data)
                                   :mobile-menu-open (:mobile-menu-open data)
                                   :auth-settings (:auth-settings data)
@@ -190,7 +190,7 @@
               (if (:show-welcome-screen data)
                 (welcome-screen)
                 (dom/div {}
-                  (if (and (empty? (:sections board-data)) (responsive/is-tablet-or-mobile?))
+                  (if (and (empty? (:topics board-data)) (responsive/is-tablet-or-mobile?))
                     (dom/div {:class "empty-dashboard"}
                       (dom/h3 {:class "empty-dashboard-title"}
                         "No topics have been created.")
@@ -201,7 +201,7 @@
                                 {:loading (:loading data)
                                  :content-loaded (or (:loading board-data) (:loading data))
                                  :board-data board-data
-                                 :new-sections (:new-sections ((keyword (router/current-board-slug)) ((keyword (router/current-org-slug)) data)))
+                                 :new-topics (:new-topics ((keyword (router/current-board-slug)) ((keyword (router/current-org-slug)) data)))
                                  :latest-su (dis/latest-stakeholder-update)
                                  :force-edit-topic (:force-edit-topic data)
                                  :foce-data-editing? (:foce-data-editing? data)

@@ -117,7 +117,7 @@
                                               :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
-      (dom/div {:class (utils/class-set {:section true
+      (dom/div {:class (utils/class-set {:topic true
                                          slug true
                                          :fake-chart (:fake-chart data)
                                          :read-only (:read-only data)})

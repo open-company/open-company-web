@@ -102,7 +102,7 @@
                             :fixed-sorted-metric (get-fixed-sorted-metric (:finances-data next-props) currency)})))
 
   (render-state [_ {:keys [chart-selected-idx fixed-sorted-metric]}]
-    (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-section-key) :finances) " editing"))}
+    (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-topic-key) :finances) " editing"))}
       ; (dom/div {:class "finances-sparklines-inner left group"}
       ;   (let [sum-revenues (utils/sum-revenues finances-data)
       ;         post-revenue? (pos? sum-revenues)
@@ -134,7 +134,7 @@
       ;                                             :label-presenter #(:sub-label %2)
       ;                                             :label-color (occ/get-color-by-kw :oc-gray-5)}}
       ;                            :hide-nav true}}]
-      ;     (dom/div {:class (utils/class-set {:section true
+      ;     (dom/div {:class (utils/class-set {:topic true
       ;                                        :fake-chart (:fake-chart data)
       ;                                        :read-only (:read-only data)})
       ;               :key "finances-sparklines"

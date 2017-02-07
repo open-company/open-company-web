@@ -99,7 +99,7 @@
 (defn- get-state [owner data current-state]
   ; get internal component state
   (let [board-data (:board-data data)
-        active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get board-data))) (:sections board-data)))
+        active-topics (apply merge (map #(hash-map (keyword %) (->> % keyword (get board-data))) (:topics board-data)))
         selected-topic (when current-state (:selected-topic current-state))]
     {; initial active topics to check with the updated active topics
      :initial-active-topics active-topics
@@ -108,7 +108,7 @@
      ; card with
      :card-width (:card-width data)
      ; remember if the /slug/new call was already started
-     :new-sections-requested (or (:new-sections-requested current-state) false)
+     :new-topics-requested (or (:new-topics-requested current-state) false)
      ; selected topic for fullscreen
      :selected-topic selected-topic
      ; transitioning btw fullscreen topics, navigated with kb arrows or swipe on mobile
@@ -155,8 +155,8 @@
     (when-not (= (:board-data next-props) (:board-data data))
       (om/set-state! owner (get-state owner next-props (om/get-state owner))))
     (let [board-data            (:board-data next-props)
-          topics                  (vec (:sections board-data))
-          no-placeholder-sections (utils/filter-placeholder-sections topics board-data)]
+          topics                  (vec (:topics board-data))
+          no-placeholder-topics (utils/filter-placeholder-topics topics board-data)]
       (when (and (:force-edit-topic next-props) (contains? board-data (keyword (:force-edit-topic next-props))))
         (om/set-state! owner :selected-topic (dispatcher/force-edit-topic)))))
 
@@ -174,7 +174,7 @@
                            rerender]}]
     (let [board-slug    (router/current-board-slug)
           board-data    (:board-data data)
-          board-topics  (vec (map keyword (:sections board-data)))
+          board-topics  (vec (map keyword (:topics board-data)))
           card-width      (:card-width data)
           columns-num     (:columns-num data)
           ww              (responsive/ww)
@@ -182,7 +182,7 @@
                                    (< ww responsive/c1-min-win-width))
                             "auto"
                             (str (responsive/total-layout-width-int card-width columns-num) "px"))
-          can-edit-secs   (utils/can-edit-sections? board-data)]
+          can-edit-secs   (utils/can-edit-topics? board-data)]
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true
                                          :editable can-edit-secs})
@@ -196,9 +196,9 @@
         ;                     :key (str "transition-" selected-topic)
         ;                     :ref "selected-topic"
         ;                     :style #js {:opacity 1}}
-        ;         (om/build fullscreen-topic {:section selected-topic
-        ;                                     :section-data (->> selected-topic keyword (get board-data))
-        ;                                     :revision-updates (dispatcher/section-revisions board-slug (router/current-topic-slug))
+        ;         (om/build fullscreen-topic {:topic selected-topic
+        ;                                     :topic-data (->> selected-topic keyword (get board-data))
+        ;                                     :revision-updates (dispatcher/topic-revisions board-slug (router/current-topic-slug))
         ;                                     :selected-metric selected-metric
         ;                                     :read-only (:read-only board-data)
         ;                                     :card-width card-width
@@ -212,8 +212,8 @@
         ;                     :key (str "transition-" tr-selected-topic)
         ;                     :ref "tr-selected-topic"
         ;                     :style #js {:opacity (if tr-selected-topic 0 1)}}
-        ;       (om/build fullscreen-topic {:section tr-selected-topic
-        ;                                   :section-data (->> tr-selected-topic keyword (get board-data))
+        ;       (om/build fullscreen-topic {:topic tr-selected-topic
+        ;                                   :topic-data (->> tr-selected-topic keyword (get board-data))
         ;                                   :selected-metric selected-metric
         ;                                   :read-only (:read-only board-data)
         ;                                   :card-width card-width
@@ -230,7 +230,7 @@
                          :loading (:loading data)
                          :topics board-topics
                          :foce-data-editing? (:foce-data-editing? data)
-                         :new-sections (:new-sections data)
+                         :new-topics (:new-topics data)
                          :board-data board-data
                          :topics-data board-data
                          :foce-key (:foce-key data)

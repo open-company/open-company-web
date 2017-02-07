@@ -36,13 +36,13 @@
                               :foce-data-editing? foce-data-editing?
                               :selected-topic-view selected-topic-view})
         (for [idx (range (count topics))
-              :let [section-kw (get topics idx)
-                    section-name (name section-kw)
-                    sd (->> section-name keyword (get board-data))
+              :let [topic-kw (get topics idx)
+                    topic-name (name topic-kw)
+                    sd (->> topic-name keyword (get board-data))
                     topic-data {:loading (:loading board-data)
-                                :section section-name
+                                :topic topic-name
                                 :is-stakeholder-update is-stakeholder-update
-                                :section-data sd
+                                :topic-data sd
                                 :card-width card-width
                                 :foce-data-editing? (:foce-data-editing? data)
                                 :read-only-board (:read-only board-data)
@@ -51,8 +51,8 @@
                                 :foce-data foce-data
                                 :is-dashboard is-dashboard
                                 :topic-flex-num idx}
-                    topic-opts {:opts {:section-name section-name
-                                       :topic-click (partial (:topic-click options) section-name)}}]]
+                    topic-opts {:opts {:topic-name topic-name
+                                       :topic-click (partial (:topic-click options) topic-name)}}]]
           (when-not (:placeholder sd)
             (dom/div {:class "topics-mobile-item" :style {:width (str card-width "px")}}
               (om/build topic topic-data topic-opts))))))))

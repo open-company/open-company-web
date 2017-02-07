@@ -42,7 +42,7 @@
                                40                                     ;; internal padding
                                5                                      ;; internal spacing
                                (if editing? editing-actions-width 0)) ;; remove 15 more pixel only in editing mode
-                subsection-data {:metric-data metric-data
+                subtopic-data {:metric-data metric-data
                                  :metric-info metric-metadata
                                  :currency currency
                                  :card-width card-width
@@ -54,7 +54,7 @@
                                  :line-stroke-width 2
                                  :chart-size {:height 40
                                               :width (max 30 (min 100 chart-width))}}]
-            (om/build growth-metric subsection-data {:opts {:hide-nav true
+            (om/build growth-metric subtopic-data {:opts {:hide-nav true
                                                             :chart-fill-polygons false}}))))
       (dom/div {:class "actions group right"}
         (dom/button
@@ -77,7 +77,7 @@
 (defcomponent growth-sparklines [{:keys [growth-data growth-metrics growth-metric-slugs currency archive-cb editing? card-width columns-num] :as data} owner]
 
   (render [_]
-    (dom/div {:class (str "growth-sparklines sparklines" (when (= (dis/foce-section-key) :growth) " editing"))}
+    (dom/div {:class (str "growth-sparklines sparklines" (when (= (dis/foce-topic-key) :growth) " editing"))}
       (for [slug growth-metric-slugs]
         (om/build growth-sparkline {:metric-data (filter #(= (keyword (:slug %)) (keyword slug)) (vals growth-data))
                                     :metric-metadata (get growth-metrics slug)

@@ -179,7 +179,7 @@
 
 (defn patch-company [slug data]
   (when data
-    (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded :revisions :section)
+    (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded :revisions :topic)
           json-data (cljs->json company-data)
           links (:links (dispatcher/board-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
@@ -203,43 +203,43 @@
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
-(def section-private-keys [:section
-                           :revisions
-                           :author
-                           :links
-                           :loading
-                           :as-of
-                           :read-only
-                           :revisions-cache
-                           :title-placeholder
-                           :body-placeholder
-                           :oc-editing
-                           :revisions-data
-                           :new
-                           :placeholder
-                           :was-archived
-                           :created-at
-                           :updated-at])
+(def topic-private-keys [:topic
+                         :revisions
+                         :author
+                         :links
+                         :loading
+                         :as-of
+                         :read-only
+                         :revisions-cache
+                         :title-placeholder
+                         :body-placeholder
+                         :oc-editing
+                         :revisions-data
+                         :new
+                         :placeholder
+                         :was-archived
+                         :created-at
+                         :updated-at])
 
-(defn save-or-create-section [section-data]
-  (when section-data
-    (let [links (:links section-data)
+(defn save-or-create-topic [topic-data]
+  (when topic-data
+    (let [links (:links topic-data)
           slug (router/current-board-slug)
-          section (keyword (:section section-data))
-          cleaned-section-data (apply dissoc section-data section-private-keys)
-          json-data (cljs->json cleaned-section-data)
-          section-link (utils/link-for links (if (:new section-data) "create" "update") "PUT")]
-      (api-put (:href section-link)
+          topic (keyword (:topic topic-data))
+          cleaned-topic-data (apply dissoc topic-data topic-private-keys)
+          json-data (cljs->json cleaned-topic-data)
+          topic-link (utils/link-for links (if (:new topic-data) "create" "update") "PUT")]
+      (api-put (:href topic-link)
         { :json-params json-data
           :headers {
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
-            "content-type" (:type section-link)
+            "content-type" (:type topic-link)
           }}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (dispatcher/dispatch! [:section {:body body :section section :slug (keyword slug)}])))))))
+            (dispatcher/dispatch! [:topic {:body body :topic topic :slug (keyword slug)}])))))))
 
 (defn load-revisions [slug topic revisions-link]
   (when (and topic revisions-link)
@@ -253,15 +253,15 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:revisions-loaded {:slug slug :topic topic :revisions (if success (json->cljs body) {})}])))))
 
-(defn partial-update-section
-  "PATCH a section, dispatching the results with a `:section` action."
-  ([section section-data]
-  (when (and section section-data)
+(defn partial-update-topic
+  "PATCH a topic, dispatching the results with a `:topic` action."
+  ([topic topic-data]
+  (when (and topic topic-data)
     (let [slug (keyword (router/current-board-slug))
-          section-kw (keyword section)
-          partial-update-link (utils/link-for (:links section-data) "partial-update" "PATCH")
-          cleaned-section-data (apply dissoc section-data section-private-keys)
-          json-data (cljs->json cleaned-section-data)]
+          topic-kw (keyword topic)
+          partial-update-link (utils/link-for (:links topic-data) "partial-update" "PATCH")
+          cleaned-topic-data (apply dissoc topic-data topic-private-keys)
+          json-data (cljs->json cleaned-topic-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
           :headers {
@@ -272,12 +272,12 @@
           }}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (load-revisions slug section (utils/link-for (:links body) "revisions")))))))))
+            (load-revisions slug topic (utils/link-for (:links body) "revisions")))))))))
 
 (defn load-revision
-  [revision slug section]
+  [revision slug topic]
     (when revision
-      (swap! revisions assoc-in [slug (keyword section) (:created-at revision)] :loading)
+      (swap! revisions assoc-in [slug (keyword topic) (:created-at revision)] :loading)
       (api-get (:href revision)
         {:headers {
           ; required by Chrome
@@ -288,7 +288,7 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})
                 dispatch-body {:body body
                                :as-of (:created-at revision)
-                               :section (keyword section)
+                               :topic (keyword topic)
                                :slug (keyword slug)}]
             (dispatcher/dispatch! [:revision dispatch-body]))))))
 
@@ -308,20 +308,20 @@
             "content-type" (:type finances-link)}}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body (merge {:section :finances} body)
-                               :section :finances
+                dispatch-body {:body (merge {:topic :finances} body)
+                               :topic :finances
                                :slug (keyword slug)}]
-            (dispatcher/dispatch! [:section dispatch-body])))))))
+            (dispatcher/dispatch! [:topic dispatch-body])))))))
 
-(defn patch-sections [sections & [new-section section-name]]
-  (when sections
+(defn patch-topics [topics & [new-topic topic-name]]
+  (when topics
     (let [slug (keyword (router/current-board-slug))
           company-data (dispatcher/board-data)
           company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
-          payload (if (and new-section section-name)
-                    {:sections sections
-                     (keyword section-name) new-section}
-                    {:sections sections})
+          payload (if (and new-topic topic-name)
+                    {:topics topics
+                     (keyword topic-name) new-topic}
+                    {:topics topics})
           json-data (cljs->json payload)]
       (api-patch (:href company-patch-link)
         { :json-params json-data
@@ -353,39 +353,38 @@
                                            :status status
                                            :body (when success (json->cljs body))}]))))))
 
-(defn remove-section [section-name]
-  (when (and section-name)
-    (let [slug (keyword (router/current-board-slug))
-          company-data (dispatcher/board-data)
-          sections (:sections company-data)
-          new-sections (apply merge (map (fn [[k v]]
-                                           {k (utils/vec-dissoc v section-name)})
-                                         sections))]
-      (patch-sections new-sections))))
+(defn remove-topic [topic-name]
+  (when (and topic-name)
+    (let [board-data (dispatcher/board-data)
+          topics (:topics board-data)
+          new-topics (apply merge (map (fn [[k v]]
+                                        {k (utils/vec-dissoc v topic-name)})
+                                    topics))]
+      (patch-topics new-topics))))
 
-(def new-sections-requested (atom false))
+(def new-topics-requested (atom false))
 
-(defn get-new-sections [& [force-load]]
-  "Load new sections, avoid to start multiple request or reload it if it's already loading or loaded.
+(defn get-new-topics [& [force-load]]
+  "Load new topics, avoid to start multiple request or reload it if it's already loading or loaded.
    It's possible to force the load passing an optional boolean parameter."
-  (when (or force-load (not @new-sections-requested))
-    (reset! new-sections-requested true)
+  (when (or force-load (not @new-topics-requested))
+    (reset! new-topics-requested true)
     (let [slug (keyword (router/current-board-slug))
           company-data (dispatcher/board-data)
           links (:links company-data)
-          add-section-link (utils/link-for links "section-list" "GET")]
-      (when add-section-link
-        (api-get (:href add-section-link)
+          add-topic-link (utils/link-for links "topic-list" "GET")]
+      (when add-topic-link
+        (api-get (:href add-topic-link)
           { :headers {
               ; required by Chrome
               "Access-Control-Allow-Headers" "Content-Type"
               ; custom content type
-              "content-type" (:type add-section-link)}}
+              "content-type" (:type add-topic-link)}}
           (fn [{:keys [success body]}]
             (when (not success)
-              (reset! new-sections-requested false))
+              (reset! new-topics-requested false))
             (let [fixed-body (if body (json->cljs body) {})]
-              (dispatcher/dispatch! [:new-section {:response fixed-body :slug slug}]))))))))
+              (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}]))))))))
 
 (defn share-stakeholder-update [{:keys [email slack]}]
   (let [slug         (keyword (router/current-board-slug))
@@ -419,7 +418,7 @@
             "content-type" (:type su-link)}}
         (fn [{:keys [success body]}]
           (when (not success)
-            (reset! new-sections-requested false))
+            (reset! new-topics-requested false))
           (let [fixed-body (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:su-list {:response fixed-body :slug slug}])))))))
 

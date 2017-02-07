@@ -129,7 +129,7 @@
   (int (* (/ cash burn-rate) 30)))
 
 (defn calc-burnrate-runway
-  "Helper function that add burn-rate and runway to each update section"
+  "Helper function that add burn-rate and runway to each update topic"
   [finances-data]
   (if (empty? finances-data)
     finances-data
@@ -231,9 +231,9 @@
         cur-period (str (.getFullYear fixed-date) "-" month-str)]
     cur-period))
 
-(defn get-section-keys [company-data]
-  "Get the section names, as a vector of keywords."
-  (vec (map keyword (:sections company-data))))
+(defn get-topic-keys [company-data]
+  "Get the topic names, as a vector of keywords."
+  (vec (map keyword (:topics company-data))))
 
 (defn link-for
   ([links rel]
@@ -257,35 +257,35 @@
   (let [date (js-date)]
     (.toISOString date)))
 
-(defn fix-finances [section-body]
-  (let [finances-data (if (contains? section-body :data) (:data section-body) [])
+(defn fix-finances [topic-body]
+  (let [finances-data (if (contains? topic-body :data) (:data topic-body) [])
         fixed-finances (calc-burnrate-runway finances-data)
         sort-pred (fn [a b] (compare (:period b) (:period a)))
         sorted-finances (sort sort-pred fixed-finances)
-        fixed-section (assoc section-body :data sorted-finances)]
-    fixed-section))
+        fixed-topic (assoc topic-body :data sorted-finances)]
+    fixed-topic))
 
-(defn fix-section 
-  "Add `:section` name and `:as-of` keys to the section map"
-  [section-body section-name & [read-only force-write]]
-  (let [with-keys (-> section-body
-                      (assoc :section (name section-name))
-                      (assoc :as-of (:created-at section-body))
-                      (assoc :read-only (readonly? (:links section-body))))]
-    (if (= section-name :finances)
+(defn fix-topic
+  "Add `:topic` name and `:as-of` keys to the topic map"
+  [topic-body topic-name & [read-only force-write]]
+  (let [with-keys (-> topic-body
+                      (assoc :topic (name topic-name))
+                      (assoc :as-of (:created-at topic-body))
+                      (assoc :read-only (readonly? (:links topic-body))))]
+    (if (= topic-name :finances)
       (fix-finances with-keys)
       with-keys)))
 
-(defn fix-sections [company-data]
-  "Add section name in each section and a section sorter"
+(defn fix-topics [company-data]
+  "Add topic name in each topic and a topic sorter"
   (let [links (:links company-data)
-        section-keys (get-section-keys company-data)
+        topic-keys (get-topic-keys company-data)
         read-only (readonly? links)
-        without-sections (apply dissoc company-data section-keys)
-        with-read-only (assoc without-sections :read-only read-only)
-        sections (apply merge (map (fn [sn] (hash-map sn (fix-section (get company-data sn) sn))) section-keys))
-        with-fixed-sections (merge with-read-only sections)]
-    with-fixed-sections))
+        without-topics (apply dissoc company-data topic-keys)
+        with-read-only (assoc without-topics :read-only read-only)
+        topics (apply merge (map (fn [sn] (hash-map sn (fix-topic (get company-data sn) sn))) topic-keys))
+        with-fixed-topics (merge with-read-only topics)]
+    with-fixed-topics))
 
 (defn sort-revisions [revisions]
   (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
@@ -316,13 +316,13 @@
 (defn px [n]
   (str n "px"))
 
-(defn select-section-data [section-data section as-of]
-  (when (and section-data section (or as-of (:placeholder section-data)))
+(defn select-topic-data [topic-data topic as-of]
+  (when (and topic-data topic (or as-of (:placeholder topic-data)))
     (let [slug (keyword (router/current-board-slug))]
-      (if (or (not (contains? (slug @caches/revisions) section))
-              (= as-of (:created-at section-data)))
-        section-data
-        (((keyword section) (slug @caches/revisions)) as-of)))))
+      (if (or (not (contains? (slug @caches/revisions) topic))
+              (= as-of (:created-at topic-data)))
+        topic-data
+        (((keyword topic) (slug @caches/revisions)) as-of)))))
 
 (def quarterly-input-format (cljs-time-format/formatter "YYYY-MM"))
 (def monthly-input-format (cljs-time-format/formatter "YYYY-MM"))
@@ -541,8 +541,8 @@
         top (- (+ (scroll-top-with-id id) body-scroll-top) 50)]
     (scroll-to-y top (or duration oc-animation-duration))))
 
-(defn scroll-to-section [section-name]
-  (scroll-to-id (str "section-" (name section-name))))
+(defn scroll-to-topic [topic-name]
+  (scroll-to-id (str "topic-" (name topic-name))))
 
 (defn round-2-dec [value decimals]
   ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
@@ -723,7 +723,7 @@
           (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
             (hidePlaceholder editor-el)))))))
 
-(defn filter-placeholder-sections [topics company-data]
+(defn filter-placeholder-topics [topics company-data]
   (vec (filter #(let [sd (->> % keyword (get company-data))] (and sd (not (:placeholder sd)))) topics)))
 
 (defn su-date-from-created-at [created-at]
@@ -735,18 +735,18 @@
 (defn exceeds-topic-body-limit [body]
   (> (count (strip-HTML-tags body)) topic-body-limit))
 
-(def min-no-placeholder-section-enable-share 1)
+(def min-no-placeholder-topic-enable-share 1)
 
-(defn can-edit-sections? [company-data]
-  (let [company-topics (vec (map keyword (:sections company-data)))]
+(defn can-edit-topics? [company-data]
+  (let [company-topics (vec (map keyword (:topics company-data)))]
     (and (not (responsive/is-mobile-size?))
          (responsive/can-edit?)
          (not (:read-only company-data))
-         (>= (count (filter-placeholder-sections company-topics company-data)) min-no-placeholder-section-enable-share))))
+         (>= (count (filter-placeholder-topics company-topics company-data)) min-no-placeholder-topic-enable-share))))
 
 (defn company-has-topics? [company-data]
-  (let [company-topics (vec (map keyword (:sections company-data)))]
-    (pos? (count (filter-placeholder-sections company-topics company-data)))))
+  (let [company-topics (vec (map keyword (:topics company-data)))]
+    (pos? (count (filter-placeholder-topics company-topics company-data)))))
 
 (defn remove-ending-empty-paragraph
   "Remove the last p tag if it's empty."
@@ -757,15 +757,15 @@
                 (= (.-length (.find (js/$ body-el) ">p:last-child img")) 0))
       (.remove (js/$ ">p:last-child" (js/$ body-el))))))
 
-(defn data-topic-has-data [section section-data]
+(defn data-topic-has-data [topic topic-data]
   (cond
     ;; growth check count of metrics and count of data
-    (= (keyword section) :growth)
-    (and (pos? (count (:metrics section-data)))
-         (pos? (count (:data section-data))))
+    (= (keyword topic) :growth)
+    (and (pos? (count (:metrics topic-data)))
+         (pos? (count (:data topic-data))))
     ;; finances check count of data
-    (= (keyword section) :finances)
-    (pos? (count (:data section-data)))
+    (= (keyword topic) :finances)
+    (pos? (count (:data topic-data)))
     ;; else false
     :else
     false))
@@ -792,22 +792,22 @@
     (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
          (not (nil? (:token (first (:bots jwt)))))))) ; with an installed Slack bot
 
-(defn new-section-body-placeholder []
+(defn new-topic-body-placeholder []
   "What would you like to say...")
 
-(defn new-section-initial-data [section title old-section-data]
-  (let [section-name (name section)
-        initial-data {:section section-name
+(defn new-topic-initial-data [topic title old-topic-data]
+  (let [topic-name (name topic)
+        initial-data {:topic topic-name
                       :title title
-                      :body-placeholder (new-section-body-placeholder)
+                      :body-placeholder (new-topic-body-placeholder)
                       :headline ""
                       :placeholder true
-                      :links (:links old-section-data)}
-        with-data (if (and old-section-data (contains? old-section-data :data))
-                    (assoc initial-data :data (:data old-section-data))
+                      :links (:links old-topic-data)}
+        with-data (if (and old-topic-data (contains? old-topic-data :data))
+                    (assoc initial-data :data (:data old-topic-data))
                     initial-data)
-        with-metrics (if (and old-section-data (contains? old-section-data :metrics))
-                       (assoc with-data :metrics (:metrics old-section-data))
+        with-metrics (if (and old-topic-data (contains? old-topic-data :metrics))
+                       (assoc with-data :metrics (:metrics old-topic-data))
                        with-data)]
     with-metrics))
 

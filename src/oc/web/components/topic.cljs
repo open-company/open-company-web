@@ -30,9 +30,9 @@
   (> (count (.text (.html (js/$ "<div/>") html))) limit))
 
 (defn start-foce-click [owner]
-  (let [topic-kw (keyword (om/get-props owner :section))
-        section-data (om/get-props owner :topic-data)]
-    (dis/dispatch! [:start-foce topic-kw (assoc section-data :section (name topic-kw))])))
+  (let [topic-kw (keyword (om/get-props owner :topic))
+        topic-data (om/get-props owner :topic-data)]
+    (dis/dispatch! [:start-foce topic-kw (assoc topic-data :topic (name topic-kw))])))
 
 (defn get-author-string
   "Return the a formatted string that shows the topic creator and the last editor."
@@ -66,7 +66,7 @@
 ;                 :cancel-cb nil}))
 
 (defcomponent topic-internal [{:keys [topic-data
-                                      section
+                                      topic
                                       currency
                                       card-width
                                       columns-num
@@ -83,7 +83,7 @@
                                       show-top-menu] :as data} owner options]
 
   (render [_]
-    (let [topic-kw          (keyword section)
+    (let [topic-kw          (keyword topic)
           chart-opts          {:chart-size {:width 230}
                                :hide-nav true}
           is-growth-finances? (#{:growth :finances} topic-kw)
@@ -99,9 +99,9 @@
           truncated-body      (if should-truncate-text
                                  (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
                                  topic-body)
-          showing-menu (= show-top-menu section)]
+          showing-menu (= show-top-menu topic)]
       (dom/div #js {:className "topic-internal group"
-                    :key (str "topic-internal-" (name section))
+                    :key (str "topic-internal-" (name topic))
                     :ref "topic-internal"}
 
         ;; Topic image for dashboard
@@ -123,7 +123,7 @@
                                                :right-column (= fixed-column columns-num)})}
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(dis/dispatch! [:start-foce topic-kw {:placeholder true
-                                                                            :section (name topic-kw)
+                                                                            :topic (name topic-kw)
                                                                             :title (:title topic-data)
                                                                             :data (:data topic-data)
                                                                             :metrics (:metrics topic-data)
@@ -201,7 +201,7 @@
             (dom/button {:class "top-right-button topic-top-menu-button btn-reset"
                          :on-click #(do
                                       (utils/event-stop %)
-                                      (dis/dispatch! [:show-top-menu (if showing-menu nil section)]))}
+                                      (dis/dispatch! [:show-top-menu (if showing-menu nil topic)]))}
               (dom/i {:class "fa fa-ellipsis-v"}))))
 
         ;; Topic image for dashboard
@@ -220,18 +220,18 @@
         (when (and (or (not is-dashboard)
                        (not is-mobile?))
                    is-growth-finances?
-                   (utils/data-topic-has-data section topic-data))
+                   (utils/data-topic-has-data topic topic-data))
           (dom/div {:class ""}
             (cond
-              (= section "growth")
-              (om/build topic-growth {:section-data topic-data
-                                      :section section
+              (= topic "growth")
+              (om/build topic-growth {:topic-data topic-data
+                                      :topic topic
                                       :card-width card-width
                                       :columns-num columns-num
                                       :currency currency} {:opts chart-opts})
-              (= section "finances")
-              (om/build topic-finances {:section-data (utils/fix-finances topic-data)
-                                        :section section
+              (= topic "finances")
+              (om/build topic-finances {:topic-data (utils/fix-finances topic-data)
+                                        :topic topic
                                         :card-width card-width
                                         :columns-num columns-num
                                         :currency currency} {:opts chart-opts}))))
@@ -260,8 +260,8 @@
                           :dangerouslySetInnerHTML (utils/emojify truncated-body)})))))))
 
 (defcomponent topic [{:keys [active-topics
-                             section-data
-                             section
+                             topic-data
+                             topic
                              currency
                              column
                              card-width
@@ -295,11 +295,11 @@
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
   (render-state [_ {:keys [editing as-of window-width] :as state}]
-    (let [topic-kw (keyword section)
+    (let [topic-kw (keyword topic)
           org-slug (keyword (router/current-org-slug))
           board-slug (keyword (router/current-board-slug))
           foce-active (not (nil? foce-key))
-          is-current-foce (or (and (= foce-key topic-kw) (= (:created-at foce-data) (:created-at section-data)))
+          is-current-foce (or (and (= foce-key topic-kw) (= (:created-at foce-data) (:created-at topic-data)))
                               (and is-dashboard (= foce-key topic-kw) (= (:created-at foce-data) nil)))
           is-mobile? (responsive/is-mobile-size?)
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
@@ -314,7 +314,7 @@
                                                  :mobile-dashboard-topic (and is-mobile? is-dashboard)
                                                  :no-tablet (not (responsive/is-tablet-or-mobile?))
                                                  :topic-edit is-current-foce
-                                                 :sticky-borders (or (= (:show-top-menu data) section) (and is-dashboard
+                                                 :sticky-borders (or (= (:show-top-menu data) topic) (and is-dashboard
                                                                                                             is-current-foce))
                                                  :dashboard-topic is-dashboard
                                                  :dashboard-selected (utils/in? dashboard-selected-topics topic-kw)
@@ -322,11 +322,11 @@
                                                  :selectable-topic (and (not is-current-foce)
                                                                         (nil? (:show-top-menu data))
                                                                         (or (not read-only-company)
-                                                                            (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)
+                                                                            (html-text-exceeds-limit (:body topic-data) utils/topic-body-limit)
                                                                             (and read-only-company
-                                                                                 (> (count (:revisions section-data)) 1))))
+                                                                                 (> (count (:revisions topic-data)) 1))))
                                                  :no-foce (or (and (not (nil? (:show-top-menu data)))
-                                                                   (not= (:show-top-menu data) section))
+                                                                   (not= (:show-top-menu data) topic))
                                                               (and foce-active (not is-current-foce)))})
                     :onClick #(when (and is-dashboard
                                          (not is-current-foce)
@@ -336,17 +336,17 @@
                                  (when (and (nil? (:foce-key data))
                                             (or (responsive/is-mobile-size?)
                                                 (not read-only-company)
-                                                (> (count (:revisions section-data)) 1)
-                                                (html-text-exceeds-limit (:body section-data) utils/topic-body-limit)))
+                                                (> (count (:revisions topic-data)) 1)
+                                                (html-text-exceeds-limit (:body topic-data) utils/topic-body-limit)))
                                   (router/nav! (oc-urls/topic org-slug board-slug topic-kw)))))
                     :style topic-style
                     :ref "topic"
-                    :data-section (name section)
-                    :key (str "topic-" (when is-current-foce "foce-") (name section) "-" (:created-at section-data))
-                    :id (str "topic-" (name section) "-" (:created-at section-data))}
+                    :data-topic (name topic)
+                    :key (str "topic-" (when is-current-foce "foce-") (name topic) "-" (:created-at topic-data))
+                    :id (str "topic-" (name topic) "-" (:created-at topic-data))}
         ; (if is-current-foce
-        ;   (om/build topic-edit {:section section
-        ;                         :topic-data section-data
+        ;   (om/build topic-edit {:topic topic
+        ;                         :topic-data topic-data
         ;                         :is-stakeholder-update is-stakeholder-update
         ;                         :currency currency
         ;                         :card-width card-width
@@ -357,9 +357,9 @@
         ;                         :show-delete-entry-button (:show-delete-entry-button data)
         ;                         :columns-num columns-num}
         ;                        {:opts options
-        ;                         :key (str "topic-foce-" section "-" (:created-at section-data))})
-          (om/build topic-internal {:section section
-                                    :topic-data section-data
+        ;                         :key (str "topic-foce-" topic "-" (:created-at topic-data))})
+          (om/build topic-internal {:topic topic
+                                    :topic-data topic-data
                                     :is-stakeholder-update (:is-stakeholder-update data)
                                     :currency currency
                                     :card-width card-width
@@ -375,4 +375,4 @@
                                     :column column
                                     :show-top-menu (:show-top-menu data)}
                                    {:opts options
-                                    :key (str "topic-" section)})))));)
+                                    :key (str "topic-" topic)})))));)

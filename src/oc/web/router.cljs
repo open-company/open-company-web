@@ -108,7 +108,7 @@
 (defn query-params []
   (:query-params @path))
 
-(defn section-editing? []
+(defn topic-editing? []
   (some #(= "edit" %) (:route @path)))
 
 (defn current-as-of []

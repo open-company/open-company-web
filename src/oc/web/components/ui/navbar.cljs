@@ -112,7 +112,7 @@
                         (when (and (not dashboard-sharing)
                                    (not (:read-only board-data))
                                    (not is-update-preview)
-                                   (pos? (count (:sections board-data))))
+                                   (pos? (count (:topics board-data))))
                           (dom/button {:class "btn-reset invite-others right"
                                        :title "Invite others"
                                        :data-toggle "tooltip"
@@ -133,7 +133,7 @@
                                            :disabled (zero? (count dashboard-selected-topics))
                                            :on-click (fn []
                                                        (om/set-state! owner :su-redirect true)
-                                                       (api/patch-stakeholder-update {:sections dashboard-selected-topics :title (:title (:stakeholder-update board-data))}))}
+                                                       (api/patch-stakeholder-update {:topics dashboard-selected-topics :title (:title (:stakeholder-update board-data))}))}
                                 (when (om/get-state owner :su-redirect)
                                   (loading/small-loading))
                                 (if (zero? (count dashboard-selected-topics))

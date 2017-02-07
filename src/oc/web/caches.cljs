@@ -2,6 +2,6 @@
 
 (def revisions (atom {}))
 
-(def new-sections (atom {}))
+(def new-topics (atom {}))
 
 (def company-cache (atom {}))

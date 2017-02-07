@@ -73,7 +73,7 @@
       (utils/remove-company-cache-key focus-cache-key))
     (hide-popover nil "archive-metric-confirm")
     (dis/dispatch! [:foce-input {:metrics fewer-metrics}])
-    ((om/get-props owner :data-section-on-change))
+    ((om/get-props owner :data-topic-on-change))
     (data-editing-toggle owner editing-cb false))) ; no longer data editing
 
 (defn- show-archive-confirm-popover [owner editing-cb metric-slug]
@@ -85,7 +85,7 @@
                 :z-index-offset 1
                 :success-cb #(do
                                 (archive-metric-cb owner editing-cb metric-slug)
-                                ((om/get-props owner :data-section-on-change)))}))
+                                ((om/get-props owner :data-topic-on-change)))}))
 
 ; (defcomponent growth-popover [{:keys [initial-focus
 ;                                       new-metric?
@@ -99,11 +99,11 @@
 ;                                       growth-data-editing-toggle-cb
 ;                                       growth-switch-focus-cb
 ;                                       growth-archive-metric-cb
-;                                       data-section-on-change
+;                                       data-topic-on-change
 ;                                       width
 ;                                       height] :as data} owner options]
 ;   (render [_]
-;     (dom/div {:class "oc-popover-container-internal growth composed-section"
+;     (dom/div {:class "oc-popover-container-internal growth composed-topic"
 ;               :style {:width "100%" :height "100%"}}
 ;       (dom/button {:class "close-button"
 ;                    :on-click #(hide-popover-cb)
@@ -135,18 +135,18 @@
 ;                                :editing-cb growth-data-editing-toggle-cb
 ;                                :switch-focus-cb growth-switch-focus-cb
 ;                                :archive-metric-cb growth-archive-metric-cb
-;                                :data-section-on-change data-section-on-change})))))
+;                                :data-topic-on-change data-topic-on-change})))))
 
 (defn- get-state [owner data initial]
-  (let [section-data (:section-data data)
-        all-metrics (:metrics section-data)
+  (let [topic-data (:topic-data data)
+        all-metrics (:metrics topic-data)
         metrics (if initial (metrics-map all-metrics) (om/get-state owner :growth-metrics))
-        first-metric (:slug (first (:metrics section-data)))
+        first-metric (:slug (first (:metrics topic-data)))
         last-focus (utils/company-cache-key focus-cache-key)
         focus (if initial
                 (or (:selected-metric data) last-focus first-metric)
                 (om/get-state owner :focus)) ; preserve focus if this is for will-update
-        growth-data (growth-utils/growth-data-map (:data section-data))
+        growth-data (growth-utils/growth-data-map (:data topic-data))
         metric-slugs (metrics-order all-metrics)
         new-metric? (if initial (not focus) (om/get-state owner :new-metric?))]
     {:growth-data growth-data
@@ -167,13 +167,13 @@
         new-metrics (assoc metrics (if (= k :slug) v focus) new-metric)]
     (om/set-state! owner :growth-metrics new-metrics)))
 
-(defcomponent topic-growth [{:keys [section section-data currency editable? foce-data-editing? editing-cb data-section-on-change card-width columns-num] :as data} owner options]
+(defcomponent topic-growth [{:keys [topic topic-data currency editable? foce-data-editing? editing-cb data-topic-on-change card-width columns-num] :as data} owner options]
 
   (init-state [_]
     (get-state owner data true))
 
   (will-update [_ next-props _]
-    ;; this means the section data has changed from the API or at a upper lever of this component
+    ;; this means the topic data has changed from the API or at a upper lever of this component
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props false))))
 
@@ -197,7 +197,7 @@
   ;                      :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
   ;                      :growth-switch-focus-cb (partial switch-focus owner)
   ;                      :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
-  ;                      :data-section-on-change data-section-on-change
+  ;                      :data-topic-on-change data-topic-on-change
   ;                      :width 400
   ;                      :height (min 507 (- (.-clientHeight (.-body js/document)) 50))
   ;                      :z-index-offset 0
@@ -209,16 +209,16 @@
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
 
     (let [no-data (utils/no-growth-data? growth-data)]
-      (dom/div {:id "section-growth"
-                :class (utils/class-set {:section-container true
+      (dom/div {:id "topic-growth"
+                :class (utils/class-set {:topic-container true
                                          :editing foce-data-editing?})
-                :key (name section)}
+                :key (name topic)}
 
         ; Chart
         (when-not no-data
-          (dom/div {:class "composed-section growth group"}
+          (dom/div {:class "composed-topic growth group"}
             ; growth data chart
-            (dom/div {:class (utils/class-set {:composed-section-body true})}
+            (dom/div {:class (utils/class-set {:composed-topic-body true})}
               ;; growth metric sparklines
               (om/build growth-sparklines {:growth-data growth-data
                                            :growth-metrics growth-metrics

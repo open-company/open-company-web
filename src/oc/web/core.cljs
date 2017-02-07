@@ -169,7 +169,7 @@
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:sections (dis/board-data)))) ;; or the section key is missing that means we have only
+              (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (api/get-entry-point false)
       (reset! dis/app-state (-> @dis/app-state
@@ -203,13 +203,13 @@
 ;   (let [slug (:slug (:params params))
 ;         update-slug (:update-slug (:params params))
 ;         update-date (:update-date (:params params))
-;         update-section (:section (:params params))
+;         update-topic (:topic (:params params))
 ;         query-params (:query-params params)
 ;         su-key (dis/stakeholder-update-key slug update-slug)]
 ;     (pre-routing query-params)
 ;     (utils/clean-org-caches)
 ;     ;; save the route
-;     (router/set-route! [slug "su-snapshot" "updates" update-date update-slug update-section] {:slug slug :update-slug update-slug :update-date update-date :query-params query-params :section update-section})
+;     (router/set-route! [slug "su-snapshot" "updates" update-date update-slug update-topic] {:slug slug :update-slug update-slug :update-date update-date :query-params query-params :topic update-topic})
 ;     ;; do we have the company data already?
 ;     (when (not (get-in @dis/app-state su-key))
 ;       ;; load the Stakeholder Update data from the API
@@ -310,13 +310,13 @@
 
     ; (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
     ;   ; add force-remove-loading to avoid inifinte spinner if the company
-    ;   ; has no sections and the user is looking at company profile
+    ;   ; has no topics and the user is looking at company profile
     ;   (swap! dis/app-state assoc :force-remove-loading true)
     ;   (board-handler "profile" target company-settings params))
 
     (defroute team-settings-route (urls/team-settings-um ":team-id") {:as params}
       ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no sections and the user is looking at company profile
+      ; has no topics and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
       (team-handler "user-management" target user-management-wrapper params))
 
@@ -341,7 +341,7 @@
     ;   (stakeholder-update-handler target su-snapshot params))
 
     ; (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
-    ;   (board-handler "section" target org-dashboard params))
+    ;   (board-handler "topic" target org-dashboard params))
 
     (defroute not-found-route "*" []
       ;; render component

@@ -35,29 +35,29 @@
     ; avoid to crash tests
     (utils/is-test-env?)
     (:topics data)
-    ; just layout the sections in :sections order
+    ; just layout the topics in :topics order
     ; in 2 columns
     (= (:columns-num data) 2)
-    (let [sections (:sections (:board-data data))
+    (let [topics (:topics (:board-data data))
           layout (loop [idx 0
                         layout {:1 [] :2 []}]
-                   (if (= idx (count sections))
+                   (if (= idx (count topics))
                      layout
-                     (let [topic (get sections idx)]
+                     (let [topic (get topics idx)]
                        (recur (inc idx)
                               (if (even? idx)
                                  (assoc layout :1 (conj (:1 layout) topic))
                                  (assoc layout :2 (conj (:2 layout) topic)))))))]
       layout)
-    ; just layout the sections in :sections order
+    ; just layout the topics in :topics order
     ; in 3 columns
     (= (:columns-num data) 3)
-    (let [sections (:sections (:board-data data))
+    (let [topics (:topics (:board-data data))
           layout (loop [idx 0
                         layout {:1 [] :2 [] :3 []}]
-                   (if (= idx (count sections))
+                   (if (= idx (count topics))
                      layout
-                     (let [topic (get sections idx)]
+                     (let [topic (get topics idx)]
                        (recur (inc idx)
                               (cond
                                  (= (mod idx 3) 0)
@@ -68,14 +68,14 @@
                                  (assoc layout :3 (conj (:3 layout) topic)))))))]
       layout)))
 
-(defn render-topic [owner options section-name column]
-  (when section-name
+(defn render-topic [owner options topic-name column]
+  (when topic-name
     (let [props                 (om/get-props owner)
           board-data            (:board-data props)
           topics-data           (:topics-data props)
           topic-click           (or (:topic-click options) identity)
           is-dashboard          (:is-dashboard props)]
-      (let [sd (->> section-name keyword (get topics-data))
+      (let [sd (->> topic-name keyword (get topics-data))
             topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                     (utils/in? (:route @router/path) "su-list"))
                               #js {}
@@ -88,14 +88,14 @@
                                               (str (:card-width props) "px")))})]
         (when-not (and (:read-only board-data) (:placeholder sd))
           (dom/div #js {:className "topic-row"
-                        :data-topic (name section-name)
+                        :data-topic (name topic-name)
                         :style topic-row-style
-                        :ref section-name
-                        :key (str "topic-row-" (name section-name))}
+                        :ref topic-name
+                        :key (str "topic-row-" (name topic-name))}
             (om/build topic {:loading (:loading board-data)
-                             :section section-name
+                             :topic topic-name
                              :is-stakeholder-update (:is-stakeholder-update props)
-                             :section-data sd
+                             :topic-data sd
                              :card-width (:card-width props)
                              :columns-num (:columns-num props)
                              :foce-data-editing? (:foce-data-editing? props)
@@ -110,18 +110,18 @@
                                                 (not (:read-only board-data)))
                              :column column
                              :show-top-menu (:show-top-menu props)}
-                             {:opts {:section-name section-name
-                                     :topic-click (partial topic-click section-name)}})))))))
+                             {:opts {:topic-name topic-name
+                                     :topic-click (partial topic-click topic-name)}})))))))
 
 (defn- update-active-topics [owner new-topic topic-data]
   (let [board-data (om/get-props owner :board-data)
         new-topic-kw (keyword new-topic)
-        fixed-topic-data (merge topic-data {:section new-topic
+        fixed-topic-data (merge topic-data {:topic new-topic
                                             :new (not (:was-archived topic-data))
                                             :loading (:was-archived topic-data)})
-        new-topics (conj (:sections board-data) new-topic)]
+        new-topics (conj (:topics board-data) new-topic)]
     (when (:was-archived topic-data)
-      (api/patch-sections new-topics))
+      (api/patch-topics new-topics))
     (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
     (when (:was-archived topic-data)
@@ -142,7 +142,7 @@
     {:topics-layout nil
      :filtered-topics (if (or (:read-only board-data)
                               (responsive/is-mobile-size?))
-                        (utils/filter-placeholder-sections topics topics-data)
+                        (utils/filter-placeholder-topics topics topics-data)
                         topics)})
 
   (did-mount [_]
@@ -152,7 +152,7 @@
   (will-receive-props [_ next-props]
     (om/set-state! owner :filtered-topics (if (or (:read-only (:board-data next-props))
                                                   (responsive/is-mobile-size?))
-                                            (utils/filter-placeholder-sections (:topics next-props) (:topics-data next-props))
+                                            (utils/filter-placeholder-topics (:topics next-props) (:topics-data next-props))
                                             (:topics next-props)))
     (when (and (> (:columns-num next-props) 1)
                (or (not= (:topics next-props) (:topics data))
@@ -214,7 +214,7 @@
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)
-                                    :new-sections (:new-sections data)
+                                    :new-topics (:new-topics data)
                                     :selected-topic-view selected-topic-view})
               ; for each column key contained in best layout
               :else
@@ -226,14 +226,14 @@
                       ; render the topics
                       (when (pos? (count column))
                         (for [idx (range (count column))
-                              :let [section-kw (get column idx)
-                                    section-name (name section-kw)]]
-                          (partial-render-topic section-name (name kw))))))))))
+                              :let [topic-kw (get column idx)
+                                    topic-name (name topic-kw)]]
+                          (partial-render-topic topic-name (name kw))))))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (for [section filtered-topics]
-                (partial-render-topic (name section) 1)))))))))
+              (for [topic filtered-topics]
+                (partial-render-topic (name topic) 1)))))))))

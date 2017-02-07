@@ -75,11 +75,11 @@
 (defn revisions-key [slug]
   [:revisions (keyword slug)])
 
-(defn section-revisions-key [slug section]
-  (vec (conj (revisions-key slug) (keyword section))))
+(defn topic-revisions-key [slug topic]
+  (vec (conj (revisions-key slug) (keyword topic))))
 
-(defn revision-key [slug section as-of]
-  (vec (conj (section-revisions-key slug section) (str as-of))))
+(defn revision-key [slug topic as-of]
+  (vec (conj (topic-revisions-key slug topic) (str as-of))))
 
 (defn org-data
   ([]
@@ -127,24 +127,24 @@
   (:force-edit-topic @app-state))
 
 (defn revision
-  ([slug section as-of] (revision slug section as-of @app-state))
-  ([slug section as-of data] (get-in data (revision-key slug section as-of))))
+  ([slug topic as-of] (revision slug topic as-of @app-state))
+  ([slug topic as-of data] (get-in data (revision-key slug topic as-of))))
 
-(defn section-revisions
-  ([slug section] (section-revisions slug section @app-state))
-  ([slug section data] (get-in data (section-revisions-key slug section))))
+(defn topic-revisions
+  ([slug topic] (topic-revisions slug topic @app-state))
+  ([slug topic data] (get-in data (topic-revisions-key slug topic))))
 
 (defn revisions
   ([slug] (revisions slug @app-state))
   ([slug data] (get-in data (revisions-key slug))))
 
-(defn foce-section-key []
+(defn foce-topic-key []
   (:foce-key @app-state))
 
-(defn foce-section-data []
+(defn foce-topic-data []
   (:foce-data @app-state))
 
-(defn foce-section-data-editing? []
+(defn foce-topic-data-editing? []
   (:foce-data-editing? @app-state))
 
 (set! (.-OCDispatcherPrintAppState js/window) print-app-state)
