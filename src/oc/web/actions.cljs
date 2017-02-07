@@ -33,10 +33,14 @@
   (router/redirect! "/")
   (dissoc db :jwt))
 
-(defmethod dispatcher/action :entry [db [_ {:keys [collection]} redirect-if-necessary]]
+(defmethod dispatcher/action :entry [db [_ {:keys [collection]}]]
   (let [orgs (:orgs collection)]
     (cond
-      redirect-if-necessary
+      ; If i have an org slug let's load the org data
+      (router/current-org-slug)
+      (api/get-org (first (filter #(= (:slug %) (router/current-org-slug)) orgs)))
+      ; If not redirect the user to the first useful org or to the create org UI
+      :else
       (let [login-redirect (cook/get-cookie :login-redirect)]
         (cond
           ; redirect to create-company if the user has no companies
@@ -48,30 +52,40 @@
           ; if the user has only one company, send him to the company dashboard
           (= (count orgs) 1)        (router/nav! (oc-urls/boards (:slug (first orgs))))
           ; if the user has more than one company send him to the companies page
-          (> (count orgs) 1)        (router/nav! oc-urls/orgs)))
-      (:load-org-data db)
-      (api/get-org (first (filter #(= (:slug %) (router/current-org-slug)) orgs))))
+          (> (count orgs) 1)        (router/nav! oc-urls/orgs))))
     (-> db
         (dissoc :loading)
         (assoc :orgs orgs)
         (assoc :api-entry-point (:links collection)))))
 
-(defmethod dispatcher/action :org [db [_ org-data refirect-if-necessary]]
+(defn newest-board [boards]
+  (first (sort #(compare (utils/js-date (:created-at %2)) (utils/js-date (:created-at %1))) boards)))
+
+(defn get-default-board [org-data]
+  (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+    (if-let [board (filter #(= (:slug %) last-board-slug) (:boards org-data))]
+      ; Get the last accessed board from the saved cookie
+      (first board)
+      ; Fallback to the newest board if the saved board was not found
+      (newest-board (:boards org-data)))
+    (newest-board (:boards org-data))))
+
+(defmethod dispatcher/action :org [db [_ org-data]]
   (let [boards (:boards org-data)]
     (cond
-      (and refirect-if-necessary
-           (nil? (router/current-board-slug)))
+      ; If there is a board slug let's load the board data
+      (router/current-board-slug)
+      (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
+        (api/get-board board-data))
+      :else
       (cond
-        ;; Redirect to create board if no board are present
-        (zero? (count boards))
-        (router/nav! (oc-urls/create-board (router/current-org-slug)))
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
-        (router/nav! (oc-urls/board (router/current-org-slug) (:slug (first boards)))))
-      (and (:load-board-data db)
-           (router/current-board-slug))
-      (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
-        (api/get-board board-data))))
+        (let [board-to (get-default-board org-data)]
+          (router/nav! (oc-urls/board (router/current-org-slug) (:slug board-to))))
+        ;; Redirect to create board if no board are present
+        :else
+        (router/nav! (oc-urls/create-board (router/current-org-slug))))))
   (assoc-in db (dispatcher/org-data-key (:slug org-data)) org-data))
 
 (defmethod dispatcher/action :board [db [_ board-data]]
