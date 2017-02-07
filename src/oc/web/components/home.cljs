@@ -6,7 +6,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.ui.login-required :refer (login-required)]
-            [open-company-web.components.sign-up :refer (sign-up)]
+            [oc.web.components.sign-up :refer (sign-up)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
