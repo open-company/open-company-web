@@ -35,13 +35,22 @@
 
 (defn complete-params [params]
   (if-let [jwt (j/jwt)]
-    (-> (merge {:with-credentials? false} params)
-        (update :headers merge {"Access-Control-Allow-Headers" "Content-Type, Authorization"
-                                "Authorization" (str "Bearer " jwt)}))
+    (-> {:with-credentials? false}
+        (merge params)
+        (update :headers merge {"Authorization" (str "Bearer " jwt)}))
     params))
 
-(defn refresh-jwt [refresh-url]
-  (http/get (str ls/auth-server-domain refresh-url) (complete-params {})))
+(defn headers-for-link [link]
+ (let [acah-headers (if (and (contains? link :access-control-allow-headers)
+                             (nil? (:access-control-allow-headers link)))
+                      {}
+                      {"Access-Control-Allow-Headers" "Content-Type, Authorization"})
+       with-content-type (if (:content-type link) (assoc acah-headers "content-type" (:content-type link)) acah-headers)
+       with-accept (if (:accept link) (assoc with-content-type "accept" (:accept link)) with-content-type)]
+  with-accept))
+
+(defn refresh-jwt [refresh-link]
+  (http/get (str ls/auth-server-domain (:href refresh-link)) (complete-params {:headers (headers-for-link refresh-link)})))
 
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -68,21 +77,12 @@
     (= method http/put)
     "PUT"))
 
-(defn headers-for-link [link]
- (let [acah-headers (if (and (contains? link :access-control-allow-headers)
-                             (nil? (:access-control-allow-headers link)))
-                      {}
-                      {"Access-Control-Allow-Headers" "Content-Type, Authorization"})
-       with-content-type (if (:content-type link) (assoc acah-headers "content-type" (:content-type link)) acah-headers)
-       with-accept (if (:accept link) (assoc with-content-type "accept" (:accept link)) with-content-type)]
-  with-accept))
-
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
       (when (and jwt (j/expired?))
         (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
-          (let [res (<! (refresh-jwt (:href refresh-url)))]
+          (let [res (<! (refresh-jwt refresh-url))]
             (if (:success res)
               (update-jwt-cookie! (:body res))
               (dispatcher/dispatch! [:logout])))))
@@ -607,7 +607,7 @@
                 (fn []
                   (go
                     (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
-                      (let [res (<! (refresh-jwt (:href refresh-url)))]
+                      (let [res (<! (refresh-jwt refresh-url))]
                         (if (:success res)
                           (update-jwt-cookie! (:body res))
                           (dispatcher/dispatch! [:logout])))))))
