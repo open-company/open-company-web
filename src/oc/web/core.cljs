@@ -25,6 +25,9 @@
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.edit-user-profile :refer (edit-user-profile)]
+            [oc.web.components.about :refer (about)]
+            [oc.web.components.sign-up :refer (sign-up)]
+            [oc.web.components.pricing :refer (pricing)]
             ; [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.board-editor :refer (board-editor)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
@@ -33,9 +36,6 @@
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.updates :refer (updates-responsive-switcher)]
             ; [oc.web.components.login :refer (login)]
-            ; [oc.web.components.sign-up :refer (sign-up)]
-            ; [oc.web.components.about :refer (about)]
-            ; [oc.web.components.pricing :refer (pricing)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
             ; [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             ))
@@ -134,25 +134,25 @@
 ;       ;; render component
 ;       (drv-root login target))))
 
-; (defn simple-handler [component route-name target params]
-;   (pre-routing (:query-params params))
-;   (utils/clean-org-caches)
-;   (if (contains? (:query-params params) :jwt)
-;     (do ; contains :jwt so auth went well
-;       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-;       (api/get-entry-point))
-;     (do
-;       (when (contains? (:query-params params) :login-redirect)
-;         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-;       ;; save route
-;       (router/set-route! [route-name] {})
-;       (when (contains? (:query-params params) :access)
-;         ;login went bad, add the error message to the app-state
-;         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
-;       ; remove om component if mounted to the same node
-;       (om/detach-root target)
-;       ;; render component
-;       (drv-root #(om/component (component)) target))))
+(defn simple-handler [component route-name target params]
+  (pre-routing (:query-params params))
+  (utils/clean-org-caches)
+  (if (contains? (:query-params params) :jwt)
+    (do ; contains :jwt so auth went well
+      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-entry-point))
+    (do
+      (when (contains? (:query-params params) :login-redirect)
+        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      ;; save route
+      (router/set-route! [route-name] {})
+      (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+      ; remove om component if mounted to the same node
+      (om/detach-root target)
+      ;; render component
+      (drv-root #(om/component (component)) target))))
 
 ;; Component specific to a company
 (defn board-handler [route target component params]
@@ -223,17 +223,17 @@
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
   (do
-    ; (defroute login-route urls/login {:as params}
-    ;   (simple-handler sign-up "login" target params))
+    (defroute login-route urls/login {:as params}
+      (simple-handler sign-up "login" target params))
 
-    ; (defroute signup-route urls/sign-up {:as params}
-    ;   (simple-handler sign-up "sign-up" target params))
+    (defroute signup-route urls/sign-up {:as params}
+      (simple-handler sign-up "sign-up" target params))
 
-    ; (defroute about-route urls/about {:as params}
-    ;   (simple-handler about "about" target params))
+    (defroute about-route urls/about {:as params}
+      (simple-handler about "about" target params))
 
-    ; (defroute pricing-route urls/pricing {:as params}
-    ;   (simple-handler pricing "pricing" target params))
+    (defroute pricing-route urls/pricing {:as params}
+      (simple-handler pricing "pricing" target params))
 
     ; (defroute email-confirmation-route urls/email-confirmation {:as params}
     ;   (utils/clean-org-caches)
@@ -349,10 +349,10 @@
 
     (def route-dispatch!
       (secretary/uri-dispatcher [
-                                 ; login-route
-                                 ;  signup-route
-                                 ;  about-route
-                                 ;  pricing-route
+                                 login-route
+                                 signup-route
+                                 about-route
+                                 pricing-route
                                  ;  email-confirmation-route
                                  ;  confirm-invitation-route
                                  ;  ; subscription-callback-route
