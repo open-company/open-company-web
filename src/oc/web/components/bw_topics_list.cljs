@@ -8,11 +8,12 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [cuerdas.core :as s]))
 
 (defn patch-board [topics-list]
   (js.console.log "patch-board" topics-list)
-  (api/patch-company (router/current-board-slug) {:sections topics-list}))
+  (api/patch-company (router/current-board-slug) {:topics topics-list}))
 
 ; (defn ordered-topics-list
 ;   "Return the list of active topics in the order the user moved them."
@@ -49,8 +50,8 @@
 (defn get-topics [data]
   (let [board-data (:board-data data)]
     (if (:read-only board-data)
-      (utils/filter-placeholder-sections (:sections board-data) board-data)
-      (:sections board-data))))
+      (utils/filter-placeholder-topics (:topics board-data) board-data)
+      (:topics board-data))))
 
 (defcomponent bw-topics-list [{:keys [board-data card-width selected-topic-view show-add-topic] :as data} owner options]
 
@@ -87,8 +88,8 @@
               (dom/div {:class "internal"
                         :key (str "bw-board-list-" (name (:slug board)) "-internal")}
                 (str "#" (or (:name board) (:slug board))))))))
-      (dom/div {:class "left-topics-list-top group"}
-        (when (not= (count (:sections board-data)) 0)
+      (dom/div {:class "left-topics-list-top mt3 group"}
+        (when (not= (count (:topics board-data)) 0)
           (dom/h3 {:class "left-topics-list-top-title"
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
@@ -120,4 +121,4 @@
                                  (router/nav! (oc-urls/topic (router/current-org-slug) (router/current-board-slug) (name topic))))}
             (dom/div {:class "internal"
                       :key (str "bw-topic-list-" (name topic) "-internal")}
-              (:title sd))))))))
+              (or (:title sd) (s/join " " (map s/capital (s/split (name topic) "-")))))))))))
