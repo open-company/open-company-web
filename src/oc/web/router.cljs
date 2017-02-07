@@ -117,3 +117,8 @@
 (defn current-team-id []
   ;; TODO: use the team switch system to get the current team if none is specified in the URL
   (or (:team-id @path) (first (jwt/get-key :teams))))
+
+(defn last-board-cookie
+  "Cookie to save the last accessed board"
+  [org-slug]
+  (str "last-board-" (name org-slug)))
