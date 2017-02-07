@@ -38,7 +38,9 @@
     ; just layout the topics in :topics order
     ; in 2 columns
     (= (:columns-num data) 2)
-    (let [topics (:topics (:board-data data))
+    (let [board-data (:board-data data)
+          all-topics (:topics board-data)
+          topics (into [] (map name (filter #(contains? board-data %) (map keyword all-topics))))
           layout (loop [idx 0
                         layout {:1 [] :2 []}]
                    (if (= idx (count topics))
@@ -52,7 +54,9 @@
     ; just layout the topics in :topics order
     ; in 3 columns
     (= (:columns-num data) 3)
-    (let [topics (:topics (:board-data data))
+    (let [board-data (:board-data data)
+          all-topics (:topics board-data)
+          topics (into [] (map name (filter #(contains? board-data %) (map keyword all-topics))))
           layout (loop [idx 0
                         layout {:1 [] :2 [] :3 []}]
                    (if (= idx (count topics))
@@ -69,13 +73,13 @@
       layout)))
 
 (defn render-topic [owner options topic-name column]
-  (when topic-name
-    (let [props                 (om/get-props owner)
-          board-data            (:board-data props)
-          topics-data           (:topics-data props)
-          topic-click           (or (:topic-click options) identity)
-          is-dashboard          (:is-dashboard props)]
-      (let [sd (->> topic-name keyword (get topics-data))
+  (let [props       (om/get-props owner)
+        board-data  (:board-data props)
+        topics-data (:topics-data props)]
+    (when (and topic-name (contains? topics-data (keyword topic-name)))
+      (let [topic-click           (or (:topic-click options) identity)
+            is-dashboard          (:is-dashboard props)
+            sd (->> topic-name keyword (get topics-data))
             topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                     (utils/in? (:route @router/path) "su-list"))
                               #js {}

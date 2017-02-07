@@ -174,15 +174,15 @@
                            rerender]}]
     (let [board-slug    (router/current-board-slug)
           board-data    (:board-data data)
-          board-topics  (vec (map keyword (:topics board-data)))
-          card-width      (:card-width data)
-          columns-num     (:columns-num data)
-          ww              (responsive/ww)
-          total-width     (if (and (= columns-num 1)
-                                   (< ww responsive/c1-min-win-width))
-                            "auto"
-                            (str (responsive/total-layout-width-int card-width columns-num) "px"))
-          can-edit-secs   (utils/can-edit-topics? board-data)]
+          board-topics  (filter #(contains? board-data %) (vec (map keyword (:topics board-data))))
+          card-width    (:card-width data)
+          columns-num   (:columns-num data)
+          ww            (responsive/ww)
+          total-width   (if (and (= columns-num 1)
+                                (< ww responsive/c1-min-win-width))
+                          "auto"
+                          (str (responsive/total-layout-width-int card-width columns-num) "px"))
+          can-edit-secs (utils/can-edit-topics? board-data)]
       (dom/div {:class (utils/class-set {:topic-list true
                                          :group true
                                          :editable can-edit-secs})

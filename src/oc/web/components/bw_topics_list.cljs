@@ -108,7 +108,8 @@
         )
       (dom/div {:class (str "left-topics-list-items group" (when (:read-only board-data) " read-only"))}
         (for [topic topics
-              :let [sd (->> topic keyword (get board-data))]]
+              :let [sd (->> topic keyword (get board-data))]
+              :when (contains? board-data (keyword topic))]
           (dom/div {:class (utils/class-set {:left-topics-list-item true
                                              :dnd false ;(can-dnd? data)
                                              :highlight-on-hover (nil? (:foce-key data))
