@@ -224,9 +224,11 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
+      (swap! dis/app-state assoc :show-login-overlay :login-with-slack)
       (simple-handler sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
+     (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
       (simple-handler sign-up "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
