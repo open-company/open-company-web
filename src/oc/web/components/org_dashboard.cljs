@@ -166,7 +166,7 @@
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
               ;;Footer
-               (om/build footer {:footer-width total-width-int}))
+               (footer total-width-int))
             (dom/div {:class "page"}
               ;; Navbar
               (when-not (and (responsive/is-tablet-or-mobile?)
@@ -218,4 +218,4 @@
                                  :is-dashboard true
                                  :show-top-menu (:show-top-menu data)}))
                   ;;Footer
-                  (om/build footer {:footer-width total-width-int}))))))))))
+                  (footer total-width-int))))))))))

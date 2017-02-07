@@ -50,4 +50,4 @@
                   (dom/ul {:class "orgs"}
                     (om/build-all list-page-item orgs-list))
                   (dom/h2 "No organizations found."))))
-            (om/build footer {:footer-width (responsive/total-layout-width-int card-width columns-num)})))))))
+            (footer (responsive/total-layout-width-int card-width columns-num))))))))

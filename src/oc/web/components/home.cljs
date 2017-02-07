@@ -25,5 +25,4 @@
         (dom/div {:class "home fullscreen-page"}
           (when-not (:loading data)
             (dom/div {:class "home-internal"})
-            (om/build footer {:su-preview false
-                              :footer-width (responsive/total-layout-width-int card-width columns-num)})))))))
+            (footer (responsive/total-layout-width-int card-width columns-num))))))))

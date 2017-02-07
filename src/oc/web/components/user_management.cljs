@@ -239,4 +239,4 @@
 
         (let [columns-num (responsive/columns-num)
               card-width (responsive/calc-card-width)]
-         (om/build footer/footer (assoc data :footer-width (responsive/total-layout-width-int card-width columns-num))))))))
+         (footer/footer (responsive/total-layout-width-int card-width columns-num)))))))

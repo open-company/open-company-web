@@ -1,21 +1,27 @@
 (ns oc.web.components.ui.footer
-  (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros [defcomponent]]
-            [om-tools.dom :as dom :include-macros true]
+  (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.responsive :as responsive]))
 
-(defcomponent footer [{:keys [su-preview footer-width] :as data} owner options]
-  (render [_]
-    (dom/div {:class "footer"}
-      (dom/div {:class "footer-internal"}
-        (dom/div {:class "footer-bottom"
-                  :style #js {:width (str footer-width "px")}}
-          (dom/a {:class "oc-logo" :href oc-urls/home} (dom/img {:src "/img/oc-wordmark.svg"}))
-          ; (dom/a {:class "footer-link" :href oc-urls/about} (str "ABOUT"  (when-not (responsive/is-mobile-size?) " US")))
-          (dom/div {:class "footer-bottom-right"}
-            (dom/a {:class "contact" :href oc-urls/contact-mail-to :title "Contact OpenCompany" :alt "Contact OpenCompany"} "CONTACT")
-            (dom/a {:class "twitter" :target "_blank" :href oc-urls/oc-twitter :title "OpenCompany on Twitter" :alt "twitter"}
-              (dom/img {:src "/img/twitter.svg"}))
-            (dom/a {:class "github" :target "_blank" :href oc-urls/oc-github :title "OpenCompany on GitHub" :alt "github"}
-              (dom/img {:src "/img/github.svg"}))))))))
+(rum/defc footer < rum/static
+  [footer-width]
+  [:div.footer
+    [:div.footer-internal
+      [:div.footer-bottom
+        {:style {:width (if footer-width (str footer-width "px") "100%")}}
+        [:a.oc-logo {:href oc-urls/home}
+          [:img {:src "/img/oc-wordmark.svg"}]]
+        [:div.footer-bottom-right
+          [:a.contact {:href oc-urls/contact-mail-to
+                       :title "Contact OpenCompany"
+                       :alt "Contact OpenCompany"} "CONTACT"]
+          [:a.twitter {:target "_blank"
+                       :href oc-urls/oc-twitter
+                       :title "OpenCompany on Twitter"
+                       :alt "twitter"}
+            [:img {:src "/img/twitter.svg"}]]
+            [:a.github {:target "_blank"
+                        :href oc-urls/oc-github
+                        :title "OpenCompany on GitHub"
+                        :alt "github"}
+              [:img {:src "/img/github.svg"}]]]]]])
