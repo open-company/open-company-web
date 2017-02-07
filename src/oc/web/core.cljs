@@ -23,6 +23,8 @@
             [oc.web.components.list-orgs :refer (list-orgs)]
             [oc.web.components.user-management :refer (user-management-wrapper)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
+            [oc.web.components.user-profile :refer (user-profile)]
+            [oc.web.components.edit-user-profile :refer (edit-user-profile)]
             ; [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.board-editor :refer (board-editor)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
@@ -30,8 +32,6 @@
             ; [oc.web.components.create-update :refer (create-update)]
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.updates :refer (updates-responsive-switcher)]
-            ; [oc.web.components.user-profile :refer (user-profile)]
-            ; [oc.web.components.edit-user-profile :refer (edit-user-profile)]
             ; [oc.web.components.login :refer (login)]
             ; [oc.web.components.sign-up :refer (sign-up)]
             ; [oc.web.components.about :refer (about)]
@@ -299,14 +299,14 @@
     (defroute org-page-route (urls/org ":org") {:as params}
       (org-handler target params))
 
-    ; (defroute user-profile-route urls/user-profile {:as params}
-    ;   (when-not (jwt/jwt)
-    ;     (router/redirect! urls/home))
-    ;   (utils/clean-org-caches)
-    ;   (pre-routing (:query-params params))
-    ;   (if (jwt/is-slack-org?)
-    ;     (drv-root user-profile target)
-    ;     (drv-root edit-user-profile target)))
+    (defroute user-profile-route urls/user-profile {:as params}
+      (when-not (jwt/jwt)
+        (router/redirect! urls/home))
+      (utils/clean-org-caches)
+      (pre-routing (:query-params params))
+      (if (jwt/is-slack-org?)
+        (drv-root #(om/component (user-profile)) target)
+        (drv-root edit-user-profile target)))
 
     ; (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
     ;   ; add force-remove-loading to avoid inifinte spinner if the company
@@ -349,21 +349,21 @@
 
     (def route-dispatch!
       (secretary/uri-dispatcher [
-                                ; login-route
-                                ;  signup-route
-                                ;  about-route
-                                ;  pricing-route
-                                ;  email-confirmation-route
-                                ;  confirm-invitation-route
-                                ;  ; subscription-callback-route
+                                 ; login-route
+                                 ;  signup-route
+                                 ;  about-route
+                                 ;  pricing-route
+                                 ;  email-confirmation-route
+                                 ;  confirm-invitation-route
+                                 ;  ; subscription-callback-route
                                  home-page-route
+                                 user-profile-route
                                  org-list-route
                                  org-page-route
                                  ; org-create-route
                                  ; board-create-route
                                  ; ; board-logo-setup-route
                                  ; logout-route
-                                 ; user-profile-route
                                  ; board-settings-route
                                  team-settings-route
                                  board-route
