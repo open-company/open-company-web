@@ -11,7 +11,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.topic :refer (topic)]
-            ; [open-company-web.components.topic-edit :refer (topic-edit)]
+            [oc.web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [oc.web.components.ui.loading :refer (loading)]
             [cuerdas.core :as s]))
@@ -32,13 +32,13 @@
   (when-let* [topic-name (om/get-props owner :selected-topic-view)
                 board-data (om/get-props owner :board-data)
                 topic-data (->> topic-name keyword (get board-data))
-                revisions-link (utils/link-for (:links topic-data) "revisions" "GET")]
+                revisions-link (utils/link-for (:links topic-data) "collection" "GET")]
     ; Do not request old revisions if there is the :new key
     ; since it was newly added from the add topic component
     ; and also it's not an archived topic being reactivated
     (when-not (:placeholder topic-data)
       (om/set-state! owner :revisions-requested true)
-      (api/load-revisions (router/current-board-slug) topic-name revisions-link))))
+      (api/load-revisions topic-name revisions-link))))
 
 (defn load-revisions-if-needed [owner]
   (when (not (om/get-state owner :revisions-requested))
@@ -126,20 +126,20 @@
                          (not (responsive/is-tablet-or-mobile?)))
                 (dom/div {:class (str "fake-textarea group " (when is-another-foce "disabled"))}
                   (cond
-                    ; is-new-foce
-                    ; (dom/div {:class "topic topic-edit"
-                    ;           :style {:width (str (- topic-card-width 120) "px")}}
-                    ;   (om/build topic-edit {:is-stakeholder-update false
-                    ;                         :currency (:currency board-data)
-                    ;                         :card-width (- topic-card-width 120)
-                    ;                         :columns-num columns-num
-                    ;                         :is-topic-view true
-                    ;                         :foce-data-editing? foce-data-editing?
-                    ;                         :foce-key foce-key
-                    ;                         :show-delete-entry-button false
-                    ;                         :foce-data foce-data}
-                    ;                        {:opts options
-                    ;                         :key (str "topic-foce-" selected-topic-view "-new")}))
+                    is-new-foce
+                    (dom/div {:class "topic topic-edit"
+                              :style {:width (str (- topic-card-width 120) "px")}}
+                      (om/build topic-edit {:is-stakeholder-update false
+                                            :currency (:currency board-data)
+                                            :card-width (- topic-card-width 120)
+                                            :columns-num columns-num
+                                            :is-topic-view true
+                                            :foce-data-editing? foce-data-editing?
+                                            :foce-key foce-key
+                                            :show-delete-entry-button false
+                                            :foce-data foce-data}
+                                           {:opts options
+                                            :key (str "topic-foce-" selected-topic-view "-new")}))
                     (utils/in? (:topics board-data) selected-topic-view)
                     (let [initial-data (utils/new-topic-initial-data selected-topic-view (:title topic-data) topic-data)
                           with-data (if (#{:growth :finances} topic-kw) (assoc initial-data :data (:data topic-data)) initial-data)
