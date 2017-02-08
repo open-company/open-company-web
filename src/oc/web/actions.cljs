@@ -34,7 +34,7 @@
   (dissoc db :jwt))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [collection]}]]
-  (let [orgs (:orgs collection)]
+  (let [orgs (:items collection)]
     (cond
       ; If i have an org slug let's load the org data
       (router/current-org-slug)
@@ -138,7 +138,7 @@
 
 (defmethod dispatcher/action :topic [db [_ {:keys [slug topic body]}]]
   ;; Refresh topic revisions
-  (api/load-revisions slug topic (utils/link-for (:links body) "revisions"))
+  (api/load-revisions topic (utils/link-for (:links body) "entries"))
   (if body
     (let [fixed-topic (utils/fix-topic body topic)]
       (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
@@ -638,7 +638,7 @@
 (defmethod dispatcher/action :revisions-loaded
   [db [_ {:keys [topic revisions]}]]
   (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
-    (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic) :revisions-data) (vec (sort sort-pred (:revisions (:collection revisions)))))))
+    (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic) :revisions-data) (vec (sort sort-pred (:items (:collection revisions)))))))
 
 ((defmethod dispatcher/action :show-add-topic
   [db [_ active]]
