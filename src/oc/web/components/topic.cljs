@@ -8,7 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as oc-colors]
             [oc.web.lib.responsive :as responsive]
-            ; [open-company-web.components.topic-edit :refer (topic-edit)]
+            [oc.web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
@@ -344,20 +344,20 @@
                     :data-topic (name topic)
                     :key (str "topic-" (when is-current-foce "foce-") (name topic) "-" (:created-at topic-data))
                     :id (str "topic-" (name topic) "-" (:created-at topic-data))}
-        ; (if is-current-foce
-        ;   (om/build topic-edit {:topic topic
-        ;                         :topic-data topic-data
-        ;                         :is-stakeholder-update is-stakeholder-update
-        ;                         :currency currency
-        ;                         :card-width card-width
-        ;                         :foce-data-editing? foce-data-editing?
-        ;                         :read-only-company read-only-company
-        ;                         :foce-key foce-key
-        ;                         :foce-data foce-data
-        ;                         :show-delete-entry-button (:show-delete-entry-button data)
-        ;                         :columns-num columns-num}
-        ;                        {:opts options
-        ;                         :key (str "topic-foce-" topic "-" (:created-at topic-data))})
+        (if is-current-foce
+          (om/build topic-edit {:topic topic
+                                :topic-data topic-data
+                                :is-stakeholder-update is-stakeholder-update
+                                :currency currency
+                                :card-width card-width
+                                :foce-data-editing? foce-data-editing?
+                                :read-only-company read-only-company
+                                :foce-key foce-key
+                                :foce-data foce-data
+                                :show-delete-entry-button (:show-delete-entry-button data)
+                                :columns-num columns-num}
+                               {:opts options
+                                :key (str "topic-foce-" topic "-" (:created-at topic-data))})
           (om/build topic-internal {:topic topic
                                     :topic-data topic-data
                                     :is-stakeholder-update (:is-stakeholder-update data)
@@ -375,4 +375,4 @@
                                     :column column
                                     :show-top-menu (:show-top-menu data)}
                                    {:opts options
-                                    :key (str "topic-" topic)})))));)
+                                    :key (str "topic-" topic)}))))))
