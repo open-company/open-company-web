@@ -154,14 +154,14 @@
                (dispatcher/dispatch! [:subscription body])))))
 
 (defn get-org [org-data]
-  (when-let [org-link (utils/link-for (:links org-data) "item" "GET")]
+  (when-let [org-link (or (utils/link-for (:links org-data) "item" "GET") (utils/link-for (:links org-data) "self" "GET"))]
     (api-get (:href org-link)
       {:headers (headers-for-link org-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org (json->cljs body)])))))
 
 (defn get-board [board-data]
-  (when-let [board-link (utils/link-for (:links board-data) "item" "GET")]
+  (when-let [board-link (or (utils/link-for (:links board-data) "item" "GET") (utils/link-for (:links board-data) "self" "GET"))]
     (api-get (:href board-link)
       {:headers (headers-for-link board-link)}
       (fn [{:keys [status body success]}]
@@ -241,17 +241,12 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (dispatcher/dispatch! [:topic {:body body :topic topic :slug (keyword slug)}])))))))
 
-(defn load-revisions [slug topic revisions-link]
+(defn load-revisions [topic revisions-link]
   (when (and topic revisions-link)
     (api-get (:href revisions-link)
-      {:headers {
-        ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type, Authorization"
-          ; custom content type
-          "content-type" (:type revisions-link)
-          "accept" (:type revisions-link)}}
+      {:headers (headers-for-link revisions-link)}
       (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:revisions-loaded {:slug slug :topic topic :revisions (if success (json->cljs body) {})}])))))
+        (dispatcher/dispatch! [:revisions-loaded {:topic topic :revisions (if success (json->cljs body) {})}])))))
 
 (defn partial-update-topic
   "PATCH a topic, dispatching the results with a `:topic` action."
@@ -264,15 +259,10 @@
           json-data (cljs->json cleaned-topic-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type partial-update-link)
-          }}
+          :headers (headers-for-link partial-update-link)}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (load-revisions slug topic (utils/link-for (:links body) "revisions")))))))))
+            (load-revisions topic (utils/link-for (:links body) "entries")))))))))
 
 (defn load-revision
   [revision slug topic]
@@ -480,7 +470,7 @@
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:enumerate-users/teams (-> fixed-body :collection :teams)])))))))
+            (dispatcher/dispatch! [:enumerate-users/teams (-> fixed-body :collection :items)])))))))
 
 (defn enumerate-team-users [team-link]
   (when team-link
