@@ -26,16 +26,16 @@
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.edit-user-profile :refer (edit-user-profile)]
             [oc.web.components.about :refer (about)]
+            [oc.web.components.login :refer (login)]
             [oc.web.components.sign-up :refer (sign-up)]
             [oc.web.components.pricing :refer (pricing)]
-            ; [oc.web.components.org-editor :refer (org-editor)]
-            ; [oc.web.components.board-editor :refer (board-editor)]
+            [oc.web.components.org-editor :refer (org-editor)]
+            [oc.web.components.board-editor :refer (board-editor)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
             ; [oc.web.components.company-settings :refer (company-settings)]
             ; [oc.web.components.create-update :refer (create-update)]
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.updates :refer (updates-responsive-switcher)]
-            ; [oc.web.components.login :refer (login)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
             ; [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             ))
@@ -114,24 +114,23 @@
     ;; render component
     (drv-root #(om/component) target)))
 
-; ;; Handle successful and unsuccessful logins
-; (defn login-handler [target params]
-;   (pre-routing (:query-params params))
-;   (utils/clean-org-caches)
-;   (if (contains? (:query-params params) :jwt)
-;     (do ; contains :jwt so auth went well
-;       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-;       (api/get-entry-point))
-;     (do
-;       (when (contains? (:query-params params) :login-redirect)
-;         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-;       ;; save route
-;       (router/set-route! ["login"] {})
-;       (when (contains? (:query-params params) :access)
-;         ;login went bad, add the error message to the app-state
-;         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
-;       ;; render component
-;       (drv-root login target))))
+;; Handle successful and unsuccessful logins
+(defn login-handler [target params]
+  (pre-routing (:query-params params))
+  (utils/clean-org-caches)
+  (if (contains? (:query-params params) :jwt)
+    (do ; contains :jwt so auth went well
+      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-entry-point))
+    (do
+      (router/set-route! ["login"] {:query-params (:query-params params)})
+      (when (contains? (:query-params params) :login-redirect)
+        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      (when (contains? (:query-params params) :access)
+        ;login went bad, add the error message to the app-state
+        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+      ;; render component
+      (drv-root #(om/component (login)) target))))
 
 (defn simple-handler [component route-name target params]
   (pre-routing (:query-params params))
@@ -257,23 +256,23 @@
     (defroute org-list-route urls/orgs {:as params}
       (list-orgs-handler target params))
 
-    ; (defroute org-create-route urls/create-org {:as params}
-    ;   (if (jwt/jwt)
-    ;     (do
-    ;       (pre-routing (:query-params params))
-    ;       (router/set-route! ["create-org"] {:query-params (:query-params params)})
-    ;       (api/get-entry-point false)
-    ;       (drv-root org-editor target))
-    ;     (login-handler target params)))
+    (defroute org-create-route urls/create-org {:as params}
+      (if (jwt/jwt)
+        (do
+          (pre-routing (:query-params params))
+          (router/set-route! ["create-org"] {:query-params (:query-params params)})
+          (api/get-entry-point)
+          (drv-root org-editor target))
+        (login-handler target params)))
 
-    ; (defroute board-create-route (urls/create-board ":org") {:as params}
-    ;   (if (jwt/jwt)
-    ;     (do
-    ;       (pre-routing (:query-params params))
-    ;       (router/set-route! ["create-company"] {:query-params (:query-params params)})
-    ;       (api/get-entry-point false)
-    ;       (drv-root board-editor target))
-    ;     (login-handler target params)))
+    (defroute board-create-route (urls/create-board ":org") {:as params}
+      (if (jwt/jwt)
+        (do
+          (pre-routing (:query-params params))
+          (router/set-route! ["create-board"] {:query-params (:query-params params)})
+          (api/get-entry-point)
+          (drv-root board-editor target))
+        (login-handler target params)))
 
     ; (defroute board-logo-setup-route (urls/board-logo-setup ":org" ":board") {:as params}
     ;   (let [org (:org (:params params))
@@ -353,6 +352,7 @@
                                  about-route
                                  pricing-route
                                  logout-route
+                                 org-create-route
                                  ;  email-confirmation-route
                                  ;  confirm-invitation-route
                                  ;  ; subscription-callback-route
@@ -360,9 +360,8 @@
                                  user-profile-route
                                  org-list-route
                                  org-page-route
-                                 ; org-create-route
-                                 ; board-create-route
-                                 ; ; board-logo-setup-route
+                                 board-create-route
+                                 ; board-logo-setup-route
                                  ; board-settings-route
                                  team-settings-route
                                  board-route
