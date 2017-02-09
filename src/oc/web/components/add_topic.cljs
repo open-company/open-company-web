@@ -17,9 +17,9 @@
   (let [board-data (dis/board-data)]
     (into
       (:archived board-data)
-      (for [sec new-topics]
+      (for [sec (vals new-topics)]
         (-> sec
-            (assoc :topic (:topic-name sec))
+            (assoc :topic (:slug sec))
             (select-keys [:title :topic :body-placeholder :links]))))))
 
 (defn get-categories [new-topic-categories]
@@ -54,13 +54,13 @@
                     (submit-fn topic-name new-topic-data))} "Add"]]))
 
 (rum/defcs category < rum/static
-  [s new-topics cat board-data update-active-topics-cb all-topics is-archived]
+  [s cat board-data update-active-topics-cb all-topics is-archived]
   (let [archived-topics (:archived board-data)
         all-topics (into {} (if is-archived
-                                (for [a archived-topics]
-                                  [(keyword (:topic a)) a])
-                                (for [s new-topics]
-                                  [(keyword (:topic s)) s])))]
+                              (for [a archived-topics]
+                                [(keyword (:topic a)) a])
+                              (for [s (vals all-topics)]
+                                [(keyword (:topic s)) s])))]
     [:div.category
       [:span.block.mb1.all-caps.category-title
         (str (:name cat) (when (:icon cat) " "))]
@@ -92,6 +92,7 @@
 (rum/defcs add-topic < rum/reactive
                        (drv/drv :board-data)
                        (drv/drv :board-new-topics)
+                       (drv/drv :board-new-categories)
                        (rum/local "" ::tt-key)
                        {:did-mount (fn [s]
                                     (let [rum-comp (:rum/react-component s)
@@ -118,7 +119,6 @@
                                        (t/hide (::tt-key s))
                                       s)}
   [s update-active-topics-cb]
-  (js/console.log "add-topic/render" (drv/react s :board-new-topics))
   (let [board-data (drv/react s :board-data)
         board-new-topics (drv/react s :board-new-topics)
         board-new-categories (drv/react s :board-new-categories)
@@ -153,11 +153,11 @@
               (for [cat (get categories column)
                     :let [filtered-topics (vec (filter #(is-active-or-archived % topics archived) (:topics cat)))]
                     :when (pos? (count filtered-topics))]
-                (rum/with-key (category board-new-topics (assoc cat :topics filtered-topics) board-data update-active-topics-cb all-topics false)
+                (rum/with-key (category (assoc cat :topics filtered-topics) board-data update-active-topics-cb all-topics false)
                  (str "col-" (:name cat))))])]
         [:div.mxn2.clearfix
           (when (pos? (count archived))
             [:div.col.px2.col-12
-              (rum/with-key (category board-new-topics archived-category board-data update-active-topics-cb all-topics true)
+              (rum/with-key (category archived-category board-data update-active-topics-cb all-topics true)
                (str "col-Archived"))])]
         (custom-topic-input (get all-topics (keyword "custom-{4-char-UUID}")) #(update-active-topics-cb %1 %2))]))
