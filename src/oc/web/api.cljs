@@ -358,16 +358,12 @@
   (when (or force-load (not @new-topics-requested))
     (reset! new-topics-requested true)
     (let [slug (keyword (router/current-board-slug))
-          company-data (dispatcher/board-data)
-          links (:links company-data)
-          add-topic-link (utils/link-for links "topic-list" "GET")]
+          board-data (dispatcher/board-data)
+          links (:links board-data)
+          add-topic-link (utils/link-for links "new" "GET")]
       (when add-topic-link
         (api-get (:href add-topic-link)
-          { :headers {
-              ; required by Chrome
-              "Access-Control-Allow-Headers" "Content-Type"
-              ; custom content type
-              "content-type" (:type add-topic-link)}}
+          { :headers (headers-for-link add-topic-link)}
           (fn [{:keys [success body]}]
             (when (not success)
               (reset! new-topics-requested false))
