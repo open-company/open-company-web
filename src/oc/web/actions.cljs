@@ -40,8 +40,10 @@
       (router/current-org-slug)
       (api/get-org (first (filter #(= (:slug %) (router/current-org-slug)) orgs)))
       ; If not redirect the user to the first useful org or to the create org UI
-      :else
+      (and (not (utils/in? (:route @router/path) "create-org"))
+           (not (utils/in? (:route @router/path) "create-board")))
       (let [login-redirect (cook/get-cookie :login-redirect)]
+        (js/console.log "actions/:entry" @router/path)
         (cond
           ; redirect to create-company if the user has no companies
           (zero? (count orgs))   (router/nav! oc-urls/create-org)
