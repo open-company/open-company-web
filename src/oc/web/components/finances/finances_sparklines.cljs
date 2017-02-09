@@ -103,49 +103,48 @@
 
   (render-state [_ {:keys [chart-selected-idx fixed-sorted-metric]}]
     (dom/div {:class (str "finances-sparklines group sparklines" (when (= (dis/foce-topic-key) :finances) " editing"))}
-      ; (dom/div {:class "finances-sparklines-inner left group"}
-      ;   (let [sum-revenues (utils/sum-revenues finances-data)
-      ;         post-revenue? (pos? sum-revenues)
-      ;         filled-metric-data (finance-utils/fill-gap-months finances-data)
-      ;         actual-set (first finances-data)
-      ;         period (utils/get-period-string (:period actual-set) "monthly" [:force-year])
-      ;         currency-symbol (utils/get-symbol-for-currency-code (:currency data))
-      ;         actual-with-label (label-from-set actual-set currency-symbol)
-      ;         ww (responsive/ww)
-      ;         total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
-      ;         fixed-card-width (if (responsive/is-mobile-size?)
-      ;                              total-card-width ; use all the possible space on mobile
-      ;                              card-width)
-      ;         chart-opts {:opts {:chart-type "unbordered-chart"
-      ;                            :chart-keys (if post-revenue? [:revenue :costs] [:costs])
-      ;                            :interval "monthly"
-      ;                            :x-axis-labels false
-      ;                            :chart-colors (finance-utils/finances-key-colors false)
-      ;                            :chart-selected-colors (finance-utils/finances-key-colors true)
-      ;                            :chart-fill-polygons false
-      ;                            :label-color (occ/get-color-by-kw :oc-gray-5)
-      ;                            :sub-label-color (occ/get-color-by-kw :oc-gray-5)
-      ;                            :sparklines-class "chart-sparklines finances-sparklines"
-      ;                            :show-chart true
-      ;                            :labels {:value {:position :bottom
-      ;                                             :order 1
-      ;                                             :value-presenter #(or (:label %2) "-")
-      ;                                             :value (occ/get-color-by-kw :oc-blue-dark)
-      ;                                             :label-presenter #(:sub-label %2)
-      ;                                             :label-color (occ/get-color-by-kw :oc-gray-5)}}
-      ;                            :hide-nav true}}]
-      ;     (dom/div {:class (utils/class-set {:topic true
-      ;                                        :fake-chart (:fake-chart data)
-      ;                                        :read-only (:read-only data)})
-      ;               :key "finances-sparklines"
-      ;               :on-click (:start-editing-cb data)}
+      (dom/div {:class "finances-sparklines-inner left group"}
+        (let [sum-revenues (utils/sum-revenues finances-data)
+              post-revenue? (pos? sum-revenues)
+              filled-metric-data (finance-utils/fill-gap-months finances-data)
+              actual-set (first finances-data)
+              period (utils/get-period-string (:period actual-set) "monthly" [:force-year])
+              currency-symbol (utils/get-symbol-for-currency-code (:currency data))
+              actual-with-label (label-from-set actual-set currency-symbol)
+              ww (responsive/ww)
+              total-card-width (if (>= ww responsive/c1-min-win-width) card-width ww)
+              fixed-card-width (if (responsive/is-mobile-size?)
+                                   total-card-width ; use all the possible space on mobile
+                                   card-width)
+              chart-opts {:opts {:chart-type "unbordered-chart"
+                                 :chart-keys (if post-revenue? [:revenue :costs] [:costs])
+                                 :interval "monthly"
+                                 :x-axis-labels false
+                                 :chart-colors (finance-utils/finances-key-colors false)
+                                 :chart-selected-colors (finance-utils/finances-key-colors true)
+                                 :chart-fill-polygons false
+                                 :label-color (occ/get-color-by-kw :oc-gray-5)
+                                 :sub-label-color (occ/get-color-by-kw :oc-gray-5)
+                                 :sparklines-class "chart-sparklines finances-sparklines"
+                                 :show-chart true
+                                 :labels {:value {:position :bottom
+                                                  :order 1
+                                                  :value-presenter #(or (:label %2) "-")
+                                                  :value (occ/get-color-by-kw :oc-blue-dark)
+                                                  :label-presenter #(:sub-label %2)
+                                                  :label-color (occ/get-color-by-kw :oc-gray-5)}}
+                                 :hide-nav true}}]
+          (dom/div {:class (utils/class-set {:fake-chart (:fake-chart data)
+                                             :read-only (:read-only data)})
+                    :key "finances-sparklines"
+                    :on-click (:start-editing-cb data)}
 
-      ;       (dom/div {}
-      ;         (om/build d3-column-chart {:chart-data fixed-sorted-metric
-      ;                                    :selected chart-selected-idx
-      ;                                    :selected-metric-cb #(om/set-state! owner :chart-selected-idx %)
-      ;                                    :chart-height 80
-      ;                                    :chart-width (- fixed-card-width 50 40 5)} chart-opts)))))
+            (dom/div {}
+              (om/build d3-column-chart {:chart-data fixed-sorted-metric
+                                         :selected chart-selected-idx
+                                         :selected-metric-cb #(om/set-state! owner :chart-selected-idx %)
+                                         :chart-height 80
+                                         :chart-width (- fixed-card-width 50 40 5)} chart-opts)))))
       (dom/div {:class "actions group right"}
         (dom/button
           {:class "btn-reset"
