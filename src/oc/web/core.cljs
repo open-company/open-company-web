@@ -290,10 +290,10 @@
     ;       (swap! dis/app-state assoc :loading true))
     ;   (drv-root board-logo-setup target)))
 
-    ; (defroute logout-route urls/logout {:as params}
-    ;   (cook/remove-cookie! :jwt)
-    ;   (cook/remove-cookie! :login-redirect)
-    ;   (router/redirect! urls/home))
+    (defroute logout-route urls/logout {:as params}
+      (cook/remove-cookie! :jwt)
+      (cook/remove-cookie! :login-redirect)
+      (router/redirect! urls/home))
 
     (defroute org-page-route (urls/org ":org") {:as params}
       (org-handler target params))
@@ -352,6 +352,7 @@
                                  signup-route
                                  about-route
                                  pricing-route
+                                 logout-route
                                  ;  email-confirmation-route
                                  ;  confirm-invitation-route
                                  ;  ; subscription-callback-route
@@ -362,7 +363,6 @@
                                  ; org-create-route
                                  ; board-create-route
                                  ; ; board-logo-setup-route
-                                 ; logout-route
                                  ; board-settings-route
                                  team-settings-route
                                  board-route
