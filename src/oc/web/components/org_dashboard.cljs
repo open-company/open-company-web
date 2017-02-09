@@ -31,7 +31,7 @@
     (let [org-slug (keyword (router/current-org-slug))
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data)]
-      (when (and (get-in (om/get-props owner) (dis/board-new-topics-key org-slug board-slug))
+      (when (and (not (get-in (om/get-props owner) (dis/board-new-topics-key org-slug board-slug)))
                  (seq board-data))
         (om/update-state! owner :new-topics-requested not)
         (utils/after 1000 #(api/get-new-topics))))))
