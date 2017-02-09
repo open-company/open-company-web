@@ -11,46 +11,7 @@
 (defn print-app-state []
   (js/console.log @app-state))
 
-;; Derived Data ================================================================
-
-(defn drv-spec [db route-db]
-  {:base               [[] db]
-   :route              [[] route-db]
-   :company-slug       [[:route] (fn [route] (:slug route))]
-   :su-share           [[:base] (fn [base] (:su-share base))]
-   :su-list            [[:base :company-slug] (fn [base company-slug]
-                                                (when company-slug
-                                                  (-> company-slug keyword base :su-list :collection :stakeholder-updates)))]
-   :user-management    [[:base] (fn [base]
-                                 {:um-invite (:um-invite base)
-                                  :enumerate-users (:enumerate-users base)
-                                  :um-domain-invite (:um-domain-invite base)
-                                  :invite-by-email-error (:invite-by-email-error base)
-                                  :add-email-domain-team-error (:add-email-domain-team-error base)})]
-   :jwt                [[:base] (fn [base] (:jwt base))]
-   :current-user-data  [[:base] (fn [base] (:current-user-data base))]
-   :subscription       [[:base] (fn [base] (:subscription base))]
-   :show-login-overlay [[:base] (fn [base] (:show-login-overlay base))]
-   :rum-popover-data   [[:base] (fn [base] (:rum-popover-data base))]
-   :company-data       [[:base :company-slug] (fn [base company-slug]
-                                                (when company-slug
-                                                  (-> company-slug keyword base :company-data)))]})
-
-;; Action Loop =================================================================
-
-(defmulti action (fn [db [action-type & _]] action-type))
-
-(def actions (flux/dispatcher))
-
-(def actions-dispatch
-  (flux/register
-   actions
-   (fn [payload]
-     ;; (prn payload) ; debug :)
-     (swap! app-state action payload))))
-
-(defn dispatch! [payload]
-  (flux/dispatch actions payload))
+;; Data key paths
 
 (def companies-key [:companies])
 
@@ -59,6 +20,15 @@
 
 (defn board-data-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :board-data])
+
+(defn board-cache-key [org-slug board-slug]
+  [(keyword org-slug) (keyword board-slug) :cache])
+
+(defn board-new-topics-key [org-slug board-slug]
+  [(keyword org-slug) (keyword board-slug) :new-topics])
+
+(defn board-new-categories-key [org-slug board-slug]
+  [(keyword org-slug) (keyword board-slug) :new-categories])
 
 (defn board-topic-key [org-slug board-slug topic-slug]
   (conj (board-data-key org-slug board-slug) (keyword topic-slug)))
@@ -81,6 +51,65 @@
 (defn revision-key [slug topic as-of]
   (vec (conj (topic-revisions-key slug topic) (str as-of))))
 
+;; Derived Data ================================================================
+
+(defn drv-spec [db route-db]
+  {:base                [[] db]
+   :route               [[] route-db]
+   :org-slug            [[:route] (fn [route] (:org route))]
+   :board-slug          [[:route] (fn [route] (:board route))]
+   :su-share            [[:base] (fn [base] (:su-share base))]
+   :su-list             [[:base :company-slug]
+                          (fn [base company-slug]
+                            (when company-slug
+                              (-> company-slug keyword base :su-list :collection :stakeholder-updates)))]
+   :user-management     [[:base]
+                          (fn [base]
+                            {:um-invite (:um-invite base)
+                             :enumerate-users (:enumerate-users base)
+                             :um-domain-invite (:um-domain-invite base)
+                             :invite-by-email-error (:invite-by-email-error base)
+                             :add-email-domain-team-error (:add-email-domain-team-error base)})]
+   :jwt                 [[:base] (fn [base] (:jwt base))]
+   :current-user-data   [[:base] (fn [base] (:current-user-data base))]
+   :subscription        [[:base] (fn [base] (:subscription base))]
+   :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
+   :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
+   :org-data            [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when org-slug
+                              (get-in base (org-data-key org-slug))))]
+   :board-new-topics    [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (get-in base (board-new-topics-key org-slug board-slug))))]
+   :board-new-categories [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (get-in base (board-new-categories-key org-slug board-slug))))]
+   :board-data          [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (get-in base (board-data-key org-slug board-slug))))]})
+
+;; Action Loop =================================================================
+
+(defmulti action (fn [db [action-type & _]] action-type))
+
+(def actions (flux/dispatcher))
+
+(def actions-dispatch
+  (flux/register
+   actions
+   (fn [payload]
+     ;; (prn payload) ; debug :)
+     (swap! app-state action payload))))
+
+(defn dispatch! [payload]
+  (flux/dispatch actions payload))
+
+;; Data
+
 (defn org-data
   ([]
     (org-data @app-state))
@@ -98,6 +127,18 @@
     (board-data data org-slug (router/current-board-slug)))
   ([data org-slug board-slug]
     (get-in data (board-data-key org-slug board-slug))))
+
+(defn board-cache
+  ([]
+    (board-cache @app-state))
+  ([data]
+    (board-cache data (router/current-org-slug) (router/current-board-slug)))
+  ([data org-slug]
+    (board-cache data org-slug (router/current-board-slug)))
+  ([data org-slug board-slug]
+    (get-in data (board-cache-key org-slug board-slug)))
+  ([data org-slug board-slug k]
+    (get-in data (conj (board-cache-key org-slug board-slug) k))))
 
 (defn latest-stakeholder-update
   ([]

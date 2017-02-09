@@ -13,7 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.topic-view :refer (topic-view)]
-            ; [open-company-web.components.add-topic :refer (add-topic)]
+            [oc.web.components.add-topic :refer (add-topic)]
             [oc.web.components.bw-topics-list :refer (bw-topics-list)]))
 
 (def topic-margins 20)
@@ -202,13 +202,13 @@
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             (cond
-              ; (and is-dashboard
-              ;      (not (responsive/is-mobile-size?))
-              ;      (not selected-topic-view)
-              ;      show-add-topic)
-              ; (dom/div {:class "add-topic-container"
-              ;           :style {:margin-right (str (- topic-view-width 660) "px")}}
-              ;   (add-topic (partial update-active-topics owner)))
+              (and is-dashboard
+                   (not (responsive/is-mobile-size?))
+                   (not selected-topic-view)
+                   show-add-topic)
+              (dom/div {:class "add-topic-container"
+                        :style {:margin-right (str (- topic-view-width 660) "px")}}
+                (add-topic (partial update-active-topics owner)))
               (and is-dashboard
                    (not (responsive/is-mobile-size?))
                    selected-topic-view)

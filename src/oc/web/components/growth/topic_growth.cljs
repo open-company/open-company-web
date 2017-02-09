@@ -5,7 +5,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]
-            [oc.web.caches :refer (company-cache)]
             [oc.web.lib.growth-utils :as growth-utils]
             ; [open-company-web.components.growth.growth-edit :refer (growth-edit)]
             [oc.web.components.growth.growth-sparklines :refer (growth-sparklines)]
@@ -21,7 +20,7 @@
    :unit "number"})
 
 (defn- switch-focus [owner focus options]
-  (utils/company-cache-key focus-cache-key focus)
+  (dis/dispatch! [:set-board-cache! focus-cache-key focus])
   (om/set-state! owner :focus focus)
   (when (fn? (:switch-metric-cb options))
     ((:switch-metric-cb options) focus)))
@@ -69,8 +68,8 @@
     (om/set-state! owner :growth-metric-slugs metric-slugs) ; update valid slugs state
     (om/set-state! owner :growth-metrics (metrics-map fewer-metrics))
     ;; if last focus is the removing metric, remove the last focus cache
-    (when (= (utils/company-cache-key focus-cache-key) metric-slug)
-      (utils/remove-company-cache-key focus-cache-key))
+    (when (= (get (dis/board-cache) focus-cache-key) metric-slug)
+      (dis/dispatch! [:set-board-cache! focus-cache-key nil]))
     (hide-popover nil "archive-metric-confirm")
     (dis/dispatch! [:foce-input {:metrics fewer-metrics}])
     ((om/get-props owner :data-topic-on-change))
@@ -142,7 +141,7 @@
         all-metrics (:metrics topic-data)
         metrics (if initial (metrics-map all-metrics) (om/get-state owner :growth-metrics))
         first-metric (:slug (first (:metrics topic-data)))
-        last-focus (utils/company-cache-key focus-cache-key)
+        last-focus (get (dis/board-cache) focus-cache-key)
         focus (if initial
                 (or (:selected-metric data) last-focus first-metric)
                 (om/get-state owner :focus)) ; preserve focus if this is for will-update

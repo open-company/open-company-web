@@ -97,18 +97,17 @@
                    :on-click #(when (nil? (:foce-key data))
                                 (dis/dispatch! [:show-add-topic false])
                                 (router/nav! (oc-urls/board)))} "TOPICS"))
-        ; (when (and (not (responsive/is-tablet-or-mobile?))
-        ;            (not show-add-topic)
-        ;            (not (:read-only board-data)))
-        ;   (dom/button {:class "left-topics-list-top-title btn-reset right"
-        ;                :on-click #(when (nil? (:foce-key data))
-        ;                             (dis/dispatch! [:show-add-topic true]))
-        ;                :title "Add a topic"
-        ;                :data-placement "top"
-        ;                :data-toggle "tooltip"
-        ;                :data-container "body"}
-        ;     (dom/i {:class "fa fa-plus-circle"})))
-        )
+        (when (and (not (responsive/is-tablet-or-mobile?))
+                   (not show-add-topic)
+                   (not (:read-only board-data)))
+          (dom/button {:class "left-topics-list-top-title btn-reset right"
+                       :on-click #(when (nil? (:foce-key data))
+                                    (dis/dispatch! [:show-add-topic true]))
+                       :title "Add a topic"
+                       :data-placement "top"
+                       :data-toggle "tooltip"
+                       :data-container "body"}
+            (dom/i {:class "fa fa-plus-circle"}))))
       (dom/div {:class (str "left-topics-list-items group" (when (:read-only board-data) " read-only"))}
         (for [topic topics
               :let [sd (->> topic keyword (get board-data))]

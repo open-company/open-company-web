@@ -3,7 +3,6 @@
             [clojure.string :as string]
             [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
-            [oc.web.caches :as cache]
             [oc.web.router :as router]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
@@ -106,13 +105,11 @@
 
 (defmethod dispatcher/action :new-topic [db [_ body]]
   (if body
-    (let [response (:response body)]
-      (swap! cache/new-topics assoc-in [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :new-topics] (:templates response))
-      (swap! cache/new-topics assoc-in [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :new-topics-categories] (:categories response))
-      ;; signal to the app-state that the new-topics have been loaded
-      (-> db
-        (assoc-in [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :new-topics] (:templates response))
-        (dissoc :loading)))
+    ;; signal to the app-state that the new-topics have been loaded
+    (-> db
+      (assoc-in (dispatcher/board-new-topics-key (router/current-org-slug) (router/current-board-slug)) (:templates (:response body)))
+      (assoc-in (dispatcher/board-new-categories-key (router/current-org-slug) (router/current-board-slug)) (:categories (:response body)))
+      (dissoc :loading))
     db))
 
 (defmethod dispatcher/action :auth-settings [db [_ body]]
@@ -134,7 +131,6 @@
           assoc-in-coll [(:slug body) (:topic body) (:as-of body)]
           assoc-in-coll-2 (dispatcher/revision-key (:slug body) (:topic body) (:as-of body))
           next-db (assoc-in db assoc-in-coll-2 true)]
-      (swap! cache/revisions assoc-in assoc-in-coll fixed-topic)
       next-db)
     db))
 
@@ -771,3 +767,10 @@
   [db [_]]
   (api/refresh-slack-user)
   db)
+
+(defmethod dispatcher/action :set-board-cache!
+  [db [_ k v]]
+  (let [cache-key (dispatcher/board-cache-key (router/current-org-slug) (router/current-board-slug))]
+    (if (nil? v)
+      (update-in db cache-key dissoc k)
+      (assoc-in db (conj cache-key k) v))))

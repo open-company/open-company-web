@@ -13,8 +13,7 @@
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
-            [oc.web.caches :refer (revisions)]))
+            [oc.web.lib.raven :as sentry]))
 
 (def ^:private api-endpoint ls/api-server-domain)
 
@@ -267,7 +266,6 @@
 (defn load-revision
   [revision slug topic]
     (when revision
-      (swap! revisions assoc-in [slug (keyword topic) (:created-at revision)] :loading)
       (api-get (:href revision)
         {:headers {
           ; required by Chrome

@@ -12,7 +12,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.components.topics-list :refer (topics-list)]
-            [oc.web.caches :as caches]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.footer :refer (footer)]
@@ -32,7 +31,7 @@
     (let [org-slug (keyword (router/current-org-slug))
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data)]
-      (when (and (empty? (get (get @caches/new-topics board-slug) org-slug))
+      (when (and (get-in (om/get-props owner) (dis/board-new-topics-key org-slug board-slug))
                  (seq board-data))
         (om/update-state! owner :new-topics-requested not)
         (utils/after 1000 #(api/get-new-topics))))))

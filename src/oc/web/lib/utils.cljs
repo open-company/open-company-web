@@ -16,7 +16,6 @@
             [oc.web.caches :as caches]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.iso4217 :refer (iso4217)]
-            [oc.web.caches :refer (company-cache)]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
@@ -316,14 +315,6 @@
 (defn px [n]
   (str n "px"))
 
-(defn select-topic-data [topic-data topic as-of]
-  (when (and topic-data topic (or as-of (:placeholder topic-data)))
-    (let [slug (keyword (router/current-board-slug))]
-      (if (or (not (contains? (slug @caches/revisions) topic))
-              (= as-of (:created-at topic-data)))
-        topic-data
-        (((keyword topic) (slug @caches/revisions)) as-of)))))
-
 (def quarterly-input-format (cljs-time-format/formatter "YYYY-MM"))
 (def monthly-input-format (cljs-time-format/formatter "YYYY-MM"))
 (def weekly-input-format (cljs-time-format/formatter "YYYY-MM-dd"))
@@ -489,23 +480,6 @@
         (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date))))
       ;; Default tp monthly
       (str year "-" (add-zero month)))))
-
-(defn company-cache-key [k & [v]]
-  (let [org-slug (keyword (router/current-org-slug))
-        board-slug (keyword (router/current-board-slug))
-        cc (board-slug (org-slug @company-cache))]
-    (when v
-      (swap! company-cache assoc-in [org-slug board-slug k] v))
-    (get cc k nil)))
-
-(defn remove-company-cache-key [k]
-  (let [org-slug (keyword (router/current-org-slug))
-        board-slug (keyword (router/current-board-slug))
-        cc (board-slug (org-slug @company-cache))]
-    (swap! company-cache update-in [org-slug board-slug] dissoc k)))
-
-(defn clean-org-caches []
-  (reset! company-cache {}))
 
 (defn thousands-separator
   ([number]

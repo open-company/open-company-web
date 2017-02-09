@@ -49,7 +49,7 @@
                 :target target}))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+; (defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -75,8 +75,6 @@
 ;; home
 (defn home-handler [target params]
   (pre-routing (:query-params params))
-  ;; clean the caches
-  (utils/clean-org-caches)
   ;; save route
   (router/set-route! ["home"] {})
   (when (jwt/jwt)
@@ -89,8 +87,6 @@
 ; ;; Orgs list
 (defn list-orgs-handler [target params]
   (pre-routing (:query-params params))
-  ;; clean the caches
-  (utils/clean-org-caches)
   ;; save route
   (router/set-route! ["orgs"] {})
   ;; load data from api
@@ -104,8 +100,6 @@
   (let [org (:org (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
-    ;; clean the caches
-    (utils/clean-org-caches)
     ;; save route
     (router/set-route! [org "boards"] {:org org})
     ;; load data from api
@@ -117,7 +111,6 @@
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
   (pre-routing (:query-params params))
-  (utils/clean-org-caches)
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -134,7 +127,6 @@
 
 (defn simple-handler [component route-name target params]
   (pre-routing (:query-params params))
-  (utils/clean-org-caches)
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -160,7 +152,6 @@
         query-params (:query-params params)]
     (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6))
     (pre-routing query-params)
-    (utils/clean-org-caches)
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
     (when (contains? (:query-params params) :access)
@@ -185,7 +176,6 @@
   (let [team-id (:team-id (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
-    (utils/clean-org-caches)
     ;; save the route
     (router/set-route! [team-id route] {:team-id team-id :query-params query-params})
     (when (contains? (:query-params params) :access)
@@ -203,7 +193,6 @@
 ;         query-params (:query-params params)
 ;         su-key (dis/stakeholder-update-key slug update-slug)]
 ;     (pre-routing query-params)
-;     (utils/clean-org-caches)
 ;     ;; save the route
 ;     (router/set-route! [slug "su-snapshot" "updates" update-date update-slug update-topic] {:slug slug :update-slug update-slug :update-date update-date :query-params query-params :topic update-topic})
 ;     ;; do we have the company data already?
@@ -234,14 +223,12 @@
       (simple-handler pricing "pricing" target params))
 
     ; (defroute email-confirmation-route urls/email-confirmation {:as params}
-    ;   (utils/clean-org-caches)
     ;   (pre-routing (:query-params params))
     ;   (drv-root email-confirmation target))
 
     ; (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
     ;   (when (jwt/jwt)
     ;     (router/redirect! urls/home))
-    ;   (utils/clean-org-caches)
     ;   (pre-routing query-params)
     ;   (router/set-route! ["confirm-invitation"] {:query-params query-params})
     ;   (drv-root confirm-invitation target))
@@ -279,7 +266,6 @@
     ;         board (:board (:params params))
     ;         query-params (:query-params params)]
     ;     (pre-routing query-params)
-    ;     (utils/clean-org-caches)
     ;     ;; save the route
     ;     (router/set-route! [org company "settings" "logo"] {:org org :board board :query-params query-params})
     ;     ;; do we have the company data already?
@@ -300,7 +286,6 @@
     (defroute user-profile-route urls/user-profile {:as params}
       (when-not (jwt/jwt)
         (router/redirect! urls/home))
-      (utils/clean-org-caches)
       (pre-routing (:query-params params))
       (if (jwt/is-slack-org?)
         (drv-root #(om/component (user-profile)) target)
@@ -400,5 +385,5 @@
     (router/setup-navigation! handle-url-change route-dispatch!)))
 
 (defn on-js-reload []
-  (.clear js/console)
+  ; (.clear js/console)
   (route-dispatch! (router/get-token)))

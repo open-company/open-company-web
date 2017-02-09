@@ -11,7 +11,6 @@
             [dommy.core :as dommy :refer-macros (sel sel1)]
             [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
-            [oc.web.caches :as caches]
             [oc.web.router :as router]
             [oc.web.lib.raven :as sentry]
             [oc.web.dispatcher :as dispatcher]
