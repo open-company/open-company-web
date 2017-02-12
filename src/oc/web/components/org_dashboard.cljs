@@ -144,8 +144,10 @@
     (let [org-slug (keyword (router/current-org-slug))
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)]
-      (if (:loading data)
+          total-width-int (responsive/total-layout-width-int card-width columns-num)
+          board-error (get-in data (dis/board-access-error-key (router/current-org-slug) (router/current-board-slug)))]
+      (if (or (not (dis/org-data))
+              (not (dis/board-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
@@ -158,10 +160,10 @@
                                                               (not (nil? (:show-top-menu data))))
                                            :main-scroll true})}
           (when (and (not (utils/is-test-env?))
-                     (get-in data [(keyword (router/current-board-slug)) :error]))
+                     board-error)
             ;show login overlays if needed
             (login-overlays-handler))
-          (if (get-in data [(keyword (router/current-board-slug)) :error])
+          (if board-error
             (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
               (login-required data)
               ;;Footer
