@@ -247,7 +247,9 @@
       (home-handler target params))
 
     (defroute org-list-route urls/orgs {:as params}
-      (list-orgs-handler target params))
+      (if (jwt/jwt)
+        (list-orgs-handler target params)
+        (login-handler target params)))
 
     (defroute org-create-route urls/create-org {:as params}
       (if (jwt/jwt)
