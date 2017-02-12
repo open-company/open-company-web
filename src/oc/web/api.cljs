@@ -227,15 +227,10 @@
           topic (keyword (:topic topic-data))
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
           json-data (cljs->json cleaned-topic-data)
-          topic-link (utils/link-for links (if (:new topic-data) "create" "update") "PUT")]
-      (api-put (:href topic-link)
+          topic-link (utils/link-for links "create" "POST")]
+      (api-post (:href topic-link)
         { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type topic-link)
-          }}
+          :headers (headers-for-link topic-link)}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (dispatcher/dispatch! [:topic {:body body :topic topic :slug (keyword slug)}])))))))
