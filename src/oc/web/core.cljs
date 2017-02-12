@@ -79,6 +79,7 @@
   (router/set-route! ["home"] {})
   (when (jwt/jwt)
     ;; load data from api
+    (api/get-auth-settings)
     (api/get-entry-point)
     (swap! dis/app-state assoc :loading true))
   ;; render component
@@ -91,6 +92,7 @@
   (router/set-route! ["orgs"] {})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
+  (api/get-auth-settings)
   (api/get-entry-point)
   ;; render component
   (drv-root list-orgs target))
@@ -104,6 +106,7 @@
     (router/set-route! [org "boards"] {:org org})
     ;; load data from api
     (swap! dis/app-state merge {:loading true})
+    (api/get-auth-settings)
     (api/get-entry-point)
     ;; render component
     (drv-root #(om/component) target)))
@@ -114,6 +117,7 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-auth-settings)
       (api/get-entry-point))
     (do
       (router/set-route! ["login"] {:query-params (:query-params params)})
@@ -130,6 +134,7 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (api/get-auth-settings)
       (api/get-entry-point))
     (do
       (when (contains? (:query-params params) :login-redirect)
@@ -161,6 +166,7 @@
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
+      (api/get-auth-settings)
       (api/get-entry-point)
       (reset! dis/app-state (-> @dis/app-state
                                (assoc :loading true)
@@ -248,6 +254,7 @@
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-org"] {:query-params (:query-params params)})
+          (api/get-auth-settings)
           (api/get-entry-point)
           (drv-root org-editor target))
         (login-handler target params)))
@@ -257,6 +264,7 @@
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-board"] {:query-params (:query-params params)})
+          (api/get-auth-settings)
           (api/get-entry-point)
           (drv-root board-editor target))
         (login-handler target params)))
