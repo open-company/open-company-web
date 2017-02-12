@@ -188,7 +188,7 @@
           with-already-loaded))
     (= 401 status)
     (-> db
-        (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) :error) :forbidden)
+        (assoc-in (dispatcher/board-access-error-key (router/current-org-slug) (router/current-board-slug)) :forbidden)
         (dissoc :loading))
     (= 404 status)
     (do
