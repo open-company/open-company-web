@@ -24,6 +24,9 @@
 (defn board-cache-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :cache])
 
+(defn board-access-error-key [org-slug board-slug]
+  [(keyword org-slug) (keyword board-slug) :error])
+
 (defn board-new-topics-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :new-topics])
 
