@@ -176,18 +176,18 @@
         ; no changes, so dispatch the current url
         (@router/route-dispatcher (router/get-token)))))
 
-(defn- delete-revision-click [owner e]
-  (add-popover {:container-id "delete-revision-confirm"
-                :message utils/before-removing-revision-message
+(defn- delete-entry-click [owner e]
+  (add-popover {:container-id "delete-entry-confirm"
+                :message utils/before-removing-entry-message
                 :height "130px"
                 :cancel-title "KEEP IT"
-                :cancel-cb #(hide-popover nil "delete-revision-confirm")
+                :cancel-cb #(hide-popover nil "delete-entry-confirm")
                 :success-title "DELETE"
                 :success-cb #(let [topic (dis/foce-topic-key)
-                                   revisions (dis/topic-revisions-data topic)]
-                               (dis/dispatch! [:delete-revision topic (:created-at (dis/foce-topic-data))])
-                               (hide-popover nil "delete-revision-confirm")
-                               (when (= (count revisions) 1)
+                                   entries (dis/topic-entries-data topic)]
+                               (dis/dispatch! [:delete-entry topic (:created-at (dis/foce-topic-data))])
+                               (hide-popover nil "delete-entry-confirm")
+                               (when (= (count entries) 1)
                                   (router/nav! (oc-urls/board))))}))
 
 (defn- add-image-tooltip [image-header]
@@ -558,5 +558,5 @@
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (nil? file-upload-state) "block" "none")}
-                           :on-click (partial delete-revision-click owner)}
+                           :on-click (partial delete-entry-click owner)}
                   (dom/i {:class "fa fa-trash"}))))))))))

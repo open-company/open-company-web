@@ -285,31 +285,31 @@
         with-fixed-topics (merge with-read-only topics)]
     with-fixed-topics))
 
-(defn sort-revisions [revisions]
+(defn sort-entries [entries]
   (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
-    (vec (sort sort-pred revisions))))
+    (vec (sort sort-pred entries))))
 
-(defn revision-next
-  "Return the first future revision"
-  [revisions as-of]
-  (when (pos? (count revisions))
+(defn entry-next
+  "Return the first future entry"
+  [entries as-of]
+  (when (pos? (count entries))
     (first (remove nil? (map
                           (fn [r]
                             (when (= (:created-at r) as-of)
-                              (let [idx (.indexOf (to-array revisions) r)]
-                                (get revisions (inc idx)))))
-                          revisions)))))
+                              (let [idx (.indexOf (to-array entries) r)]
+                                (get entries (inc idx)))))
+                          entries)))))
 
-(defn revision-prev
-  "Return the first future revision"
-  [revisions as-of]
-  (when (pos? (count revisions))
+(defn entry-prev
+  "Return the first future entry"
+  [entries as-of]
+  (when (pos? (count entries))
     (first (remove nil? (map
                           (fn [r]
                             (when (= (:created-at r) as-of)
-                              (let [idx (.indexOf (to-array revisions) r)]
-                                (get revisions (dec idx)))))
-                          revisions)))))
+                              (let [idx (.indexOf (to-array entries) r)]
+                                (get entries (dec idx)))))
+                          entries)))))
 
 (defn px [n]
   (str n "px"))
@@ -785,7 +785,7 @@
     with-metrics))
 
 (def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
-(def before-removing-revision-message "Are you sure you want to delete this entry?")
+(def before-removing-entry-message "Are you sure you want to delete this entry?")
 
 (defn sum-revenues [finances-data]
   (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)

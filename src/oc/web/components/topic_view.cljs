@@ -28,21 +28,21 @@
                                (hide-popover nil "archive-topic-confirm")
                                (router/nav! (oc-urls/board)))}))
 
-(defn load-revisions [owner]
+(defn load-entries [owner]
   (when-let* [topic-name (om/get-props owner :selected-topic-view)
                 board-data (om/get-props owner :board-data)
                 topic-data (->> topic-name keyword (get board-data))
-                revisions-link (utils/link-for (:links topic-data) "collection" "GET")]
-    ; Do not request old revisions if there is the :new key
+                entries-link (utils/link-for (:links topic-data) "collection" "GET")]
+    ; Do not request old entries if there is the :new key
     ; since it was newly added from the add topic component
     ; and also it's not an archived topic being reactivated
     (when-not (:placeholder topic-data)
-      (om/set-state! owner :revisions-requested true)
-      (api/load-revisions topic-name revisions-link))))
+      (om/set-state! owner :entries-requested true)
+      (api/load-entries topic-name entries-link))))
 
-(defn load-revisions-if-needed [owner]
-  (when (not (om/get-state owner :revisions-requested))
-    (load-revisions owner)))
+(defn load-entries-if-needed [owner]
+  (when (not (om/get-state owner :entries-requested))
+    (load-entries owner)))
 
 (defn start-foce-if-needed [{:keys [foce-key
                                     board-data
@@ -71,26 +71,26 @@
                                   foce-data
                                   foce-data-editing?] :as data} owner options]
   (init-state [_]
-    {:revisions-requested false})
+    {:entries-requested false})
 
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
-    (load-revisions-if-needed owner)
+    (load-entries-if-needed owner)
     (start-foce-if-needed owner)
-    (om/set-state! owner :revisions-reload-interval (js/setInterval #(load-revisions owner) (* 60 1000))))
+    (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000))))
 
   (will-update [_ next-props _]
     (start-foce-if-needed next-props)
     (when (not= (:selected-topic-view next-props) selected-topic-view)
-      (om/set-state! owner :revisions-requested false)))
+      (om/set-state! owner :entries-requested false)))
 
   (did-update [_ _ _]
-    (load-revisions-if-needed owner)
+    (load-entries-if-needed owner)
     (start-foce-if-needed owner))
 
   (will-unmount [_]
-    (when (om/get-state owner :revisions-reload-interval)
-      (js/clearInterval (om/get-state owner :revisions-reload-interval))))
+    (when (om/get-state owner :entries-reload-interval)
+      (js/clearInterval (om/get-state owner :entries-reload-interval))))
 
   (render [_]
     (let [topic-kw (keyword selected-topic-view)
@@ -98,7 +98,7 @@
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get board-data topic-kw)
           is-custom-topic (s/starts-with? (:topic topic-data) "custom-")
-          revisions (:revisions-data topic-data)
+          entries (:entries-data topic-data)
           is-new-foce (and (= foce-key topic-kw) (nil? (:created-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:created-at foce-data))))
           loading-topic-data (and (contains? board-data topic-kw)
@@ -151,12 +151,12 @@
                         (dom/span {:class "new-entry"} "Start a new entry...")))
                     :else
                     (om/build loading {:loading true}))))
-              ;; Render the topic from the board data only until the revisions are loaded.
+              ;; Render the topic from the board data only until the entries are loaded.
               (when (and (not foce-key)
-                         (not revisions)
+                         (not entries)
                          (not (:placeholder topic-data))
                          (utils/in? (:topics board-data) selected-topic-view))
-                (dom/div {:class "revision-container group"}
+                (dom/div {:class "entry-container group"}
                   (om/build topic {:topic selected-topic-view
                                    :topic-data topic-data
                                    :card-width (- topic-card-width 60)
@@ -169,10 +169,10 @@
                                    :foce-data foce-data
                                    :show-editing false}
                                    {:opts {:topic-name selected-topic-view}})))
-              (for [idx (range (count revisions))
-                    :let [rev (get revisions idx)]]
+              (for [idx (range (count entries))
+                    :let [rev (get entries idx)]]
                 (when rev
-                  (dom/div {:class "revision-container group"}
+                  (dom/div {:class "entry-container group"}
                     (when-not (= idx 0)
                       (dom/hr {:class "separator-line"
                                :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))

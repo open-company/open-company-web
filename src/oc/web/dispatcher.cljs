@@ -45,14 +45,14 @@
 (defn stakeholder-update-key [company-slug update-slug]
   [(keyword company-slug) (keyword update-slug)])
 
-(defn revisions-key [org-slug board-slug]
-  [(keyword org-slug) :boards (keyword board-slug) :revisions-data])
+(defn entries-key [org-slug board-slug]
+  [(keyword org-slug) :boards (keyword board-slug) :entries-data])
 
-(defn topic-revisions-key [org-slug board-slug topic-slug]
-  (vec (conj (revisions-key org-slug board-slug) (keyword topic-slug))))
+(defn topic-entries-key [org-slug board-slug topic-slug]
+  (vec (conj (entries-key org-slug board-slug) (keyword topic-slug))))
 
-(defn revision-key [org-slug board-slug topic-slug as-of]
-  (vec (conj (topic-revisions-key org-slug board-slug topic-slug) (str as-of))))
+(defn entry-key [org-slug board-slug topic-slug as-of]
+  (vec (conj (topic-entries-key org-slug board-slug topic-slug) (str as-of))))
 
 ;; Derived Data ================================================================
 
@@ -170,19 +170,19 @@
 (defn force-edit-topic []
   (:force-edit-topic @app-state))
 
-(defn revision
-  ([org-slug board-slug topic-slug as-of] (revision org-slug board-slug topic-slug as-of @app-state))
-  ([org-slug board-slug topic-slug as-of data] (get-in data (revision-key org-slug board-slug topic-slug as-of))))
+(defn entry
+  ([org-slug board-slug topic-slug as-of] (entry org-slug board-slug topic-slug as-of @app-state))
+  ([org-slug board-slug topic-slug as-of data] (get-in data (entry-key org-slug board-slug topic-slug as-of))))
 
-(defn revisions
-  ([] (revisions (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug board-slug] (revisions org-slug board-slug @app-state))
-  ([org-slug board-slug data] (get-in data (revisions-key org-slug board-slug))))
+(defn entries
+  ([] (entries (router/current-org-slug) (router/current-board-slug)))
+  ([org-slug board-slug] (entries org-slug board-slug @app-state))
+  ([org-slug board-slug data] (get-in data (entries-key org-slug board-slug))))
 
-(defn topic-revisions-data
-  ([topic-slug] (topic-revisions-data (router/current-org-slug) (router/current-board-slug) topic-slug))
-  ([org-slug board-slug topic-slug] (topic-revisions-data org-slug board-slug topic-slug @app-state))
-  ([org-slug board-slug topic-slug data] (get-in data (topic-revisions-key org-slug board-slug topic-slug))))
+(defn topic-entries-data
+  ([topic-slug] (topic-entries-data (router/current-org-slug) (router/current-board-slug) topic-slug))
+  ([org-slug board-slug topic-slug] (topic-entries-data org-slug board-slug topic-slug @app-state))
+  ([org-slug board-slug topic-slug data] (get-in data (topic-entries-key org-slug board-slug topic-slug))))
 
 (defn foce-topic-key []
   (:foce-key @app-state))

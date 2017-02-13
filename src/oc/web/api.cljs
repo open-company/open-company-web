@@ -178,7 +178,7 @@
 
 (defn patch-company [slug data]
   (when data
-    (let [company-data (dissoc data :links :read-only :revisions :su-list :su-list-loaded :revisions :topic)
+    (let [company-data (dissoc data :links :read-only :entries :su-list :su-list-loaded :entries :topic)
           json-data (cljs->json company-data)
           links (:links (dispatcher/board-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
@@ -203,17 +203,17 @@
         (dispatcher/dispatch! [:auth-settings body])))))
 
 (def topic-private-keys [:topic
-                         :revisions
+                         :entries
                          :author
                          :links
                          :loading
                          :as-of
                          :read-only
-                         :revisions-cache
+                         :entries-cache
                          :title-placeholder
                          :body-placeholder
                          :oc-editing
-                         :revisions-data
+                         :entries-data
                          :new
                          :placeholder
                          :was-archived
@@ -241,12 +241,12 @@
               (dispatcher/dispatch! [:topic-entry {:body body :topic topic :created-at (:created-at body)}])
               (dispatcher/dispatch! [:topic {:body body :topic topic}]))))))))
 
-(defn load-revisions [topic revisions-link]
-  (when (and topic revisions-link)
-    (api-get (:href revisions-link)
-      {:headers (headers-for-link revisions-link)}
+(defn load-entries [topic entries-link]
+  (when (and topic entries-link)
+    (api-get (:href entries-link)
+      {:headers (headers-for-link entries-link)}
       (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:revisions-loaded {:topic topic :revisions (if success (json->cljs body) {})}])))))
+        (dispatcher/dispatch! [:entries-loaded {:topic topic :entries (if success (json->cljs body) {})}])))))
 
 (defn partial-update-topic
   "PATCH a topic, dispatching the results with a `:topic` action."
@@ -262,7 +262,7 @@
           :headers (headers-for-link partial-update-link)}
         (fn [response]
           (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (load-revisions topic (utils/link-for (:links body) "entries")))))))))
+            (load-entries topic (utils/link-for (:links body) "entries")))))))))
 
 (defn update-finances-data[finances-data]
   (when finances-data
@@ -541,9 +541,9 @@
             (dispatcher/dispatch! [:user-data (json->cljs body)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
 
-(defn delete-revision [topic revision-data]
-  (when (and topic revision-data)
-    (let [links (:links revision-data)
+(defn delete-entry [topic entry-data]
+  (when (and topic entry-data)
+    (let [links (:links entry-data)
           delete-link (utils/link-for links "delete")]
       (when delete-link
         (api-delete (:href delete-link)

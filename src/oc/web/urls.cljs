@@ -106,10 +106,10 @@
   ([board-slug topic-slug] (topic (router/current-org-slug) board-slug topic-slug))
   ([org-slug board-slug topic-slug] (str (board org-slug board-slug) "/" (name topic-slug))))
 
-(defn topic-revision
+(defn topic-entry
   ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
-  ([revision] (str (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)) "?as-of=" revision))
-  ([org-slug board-slug topic-slug revision] (str (topic org-slug board-slug topic-slug) "?as-of=" revision)))
+  ([entry] (str (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)) "?as-of=" entry))
+  ([org-slug board-slug topic-slug entry] (str (topic org-slug board-slug topic-slug) "?as-of=" entry)))
 
 ;; Stakeholder update
 

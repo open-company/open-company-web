@@ -32,7 +32,7 @@
   (router/redirect! "/")
   (dissoc db :jwt))
 
-(defmethod dispatcher/action :entry [db [_ {:keys [collection]}]]
+(defmethod dispatcher/action :entry-point [db [_ {:keys [collection]}]]
   (let [orgs (:items collection)]
     (cond
       ; If i have an org slug let's load the org data
@@ -126,18 +126,25 @@
     (utils/after 2000 #(api/get-auth-settings)))
   (assoc db :auth-settings body))
 
-(defmethod dispatcher/action :revision [db [_ body]]
+(defmethod dispatcher/action :entry [db [_ body]]
   (if body
-    (let [fixed-topic (utils/fix-topic (:body body) (:topic body) true)
-          assoc-in-coll [(:slug body) (:topic body) (:as-of body)]
-          assoc-in-coll-2 (dispatcher/revision-key (:slug body) (:topic body) (:as-of body))
-          next-db (assoc-in db assoc-in-coll-2 true)]
+    (let [fixed-topic (utils/fix-topic (:body body) (:topic-slug body) true)
+          assoc-in-coll (dispatcher/entry-key (:org-slug body) (:board-slug body) (:topic-slug body) (:as-of body))
+          next-db (assoc-in db assoc-in-coll true)]
       next-db)
     db))
 
-(defmethod dispatcher/action :topic [db [_ {:keys [slug topic body]}]]
-  ;; Refresh topic revisions
-  (api/load-revisions topic (utils/link-for (:links body) "entries"))
+(defmethod dispatcher/action :topic [db [_ {:keys [topic body]}]]
+  ;; Refresh topic entries
+  (api/load-entries topic (utils/link-for (:links body) "collection"))
+  (if body
+    (let [fixed-topic (utils/fix-topic body topic)]
+      (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
+    db))
+
+(defmethod dispatcher/action :topic-entry [db [_ {:keys [topic body created-at]}]]
+  ;; Refresh topic entries
+  ; (let [current-entries ])
   (if body
     (let [fixed-topic (utils/fix-topic body topic)]
       (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
@@ -152,8 +159,8 @@
           updated-body (utils/fix-topics body)
           board-data-key (dispatcher/board-data-key org board)
           board-topics-key (conj board-data-key :topics)
-          topic-revisions-data-key (when (:selected-topic-view db)
-                                        (concat board-data-key [(keyword (:selected-topic-view db)) :revisions-data]))
+          topic-entries-data-key (when (:selected-topic-view db)
+                                      (dispatcher/topic-entries-key org board (keyword (:selected-topic-view db))))
           board-editing-topic-key (when (:foce-key db) (conj board-data-key (keyword (:foce-key db))))
           board-already-loaded-key (conj board-data-key :board-data-loaded)
           already-loaded? (get-in db board-already-loaded-key)
@@ -177,10 +184,10 @@
                                         (get-in db board-editing-topic-key))
                                   (assoc-in keep-topics-edits board-editing-topic-key (get-in db board-editing-topic-key))
                                   keep-topics-edits)
-          keeping-revisions (if (:selected-topic-view db)
-                              (assoc-in keep-editing-topic topic-revisions-data-key (get-in db topic-revisions-data-key))
+          keeping-entries (if (:selected-topic-view db)
+                              (assoc-in keep-editing-topic topic-entries-data-key (get-in db topic-entries-data-key))
                               keep-editing-topic)
-          with-already-loaded (assoc-in keeping-revisions board-already-loaded-key true)]
+          with-already-loaded (assoc-in keeping-entries board-already-loaded-key true)]
       ; async preload the SU list
       (utils/after 100 #(api/get-su-list))
       (if (or (:read-only updated-body)
@@ -312,30 +319,33 @@
       (assoc-in (conj company-key :topics) new-topics)
       (assoc-in (conj company-key :archived) new-archived))))
 
-(defmethod dispatcher/action :delete-revision [db [_ topic as-of]]
-  (let [board-data (dispatcher/board-data)
-        old-topic-data ((keyword topic) board-data)
-        revisions (:revisions-data old-topic-data)
-        revision-data (first (filter #(= (:created-at %) as-of) revisions))
-        new-revisions (vec (filter #(not= (:created-at %) as-of) revisions))
-        should-remove-topic? (zero? (count new-revisions))
-        should-update-topic? (= (:created-at old-topic-data) as-of)
-        new-topics (if should-remove-topic? (utils/vec-dissoc (:topics board-data) (name topic)) (:topics board-data))
-        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        new-topic-data (if should-update-topic?
-                          (merge (first new-revisions) {:revisions (:revisions old-topic-data)
-                                                        :links (:links old-topic-data)
-                                                        :revisions-data new-revisions
-                                                        :topic (:topic old-topic-data)})
-                          (assoc old-topic-data :revisions-data new-revisions))
-        with-topics (assoc board-data :topics new-topics)
-        with-fixed-topics (if should-remove-topic?
-                            (dissoc with-topics (keyword topic))
-                            (assoc with-topics (keyword topic) new-topic-data))]
-    (api/delete-revision topic revision-data)
-    (-> db
-      (stop-foce)
-      (assoc-in board-data-key with-fixed-topics))))
+(defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
+  ;; TODO: fix :delete-entry action
+  db
+  ; (let [board-data (dispatcher/board-data)
+  ;       old-topic-data ((keyword topic) board-data)
+  ;       entries (dispatcher/topic-entries-data (router/current-org-slug) (router/current-board-slug) topic)
+  ;       entry-data (first (filter #(= (:created-at %) as-of) entries))
+  ;       new-entries (vec (filter #(not= (:created-at %) as-of) entries))
+  ;       should-remove-topic? (zero? (count new-entries))
+  ;       should-update-topic? (= (:created-at old-topic-data) as-of)
+  ;       new-topics (if should-remove-topic? (utils/vec-dissoc (:topics board-data) (name topic)) (:topics board-data))
+  ;       board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+  ;       new-topic-data (if should-update-topic?
+  ;                         (merge (first new-entries) {:entries (:entries old-topic-data)
+  ;                                                       :links (:links old-topic-data)
+  ;                                                       :entries-data new-entries
+  ;                                                       :topic (:topic old-topic-data)})
+  ;                         (assoc old-topic-data :entries-data new-entries))
+  ;       with-topics (assoc board-data :topics new-topics)
+  ;       with-fixed-topics (if should-remove-topic?
+  ;                           (dissoc with-topics (keyword topic))
+  ;                           (assoc with-topics (keyword topic) new-topic-data))]
+  ;   (api/delete-entry topic entry-data)
+  ;   (-> db
+  ;     (stop-foce)
+  ;     (assoc-in board-data-key with-fixed-topics)))
+  )
 
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-topics topic-data]]]
@@ -346,16 +356,17 @@
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         with-created-at (if (contains? with-fixed-body :created-at) with-fixed-body (assoc with-fixed-body :created-at (utils/as-of-now)))
         created-at (:created-at with-created-at)
-        revisions-data (or (:revisions-data (get (dispatcher/board-data db) topic)) [])
-        without-current-revision (vec (filter #(not= (:created-at %) created-at) revisions-data))
-        with-new-revision (conj without-current-revision with-created-at)
-        sorted-revisions (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-revision))
-        complete-topic-data (merge with-created-at {:revisions-data sorted-revisions})]
+        topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic)
+        entries-data (or (get-in db topic-entries-key) []) ;(or (:entries-data (get (dispatcher/board-data db) topic)) [])
+        without-current-entry (vec (filter #(not= (:created-at %) created-at) entries-data))
+        with-new-entry (conj without-current-entry with-created-at)
+        sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-entry))]
     (if (not (:placeholder topic-data))
       (api/partial-update-topic topic with-created-at)
       (api/save-or-create-topic with-created-at))
     (-> db
-      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) complete-topic-data)
+      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) with-created-at)
+      (assoc-in topic-entries-key sorted-entries)
       (stop-foce))))
 
 (defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
@@ -634,10 +645,10 @@
   ; Reset flag to reload su list when needed
   (dissoc db :su-list-loaded))
 
-(defmethod dispatcher/action :revisions-loaded
-  [db [_ {:keys [topic revisions]}]]
+(defmethod dispatcher/action :entries-loaded
+  [db [_ {:keys [topic entries]}]]
   (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
-    (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic) :revisions-data) (vec (sort sort-pred (:items (:collection revisions)))))))
+    (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) (vec (sort sort-pred (:items (:collection entries)))))))
 
 ((defmethod dispatcher/action :show-add-topic
   [db [_ active]]
