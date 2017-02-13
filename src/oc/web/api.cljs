@@ -234,7 +234,6 @@
         { :json-params json-data
           :headers (headers-for-link topic-link)}
         (fn [response]
-          (js/console.log "response headers" (:headers response) "->" (get (:headers response) "content-type"))
           (let [body (if (:success response) (json->cljs (:body response)) {})
                 response-content-type (get (:headers response) "content-type")]
             (if (= response-content-type "application/vnd.open-company.entry.v1+json")
