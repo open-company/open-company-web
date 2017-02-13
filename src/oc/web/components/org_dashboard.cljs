@@ -206,7 +206,6 @@
                                  :latest-su (dis/latest-stakeholder-update)
                                  :force-edit-topic (:force-edit-topic data)
                                  :foce-data-editing? (:foce-data-editing? data)
-                                 :revision-updates (dis/revisions (router/current-board-slug))
                                  :card-width card-width
                                  :columns-num columns-num
                                  :show-login-overlay (:show-login-overlay data)
