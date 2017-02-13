@@ -220,7 +220,7 @@
       (simple-handler sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
-     (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
+      (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
       (simple-handler sign-up "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
@@ -314,6 +314,13 @@
       (swap! dis/app-state assoc :force-remove-loading true)
       (team-handler "user-management" target user-management-wrapper params))
 
+    (defroute boards-list-route (urls/boards ":org") {:as params}
+      (swap! dis/app-state assoc :loading true)
+      (api/get-auth-settings)
+      (api/get-entry-point)
+      (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params))})
+      (drv-root #(om/component) target))
+
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (board-handler "dashboard" target org-dashboard params))
 
@@ -360,6 +367,7 @@
                                  ; board-logo-setup-route
                                  ; board-settings-route
                                  team-settings-route
+                                 boards-list-route
                                  board-route
                                  board-route-slash
                                  ; create-update-route
