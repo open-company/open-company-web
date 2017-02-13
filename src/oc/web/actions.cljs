@@ -78,8 +78,7 @@
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
-        (api/get-board board-data)
-        (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
+        (api/get-board board-data))
       :else
       (cond
         ;; Redirect to the first board if only one is presnet
@@ -98,6 +97,8 @@
   db)
 
 (defmethod dispatcher/action :board [db [_ board-data]]
+  (when (= (:slug board-data) (router/current-board-slug))
+    (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
   (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) board-data))
 
 (defmethod dispatcher/action :company-submit [db _]
