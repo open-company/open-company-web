@@ -197,7 +197,6 @@
         ;                     :style #js {:opacity 1}}
         ;         (om/build fullscreen-topic {:topic selected-topic
         ;                                     :topic-data (->> selected-topic keyword (get board-data))
-        ;                                     :revision-updates (dispatcher/topic-revisions board-slug (router/current-topic-slug))
         ;                                     :selected-metric selected-metric
         ;                                     :read-only (:read-only board-data)
         ;                                     :card-width card-width
