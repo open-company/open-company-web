@@ -143,7 +143,7 @@
 (defn get-entry-point []
   (api-get "/" nil (fn [response]
                      (let [body (if (:success response) (:body response) {})]
-                       (dispatcher/dispatch! [:entry (json->cljs body)])))))
+                       (dispatcher/dispatch! [:entry-point (json->cljs body)])))))
 
 (defn get-subscription [company-uuid]
   (pay-get (str "/subscriptions/" company-uuid)
@@ -218,12 +218,14 @@
                          :placeholder
                          :was-archived
                          :created-at
-                         :updated-at])
+                         :updated-at
+                         :value
+                         :burn-rate
+                         :runway])
 
 (defn save-or-create-topic [topic-data]
   (when topic-data
     (let [links (:links topic-data)
-          slug (router/current-board-slug)
           topic (keyword (:topic topic-data))
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
           json-data (cljs->json cleaned-topic-data)
@@ -232,8 +234,12 @@
         { :json-params json-data
           :headers (headers-for-link topic-link)}
         (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (dispatcher/dispatch! [:topic {:body body :topic topic :slug (keyword slug)}])))))))
+          (js/console.log "response headers" (:headers response) "->" (get (:headers response) "content-type"))
+          (let [body (if (:success response) (json->cljs (:body response)) {})
+                response-content-type (get (:headers response) "content-type")]
+            (if (= response-content-type "application/vnd.open-company.entry.v1+json")
+              (dispatcher/dispatch! [:topic-entry {:body body :topic topic :created-at (:created-at body)}])
+              (dispatcher/dispatch! [:topic {:body body :topic topic}]))))))))
 
 (defn load-revisions [topic revisions-link]
   (when (and topic revisions-link)
@@ -258,28 +264,11 @@
           (let [body (if (:success response) (json->cljs (:body response)) {})]
             (load-revisions topic (utils/link-for (:links body) "entries")))))))))
 
-(defn load-revision
-  [revision slug topic]
-    (when revision
-      (api-get (:href revision)
-        {:headers {
-          ; required by Chrome
-          "Access-Control-Allow-Headers" "Content-Type"
-          ; custom content type
-          "content-type" (:type revision)}}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body body
-                               :as-of (:created-at revision)
-                               :topic (keyword topic)
-                               :slug (keyword slug)}]
-            (dispatcher/dispatch! [:revision dispatch-body]))))))
-
 (defn update-finances-data[finances-data]
   (when finances-data
     (let [links (:links finances-data)
           slug (router/current-board-slug)
-          data {:data (map #(dissoc % :burn-rate :runway :value :new :read-only :revisions-data) (:data finances-data))}
+          data {:data (map #(apply dissoc % topic-private-keys) (:data finances-data))}
           json-data (cljs->json data)
           finances-link (utils/link-for links "partial-update" "PATCH")]
       (api-patch (:href finances-link)
