@@ -184,10 +184,10 @@
                 :cancel-cb #(hide-popover nil "delete-revision-confirm")
                 :success-title "DELETE"
                 :success-cb #(let [topic (dis/foce-topic-key)
-                                   board-data (dis/board-data)]
+                                   revisions (dis/topic-revisions-data topic)]
                                (dis/dispatch! [:delete-revision topic (:created-at (dis/foce-topic-data))])
                                (hide-popover nil "delete-revision-confirm")
-                               (when (= (count (:revisions-data (topic board-data))) 1)
+                               (when (= (count revisions) 1)
                                   (router/nav! (oc-urls/board))))}))
 
 (defn- add-image-tooltip [image-header]
