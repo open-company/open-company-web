@@ -215,7 +215,8 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
-      (swap! dis/app-state assoc :show-login-overlay :login-with-slack)
+      (when-not (contains? (:query-params params) :jwt)
+        (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
       (simple-handler sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
