@@ -434,6 +434,7 @@
   [db [_]]
   (let [current (router/get-token)
         auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})]
+    (js/console.log "actions/:login-with-slack" auth-url (:links (:auth-settings db)))
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
