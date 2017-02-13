@@ -230,6 +230,7 @@
                          :foce-data-editing? (:foce-data-editing? data)
                          :new-topics (:new-topics data)
                          :board-data board-data
+                         :entries-data (:entries-data data)
                          :topics-data board-data
                          :foce-key (:foce-key data)
                          :foce-data (:foce-data data)

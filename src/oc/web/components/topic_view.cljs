@@ -67,6 +67,7 @@
                                   columns-num
                                   selected-topic-view
                                   board-data
+                                  entries-data
                                   foce-key
                                   foce-data
                                   foce-data-editing?] :as data} owner options]
@@ -98,7 +99,7 @@
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get board-data topic-kw)
           is-custom-topic (s/starts-with? (:topic topic-data) "custom-")
-          entries (:entries-data topic-data)
+          entries (or (get entries-data topic-kw) [])
           is-new-foce (and (= foce-key topic-kw) (nil? (:created-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:created-at foce-data))))
           loading-topic-data (and (contains? board-data topic-kw)

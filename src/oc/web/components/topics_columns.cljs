@@ -215,6 +215,7 @@
               (om/build topic-view {:card-width card-width
                                     :columns-num columns-num
                                     :board-data board-data
+                                    :entries-data (:entries-data data)
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)

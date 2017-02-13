@@ -144,6 +144,7 @@
     (let [org-slug (keyword (router/current-org-slug))
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
+          entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           board-error (get-in data (dis/board-access-error-key (router/current-org-slug) (router/current-board-slug)))]
       (if (or (not (dis/org-data))
@@ -202,6 +203,7 @@
                                 {:loading (:loading data)
                                  :content-loaded (or (:loading board-data) (:loading data))
                                  :board-data board-data
+                                 :entries-data entries-data
                                  :new-topics (:new-topics ((keyword (router/current-board-slug)) ((keyword (router/current-org-slug)) data)))
                                  :latest-su (dis/latest-stakeholder-update)
                                  :force-edit-topic (:force-edit-topic data)

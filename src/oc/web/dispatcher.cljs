@@ -174,10 +174,10 @@
   ([org-slug board-slug topic-slug as-of] (entry org-slug board-slug topic-slug as-of @app-state))
   ([org-slug board-slug topic-slug as-of data] (get-in data (entry-key org-slug board-slug topic-slug as-of))))
 
-(defn entries
-  ([] (entries (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug board-slug] (entries org-slug board-slug @app-state))
-  ([org-slug board-slug data] (get-in data (entries-key org-slug board-slug))))
+(defn entries-data
+  ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))
+  ([data] (entries-data data (router/current-org-slug) (router/current-board-slug)))
+  ([data org-slug board-slug] (get-in data (entries-key org-slug board-slug))))
 
 (defn topic-entries-data
   ([topic-slug] (topic-entries-data (router/current-org-slug) (router/current-board-slug) topic-slug))
