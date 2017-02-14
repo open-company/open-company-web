@@ -183,11 +183,11 @@
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]
-                                 :preloads '[devtools.preload
+                                 :preloads '[devtools.preload]
                                  :external-config {
                                   :devtools/config {
                                     :print-config-overrides true
-                                    :disable-advanced-mode-check true}}]})))
+                                    :disable-advanced-mode-check true}}})))
 
 (deftask prod-build
   "OC Production build."
