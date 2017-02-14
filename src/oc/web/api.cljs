@@ -49,7 +49,9 @@
   with-accept))
 
 (defn refresh-jwt [refresh-link]
-  (http/get (str ls/auth-server-domain (:href refresh-link)) (complete-params {:headers (headers-for-link refresh-link)})))
+  (let [refresh-url (if (map? refresh-link) (:href refresh-link) refresh-link)
+        headers (if (map? refresh-link) {:headers (headers-for-link refresh-link)} {})]
+  (http/get (str ls/auth-server-domain refresh-url) (complete-params headers))))
 
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -80,7 +82,7 @@
   (let [jwt (j/jwt)]
     (go
       (when (and jwt (j/expired?) )
-        (if-let [refresh-url (utils/link-for (j/get-key :links) "refresh")]
+        (if-let [refresh-url (j/get-key :refresh-url)]
           (let [res (<! (refresh-jwt refresh-url))]
             (if (:success res)
               (update-jwt-cookie! (:body res))
@@ -547,11 +549,7 @@
           delete-link (utils/link-for links "delete")]
       (when delete-link
         (api-delete (:href delete-link)
-          {:headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type delete-link)}}
+          {:headers (headers-for-link delete-link)}
           (fn [_]))))))
 
 (defn get-current-user [auth-links]
@@ -592,7 +590,7 @@
           (dispatcher/dispatch! [:add-email-domain-team/finish (= status 204)]))))))
 
 (defn refresh-slack-user []
-  (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh" "GET")]
+  (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
     (auth-get (:href refresh-url)
       {:headers (headers-for-link refresh-url)}
       (fn [{:keys [status body success]}]
