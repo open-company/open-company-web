@@ -66,6 +66,7 @@
 ;                 :cancel-cb nil}))
 
 (defcomponent topic-internal [{:keys [topic-data
+                                      entries-data
                                       topic
                                       currency
                                       card-width
@@ -162,7 +163,7 @@
                 (utils/time-since (if is-topic-view (:created-at topic-data) (:updated-at topic-data)) [:short-month])))
             (when (and is-dashboard
                        (not is-mobile?)
-                       (> (count (:entrie topic-data)) 1))
+                       (> (count entries-data) 1))
               (dom/button {:class "topic-history-button btn-reset"
                            :data-placement "top"
                            :data-container "body"
@@ -261,6 +262,7 @@
 
 (defcomponent topic [{:keys [active-topics
                              topic-data
+                             entries-data
                              topic
                              currency
                              column
@@ -324,7 +326,7 @@
                                                                         (or (not read-only-company)
                                                                             (html-text-exceeds-limit (:body topic-data) utils/topic-body-limit)
                                                                             (and read-only-company
-                                                                                 (> (count (:entries topic-data)) 1))))
+                                                                                 (> (count entries-data) 1))))
                                                  :no-foce (or (and (not (nil? (:show-top-menu data)))
                                                                    (not= (:show-top-menu data) topic))
                                                               (and foce-active (not is-current-foce)))})
@@ -336,7 +338,7 @@
                                  (when (and (nil? (:foce-key data))
                                             (or (responsive/is-mobile-size?)
                                                 (not read-only-company)
-                                                (> (count (:entries topic-data)) 1)
+                                                (> (count entries-data) 1)
                                                 (html-text-exceeds-limit (:body topic-data) utils/topic-body-limit)))
                                   (router/nav! (oc-urls/topic org-slug board-slug topic-kw)))))
                     :style topic-style
@@ -360,6 +362,7 @@
                                 :key (str "topic-foce-" topic "-" (:created-at topic-data))})
           (om/build topic-internal {:topic topic
                                     :topic-data topic-data
+                                    :entries-data entries-data
                                     :is-stakeholder-update (:is-stakeholder-update data)
                                     :currency currency
                                     :card-width card-width
