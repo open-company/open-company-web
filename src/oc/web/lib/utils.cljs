@@ -245,11 +245,15 @@
                         (every? #(= (% params) (% link)) (keys params)))
             link)) links)))
 
-(defn readonly? [links]
-  (let [update (link-for links "update" "PUT")
-        partial-update (link-for links "partial-update" "PATCH")
-        delete (link-for links "delete" "DELETE")]
-    (and (nil? update) (nil? partial-update) (nil? delete))))
+(defn readonly-board? [links]
+  (let [new-link (link-for links "new")]
+    (nil? new-link)))
+
+(defn readonly-topic? [links]
+  (let [create (link-for links "create")
+        partial-update (link-for links "partial-update")
+        delete (link-for links "delete")]
+    (and (nil? create) (nil? partial-update) (nil? delete))))
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -269,19 +273,19 @@
   (let [with-keys (-> topic-body
                       (assoc :topic (name topic-name))
                       (assoc :as-of (:created-at topic-body))
-                      (assoc :read-only (readonly? (:links topic-body))))]
+                      (assoc :read-only (readonly-topic? (:links topic-body))))]
     (if (= topic-name :finances)
       (fix-finances with-keys)
       with-keys)))
 
-(defn fix-topics [company-data]
+(defn fix-topics [board-data]
   "Add topic name in each topic and a topic sorter"
-  (let [links (:links company-data)
-        topic-keys (get-topic-keys company-data)
-        read-only (readonly? links)
-        without-topics (apply dissoc company-data topic-keys)
+  (let [links (:links board-data)
+        topic-keys (get-topic-keys board-data)
+        read-only (readonly-board? links)
+        without-topics (apply dissoc board-data topic-keys)
         with-read-only (assoc without-topics :read-only read-only)
-        topics (apply merge (map (fn [sn] (hash-map sn (fix-topic (get company-data sn) sn))) topic-keys))
+        topics (apply merge (map (fn [sn] (hash-map sn (fix-topic (get board-data sn) sn))) topic-keys))
         with-fixed-topics (merge with-read-only topics)]
     with-fixed-topics))
 

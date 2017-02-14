@@ -100,7 +100,7 @@
   (when (= (:slug board-data) (router/current-board-slug))
     (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
   (-> db
-    (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) board-data)
+    (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) (utils/fix-topics board-data))
     ;; show add topic if the board loaded is the one currently shown and it has no topics
     (assoc :show-add-topic (if (= (:slug board-data) (router/current-board-slug))
                               (and (not (:selected-topic-view db))
@@ -656,8 +656,10 @@
 
 (defmethod dispatcher/action :entries-loaded
   [db [_ {:keys [topic entries]}]]
-  (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
-    (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) (vec (sort sort-pred (:items (:collection entries)))))))
+  (let [fixed-entries (map #(utils/fix-topic % topic) (:items (:collection entries)))
+        sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))
+        sorted-fixed-entries (vec (sort sort-pred fixed-entries))]
+    (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
 ((defmethod dispatcher/action :show-add-topic
   [db [_ active]]
