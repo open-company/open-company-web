@@ -364,17 +364,18 @@
         with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
         with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
         with-created-at (if (contains? with-fixed-body :created-at) with-fixed-body (assoc with-fixed-body :created-at (utils/as-of-now)))
-        created-at (:created-at with-created-at)
+        without-placeholder (dissoc with-created-at :placeholder)
+        created-at (:created-at without-placeholder)
         topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic)
         entries-data (or (get-in db topic-entries-key) []) ;(or (:entries-data (get (dispatcher/board-data db) topic)) [])
         without-current-entry (vec (filter #(not= (:created-at %) created-at) entries-data))
-        with-new-entry (conj without-current-entry with-created-at)
+        with-new-entry (conj without-current-entry without-placeholder)
         sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-entry))]
     (if (not (:placeholder topic-data))
-      (api/partial-update-topic topic with-created-at)
-      (api/save-or-create-topic with-created-at))
+      (api/partial-update-topic topic without-placeholder)
+      (api/save-or-create-topic without-placeholder))
     (-> db
-      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) with-created-at)
+      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) without-placeholder)
       (assoc-in topic-entries-key sorted-entries)
       (stop-foce))))
 
