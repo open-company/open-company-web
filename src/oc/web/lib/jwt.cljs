@@ -30,3 +30,5 @@
   (let [current-team (oc.web.router/current-team-id)
         admins (get-key :admin)]
     (some #{current-team} admins)))
+
+(set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))

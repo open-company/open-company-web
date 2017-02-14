@@ -59,3 +59,4 @@ var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintBoardData = function(){};
 var OCWebPrintEntriesData = function(){};
+var OCWebPrintJWTContents = function(){};
