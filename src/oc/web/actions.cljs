@@ -336,7 +336,7 @@
 (defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
   (let [board-data (dispatcher/board-data)
         old-topic-data ((keyword topic) board-data)
-        entries (dispatcher/topic-entries-data db (router/current-org-slug) (router/current-board-slug) topic)
+        entries (dispatcher/topic-entries-data (router/current-org-slug) (router/current-board-slug) topic db)
         entry-data (first (filter #(= (:created-at %) as-of) entries))
         new-entries (vec (filter #(not= (:created-at %) as-of) entries))
         should-remove-topic? (zero? (count new-entries))
@@ -670,7 +670,7 @@
       (-> db
         (assoc :show-add-topic true)
         (dissoc :selected-topic-view)))
-    (dissoc db :show-add-topic))))
+    (assoc db :show-add-topic false))))
 
 (defmethod dispatcher/action :dashboard-select-topic
   [db [_ topic-kw]]
