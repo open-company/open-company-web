@@ -75,7 +75,8 @@
 (defn render-topic [owner options topic-name column]
   (let [props       (om/get-props owner)
         board-data  (:board-data props)
-        topics-data (:topics-data props)]
+        topics-data (:topics-data props)
+        entries-data (:entries-data props)]
     (when (and topic-name (contains? topics-data (keyword topic-name)))
       (let [topic-click           (or (:topic-click options) identity)
             is-dashboard          (:is-dashboard props)
@@ -100,6 +101,7 @@
                              :topic topic-name
                              :is-stakeholder-update (:is-stakeholder-update props)
                              :topic-data sd
+                             :entries-data (get entries-data (keyword topic-name) [])
                              :card-width (:card-width props)
                              :columns-num (:columns-num props)
                              :foce-data-editing? (:foce-data-editing? props)
