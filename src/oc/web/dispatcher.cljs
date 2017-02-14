@@ -6,6 +6,7 @@
 (defonce app-state (atom {:loading false
                           :mobile-menu-open false
                           :show-login-overlay false
+                          :show-add-topic false
                           :dashboard-sharing false}))
 
 ;; Data key paths
