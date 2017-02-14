@@ -99,7 +99,7 @@
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get board-data topic-kw)
           is-custom-topic (s/starts-with? (:topic topic-data) "custom-")
-          entries (or (get entries-data topic-kw) [])
+          entries (get entries-data topic-kw [])
           is-new-foce (and (= foce-key topic-kw) (nil? (:created-at foce-data)))
           is-another-foce (and (not (nil? foce-key)) (not (nil? (:created-at foce-data))))
           loading-topic-data (and (contains? board-data topic-kw)
@@ -160,6 +160,7 @@
                 (dom/div {:class "entry-container group"}
                   (om/build topic {:topic selected-topic-view
                                    :topic-data topic-data
+                                   :entries-data entries
                                    :card-width (- topic-card-width 60)
                                    :is-stakeholder-update false
                                    :read-only-board (:read-only board-data)
@@ -179,6 +180,7 @@
                                :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
                     (om/build topic {:topic selected-topic-view
                                      :topic-data rev
+                                     :entries-data entries
                                      :card-width (- topic-card-width 60)
                                      :is-stakeholder-update false
                                      :read-only-board (:read-only board-data)
