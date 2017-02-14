@@ -44,11 +44,11 @@
   (when (not (om/get-state owner :entries-requested))
     (load-entries owner)))
 
-(defn start-foce-if-needed [{:keys [foce-key
-                                    board-data
-                                    selected-topic-view
-                                    new-topics]
-                             :as data} ]
+(defn start-editing-if-needed [{:keys [foce-key
+                                       board-data
+                                       selected-topic-view
+                                       new-topics]
+                                :as data}]
   (when (nil? foce-key)
     (let [topic-kw (keyword selected-topic-view)
           topics-contains-topic (utils/in? (:topics board-data) selected-topic-view)]
@@ -57,7 +57,7 @@
           (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))
           ; look for the urls in the new topics
           (when new-topics
-            (let [new-topic (first (filter #(= (:topic-name %) selected-topic-view) new-topics))
+            (let [new-topic (first (filter #(= (:slug %) selected-topic-view) new-topics))
                   new-topic-data (utils/new-topic-initial-data topic-kw (:title new-topic) {:links (:links new-topic)})]
               (if (and new-topic (contains? new-topic :links))
                 (dis/dispatch! [:add-topic topic-kw (assoc new-topic-data :new true)])
@@ -77,17 +77,17 @@
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-entries-if-needed owner)
-    (start-foce-if-needed owner)
+    (start-editing-if-needed (om/get-props owner))
     (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000))))
 
   (will-update [_ next-props _]
-    (start-foce-if-needed next-props)
+    (start-editing-if-needed next-props)
     (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :entries-requested false)))
 
   (did-update [_ _ _]
     (load-entries-if-needed owner)
-    (start-foce-if-needed owner))
+    (start-editing-if-needed (om/get-props owner)))
 
   (will-unmount [_]
     (when (om/get-state owner :entries-reload-interval)
