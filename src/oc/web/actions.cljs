@@ -328,32 +328,27 @@
       (assoc-in (conj company-key :archived) new-archived))))
 
 (defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
-  ;; TODO: fix :delete-entry action
-  db
-  ; (let [board-data (dispatcher/board-data)
-  ;       old-topic-data ((keyword topic) board-data)
-  ;       entries (dispatcher/topic-entries-data (router/current-org-slug) (router/current-board-slug) topic)
-  ;       entry-data (first (filter #(= (:created-at %) as-of) entries))
-  ;       new-entries (vec (filter #(not= (:created-at %) as-of) entries))
-  ;       should-remove-topic? (zero? (count new-entries))
-  ;       should-update-topic? (= (:created-at old-topic-data) as-of)
-  ;       new-topics (if should-remove-topic? (utils/vec-dissoc (:topics board-data) (name topic)) (:topics board-data))
-  ;       board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-  ;       new-topic-data (if should-update-topic?
-  ;                         (merge (first new-entries) {:entries (:entries old-topic-data)
-  ;                                                       :links (:links old-topic-data)
-  ;                                                       :entries-data new-entries
-  ;                                                       :topic (:topic old-topic-data)})
-  ;                         (assoc old-topic-data :entries-data new-entries))
-  ;       with-topics (assoc board-data :topics new-topics)
-  ;       with-fixed-topics (if should-remove-topic?
-  ;                           (dissoc with-topics (keyword topic))
-  ;                           (assoc with-topics (keyword topic) new-topic-data))]
-  ;   (api/delete-entry topic entry-data)
-  ;   (-> db
-  ;     (stop-foce)
-  ;     (assoc-in board-data-key with-fixed-topics)))
-  )
+  (let [board-data (dispatcher/board-data)
+        old-topic-data ((keyword topic) board-data)
+        entries (dispatcher/topic-entries-data db (router/current-org-slug) (router/current-board-slug) topic)
+        entry-data (first (filter #(= (:created-at %) as-of) entries))
+        new-entries (vec (filter #(not= (:created-at %) as-of) entries))
+        should-remove-topic? (zero? (count new-entries))
+        should-update-topic? (= (:created-at old-topic-data) as-of)
+        new-topics (if should-remove-topic? (utils/vec-dissoc (:topics board-data) (name topic)) (:topics board-data))
+        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        new-topic-data (if should-update-topic?
+                          (merge old-topic-data (first new-entries))
+                          old-topic-data)
+        with-topics (assoc board-data :topics new-topics)
+        with-fixed-topics (if should-remove-topic?
+                            (dissoc with-topics (keyword topic))
+                            (assoc with-topics (keyword topic) new-topic-data))]
+    (api/delete-entry topic entry-data)
+    (-> db
+      (stop-foce)
+      (assoc-in board-data-key with-fixed-topics)
+      (assoc-in (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) new-entries))))
 
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-topics topic-data]]]
