@@ -79,12 +79,13 @@
 (defn- req [endpoint method path params on-complete]
   (let [jwt (j/jwt)]
     (go
-      (when (and jwt (j/expired?))
-        (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
+      (when (and jwt (j/expired?) )
+        (if-let [refresh-url (utils/link-for (j/get-key :links) "refresh")]
           (let [res (<! (refresh-jwt refresh-url))]
             (if (:success res)
               (update-jwt-cookie! (:body res))
-              (dispatcher/dispatch! [:logout])))))
+              (dispatcher/dispatch! [:logout])))
+          (dispatcher/dispatch! [:logout])))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         ; when a request get a 401 logout the user since his using an old token, need to repeat auth process
