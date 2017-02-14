@@ -197,13 +197,13 @@
   (js/console.log @app-state))
 
 (defn print-org-data []
-  (js/console.log (get-in (org-data-key (router/current-org-slug)) @app-state)))
+  (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
 (defn print-board-data []
-  (js/console.log (get-in (board-data-key (router/current-org-slug) (router/current-board-slug)) @app-state)))
+  (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-entries-data []
-  (js/console.log (get-in (entries-key (router/current-org-slug) (router/current-board-slug)) @app-state)))
+  (js/console.log (get-in @app-state (entries-key (router/current-org-slug) (router/current-board-slug)))))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
