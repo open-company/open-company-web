@@ -49,9 +49,11 @@
   with-accept))
 
 (defn refresh-jwt [refresh-link]
-  (let [refresh-url (if (map? refresh-link) (:href refresh-link) refresh-link)
+  (let [refresh-url (if (map? refresh-link)
+                      (str ls/auth-server-domain (:href refresh-link))
+                      refresh-link)
         headers (if (map? refresh-link) {:headers (headers-for-link refresh-link)} {})]
-  (http/get (str ls/auth-server-domain refresh-url) (complete-params headers))))
+  (http/get refresh-url (complete-params headers))))
 
 (defn update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
