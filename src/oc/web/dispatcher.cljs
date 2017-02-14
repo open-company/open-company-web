@@ -8,9 +8,6 @@
                           :show-login-overlay false
                           :dashboard-sharing false}))
 
-(defn print-app-state []
-  (js/console.log @app-state))
-
 ;; Data key paths
 
 (def companies-key [:companies])
@@ -193,4 +190,21 @@
 (defn foce-topic-data-editing? []
   (:foce-data-editing? @app-state))
 
-(set! (.-OCDispatcherPrintAppState js/window) print-app-state)
+;; Debug functions
+
+(defn print-app-state []
+  (js/console.log @app-state))
+
+(defn print-org-data []
+  (js/console.log (get-in (org-data-key (router/current-org-slug)) @app-state)))
+
+(defn print-board-data []
+  (js/console.log (get-in (board-data-key (router/current-org-slug) (router/current-board-slug)) @app-state)))
+
+(defn print-entries-data []
+  (js/console.log (get-in (entries-key (router/current-org-slug) (router/current-board-slug)) @app-state)))
+
+(set! (.-OCWebPrintAppState js/window) print-app-state)
+(set! (.-OCWebPrintOrgData js/window) print-org-data)
+(set! (.-OCWebPrintBoardData js/window) print-board-data)
+(set! (.-OCWebPrintEntriesData js/window) print-entries-data)
