@@ -31,13 +31,13 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.board-editor :refer (board-editor)]
+            [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
             ; [oc.web.components.company-settings :refer (company-settings)]
             ; [oc.web.components.create-update :refer (create-update)]
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.updates :refer (updates-responsive-switcher)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
-            ; [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             ))
 
 (enable-console-print!)
@@ -49,7 +49,7 @@
                 :target target}))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+; (defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -233,12 +233,13 @@
     ;   (pre-routing (:query-params params))
     ;   (drv-root email-confirmation target))
 
-    ; (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
-    ;   (when (jwt/jwt)
-    ;     (router/redirect! urls/home))
-    ;   (pre-routing query-params)
-    ;   (router/set-route! ["confirm-invitation"] {:query-params query-params})
-    ;   (drv-root confirm-invitation target))
+    (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
+      (js/console.log "confirm-invitation-route:" params (jwt/jwt))
+      (when (jwt/jwt)
+        (router/redirect! urls/home))
+      (pre-routing query-params)
+      (router/set-route! ["confirm-invitation"] {:query-params query-params})
+      (drv-root confirm-invitation target))
 
     ; (defroute subscription-callback-route urls/subscription-callback {}
     ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
@@ -357,7 +358,7 @@
                                  logout-route
                                  org-create-route
                                  ;  email-confirmation-route
-                                 ;  confirm-invitation-route
+                                 confirm-invitation-route
                                  ;  ; subscription-callback-route
                                  home-page-route
                                  user-profile-route
