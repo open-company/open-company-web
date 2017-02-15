@@ -202,8 +202,10 @@
                     (om/build topics-list
                                 {:loading (:loading data)
                                  :content-loaded (or (:loading board-data) (:loading data))
+                                 :org-data (dis/org-data data)
                                  :board-data board-data
                                  :entries-data entries-data
+                                 :create-board (:create-board data)
                                  :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
                                  :latest-su (dis/latest-stakeholder-update)
                                  :force-edit-topic (:force-edit-topic data)
