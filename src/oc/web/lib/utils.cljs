@@ -245,6 +245,10 @@
                         (every? #(= (% params) (% link)) (keys params)))
             link)) links)))
 
+(defn readonly-org? [links]
+  (let [create-link (link-for links "create")]
+    (nil? create-link)))
+
 (defn readonly-board? [links]
   (let [new-link (link-for links "new")]
     (nil? new-link)))
@@ -278,8 +282,9 @@
       (fix-finances with-keys)
       with-keys)))
 
-(defn fix-topics [board-data]
+(defn fix-board
   "Add topic name in each topic and a topic sorter"
+  [board-data]
   (let [links (:links board-data)
         topic-keys (get-topic-keys board-data)
         read-only (readonly-board? links)
@@ -288,6 +293,13 @@
         topics (apply merge (map (fn [sn] (hash-map sn (fix-topic (get board-data sn) sn))) topic-keys))
         with-fixed-topics (merge with-read-only topics)]
     with-fixed-topics))
+
+(defn fix-org
+  "Fix org data coming from the API."
+  [org-data]
+  (let [links (:links org-data)
+        read-only (readonly-org? links)]
+    (assoc org-data :read-only read-only)))
 
 (defn sort-entries [entries]
   (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
