@@ -60,3 +60,5 @@ var OCWebPrintOrgData = function(){};
 var OCWebPrintBoardData = function(){};
 var OCWebPrintEntriesData = function(){};
 var OCWebPrintJWTContents = function(){};
+var OCWebHelp = function(){};
+var OCWebPrintAsciiArt = function(){};

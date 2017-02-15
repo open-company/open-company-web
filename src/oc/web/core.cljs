@@ -394,6 +394,7 @@
   (sentry/capture-message "Error: div#app is not defined!"))
 
 (defn init []
+  (.OCWebPrintAsciiArt js/window)
   ;; Persist JWT in App State
   (dis/dispatch! [:jwt (jwt/get-contents)])
   ;; on any click remove all the shown tooltips to make sure they don't get stuck

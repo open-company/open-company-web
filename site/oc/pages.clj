@@ -198,7 +198,8 @@
           ;; EmojionePicker css from cljsjs
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]
           ;; Filestack
-          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]]
+          [:script {:type "text/javascript" :src "//api.filestackapi.com/filestack.js"}]
+          [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-loading]
