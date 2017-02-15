@@ -66,11 +66,11 @@
                 (dom/div {:class "form-group"}
                   (when (and (jwt/jwt) (jwt/get-key :first-name))
                     (dom/label {:class "board-editor-message"} (str "Hi " (s/capital (jwt/get-key :first-name)) "!")))
-                  (dom/label {:class "board-editor-message"} "What's the name of the board?")
+                  (dom/label {:class "board-editor-message"} "You need to create a board to contain your topics, what should it be called?")
                   (dom/input {:type "text"
                               :class "board-editor-input domine h4"
                               :style #js {:width "100%"}
-                              :placeholder "Simple name without the Inc., LLC, etc."
+                              :placeholder "Name of the board (e.g. \"Sales\")"
                               :value (or (:create-board data) "")
                               :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])})))
                 (dom/div {:class "center"}
