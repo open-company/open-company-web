@@ -33,6 +33,7 @@
   (dissoc db :jwt))
 
 (defmethod dispatcher/action :entry-point [db [_ {:keys [collection]}]]
+  (js/console.log "action/:entry-point" (:items collection) (router/current-org-slug))
   (let [orgs (:items collection)]
     (cond
       ; If i have an org slug let's load the org data
@@ -80,7 +81,7 @@
       (router/current-board-slug)
       (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         (api/get-board board-data))
-      :else
+      (not (utils/in? (:route @router/path) "create-board"))
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
