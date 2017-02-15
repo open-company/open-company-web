@@ -91,33 +91,32 @@
                        :data-toggle "tooltip"
                        :data-container "body"}
             (dom/i {:class "fa fa-plus-circle"}))))
-      (let [org-data (dis/org-data)]
-        (dom/div {:class (str "left-topics-list-items group")}
-          (for [board (sorted-boards (:boards org-data))]
-            (dom/div {:class (utils/class-set {:left-topics-list-item true
-                                               :highlight-on-hover (nil? (:foce-key data))
-                                               :group true
-                                               :selected (= (router/current-board-slug) (:slug board))})
-                      :style {:width (str (- responsive/left-topics-list-width 5) "px")}
-                      :data-board (name (:slug board))
-                      :key (str "bw-board-list-" (name (:slug board)))
-                      :on-click #(when (nil? (:foce-key data))
-                                   (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
-              (dom/div {:class "internal"
-                        :key (str "bw-board-list-" (name (:slug board)) "-internal")}
-                (str "#" (or (:name board) (:slug board))))))
-          (when-not (nil? (:create-board data))
-            (dom/div {:class "left-topics-list-item group"}
-              (dom/span {:class "left"} "#")
-              (dom/input {:class "board-name left"
-                          :value (:create-board data)
-                          :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
-                          :on-key-up (fn [e]
-                                          (cond
-                                            (= "Enter" (.-key e))
-                                            (dis/dispatch! [:create-board])
-                                            (= "Escape" (.-key e))
-                                            (dis/dispatch! [:input [:create-board] nil])))})))))
+      (dom/div {:class (str "left-topics-list-items group")}
+        (for [board (sorted-boards (:boards org-data))]
+          (dom/div {:class (utils/class-set {:left-topics-list-item true
+                                             :highlight-on-hover (nil? (:foce-key data))
+                                             :group true
+                                             :selected (= (router/current-board-slug) (:slug board))})
+                    :style {:width (str (- responsive/left-topics-list-width 5) "px")}
+                    :data-board (name (:slug board))
+                    :key (str "bw-board-list-" (name (:slug board)))
+                    :on-click #(when (nil? (:foce-key data))
+                                 (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
+            (dom/div {:class "internal"
+                      :key (str "bw-board-list-" (name (:slug board)) "-internal")}
+              (str "#" (or (:name board) (:slug board))))))
+        (when-not (nil? (:create-board data))
+          (dom/div {:class "left-topics-list-item group"}
+            (dom/span {:class "left"} "#")
+            (dom/input {:class "board-name left"
+                        :value (:create-board data)
+                        :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
+                        :on-key-up (fn [e]
+                                        (cond
+                                          (= "Enter" (.-key e))
+                                          (dis/dispatch! [:create-board])
+                                          (= "Escape" (.-key e))
+                                          (dis/dispatch! [:input [:create-board] nil])))}))))
       (dom/div {:class "left-topics-list-top mt3 group"}
         (when (not= (count (:topics board-data)) 0)
           (dom/h3 {:class "left-topics-list-top-title"
