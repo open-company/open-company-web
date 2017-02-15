@@ -128,14 +128,21 @@
       (dissoc :loading))
     db))
 
-(defmethod dispatcher/action :auth-settings [db [_ body]]
+(defmethod dispatcher/action :auth-settings
+  [db [_ body]]
   (if body
     ; auth settings loaded
     (do
       (api/get-current-user body)
-      (when (and (utils/in? (:route @router/path) "confirm-invitation")
-                   (contains? (:query-params @router/path) :token))
-        ; call confirm-invitation if needed
+      (cond
+        ; if showing the create organization UI load the list of teams
+        ; to use the team name as suggestion and to PATCH the name back
+        ; if it doesn't has one yet
+        (utils/in? (:route @router/path) "create-org")
+        (utils/after 100 #(api/get-teams true))
+        ; confirm email invitation
+        (and (utils/in? (:route @router/path) "confirm-invitation")
+             (contains? (:query-params @router/path) :token))
         (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path))))))
     ; if the auth-settings call failed retry it in 2 seconds
     (utils/after 2000 #(api/get-auth-settings)))
@@ -508,17 +515,18 @@
 
 (defmethod dispatcher/action :enumerate-users
   [db [_]]
-  (api/enumerate-users)
+  (api/get-teams)
   (assoc db :enumerate-users-requested true))
 
-(defmethod dispatcher/action :enumerate-users/teams
-  [db [_ teams]]
-  (doseq [team teams
-          :let [team-link (utils/link-for (:links team) "item" "GET")]]
-    (api/enumerate-team-users team-link))
+(defmethod dispatcher/action :teams-loaded
+  [db [_ teams dont-follow-team-link]]
+  (when-not dont-follow-team-link
+    (doseq [team teams
+            :let [team-link (utils/link-for (:links team) "item" "GET")]]
+      (api/get-team team-link)))
   (assoc-in db [:enumerate-users :teams] teams))
 
-(defmethod dispatcher/action :enumerate-users/success
+(defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
   (if team-data
     (assoc-in db [:enumerate-users (:team-id team-data)] team-data)
@@ -594,7 +602,7 @@
 (defmethod dispatcher/action :invite-by-email/success
   [db [_ email]]
   ; refresh the users list once the invitation succeded
-  (api/enumerate-users)
+  (api/get-teams)
   (-> db
       (assoc-in [:um-invite :email] "")
       (assoc-in [:um-invite :user-type] nil)))
@@ -602,7 +610,7 @@
 (defmethod dispatcher/action :invite-by-email/failed
   [db [_ email]]
   ; refresh the users list once the invitation succeded
-  (api/enumerate-users)
+  (api/get-teams)
   (assoc db :invite-by-email-error true))
 
 (defmethod dispatcher/action :user-action
@@ -616,7 +624,7 @@
 (defmethod dispatcher/action :user-action/complete
   [db [_]]
   ; refresh the list of users once the invitation action complete
-  (api/enumerate-users)
+  (api/get-teams)
   db)
 
 (defmethod dispatcher/action :confirm-invitation
@@ -774,7 +782,7 @@
 (defmethod dispatcher/action :add-email-domain-team/finish
   [db [_ success]]
   (when success
-    (api/enumerate-users))
+    (api/get-teams))
   (-> db
       (assoc-in [:um-domain-invite :domain] (if success "" (:domain (:um-domain-invite db))))
       (assoc :add-email-domain-team-error (if success false true))))
