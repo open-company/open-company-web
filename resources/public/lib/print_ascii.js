@@ -1,6 +1,6 @@
 function OCWebHelp(){
   console.log(`
-Help:
+OpenCompany Web help:
 OCWebHelp(): print this help,
 OCWebPrintAppState(): print the whole app-state,
 OCWebPrintOrgData(): to print the current org data,
