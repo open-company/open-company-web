@@ -75,6 +75,7 @@
                               :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])})))
                 (dom/div {:class "center"}
                   (dom/button {:class "btn-reset btn-solid get-started-button"
+                               :disabled (not (pos? (count (:create-board data))))
                                :on-click (partial create-board-clicked owner)}
                               (when loading
                                 (loading/small-loading {:class "left mt1"}))
