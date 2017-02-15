@@ -59,7 +59,8 @@
       ;; using utils/after here because we can't dispatch inside another dispatch.
       ;; ultimately we should switch to some event-loop impl that works like a proper queue
       ;; and does not have these limitations
-      (utils/after 1 #(dis/dispatch! [:input [:create-org] (jwt/get-key :slack-org-name)]))))
+      (utils/after 1 #(let [team-data (dis/team-data)]
+                        (dis/dispatch! [:input [:create-org] (or (:name team-data) "")])))))
 
   (render-state [_ {:keys [loading skip-bot]}]
     (dom/div {:class "org-editor"}
