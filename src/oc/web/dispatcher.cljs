@@ -191,6 +191,15 @@
   ([org-slug board-slug topic-slug] (topic-entries-data org-slug board-slug topic-slug @app-state))
   ([org-slug board-slug topic-slug data] (get-in data (topic-entries-key org-slug board-slug topic-slug))))
 
+(defn teams-data
+  ([] (teams-data @app-state))
+  ([data] (get-in data [:enumerate-users :teams])))
+
+(defn team-data
+  ([] (team-data (router/current-team-id)))
+  ([team-id] (team-data team-id @app-state))
+  ([team-id data] (get-in data [:enumerate-users team-id])))
+
 (defn foce-topic-key []
   (:foce-key @app-state))
 
