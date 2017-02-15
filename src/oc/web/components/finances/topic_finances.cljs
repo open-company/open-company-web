@@ -8,7 +8,7 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.finance-utils :as finance-utils]
-            ; [open-company-web.components.finances.finances-edit :refer (finances-edit)]
+            [oc.web.components.finances.finances-edit :refer (finances-edit)]
             [oc.web.components.finances.finances-sparklines :refer (finances-sparklines)]
             [oc.web.components.ui.popover :as popover :refer (add-popover-with-om-component add-popover hide-popover)]))
 
@@ -55,37 +55,37 @@
                               (om/update-state! owner #(merge % {:finances-raw-data {}
                                                                  :table-key (str (rand 4))})))}))
 
-; (defcomponent finances-popover [{:keys [currency finances-raw-data topic-data hide-popover-cb table-key data-topic-on-change width height] :as data} owner options]
-;   (render [_]
-;     (dom/div {:class "oc-popover-container-internal finances composed-topic"
-;               :style {:width "100%" :height "100vh"}}
-;       (dom/button {:class "close-button"
-;                    :on-click #(hide-popover-cb)
-;                    :style {:top "50%"
-;                            :left "50%"
-;                            :margin-top (str "-" (/ height 2) "px")
-;                            :margin-left (str (/ width 2) "px")}}
-;         (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
-;       (dom/div {:class "oc-popover"
-;                 :on-click (fn [e] (.stopPropagation e))
-;                 :style {:width (str width "px")
-;                         :height (str height "px")
-;                         :margin-top (str "-" (/ height 2) "px")
-;                         :margin-left (str "-" (/ width 2) "px")
-;                         :text-align "center"
-;                         :overflow-x "visible"
-;                         :z-index (+ popover/default-z-index 1)
-;                         :overflow-y "scroll"}}
+(defcomponent finances-popover [{:keys [currency finances-raw-data topic-data hide-popover-cb table-key data-topic-on-change width height] :as data} owner options]
+  (render [_]
+    (dom/div {:class "oc-popover-container-internal finances composed-topic"
+              :style {:width "100%" :height "100vh"}}
+      (dom/button {:class "close-button"
+                   :on-click #(hide-popover-cb)
+                   :style {:top "50%"
+                           :left "50%"
+                           :margin-top (str "-" (/ height 2) "px")
+                           :margin-left (str (/ width 2) "px")}}
+        (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
+      (dom/div {:class "oc-popover"
+                :on-click (fn [e] (.stopPropagation e))
+                :style {:width (str width "px")
+                        :height (str height "px")
+                        :margin-top (str "-" (/ height 2) "px")
+                        :margin-left (str "-" (/ width 2) "px")
+                        :text-align "center"
+                        :overflow-x "visible"
+                        :z-index (+ popover/default-z-index 1)
+                        :overflow-y "scroll"}}
 
-;         (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-raw-data)
-;                                  :currency currency
-;                                  :table-key table-key
-;                                  :data-on-change-cb (:finances-data-on-change data)
-;                                  :editing-cb (:editing-cb data)
-;                                  :data-topic-on-change data-topic-on-change
-;                                  :main-height height
-;                                  :main-width width}
-;                                 {:key (:created-at topic-data)})))))
+        (om/build finances-edit {:finances-data (finance-utils/finances-data-map finances-raw-data)
+                                 :currency currency
+                                 :table-key table-key
+                                 :data-on-change-cb (:finances-data-on-change data)
+                                 :editing-cb (:editing-cb data)
+                                 :data-topic-on-change data-topic-on-change
+                                 :main-height height
+                                 :main-width width}
+                                {:key (:created-at topic-data)})))))
 
 (defcomponent topic-finances [{:keys [topic topic-data currency editable? foce-data-editing? editing-cb table-key data-topic-on-change card-width columns-num] :as data} owner options]
 
@@ -97,23 +97,23 @@
     (when-not (= next-props data)
       (om/set-state! owner {:finances-raw-data (-> next-props :topic-data :data)})))
 
-  ; (did-update [_ prev-props prev-state]
-  ;   (when (and (not (:foce-data-editing? prev-props))
-  ;              (:foce-data-editing? data))
-  ;     (add-popover-with-om-component finances-popover (merge data {:finances-raw-data (om/get-state owner :finances-raw-data)
-  ;                                                                  :finances-data-on-change (partial finances-data-on-change owner)
-  ;                                                                  :table-key table-key
-  ;                                                                  :archive-data-cb #(show-archive-confirm-popover owner data)
-  ;                                                                  :hide-popover-cb #(editing-cb false)
-  ;                                                                  :editing-cb (partial data-editing-toggle owner editing-cb)
-  ;                                                                  :data-topic-on-change data-topic-on-change
-  ;                                                                  :width 400
-  ;                                                                  :height (min 380 (.-clientHeight (.-body js/document)))
-  ;                                                                  :z-index-popover 0
-  ;                                                                  :container-id "finances-edit"})))
-  ;   (when (and (:foce-data-editing? prev-props)
-  ;              (not (:foce-data-editing? data)))
-  ;     (hide-popover nil "finances-edit")))
+  (did-update [_ prev-props prev-state]
+    (when (and (not (:foce-data-editing? prev-props))
+               (:foce-data-editing? data))
+      (add-popover-with-om-component finances-popover (merge data {:finances-raw-data (om/get-state owner :finances-raw-data)
+                                                                   :finances-data-on-change (partial finances-data-on-change owner)
+                                                                   :table-key table-key
+                                                                   :archive-data-cb #(show-archive-confirm-popover owner data)
+                                                                   :hide-popover-cb #(editing-cb false)
+                                                                   :editing-cb (partial data-editing-toggle owner editing-cb)
+                                                                   :data-topic-on-change data-topic-on-change
+                                                                   :width 400
+                                                                   :height (min 380 (.-clientHeight (.-body js/document)))
+                                                                   :z-index-popover 0
+                                                                   :container-id "finances-edit"})))
+    (when (and (:foce-data-editing? prev-props)
+               (not (:foce-data-editing? data)))
+      (hide-popover nil "finances-edit")))
 
   (render-state [_ {:keys [finances-raw-data]}]
     (let [no-data (or (empty? finances-raw-data) (utils/no-finances-data? finances-raw-data))]

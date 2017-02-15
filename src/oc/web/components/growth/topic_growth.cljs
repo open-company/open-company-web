@@ -6,7 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.growth-utils :as growth-utils]
-            ; [open-company-web.components.growth.growth-edit :refer (growth-edit)]
+            [oc.web.components.growth.growth-edit :refer (growth-edit)]
             [oc.web.components.growth.growth-sparklines :refer (growth-sparklines)]
             [oc.web.components.ui.popover :refer (add-popover-with-om-component add-popover hide-popover)]))
 
@@ -86,55 +86,55 @@
                                 (archive-metric-cb owner editing-cb metric-slug)
                                 ((om/get-props owner :data-topic-on-change)))}))
 
-; (defcomponent growth-popover [{:keys [initial-focus
-;                                       new-metric?
-;                                       growth-data
-;                                       growth-metrics
-;                                       curency
-;                                       hide-popover-cb
-;                                       growth-metric-slugs
-;                                       growth-editing-on-change-cb
-;                                       growth-metadata-editing-on-change-cb
-;                                       growth-data-editing-toggle-cb
-;                                       growth-switch-focus-cb
-;                                       growth-archive-metric-cb
-;                                       data-topic-on-change
-;                                       width
-;                                       height] :as data} owner options]
-;   (render [_]
-;     (dom/div {:class "oc-popover-container-internal growth composed-topic"
-;               :style {:width "100%" :height "100%"}}
-;       (dom/button {:class "close-button"
-;                    :on-click #(hide-popover-cb)
-;                    :style {:top "50%"
-;                            :left "50%"
-;                            :margin-top (str "-" (/ height 2) "px")
-;                            :margin-left (str (/ width 2) "px")}}
-;         (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
-;       (dom/div {:class "oc-popover "
-;                 :on-click (fn [e] (.stopPropagation e))
-;                 :style {:width (str width "px")
-;                         :height (str height "px")
-;                         :margin-top (str "-" (/ height 2) "px")
-;                         :margin-left (str "-" (/ width 2) "px")
-;                         :text-align "center"
-;                         :overflow-x "visible"
-;                         :overflow-y "scroll"}}
+(defcomponent growth-popover [{:keys [initial-focus
+                                      new-metric?
+                                      growth-data
+                                      growth-metrics
+                                      curency
+                                      hide-popover-cb
+                                      growth-metric-slugs
+                                      growth-editing-on-change-cb
+                                      growth-metadata-editing-on-change-cb
+                                      growth-data-editing-toggle-cb
+                                      growth-switch-focus-cb
+                                      growth-archive-metric-cb
+                                      data-topic-on-change
+                                      width
+                                      height] :as data} owner options]
+  (render [_]
+    (dom/div {:class "oc-popover-container-internal growth composed-topic"
+              :style {:width "100%" :height "100%"}}
+      (dom/button {:class "close-button"
+                   :on-click #(hide-popover-cb)
+                   :style {:top "50%"
+                           :left "50%"
+                           :margin-top (str "-" (/ height 2) "px")
+                           :margin-left (str (/ width 2) "px")}}
+        (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
+      (dom/div {:class "oc-popover "
+                :on-click (fn [e] (.stopPropagation e))
+                :style {:width (str width "px")
+                        :height (str height "px")
+                        :margin-top (str "-" (/ height 2) "px")
+                        :margin-left (str "-" (/ width 2) "px")
+                        :text-align "center"
+                        :overflow-x "visible"
+                        :overflow-y "scroll"}}
 
-;         (om/build growth-edit {:initial-focus initial-focus
-;                                :new-metric? new-metric?
-;                                :growth-data growth-data
-;                                :main-height height
-;                                :main-width width
-;                                :metrics growth-metrics
-;                                :currency curency
-;                                :metric-slugs growth-metric-slugs
-;                                :data-on-change-cb growth-editing-on-change-cb
-;                                :metadata-on-change-cb growth-metadata-editing-on-change-cb
-;                                :editing-cb growth-data-editing-toggle-cb
-;                                :switch-focus-cb growth-switch-focus-cb
-;                                :archive-metric-cb growth-archive-metric-cb
-;                                :data-topic-on-change data-topic-on-change})))))
+        (om/build growth-edit {:initial-focus initial-focus
+                               :new-metric? new-metric?
+                               :growth-data growth-data
+                               :main-height height
+                               :main-width width
+                               :metrics growth-metrics
+                               :currency curency
+                               :metric-slugs growth-metric-slugs
+                               :data-on-change-cb growth-editing-on-change-cb
+                               :metadata-on-change-cb growth-metadata-editing-on-change-cb
+                               :editing-cb growth-data-editing-toggle-cb
+                               :switch-focus-cb growth-switch-focus-cb
+                               :archive-metric-cb growth-archive-metric-cb
+                               :data-topic-on-change data-topic-on-change})))))
 
 (defn- get-state [owner data initial]
   (let [topic-data (:topic-data data)
@@ -176,34 +176,34 @@
     (when-not (= next-props data)
       (om/set-state! owner (get-state owner next-props false))))
 
-  ; (did-update [_ prev-props prev-state]
-  ;   (let [data-editing? (:foce-data-editing? data)]
-  ;     (cond
-  ;       (and (not (:foce-data-editing? prev-props))
-  ;            data-editing?)
-  ;       (utils/after 1 #(data-editing-toggle owner editing-cb data-editing? (= data-editing? growth-utils/new-metric-slug-placeholder)))
-  ;       (and (not (:editing prev-state))
-  ;            (om/get-state owner :editing))
-  ;       (add-popover-with-om-component growth-popover
-  ;         (merge data {:initial-focus data-editing?
-  ;                      :new-metric? (om/get-state owner :new-metric?)
-  ;                      :hide-popover-cb (fn [] (editing-cb false))
-  ;                      :growth-data (om/get-state owner :growth-data)
-  ;                      :growth-metrics (om/get-state owner :growth-metrics)
-  ;                      :growth-metric-slugs (om/get-state owner :growth-metric-slugs)
-  ;                      :growth-editing-on-change-cb (partial data-editing-on-change owner)
-  ;                      :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner data-editing?)
-  ;                      :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
-  ;                      :growth-switch-focus-cb (partial switch-focus owner)
-  ;                      :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
-  ;                      :data-topic-on-change data-topic-on-change
-  ;                      :width 400
-  ;                      :height (min 507 (- (.-clientHeight (.-body js/document)) 50))
-  ;                      :z-index-offset 0
-  ;                      :container-id "growth-edit"}))
-  ;       (and (:foce-data-editing? prev-props)
-  ;            (not data-editing?))
-  ;       (data-editing-toggle owner editing-cb false))))
+  (did-update [_ prev-props prev-state]
+    (let [data-editing? (:foce-data-editing? data)]
+      (cond
+        (and (not (:foce-data-editing? prev-props))
+             data-editing?)
+        (utils/after 1 #(data-editing-toggle owner editing-cb data-editing? (= data-editing? growth-utils/new-metric-slug-placeholder)))
+        (and (not (:editing prev-state))
+             (om/get-state owner :editing))
+        (add-popover-with-om-component growth-popover
+          (merge data {:initial-focus data-editing?
+                       :new-metric? (om/get-state owner :new-metric?)
+                       :hide-popover-cb (fn [] (editing-cb false))
+                       :growth-data (om/get-state owner :growth-data)
+                       :growth-metrics (om/get-state owner :growth-metrics)
+                       :growth-metric-slugs (om/get-state owner :growth-metric-slugs)
+                       :growth-editing-on-change-cb (partial data-editing-on-change owner)
+                       :growth-metadata-editing-on-change-cb (partial metadata-editing-on-change owner data-editing?)
+                       :growth-data-editing-toggle-cb (partial data-editing-toggle owner editing-cb)
+                       :growth-switch-focus-cb (partial switch-focus owner)
+                       :growth-archive-metric-cb (partial show-archive-confirm-popover owner editing-cb)
+                       :data-topic-on-change data-topic-on-change
+                       :width 400
+                       :height (min 507 (- (.-clientHeight (.-body js/document)) 50))
+                       :z-index-offset 0
+                       :container-id "growth-edit"}))
+        (and (:foce-data-editing? prev-props)
+             (not data-editing?))
+        (data-editing-toggle owner editing-cb false))))
 
   (render-state [_ {:keys [focus growth-metrics growth-data growth-metric-slugs metric-slug new-metric?]}]
 
