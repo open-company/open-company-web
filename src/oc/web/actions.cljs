@@ -65,11 +65,12 @@
 
 (defn get-default-board [org-data]
   (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (if-let [board (filter #(= (:slug %) last-board-slug) (:boards org-data))]
-      ; Get the last accessed board from the saved cookie
-      (first board)
-      ; Fallback to the newest board if the saved board was not found
-      (newest-board (:boards org-data)))
+    (let [boards (filter #(= (:slug %) last-board-slug) (:boards org-data))]
+      (if (pos? (count boards))
+        ; Get the last accessed board from the saved cookie
+        (first boards)
+        ; Fallback to the newest board if the saved board was not found
+        (newest-board (:boards org-data))))
     (newest-board (:boards org-data))))
 
 (defmethod dispatcher/action :org [db [_ org-data]]
@@ -88,7 +89,7 @@
         ;; Redirect to create board if no board are present
         :else
         (router/nav! (oc-urls/create-board (router/current-org-slug))))))
-  (assoc-in db (dispatcher/org-data-key (:slug org-data)) org-data))
+  (assoc-in db (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data)))
 
 (defmethod dispatcher/action :load-other-boards [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
@@ -100,7 +101,7 @@
   (when (= (:slug board-data) (router/current-board-slug))
     (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
   (-> db
-    (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) (utils/fix-topics board-data))
+    (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) (utils/fix-board board-data))
     ;; show add topic if the board loaded is the one currently shown and it has no topics
     (assoc :show-add-topic (if (= (:slug board-data) (router/current-board-slug))
                               (and (not (:selected-topic-view db))
@@ -113,7 +114,7 @@
 
 (defmethod dispatcher/action :company-created [db [_ body]]
   (if (:links body)
-    (let [updated (utils/fix-topics body)]
+    (let [updated (utils/fix-board body)]
       (router/redirect! (oc-urls/board (:slug updated)))
       (assoc-in db (dispatcher/org-data-key (:slug updated)) updated))
     db))
@@ -170,7 +171,7 @@
     ;; add topic name inside each topic
     (let [org (router/current-org-slug)
           board (router/current-board-slug)
-          updated-body (utils/fix-topics body)
+          updated-body (utils/fix-board body)
           board-data-key (dispatcher/board-data-key org board)
           board-topics-key (conj board-data-key :topics)
           topic-entries-data-key (when (:selected-topic-view db)
@@ -268,7 +269,7 @@
       ; save the company data returned with the SU data
       (-> db
         (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
-        (assoc-in (dispatcher/board-data-key (router/current-org-slug) slug) (utils/fix-topics board-data))
+        (assoc-in (dispatcher/board-data-key (router/current-org-slug) slug) (utils/fix-board board-data))
         (dissoc :loading))
       ; save only the SU data
       (-> db
@@ -350,7 +351,7 @@
         with-fixed-topics (if should-remove-topic?
                             (dissoc with-topics (keyword topic))
                             (assoc with-topics (keyword topic) new-topic-data))]
-    (api/delete-entry topic entry-data)
+    (api/delete-entry topic entry-data should-remove-topic?)
     (-> db
       (stop-foce)
       (assoc-in board-data-key with-fixed-topics)
