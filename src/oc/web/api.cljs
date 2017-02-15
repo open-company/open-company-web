@@ -603,3 +603,14 @@
             (update-jwt-cookie! body)
             (dispatcher/dispatch! [:jwt body]))
           (router/redirect! oc-urls/logout))))))
+
+(defn create-board [board-name]
+  (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
+    (when (and board-name create-link)
+      (api-post (:href create-link)
+        {:headers (headers-for-link create-link)
+         :json-params (cljs->json {:name board-name :access "team"})}
+        (fn [{:keys [success status body]}]
+          (let [board-data (if success (json->cljs body) {})]
+            (dispatcher/dispatch! [:board board-data])
+            (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))

@@ -799,3 +799,10 @@
     (if (nil? v)
       (update-in db cache-key dissoc k)
       (assoc-in db (conj cache-key k) v))))
+
+(defmethod dispatcher/action :create-board
+  [db [_]]
+  (let [board-name (:create-board db)]
+    (when (> (count board-name) 3)
+      (api/create-board board-name)))
+  db)
