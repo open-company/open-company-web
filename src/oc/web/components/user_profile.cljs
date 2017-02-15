@@ -20,7 +20,7 @@
           [:div.user-profile-name-title.data-title "LAST NAME"]
           [:div.user-profile-name (:last-name (drv/react s :current-user-data))]
           [:div.user-profile-name-title.data-title "SLACK ORGANIZATION"]
-          [:div.user-profile-name (:org-name (drv/react s :current-user-data))]
+          [:div.user-profile-name (:slack-org-name (drv/react s :current-user-data))]
           [:div.user-profile-name-title.data-title "EMAIL"]
           [:div.user-profile-name (:email (drv/react s :current-user-data))]]
         [:div.right-column
