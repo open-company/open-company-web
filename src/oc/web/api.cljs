@@ -545,14 +545,16 @@
             (dispatcher/dispatch! [:user-data (json->cljs body)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
 
-(defn delete-entry [topic entry-data]
+(defn delete-entry [topic entry-data should-redirect-to-board]
   (when (and topic entry-data)
     (let [links (:links entry-data)
           delete-link (utils/link-for links "delete")]
       (when delete-link
         (api-delete (:href delete-link)
           {:headers (headers-for-link delete-link)}
-          (fn [_]))))))
+          (fn [_]
+            (when should-redirect-to-board
+              (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug))))))))))
 
 (defn get-current-user [auth-links]
   (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
