@@ -264,9 +264,9 @@
 
     (defroute board-create-route (urls/create-board ":org") {:as params}
       (if (jwt/jwt)
-        (do
+        (let [org (:org (:params params))]
           (pre-routing (:query-params params))
-          (router/set-route! ["create-board"] {:query-params (:query-params params)})
+          (router/set-route! [org "create-board"] {:org org :query-params (:query-params params)})
           (api/get-auth-settings)
           (api/get-entry-point)
           (drv-root board-editor target))
