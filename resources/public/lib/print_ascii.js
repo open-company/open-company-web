@@ -25,3 +25,4 @@ function printArt(){
 }
 
 window.OCWebPrintAsciiArt = printArt;
+printArt();
