@@ -33,7 +33,6 @@
   (dissoc db :jwt))
 
 (defmethod dispatcher/action :entry-point [db [_ {:keys [collection]}]]
-  (js/console.log "action/:entry-point" (:items collection) (router/current-org-slug))
   (let [orgs (:items collection)]
     (cond
       ; If i have an org slug let's load the org data
