@@ -13,6 +13,8 @@
 
 (def companies-key [:companies])
 
+(def api-entry-point-key [:api-entry-point])
+
 (defn org-data-key [org-slug]
   [(keyword org-slug) :org-data])
 
@@ -111,7 +113,13 @@
 
 ;; Data
 
+(defn api-entry-point
+  "Get the API entry point."
+  ([] (api-entry-point @app-state))
+  ([data] (get-in data api-entry-point-key)))
+
 (defn org-data
+  "Get org data."
   ([]
     (org-data @app-state))
   ([data]
@@ -120,6 +128,7 @@
     (get-in data (org-data-key org-slug))))
 
 (defn board-data
+  "Get board data."
   ([]
     (board-data @app-state))
   ([data]

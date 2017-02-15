@@ -58,7 +58,7 @@
     (-> db
         (dissoc :loading)
         (assoc :orgs orgs)
-        (assoc :api-entry-point (:links collection)))))
+        (assoc-in dispatcher/api-entry-point-key (:links collection)))))
 
 (defn newest-board [boards]
   (first (sort #(compare (utils/js-date (:created-at %2)) (utils/js-date (:created-at %1))) boards)))
@@ -85,10 +85,10 @@
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
         (let [board-to (get-default-board org-data)]
-          (router/nav! (oc-urls/board (router/current-org-slug) (:slug board-to))))
+          (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
         ;; Redirect to create board if no board are present
         :else
-        (router/nav! (oc-urls/create-board (router/current-org-slug))))))
+        (router/nav! (oc-urls/create-board (:slug org-data))))))
   (assoc-in db (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data)))
 
 (defmethod dispatcher/action :load-other-boards [db [_]]
@@ -544,7 +544,7 @@
     (dissoc :invite-by-email-error)))
 
 (defn resend-invite [db user]
-  (let [api-entry-point-links (:api-entry-point db)
+  (let [api-entry-point-links (dispatcher/api-entry-point db)
         companies (count (filter #(= (:rel %) "company") api-entry-point-links))
         team-data (get (:enumerate-users db) (router/current-team-id))
         idx (.indexOf (:users team-data) user)
@@ -800,9 +800,16 @@
       (update-in db cache-key dissoc k)
       (assoc-in db (conj cache-key k) v))))
 
+(defmethod dispatcher/action :create-org
+  [db [_]]
+  (let [org-name (:create-org db)]
+    (when-not (string/blank? org-name)
+      (api/create-org org-name)))
+  db)
+
 (defmethod dispatcher/action :create-board
   [db [_]]
   (let [board-name (:create-board db)]
-    (when (> (count board-name) 3)
+    (when-not (string/blank? board-name)
       (api/create-board board-name)))
   db)

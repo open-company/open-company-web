@@ -604,6 +604,17 @@
             (dispatcher/dispatch! [:jwt body]))
           (router/redirect! oc-urls/logout))))))
 
+(defn create-org [org-name]
+  (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")]
+    (when (and org-name create-org-link)
+      (api-post (:href create-org-link)
+        {:headers (headers-for-link create-org-link)
+         :json-params (cljs->json {:name org-name :team-id (router/current-team-id)})}
+        (fn [{:keys [success status body]}]
+          (when-let [org-data (if success (json->cljs body) {})]
+            (dispatcher/dispatch! [:org org-data])
+            (router/redirect! (oc-urls/org (:slug org-data)))))))))
+
 (defn create-board [board-name]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
     (when (and board-name create-link)

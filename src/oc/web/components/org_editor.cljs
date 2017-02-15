@@ -13,9 +13,9 @@
             [oc.web.components.ui.small-loading :as loading]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]))
 
-(defn- create-org-alert []
+(defn- create-org-alert [owner]
   (add-popover {:container-id "create-org-alert"
-                :message "Please enter an org name."
+                :message "Please enter a company name."
                 :height "120px"
                 :success-title "GOT IT"
                 :success-cb #(hide-popover nil "create-org-alert")}))
@@ -24,12 +24,12 @@
   (utils/event-stop e)
   (when-not (om/get-state owner :loading)
     (let [data         (om/get-props owner)
-          org-name (-> data :org-editor :name)]
+          org-name (:create-org data)]
       (if (clojure.string/blank? org-name)
-        (create-org-alert)
+        (create-org-alert owner)
         (do
           (om/set-state! owner :loading true)
-          (dis/dispatch! [:org-submit]))))))
+          (dis/dispatch! [:create-org]))))))
 
 (rum/defcs bot-access-prompt < rum/static
   [s maybe-later-cb]
@@ -55,11 +55,11 @@
 
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Organization")
-    (when-not (-> data :org-editor :name)
+    (when-not (:create-org data)
       ;; using utils/after here because we can't dispatch inside another dispatch.
       ;; ultimately we should switch to some event-loop impl that works like a proper queue
       ;; and does not have these limitations
-      (utils/after 1 #(dis/dispatch! [:input [:org-editor :name] (jwt/get-key :org-name)]))))
+      (utils/after 1 #(dis/dispatch! [:input [:create-org] (jwt/get-key :slack-org-name)]))))
 
   (render-state [_ {:keys [loading skip-bot]}]
     (dom/div {:class "org-editor"}
@@ -72,15 +72,16 @@
               (dom/div {:class "form-group"}
                 (when (and (jwt/jwt) (jwt/get-key :first-name))
                   (dom/label {:class "org-editor-message"} (str "Hi " (s/capital (jwt/get-key :first-name)) "!")))
-                (dom/label {:class "org-editor-message"} "What's the name of your org?")
+                (dom/label {:class "org-editor-message"} "What's the name of your organization?")
                 (dom/input {:type "text"
                             :class "org-editor-input domine h4"
                             :style #js {:width "100%"}
                             :placeholder "Simple name without the Inc., LLC, etc."
-                            :value (or (-> data :org-editor :name) "")
-                            :on-change #(dis/dispatch! [:input [:org-editor :name] (.. % -target -value)])})))
+                            :value (or (:create-org data) "")
+                            :on-change #(dis/dispatch! [:input [:create-org] (.. % -target -value)])})))
               (dom/div {:class "center"}
                 (dom/button {:class "btn-reset btn-solid get-started-button"
+                             :disabled (not (pos? (count (:create-org data))))
                              :on-click (partial create-org-clicked owner)}
                             (when loading
                               (loading/small-loading {:class "left mt1"}))
