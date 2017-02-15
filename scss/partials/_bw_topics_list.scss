@@ -87,6 +87,16 @@ div.left-topics-list {
           opacity: 0.7;
         }
       }
+
+      input.board-name {
+        width: 130px;
+        height: 20px;
+        margin: 2px 0;
+
+        &:active, &:focus {
+          outline: none;
+        }
+      }
     }
   }
 }

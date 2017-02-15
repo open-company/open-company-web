@@ -56,7 +56,7 @@
 (defn sorted-boards [boards]
   (into [] (sort #(compare (utils/js-date (:created-at %1)) (utils/js-date (:created-at %2))) boards)))
 
-(defcomponent bw-topics-list [{:keys [board-data card-width selected-topic-view show-add-topic] :as data} owner options]
+(defcomponent bw-topics-list [{:keys [org-data board-data card-width selected-topic-view show-add-topic] :as data} owner options]
 
   (init-state [_]
     {:topics (get-topics data)})
@@ -72,10 +72,25 @@
   ;   (when (and (not (can-dnd? data)) (can-dnd? next-props))
   ;     (setup-sortable owner)))
 
+  (did-update [_ prev-props _]
+    (when (and (nil? (:create-board prev-props))
+               (not (nil? (om/get-props owner :create-board))))
+      (utils/after 100 #(.focus (js/$ "input.board-name")))))
+
   (render-state [_ {:keys [topics]}]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
       (dom/div {:class "left-topics-list-top group"}
-        (dom/h3 {:class "left-topics-list-top-title"} "BOARDS"))
+        (dom/h3 {:class "left-topics-list-top-title"} "BOARDS")
+        (when (and (not (responsive/is-tablet-or-mobile?))
+                   (not (:read-only org-data)))
+          (dom/button {:class "left-topics-list-top-title btn-reset right"
+                       :on-click #(when (nil? (:foce-key data))
+                                    (dis/dispatch! [:input [:create-board] ""]))
+                       :title "Create a new board"
+                       :data-placement "top"
+                       :data-toggle "tooltip"
+                       :data-container "body"}
+            (dom/i {:class "fa fa-plus-circle"}))))
       (let [org-data (dis/org-data)]
         (dom/div {:class (str "left-topics-list-items group")}
           (for [board (sorted-boards (:boards org-data))]
@@ -90,7 +105,19 @@
                                    (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
               (dom/div {:class "internal"
                         :key (str "bw-board-list-" (name (:slug board)) "-internal")}
-                (str "#" (or (:name board) (:slug board))))))))
+                (str "#" (or (:name board) (:slug board))))))
+          (when-not (nil? (:create-board data))
+            (dom/div {:class "left-topics-list-item group"}
+              (dom/span {:class "left"} "#")
+              (dom/input {:class "board-name left"
+                          :value (:create-board data)
+                          :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
+                          :on-key-up (fn [e]
+                                          (cond
+                                            (= "Enter" (.-key e))
+                                            (dis/dispatch! [:create-board])
+                                            (= "Escape" (.-key e))
+                                            (dis/dispatch! [:input [:create-board] nil])))})))))
       (dom/div {:class "left-topics-list-top mt3 group"}
         (when (not= (count (:topics board-data)) 0)
           (dom/h3 {:class "left-topics-list-top-title"
