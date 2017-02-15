@@ -671,7 +671,7 @@
         sorted-fixed-entries (vec (sort sort-pred fixed-entries))]
     (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
-((defmethod dispatcher/action :show-add-topic
+(defmethod dispatcher/action :show-add-topic
   [db [_ active]]
   (if active
     (do
@@ -679,7 +679,7 @@
       (-> db
         (assoc :show-add-topic true)
         (dissoc :selected-topic-view)))
-    (assoc db :show-add-topic false))))
+    (assoc db :show-add-topic false)))
 
 (defmethod dispatcher/action :dashboard-select-topic
   [db [_ topic-kw]]
