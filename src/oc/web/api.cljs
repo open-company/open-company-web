@@ -445,23 +445,23 @@
             (dispatcher/dispatch! [:signup-with-email/success body])
             (dispatcher/dispatch! [:signup-with-email/failed status])))))))
 
-(defn enumerate-users []
+(defn get-teams [& [dont-follow-team-link]]
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "collection" "GET")]
     (auth-get (:href enumerate-link)
       {:headers (headers-for-link enumerate-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:enumerate-users/teams (-> fixed-body :collection :items)])))))))
+            (dispatcher/dispatch! [:teams-loaded (-> fixed-body :collection :items) dont-follow-team-link])))))))
 
-(defn enumerate-team-users [team-link]
+(defn get-team [team-link]
   (when team-link
     (auth-get (:href team-link)
       {:headers (headers-for-link team-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:enumerate-users/success fixed-body])))))))
+            (dispatcher/dispatch! [:team-loaded fixed-body])))))))
 
 (defn enumerate-channels []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]
@@ -604,6 +604,18 @@
             (dispatcher/dispatch! [:jwt body]))
           (router/redirect! oc-urls/logout))))))
 
+(defn patch-team [new-team-data redirect-url]
+  (when-let* [teams-data (dispatcher/teams-data)
+              team-data (first (filter #(= (:team-id %) (router/current-team-id)) teams-data))
+              team-patch (utils/link-for (:links team-data) "partial-update")]
+    (api-patch (:href team-patch)
+      {:headers (headers-for-link team-patch)
+       :json-params (cljs->json new-team-data)}
+      (fn [{:keys [success body status]}]
+        (when (and success
+                   (not (s/blank? redirect-url)))
+          (router/redirect! redirect-url))))))
+
 (defn create-org [org-name]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")]
     (when (and org-name create-org-link)
@@ -613,7 +625,17 @@
         (fn [{:keys [success status body]}]
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
-            (router/redirect! (oc-urls/org (:slug org-data)))))))))
+            (let [teams-data (dispatcher/teams-data)
+                  team-data (first (filter #(= (:team-id %) (router/current-team-id))))
+                  board-url (oc-urls/org (:slug org-data))]
+              (if (and (s/blank? (:name team-data)))
+                ; if the current team has no name and
+                ; the user has write permission on it
+                ; use the org name
+                ; for it and patch it back
+                (patch-team {:name org-name} board-url)
+                ; if not refirect the user to the slug
+                (router/redirect! board-url)))))))))
 
 (defn create-board [board-name]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
