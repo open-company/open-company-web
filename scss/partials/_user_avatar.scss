@@ -40,7 +40,7 @@ img.user-avatar-img {
 }
 
 div.user-avatar-name {
-  width: #{$avatar_size}px;
+  min-width: #{$avatar_size}px;
   height: #{$avatar_size}px;
   font-size: 22px;
   font-family: $oc_headers_font;
