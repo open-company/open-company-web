@@ -186,9 +186,7 @@
                 :success-cb #(let [topic (dis/foce-topic-key)
                                    entries (dis/topic-entries-data topic)]
                                (dis/dispatch! [:delete-entry topic (:created-at (dis/foce-topic-data))])
-                               (hide-popover nil "delete-entry-confirm")
-                               (when (= (count entries) 1)
-                                  (router/nav! (oc-urls/board))))}))
+                               (hide-popover nil "delete-entry-confirm"))}))
 
 (defn- add-image-tooltip [image-header]
   (if (or (not image-header) (string/blank? image-header))
