@@ -75,7 +75,9 @@
   (did-update [_ prev-props _]
     (when (and (nil? (:create-board prev-props))
                (not (nil? (om/get-props owner :create-board))))
-      (utils/after 100 #(.focus (js/$ "input.board-name")))))
+      (utils/after 100 #(.focus (js/$ "input.board-name"))))
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render-state [_ {:keys [topics]}]
     (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
@@ -110,7 +112,13 @@
             (dom/span {:class "left"} "#")
             (dom/input {:class "board-name left"
                         :value (:create-board data)
+                        :data-toggle "tooltip"
+                        :data-placement "right"
+                        :data-container "body"
+                        :title "Press Enter to submit and Escape to cancel."
                         :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
+                        :on-blur #(when (s/blank? (:create-board data))
+                                    (dis/dispatch! [:input [:create-board] nil]))
                         :on-key-up (fn [e]
                                         (cond
                                           (= "Enter" (.-key e))
