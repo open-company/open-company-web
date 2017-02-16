@@ -14,12 +14,10 @@
 (defcomponent confirm-invitation [data owner]
 
   (init-state [_]
-    (js/console.log "confirm-invitation/init-state")
     {:loading true
      :confirmed false})
 
   (did-mount [_]
-    (js/console.log "confirm-invitation/did-mount")
     (if (contains? (:query-params @router/path) :token)
       ; start loading the auth settings,
       ; then the token will be automatically exchanged
@@ -29,13 +27,11 @@
                                          :confirmed false}))))
 
   (will-receive-props [_ next-props]
-    (js/console.log "confirm-invitation/will-receive-props")
     (when (contains? next-props :email-confirmed)
       (om/update-state! owner #(merge % {:loading false
                                          :confirmed (:email-confirmed next-props)}))))
 
   (render-state [_ {:keys [loading confirmed] :as state}]
-    (js/console.log "confirm-invitation/render-state" state)
     (dom/div {:class (utils/class-set {:confirm-invitation true
                                        :main-scroll true})}
       (dom/div {:class (str "group fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
