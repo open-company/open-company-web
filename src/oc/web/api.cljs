@@ -634,9 +634,10 @@
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
             (let [teams-data (dispatcher/teams-data)
-                  team-data (first (filter #(= (:team-id %) (router/current-team-id))))
+                  team-data (first (filter #(= (:team-id %) (router/current-team-id)) teams-data))
                   board-url (oc-urls/org (:slug org-data))]
-              (if (and (s/blank? (:name team-data)))
+              (if (and (s/blank? (:name team-data))
+                       (utils/link-for (:links team-data) "partial-update"))
                 ; if the current team has no name and
                 ; the user has write permission on it
                 ; use the org name
