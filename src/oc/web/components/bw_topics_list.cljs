@@ -84,7 +84,7 @@
       (dom/div {:class "left-topics-list-top group"}
         (dom/h3 {:class "left-topics-list-top-title"} "BOARDS")
         (when (and (not (responsive/is-tablet-or-mobile?))
-                   (not (:read-only org-data)))
+                   (utils/link-for (:links org-data) "create"))
           (dom/button {:class "left-topics-list-top-title btn-reset right"
                        :on-click #(when (nil? (:foce-key data))
                                     (dis/dispatch! [:input [:create-board] ""]))
