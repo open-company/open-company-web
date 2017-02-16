@@ -50,7 +50,7 @@
                 :target target}))
 
 ;; setup Sentry error reporting
-; (defonce raven (sentry/raven-setup))
+(defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -81,6 +81,7 @@
   (when (jwt/jwt)
     ;; load data from api
     (api/get-entry-point)
+    (api/get-auth-settings)
     (swap! dis/app-state assoc :loading true))
   ;; render component
   (drv-root home target))
@@ -93,6 +94,7 @@
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
   (api/get-entry-point)
+  (api/get-auth-settings)
   ;; render component
   (drv-root list-orgs target))
 
@@ -106,6 +108,7 @@
     ;; load data from api
     (swap! dis/app-state merge {:loading true})
     (api/get-entry-point)
+    (api/get-auth-settings)
     ;; render component
     (drv-root #(om/component) target)))
 
@@ -115,7 +118,8 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-entry-point))
+      (api/get-entry-point)
+      (api/get-auth-settings))
     (do
       (router/set-route! ["login"] {:query-params (:query-params params)})
       (when (contains? (:query-params params) :login-redirect)
@@ -131,7 +135,8 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-entry-point))
+      (api/get-entry-point)
+      (api/get-auth-settings))
     (do
       (when (contains? (:query-params params) :login-redirect)
         (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
@@ -163,6 +168,7 @@
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (api/get-entry-point)
+      (api/get-auth-settings)
       (reset! dis/app-state (-> @dis/app-state
                                (assoc :loading true)
                                (dissoc (keyword org)))))
@@ -177,6 +183,8 @@
   (let [team-id (:team-id (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
+    ; (api/get-entry-point)
+    (api/get-auth-settings)
     ;; save the route
     (router/set-route! [team-id route] {:team-id team-id :query-params query-params})
     (when (contains? (:query-params params) :access)
@@ -261,6 +269,7 @@
           (pre-routing (:query-params params))
           (router/set-route! ["create-org"] {:query-params (:query-params params)})
           (api/get-entry-point)
+          (api/get-auth-settings)
           (drv-root org-editor target))
         (login-handler target params)))
 
@@ -271,6 +280,7 @@
           (pre-routing (:query-params params))
           (router/set-route! [org "create-board"] {:org org :query-params (:query-params params)})
           (api/get-entry-point)
+          (api/get-auth-settings)
           (drv-root board-editor target))
         (login-handler target params)))
 
@@ -325,6 +335,7 @@
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
       (api/get-entry-point)
+      (api/get-auth-settings)
       (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params))})
       (drv-root #(om/component) target))
 
