@@ -17,7 +17,7 @@
                            (:name org-data)
                            (utils/camel-case-str org-slug))
             first-letter (first (clojure.string/upper-case org-name))
-            org-logo (:logo org-data)
+            org-logo (:logo-url org-data)
             su-navbar (:su-navbar data)
             should-show-link (if su-navbar
                                   (utils/link-for (:links (dis/stakeholder-update-data)) "company" "GET")
