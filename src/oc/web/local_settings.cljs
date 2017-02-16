@@ -32,3 +32,6 @@
 
 ;; Cookie prefix
 (def cookie-name-prefix "localhost-")
+
+;; Log level
+(def log-level "debug")

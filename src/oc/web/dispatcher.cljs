@@ -1,6 +1,7 @@
 (ns oc.web.dispatcher
   (:require [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
             [oc.web.router :as router]))
 
 (defonce app-state (atom {:loading false
@@ -97,7 +98,10 @@
 
 ;; Action Loop =================================================================
 
-(defmulti action (fn [db [action-type & _]] action-type))
+(defmulti action (fn [db [action-type & _]]
+                   (when (not= action-type :input)
+                     (timbre/info "Dipatching action:" action-type))
+                   action-type))
 
 (def actions (flux/dispatcher))
 

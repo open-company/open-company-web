@@ -42,6 +42,7 @@
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
+    [com.taoensso/timbre "4.8.0"] ; Pure Clojure/Script logging library https://www.taoensso.com
 
     [binaryage/devtools "0.8.3"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 

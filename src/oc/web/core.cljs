@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [taoensso.timbre :as timbre]
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.medium-editor-exts]
@@ -79,7 +80,6 @@
   (router/set-route! ["home"] {})
   (when (jwt/jwt)
     ;; load data from api
-    (api/get-auth-settings)
     (api/get-entry-point)
     (swap! dis/app-state assoc :loading true))
   ;; render component
@@ -92,7 +92,6 @@
   (router/set-route! ["orgs"] {})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
-  (api/get-auth-settings)
   (api/get-entry-point)
   ;; render component
   (drv-root list-orgs target))
@@ -106,7 +105,6 @@
     (router/set-route! [org "boards"] {:org org})
     ;; load data from api
     (swap! dis/app-state merge {:loading true})
-    (api/get-auth-settings)
     (api/get-entry-point)
     ;; render component
     (drv-root #(om/component) target)))
@@ -117,7 +115,6 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-auth-settings)
       (api/get-entry-point))
     (do
       (router/set-route! ["login"] {:query-params (:query-params params)})
@@ -134,7 +131,6 @@
   (if (contains? (:query-params params) :jwt)
     (do ; contains :jwt so auth went well
       (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-auth-settings)
       (api/get-entry-point))
     (do
       (when (contains? (:query-params params) :login-redirect)
@@ -166,7 +162,6 @@
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
-      (api/get-auth-settings)
       (api/get-entry-point)
       (reset! dis/app-state (-> @dis/app-state
                                (assoc :loading true)
@@ -215,18 +210,22 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
+      (timbre/info "Rounting login-route" urls/login)
       (when-not (contains? (:query-params params) :jwt)
         (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
       (simple-handler sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
+      (timbre/info "Rounting signup-route" urls/sign-up)
       (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
       (simple-handler sign-up "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
+      (timbre/info "Rounting about-route" urls/about)
       (simple-handler about "about" target params))
 
     (defroute pricing-route urls/pricing {:as params}
+      (timbre/info "Rounting pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
 
     ; (defroute email-confirmation-route urls/email-confirmation {:as params}
@@ -234,6 +233,7 @@
     ;   (drv-root email-confirmation target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
+      (timbre/info "Rounting confirm-invitation-route" urls/confirm-invitation)
       (when (jwt/jwt)
         (router/redirect! urls/home))
       (pre-routing query-params)
@@ -245,29 +245,31 @@
     ;     (router/redirect! (urls/board-settings s))))
 
     (defroute home-page-route urls/home {:as params}
+      (timbre/info "Rounting home-page-route" urls/home)
       (home-handler target params))
 
     (defroute org-list-route urls/orgs {:as params}
+      (timbre/info "Rounting org-list-route" urls/orgs)
       (if (jwt/jwt)
         (list-orgs-handler target params)
         (login-handler target params)))
 
     (defroute org-create-route urls/create-org {:as params}
+      (timbre/info "Rounting org-create-route" urls/create-org)
       (if (jwt/jwt)
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-org"] {:query-params (:query-params params)})
-          (api/get-auth-settings)
           (api/get-entry-point)
           (drv-root org-editor target))
         (login-handler target params)))
 
     (defroute board-create-route (urls/create-board ":org") {:as params}
+      (timbre/info "Rounting board-create-route" (urls/create-board ":org"))
       (if (jwt/jwt)
         (let [org (:org (:params params))]
           (pre-routing (:query-params params))
           (router/set-route! [org "create-board"] {:org org :query-params (:query-params params)})
-          (api/get-auth-settings)
           (api/get-entry-point)
           (drv-root board-editor target))
         (login-handler target params)))
@@ -287,14 +289,17 @@
     ;   (drv-root board-logo-setup target)))
 
     (defroute logout-route urls/logout {:as params}
+      (timbre/info "Rounting logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :login-redirect)
       (router/redirect! urls/home))
 
     (defroute org-page-route (urls/org ":org") {:as params}
+      (timbre/info "Rounting org-page-route" (urls/org ":org"))
       (org-handler target params))
 
     (defroute user-profile-route urls/user-profile {:as params}
+      (timbre/info "Routing user-profile-route" urls/user-profile)
       (when-not (jwt/jwt)
         (router/redirect! urls/home))
       (pre-routing (:query-params params))
@@ -309,22 +314,25 @@
     ;   (board-handler "profile" target company-settings params))
 
     (defroute team-settings-route (urls/team-settings-um ":team-id") {:as params}
+      (timbre/info "Routing team-settings-route" (urls/team-settings-um ":team-id"))
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no topics and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
       (team-handler "user-management" target user-management-wrapper params))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
+      (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
-      (api/get-auth-settings)
       (api/get-entry-point)
       (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params))})
       (drv-root #(om/component) target))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
+      (timbre/info "Routing board-route" (urls/board ":org" ":board"))
       (board-handler "dashboard" target org-dashboard params))
 
     (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
+      (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params))
 
     ; (defroute create-update-route (urls/stakeholder-update-preview ":slug") {:as params}
@@ -342,9 +350,11 @@
     ;   (stakeholder-update-handler target su-snapshot params))
 
     (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
+      (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
       (board-handler "topic" target org-dashboard params))
 
     (defroute not-found-route "*" []
+      (timbre/info "Routing not-found-route" "*")
       ;; render component
       (router/redirect-404!))
 
@@ -391,9 +401,18 @@
         (route-dispatch! (router/get-token))
         ; remove all the tooltips
         (utils/after 100 #(utils/remove-tooltips)))))
-  (sentry/capture-message "Error: div#app is not defined!"))
+  (do
+    (timbre/error "Error: div#app is not defined!")
+    (sentry/capture-message "Error: div#app is not defined!")))
+
+(defn config-log-level! [level]
+  (timbre/merge-config! {:level (keyword level)}))
+
+(set! (.-OCWebConfigLogLevel js/window) config-log-level!)
 
 (defn init []
+  ;; Setup timbre log level
+  (config-log-level! ls/log-level)
   ;; Persist JWT in App State
   (dis/dispatch! [:jwt (jwt/get-contents)])
   ;; on any click remove all the shown tooltips to make sure they don't get stuck

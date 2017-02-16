@@ -3,6 +3,7 @@
                    [if-let.core :refer (when-let*)])
   (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
+            [taoensso.timbre :as timbre]
             [cognitect.transit :as t]
             [clojure.walk :refer (keywordize-keys stringify-keys)]
             [clojure.string :as s]
@@ -81,6 +82,7 @@
     "PUT"))
 
 (defn- req [endpoint method path params on-complete]
+  (timbre/debug "Req:" (method-name method) (str endpoint path))
   (let [jwt (j/jwt)]
     (go
       (when (and jwt (j/expired?) )
@@ -92,6 +94,7 @@
           (dispatcher/dispatch! [:logout])))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
+        (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
         ; when a request get a 401 logout the user since his using an old token, need to repeat auth process
         ; no token refresh
         (when (and (j/jwt)

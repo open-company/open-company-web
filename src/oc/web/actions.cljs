@@ -20,11 +20,11 @@
 ;; namespace to avoid cyclical dependencies between namespaces
 
 (defn- log [& args]
-  (js/console.log (apply pr-str args)))
+  (timbre/info (apply pr-str args)))
 
 (defmethod dispatcher/action :default [db payload]
-  (js/console.warn "No handler defined for" (str (first payload)))
-  (js/console.log "Full event: " (pr-str payload))
+  (timbre/warn "No handler defined for" (str (first payload)))
+  (timbre/info "Full event: " (pr-str payload))
   db)
 
 (defmethod dispatcher/action :logout [db _]
@@ -414,8 +414,7 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
-  (when jwt-data
-    (api/get-auth-settings))
+  (api/get-auth-settings)
   (let [next-db (if (cook/get-cookie :show-login-overlay)
                   (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
                   db)]

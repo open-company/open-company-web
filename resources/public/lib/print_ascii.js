@@ -6,7 +6,8 @@ OCWebPrintAppState(): print the whole app-state,
 OCWebPrintOrgData(): to print the current org data,
 OCWebPrintBoardData(): to print the current board data,
 OCWebPrintEntriesData(): to print all the entries loaded,
-OCWebPrintJWTContents(): to print the content of the JWT.`)
+OCWebPrintJWTContents(): to print the content of the JWT.
+OCWebConfigLogLevel("debug"): to change log level.`)
 }
 
 function printArt(){
