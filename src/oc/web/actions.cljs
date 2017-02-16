@@ -82,6 +82,7 @@
       (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         (api/get-board board-data))
       (and (not (utils/in? (:route @router/path) "create-board"))
+           (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-settings")))
       (cond
         ;; Redirect to the first board if only one is presnet
@@ -416,7 +417,6 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
-  (api/get-auth-settings)
   (let [next-db (if (cook/get-cookie :show-login-overlay)
                   (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
                   db)]
