@@ -121,20 +121,18 @@
 (defn- upload-file! [owner file]
   (js/filepicker.setKey ls/filestack-key)
   (let [success-cb  (fn [success]
-                      (let [url    (.-url success)]
-                        (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
-                                                                          :file-upload-progress nil
-                                                                          :logo-did-change true
-                                                                          :state-logo url}))))
+                      (om/update-state! owner #(merge % {:file-upload-state nil
+                                                         :file-upload-progress nil
+                                                         :logo-did-change true
+                                                         :state-logo (.-url success)})))
         error-cb    (fn [error]
                       (timbre/error "Error uploading image:" error)
                       (js/alert "An error occurred while uploading the file, please try again.")
-                      (om/set-state! owner (merge state {:file-upload-state nil
+                      (om/update-state! owner #(merge % {:file-upload-state nil
                                                          :file-upload-progress nil})))
         progress-cb (fn [progress]
-                      (let [state (om/get-state owner)]
-                        (om/set-state! owner (merge state {:file-upload-state :show-progress
-                                                           :file-upload-progress progress}))))]
+                      (om/update-state! owner #(merge % {:file-upload-state :show-progress
+                                                         :file-upload-progress progress})))]
     (cond
       (and (string? file) (not (string/blank? file)))
       (js/filepicker.storeUrl file success-cb error-cb progress-cb)
