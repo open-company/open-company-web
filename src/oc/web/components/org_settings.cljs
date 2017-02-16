@@ -153,14 +153,14 @@
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (will-receive-props [_ next-props]
-    (when (and (not= (:logo next-props) (:logo data))
+    (when (and (not= (:logo-url next-props) (:logo-url data))
                (nil? (om/get-state owner :file-upload-state))
                (nil? (om/get-state owner :upload-remote-url)))
-      (om/set-state! owner :state-logo (:logo next-props))))
+      (om/set-state! owner :state-logo (:logo-url next-props))))
 
   (did-update [_ _ prev-state]
     (when (and (not= (:state-logo prev-state) (om/get-state owner :state-logo))
-               (not= (om/get-state owner :state-logo) (:logo data)))
+               (not= (om/get-state owner :state-logo) (:logo-url data)))
       (when (fn? logo-did-change-cb)
         (logo-did-change-cb (om/get-state owner :state-logo)))))
 
