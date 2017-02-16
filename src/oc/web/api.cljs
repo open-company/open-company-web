@@ -110,6 +110,7 @@
                         :method (method-name method)
                         :jwt (j/jwt)
                         :params params}]
+            (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/set-user-context! report)
             (sentry/capture-message (str "xhr response error:" status))
             (sentry/set-user-context! nil)))
