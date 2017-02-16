@@ -246,8 +246,8 @@
             link)) links)))
 
 (defn readonly-org? [links]
-  (let [create-link (link-for links "create")]
-    (nil? create-link)))
+  (let [update-link (link-for links "partial-update")]
+    (nil? update-link)))
 
 (defn readonly-board? [links]
   (let [new-link (link-for links "new")]
