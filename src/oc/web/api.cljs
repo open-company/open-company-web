@@ -204,6 +204,18 @@
                                            :status status
                                            :body (when success (json->cljs body))}]))))))
 
+(defn patch-org [data]
+  (when data
+    (let [org-data (dissoc data :links :read-only)
+          json-data (cljs->json org-data)
+          links (:links (dispatcher/org-data))
+          org-patch-link (utils/link-for links "partial-update")]
+      (api-patch (:href org-patch-link)
+        {:json-params json-data
+         :headers (headers-for-link org-patch-link)}
+        (fn [{:keys [success body status]}]
+          (dispatcher/dispatch! [:org (json->cljs body)]))))))
+
 (defn get-auth-settings []
   (auth-get "/"
     {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}

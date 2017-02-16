@@ -33,8 +33,8 @@
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
+            [oc.web.components.org-settings :refer (org-settings)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
-            ; [oc.web.components.company-settings :refer (company-settings)]
             ; [oc.web.components.create-update :refer (create-update)]
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.updates :refer (updates-responsive-switcher)]
@@ -307,11 +307,12 @@
         (drv-root #(om/component (user-profile)) target)
         (drv-root edit-user-profile target)))
 
-    ; (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
-    ;   ; add force-remove-loading to avoid inifinte spinner if the company
-    ;   ; has no topics and the user is looking at company profile
-    ;   (swap! dis/app-state assoc :force-remove-loading true)
-    ;   (board-handler "profile" target company-settings params))
+    (defroute org-settings-route (urls/org-settings ":org") {:as params}
+      (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
+      ; add force-remove-loading to avoid inifinte spinner if the company
+      ; has no topics and the user is looking at company profile
+      (swap! dis/app-state assoc :force-remove-loading true)
+      (board-handler "org-settings" target org-settings params))
 
     (defroute team-settings-route (urls/team-settings-um ":team-id") {:as params}
       (timbre/info "Routing team-settings-route" (urls/team-settings-um ":team-id"))
@@ -375,7 +376,7 @@
                                  org-page-route
                                  board-create-route
                                  ; board-logo-setup-route
-                                 ; board-settings-route
+                                 org-settings-route
                                  team-settings-route
                                  boards-list-route
                                  board-route

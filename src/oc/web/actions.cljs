@@ -81,7 +81,8 @@
       (router/current-board-slug)
       (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         (api/get-board board-data))
-      (not (utils/in? (:route @router/path) "create-board"))
+      (and (not (utils/in? (:route @router/path) "create-board"))
+           (not (utils/in? (:route @router/path) "org-settings")))
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)

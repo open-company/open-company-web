@@ -54,6 +54,13 @@
   ([org-slug]
     (str "/" (name org-slug))))
 
+(defn org-settings
+  "Org settings url"
+  ([]
+    (org-settings (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/settings")))
+
 ;; Boards
 
 (defn boards

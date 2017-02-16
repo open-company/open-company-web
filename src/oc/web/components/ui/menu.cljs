@@ -37,10 +37,10 @@
   (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
-(defn board-settings-click [e]
+(defn org-settings-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/board-settings))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings))))
 
 (defn um-click [e]
   (utils/event-stop e)
@@ -72,16 +72,13 @@
                      (pos? (:count su-link)))
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "View Shared Updates"))))
-        (when (and (jwt/is-admin?)
-                   (not (:read-only (dis/board-data))))
+        (when (jwt/is-admin?)
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/team-settings-um) :on-click um-click} "Manage Team")))
         (when (and (router/current-org-slug)
-                   (router/current-board-slug)
-                   (not (:read-only (dis/board-data)))
                    (not (responsive/is-mobile-size?)))
           (dom/li {:class "oc-menu-item menu-separator"}
-            (dom/a {:href (oc-urls/board-settings) :on-click board-settings-click} "Board Settings")))
+            (dom/a {:href (oc-urls/org-settings) :on-click org-settings-click} "Company Settings")))
         ;; Temp commenting this out since we need API support to know how many companies the user has
         ; (when (jwt/jwt)
         ;   (dom/li {:class "oc-menu-item"}

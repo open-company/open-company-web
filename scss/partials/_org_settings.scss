@@ -1,16 +1,16 @@
-/* Company settings */
+/* org settings */
 
 body.small-footer {
-  div.main-company-settings {
-    div.company-settings-container {
+  div.main-org-settings {
+    div.org-settings-container {
       /* 138px is the total height above and below the settings */
       min-height: calc(100vh - #{$navbar_height}px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
     }
   }
 }
 
-div.main-company-settings {
-  div.company-settings-container {
+div.main-org-settings {
+  div.org-settings-container {
     div.settings-container {
       width: 580px;
 
@@ -94,7 +94,7 @@ div.main-company-settings {
       div.settings-form{
         background-color: rgba(78, 90, 107, 0.05);
 
-        select.company-currency {
+        select.org-currency {
           -webkit-appearance: none;
           align-items: center;
           white-space: pre;
@@ -102,14 +102,14 @@ div.main-company-settings {
           cursor: default;
         }
 
-        div.company-logo-container{
+        div.org-logo-container{
           width: 50px;
           height: 50px;
           border: solid 1px rgba(78, 90, 107, 0.2);
           padding: 5px;
           margin-bottom: .5rem;
 
-          img.company-logo {
+          img.org-logo {
             max-width: 40px;
             max-height: 40px;
           }
