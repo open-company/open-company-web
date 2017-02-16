@@ -3,6 +3,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [taoensso.timbre :as timbre]
             [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
             [clojure.string :as string]
@@ -125,7 +126,11 @@
                                                                           :file-upload-progress nil
                                                                           :logo-did-change true
                                                                           :state-logo url}))))
-        error-cb    (fn [error] (js/console.log "error" error))
+        error-cb    (fn [error]
+                      (timbre/error "Error uploading image:" error)
+                      (js/alert "An error occurred while uploading the file, please try again.")
+                      (om/set-state! owner (merge state {:file-upload-state nil
+                                                         :file-upload-progress nil})))
         progress-cb (fn [progress]
                       (let [state (om/get-state owner)]
                         (om/set-state! owner (merge state {:file-upload-state :show-progress
