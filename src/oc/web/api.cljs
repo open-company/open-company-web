@@ -646,7 +646,7 @@
     (when (and board-name create-link)
       (api-post (:href create-link)
         {:headers (headers-for-link create-link)
-         :json-params (cljs->json {:name board-name :access "team"})}
+         :json-params (cljs->json {:name board-name})}
         (fn [{:keys [success status body]}]
           (let [board-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:board board-data])
