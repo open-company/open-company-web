@@ -234,7 +234,6 @@
     ;   (drv-root email-confirmation target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
-      (js/console.log "confirm-invitation-route:" params (jwt/jwt))
       (when (jwt/jwt)
         (router/redirect! urls/home))
       (pre-routing query-params)
