@@ -106,8 +106,6 @@
      :active-topics active-topics
      ; card with
      :card-width (:card-width data)
-     ; remember if the /slug/new call was already started
-     :new-topics-requested (or (:new-topics-requested current-state) false)
      ; selected topic for fullscreen
      :selected-topic selected-topic
      ; transitioning btw fullscreen topics, navigated with kb arrows or swipe on mobile

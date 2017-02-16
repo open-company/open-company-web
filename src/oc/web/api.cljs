@@ -354,25 +354,19 @@
                                     topics))]
       (patch-topics new-topics))))
 
-(def new-topics-requested (atom false))
-
-(defn get-new-topics [& [force-load]]
+(defn get-new-topics []
   "Load new topics, avoid to start multiple request or reload it if it's already loading or loaded.
    It's possible to force the load passing an optional boolean parameter."
-  (when (or force-load (not @new-topics-requested))
-    (reset! new-topics-requested true)
-    (let [slug (keyword (router/current-board-slug))
-          board-data (dispatcher/board-data)
-          links (:links board-data)
-          add-topic-link (utils/link-for links "new" "GET")]
-      (when add-topic-link
-        (api-get (:href add-topic-link)
-          { :headers (headers-for-link add-topic-link)}
-          (fn [{:keys [success body]}]
-            (when (not success)
-              (reset! new-topics-requested false))
-            (let [fixed-body (if body (json->cljs body) {})]
-              (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}]))))))))
+  (let [slug (keyword (router/current-board-slug))
+        board-data (dispatcher/board-data)
+        links (:links board-data)
+        add-topic-link (utils/link-for links "new" "GET")]
+    (when add-topic-link
+      (api-get (:href add-topic-link)
+        { :headers (headers-for-link add-topic-link)}
+        (fn [{:keys [success body]}]
+          (let [fixed-body (if body (json->cljs body) {})]
+            (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}])))))))
 
 (defn share-stakeholder-update [{:keys [email slack]}]
   (let [slug         (keyword (router/current-board-slug))
@@ -405,8 +399,6 @@
             ; custom content type
             "content-type" (:type su-link)}}
         (fn [{:keys [success body]}]
-          (when (not success)
-            (reset! new-topics-requested false))
           (let [fixed-body (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:su-list {:response fixed-body :slug slug}])))))))
 
