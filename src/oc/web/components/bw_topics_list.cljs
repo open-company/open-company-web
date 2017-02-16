@@ -12,7 +12,6 @@
             [cuerdas.core :as s]))
 
 (defn patch-board [topics-list]
-  (js.console.log "patch-board" topics-list)
   (api/patch-company (router/current-board-slug) {:topics topics-list}))
 
 ; (defn ordered-topics-list
