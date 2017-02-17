@@ -107,8 +107,9 @@
     (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) (utils/fix-board board-data))
     ;; show add topic if the board loaded is the one currently shown and it has no topics
     (assoc :show-add-topic (if (= (:slug board-data) (router/current-board-slug))
-                              (and (not (:selected-topic-view db))
-                                   (zero? (count (:topics board-data))))
+                              (or (and (not (:selected-topic-view db))
+                                       (zero? (count (:topics board-data))))
+                                  (:show-add-topic db))
                               (:show-add-topic db)))))
 
 (defmethod dispatcher/action :company-submit [db _]
