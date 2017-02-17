@@ -12,11 +12,14 @@
   (dis/dispatch! [:user-action team-id user action method other-link-params payload]))
 
 (rum/defc user-row < rum/static
-  [team-id user]
+                     {:after-render (fn [s]
+                                      (when-not (utils/is-test-env?)
+                                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                      s)}
+  [team-id user author]
   (let [user-links (:links user)
         user-dropdown-id (str "user-row-" (:user-id user))
         add-link (utils/link-for user-links "add" "PUT" {:ref "application/vnd.open-company.user.v1+json"})
-        user-author (utils/get-author (:user-id user))
         user-type (utils/get-user-type user)
         admin-type {:ref "application/vnd.open-company.team.admin.v1"}
         remove-user (utils/link-for user-links "remove" "DELETE" {:ref "application/vnd.open-company.user.v1+json"})
@@ -50,15 +53,15 @@
             {:aria-labelledby user-dropdown-id}
             [:li
               {:class (when (= user-type :viewer) "active")
-               :on-click #(api/switch-user-type user-type :viewer user user-author)}
+               :on-click #(api/switch-user-type user-type :viewer user author)}
               [:i.fa.fa-user] " Viewer"]
             [:li
               {:class (when (= user-type :author) "active")
-               :on-click #(api/switch-user-type user-type :viewer user user-author)}
+               :on-click #(api/switch-user-type user-type :author user author)}
               [:i.fa.fa-pencil] " Author"]
             [:li
               {:class (when (= user-type :admin) "active")
-               :on-click #(api/switch-user-type user-type :viewer user user-author)}
+               :on-click #(api/switch-user-type user-type :admin user author)}
               [:i.fa.fa-gear] " Admin"]]]]
       [:td [:div.value
              {:title (if (pos? (count (:email user))) (:email user) "")
@@ -66,11 +69,13 @@
               :data-placement "top"
               :data-container "body"}
              visualized-name]]
-      [:td [:div (when (:status user)
-                   (let [upper-status (clojure.string/upper-case (:status user))]
-                     (if (= upper-status "UNVERIFIED")
-                       "ACTIVE"
-                       upper-status)))]]
+      [:td
+        [:div
+          (when (:status user)
+            (let [upper-status (clojure.string/upper-case (:status user))]
+              (if (= upper-status "UNVERIFIED")
+                "ACTIVE"
+                upper-status)))]]
       [:td {:style {:text-align "center"}}
         (if (:loading user)
           ; if it's loading show the spinner
@@ -93,17 +98,16 @@
                  :data-toggle "tooltip"
                  :data-container "body"
                  :title (if (and pending? (not is-self?)) "CANCEL INVITE" "REMOVE USER")
-                 :on-click #(user-action team-id user "remove" "DELETE"  nil)}
+                 :on-click #(do
+                              (when author
+                                (api/remove-author author))
+                             (user-action team-id user "remove" "DELETE"  {:ref "application/vnd.open-company.user.v1+json"}))}
                 (if (and pending? (not is-self?))
                   [:i.fa.fa-times]
                   [:i.fa.fa-trash-o])])])]]))
 
 (rum/defc users-list < rum/static
-                            {:did-mount (fn [s]
-                                          (when-not (utils/is-test-env?)
-                                            (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                        s)}
-  [team-id users]
+  [team-id users org-authors]
   [:div.um-users-box.col-12.group
     [:table.table
       [:thead
@@ -113,5 +117,6 @@
           [:th "STATUS"]
           [:th {:style {:text-align "center"}} "ACTIONS"]]]
       [:tbody
-        (for [user users]
-          (rum/with-key (user-row team-id user) (str "user-tr-" team-id "-" (:user-id user))))]]])
+        (for [user users
+              :let [author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)]]
+          (rum/with-key (user-row team-id user author) (str "user-tr-" team-id "-" (:user-id user))))]]])
