@@ -120,7 +120,7 @@
                                        :data-placement "bottom"
                                        :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/board-data)))]
                                                    (t/hide share-work-tip)
-                                                   (router/nav! (oc-urls/team-settings-um)))}
+                                                   (router/nav! (oc-urls/org-team-settings)))}
                             (dom/i {:class "fa fa-user-plus"})))
                         (when fixed-show-share-su-button
                           (if dashboard-sharing
