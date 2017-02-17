@@ -31,6 +31,7 @@
 (rum/defcs user-management < (rum/local nil ::last-user-type)
                              rum/reactive
                              (drv/drv :user-management)
+                             (drv/drv :org-data)
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)
                                                           (not (:enumerate-users-requested @dis/app-state)))
@@ -48,10 +49,11 @@
   [s]
   (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error add-slack-team-error invite-by-email-error] :as user-man} (drv/react s :user-management)
         ro-user-man @(drv/get-ref s :user-management)
+        org-data @(drv/get-ref s :org-data)
         user-type (:user-type um-invite)
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
-        team-id (router/current-team-id)
+        team-id (:team-id org-data)
         team-data (get enumerate-users team-id)]
     [:div.user-management.mx-auto.p3.my4.group
       [:div.um-invite.group.mb3
@@ -120,9 +122,8 @@
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label "TEAM MEMBERS"]
-          (let [team-id (router/current-team-id)]
-            (when (contains? enumerate-users team-id)
-              (users-list team-id (:users (get enumerate-users team-id)))))])
+          (when (contains? enumerate-users team-id)
+            (users-list team-id (:users (get enumerate-users team-id))))])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
