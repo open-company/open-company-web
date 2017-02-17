@@ -584,9 +584,8 @@
             (dispatcher/dispatch! [:jwt body]))
           (router/redirect! oc-urls/logout))))))
 
-(defn patch-team [new-team-data redirect-url]
+(defn patch-team [team-id new-team-data redirect-url]
   (when-let* [teams-data (dispatcher/teams-data)
-              team-id (:team-id (dispatcher/org-data))
               team-data (first (filter #(= (:team-id %) team-id) teams-data))
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-patch (:href team-patch)
@@ -616,7 +615,7 @@
                 ; the user has write permission on it
                 ; use the org name
                 ; for it and patch it back
-                (patch-team {:name org-name} board-url)
+                (patch-team (:team-id org-data) {:name org-name} board-url)
                 ; if not refirect the user to the slug
                 (router/redirect! board-url)))))))))
 
