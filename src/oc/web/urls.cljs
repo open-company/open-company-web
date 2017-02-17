@@ -61,6 +61,13 @@
   ([org-slug]
     (str (org org-slug) "/settings")))
 
+(defn org-team-settings
+  "Team settings url"
+  ([]
+    (org-team-settings (router/current-org-slug)))
+  ([org-slug]
+    (str (org-settings org-slug) "/team-management")))
+
 ;; Boards
 
 (defn boards
@@ -96,13 +103,6 @@
     (board-logo-setup (router/current-org-slug) (router/current-board-slug)))
   ([org-slug board-slug]
     (str (board-settings org-slug board-slug) "/logo")))
-
-(defn team-settings-um
-  "Team settings url"
-  ([]
-    (team-settings-um (j/team-id)))
-  ([team-id]
-    (str "/" team-id "/settings/user-management")))
 
 ;; Topics
 
