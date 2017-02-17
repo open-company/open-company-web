@@ -271,7 +271,7 @@
           (api/get-entry-point)
           (api/get-auth-settings)
           (drv-root org-editor target))
-        (login-handler target params)))
+        (router/redirect! urls/home)))
 
     (defroute board-create-route (urls/create-board ":org") {:as params}
       (timbre/info "Rounting board-create-route" (urls/create-board ":org"))
@@ -282,7 +282,7 @@
           (api/get-entry-point)
           (api/get-auth-settings)
           (drv-root board-editor target))
-        (login-handler target params)))
+        (router/redirect! urls/home)))
 
     ; (defroute board-logo-setup-route (urls/board-logo-setup ":org" ":board") {:as params}
     ;   (let [org (:org (:params params))
