@@ -89,7 +89,11 @@
                  :data-toggle "tooltip"
                  :data-container "body"
                  :title "RESEND INVITE"
-                 :on-click #(dis/dispatch! [:resend-invite user])}
+                 :on-click (fn []
+                              (dis/dispatch! [:input [:um-invite] {:email (:email user)
+                                                                   :user-type user-type
+                                                                   :error nil}])
+                              (utils/after 100 #(dis/dispatch! [:invite-by-email])))}
                 [:i.fa.fa-share]])
             ; if it has a delete link
             (when remove-user
