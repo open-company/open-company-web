@@ -26,9 +26,8 @@
 (defn team-id []
   (first (get-key :teams)))
 
-(defn is-admin? []
-  (let [current-team (oc.web.router/current-team-id)
-        admins (get-key :admin)]
-    (some #{current-team} admins)))
+(defn is-admin? [team-id]
+  (let [admins (get-key :admin)]
+    (some #{team-id} admins)))
 
 (set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))
