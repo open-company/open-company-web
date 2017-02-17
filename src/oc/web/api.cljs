@@ -480,47 +480,6 @@
           (if success
             (dispatcher/dispatch! [:enumerate-channels/success (-> fixed-body :collection :channels)])))))))
 
-(defn send-invitation
-  "Give a user email and type of user send an invitation to the team.
-   If the team has only one company, checked via API entry point links, send the company name of that.
-   Add the logo of the company if possible"
-  [email user-type first-name last-name]
-  (when (and email user-type)
-    (let [org-data (dispatcher/org-data)
-          team-data (dispatcher/team-data)
-          invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
-          api-entry-point-links (:api-entry-point @dispatcher/app-state)
-          companies (count (filter #(= (:rel %) "company") api-entry-point-links))
-          json-params {:email email
-                       :first-name first-name
-                       :last-name last-name
-                       :admin (= user-type :admin)}
-          with-company-name (merge json-params {:org-name (:name org-data)
-                                                :logo-url (:logo-url org-data)})]
-      (auth-post (:href invitation-link)
-        {:json-params (cljs->json with-company-name)
-         :headers (headers-for-link invitation-link)}
-        (fn [{:keys [success body status]}]
-          (if success
-            ;; On successfull invitation
-            ;; if the invited user was an author add it to the org
-            (if (or (= user-type :author)
-                    (= user-type :admin))
-              (let [new-user (json->cljs body)
-                    add-author-link (utils/link-for (:links (dispatcher/org-data)) "add")]
-                (api-post (:href add-author-link)
-                  {:headers (headers-for-link add-author-link)
-                   :body (:user-id new-user)}
-                  (fn [{:keys [status success body]}]
-                    (if success
-                      (do
-                        (get-org (dispatcher/org-data))
-                        (dispatcher/dispatch! [:invite-by-email/success]))
-                      (dispatcher/dispatch! [:invite-by-email/failed])))))
-              ;; if not reload the users list immediately
-              (dispatcher/dispatch! [:invite-by-email/success]))
-            (dispatcher/dispatch! [:invite-by-email/failed])))))))
-
 (defn user-action [action-link payload]
   (when action-link
     (let [auth-req (case (:method action-link)
@@ -672,13 +631,61 @@
             (dispatcher/dispatch! [:board board-data])
             (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))
 
-(defn remove-author [user-author]
+(defn add-author
+  "Given a user-id add him as an author to the current org.
+  Refresh the user list and the org-data when finished."
+  [user-id]
+  (when-let [add-author-link (utils/link-for (:links (dispatcher/org-data)) "add")]
+    (api-post (:href add-author-link)
+      {:headers (headers-for-link add-author-link)
+       :body user-id}
+      (fn [{:keys [status success body]}]
+        (when success
+          (get-org (dispatcher/org-data)))))))
+
+(defn remove-author
+  "Given a map containing :user-id and :links, remove the user as an author using the `remove` link.
+  Refresh the org data when finished."
+  [user-author]
   (let [remove-author-link (utils/link-for (:links user-author) "remove")]
     (when remove-author-link
       (api-delete (:href remove-author-link)
         {:headers (headers-for-link remove-author-link)}
         (fn [{:keys [status success body]}]
           (utils/after 1 #(get-org (dispatcher/org-data))))))))
+
+(defn send-invitation
+  "Give a user email and type of user send an invitation to the team.
+   If the team has only one company, checked via API entry point links, send the company name of that.
+   Add the logo of the company if possible"
+  [email user-type first-name last-name]
+  (when (and email user-type)
+    (let [org-data (dispatcher/org-data)
+          team-data (dispatcher/team-data)
+          invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
+          api-entry-point-links (:api-entry-point @dispatcher/app-state)
+          companies (count (filter #(= (:rel %) "company") api-entry-point-links))
+          json-params {:email email
+                       :first-name first-name
+                       :last-name last-name
+                       :admin (= user-type :admin)}
+          with-company-name (merge json-params {:org-name (:name org-data)
+                                                :logo-url (:logo-url org-data)})]
+      (auth-post (:href invitation-link)
+        {:json-params (cljs->json with-company-name)
+         :headers (headers-for-link invitation-link)}
+        (fn [{:keys [success body status]}]
+          (if success
+            ;; On successfull invitation
+            ;; if the invited user was an author add it to the org
+            (if (or (= user-type :author)
+                    (= user-type :admin))
+              (let [new-user (json->cljs body)]
+                (add-author (:user-id new-user))
+                (dispatcher/dispatch! [:invite-by-email/success]))
+              ;; if not reload the users list immediately
+              (dispatcher/dispatch! [:invite-by-email/success]))
+            (dispatcher/dispatch! [:invite-by-email/failed])))))))
 
 (defn switch-user-type
   "Given an existing user switch user type"
@@ -712,11 +719,7 @@
               (dispatcher/dispatch! [:invite-by-email/failed])))))
       ;; Add author call
       (when (and add-author? add-author-link)
-        (api-post (:href add-author-link)
-          {:headers (headers-for-link add-author-link)
-           :body (:user-id user)}
-          (fn [{:keys [status success body]}]
-            (utils/after 100 #(get-org (dispatcher/org-data))))))
+        (add-author (:user-id user)))
       ;; Remove author call
       (when (and remove-author? remove-author-link)
         (remove-author user-author)))))
