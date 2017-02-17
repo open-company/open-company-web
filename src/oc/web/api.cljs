@@ -616,7 +616,7 @@
   (when-let* [teams-data (dispatcher/teams-data)
               team-data (first (filter #(= (:team-id %) (router/current-team-id)) teams-data))
               team-patch (utils/link-for (:links team-data) "partial-update")]
-    (api-patch (:href team-patch)
+    (auth-patch (:href team-patch)
       {:headers (headers-for-link team-patch)
        :json-params (cljs->json new-team-data)}
       (fn [{:keys [success body status]}]
