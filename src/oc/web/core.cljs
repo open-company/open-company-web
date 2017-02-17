@@ -180,13 +180,13 @@
 
 ;; Component specific to a team settings
 (defn team-handler [route target component params]
-  (let [team-id (:team-id (:params params))
+  (let [org (:org (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
-    ; (api/get-entry-point)
+    (api/get-entry-point)
     (api/get-auth-settings)
     ;; save the route
-    (router/set-route! [team-id route] {:team-id team-id :query-params query-params})
+    (router/set-route! [org route] {:org org :query-params query-params})
     (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
@@ -324,12 +324,12 @@
       (swap! dis/app-state assoc :force-remove-loading true)
       (board-handler "org-settings" target org-settings params))
 
-    (defroute team-settings-route (urls/team-settings-um ":team-id") {:as params}
-      (timbre/info "Routing team-settings-route" (urls/team-settings-um ":team-id"))
+    (defroute org-team-settings-route (urls/org-team-settings ":org") {:as params}
+      (timbre/info "Routing org-team-settings-route" (urls/org-team-settings ":org"))
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no topics and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
-      (team-handler "user-management" target user-management-wrapper params))
+      (team-handler "org-team-settings" target user-management-wrapper params))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
@@ -388,7 +388,7 @@
                                  board-create-route
                                  ; board-logo-setup-route
                                  org-settings-route
-                                 team-settings-route
+                                 org-team-settings-route
                                  boards-list-route
                                  board-route
                                  board-route-slash
