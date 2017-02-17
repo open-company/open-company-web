@@ -486,7 +486,8 @@
    Add the logo of the company if possible"
   [email user-type first-name last-name]
   (when (and email user-type)
-    (let [team-data (get (:enumerate-users @dispatcher/app-state) (router/current-team-id))
+    (let [org-data (dispatcher/org-data)
+          team-data (dispatcher/team-data)
           invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
           api-entry-point-links (:api-entry-point @dispatcher/app-state)
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
@@ -494,17 +495,30 @@
                        :first-name first-name
                        :last-name last-name
                        :admin (= user-type :admin)}
-          with-company-name (if (= companies 1)
-                              (let [company-link (utils/link-for api-entry-point-links "company")]
-                                (merge json-params {:org-name (:name company-link)
-                                                    :logo-url (:logo-url company-link)}))
-                              json-params)]
+          with-company-name (merge json-params {:org-name (:name org-data)
+                                                :logo-url (:logo-url org-data)})]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
         (fn [{:keys [success body status]}]
           (if success
-            (dispatcher/dispatch! [:invite-by-email/success (:users (:collection body))])
+            ;; On successfull invitation
+            ;; if the invited user was an author add it to the org
+            (if (or (= user-type :author)
+                    (= user-type :admin))
+              (let [new-user (json->cljs body)
+                    add-author-link (utils/link-for (:links (dispatcher/org-data)) "add")]
+                (api-post (:href add-author-link)
+                  {:headers (headers-for-link add-author-link)
+                   :body (:user-id new-user)}
+                  (fn [{:keys [status success body]}]
+                    (if success
+                      (do
+                        (get-org (dispatcher/org-data))
+                        (dispatcher/dispatch! [:invite-by-email/success]))
+                      (dispatcher/dispatch! [:invite-by-email/failed])))))
+              ;; if not reload the users list immediately
+              (dispatcher/dispatch! [:invite-by-email/success]))
             (dispatcher/dispatch! [:invite-by-email/failed])))))))
 
 (defn user-action [action-link payload]
@@ -592,8 +606,7 @@
 
 (defn add-email-domain [domain]
   (when domain
-    (let [teams-data (:enumerate-users @dispatcher/app-state)
-          team-data (get teams-data (router/current-team-id))
+    (let [team-data (dispatcher/team-data)
           add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.email-domain.v1"})]
       (auth-post (:href add-domain-team-link)
         {:headers (headers-for-link add-domain-team-link)
@@ -614,7 +627,8 @@
 
 (defn patch-team [new-team-data redirect-url]
   (when-let* [teams-data (dispatcher/teams-data)
-              team-data (first (filter #(= (:team-id %) (router/current-team-id)) teams-data))
+              team-id (:team-id (dispatcher/org-data))
+              team-data (first (filter #(= (:team-id %) team-id) teams-data))
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-patch (:href team-patch)
       {:headers (headers-for-link team-patch)
@@ -625,16 +639,17 @@
           (router/redirect! redirect-url))))))
 
 (defn create-org [org-name]
-  (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")]
+  (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
+        team-id (first (j/get-key :teams))]
     (when (and org-name create-org-link)
       (api-post (:href create-org-link)
         {:headers (headers-for-link create-org-link)
-         :json-params (cljs->json {:name org-name :team-id (router/current-team-id)})}
+         :json-params (cljs->json {:name org-name :team-id team-id})}
         (fn [{:keys [success status body]}]
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
             (let [teams-data (dispatcher/teams-data)
-                  team-data (first (filter #(= (:team-id %) (router/current-team-id)) teams-data))
+                  team-data (first (filter #(= (:team-id %) team-id) teams-data))
                   board-url (oc-urls/org (:slug org-data))]
               (if (and (s/blank? (:name team-data))
                        (utils/link-for (:links team-data) "partial-update"))
@@ -656,3 +671,52 @@
           (let [board-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:board board-data])
             (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))
+
+(defn remove-author [user-author]
+  (let [remove-author-link (utils/link-for (:links user-author) "remove")]
+    (when remove-author-link
+      (api-delete (:href remove-author-link)
+        {:headers (headers-for-link remove-author-link)}
+        (fn [{:keys [status success body]}]
+          (utils/after 1 #(get-org (dispatcher/org-data))))))))
+
+(defn switch-user-type
+  "Given an existing user switch user type"
+  [old-user-type new-user-type user user-author]
+  (when (not= old-user-type new-user-type)
+    (let [org-data           (dispatcher/org-data)
+          add-admin-link     (utils/link-for (:links user) "add")
+          remove-admin-link  (utils/link-for (:links user) "remove" "DELETE" {:ref "application/vnd.open-company.team.admin.v1"})
+          add-author-link    (utils/link-for (:links org-data) "add")
+          remove-author-link (utils/link-for (:links user-author) "remove")
+          add-admin?         (= new-user-type :admin)
+          remove-admin?      (= old-user-type :admin)
+          add-author?        (or (= new-user-type :author)
+                                 (= new-user-type :admin))
+          remove-author?     (= new-user-type :viewer)]
+      ;; Add an admin call
+      (when (and add-admin? add-admin-link)
+        (auth-put (:href add-admin-link)
+          {:headers (headers-for-link add-admin-link)}
+          (fn [{:keys [status success body]}]
+            (if success
+              (dispatcher/dispatch! [:invite-by-email/success])
+              (dispatcher/dispatch! [:invite-by-email/failed])))))
+      ;; Remove admin call
+      (when (and remove-admin? remove-admin-link)
+        (auth-delete (:href remove-admin-link)
+          {:headers (headers-for-link remove-admin-link)}
+          (fn [{:keys [status success body]}]
+            (if success
+              (dispatcher/dispatch! [:invite-by-email/success])
+              (dispatcher/dispatch! [:invite-by-email/failed])))))
+      ;; Add author call
+      (when (and add-author? add-author-link)
+        (api-post (:href add-author-link)
+          {:headers (headers-for-link add-author-link)
+           :body (:user-id user)}
+          (fn [{:keys [status success body]}]
+            (utils/after 100 #(get-org (dispatcher/org-data))))))
+      ;; Remove author call
+      (when (and remove-author? remove-author-link)
+        (remove-author user-author)))))
