@@ -45,7 +45,7 @@
 (defn um-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/team-settings-um))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-team-settings))))
 
 (defn updates-click [e]
   (utils/event-stop e)
@@ -72,9 +72,10 @@
                      (pos? (:count su-link)))
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "View Shared Updates"))))
-        (when (jwt/is-admin?)
+        (when (and (router/current-org-slug)
+                   (jwt/is-admin? (:team-id (dis/org-data))))
           (dom/li {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/team-settings-um) :on-click um-click} "Manage Team")))
+            (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Team")))
         (when (and (router/current-org-slug)
                    (not (responsive/is-mobile-size?)))
           (dom/li {:class "oc-menu-item menu-separator"}
