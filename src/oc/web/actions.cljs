@@ -83,7 +83,8 @@
         (api/get-board board-data))
       (and (not (utils/in? (:route @router/path) "create-board"))
            (not (utils/in? (:route @router/path) "create-org"))
-           (not (utils/in? (:route @router/path) "org-settings")))
+           (not (utils/in? (:route @router/path) "org-settings"))
+           (not (utils/in? (:route @router/path) "org-team-settings")))
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
@@ -547,47 +548,22 @@
       (dissoc :enumerate-channels-requested))
     (dissoc db :enumerate-channels)))
 
-(defmethod dispatcher/action :invite-by-email-change
-  [db [_ k v]]
-  (-> db
-    (assoc-in [:um-invite k] v)
-    (dissoc :invite-by-email-error)))
-
-(defn resend-invite [db user]
-  (let [api-entry-point-links (dispatcher/api-entry-point db)
-        companies (count (filter #(= (:rel %) "company") api-entry-point-links))
-        team-data (get (:enumerate-users db) (router/current-team-id))
-        idx (.indexOf (:users team-data) user)
-        json-params {:email (:email user)}
-        with-first-name (if (:first-name user) (assoc json-params :first-name (:first-name user)) json-params)
-        with-last-name (if (:last-name user) (assoc with-first-name :last-name (:last-name user)) with-first-name)
-        with-company-name (if (= companies 1)
-                            (let [company-link (utils/link-for api-entry-point-links "company")]
-                              (merge with-last-name {:org-name (:name company-link)
-                                                     :logo-url (:logo-url company-link)})
-                              with-last-name))
-        with-admin (assoc with-company-name :admin (or (:admin user) false))]
-    (api/user-action (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"}) with-admin)
-    (assoc-in db [:enumerate-users (router/current-team-id) :users idx :loading] true)))
-
-(defmethod dispatcher/action :resend-invite
-  [db [_ user]]
-  (resend-invite db user))
-
 (defmethod dispatcher/action :invite-by-email
   [db [_]]
-  (let [email (:email (:um-invite db))
+  (let [org-data (dispatcher/org-data)
+        email (:email (:um-invite db))
+        user-type (:user-type (:um-invite db))
         parsed-email (utils/parse-input-email email)
         email-name (:name parsed-email)
         email-address (:address parsed-email)
-        user  (first (filter #(= (:email %) email-address) (:users (get (:enumerate-users db) (router/current-team-id)))))]
-    (if user
-      (if (= (:status user) "pending")
-        ;resend invitation since user was invited and didn't accept
-        (resend-invite db user)
-        ; user is already in, send error message
-        (assoc db :invite-by-email-error :user-exists))
-      ; looks like a new user, sending invitation
+        user  (first (filter #(= (:email %) email-address) (:users (get (:enumerate-users db) (:team-id org-data)))))
+        old-user-type (when user (utils/get-user-type user))
+        new-user-type (:user-type (:um-invite db))]
+    ;; Send the invitation only if the user is not part of the team already
+    ;; or if it's still pending, ie resend the invitation email
+    (when (or (not user)
+              (and user
+                   (= (:status user) "pending")))
       (let [splitted-name (string/split email-name #"\s")
             name-size (count splitted-name)
             splittable-name? (= name-size 2)
@@ -598,22 +574,27 @@
             last-name (cond
                         splittable-name? (second splitted-name)
                         :else "")]
+        ;; If the user is already in the list
+        ;; but the type changed we need to change the user type too
+        (when (and user
+                  (not= old-user-type new-user-type))
+          (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user))))
         (api/send-invitation email-address (:user-type (:um-invite db)) first-name last-name)
-        (dissoc db :invite-by-email-error)))))
+        (update-in db [:um-invite] dissoc :error)))))
 
 (defmethod dispatcher/action :invite-by-email/success
-  [db [_ email]]
+  [db [_]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
-  (-> db
-      (assoc-in [:um-invite :email] "")
-      (assoc-in [:um-invite :user-type] nil)))
+  (assoc db :um-invite {:email ""
+                        :user-type nil
+                        :error nil}))
 
 (defmethod dispatcher/action :invite-by-email/failed
   [db [_ email]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
-  (assoc db :invite-by-email-error true))
+  (assoc-in db [:um-invite :error] true))
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]
@@ -792,7 +773,8 @@
 (defmethod dispatcher/action :add-slack-team
   [db [_]]
   (let [teams-data (:enumerate-users db)
-        team-data (get teams-data (router/current-team-id))
+        org-data (dispatcher/org-data db)
+        team-data (get teams-data (:team-id org-data))
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})]
     (when add-slack-team-link
       (router/redirect! (:href add-slack-team-link))))
