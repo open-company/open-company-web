@@ -72,7 +72,6 @@
                             {:um-invite (:um-invite base)
                              :enumerate-users (:enumerate-users base)
                              :um-domain-invite (:um-domain-invite base)
-                             :invite-by-email-error (:invite-by-email-error base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)})]
    :jwt                 [[:base] (fn [base] (:jwt base))]
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
