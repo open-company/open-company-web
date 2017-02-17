@@ -811,3 +811,21 @@
 (defn parse-input-email [email-address]
   (let [parsed-email (email/parse email-address)]
     {:name (.getName parsed-email) :address (.getAddress parsed-email)}))
+
+(defn get-author
+  "Get the author data from the org list of authors"
+  [user-id]
+  (let [org-data (dis/org-data)
+        authors (:authors org-data)]
+    (first (filter #(= (:user-id %) user-id) authors))))
+
+(defn get-user-type
+  "Calculate the user type, return admin if it's an admin,
+  check if it's in the authors list if not admin
+  return viewer else."
+  [user-data]
+  (if (:admin user-data)
+    :admin
+    (if-let [author (get-author (:user-id user-data))]
+      :author
+      :viewer)))
