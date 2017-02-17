@@ -200,7 +200,7 @@
   ([data] (get-in data [:enumerate-users :teams])))
 
 (defn team-data
-  ([] (team-data (router/current-team-id)))
+  ([] (team-data (:team-id (org-data))))
   ([team-id] (team-data team-id @app-state))
   ([team-id data] (get-in data [:enumerate-users team-id])))
 
