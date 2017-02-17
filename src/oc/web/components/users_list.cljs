@@ -1,6 +1,7 @@
 (ns oc.web.components.users-list
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
+            [oc.web.api :as api]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
@@ -15,7 +16,8 @@
   (let [user-links (:links user)
         user-dropdown-id (str "user-row-" (:user-id user))
         add-link (utils/link-for user-links "add" "PUT" {:ref "application/vnd.open-company.user.v1+json"})
-        is-admin? (:admin user)
+        user-author (utils/get-author (:user-id user))
+        user-type (utils/get-user-type user)
         admin-type {:ref "application/vnd.open-company.team.admin.v1"}
         remove-user (utils/link-for user-links "remove" "DELETE" {:ref "application/vnd.open-company.user.v1+json"})
         pending? (= (:status user) "pending")
@@ -34,25 +36,29 @@
       [:td
         [:div.dropdown
           [:button.btn-reset.user-type-btn.dropdown-toggle
-            {:on-click #()
-             :id user-dropdown-id
+            {:id user-dropdown-id
              :data-toggle "dropdown"
              :aria-haspopup true
              :aria-expanded false}
-            (cond
-              is-admin?
+            (case user-type
+              :admin
               [:i.fa.fa-gear]
-              :else
+              :author
+              [:i.fa.fa-pencil]
               [:i.fa.fa-user])]
           [:ul.dropdown-menu.user-type-dropdown-menu
             {:aria-labelledby user-dropdown-id}
             [:li
-              {:class (when (not is-admin?) "active")
-               :on-click #(user-action team-id user "remove" "DELETE" admin-type nil)}
+              {:class (when (= user-type :viewer) "active")
+               :on-click #(api/switch-user-type user-type :viewer user user-author)}
               [:i.fa.fa-user] " Viewer"]
             [:li
-              {:class (when is-admin? "active")
-               :on-click #(user-action team-id user "add" "PUT" admin-type nil)}
+              {:class (when (= user-type :author) "active")
+               :on-click #(api/switch-user-type user-type :viewer user user-author)}
+              [:i.fa.fa-pencil] " Author"]
+            [:li
+              {:class (when (= user-type :admin) "active")
+               :on-click #(api/switch-user-type user-type :viewer user user-author)}
               [:i.fa.fa-gear] " Admin"]]]]
       [:td [:div.value
              {:title (if (pos? (count (:email user))) (:email user) "")
