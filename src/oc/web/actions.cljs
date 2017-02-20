@@ -263,8 +263,8 @@
     (assoc-in (dispatcher/updates-list-key (router/current-org-slug)) (:collection response))))
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug]}]]
-  (let [su-url   (oc-urls/stakeholder-update (router/current-board-slug) (utils/su-date-from-created-at su-date) su-slug)
-        latest-su-key (dispatcher/latest-stakeholder-update-key (router/current-board-slug))
+  (let [su-url   (oc-urls/update-link (router/current-board-slug) (utils/su-date-from-created-at su-date) su-slug)
+        latest-su-key (dispatcher/latest-update-key (router/current-board-slug))
         board-data-links (:links (dispatcher/board-data))
         updates-list-link (utils/link-for board-data-links "stakeholder-updates")
         updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
@@ -276,19 +276,19 @@
       ; refresh the su list
       (get-updates))))
 
-(defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-board-data]}]]
-  (let [board-data-keys [:logo :logo-width :logo-height :name :slug :currency :public :promoted]
-        board-data      (select-keys response board-data-keys)]
-    ; load-board-data is used to save the subset of company data that is returned with a stakeholder-update data
-    (if load-board-data
+(defmethod dispatcher/action :update-loaded [db [_ {:keys [org-slug update-slug response load-org-data]}]]
+  (let [org-data-keys [:logo-url :logo-width :logo-height :name :slug :currency :public :promoted]
+        org-data      (select-keys response org-data-keys)]
+    ; load-org-data is used to save the subset of company data that is returned with a stakeholder-update data
+    (if load-org-data
       ; save the company data returned with the SU data
       (-> db
-        (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
-        (assoc-in (dispatcher/board-data-key (router/current-org-slug) slug) (utils/fix-board board-data))
+        (assoc-in (dispatcher/update-key org-slug update-slug) response)
+        (assoc-in (dispatcher/org-data-key org-slug) (utils/fix-org org-data))
         (dissoc :loading))
       ; save only the SU data
       (-> db
-        (assoc-in (dispatcher/stakeholder-update-key slug update-slug) response)
+        (assoc-in (dispatcher/update-key org-slug update-slug) response)
         (dissoc :loading)))))
 
 (defn start-foce [db topic topic-data]
