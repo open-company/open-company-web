@@ -105,16 +105,23 @@
   db)
 
 (defmethod dispatcher/action :board [db [_ board-data]]
-  (when (= (:slug board-data) (router/current-board-slug))
-    (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
-  (-> db
-    (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) (utils/fix-board board-data))
-    ;; show add topic if the board loaded is the one currently shown and it has no topics
-    (assoc :show-add-topic (if (= (:slug board-data) (router/current-board-slug))
-                              (or (and (not (:selected-topic-view db))
-                                       (zero? (count (:topics board-data))))
-                                  (:show-add-topic db))
-                              (:show-add-topic db)))))
+ (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
+    (when is-currently-shown
+      (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
+    (let [fixed-board-data (utils/fix-board board-data)
+          old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
+          with-current-edit (if (and is-currently-shown
+                                     (:foce-key db))
+                              old-board-data
+                              fixed-board-data)]
+      (-> db
+        (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
+        ;; show add topic if the board loaded is the one currently shown and it has no topics
+        (assoc :show-add-topic (if (and is-currently-shown
+                                        (empty? old-board-data)
+                                        (not (:selected-topic-view db)))
+                                 (zero? (count (:topics fixed-board-data)))
+                                 (:show-add-topic db)))))))
 
 (defmethod dispatcher/action :company-submit [db _]
   (api/create-company (:company-editor db))
