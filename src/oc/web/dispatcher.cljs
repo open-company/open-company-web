@@ -63,7 +63,6 @@
    :su-share            [[:base] (fn [base] (:su-share base))]
    :updates-list        [[:base :org-slug]
                           (fn [base org-slug]
-                            (js/console.log "dis/drv-spec" base org-slug (-> base (keyword org-slug) :updates-list :collection :items))
                             (when org-slug
                               (:items (get-in base (updates-list-key org-slug)))))]
    :user-management     [[:base]

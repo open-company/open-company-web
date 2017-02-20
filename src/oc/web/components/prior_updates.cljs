@@ -79,8 +79,7 @@
                 (:title update))
         author (if same-user? "You" (-> update :author :name))
         medium (medium-for (:medium update))]
-    [:div.update {:key update-slug
-                  :class (when (= current-update update-slug) "active")
+    [:div.update {:class (when (= current-update update-slug) "active")
                   :on-click #(when-not standalone-component (update-click list-link %))}
       [:div.update-title.domine
         [:a {:href link :on-click #(when-not standalone-component (.preventDefault %))}
@@ -94,10 +93,9 @@
                            rum/reactive
   [s standalone-component current-update]
   (let [org-slug (router/current-org-slug)
-        updates (reverse (drv/react s :updates-list))
+        updates (vec (reverse (drv/react s :updates-list)))
         none? (empty? updates)
         org-data (dispatcher/org-data)]
-    (js/console.log "prior-updates/render" updates)
     (when standalone-component
       (load-prior-updates-if-needed))
     (if (and standalone-component
