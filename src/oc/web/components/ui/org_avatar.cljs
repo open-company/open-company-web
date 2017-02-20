@@ -10,8 +10,8 @@
 
 (defcomponent org-avatar [data owner]
   (render-state [_ {:keys [img-load-failed]}]
-    (when (:board-data data)
-      (let [org-data (dis/org-data)
+    (when (:org-data data)
+      (let [org-data (:org-data data)
             org-slug (router/current-org-slug)
             org-name (if (contains? org-data :name)
                            (:name org-data)
@@ -26,8 +26,8 @@
                                   (not (clojure.string/blank? org-logo)))
             avatar-link (if should-show-link
                           (if (router/current-board-slug)
-                            (oc-urls/org)
-                            (oc-urls/board))
+                            (oc-urls/board)
+                            (oc-urls/org))
                           "")]
         (dom/div {:class (utils/class-set {:org-avatar true
                                            :navbar-brand (:navbar-brand data)})}
