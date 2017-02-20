@@ -20,7 +20,7 @@
 (defn prior-updates-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/stakeholder-update-list))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/updates-list))))
 
 (defn logout-click [e]
   (utils/event-stop e)
@@ -50,7 +50,7 @@
 (defn updates-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (router/nav! (oc-urls/stakeholder-update-list)))
+  (router/nav! (oc-urls/updates-list)))
 
 (defn sign-in-sign-up-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
@@ -66,12 +66,10 @@
                             " dropdown-menu"))]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
-        (when-let [su-link (utils/link-for (:links (dis/board-data)) "stakeholder-updates" "GET")]
-          (when (and (router/current-org-slug)
-                     (router/current-board-slug)
-                     (pos? (:count su-link)))
+        (when-let [su-link (utils/link-for (:links (dis/org-data)) "collection" "GET")]
+          (when (router/current-org-slug)
             (dom/li {:class "oc-menu-item menu-separator"}
-              (dom/a {:href (oc-urls/stakeholder-update-list) :on-click prior-updates-click} "View Shared Updates"))))
+              (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
         (when (and (router/current-org-slug)
                    (jwt/is-admin? (:team-id (dis/org-data))))
           (dom/li {:class "oc-menu-item"}
