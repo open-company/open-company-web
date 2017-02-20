@@ -78,11 +78,10 @@
         topics-data (:topics-data props)
         entries-data (:entries-data props)]
     (when (and topic-name (contains? topics-data (keyword topic-name)))
-      (let [topic-click           (or (:topic-click options) identity)
-            is-dashboard          (:is-dashboard props)
+      (let [is-dashboard          (:is-dashboard props)
             sd (->> topic-name keyword (get topics-data))
             topic-row-style (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
-                                    (utils/in? (:route @router/path) "su-list"))
+                                    (utils/in? (:route @router/path) "updates-list"))
                               #js {}
                               #js {:width (if is-dashboard
                                             (if (responsive/window-exceeds-breakpoint)
@@ -116,8 +115,7 @@
                                                 (not (:read-only board-data)))
                              :column column
                              :show-top-menu (:show-top-menu props)}
-                             {:opts {:topic-name topic-name
-                                     :topic-click (partial topic-click topic-name)}})))))))
+                             {:opts {:topic-name topic-name}})))))))
 
 (defn- update-active-topics [owner new-topic topic-data]
   (let [board-data (om/get-props owner :board-data)
