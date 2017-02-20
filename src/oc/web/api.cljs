@@ -743,7 +743,6 @@
 (defn archive-topic
   "Give a topic name and it's data, make the request to archive the topic."
   [topic topic-data]
-  (js/console.log "api/archive-topic" topic topic-data (utils/link-for (:links topic-data) "archive"))
   (when (and topic topic-data)
     (when-let [archive-link (utils/link-for (:links topic-data) "archive")]
       (api-delete (:href archive-link)

@@ -365,7 +365,7 @@
       (assoc-in (conj board-key :archived) new-archived))))
 
 (defmethod dispatcher/action :archive-topic/success [db [_]]
-  (api/get-board (dispatcher/board-data))
+  (api/get-board (dispatcher/board-data db))
   db)
 
 (defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
