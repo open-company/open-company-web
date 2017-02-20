@@ -167,7 +167,9 @@
   (render-state [_ {:keys [topics-layout filtered-topics]}]
     (let [selected-topic-view   (:selected-topic-view data)
           partial-render-topic  (partial render-topic owner options)
-          columns-container-key (apply str filtered-topics)
+          columns-container-key (if selected-topic-view
+                                  (str "topics-columns-selected-topic-" selected-topic-view)
+                                  (apply str filtered-topics))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
                                             #js {:width total-width}
