@@ -23,11 +23,12 @@
                 :cancel-title "KEEP IT"
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
-                :success-cb #(let [topic (om/get-props owner :selected-topic-view)]
-                               (om/set-state! owner :archiving true)
-                               (dis/dispatch! [:archive-topic topic])
-                               (hide-popover nil "archive-topic-confirm")
-                               (router/nav! (oc-urls/board)))}))
+                :success-cb (fn []
+                              (let [topic (om/get-props owner :selected-topic-view)]
+                                (om/set-state! owner :archiving true)
+                                (dis/dispatch! [:archive-topic topic])
+                                (hide-popover nil "archive-topic-confirm")
+                                (utils/after 100 #(router/nav! (oc-urls/board)))))}))
 
 (defn load-entries [owner]
   (when-let* [topic-name (om/get-props owner :selected-topic-view)
