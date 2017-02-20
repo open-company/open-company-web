@@ -174,6 +174,7 @@
               (when-not (and (responsive/is-tablet-or-mobile?)
                              (:selected-topic-view data))
                 (om/build navbar {:save-bt-active save-bt-active
+                                  :org-data (dis/org-data data)
                                   :board-data board-data
                                   :card-width card-width
                                   :header-width total-width-int
