@@ -148,7 +148,7 @@
                 new-topic-data (-> next-props :board-data new-topic-foce)]
       (dispatcher/dispatch! [:start-foce new-topic-foce new-topic-data]))
     (when (om/get-state owner :redirect-to-preview)
-      (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview))))
+      (utils/after 100 #(router/nav! (oc-urls/update-preview))))
     (when-not (= (:board-data next-props) (:board-data data))
       (om/set-state! owner (get-state owner next-props (om/get-state owner))))
     (let [board-data            (:board-data next-props)
