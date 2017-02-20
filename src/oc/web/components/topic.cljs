@@ -78,7 +78,6 @@
                                       dashboard-sharing
                                       is-topic-view
                                       foce-active
-                                      topic-click
                                       show-editing
                                       column
                                       show-top-menu] :as data} owner options]
@@ -307,7 +306,7 @@
           with-order (if (contains? data :topic-flex-num) {:order topic-flex-num} {})
           topic-style (clj->js (if (or (utils/in? (:route @router/path) "su-snapshot-preview")
                                        (utils/in? (:route @router/path) "su-snapshot")
-                                       (utils/in? (:route @router/path) "su-list")
+                                       (utils/in? (:route @router/path) "updates-list")
                                        (responsive/is-mobile-size?))
                                  with-order
                                  (merge with-order {:width (if (responsive/is-tablet-or-mobile?) "auto" (str card-width "px"))})))]
@@ -368,7 +367,6 @@
                                     :card-width card-width
                                     :columns-num columns-num
                                     :read-only-company (:read-only-company data)
-                                    :topic-click (:topic-click options)
                                     :foce-active foce-active
                                     :is-mobile? is-mobile?
                                     :is-dashboard is-dashboard
