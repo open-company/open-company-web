@@ -70,8 +70,8 @@
                                         :card-width (- fixed-card-width 60)
                                         :total-width (- fixed-card-width 60)
                                         :content-loaded (not (:loading data))
-                                        :topics (:sections su-data)
-                                        :topics-data su-data
+                                        :topics (:entries su-data)
+                                        :topics-data (:entries su-data)
                                         :org-data org-data
                                         :hide-add-topic true
                                         :is-stakeholder-update true})
