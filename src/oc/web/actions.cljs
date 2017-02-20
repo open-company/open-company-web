@@ -339,15 +339,34 @@
         new-topics (utils/vec-dissoc old-topics (name topic))
         old-archived (:archived board-data)
         new-archived (vec (conj old-archived {:title (:title ((keyword topic) board-data)) :topic (name topic)}))
-        company-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
+        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
     (api/patch-topics new-topics)
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
       (dissoc :foce-data-editing?)
       (assoc :show-add-topic (zero? (count new-topics)))
-      (assoc-in (conj company-key :topics) new-topics)
-      (assoc-in (conj company-key :archived) new-archived))))
+      (assoc-in (conj board-key :topics) new-topics)
+      (assoc-in (conj board-key :archived) new-archived))))
+
+(defmethod dispatcher/action :archive-topic [db [_ topic]]
+  (let [board-data (dispatcher/board-data)
+        topic-data ((keyword topic) board-data)
+        old-topics (:topics board-data)
+        new-topics (utils/vec-dissoc old-topics (name topic))
+        old-archived (:archived board-data)
+        new-archived (vec (conj old-archived {:title (:title ((keyword topic) board-data)) :topic (name topic)}))
+        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
+    (api/archive-topic topic topic-data)
+    (-> db
+      (stop-foce)
+      (assoc :show-add-topic (zero? (count new-topics)))
+      (assoc-in (conj board-key :topics) new-topics)
+      (assoc-in (conj board-key :archived) new-archived))))
+
+(defmethod dispatcher/action :archive-topic/success [db [_]]
+  (api/get-board (dispatcher/board-data))
+  db)
 
 (defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
   (let [board-data (dispatcher/board-data)

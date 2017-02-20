@@ -41,9 +41,17 @@
     params))
 
 (defn headers-for-link [link]
- (let [acah-headers (if (and (contains? link :access-control-allow-headers)
-                             (nil? (:access-control-allow-headers link)))
+ (let [acah-headers (cond
+                      ; If there is Access-Control-Allow-Headers and it's nil do not set it
+                      (and (contains? link :access-control-allow-headers)
+                           (nil? (:access-control-allow-headers link)))
                       {}
+                      ; If there is Access-Control-Allow-Headers and it contains a string
+                      (and (contains? link :access-control-allow-headers)
+                           (:access-control-allow-headers link))
+                      {"Access-Control-Allow-Headers" (:access-control-allow-headers link)}
+                      ; else set the default
+                      :else
                       {"Access-Control-Allow-Headers" "Content-Type, Authorization"})
        with-content-type (if (:content-type link) (assoc acah-headers "content-type" (:content-type link)) acah-headers)
        with-accept (if (:accept link) (assoc with-content-type "accept" (:accept link)) with-content-type)]
@@ -731,3 +739,14 @@
       ;; Remove author call
       (when (and remove-author? remove-author-link)
         (remove-author user-author)))))
+
+(defn archive-topic
+  "Give a topic name and it's data, make the request to archive the topic."
+  [topic topic-data]
+  (js/console.log "api/archive-topic" topic topic-data (utils/link-for (:links topic-data) "archive"))
+  (when (and topic topic-data)
+    (when-let [archive-link (utils/link-for (:links topic-data) "archive")]
+      (api-delete (:href archive-link)
+        {:headers (headers-for-link archive-link)}
+        (fn [{:keys [status success body] :as response}]
+          (dispatcher/dispatch! [:archive-topic/success]))))))

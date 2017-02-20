@@ -24,7 +24,7 @@
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #(let [topic (om/get-props owner :selected-topic-view)]
-                               (dis/dispatch! [:topic-archive topic])
+                               (dis/dispatch! [:archive-topic topic])
                                (hide-popover nil "archive-topic-confirm")
                                (router/nav! (oc-urls/board)))}))
 
