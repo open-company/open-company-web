@@ -397,10 +397,24 @@
           (let [fixed-body (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:updates-list {:response fixed-body}])))))))
 
-(defn get-stakeholder-update
-  ([slug update-slug load-company-data]
-    (when (and slug update-slug)
-      (let [update-link (str "/companies/" slug "/updates/" update-slug)]
+(defn get-update
+  ([update-data load-company-data]
+    (when update-data
+      (let [update-link (utils/link-for (:links update-data) "self")]
+        (api-get (:href update-link)
+          {:headers (headers-for-link update-link)}
+          (fn [{:keys [success body] :as response}]
+            (let [fixed-body (if success (json->cljs body) {})
+                  response {:org-slug (router/current-org-slug)
+                            :update-slug (keyword (:slug update-data))
+                            :response fixed-body
+                            :load-company-data load-company-data}]
+              (dispatcher/dispatch! [:update-loaded response]))))))))
+
+(defn get-update-with-slug
+  ([org-slug update-slug load-company-data]
+    (when (and org-slug update-slug)
+      (let [update-link (str "/orgs/" org-slug "/updates/" update-slug)]
         (api-get update-link
           { :headers {
             ; required by Chrome
@@ -409,11 +423,11 @@
             "content-type" (content-type "stakeholder-update")}}
           (fn [{:keys [success body]}]
             (let [fixed-body (if success (json->cljs body) {})
-                  response {:slug (keyword slug)
+                  response {:org-slug (keyword org-slug)
                             :update-slug (keyword update-slug)
                             :response fixed-body
                             :load-company-data load-company-data}]
-              (dispatcher/dispatch! [:stakeholder-update response]))))))))
+              (dispatcher/dispatch! [:update-loaded response]))))))))
 
 (defn auth-with-email [email pswd]
   (when (and email pswd)
