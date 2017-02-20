@@ -24,6 +24,7 @@
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb #(let [topic (om/get-props owner :selected-topic-view)]
+                               (om/set-state! owner :archiving true)
                                (dis/dispatch! [:archive-topic topic])
                                (hide-popover nil "archive-topic-confirm")
                                (router/nav! (oc-urls/board)))}))
@@ -72,7 +73,8 @@
                                   foce-data
                                   foce-data-editing?] :as data} owner options]
   (init-state [_]
-    {:entries-requested false})
+    {:entries-requested false
+     :archiving false})
 
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
@@ -80,14 +82,16 @@
     (start-editing-if-needed (om/get-props owner))
     (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000))))
 
-  (will-update [_ next-props _]
-    (start-editing-if-needed next-props)
+  (will-update [_ next-props next-state]
+    (when-not (:archiving next-state)
+      (start-editing-if-needed next-props))
     (when (not= (:selected-topic-view next-props) selected-topic-view)
       (om/set-state! owner :entries-requested false)))
 
   (did-update [_ _ _]
     (load-entries-if-needed owner)
-    (start-editing-if-needed (om/get-props owner)))
+    (when-not (om/get-state owner :archiving)
+      (start-editing-if-needed (om/get-props owner))))
 
   (will-unmount [_]
     (when (om/get-state owner :entries-reload-interval)
