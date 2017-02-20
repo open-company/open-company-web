@@ -37,7 +37,7 @@
             [oc.web.components.updates :refer (updates-responsive-switcher)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
             ; [oc.web.components.create-update :refer (create-update)]
-            ; [oc.web.components.su-snapshot :refer (su-snapshot)]
+            [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
             ))
 
@@ -194,24 +194,23 @@
     (drv-root component target)))
 
 ; ;; Component specific to a stakeholder update
-; (defn stakeholder-update-handler [target component params]
-;   (let [slug (:slug (:params params))
-;         update-slug (:update-slug (:params params))
-;         update-date (:update-date (:params params))
-;         update-topic (:topic (:params params))
-;         query-params (:query-params params)
-;         su-key (dis/stakeholder-update-key slug update-slug)]
-;     (pre-routing query-params)
-;     ;; save the route
-;     (router/set-route! [slug "su-snapshot" "updates" update-date update-slug update-topic] {:slug slug :update-slug update-slug :update-date update-date :query-params query-params :topic update-topic})
-;     ;; do we have the company data already?
-;     (when (not (get-in @dis/app-state su-key))
-;       ;; load the Stakeholder Update data from the API
-;       (api/get-stakeholder-update slug update-slug true)
-;       (let [su-loading-key (conj su-key :loading)]
-;         (swap! dis/app-state assoc-in su-loading-key true)))
-;     ;; render component
-;     (drv-root component target)))
+(defn stakeholder-update-handler [target component params]
+  (let [org (:org (:params params))
+        update-slug (:update-slug (:params params))
+        update-date (:update-date (:params params))
+        query-params (:query-params params)
+        su-key (dis/update-key org update-slug)]
+    (pre-routing query-params)
+    ;; save the route
+    (router/set-route! [org "su-snapshot" "updates" update-date update-slug] {:org org :update-slug update-slug :update-date update-date :query-params query-params})
+    ;; do we have the company data already?
+    (when (not (get-in @dis/app-state su-key))
+      ;; load the Stakeholder Update data from the API
+      (api/get-update-with-slug org update-slug true)
+      (let [su-loading-key (conj su-key :loading)]
+        (swap! dis/app-state assoc-in su-loading-key true)))
+    ;; render component
+    (drv-root component target)))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -347,19 +346,19 @@
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params))
 
-    ; (defroute create-update-route (urls/stakeholder-update-preview ":org") {:as params}
+    ; (defroute create-update-route (urls/update-preview ":org") {:as params}
     ;   (board-handler "su-snapshot-preview" target create-update params))
 
     (defroute updates-list-route (urls/updates-list ":org") {:as params}
       (timbre/info "Routing updates-list-route" (urls/updates-list ":org"))
       (board-handler "updates-list" target updates-responsive-switcher params))
 
-    ; (defroute su-list-update-route (urls/updates-list ":org" ":update-slug") {:as params}
-    ;   (if (responsive/is-mobile-size?)
-    ;     (stakeholder-update-handler target su-snapshot params)
-    ;     (board-handler "su-list" target updates-responsive-switcher params)))
+    (defroute update-route (urls/updates-list ":org" ":update-slug") {:as params}
+      (if (responsive/is-mobile-size?)
+        (stakeholder-update-handler target su-snapshot params)
+        (board-handler "updates-list" target updates-responsive-switcher params)))
 
-    ; (defroute stakeholder-update-route (urls/stakeholder-update ":org" ":update-date" ":update-slug") {:as params}
+    ; (defroute stakeholder-update-route (urls/update-link ":org" ":update-date" ":update-slug") {:as params}
     ;   (stakeholder-update-handler target su-snapshot params))
 
     (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
@@ -394,7 +393,7 @@
                                  ;; Updates
                                  ; create-update-route
                                  updates-list-route
-                                 ; su-list-update-route
+                                 update-route
                                  ; stakeholder-update-route
                                  ;; Boards
                                  boards-list-route
