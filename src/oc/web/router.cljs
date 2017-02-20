@@ -1,6 +1,7 @@
 (ns oc.web.router
   (:require [secretary.core :as secretary]
             [oc.web.lib.prevent-route-dispatch :as prd]
+            [taoensso.timbre :as timbre]
             [goog.history.Html5History :as history5]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -11,6 +12,7 @@
 (def path (atom {}))
 
 (defn set-route! [route parts]
+  (timbre/info "set-route!" route parts)
   (reset! path {})
   (swap! path assoc :route route)
   (doseq [[k v] parts] (swap! path assoc k v)))
@@ -54,9 +56,11 @@
 
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
+  (timbre/info "nav!" token)
   (.setToken @history token))
 
 (defn redirect! [loc]
+  (timbre/info "redirect!" loc)
   (set! (.-location js/window) loc))
 
 (defn redirect-404! []
@@ -65,6 +69,7 @@
         search (.-search win-location)
         hash-string (.-hash win-location)
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+    (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
     (redirect! (str "/404?path=" encoded-url))))
 
@@ -74,10 +79,12 @@
         search (.-search win-location)
         hash-string (.-hash win-location)
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+    (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
     (redirect! (str "/500?path=" encoded-url))))
 
 (defn history-back! []
+  (timbre/info "history-back!")
   (.go (.-history js/window) -1))
 
 (defn setup-navigation! [cb-fn sec-route-dispatcher]
