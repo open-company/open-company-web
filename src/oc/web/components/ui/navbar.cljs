@@ -29,7 +29,8 @@
     "Select topics to share by Slack, email or link."
     "Select topics to share by email or link."))
 
-(defcomponent navbar [{:keys [board-data
+(defcomponent navbar [{:keys [org-data
+                              board-data
                               columns-num
                               card-width
                               latest-su
@@ -72,18 +73,16 @@
                                           (not (:read-only board-data))            ; it's not a read-only cmp
                                           (if (contains? data :show-share-su-button) ; the including component
                                             show-share-su-button                     ; wants to
-                                            true))
-          should-show-left-links (and (router/current-board-slug)
-                                      show-navigation-bar)]
+                                            true))]
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
-                                         :small-navbar (or su-navbar (not show-navigation-bar))
+                                         :small-navbar su-navbar
                                          :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
-                                         :has-prior-updates (and (router/current-board-slug)
-                                                                 (pos? (:count (utils/link-for (:links (dis/board-data)) "stakeholder-updates" "GET"))))
-                                         :can-edit-board (and (router/current-board-slug)
-                                                                (not (:read-only (dis/board-data))))
+                                         :has-prior-updates (and (router/current-org-slug)
+                                                                 (pos? (:count (utils/link-for (:links (dis/org-data)) "collection" "GET"))))
+                                         :can-edit-board (and (router/current-org-slug)
+                                                              (not (:read-only (dis/org-data))))
                                          :jwt (jwt/jwt)})}
         (when (not (utils/is-test-env?))
           (login-overlays-handler))
@@ -91,8 +90,7 @@
                   :style {:width (if header-width (str header-width "px") "100%")}}
           (dom/div {:class "oc-navbar-header-container group"}
             (if (or (utils/in? (:route @router/path) "orgs")
-                    (not (router/current-org-slug))
-                    (not board-data))
+                    (not (router/current-org-slug)))
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
                 (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
               (om/build org-avatar data))
@@ -110,15 +108,15 @@
                           (user-avatar {:classes "btn-reset dropdown-toggle"})
                           (om/build menu {}))
                         (when (and (not dashboard-sharing)
-                                   (not (:read-only board-data))
                                    (not is-update-preview)
-                                   (pos? (count (:topics board-data))))
+                                   (router/current-board-slug)
+                                   (pos? (count (:topics (dis/board-data)))))
                           (dom/button {:class "btn-reset invite-others right"
                                        :title "Invite others"
                                        :data-toggle "tooltip"
                                        :data-container "body"
                                        :data-placement "bottom"
-                                       :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/board-data)))]
+                                       :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/org-data)))]
                                                    (t/hide share-work-tip)
                                                    (router/nav! (oc-urls/org-team-settings)))}
                             (dom/i {:class "fa fa-user-plus"})))
@@ -133,7 +131,7 @@
                                            :disabled (zero? (count dashboard-selected-topics))
                                            :on-click (fn []
                                                        (om/set-state! owner :su-redirect true)
-                                                       (api/patch-stakeholder-update {:topics dashboard-selected-topics :title (:title (:stakeholder-update board-data))}))}
+                                                       (api/patch-stakeholder-update {:topics dashboard-selected-topics :title (:title (:stakeholder-update org-data))}))}
                                 (when (om/get-state owner :su-redirect)
                                   (loading/small-loading))
                                 (if (zero? (count dashboard-selected-topics))
