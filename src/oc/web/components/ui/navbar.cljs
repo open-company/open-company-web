@@ -63,7 +63,7 @@
       (om/set-state! owner :su-redirect nil)
       ; Delay the navigation to updates preview to avoid conflicts
       ; when in data updates
-      (utils/after 100 #(router/nav! (oc-urls/stakeholder-update-preview)))))
+      (utils/after 100 #(router/nav! (oc-urls/update-preview)))))
 
   (render [_]
     (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
