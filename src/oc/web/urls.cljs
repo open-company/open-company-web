@@ -128,16 +128,16 @@
   ([org-slug update-slug]
     (str (updates-list org-slug) "/" (name update-slug))))
 
-(defn stakeholder-update-preview
+(defn update-preview
   ([]
-    (stakeholder-update-preview (router/current-board-slug)))
+    (update-preview (router/current-board-slug)))
   ([org-slug]
     (str (updates-list org-slug) "/preview")))
 
-(defn stakeholder-update
+(defn update-link
   ([]
-    (stakeholder-update (router/current-org-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
+    (update (router/current-org-slug) (router/current-update-date) (router/current-update-slug)))
   ([update-date update-slug]
-    (stakeholder-update (router/current-org-slug) update-date update-slug))
+    (update (router/current-org-slug) update-date update-slug))
   ([org-slug update-date update-slug]
     (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))
