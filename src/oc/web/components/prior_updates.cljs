@@ -72,7 +72,7 @@
         human-date (str month-string " " day (when needs-year (str ", " year)))
         update-slug (:slug update)
         list-link (urls/updates-list org-slug update-slug)
-        link-url (urls/stakeholder-update org-slug link-date update-slug)
+        link-url (urls/update-link org-slug link-date update-slug)
         link (if mobile? (str link-url "?list=true") link-url)
         title (if (clojure.string/blank? (:title update))
                 (str (:name org-data) " Update")
@@ -93,7 +93,7 @@
                            rum/reactive
   [s standalone-component current-update]
   (let [org-slug (router/current-org-slug)
-        updates (vec (reverse (drv/react s :updates-list)))
+        updates (vec (sort #(compare (:created-at %2) (:created-at %1)) (drv/react s :updates-list)))
         none? (empty? updates)
         org-data (dispatcher/org-data)]
     (when standalone-component
