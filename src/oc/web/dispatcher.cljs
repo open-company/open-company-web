@@ -38,10 +38,10 @@
 (defn updates-list-key [org-slug]
   [(keyword org-slug) :updates-list])
 
-(defn latest-stakeholder-update-key [org-slug]
+(defn latest-update-key [org-slug]
   [(keyword org-slug) :latest-su])
 
-(defn stakeholder-update-key [org-slug update-slug]
+(defn update-key [org-slug update-slug]
   [(keyword org-slug) (keyword update-slug)])
 
 (defn entries-key [org-slug board-slug]
@@ -157,7 +157,7 @@
   ([data]
     (latest-stakeholder-update data (router/current-org-slug)))
   ([data org-slug]
-    (get-in data (latest-stakeholder-update-key org-slug))))
+    (get-in data (latest-update-key org-slug))))
 
 (defn updates-list-data
   ([]
@@ -171,9 +171,9 @@
   ([]
     (stakeholder-update-data @app-state))
   ([data]
-    (stakeholder-update-data data (router/current-board-slug) (router/current-stakeholder-update-slug)))
+    (stakeholder-update-data data (router/current-board-slug) (router/current-update-slug)))
   ([data org-slug update-slug]
-    (get-in data (stakeholder-update-key org-slug update-slug))))
+    (get-in data (update-key org-slug update-slug))))
 
 (defn force-edit-topic []
   (:force-edit-topic @app-state))
