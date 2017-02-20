@@ -99,10 +99,10 @@
 (defn current-topic-slug []
   (:topic @path))
 
-(defn current-stakeholder-update-date []
+(defn current-update-date []
   (:update-date @path))
 
-(defn current-stakeholder-update-slug []
+(defn current-update-slug []
   (:update-slug @path))
 
 (defn query-params []
