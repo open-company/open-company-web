@@ -144,7 +144,7 @@
 (defn- save-data [owner]
   ; (om/set-state! owner :has-changes false)
   (om/set-state! owner :has-changes? false)
-  ((om/get-props owner :data-section-on-change))
+  ((om/get-props owner :data-topic-on-change))
 
   (dis/dispatch! [:foce-input {:data (finances-clean-data (om/get-state owner :finances-data))}]))
 
@@ -169,7 +169,7 @@
 
   (render-state [_ {:keys [finances-data stop has-changes?]}]
     (dom/div {:class "finances" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
-      (dom/div {:class "composed-section-edit finances-body edit"
+      (dom/div {:class "composed-topic-edit finances-body edit"
                 :style {:height (str (- (:main-height data) 63) "px")
                         :width (str (:main-width data) "px")
                         :overflow-y "scroll"

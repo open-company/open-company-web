@@ -167,7 +167,7 @@
                           old-metric-slugs)
           new-metrics (vec (growth-utils/metrics-as-sequence new-metrics-map metric-slugs))
           final-map (assoc data-map :metrics new-metrics)] ; add the metadata if this is a new metric
-      ((om/get-props owner :data-section-on-change))
+      ((om/get-props owner :data-topic-on-change))
       (dis/dispatch! [:foce-input final-map])
       (when new-metric?
         ((:switch-focus-cb data) new-slug {}))))) ; show the new metric
@@ -208,7 +208,7 @@
           prefix (if (= unit "currency") (utils/get-symbol-for-currency-code currency) "")
           suffix (when (= unit "%") "%")]
       (dom/div {:class "growth" :style {:height (str (- (:main-height data) 5) "px") :overflow "hidden"}}
-        (dom/div {:class "composed-section-edit growth-body edit"
+        (dom/div {:class "composed-topic-edit growth-body edit"
                   :style {:height (str (- (:main-height data) 63) "px")
                           :width (str (:main-width data) "px")
                           :overflow-y "scroll"
