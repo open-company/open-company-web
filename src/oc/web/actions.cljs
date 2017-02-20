@@ -84,7 +84,7 @@
       (and (not (utils/in? (:route @router/path) "create-board"))
            (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-settings"))
-           (not (utils/in? (:route @router/path) "org-team-settings")))
+           (not (utils/in? (:route @router/path) "updates-list")))
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
@@ -93,7 +93,10 @@
         ;; Redirect to create board if no board are present
         :else
         (router/nav! (oc-urls/create-board (:slug org-data))))))
-  (assoc-in db (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data)))
+  (utils/after 100 #(api/get-updates))
+  (-> db
+    (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
+    (assoc :updates-list-loading (utils/in? (:route @router/path) "updates-list"))))
 
 (defmethod dispatcher/action :load-other-boards [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
@@ -216,7 +219,7 @@
                               keep-editing-topic)
           with-already-loaded (assoc-in keeping-entries board-already-loaded-key true)]
       ; async preload the SU list
-      (utils/after 100 #(api/get-su-list))
+      (utils/after 100 #(api/get-updates))
       (if (or (:read-only updated-body)
               (pos? (count (:topics updated-body)))
               (:force-remove-loading with-board-data))
@@ -238,26 +241,19 @@
     ;; probably some default failure handling should be added here
     :else db))
 
-(defmethod dispatcher/action :companies [db [_ body]]
-  (if body
-    (-> db
-     (assoc-in dispatcher/companies-key (:companies (:collection body)))
-     (dissoc :loading))
-    db))
+(defn- get-updates [db]
+  (api/get-updates)
+  (assoc db :updates-list-loading true))
 
-(defn- get-su-list [db]
-  (api/get-su-list)
-  (assoc db :su-list-loading true))
+(defmethod dispatcher/action :get-updates-list [db [_ {:keys [slug response]}]]
+  (get-updates db))
 
-(defmethod dispatcher/action :get-su-list [db [_ {:keys [slug response]}]]
-  (get-su-list db))
-
-(defmethod dispatcher/action :su-list [db [_ {:keys [slug response]}]]
+(defmethod dispatcher/action :updates-list [db [_ {:keys [response]}]]
   (-> db
     (dissoc :loading)
-    (dissoc :su-list-loading)
-    (assoc :su-list-loaded true)
-    (assoc-in (dispatcher/su-list-key slug) response)))
+    (dissoc :updates-list-loading)
+    (assoc :updates-list-loaded true)
+    (assoc-in (dispatcher/updates-list-key (router/current-org-slug)) (:collection response))))
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug]}]]
   (let [su-url   (oc-urls/stakeholder-update (router/current-board-slug) (utils/su-date-from-created-at su-date) su-slug)
@@ -271,7 +267,7 @@
       (dissoc :loading)
       (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) :links) new-links)
       ; refresh the su list
-      (get-su-list))))
+      (get-updates))))
 
 (defmethod dispatcher/action :stakeholder-update [db [_ {:keys [slug update-slug response load-board-data]}]]
   (let [board-data-keys [:logo :logo-width :logo-height :name :slug :currency :public :promoted]
@@ -642,10 +638,10 @@
     (assoc db :mobile-menu-open (not (:mobile-menu-open db)))
     db))
 
-(defmethod dispatcher/action :reset-su-list
+(defmethod dispatcher/action :reset-updates-list
   [db [_]]
   ; Reset flag to reload su list when needed
-  (dissoc db :su-list-loaded))
+  (dissoc db :updates-list-loaded))
 
 (defmethod dispatcher/action :entries-loaded
   [db [_ {:keys [topic entries]}]]

@@ -120,24 +120,24 @@
 
 ;; Stakeholder update
 
-(defn stakeholder-update-list
+(defn updates-list
   ([]
-    (stakeholder-update-list (router/current-board-slug)))
-  ([slug]
-    (str "/" (name slug) "/updates"))
-  ([slug update-slug]
-    (str (stakeholder-update-list slug) "/" (name update-slug))))
+    (updates-list (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/updates"))
+  ([org-slug update-slug]
+    (str (updates-list org-slug) "/" (name update-slug))))
 
 (defn stakeholder-update-preview
   ([]
     (stakeholder-update-preview (router/current-board-slug)))
-  ([slug]
-    (str "/" (name slug) "/updates/preview")))
+  ([org-slug]
+    (str (updates-list org-slug) "/preview")))
 
 (defn stakeholder-update
   ([]
-    (stakeholder-update (router/current-board-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
+    (stakeholder-update (router/current-org-slug) (router/current-stakeholder-update-date) (router/current-stakeholder-update-slug)))
   ([update-date update-slug]
-    (stakeholder-update (router/current-board-slug) update-date update-slug))
-  ([slug update-date update-slug]
-    (str "/" (name slug) "/updates/" (name update-date) "/" (name update-slug))))
+    (stakeholder-update (router/current-org-slug) update-date update-slug))
+  ([org-slug update-date update-slug]
+    (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))

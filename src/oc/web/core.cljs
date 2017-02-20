@@ -34,10 +34,10 @@
             [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
+            [oc.web.components.updates :refer (updates-responsive-switcher)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
             ; [oc.web.components.create-update :refer (create-update)]
             ; [oc.web.components.su-snapshot :refer (su-snapshot)]
-            ; [oc.web.components.updates :refer (updates-responsive-switcher)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
             ))
 
@@ -347,18 +347,19 @@
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params))
 
-    ; (defroute create-update-route (urls/stakeholder-update-preview ":slug") {:as params}
+    ; (defroute create-update-route (urls/stakeholder-update-preview ":org") {:as params}
     ;   (board-handler "su-snapshot-preview" target create-update params))
 
-    ; (defroute su-list-route (urls/stakeholder-update-list ":slug") {:as params}
-    ;   (board-handler "su-list" target updates-responsive-switcher params))
+    (defroute updates-list-route (urls/updates-list ":org") {:as params}
+      (timbre/info "Routing updates-list-route" (urls/updates-list ":org"))
+      (board-handler "updates-list" target updates-responsive-switcher params))
 
-    ; (defroute su-list-update-route (urls/stakeholder-update-list ":slug" ":update-slug") {:as params}
+    ; (defroute su-list-update-route (urls/updates-list ":org" ":update-slug") {:as params}
     ;   (if (responsive/is-mobile-size?)
     ;     (stakeholder-update-handler target su-snapshot params)
     ;     (board-handler "su-list" target updates-responsive-switcher params)))
 
-    ; (defroute stakeholder-update-route (urls/stakeholder-update ":slug" ":update-date" ":update-slug") {:as params}
+    ; (defroute stakeholder-update-route (urls/stakeholder-update ":org" ":update-date" ":update-slug") {:as params}
     ;   (stakeholder-update-handler target su-snapshot params))
 
     (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
@@ -383,20 +384,25 @@
                                  ;  ; subscription-callback-route
                                  home-page-route
                                  user-profile-route
+                                 ;; Org routes
                                  org-list-route
                                  org-page-route
-                                 board-create-route
-                                 ; board-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
+                                 board-create-route
+                                 ; board-logo-setup-route
+                                 ;; Updates
+                                 ; create-update-route
+                                 updates-list-route
+                                 ; su-list-update-route
+                                 ; stakeholder-update-route
+                                 ;; Boards
                                  boards-list-route
                                  board-route
                                  board-route-slash
-                                 ; create-update-route
-                                 ; su-list-route
-                                 ; su-list-update-route
+                                 ;; Topics
                                  topic-route
-                                 ; stakeholder-update-route
+                                 ;; Not found
                                  not-found-route
                                  ]))
 

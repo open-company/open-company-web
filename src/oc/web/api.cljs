@@ -187,7 +187,7 @@
 
 (defn patch-company [slug data]
   (when data
-    (let [company-data (dissoc data :links :read-only :entries :su-list :su-list-loaded :entries :topic)
+    (let [company-data (dissoc data :links :read-only :entries :updates-list :updates-list-loaded :entries :topic)
           json-data (cljs->json company-data)
           links (:links (dispatcher/board-data))
           company-link (utils/link-for links "partial-update" "PATCH")]
@@ -308,20 +308,20 @@
 (defn patch-topics [topics & [new-topic topic-name]]
   (when topics
     (let [slug (keyword (router/current-board-slug))
-          company-data (dispatcher/board-data)
-          company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
+          board-data (dispatcher/board-data)
+          board-patch-link (utils/link-for (:links board-data) "partial-update" "PATCH")
           payload (if (and new-topic topic-name)
                     {:topics topics
                      (keyword topic-name) new-topic}
                     {:topics topics})
           json-data (cljs->json payload)]
-      (api-patch (:href company-patch-link)
+      (api-patch (:href board-patch-link)
         { :json-params json-data
           :headers {
             ; required by Chrome
             "Access-Control-Allow-Headers" "Content-Type"
             ; custom content type
-            "content-type" (:type company-patch-link)}}
+            "content-type" (:type board-patch-link)}}
         (fn [{:keys [success body status]}]
           (dispatcher/dispatch! [:company {:success success
                                            :status status
@@ -386,21 +386,16 @@
           (let [fixed-body (json->cljs body)]
             (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
 
-(defn get-su-list []
-  (let [slug (keyword (router/current-board-slug))
-        company-data (dispatcher/board-data)
-        links (:links company-data)
-        su-link (utils/link-for links "stakeholder-updates" "GET")]
+(defn get-updates []
+  (let [org-data (dispatcher/org-data)
+        links (:links org-data)
+        su-link (utils/link-for links "collection" "GET")]
     (when su-link
       (api-get (:href su-link)
-        { :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type su-link)}}
+        {:headers (headers-for-link su-link)}
         (fn [{:keys [success body]}]
           (let [fixed-body (if success (json->cljs body) {})]
-            (dispatcher/dispatch! [:su-list {:response fixed-body :slug slug}])))))))
+            (dispatcher/dispatch! [:updates-list {:response fixed-body}])))))))
 
 (defn get-stakeholder-update
   ([slug update-slug load-company-data]

@@ -12,8 +12,6 @@
 
 ;; Data key paths
 
-(def companies-key [:companies])
-
 (def api-entry-point-key [:api-entry-point])
 
 (defn org-data-key [org-slug]
@@ -37,14 +35,14 @@
 (defn board-topic-key [org-slug board-slug topic-slug]
   (conj (board-data-key org-slug board-slug) (keyword topic-slug)))
 
-(defn su-list-key [company-slug]
-  [(keyword company-slug) :su-list])
+(defn updates-list-key [org-slug]
+  [(keyword org-slug) :updates-list])
 
-(defn latest-stakeholder-update-key [company-slug]
-  [(keyword company-slug) :latest-su])
+(defn latest-stakeholder-update-key [org-slug]
+  [(keyword org-slug) :latest-su])
 
-(defn stakeholder-update-key [company-slug update-slug]
-  [(keyword company-slug) (keyword update-slug)])
+(defn stakeholder-update-key [org-slug update-slug]
+  [(keyword org-slug) (keyword update-slug)])
 
 (defn entries-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :entries-data])
@@ -63,10 +61,11 @@
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
-   :su-list             [[:base :company-slug]
-                          (fn [base company-slug]
-                            (when company-slug
-                              (-> company-slug keyword base :su-list :collection :stakeholder-updates)))]
+   :updates-list        [[:base :org-slug]
+                          (fn [base org-slug]
+                            (js/console.log "dis/drv-spec" base org-slug (-> base (keyword org-slug) :updates-list :collection :items))
+                            (when org-slug
+                              (:items (get-in base (updates-list-key org-slug)))))]
    :user-management     [[:base]
                           (fn [base]
                             {:um-invite (:um-invite base)
@@ -157,25 +156,25 @@
   ([]
     (latest-stakeholder-update @app-state))
   ([data]
-    (latest-stakeholder-update data (router/current-board-slug)))
-  ([data company-slug]
-    (get-in data (latest-stakeholder-update-key company-slug))))
+    (latest-stakeholder-update data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (latest-stakeholder-update-key org-slug))))
 
-(defn stakeholder-update-list-data
+(defn updates-list-data
   ([]
-    (stakeholder-update-list-data @app-state))
+    (updates-list-data @app-state))
   ([data]
-    (stakeholder-update-list-data data (router/current-board-slug)))
-  ([data company-slug]
-    (get-in data (su-list-key company-slug))))
+    (updates-list-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (updates-list-key org-slug))))
 
 (defn stakeholder-update-data
   ([]
     (stakeholder-update-data @app-state))
   ([data]
     (stakeholder-update-data data (router/current-board-slug) (router/current-stakeholder-update-slug)))
-  ([data company-slug update-slug]
-    (get-in data (stakeholder-update-key company-slug update-slug))))
+  ([data org-slug update-slug]
+    (get-in data (stakeholder-update-key org-slug update-slug))))
 
 (defn force-edit-topic []
   (:force-edit-topic @app-state))
@@ -220,6 +219,9 @@
 (defn print-org-data []
   (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
+(defn print-updates-data []
+  (js/console.log (get-in @app-state (updates-list-key (router/current-org-slug)))))
+
 (defn print-board-data []
   (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
@@ -228,5 +230,6 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
+(set! (.-OCWebPrintUpdatesData js/window) print-updates-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintEntriesData js/window) print-entries-data)
