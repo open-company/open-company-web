@@ -20,8 +20,8 @@
 (defn load-latest-su [owner data]
   (when (and (:updates-list-loaded data)
              (not (om/get-state owner :selected-su)))
-    (let [updates-list (:collection (dis/updates-list-data data))
-          last-su (last (:stakeholder-updates updates-list))]
+    (let [updates-list (:items (dis/updates-list-data data))
+          last-su (first (vec (sort #(compare (:created-at %2) (:created-at %1)) updates-list)))]
       (om/set-state! owner :selected-su (:slug last-su)))))
 
 (defn load-updates-list-if-needed [owner data]
@@ -35,9 +35,9 @@
 (defcomponent updates [data owner]
 
   (init-state [_]
-    (let [current-update-slug (router/current-stakeholder-update-slug)]
+    (let [current-update-slug (router/current-update-slug)]
       (when current-update-slug
-        (api/get-stakeholder-update (router/current-board-slug) current-update-slug false))
+        (api/get-update-with-slug (router/current-org-slug) current-update-slug false))
       {:columns-num (responsive/columns-num)
        :card-width (responsive/calc-card-width)
        :updates-list (dis/updates-list-data)
@@ -65,7 +65,9 @@
     ; if we had a selected-su and it changed let's load the new update data
     ; if selected-su was empty there is no need to load
     (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
-      (api/get-stakeholder-update (router/current-board-slug) (om/get-state owner :selected-su) false)))
+      (let [updates-list (:items (dis/updates-list-data data))
+            update-data (first (filter #(= (:slug %) (om/get-state owner :selected-su)) updates-list))]
+        (api/get-update update-data false))))
 
   (render-state [_ {:keys [columns-num card-width updates-list selected-su]}]
     (let [org-data (dis/org-data data)
@@ -99,8 +101,8 @@
                                         :total-width (- fixed-card-width 60)
                                         :is-stakeholder-update true
                                         :content-loaded (not (:loading data))
-                                        :topics (:sections su-data)
-                                        :topics-data su-data
+                                        :topics (:entries su-data)
+                                        :topics-data (:entries su-data)
                                         :org-data org-data
                                         :hide-add-topic true}))))))))
 
