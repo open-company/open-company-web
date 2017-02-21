@@ -142,13 +142,14 @@
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
+          org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
           entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           board-error (get-in data (dis/board-access-error-key (router/current-org-slug) (router/current-board-slug)))]
-      (if (or (not (dis/org-data))
-              (not (dis/board-data)))
+      (if (or (not org-data)
+              (not board-data))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
@@ -174,7 +175,7 @@
               (when-not (and (responsive/is-tablet-or-mobile?)
                              (:selected-topic-view data))
                 (om/build navbar {:save-bt-active save-bt-active
-                                  :org-data (dis/org-data data)
+                                  :org-data org-data
                                   :board-data board-data
                                   :card-width card-width
                                   :header-width total-width-int
@@ -200,27 +201,52 @@
                       (when-not (:read-only board-data)
                         (dom/p {:class "empty-dashboard-msg"}
                           (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) ", your dashboard can be viewed after it's been created on a desktop browser."))))
-                    (om/build topics-list
-                                {:loading (:loading data)
-                                 :content-loaded (or (:loading board-data) (:loading data))
-                                 :org-data (dis/org-data data)
-                                 :board-data board-data
-                                 :entries-data entries-data
-                                 :create-board (:create-board data)
-                                 :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
-                                 :latest-su (dis/latest-stakeholder-update)
-                                 :force-edit-topic (:force-edit-topic data)
-                                 :foce-data-editing? (:foce-data-editing? data)
-                                 :card-width card-width
-                                 :columns-num columns-num
-                                 :show-login-overlay (:show-login-overlay data)
-                                 :foce-key (:foce-key data)
-                                 :foce-data (:foce-data data)
-                                 :show-add-topic (:show-add-topic data)
-                                 :selected-topic-view (:selected-topic-view data)
-                                 :dashboard-selected-topics (:dashboard-selected-topics data)
-                                 :dashboard-sharing (:dashboard-sharing data)
-                                 :is-dashboard true
-                                 :show-top-menu (:show-top-menu data)}))
+                    (if (:dashboard-sharing data)
+                      (for [board (:boards org-data)
+                            :let [board-data (dis/board-data data (router/current-org-slug) (:slug board))]]
+                        (om/build topics-list
+                                    {:loading (:loading data)
+                                     :content-loaded (or (:loading board-data) (:loading data))
+                                     :org-data org-data
+                                     :board-data board-data
+                                     :entries-data []
+                                     :create-board (:create-board data)
+                                     :new-topics nil
+                                     :latest-su (dis/latest-stakeholder-update)
+                                     :force-edit-topic (:force-edit-topic data)
+                                     :foce-data-editing? (:foce-data-editing? data)
+                                     :card-width card-width
+                                     :columns-num columns-num
+                                     :show-login-overlay (:show-login-overlay data)
+                                     :foce-key (:foce-key data)
+                                     :foce-data (:foce-data data)
+                                     :show-add-topic (:show-add-topic data)
+                                     :selected-topic-view (:selected-topic-view data)
+                                     :dashboard-selected-topics (:dashboard-selected-topics data)
+                                     :dashboard-sharing (:dashboard-sharing data)
+                                     :is-dashboard true
+                                     :show-top-menu (:show-top-menu data)}))
+                      (om/build topics-list
+                                  {:loading (:loading data)
+                                   :content-loaded (or (:loading board-data) (:loading data))
+                                   :org-data org-data
+                                   :board-data board-data
+                                   :entries-data entries-data
+                                   :create-board (:create-board data)
+                                   :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
+                                   :latest-su (dis/latest-stakeholder-update)
+                                   :force-edit-topic (:force-edit-topic data)
+                                   :foce-data-editing? (:foce-data-editing? data)
+                                   :card-width card-width
+                                   :columns-num columns-num
+                                   :show-login-overlay (:show-login-overlay data)
+                                   :foce-key (:foce-key data)
+                                   :foce-data (:foce-data data)
+                                   :show-add-topic (:show-add-topic data)
+                                   :selected-topic-view (:selected-topic-view data)
+                                   :dashboard-selected-topics (:dashboard-selected-topics data)
+                                   :dashboard-sharing (:dashboard-sharing data)
+                                   :is-dashboard true
+                                   :show-top-menu (:show-top-menu data)})))
                   ;;Footer
                   (footer total-width-int))))))))))
