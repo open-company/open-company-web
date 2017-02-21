@@ -36,7 +36,7 @@
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.updates :refer (updates-responsive-switcher)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
-            ; [oc.web.components.create-update :refer (create-update)]
+            [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
             ))
@@ -170,8 +170,7 @@
       (api/get-entry-point)
       (api/get-auth-settings)
       (reset! dis/app-state (-> @dis/app-state
-                               (assoc :loading true)
-                               (dissoc (keyword org)))))
+                               (assoc :loading true))))
     (if topic
       (reset! dis/app-state (assoc @dis/app-state :selected-topic-view topic))
       (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
@@ -346,8 +345,9 @@
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params))
 
-    ; (defroute create-update-route (urls/update-preview ":org") {:as params}
-    ;   (board-handler "su-snapshot-preview" target create-update params))
+    (defroute create-update-route (urls/update-preview ":org") {:as params}
+      (timbre/info "Routing create-update-route" (urls/update-preview ":org"))
+      (board-handler "su-snapshot-preview" target create-update params))
 
     (defroute updates-list-route (urls/updates-list ":org") {:as params}
       (timbre/info "Routing updates-list-route" (urls/updates-list ":org"))
@@ -393,7 +393,7 @@
                                  board-create-route
                                  ; board-logo-setup-route
                                  ;; Updates
-                                 ; create-update-route
+                                 create-update-route
                                  updates-list-route
                                  update-route
                                  update-unique-route
