@@ -20,9 +20,16 @@
             [cljsjs.clipboard]))
 
 (defn send-clicked [type]
-  (let [post-data (get-in @dis/app-state [:su-share type])
-        emojied   (update post-data :note (fnil utils/unicode-emojis ""))]
-    (api/share-update {type emojied})))
+  (let [update-data (get-in @dis/app-state [:su-share type])
+        emojied   (update update-data :note (fnil utils/unicode-emojis ""))
+        post-data {:medium type :note (:note emojied)}
+        with-to (if (contains? emojied :to)
+                  (assoc post-data :to (:to update-data))
+                  post-data)
+        with-subject (if (contains? emojied :subject)
+                        (assoc with-to :subject (:subject emojied))
+                        with-to)]
+    (api/share-update with-subject)))
 
 (defn select-share-link [event]
   (when-let [input (.-target event)]
@@ -391,7 +398,7 @@
               (case share-via
                 :prompt (prompt-dialog #(do
                                           (when (= % :link)
-                                            (api/share-update {}))
+                                            (api/share-update {:medium :link}))
                                           (om/set-state! owner :share-via %)))
                 :link  (link-dialog share-link)
                 :email (email-dialog success-cb {:share-link share-link})

@@ -374,14 +374,13 @@
           (let [fixed-body (if body (json->cljs body) {})]
             (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}])))))))
 
-(defn share-update [{:keys [email slack]}]
+(defn share-update [update-data]
   (let [org-data   (dispatcher/org-data)
-        post-data  (cond email (assoc email :email true)
-                         slack (assoc slack :slack true))
-        share-link (utils/link-for (:links org-data) "create" "POST" {:accept "application/vnd.open-company.update.v1+json"})]
+        share-link (utils/link-for (:links org-data) "create" "POST" {:accept "application/vnd.open-company.update.v1+json"})
+        json-data  (merge update-data {:title (:su-title @dispatcher/app-state)
+                                       :entries (vec (map #(dissoc % :board-slug) (:dashboard-selected-topics @dispatcher/app-state)))})]
     (api-post (:href share-link)
-              {:json-params (cljs->json (merge post-data {:title (:su-title @dispatcher/app-state)
-                                                          :entries (:dashboard-selected-topics @dispatcher/app-state)}))
+              {:json-params (cljs->json json-data)
                :headers (headers-for-link share-link)}
       (fn [{:keys [success body]}]
         (when success
