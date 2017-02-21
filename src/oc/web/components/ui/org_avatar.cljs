@@ -20,7 +20,7 @@
             org-logo (:logo-url org-data)
             su-navbar (:su-navbar data)
             should-show-link (if su-navbar
-                                  (utils/link-for (:links (dis/stakeholder-update-data)) "company" "GET")
+                                  (utils/link-for (:links (dis/update-data)) "company" "GET")
                                   true)
             show-org-avatar? (and (not img-load-failed)
                                   (not (clojure.string/blank? org-logo)))
