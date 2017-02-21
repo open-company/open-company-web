@@ -193,8 +193,8 @@
     ;; render component
     (drv-root component target)))
 
-; ;; Component specific to a stakeholder update
-(defn stakeholder-update-handler [target component params]
+; ;; Component specific to an update
+(defn update-handler [target component params]
   (let [org (:org (:params params))
         update-slug (:update-slug (:params params))
         update-date (:update-date (:params params))
@@ -205,7 +205,7 @@
     (router/set-route! [org "su-snapshot" "updates" update-date update-slug] {:org org :update-slug update-slug :update-date update-date :query-params query-params})
     ;; do we have the company data already?
     (when (not (get-in @dis/app-state su-key))
-      ;; load the Stakeholder Update data from the API
+      ;; load the Update data from the API
       (api/get-update-with-slug org update-slug true)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
@@ -354,12 +354,14 @@
       (board-handler "updates-list" target updates-responsive-switcher params))
 
     (defroute update-route (urls/updates-list ":org" ":update-slug") {:as params}
+      (timbre/info "Routing update-route" (urls/updates-list ":org" ":update-slug"))
       (if (responsive/is-mobile-size?)
-        (stakeholder-update-handler target su-snapshot params)
+        (update-handler target su-snapshot params)
         (board-handler "updates-list" target updates-responsive-switcher params)))
 
-    ; (defroute stakeholder-update-route (urls/update-link ":org" ":update-date" ":update-slug") {:as params}
-    ;   (stakeholder-update-handler target su-snapshot params))
+    (defroute update-unique-route (urls/update-link ":org" ":update-date" ":update-slug") {:as params}
+      (timbre/info "Routing update-unique-route" (urls/update-link ":org" ":update-data" ":update-slug"))
+      (update-handler target su-snapshot params))
 
     (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
       (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
@@ -394,7 +396,7 @@
                                  ; create-update-route
                                  updates-list-route
                                  update-route
-                                 ; stakeholder-update-route
+                                 update-unique-route
                                  ;; Boards
                                  boards-list-route
                                  board-route
