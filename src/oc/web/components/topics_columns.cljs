@@ -100,6 +100,7 @@
                              :topic topic-name
                              :is-stakeholder-update (:is-stakeholder-update props)
                              :topic-data sd
+                             :board-data board-data
                              :entries-data (get entries-data (keyword topic-name) [])
                              :card-width (:card-width props)
                              :columns-num (:columns-num props)
@@ -198,7 +199,7 @@
               (dom/div {:class "dashboard-sharing-select-all"}
                 (dom/span "Click topics to include or")
                 (dom/button {:class "btn-reset btn-link"
-                             :on-click #(dis/dispatch! [:dashboard-select-all])} "select all")))
+                             :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-topics-list data))
             (cond
