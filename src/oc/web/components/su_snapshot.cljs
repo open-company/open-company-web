@@ -2,15 +2,12 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.topics-columns :refer (topics-columns)]
-            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
+            [oc.web.components.topic :refer (topic)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [cljsjs.hammer]))
@@ -25,9 +22,8 @@
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
   (render-state [_ {:keys [columns-num prior-list]}]
-
     (let [org-data (dis/org-data data)
-          su-data      (dis/update-data)
+          su-data      (dis/update-data data)
           mobile?      (responsive/is-tablet-or-mobile?)
           fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
@@ -61,19 +57,35 @@
                 (dom/i {:class "fa fa-angle-left"}))))
 
           ;; SU Snapshot
-          (when org-data
+          (when (and org-data su-data)
             (dom/div {:class "su-sp-content"
                       :style {:width (if (responsive/is-mobile-size?) "auto" (str fixed-card-width "px"))}}
               (dom/div {:class "su-sp-org-header"}
                 (dom/div {:class "su-snapshot-title"} title))
-              (om/build topics-columns {:columns-num 1
-                                        :card-width (- fixed-card-width 60)
-                                        :total-width (- fixed-card-width 60)
-                                        :content-loaded (not (:loading data))
-                                        :org-data org-data
-                                        :board-data (dis/board-data data)
-                                        :topics-data (:entries su-data)
-                                        :hide-add-topic true
-                                        :is-stakeholder-update true})
+              (dom/div {:class (str "topics-columns overflow-visible group" (when-not (:loading data) " content-loaded"))}
+                (dom/div {:class "topics-column-container columns-1 group"
+                          :style (if (responsive/is-mobile-size?)
+                                   #js {:margin "0px 9px"
+                                        :width "auto"}
+                                   #js {:width (- fixed-card-width 60)})}
+                  (dom/div {:class "topics-column"}
+                    (for [entry (:entries su-data)]
+                      (dom/div {:class "topic-row"}
+                        (om/build topic {:loading (:loading data)
+                                         :topic (:topic-slug entry)
+                                         :is-stakeholder-update true
+                                         :topic-data entry
+                                         :entries-data []
+                                         :card-width card-width
+                                         :columns-num columns-num
+                                         :read-only-board (:read-only org-data)
+                                         :currency (:currency org-data)
+                                         :editing false
+                                         :foce-key nil
+                                         :is-dashboard false
+                                         :show-editing false
+                                         :column 1}
+                                         {:opts {:topic-name (name (:topic-slug entry))}
+                                          :key (:slug update)}))))))
               (dom/div {:class "su-sp-footer"} "Updates by "
                 (dom/a {:href "https://opencompany.com"} "OpenCompany")))))))))
