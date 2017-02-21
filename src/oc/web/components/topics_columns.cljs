@@ -124,8 +124,6 @@
                                             :new (not (:was-archived topic-data))
                                             :loading (:was-archived topic-data)})
         new-topics (conj (:topics board-data) new-topic)]
-    (when (:was-archived topic-data)
-      (api/patch-topics new-topics))
     (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
     (when (:was-archived topic-data)
