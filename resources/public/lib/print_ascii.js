@@ -4,7 +4,8 @@ OpenCompany Web help:
 OCWebHelp(): print this help,
 OCWebPrintAppState(): print the whole app-state,
 OCWebPrintOrgData(): to print the current org data,
-OCWebPrintUpdatesData(): to print the current org updates data,
+OCWebPrintUpdatesListData(): to print the current loaded list of updates,
+OCWebPrintUpdateData(): to print the current update data,
 OCWebPrintBoardData(): to print the current board data,
 OCWebPrintEntriesData(): to print all the entries loaded,
 OCWebPrintJWTContents(): to print the content of the JWT.

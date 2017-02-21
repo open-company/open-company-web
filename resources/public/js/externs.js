@@ -63,4 +63,5 @@ var OCWebPrintJWTContents = function(){};
 var OCWebHelp = function(){};
 var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
-var OCWebPrintUpdatesData = function(){};
+var OCWebPrintUpdatesListData = function(){};
+var OCWebPrintUpdateData = function(){};
