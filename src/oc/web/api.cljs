@@ -262,12 +262,12 @@
       (api-post (:href topic-link)
         { :json-params json-data
           :headers (headers-for-link topic-link)}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})
-                response-content-type (get (:headers response) "content-type")]
+        (fn [{:keys [body success headers]}]
+          (let [fixed-body (if success (json->cljs body) {})
+                response-content-type (get headers "content-type")]
             (if (= response-content-type "application/vnd.open-company.entry.v1+json")
-              (dispatcher/dispatch! [:topic-entry {:body body :topic topic :created-at (:created-at body)}])
-              (dispatcher/dispatch! [:topic {:body body :topic topic}]))))))))
+              (dispatcher/dispatch! [:topic-entry {:body fixed-body :topic topic :created-at (:created-at fixed-body)}])
+              (dispatcher/dispatch! [:topic {:body fixed-body :topic topic}]))))))))
 
 (defn load-entries [topic entries-link]
   (when (and topic entries-link)
@@ -280,17 +280,15 @@
   "PATCH a topic, dispatching the results with a `:topic` action."
   ([topic topic-data]
   (when (and topic topic-data)
-    (let [slug (keyword (router/current-board-slug))
-          topic-kw (keyword topic)
-          partial-update-link (utils/link-for (:links topic-data) "partial-update" "PATCH")
+    (let [partial-update-link (utils/link-for (:links topic-data) "partial-update" "PATCH")
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
           json-data (cljs->json cleaned-topic-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
           :headers (headers-for-link partial-update-link)}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})]
-            (load-entries topic (utils/link-for (:links body) "entries")))))))))
+        (fn [{:keys [success body]}]
+          (let [fixed-body (if success (json->cljs body) {})]
+            (dispatcher/dispatch! [:topic-entry {:body fixed-body :topic topic :created-at (:created-at fixed-body)}]))))))))
 
 (defn update-finances-data[finances-data]
   (when finances-data
