@@ -167,11 +167,11 @@
   ([data org-slug]
     (get-in data (updates-list-key org-slug))))
 
-(defn stakeholder-update-data
+(defn update-data
   ([]
-    (stakeholder-update-data @app-state))
+    (update-data @app-state))
   ([data]
-    (stakeholder-update-data data (router/current-board-slug) (router/current-update-slug)))
+    (update-data data (router/current-board-slug) (router/current-update-slug)))
   ([data org-slug update-slug]
     (get-in data (update-key org-slug update-slug))))
 
