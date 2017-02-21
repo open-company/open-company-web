@@ -374,23 +374,19 @@
           (let [fixed-body (if body (json->cljs body) {})]
             (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}])))))))
 
-(defn share-stakeholder-update [{:keys [email slack]}]
-  (let [slug         (keyword (router/current-board-slug))
-        company-data (dispatcher/board-data)
-        links        (:links company-data)
-        post-data    (cond email (assoc email :email true)
-                           slack (assoc slack :slack true))
-        share-link   (utils/link-for links "share" "POST")]
+(defn share-update [{:keys [email slack]}]
+  (let [org-data   (dispatcher/org-data)
+        post-data  (cond email (assoc email :email true)
+                         slack (assoc slack :slack true))
+        share-link (utils/link-for (:links org-data) "create" "POST" {:accept "application/vnd.open-company.update.v1+json"})]
     (api-post (:href share-link)
-              {:json-params post-data
-               :headers {;; required by Chrome
-                         "Access-Control-Allow-Headers" "Content-Type"
-                         ;; custom content type
-                         "content-type" (:type share-link)}}
+              {:json-params (cljs->json (merge post-data {:title (:su-title @dispatcher/app-state)
+                                                          :entries (:dashboard-selected-topics @dispatcher/app-state)}))
+               :headers (headers-for-link share-link)}
       (fn [{:keys [success body]}]
         (when success
           (let [fixed-body (json->cljs body)]
-            (dispatcher/dispatch! [:su-edit {:slug slug :su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
+            (dispatcher/dispatch! [:su-edit {:su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
 
 (defn get-updates []
   (let [org-data (dispatcher/org-data)
