@@ -27,7 +27,7 @@
   (render-state [_ {:keys [columns-num prior-list]}]
 
     (let [org-data (dis/org-data data)
-          su-data      (dis/stakeholder-update-data)
+          su-data      (dis/update-data)
           mobile?      (responsive/is-tablet-or-mobile?)
           fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
@@ -70,9 +70,9 @@
                                         :card-width (- fixed-card-width 60)
                                         :total-width (- fixed-card-width 60)
                                         :content-loaded (not (:loading data))
-                                        :topics (:entries su-data)
-                                        :topics-data (:entries su-data)
                                         :org-data org-data
+                                        :board-data (dis/board-data data)
+                                        :topics-data (:entries su-data)
                                         :hide-add-topic true
                                         :is-stakeholder-update true})
               (dom/div {:class "su-sp-footer"} "Updates by "
