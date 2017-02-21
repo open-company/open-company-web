@@ -693,8 +693,9 @@
   [db [_ board-slug topic-slug]]
   (if (pos? (count (filter #(and (= board-slug (:board-slug %)) (= topic-slug (:topic-slug %))) (:dashboard-selected-topics db))))
     (assoc db :dashboard-selected-topics (filter #(or (not= board-slug (:board-slug %)) (not= topic-slug (:topic-slug %))) (:dashboard-selected-topics db)))
-    (let [new-entry {:board-slug board-slug :topic-slug topic-slug}
-          topics (to-array (:topics (dispatcher/board-data db (router/current-org-slug) board-slug)))
+    (let [board-data (dispatcher/board-data db (router/current-org-slug) board-slug)
+          topic-data (get board-data (keyword topic-slug))
+          new-entry {:created-at (:created-at topic-data) :board-slug board-slug :topic-slug topic-slug}
           next-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) new-entry))]
       (assoc db :dashboard-selected-topics next-selected-topics))))
 
@@ -702,7 +703,7 @@
   [db [_ board-slug]]
   (let [without-board-topics (filter #(not= (:board-slug %) board-slug) (:dashboard-selected-topics db))
         all-topics (:topics (dispatcher/board-data db (router/current-org-slug) board-slug))
-        new-entries (vec (map #(hash-map :board-slug board-slug :topic-slug (keyword %)) all-topics))]
+        new-entries (vec (map #(hash-map :created-at (:created-at board-slug) :board-slug board-slug :topic-slug (keyword %)) all-topics))]
     (assoc db :dashboard-selected-topics (vec (concat without-board-topics new-entries)))))
 
 (defmethod dispatcher/action :dashboard-share-mode
