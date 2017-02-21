@@ -12,9 +12,9 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.su-snapshot :refer (su-snapshot)]
             [oc.web.components.prior-updates :refer (prior-updates)]
             [oc.web.components.topics-columns :refer (topics-columns)]
+            [oc.web.components.topic :refer (topic)]
             [oc.web.components.ui.loading :refer (loading)]))
 
 (defn load-latest-su [owner data]
@@ -65,8 +65,8 @@
     ; if we had a selected-su and it changed let's load the new update data
     ; if selected-su was empty there is no need to load
     (when (not= (:selected-su prev-state) (om/get-state owner :selected-su))
-      (let [updates-list (:items (dis/updates-list-data data))
-            update-data (first (filter #(= (:slug %) (om/get-state owner :selected-su)) updates-list))]
+      (let [updates-list (:items (dis/updates-list-data))
+            update-data (first (filter #(= (:slug %) (name (om/get-state owner :selected-su))) updates-list))]
         (api/get-update update-data false))))
 
   (render-state [_ {:keys [columns-num card-width updates-list selected-su]}]
@@ -74,7 +74,7 @@
           total-width-int (:total-width-int data)
           total-width (str total-width-int "px")
           fixed-card-width (responsive/calc-update-width columns-num)
-          su-data (dis/stakeholder-update-data data (:slug org-data) selected-su)
+          su-data (dis/update-data data (:slug org-data) selected-su)
           update-title (if su-data
                           (if (clojure.string/blank? (:title su-data))
                             (str (:name org-data) " Update")
@@ -96,15 +96,31 @@
             (when su-data
               (dom/h3 {:class "updates-content-cards-title"} update-title))
             (when su-data
-              (om/build topics-columns {:columns-num 1
-                                        :card-width (- fixed-card-width 60) ; remove 60 padding
-                                        :total-width (- fixed-card-width 60)
-                                        :is-stakeholder-update true
-                                        :content-loaded (not (:loading data))
-                                        :topics (:entries su-data)
-                                        :topics-data (:entries su-data)
-                                        :org-data org-data
-                                        :hide-add-topic true}))))))))
+              (dom/div {:class (str "topics-columns overflow-visible group" (when-not (:loading data) " content-loaded"))}
+                (dom/div {:class "topics-column-container columns-1 group"
+                          :style (if (responsive/is-mobile-size?)
+                                   #js {:margin "0px 9px"
+                                        :width "auto"}
+                                   #js {:width (- fixed-card-width 60)})}
+                  (dom/div {:class "topics-column"}
+                    (for [entry (:entries su-data)]
+                      (dom/div {:class "topic-row"}
+                        (om/build topic {:loading (:loading data)
+                                         :topic (:topic-slug entry)
+                                         :is-stakeholder-update true
+                                         :topic-data entry
+                                         :entries-data []
+                                         :card-width card-width
+                                         :columns-num columns-num
+                                         :read-only-board (:read-only org-data)
+                                         :currency (:currency org-data)
+                                         :editing false
+                                         :foce-key nil
+                                         :is-dashboard false
+                                         :show-editing false
+                                         :column 1}
+                                         {:opts {:topic-name (name (:topic-slug entry))}
+                                          :key (:slug update)})))))))))))))
 
 (defcomponent updates-responsive-switcher [data owner]
 
