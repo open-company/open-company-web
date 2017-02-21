@@ -264,16 +264,16 @@
     (assoc-in (dispatcher/updates-list-key (router/current-org-slug)) (:collection response))))
 
 (defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug]}]]
-  (let [su-url   (oc-urls/update-link (router/current-board-slug) (utils/su-date-from-created-at su-date) su-slug)
-        latest-su-key (dispatcher/latest-update-key (router/current-board-slug))
-        board-data-links (:links (dispatcher/board-data))
-        updates-list-link (utils/link-for board-data-links "stakeholder-updates")
+  (let [su-url   (oc-urls/update-link (router/current-org-slug) (utils/su-date-from-created-at su-date) su-slug)
+        latest-su-key (dispatcher/latest-update-key (router/current-org-slug))
+        org-data-links (:links (dispatcher/org-data))
+        updates-list-link (utils/link-for org-data-links "collection" "GET" {:accept "application/vnd.collection+vnd.open-company.update+json;version=1"})
         updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
-        new-links (conj (utils/vec-dissoc board-data-links updates-list-link) updated-link)]
+        new-links (conj (utils/vec-dissoc org-data-links updates-list-link) updated-link)]
     (-> db
       (assoc-in latest-su-key su-url)
       (dissoc :loading)
-      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) :links) new-links)
+      (assoc-in (conj (dispatcher/org-data-key (router/current-org-slug)) :links) new-links)
       ; refresh the su list
       (get-updates))))
 
