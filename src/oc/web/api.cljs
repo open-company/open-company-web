@@ -404,7 +404,7 @@
             (dispatcher/dispatch! [:updates-list {:response fixed-body}])))))))
 
 (defn get-update
-  ([update-data load-company-data]
+  ([update-data load-org-data]
     (when update-data
       (let [update-link (utils/link-for (:links update-data) "self")]
         (api-get (:href update-link)
@@ -414,11 +414,11 @@
                   response {:org-slug (router/current-org-slug)
                             :update-slug (keyword (:slug update-data))
                             :response fixed-body
-                            :load-company-data load-company-data}]
+                            :load-org-data load-org-data}]
               (dispatcher/dispatch! [:update-loaded response]))))))))
 
 (defn get-update-with-slug
-  ([org-slug update-slug load-company-data]
+  ([org-slug update-slug load-org-data]
     (when (and org-slug update-slug)
       (let [update-link (str "/orgs/" org-slug "/updates/" update-slug)]
         (api-get update-link
@@ -432,7 +432,7 @@
                   response {:org-slug (keyword org-slug)
                             :update-slug (keyword update-slug)
                             :response fixed-body
-                            :load-company-data load-company-data}]
+                            :load-org-data load-org-data}]
               (dispatcher/dispatch! [:update-loaded response]))))))))
 
 (defn auth-with-email [email pswd]
