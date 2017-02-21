@@ -298,7 +298,8 @@
   (render-state [_ {:keys [editing as-of window-width] :as state}]
     (let [topic-kw (keyword topic)
           org-slug (keyword (router/current-org-slug))
-          board-slug (keyword (router/current-board-slug))
+          board-data (:board-data data)
+          board-slug (:slug board-data)
           foce-active (not (nil? foce-key))
           is-current-foce (or (and (= foce-key topic-kw) (= (:created-at foce-data) (:created-at topic-data)))
                               (and is-dashboard (= foce-key topic-kw) (= (:created-at foce-data) nil)))
@@ -318,7 +319,7 @@
                                                  :sticky-borders (or (= (:show-top-menu data) topic) (and is-dashboard
                                                                                                             is-current-foce))
                                                  :dashboard-topic is-dashboard
-                                                 :dashboard-selected (utils/in? dashboard-selected-topics topic-kw)
+                                                 :dashboard-selected (pos? (count (filter #(and (= (:slug board-data) (:board-slug %)) (= topic-kw (:topic-slug %))) dashboard-selected-topics)))
                                                  :dashboard-share-mode (:dashboard-sharing data)
                                                  :selectable-topic (and (not is-current-foce)
                                                                         (nil? (:show-top-menu data))
@@ -333,7 +334,7 @@
                                          (not is-current-foce)
                                          (nil? (:show-top-menu data)))
                                (if (:dashboard-sharing data)
-                                 (dis/dispatch! [:dashboard-select-topic topic-kw])
+                                 (dis/dispatch! [:dashboard-select-topic board-slug topic-kw])
                                  (when (and (nil? (:foce-key data))
                                             (or (responsive/is-mobile-size?)
                                                 (not read-only-company)
