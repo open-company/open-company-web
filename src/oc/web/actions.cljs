@@ -277,8 +277,10 @@
       (get-updates))))
 
 (defmethod dispatcher/action :update-loaded [db [_ {:keys [org-slug update-slug response load-org-data]}]]
-  (let [org-data-keys [:logo-url :logo-width :logo-height :name :slug :currency :public :promoted]
-        org-data      (select-keys response org-data-keys)]
+  (let [org-data-keys [:logo-url :logo-width :logo-height :currency]
+        org-data      (-> response
+                          (select-keys org-data-keys)
+                          (assoc :name (:org-name response)))]
     ; load-org-data is used to save the subset of company data that is returned with a stakeholder-update data
     (if load-org-data
       ; save the company data returned with the SU data
