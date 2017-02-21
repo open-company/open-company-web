@@ -58,13 +58,6 @@
                      (not su-navbar))
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (will-receive-props [_ _]
-    (when (om/get-state owner :su-redirect)
-      (om/set-state! owner :su-redirect nil)
-      ; Delay the navigation to updates preview to avoid conflicts
-      ; when in data updates
-      (utils/after 100 #(router/nav! (oc-urls/update-preview)))))
-
   (render [_]
     (let [fixed-show-share-su-button (and (not (responsive/is-mobile?))              ; it's not mobile
                                           (jwt/jwt)                                  ; the user is logged in
@@ -129,9 +122,7 @@
                                            :data-container "body"
                                            :data-placement "left"
                                            :disabled (zero? (count dashboard-selected-topics))
-                                           :on-click (fn []
-                                                       (om/set-state! owner :su-redirect true)
-                                                       (api/patch-stakeholder-update {:topics dashboard-selected-topics :title (:title (:stakeholder-update org-data))}))}
+                                           :on-click #(router/nav! (oc-urls/update-preview))}
                                 (when (om/get-state owner :su-redirect)
                                   (loading/small-loading))
                                 (if (zero? (count dashboard-selected-topics))
