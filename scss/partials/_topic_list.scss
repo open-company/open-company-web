@@ -37,6 +37,10 @@ div.topic-list{
 
   @include big_web(){
     padding-top: #{$navbar_height}px;
+
+    &.not-first-board {
+      padding-top: 0px;
+    }
   }
 
   @include mobile(){
