@@ -12,15 +12,13 @@
 ;; topic adding component
 (defn get-all-topics
   "Return all topics for the current board no matter it's state (archived, active, inactive)
-   e.g {:topic a-string :title a-string}"
+   e.g {:slug a-string :title a-string}"
   [new-topics]
   (let [board-data (dis/board-data)]
     (into
       (:archived board-data)
       (for [sec (vals new-topics)]
-        (-> sec
-            (assoc :topic (:slug sec))
-            (select-keys [:title :topic :body-placeholder :links]))))))
+        (select-keys sec [:title :slug :body-placeholder :links])))))
 
 (defn get-categories [new-topic-categories]
   "Return the categories of the new available topics divided in columns and sorted by the
@@ -58,9 +56,9 @@
   (let [archived-topics (:archived board-data)
         all-topics (into {} (if is-archived
                               (for [a archived-topics]
-                                [(keyword (:topic a)) a])
+                                [(keyword (:slug a)) a])
                               (for [s (vals all-topics)]
-                                [(keyword (:topic s)) s])))]
+                                [(keyword (:slug s)) s])))]
     [:div.category
       [:span.block.mb1.all-caps.category-title
         (str (:name cat) (when (:icon cat) " "))]
@@ -69,11 +67,11 @@
                       (and (not (utils/in? (:topics board-data) sec))
                            (not (utils/in? archived-topics sec))))
             :let [topic-data (get all-topics (keyword sec))
-                  topic-kw (keyword (:topic topic-data))]]
+                  topic-kw (keyword (:slug topic-data))]]
         [:div.mb1.btn-reset.yellow-line-hover-child
           {:key (str "topic-" sec)
-           :on-click #(update-active-topics-cb (:topic topic-data) {:title (:title topic-data)
-                                                                        :topic (:topic topic-data)
+           :on-click #(update-active-topics-cb (:slug topic-data) {:title (:title topic-data)
+                                                                        :topic (:slug topic-data)
                                                                         :placeholder (not is-archived)
                                                                         :body-placeholder (:body-placeholder topic-data)
                                                                         :links (:links topic-data)
@@ -123,10 +121,10 @@
         board-new-topics (drv/react s :board-new-topics)
         board-new-categories (drv/react s :board-new-categories)
         all-topics (into {} (for [s (get-all-topics board-new-topics)]
-                                [(keyword (:topic s)) s]))
+                                [(keyword (:slug s)) s]))
         categories (get-categories board-new-categories)
         topics (:topics board-data)
-        archived (vec (map :topic (:archived board-data)))
+        archived (vec (map :slug (:archived board-data)))
         archived-category {:name "Archived" :order 2 :topics archived}]
       [:div.add-topic.group
         [:div.add-topic-title
@@ -155,6 +153,7 @@
                     :when (pos? (count filtered-topics))]
                 (rum/with-key (category (assoc cat :topics filtered-topics) board-data update-active-topics-cb all-topics false)
                  (str "col-" (:name cat))))])]
+        ;; Archived topics
         [:div.mxn2.clearfix
           (when (pos? (count archived))
             [:div.col.px2.col-12
