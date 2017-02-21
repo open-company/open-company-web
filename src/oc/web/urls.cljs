@@ -130,7 +130,7 @@
 
 (defn update-preview
   ([]
-    (update-preview (router/current-board-slug)))
+    (update-preview (router/current-org-slug)))
   ([org-slug]
     (str (updates-list org-slug) "/preview")))
 
