@@ -13,10 +13,11 @@
     (when (:org-data data)
       (let [org-data (:org-data data)
             org-slug (router/current-org-slug)
-            org-name (if (contains? org-data :name)
+            has-name (empty? (:name org-data))
+            org-name (if has-name
                            (:name org-data)
                            (utils/camel-case-str org-slug))
-            first-letter (first (clojure.string/upper-case org-name))
+            first-letter (first (clojure.string/upper-case (if has-name org-name org-slug))) 
             org-logo (:logo-url org-data)
             su-navbar (:su-navbar data)
             should-show-link (if su-navbar
