@@ -79,82 +79,83 @@
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render-state [_ {:keys [topics]}]
-    (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
-      (dom/div {:class "left-topics-list-top group"}
-        (dom/h3 {:class "left-topics-list-top-title"} "BOARDS")
-        (when (and (not (responsive/is-tablet-or-mobile?))
-                   (utils/link-for (:links org-data) "create"))
-          (dom/button {:class "left-topics-list-top-title btn-reset right"
-                       :on-click #(when (nil? (:foce-key data))
-                                    (dis/dispatch! [:input [:create-board] ""]))
-                       :title "Create a new board"
-                       :data-placement "top"
-                       :data-toggle "tooltip"
-                       :data-container "body"}
-            (dom/i {:class "fa fa-plus-circle"}))))
-      (dom/div {:class (str "left-topics-list-items group")}
-        (for [board (sorted-boards (:boards org-data))]
-          (dom/div {:class (utils/class-set {:left-topics-list-item true
-                                             :highlight-on-hover (nil? (:foce-key data))
-                                             :group true
-                                             :selected (= (router/current-board-slug) (:slug board))})
-                    :style {:width (str (- responsive/left-topics-list-width 5) "px")}
-                    :data-board (name (:slug board))
-                    :key (str "bw-board-list-" (name (:slug board)))
-                    :on-click #(when (nil? (:foce-key data))
-                                 (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
-            (dom/div {:class "internal"
-                      :key (str "bw-board-list-" (name (:slug board)) "-internal")}
-              (str "#" (or (:name board) (:slug board))))))
-        (when-not (nil? (:create-board data))
-          (dom/div {:class "left-topics-list-item group"}
-            (dom/span {:class "left"} "#")
-            (dom/input {:class "board-name left"
-                        :value (:create-board data)
-                        :data-toggle "tooltip"
-                        :data-placement "right"
-                        :data-container "body"
-                        :title "Press Enter to submit and Escape to cancel."
-                        :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
-                        :on-blur #(when (s/blank? (:create-board data))
-                                    (dis/dispatch! [:input [:create-board] nil]))
-                        :on-key-up (fn [e]
-                                        (cond
-                                          (= "Enter" (.-key e))
-                                          (dis/dispatch! [:create-board])
-                                          (= "Escape" (.-key e))
-                                          (dis/dispatch! [:input [:create-board] nil])))}))))
-      (dom/div {:class "left-topics-list-top mt3 group"}
-        (when (not= (count (:topics board-data)) 0)
-          (dom/h3 {:class "left-topics-list-top-title"
-                   :on-click #(when (nil? (:foce-key data))
-                                (dis/dispatch! [:show-add-topic false])
-                                (router/nav! (oc-urls/board)))} "TOPICS"))
-        (when (and (not (responsive/is-tablet-or-mobile?))
-                   (not show-add-topic)
-                   (not (:read-only board-data)))
-          (dom/button {:class "left-topics-list-top-title btn-reset right"
-                       :on-click #(when (nil? (:foce-key data))
-                                    (dis/dispatch! [:show-add-topic true]))
-                       :title "Add a topic"
-                       :data-placement "top"
-                       :data-toggle "tooltip"
-                       :data-container "body"}
-            (dom/i {:class "fa fa-plus-circle"}))))
-      (dom/div {:class (str "left-topics-list-items group" (when (:read-only board-data) " read-only"))}
-        (for [topic topics
-              :let [sd (->> topic keyword (get board-data))]
-              :when (contains? board-data (keyword topic))]
-          (dom/div {:class (utils/class-set {:left-topics-list-item true
-                                             :dnd false ;(can-dnd? data)
-                                             :highlight-on-hover (nil? (:foce-key data))
-                                             :group true
-                                             :selected (= selected-topic-view topic)})
-                    :style {:width (str (- responsive/left-topics-list-width 5) "px")}
-                    :data-topic (name topic)
-                    :key (str "bw-topic-list-" (name topic))
-                    :on-click #(when (nil? (:foce-key data))
-                                 (router/nav! (oc-urls/topic (router/current-org-slug) (router/current-board-slug) (name topic))))}
-            (dom/div {:class "internal"
-                      :key (str "bw-topic-list-" (name topic) "-internal")}
-              (or (:title sd) (s/join " " (map s/capital (s/split (name topic) "-")))))))))))
+    (when-not (:dashboard-sharing data)
+      (dom/div {:class "left-topics-list group" :style {:width (str responsive/left-topics-list-width "px")}}
+        (dom/div {:class "left-topics-list-top group"}
+          (dom/h3 {:class "left-topics-list-top-title"} "BOARDS")
+          (when (and (not (responsive/is-tablet-or-mobile?))
+                     (utils/link-for (:links org-data) "create"))
+            (dom/button {:class "left-topics-list-top-title btn-reset right"
+                         :on-click #(when (nil? (:foce-key data))
+                                      (dis/dispatch! [:input [:create-board] ""]))
+                         :title "Create a new board"
+                         :data-placement "top"
+                         :data-toggle "tooltip"
+                         :data-container "body"}
+              (dom/i {:class "fa fa-plus-circle"}))))
+        (dom/div {:class (str "left-topics-list-items group")}
+          (for [board (sorted-boards (:boards org-data))]
+            (dom/div {:class (utils/class-set {:left-topics-list-item true
+                                               :highlight-on-hover (nil? (:foce-key data))
+                                               :group true
+                                               :selected (= (router/current-board-slug) (:slug board))})
+                      :style {:width (str (- responsive/left-topics-list-width 5) "px")}
+                      :data-board (name (:slug board))
+                      :key (str "bw-board-list-" (name (:slug board)))
+                      :on-click #(when (nil? (:foce-key data))
+                                   (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
+              (dom/div {:class "internal"
+                        :key (str "bw-board-list-" (name (:slug board)) "-internal")}
+                (str "#" (or (:name board) (:slug board))))))
+          (when-not (nil? (:create-board data))
+            (dom/div {:class "left-topics-list-item group"}
+              (dom/span {:class "left"} "#")
+              (dom/input {:class "board-name left"
+                          :value (:create-board data)
+                          :data-toggle "tooltip"
+                          :data-placement "right"
+                          :data-container "body"
+                          :title "Press Enter to submit and Escape to cancel."
+                          :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
+                          :on-blur #(when (s/blank? (:create-board data))
+                                      (dis/dispatch! [:input [:create-board] nil]))
+                          :on-key-up (fn [e]
+                                          (cond
+                                            (= "Enter" (.-key e))
+                                            (dis/dispatch! [:create-board])
+                                            (= "Escape" (.-key e))
+                                            (dis/dispatch! [:input [:create-board] nil])))}))))
+        (dom/div {:class "left-topics-list-top mt3 group"}
+          (when (not= (count (:topics board-data)) 0)
+            (dom/h3 {:class "left-topics-list-top-title"
+                     :on-click #(when (nil? (:foce-key data))
+                                  (dis/dispatch! [:show-add-topic false])
+                                  (router/nav! (oc-urls/board)))} "TOPICS"))
+          (when (and (not (responsive/is-tablet-or-mobile?))
+                     (not show-add-topic)
+                     (not (:read-only board-data)))
+            (dom/button {:class "left-topics-list-top-title btn-reset right"
+                         :on-click #(when (nil? (:foce-key data))
+                                      (dis/dispatch! [:show-add-topic true]))
+                         :title "Add a topic"
+                         :data-placement "top"
+                         :data-toggle "tooltip"
+                         :data-container "body"}
+              (dom/i {:class "fa fa-plus-circle"}))))
+        (dom/div {:class (str "left-topics-list-items group" (when (:read-only board-data) " read-only"))}
+          (for [topic topics
+                :let [sd (->> topic keyword (get board-data))]
+                :when (contains? board-data (keyword topic))]
+            (dom/div {:class (utils/class-set {:left-topics-list-item true
+                                               :dnd false ;(can-dnd? data)
+                                               :highlight-on-hover (nil? (:foce-key data))
+                                               :group true
+                                               :selected (= selected-topic-view topic)})
+                      :style {:width (str (- responsive/left-topics-list-width 5) "px")}
+                      :data-topic (name topic)
+                      :key (str "bw-topic-list-" (name topic))
+                      :on-click #(when (nil? (:foce-key data))
+                                   (router/nav! (oc-urls/topic (router/current-org-slug) (router/current-board-slug) (name topic))))}
+              (dom/div {:class "internal"
+                        :key (str "bw-topic-list-" (name topic) "-internal")}
+                (or (:title sd) (s/join " " (map s/capital (s/split (name topic) "-"))))))))))))
