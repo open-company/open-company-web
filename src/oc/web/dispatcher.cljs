@@ -42,7 +42,7 @@
   [(keyword org-slug) :latest-su])
 
 (defn update-key [org-slug update-slug]
-  [(keyword org-slug) (keyword update-slug)])
+  [(keyword org-slug) :updates (keyword update-slug)])
 
 (defn entries-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :entries-data])
@@ -171,7 +171,7 @@
   ([]
     (update-data @app-state))
   ([data]
-    (update-data data (router/current-board-slug) (router/current-update-slug)))
+    (update-data data (router/current-org-slug) (router/current-update-slug)))
   ([data org-slug update-slug]
     (get-in data (update-key org-slug update-slug))))
 
@@ -218,8 +218,11 @@
 (defn print-org-data []
   (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
-(defn print-updates-data []
+(defn print-updates-list-data []
   (js/console.log (get-in @app-state (updates-list-key (router/current-org-slug)))))
+
+(defn print-update-data []
+  (js/console.log (get-in @app-state (update-key (router/current-org-slug) (router/current-update-slug)))))
 
 (defn print-board-data []
   (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
@@ -229,6 +232,7 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
-(set! (.-OCWebPrintUpdatesData js/window) print-updates-data)
+(set! (.-OCWebPrintUpdatesListData js/window) print-updates-list-data)
+(set! (.-OCWebPrintUpdateData js/window) print-update-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintEntriesData js/window) print-entries-data)
