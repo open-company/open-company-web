@@ -173,7 +173,7 @@
 
 (defmethod dispatcher/action :topic [db [_ {:keys [topic body]}]]
   ;; Refresh topic entries
-  (api/load-entries topic (utils/link-for (:links body) "collection"))
+  (api/load-entries topic (utils/link-for (:links body) "up"))
   (if body
     (let [fixed-topic (utils/fix-topic body topic)]
       (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
@@ -181,7 +181,7 @@
 
 (defmethod dispatcher/action :topic-entry [db [_ {:keys [topic body created-at]}]]
   ;; Refresh topic entries
-  ; (let [current-entries ])
+  (api/load-entries topic (utils/link-for (:links body) "up"))
   (if body
     (let [fixed-topic (utils/fix-topic body topic)]
       (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
@@ -720,6 +720,8 @@
                                 (assoc (keyword topic) topic-data))
         board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         next-db (assoc-in db board-data-key updated-board-data)]
+    (when (:was-archived topic-data)
+      (api/patch-topics updated-topics))
     (if (:was-archived topic-data)
      next-db
      (start-foce next-db topic topic-data))))
