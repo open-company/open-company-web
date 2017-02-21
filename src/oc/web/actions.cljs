@@ -84,7 +84,8 @@
       (and (not (utils/in? (:route @router/path) "create-board"))
            (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
-           (not (utils/in? (:route @router/path) "updates-list")))
+           (not (utils/in? (:route @router/path) "updates-list"))
+           (not (utils/in? (:route @router/path) "su-snapshot-preview")))
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
@@ -689,17 +690,20 @@
     (assoc db :show-add-topic false)))
 
 (defmethod dispatcher/action :dashboard-select-topic
-  [db [_ topic-kw]]
-  (if (utils/in? (:dashboard-selected-topics db) topic-kw)
-    (assoc db :dashboard-selected-topics (utils/vec-dissoc (:dashboard-selected-topics db) topic-kw))
-    (let [topics (to-array (:topics (dispatcher/board-data db)))
-          all-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) topic-kw))
-          next-selected-topics (vec (map keyword (filter #(utils/in? all-selected-topics (keyword %)) topics)))]
+  [db [_ board-slug topic-slug]]
+  (if (pos? (count (filter #(and (= board-slug (:board-slug %)) (= topic-slug (:topic-slug %))) (:dashboard-selected-topics db))))
+    (assoc db :dashboard-selected-topics (filter #(or (not= board-slug (:board-slug %)) (not= topic-slug (:topic-slug %))) (:dashboard-selected-topics db)))
+    (let [new-entry {:board-slug board-slug :topic-slug topic-slug}
+          topics (to-array (:topics (dispatcher/board-data db (router/current-org-slug) board-slug)))
+          next-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) new-entry))]
       (assoc db :dashboard-selected-topics next-selected-topics))))
 
 (defmethod dispatcher/action :dashboard-select-all
-  [db [_ topic-kw]]
-  (assoc db :dashboard-selected-topics (vec (map keyword (:topics (dispatcher/board-data db))))))
+  [db [_ board-slug]]
+  (let [without-board-topics (filter #(not= (:board-slug %) board-slug) (:dashboard-selected-topics db))
+        all-topics (:topics (dispatcher/board-data db (router/current-org-slug) board-slug))
+        new-entries (vec (map #(hash-map :board-slug board-slug :topic-slug (keyword %)) all-topics))]
+    (assoc db :dashboard-selected-topics (vec (concat without-board-topics new-entries)))))
 
 (defmethod dispatcher/action :dashboard-share-mode
   [db [_ activate]]
