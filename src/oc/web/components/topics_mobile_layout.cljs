@@ -23,18 +23,16 @@
                                             foce-data
                                             foce-data-editing?
                                             is-dashboard
-                                            is-stakeholder-update
-                                            selected-topic-view] :as data} owner options]
+                                            is-stakeholder-update] :as data} owner options]
   (render [_]
-    (dom/div {:class (str "topics-mobile-layout" (when selected-topic-view " showing-topic-view"))}
-      (if selected-topic-view
+    (dom/div {:class (str "topics-mobile-layout" (when (router/current-topic-slug) " showing-topic-view"))}
+      (if (router/current-topic-slug)
         (om/build topic-view {:card-width card-width
                               :columns-num columns-num
                               :board-data board-data
                               :foce-key foce-key
                               :foce-data foce-data
-                              :foce-data-editing? foce-data-editing?
-                              :selected-topic-view selected-topic-view})
+                              :foce-data-editing? foce-data-editing?})
         (for [idx (range (count topics))
               :let [topic-kw (get topics idx)
                     topic-name (name topic-kw)

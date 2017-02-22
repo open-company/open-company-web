@@ -164,10 +164,9 @@
       (om/set-state! owner :topics-layout (calc-layout owner next-props))))
 
   (render-state [_ {:keys [topics-layout filtered-topics]}]
-    (let [selected-topic-view   (:selected-topic-view data)
-          partial-render-topic  (partial render-topic owner options)
-          columns-container-key (if selected-topic-view
-                                  (str "topics-columns-selected-topic-" selected-topic-view)
+    (let [partial-render-topic  (partial render-topic owner options)
+          columns-container-key (if (router/current-topic-slug)
+                                  (str "topics-columns-selected-topic-" (router/current-topic-slug))
                                   (apply str filtered-topics))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
@@ -205,14 +204,14 @@
             (cond
               (and is-dashboard
                    (not (responsive/is-mobile-size?))
-                   (not selected-topic-view)
+                   (not (router/current-topic-slug))
                    show-add-topic)
               (dom/div {:class "add-topic-container"
                         :style {:margin-right (str (- topic-view-width 660) "px")}}
                 (add-topic (partial update-active-topics owner)))
               (and is-dashboard
                    (not (responsive/is-mobile-size?))
-                   selected-topic-view)
+                   (router/current-topic-slug))
               (om/build topic-view {:card-width card-width
                                     :columns-num columns-num
                                     :board-data board-data
@@ -220,8 +219,7 @@
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)
-                                    :new-topics (:new-topics data)
-                                    :selected-topic-view selected-topic-view})
+                                    :new-topics (:new-topics data)})
               ; for each column key contained in best layout
               :else
               (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}

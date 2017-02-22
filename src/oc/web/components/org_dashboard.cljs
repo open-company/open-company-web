@@ -62,8 +62,8 @@
 
 (def add-second-topic-tt-prefix "add-second-topic-")
 
-(defn refresh-board-data [owner]
-  (when (nil? (om/get-props owner :selected-topic-view))
+(defn refresh-board-data []
+  (when (not (router/current-topic-slug))
     (api/get-board (dis/board-data))))
 
 (defcomponent org-dashboard [data owner]
@@ -98,9 +98,9 @@
                                                    (dis/dispatch! [:show-top-menu nil])))))
     (when (pos? (:count (utils/link-for (:links (dis/board-data data)) "stakeholder-updates")))
       (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/board-data data))))))
-    (refresh-board-data owner)
+    (refresh-board-data)
     (om/set-state! owner :board-refresh-interval
-      (js/setInterval #(refresh-board-data owner) (* 60 1000))))
+      (js/setInterval #(refresh-board-data) (* 60 1000))))
 
   (will-unmount [_]
     (when (om/get-state owner :board-refresh-interval)
@@ -123,7 +123,7 @@
         (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug board-data))]
           (t/hide add-second-topic-tt)))
       (when (and (not (om/get-state owner :add-second-topic-tt-shown))
-                 (not (:selected-topic-view data))
+                 (not (router/current-topic-slug))
                  (= (count (utils/filter-placeholder-topics (:topics board-data) board-data)) 1)
                  (not (:show-login-overlay data)))
         (om/set-state! owner :add-second-topic-tt-shown true)
@@ -155,7 +155,7 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
-                                           :selected-topic-view (:selected-topic-view data)
+                                           :selected-topic-view (router/current-topic-slug)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :small-navbar (not (utils/company-has-topics? board-data))
                                            :editing-topic (or (not (nil? (:foce-key data)))
@@ -173,7 +173,7 @@
             (dom/div {:class "page"}
               ;; Navbar
               (when-not (and (responsive/is-tablet-or-mobile?)
-                             (:selected-topic-view data))
+                             (router/current-topic-slug))
                 (om/build navbar {:save-bt-active save-bt-active
                                   :org-data org-data
                                   :board-data board-data
@@ -189,8 +189,8 @@
                                   :dashboard-selected-topics (:dashboard-selected-topics data)
                                   :dashboard-sharing (:dashboard-sharing data)
                                   :show-navigation-bar (utils/company-has-topics? board-data)
-                                  :is-topic-view (not (nil? (:selected-topic-view data)))
-                                  :is-dashboard (nil? (:selected-topic-view data))}))
+                                  :is-topic-view (router/current-topic-slug)
+                                  :is-dashboard (not (router/current-topic-slug))}))
               (if (:show-welcome-screen data)
                 (welcome-screen)
                 (dom/div {}
@@ -221,7 +221,6 @@
                                      :foce-key (:foce-key data)
                                      :foce-data (:foce-data data)
                                      :show-add-topic (:show-add-topic data)
-                                     :selected-topic-view (:selected-topic-view data)
                                      :dashboard-selected-topics (:dashboard-selected-topics data)
                                      :dashboard-sharing (:dashboard-sharing data)
                                      :is-dashboard true
@@ -243,7 +242,6 @@
                                    :foce-key (:foce-key data)
                                    :foce-data (:foce-data data)
                                    :show-add-topic (:show-add-topic data)
-                                   :selected-topic-view (:selected-topic-view data)
                                    :dashboard-selected-topics (:dashboard-selected-topics data)
                                    :dashboard-sharing (:dashboard-sharing data)
                                    :is-dashboard true

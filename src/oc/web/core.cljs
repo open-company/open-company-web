@@ -171,9 +171,6 @@
       (api/get-auth-settings)
       (reset! dis/app-state (-> @dis/app-state
                                (assoc :loading true))))
-    (if topic
-      (reset! dis/app-state (assoc @dis/app-state :selected-topic-view topic))
-      (reset! dis/app-state (dissoc @dis/app-state :selected-topic-view)))
     ;; render component
     (drv-root component target)))
 

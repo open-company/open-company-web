@@ -123,7 +123,7 @@
         ;; show add topic if the board loaded is the one currently shown and it has no topics
         (assoc :show-add-topic (if (and is-currently-shown
                                         (empty? old-board-data)
-                                        (not (:selected-topic-view db)))
+                                        (not (router/current-topic-slug)))
                                  (zero? (count (:topics fixed-board-data)))
                                  (:show-add-topic db)))))))
 
@@ -200,8 +200,8 @@
           updated-body (utils/fix-board body)
           board-data-key (dispatcher/board-data-key org board)
           board-topics-key (conj board-data-key :topics)
-          topic-entries-data-key (when (:selected-topic-view db)
-                                      (dispatcher/topic-entries-key org board (keyword (:selected-topic-view db))))
+          topic-entries-data-key (when (router/current-topic-slug)
+                                      (dispatcher/topic-entries-key org board (keyword (router/current-topic-slug))))
           board-editing-topic-key (when (:foce-key db) (conj board-data-key (keyword (:foce-key db))))
           board-already-loaded-key (conj board-data-key :board-data-loaded)
           already-loaded? (get-in db board-already-loaded-key)
@@ -225,7 +225,7 @@
                                         (get-in db board-editing-topic-key))
                                   (assoc-in keep-topics-edits board-editing-topic-key (get-in db board-editing-topic-key))
                                   keep-topics-edits)
-          keeping-entries (if (:selected-topic-view db)
+          keeping-entries (if (router/current-topic-slug)
                               (assoc-in keep-editing-topic topic-entries-data-key (get-in db topic-entries-data-key))
                               keep-editing-topic)
           with-already-loaded (assoc-in keeping-entries board-already-loaded-key true)]
@@ -392,7 +392,6 @@
       (stop-foce)
       (assoc-in board-data-key with-fixed-topics)
       (assoc-in (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) new-entries))))
-
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-topics topic-data]]]
   (let [topic (:foce-key db)
@@ -683,9 +682,7 @@
   (if active
     (do
       (utils/after 100 #(router/nav! (oc-urls/board)))
-      (-> db
-        (assoc :show-add-topic true)
-        (dissoc :selected-topic-view)))
+      (assoc db :show-add-topic true))
     (assoc db :show-add-topic false)))
 
 (defmethod dispatcher/action :dashboard-select-topic

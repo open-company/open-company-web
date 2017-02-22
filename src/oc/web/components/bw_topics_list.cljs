@@ -44,7 +44,7 @@
 ; (defn can-dnd? [data]
 ;   (and (not (:read-only (:board-data data)))
 ;        (nil? (:show-add-topic data))
-;        (nil? (:selected-topic-view data))))
+;        (not (router/current-topic-slug))))
 
 (defn get-topics [data]
   (let [board-data (:board-data data)]
@@ -55,7 +55,7 @@
 (defn sorted-boards [boards]
   (into [] (sort #(compare (utils/js-date (:created-at %1)) (utils/js-date (:created-at %2))) boards)))
 
-(defcomponent bw-topics-list [{:keys [org-data board-data card-width selected-topic-view show-add-topic] :as data} owner options]
+(defcomponent bw-topics-list [{:keys [org-data board-data card-width show-add-topic] :as data} owner options]
 
   (init-state [_]
     {:topics (get-topics data)})
@@ -150,7 +150,7 @@
                                                :dnd false ;(can-dnd? data)
                                                :highlight-on-hover (nil? (:foce-key data))
                                                :group true
-                                               :selected (= selected-topic-view topic)})
+                                               :selected (= (router/current-topic-slug) topic)})
                       :style {:width (str (- responsive/left-topics-list-width 5) "px")}
                       :data-topic (name topic)
                       :key (str "bw-topic-list-" (name topic))

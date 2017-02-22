@@ -24,13 +24,13 @@
                 :cancel-cb #(hide-popover nil "archive-topic-confirm")
                 :success-title "ARCHIVE"
                 :success-cb (fn []
-                              (let [topic (om/get-props owner :selected-topic-view)]
+                              (let [topic (router/current-topic-slug)]
                                 (om/set-state! owner :archiving true)
                                 (dis/dispatch! [:archive-topic topic])
                                 (hide-popover nil "archive-topic-confirm")))}))
 
 (defn load-entries [owner]
-  (when-let* [topic-name (om/get-props owner :selected-topic-view)
+  (when-let* [topic-name (router/current-topic-slug)
                 board-data (om/get-props owner :board-data)
                 topic-data (->> topic-name keyword (get board-data))
                 entries-link (utils/link-for (:links topic-data) "collection" "GET")]
@@ -47,18 +47,17 @@
 
 (defn start-editing-if-needed [{:keys [foce-key
                                        board-data
-                                       selected-topic-view
                                        new-topics]
                                 :as data}]
   (when (nil? foce-key)
-    (let [topic-kw (keyword selected-topic-view)
-          topics-contains-topic (utils/in? (:topics board-data) selected-topic-view)]
+    (let [topic-kw (keyword (router/current-topic-slug))
+          topics-contains-topic (utils/in? (:topics board-data) (router/current-topic-slug))]
       (when (not topics-contains-topic)
         (if (:read-only board-data)
           (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))
           ; look for the urls in the new topics
           (when new-topics
-            (let [new-topic (first (filter #(= (:slug %) selected-topic-view) new-topics))
+            (let [new-topic (first (filter #(= (:slug %) (router/current-topic-slug)) new-topics))
                   new-topic-data (utils/new-topic-initial-data topic-kw (:title new-topic) {:links (:links new-topic)})]
               (if (and new-topic (contains? new-topic :links))
                 (dis/dispatch! [:add-topic topic-kw (assoc new-topic-data :new true)])
@@ -66,7 +65,6 @@
 
 (defcomponent topic-view [{:keys [card-width
                                   columns-num
-                                  selected-topic-view
                                   board-data
                                   entries-data
                                   foce-key
@@ -79,14 +77,13 @@
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-entries-if-needed owner)
-    (start-editing-if-needed (om/get-props owner))
+    (when-not (om/get-state owner :archiving)
+      (start-editing-if-needed (om/get-props owner)))
     (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000))))
 
   (will-update [_ next-props next-state]
     (when-not (:archiving next-state)
-      (start-editing-if-needed next-props))
-    (when (not= (:selected-topic-view next-props) selected-topic-view)
-      (om/set-state! owner :entries-requested false)))
+      (start-editing-if-needed next-props)))
 
   (did-update [_ _ _]
     (load-entries-if-needed owner)
@@ -98,7 +95,7 @@
       (js/clearInterval (om/get-state owner :entries-reload-interval))))
 
   (render [_]
-    (let [topic-kw (keyword selected-topic-view)
+    (let [topic-kw (keyword (router/current-topic-slug))
           topic-view-width (responsive/topic-view-width card-width columns-num)
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get board-data topic-kw)
@@ -111,7 +108,7 @@
       (dom/div {:class "topic-view-container group"
                 :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str topic-card-width "px"))
                         :margin-right (if (responsive/is-tablet-or-mobile?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
-                :key (str "topic-view-inner-" selected-topic-view)}
+                :key (str "topic-view-inner-" (router/current-topic-slug))}
         (dom/div {:class (utils/class-set {:topic-view true
                                            :group true
                                            :tablet-view (responsive/is-tablet-or-mobile?)
@@ -144,9 +141,9 @@
                                             :show-delete-entry-button false
                                             :foce-data foce-data}
                                            {:opts options
-                                            :key (str "topic-foce-" selected-topic-view "-new")}))
-                    (utils/in? (:topics board-data) selected-topic-view)
-                    (let [initial-data (utils/new-topic-initial-data selected-topic-view (:title topic-data) topic-data)
+                                            :key (str "topic-foce-" (router/current-topic-slug) "-new")}))
+                    (utils/in? (:topics board-data) (router/current-topic-slug))
+                    (let [initial-data (utils/new-topic-initial-data (router/current-topic-slug) (:title topic-data) topic-data)
                           with-data (if (#{:growth :finances} topic-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                           with-metrics (if (= :growth topic-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
@@ -160,9 +157,9 @@
               (when (and (not foce-key)
                          (not entries)
                          (not (:placeholder topic-data))
-                         (utils/in? (:topics board-data) selected-topic-view))
+                         (utils/in? (:topics board-data) (router/current-topic-slug)))
                 (dom/div {:class "entry-container group"}
-                  (om/build topic {:topic selected-topic-view
+                  (om/build topic {:topic (router/current-topic-slug)
                                    :topic-data topic-data
                                    :entries-data entries
                                    :card-width (- topic-card-width 60)
@@ -174,7 +171,7 @@
                                    :foce-key foce-key
                                    :foce-data foce-data
                                    :show-editing false}
-                                   {:opts {:topic-name selected-topic-view}})))
+                                   {:opts {:topic-name (router/current-topic-slug)}})))
               (for [idx (range (count entries))
                     :let [rev (get entries idx)]]
                 (when rev
@@ -182,7 +179,7 @@
                     (when-not (= idx 0)
                       (dom/hr {:class "separator-line"
                                :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width 60) "px"))}}))
-                    (om/build topic {:topic selected-topic-view
+                    (om/build topic {:topic (router/current-topic-slug)
                                      :topic-data rev
                                      :entries-data entries
                                      :card-width (- topic-card-width 60)
@@ -195,11 +192,11 @@
                                      :foce-data foce-data
                                      :show-delete-entry-button true
                                      :show-editing true}
-                                     {:opts {:topic-name selected-topic-view}
+                                     {:opts {:topic-name (router/current-topic-slug)}
                                       :key (str "topic-"
                                             (when foce-key
                                               "foce-")
-                                            selected-topic-view "-" (:updated-at rev))})))))))
+                                            (router/current-topic-slug) "-" (:updated-at rev))})))))))
         (when (and (not loading-topic-data)
                    (not (responsive/is-tablet-or-mobile?))
                    (not (:read-only board-data)))
