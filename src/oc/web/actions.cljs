@@ -366,9 +366,15 @@
     (api/archive-topic topic topic-data)
     (-> db
       (stop-foce)
+      (assoc :prevent-topic-not-found-navigation true)
       (assoc :show-add-topic (zero? (count new-topics)))
       (assoc-in (conj board-key :topics) new-topics)
       (assoc-in (conj board-key :archived) new-archived))))
+
+(defmethod dispatcher/action :archive-topic/success
+  [db [_]]
+  (router/nav! (oc-urls/board))
+  (dissoc db :prevent-topic-not-found-navigation))
 
 (defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
   (let [board-data (dispatcher/board-data)
@@ -390,8 +396,15 @@
     (api/delete-entry topic entry-data should-remove-topic?)
     (-> db
       (stop-foce)
+      (assoc :prevent-topic-not-found-navigation true)
       (assoc-in board-data-key with-fixed-topics)
       (assoc-in (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) new-entries))))
+
+(defmethod dispatcher/action :delete-entry/success
+  [db [_ should-redirect-to-board]]
+  (when should-redirect-to-board
+    (router/nav! (oc-urls/board)))
+  (dissoc db :prevent-topic-not-found-navigation))
 
 (defmethod dispatcher/action :foce-save [db [_ & [new-topics topic-data]]]
   (let [topic (:foce-key db)

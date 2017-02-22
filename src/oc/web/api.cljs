@@ -538,8 +538,7 @@
         (api-delete (:href delete-link)
           {:headers (headers-for-link delete-link)}
           (fn [_]
-            (when should-redirect-to-board
-              (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug))))))))))
+            (dispatcher/dispatch! [:delete-entry/success should-redirect-to-board])))))))
 
 (defn get-current-user [auth-links]
   (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
@@ -735,4 +734,4 @@
       (api-delete (:href archive-link)
         {:headers (headers-for-link archive-link)}
         (fn [{:keys [status success body] :as response}]
-          (router/nav! (oc-urls/board)))))))
+          (dispatcher/dispatch! [:archive-topic/success]))))))

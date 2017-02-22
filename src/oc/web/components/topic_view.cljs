@@ -25,7 +25,6 @@
                 :success-title "ARCHIVE"
                 :success-cb (fn []
                               (let [topic (router/current-topic-slug)]
-                                (om/set-state! owner :archiving true)
                                 (dis/dispatch! [:archive-topic topic])
                                 (hide-popover nil "archive-topic-confirm")))}))
 
@@ -50,17 +49,21 @@
                                        new-topics]
                                 :as data}]
   (when (nil? foce-key)
-    (let [topic-kw (keyword (router/current-topic-slug))
-          topics-contains-topic (utils/in? (:topics board-data) (router/current-topic-slug))]
+    (let [topic-slug (router/current-topic-slug)
+          topic-kw (keyword topic-slug)
+          topics-contains-topic (utils/in? (:topics board-data) topic-slug)]
       (when (not topics-contains-topic)
         (if (:read-only board-data)
           (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))
           ; look for the urls in the new topics
           (when new-topics
-            (let [new-topic (first (filter #(= (:slug %) (router/current-topic-slug)) new-topics))
-                  new-topic-data (utils/new-topic-initial-data topic-kw (:title new-topic) {:links (:links new-topic)})]
-              (if (and new-topic (contains? new-topic :links))
-                (dis/dispatch! [:add-topic topic-kw (assoc new-topic-data :new true)])
+            (let [new-topic (topic-kw new-topics)
+                  new-topic-data (utils/new-topic-initial-data topic-kw (:title new-topic) {:links (:links new-topic) :new true})
+                  is-archived? (not (empty? (filter #(= (:slug %) topic-slug) (:archived board-data))))]
+              (if (and new-topic
+                       (contains? new-topic :links)
+                       (not is-archived?))
+                (dis/dispatch! [:add-topic topic-kw new-topic-data])
                 (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))))
 
 (defcomponent topic-view [{:keys [card-width
@@ -71,24 +74,28 @@
                                   foce-data
                                   foce-data-editing?] :as data} owner options]
   (init-state [_]
-    {:entries-requested false
-     :archiving false})
+    {:entries-requested false})
 
   (did-mount [_]
     (dis/dispatch! [:show-add-topic false])
     (load-entries-if-needed owner)
-    (when-not (om/get-state owner :archiving)
-      (start-editing-if-needed (om/get-props owner)))
-    (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000))))
+    (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000)))
+    (let [props (om/get-props owner)]
+      (when (and (router/current-topic-slug)
+                 (not (:prevent-topic-not-found-navigation props)))
+        (start-editing-if-needed props))))
 
   (will-update [_ next-props next-state]
-    (when-not (:archiving next-state)
+    (when (and (router/current-topic-slug)
+               (not (:prevent-topic-not-found-navigation next-props)))
       (start-editing-if-needed next-props)))
 
   (did-update [_ _ _]
     (load-entries-if-needed owner)
-    (when-not (om/get-state owner :archiving)
-      (start-editing-if-needed (om/get-props owner))))
+    (let [props (om/get-props owner)]
+      (when (and (router/current-topic-slug)
+                 (not (:prevent-topic-not-found-navigation props)))
+        (start-editing-if-needed props))))
 
   (will-unmount [_]
     (when (om/get-state owner :entries-reload-interval)
