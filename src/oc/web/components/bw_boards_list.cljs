@@ -51,7 +51,7 @@
                                    (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
               (dom/div {:class "internal"
                         :key (str "bw-board-list-" (name (:slug board)) "-internal")}
-                (str "#" (or (:name board) (:slug board))))))
+                (or (:name board) (:slug board)))))
           (when-not (nil? (:create-board data))
             (dom/div {:class "left-boards-list-item group"}
               (dom/span {:class "left"} "#")
