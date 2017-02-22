@@ -3,7 +3,7 @@
             [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros [defcomponent]]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [dommy.core :as dommy :refer-macros (sel sel1)]
             [oc.web.dispatcher :as dis]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -57,7 +57,32 @@
   (.preventDefault e)
   (dis/dispatch! [:show-login-overlay :login-with-slack]))
 
+(defn list-boards-click [e]
+  (dis/dispatch! [:mobile-menu-toggle])
+  (.preventDefault e)
+  (router/nav! (oc-urls/boards)))
+
+(def nav-height 69)
+(def menu-item-height 38)
+
+(defn setup-mobile-nav-height [owner]
+  (when (responsive/is-mobile-size?)
+    (let [mobile-menu-open (om/get-props owner :mobile-menu-open)
+          nav-item (sel1 [:nav])
+          menu-items-count (count (sel [:ul.menu :li.oc-menu-item]))
+          final-nav-height (str (+ nav-height
+                                   (when mobile-menu-open (+ (* menu-item-height menu-items-count) 14)))
+                                "px")]
+      (js/console.log "menu/setup-mobile-nav-height" nav-item menu-items-count final-nav-height mobile-menu-open)
+      (dommy/set-style! nav-item :height final-nav-height))))
+
 (defcomponent menu [{:keys [mobile-menu-open]} owner options]
+
+  (did-mount [_]
+    (setup-mobile-nav-height owner))
+
+  (did-update [_ _ _]
+    (setup-mobile-nav-height owner))
 
   (render [_]
     (let [menu-classes (str "menu"
@@ -70,6 +95,11 @@
           (when (router/current-org-slug)
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
+        (when (and (router/current-org-slug)
+                   (not (utils/in? (:route @router/path) "boards-list"))
+                   (responsive/is-mobile-size?))
+          (dom/li {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/org) :on-click list-boards-click} "Boards List")))
         (when (and (router/current-org-slug)
                    (jwt/is-admin? (:team-id (dis/org-data))))
           (dom/li {:class "oc-menu-item"}
