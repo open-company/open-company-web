@@ -35,6 +35,7 @@
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.updates :refer (updates-responsive-switcher)]
+            [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
             [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
@@ -333,7 +334,7 @@
       (api/get-entry-point)
       (api/get-auth-settings)
       (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params))})
-      (drv-root #(om/component) target))
+      (drv-root mobile-boards-list target))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
