@@ -11,7 +11,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.lib.tooltip :as t]
+            ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.icon :as i]
@@ -110,7 +110,7 @@
                                        :data-container "body"
                                        :data-placement "bottom"
                                        :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/org-data)))]
-                                                   (t/hide share-work-tip)
+                                                   ; (t/hide share-work-tip)
                                                    (router/nav! (oc-urls/org-team-settings)))}
                             (dom/i {:class "fa fa-user-plus"})))
                         (when fixed-show-share-su-button

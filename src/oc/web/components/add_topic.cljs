@@ -4,7 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.tooltip :as t]
+            ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]))
 
@@ -91,31 +91,32 @@
                        (drv/drv :board-data)
                        (drv/drv :board-new-topics)
                        (drv/drv :board-new-categories)
-                       (rum/local "" ::tt-key)
-                       {:did-mount (fn [s]
-                                    (let [rum-comp (:rum/react-component s)
-                                          add-topic-node (js/ReactDOM.findDOMNode rum-comp)
-                                          $add-topic (js/$ add-topic-node)
-                                          add-topic-offset (.offset $add-topic)
-                                          add-topic-width (.width $add-topic)
-                                          add-topic-height (.height $add-topic)
-                                          coords [(.-left add-topic-offset)
-                                                  (+ (.-top add-topic-offset) 60)]
-                                          board-data @(drv/get-ref s :board-data)
-                                          tt-key (str "first-add-topic-" (:slug board-data))
-                                          place {:place "left-bottom"}]
-                                      (utils/after 500
-                                       #(when (and (= (count (:topics board-data)) 0)
-                                                   (= (count (:archived board-data)) 0))
-                                        (t/tooltip coords {:config {:place "left-bottom"}
-                                                           :id tt-key
-                                                           :persistent true
-                                                           :desktop "Select a topic you want everyone to know about, or you can name your own."})
-                                        (t/show tt-key)))
-                                      (assoc s ::tt-key tt-key)))
-                       :will-unmount (fn [s]
-                                       (t/hide (::tt-key s))
-                                      s)}
+                       ;Comment out onboard tooltips 
+                       ; (rum/local "" ::tt-key)
+                       ; {:did-mount (fn [s]
+                       ;              (let [rum-comp (:rum/react-component s)
+                       ;                    add-topic-node (js/ReactDOM.findDOMNode rum-comp)
+                       ;                    $add-topic (js/$ add-topic-node)
+                       ;                    add-topic-offset (.offset $add-topic)
+                       ;                    add-topic-width (.width $add-topic)
+                       ;                    add-topic-height (.height $add-topic)
+                       ;                    coords [(.-left add-topic-offset)
+                       ;                            (+ (.-top add-topic-offset) 60)]
+                       ;                    board-data @(drv/get-ref s :board-data)
+                       ;                    tt-key (str "first-add-topic-" (:slug board-data))
+                       ;                    place {:place "left-bottom"}]
+                       ;                (utils/after 500
+                       ;                 #(when (and (= (count (:topics board-data)) 0)
+                       ;                             (= (count (:archived board-data)) 0))
+                       ;                  (t/tooltip coords {:config {:place "left-bottom"}
+                       ;                                     :id tt-key
+                       ;                                     :persistent true
+                       ;                                     :desktop "Select a topic you want everyone to know about, or you can name your own."})
+                       ;                  (t/show tt-key)))
+                       ;                (assoc s ::tt-key tt-key)))
+                       ; :will-unmount (fn [s]
+                       ;                 (t/hide (::tt-key s))
+                       ;                s)}
   [s update-active-topics-cb]
   (let [board-data (drv/react s :board-data)
         board-new-topics (drv/react s :board-new-topics)

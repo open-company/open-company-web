@@ -22,7 +22,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.tooltip :as t]
+            ; [oc.web.lib.tooltip :as t]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -37,29 +37,29 @@
         (om/update-state! owner :new-topics-requested not)
         (utils/after 1000 #(api/get-new-topics))))))
 
-(defn share-tooltip-id [slug]
-  (str "second-topic-share-" slug))
+; (defn share-tooltip-id [slug]
+;   (str "second-topic-share-" slug))
 
-(defn show-share-tooltip-if-needed [owner]
-  (let [board-data (dis/board-data (om/get-props owner))
-        tt-id (share-tooltip-id (:slug board-data))]
-    (when (and (not (om/get-state owner :share-tooltip-shown))
-               (not (om/get-state owner :share-tooltip-dismissed))
-               (not= (om/get-props owner :show-login-overlay) :collect-name-password)
-               board-data
-               (zero? (:count (utils/link-for (:links board-data) "stakeholder-updates")))
-               (= (+ (count (utils/filter-placeholder-topics (:topics board-data) board-data))
-                   (count (:archived board-data))) 2)
-               (.querySelector js/document "button.sharing-button"))
-      (om/set-state! owner :share-tooltip-shown true)
-      (utils/after 500
-        (fn []
-          (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "bottom-left"}
-                                                                                     :id tt-id
-                                                                                     :once-only true
-                                                                                     :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
-                                                                                     :desktop "When you’re ready, you can share a beautiful board update with these topics."})]
-            (t/show tt-id)))))))
+; (defn show-share-tooltip-if-needed [owner]
+;   (let [board-data (dis/board-data (om/get-props owner))
+;         tt-id (share-tooltip-id (:slug board-data))]
+;     (when (and (not (om/get-state owner :share-tooltip-shown))
+;                (not (om/get-state owner :share-tooltip-dismissed))
+;                (not= (om/get-props owner :show-login-overlay) :collect-name-password)
+;                board-data
+;                (zero? (:count (utils/link-for (:links board-data) "stakeholder-updates")))
+;                (= (+ (count (utils/filter-placeholder-topics (:topics board-data) board-data))
+;                    (count (:archived board-data))) 2)
+;                (.querySelector js/document "button.sharing-button"))
+;       (om/set-state! owner :share-tooltip-shown true)
+;       (utils/after 500
+;         (fn []
+;           (let [tip (t/tooltip (.querySelector js/document "button.sharing-button") {:config {:place "bottom-left"}
+;                                                                                      :id tt-id
+;                                                                                      :once-only true
+;                                                                                      :dismiss-cb #(om/set-state! owner :share-tooltip-dismissed true)
+;                                                                                      :desktop "When you’re ready, you can share a beautiful board update with these topics."})]
+;             (t/show tt-id)))))))
 
 (def add-second-topic-tt-prefix "add-second-topic-")
 
@@ -97,8 +97,8 @@
                                                             (not (utils/event-inside? e (sel1 [(str "div.topic[data-topic=" (name (:show-top-menu @dis/app-state)) "]")]))))
                                                    (utils/event-stop e)
                                                    (dis/dispatch! [:show-top-menu nil])))))
-    (when (pos? (:count (utils/link-for (:links (dis/board-data data)) "stakeholder-updates")))
-      (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/board-data data))))))
+    ; (when (pos? (:count (utils/link-for (:links (dis/board-data data)) "stakeholder-updates")))
+    ;   (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/board-data data))))))
     (refresh-board-data)
     (om/set-state! owner :board-refresh-interval
       (js/setInterval #(refresh-board-data) (* 60 1000))))
@@ -110,32 +110,33 @@
       (events/unlistenByKey (om/get-state owner :window-click-listener)))
     (when (om/get-state owner :resize-listener)
       (events/unlistenByKey (om/get-state owner :resize-listener)))
-    (let [board-data (dis/board-data (om/get-props owner))]
-      (t/hide (str add-second-topic-tt-prefix (:slug board-data)))
-      (t/hide (share-tooltip-id (:slug board-data)))))
+    ; (let [board-data (dis/board-data (om/get-props owner))]
+    ;   (t/hide (str add-second-topic-tt-prefix (:slug board-data)))
+    ;   (t/hide (share-tooltip-id (:slug board-data))))
+    )
 
-  (did-update [_ prev-props prev-state]
-    (let [board-data (dis/board-data data)]
-      (when (and (:dashboard-sharing data)
-                 (not (:dashboard-sharing prev-props)))
-        (t/hide (share-tooltip-id (:slug board-data))))
-      (when (and (not (:show-add-topic prev-props))
-                 (:show-add-topic data))
-        (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug board-data))]
-          (t/hide add-second-topic-tt)))
-      (when (and (not (om/get-state owner :add-second-topic-tt-shown))
-                 (not (router/current-topic-slug))
-                 (= (count (utils/filter-placeholder-topics (:topics board-data) board-data)) 1)
-                 (not (:show-login-overlay data)))
-        (om/set-state! owner :add-second-topic-tt-shown true)
-        (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug board-data))]
-          (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
-                      {:desktop "Click on the + to add more topics and put together a complete board update."
-                       :once-only true
-                       :id add-second-topic-tt
-                       :config {:typeClass "add-more-tooltip" :place "bottom-left"}})
-          (t/show add-second-topic-tt)))
-      (show-share-tooltip-if-needed owner)))
+  ; (did-update [_ prev-props prev-state]
+  ;   (let [board-data (dis/board-data data)]
+  ;     (when (and (:dashboard-sharing data)
+  ;                (not (:dashboard-sharing prev-props)))
+  ;       (t/hide (share-tooltip-id (:slug board-data))))
+  ;     (when (and (not (:show-add-topic prev-props))
+  ;                (:show-add-topic data))
+  ;       (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug board-data))]
+  ;         (t/hide add-second-topic-tt)))
+  ;     (when (and (not (om/get-state owner :add-second-topic-tt-shown))
+  ;                (not (router/current-topic-slug))
+  ;                (= (count (utils/filter-placeholder-topics (:topics board-data) board-data)) 1)
+  ;                (not (:show-login-overlay data)))
+  ;       (om/set-state! owner :add-second-topic-tt-shown true)
+  ;       (let [add-second-topic-tt (str add-second-topic-tt-prefix (:slug board-data))]
+  ;         (t/tooltip (.querySelector js/document "button.left-topics-list-top-title")
+  ;                     {:desktop "Click on the + to add more topics and put together a complete board update."
+  ;                      :once-only true
+  ;                      :id add-second-topic-tt
+  ;                      :config {:typeClass "add-more-tooltip" :place "bottom-left"}})
+  ;         (t/show add-second-topic-tt)))
+  ;     (show-share-tooltip-if-needed owner)))
 
   (will-receive-props [_ next-props]
     (when-not (:read-only (dis/board-data next-props))

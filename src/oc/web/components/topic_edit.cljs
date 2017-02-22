@@ -9,7 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.tooltip :as t]
+            ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.oc-colors :as oc-colors]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
@@ -245,20 +245,20 @@
 (defn- data-editing-cb [owner value]
   (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
 
-(defn show-edit-tt [owner]
-  (let [board-data (dis/board-data)]
-    (when (and (not (om/get-state owner :first-foce-tt-shown))
-               (= (count (:topics board-data)) 1)
-               (= (count (:archived board-data)) 0)
-               (om/get-props owner :foce-key))
-      (om/set-state! owner :first-foce-tt-shown true)
-      (utils/after 500
-        #(let [first-foce (str "first-foce-" (:slug board-data))]
-          (t/tooltip (.querySelector js/document "div.topic-edit") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
-                                                                    :id first-foce
-                                                                    :once-only true
-                                                                    :config {:place "right-bottom"}})
-          (t/show first-foce))))))
+; (defn show-edit-tt [owner]
+;   (let [board-data (dis/board-data)]
+;     (when (and (not (om/get-state owner :first-foce-tt-shown))
+;                (= (count (:topics board-data)) 1)
+;                (= (count (:archived board-data)) 0)
+;                (om/get-props owner :foce-key))
+;       (om/set-state! owner :first-foce-tt-shown true)
+;       (utils/after 500
+;         #(let [first-foce (str "first-foce-" (:slug board-data))]
+;           (t/tooltip (.querySelector js/document "div.topic-edit") {:desktop "Enter your information. You can select text for easy formatting options, and jazz it up with a headline, emoji or image."
+;                                                                     :id first-foce
+;                                                                     :once-only true
+;                                                                     :config {:place "right-bottom"}})
+;           (t/show first-foce))))))
 
 (defcomponent topic-edit [{:keys [currency
                                   card-width
@@ -292,8 +292,8 @@
                  (or (:new (dis/foce-topic-data))
                      (:was-archvied (dis/foce-topic-data))))
         (dis/dispatch! [:rollback-add-topic (dis/foce-topic-key)]))
-      ; hide FoCE editing tooltip
-      (t/hide (str "first-foce-" (:slug (dis/board-data))))
+      ; ; hide FoCE editing tooltip
+      ; (t/hide (str "first-foce-" (:slug (dis/board-data))))
       ; re enable the route dispatcher
       (reset! prevent-route-dispatch false)
       ; remove the onbeforeunload handler
@@ -321,7 +321,8 @@
                                    (.-top (.offset topic-edit-div)))
                           (.animate (js/$ "html, body")
                            #js {:scrollTop (- (.-top (.offset topic-edit-div)) 168)}))))
-      (show-edit-tt owner)))
+      ; (show-edit-tt owner)
+      ))
 
   (did-update [_ _ prev-state]
     (when-not (responsive/is-tablet-or-mobile?)
@@ -339,7 +340,8 @@
         (doto add-chart-el
           (.tooltip "fixTitle")
           (.tooltip "hide")))
-      (show-edit-tt owner))
+      ; (show-edit-tt owner)
+      )
     (let [file-upload-state (om/get-state owner :file-upload-state)
           old-file-upload-state (:file-upload-state prev-state)]
       (when (and (= file-upload-state :show-url-field)

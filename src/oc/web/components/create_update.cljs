@@ -12,7 +12,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.tooltip :as t]
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.ui.navbar :refer (navbar)]
