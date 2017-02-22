@@ -100,7 +100,7 @@
           fixed-card-width (responsive/calc-update-width columns-num)
           back-to-dashboard-fn #(do
                                   (dis/dispatch! [:dashboard-share-mode false])
-                                  (router/nav! (oc-urls/board)))]
+                                  (router/nav! (oc-urls/org)))]
       (dom/div {:class "create-update main-scroll group"}
         (dom/div {:class "page"}
           (om/build navbar {:card-width card-width
