@@ -16,7 +16,7 @@
 @import "partials/_navbar";
 @import "partials/_org_settings";
 @import "partials/_org_dashboard";;
-@import "partials/_topic_list";
+@import "partials/_topics_list";
 @import "partials/_topic";
 @import "partials/_popover";
 @import "partials/_oc_buttons";
@@ -73,7 +73,7 @@
 @import "partials/_updates";
 @import "partials/_create_update";
 @import "partials/_oc_switch";
-@import "partials/_topics_mobile_layout";
+@import "partials/_mobile_topics_list";
 @import "partials/_bw_boards_list";
 @import "partials/_topic_view";
 @import "partials/_js_tooltip";
@@ -83,3 +83,4 @@
 @import "partials/_edit_user_profile";
 @import "partials/_team_disclaimer_popover";
 @import "partials/_floating_add_topic";
+@import "partials/_mobile_boards_list";
