@@ -1,7 +1,13 @@
 $add_topic_button_size: 32;
+$min_screen_height: 1000;
 
 div.floating-add-topic {
-  position: fixed;
+  @media screen and (max-height: #{$min_screen_height}px){
+    position: fixed;
+  }
+  @media screen and (min-height: #{$min_screen_height + 1}px){
+    position: absolute;
+  }
   right: 30px;
   bottom: 110px;
   width: #{$add_topic_button_size}px;
