@@ -1,4 +1,4 @@
-(ns oc.web.components.topics-mobile-layout
+(ns oc.web.components.mobile-topics-list
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -10,9 +10,7 @@
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.topic-view :refer (topic-view)]))
 
-(def mobile-topic-margins 3)
-
-(defcomponent topics-mobile-layout [{:keys [columns-num
+(defcomponent mobile-topics-list [{:keys [columns-num
                                             content-loaded
                                             total-width
                                             card-width
@@ -25,7 +23,7 @@
                                             is-dashboard
                                             is-stakeholder-update] :as data} owner options]
   (render [_]
-    (dom/div {:class (str "topics-mobile-layout" (when (router/current-topic-slug) " showing-topic-view"))}
+    (dom/div {:class (str "mobile-topics-list" (when (router/current-topic-slug) " showing-topic-view"))}
       (if (router/current-topic-slug)
         (om/build topic-view {:card-width card-width
                               :columns-num columns-num
