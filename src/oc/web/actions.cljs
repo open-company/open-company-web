@@ -33,33 +33,35 @@
   (router/redirect! "/")
   (dissoc db :jwt))
 
-(defmethod dispatcher/action :entry-point [db [_ {:keys [collection]}]]
-  (let [orgs (:items collection)]
-    (cond
-      ; If i have an org slug let's load the org data
-      (router/current-org-slug)
-      (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
-        (api/get-org org-data)
-        (router/redirect-404!))
-      ; If not redirect the user to the first useful org or to the create org UI
-      (and (not (utils/in? (:route @router/path) "create-org"))
-           (not (utils/in? (:route @router/path) "create-board")))
-      (let [login-redirect (cook/get-cookie :login-redirect)]
-        (cond
-          ; redirect to create-company if the user has no companies
-          (zero? (count orgs))   (router/nav! oc-urls/create-org)
-          ; if there is a login-redirect use it
-          (and (jwt/jwt) login-redirect)  (do
-                                            (cook/remove-cookie! :login-redirect)
-                                            (router/redirect! login-redirect))
-          ; if the user has only one company, send him to the company dashboard
-          (= (count orgs) 1)        (router/nav! (oc-urls/boards (:slug (first orgs))))
-          ; if the user has more than one company send him to the companies page
-          (> (count orgs) 1)        (router/nav! oc-urls/orgs))))
-    (-> db
-        (dissoc :loading)
-        (assoc :orgs orgs)
-        (assoc-in dispatcher/api-entry-point-key (:links collection)))))
+(defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
+  (if success
+    (let [orgs (:items collection)]
+      (cond
+        ; If i have an org slug let's load the org data
+        (router/current-org-slug)
+        (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
+          (api/get-org org-data)
+          (router/redirect-404!))
+        ; If not redirect the user to the first useful org or to the create org UI
+        (and (not (utils/in? (:route @router/path) "create-org"))
+             (not (utils/in? (:route @router/path) "create-board")))
+        (let [login-redirect (cook/get-cookie :login-redirect)]
+          (cond
+            ; redirect to create-company if the user has no companies
+            (zero? (count orgs))   (router/nav! oc-urls/create-org)
+            ; if there is a login-redirect use it
+            (and (jwt/jwt) login-redirect)  (do
+                                              (cook/remove-cookie! :login-redirect)
+                                              (router/redirect! login-redirect))
+            ; if the user has only one company, send him to the company dashboard
+            (= (count orgs) 1)        (router/nav! (oc-urls/boards (:slug (first orgs))))
+            ; if the user has more than one company send him to the companies page
+            (> (count orgs) 1)        (router/nav! oc-urls/orgs))))
+      (-> db
+          (dissoc :loading)
+          (assoc :orgs orgs)
+          (assoc-in dispatcher/api-entry-point-key (:links collection))))
+    (do (router/redirect-500!) db)))
 
 (defn newest-board [boards]
   (first (sort #(compare (utils/js-date (:created-at %2)) (utils/js-date (:created-at %1))) boards)))
