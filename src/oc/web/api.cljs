@@ -160,7 +160,7 @@
 (defn get-entry-point []
   (api-get "/" nil (fn [{:keys [success body]}]
                      (let [fixed-body (if success (json->cljs body) {})]
-                       (dispatcher/dispatch! [:entry-point {:success success :collection (:collection body)}])))))
+                       (dispatcher/dispatch! [:entry-point {:success success :collection (:collection fixed-body)}])))))
 
 (defn get-subscription [company-uuid]
   (pay-get (str "/subscriptions/" company-uuid)
