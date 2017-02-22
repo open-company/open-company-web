@@ -735,4 +735,4 @@
       (api-delete (:href archive-link)
         {:headers (headers-for-link archive-link)}
         (fn [{:keys [status success body] :as response}]
-          (dispatcher/dispatch! [:archive-topic/success]))))))
+          (router/nav! (oc-urls/board)))))))

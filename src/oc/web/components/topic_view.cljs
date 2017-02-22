@@ -27,8 +27,7 @@
                               (let [topic (om/get-props owner :selected-topic-view)]
                                 (om/set-state! owner :archiving true)
                                 (dis/dispatch! [:archive-topic topic])
-                                (hide-popover nil "archive-topic-confirm")
-                                (utils/after 100 #(router/nav! (oc-urls/board)))))}))
+                                (hide-popover nil "archive-topic-confirm")))}))
 
 (defn load-entries [owner]
   (when-let* [topic-name (om/get-props owner :selected-topic-view)
