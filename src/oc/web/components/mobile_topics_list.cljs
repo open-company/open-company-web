@@ -11,32 +11,45 @@
             [oc.web.components.topic-view :refer (topic-view)]))
 
 (defcomponent mobile-topics-list [{:keys [columns-num
-                                            content-loaded
-                                            total-width
-                                            card-width
-                                            topics
-                                            board-data
-                                            topics-data
-                                            foce-key
-                                            foce-data
-                                            foce-data-editing?
-                                            is-dashboard
-                                            is-stakeholder-update] :as data} owner options]
+                                          content-loaded
+                                          total-width
+                                          card-width
+                                          topics
+                                          org-data
+                                          board-data
+                                          entries-data
+                                          topics-data
+                                          foce-key
+                                          foce-data
+                                          foce-data-editing?
+                                          is-dashboard
+                                          is-stakeholder-update
+                                          prevent-topic-not-found-navigation] :as data} owner options]
   (render [_]
     (dom/div {:class (str "mobile-topics-list" (when (router/current-topic-slug) " showing-topic-view"))}
       (if (router/current-topic-slug)
         (om/build topic-view {:card-width card-width
                               :columns-num columns-num
+                              :loading (:loading data)
+                              :org-data org-data
                               :board-data board-data
+                              :topic-data (get board-data (keyword (router/current-topic-slug)))
+                              :entries-data entries-data
+                              :read-only-board (:read-only board-data)
+                              :currency (:currency org-data)
                               :foce-key foce-key
                               :foce-data foce-data
-                              :foce-data-editing? foce-data-editing?})
+                              :foce-data-editing? foce-data-editing?
+                              :prevent-topic-not-found-navigation prevent-topic-not-found-navigation})
         (for [idx (range (count topics))
               :let [topic-kw (get topics idx)
                     topic-name (name topic-kw)
                     sd (->> topic-name keyword (get board-data))
                     topic-data {:loading (:loading board-data)
-                                :topic topic-name
+                                :topic topic-kw
+                                :org-data org-data
+                                :board-data board-data
+                                :entries-data (get entries-data topic-kw [])
                                 :is-stakeholder-update is-stakeholder-update
                                 :topic-data sd
                                 :card-width card-width
@@ -46,9 +59,7 @@
                                 :foce-key foce-key
                                 :foce-data foce-data
                                 :is-dashboard is-dashboard
-                                :topic-flex-num idx}
-                    topic-opts {:opts {:topic-name topic-name
-                                       :topic-click (partial (:topic-click options) topic-name)}}]]
+                                :topic-flex-num idx}]]
           (when-not (:placeholder sd)
             (dom/div {:class "topics-mobile-item" :style {:width (str card-width "px")}}
-              (om/build topic topic-data topic-opts))))))))
+              (om/build topic topic-data))))))))

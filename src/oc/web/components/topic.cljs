@@ -340,7 +340,7 @@
                                                 (not read-only-company)
                                                 (> (count entries-data) 1)
                                                 (html-text-exceeds-limit (:body topic-data) utils/topic-body-limit)))
-                                  (router/nav! (oc-urls/topic org-slug board-slug topic-kw)))))
+                                   (router/nav! (oc-urls/topic org-slug board-slug topic-kw)))))
                     :style topic-style
                     :ref "topic"
                     :data-topic (name topic)
