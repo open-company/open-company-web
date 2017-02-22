@@ -92,7 +92,7 @@
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
-        (if (responsive/is-mobile-size?)
+        (if (responsive/is-tablet-or-mobile?)
           (router/nav! (oc-urls/boards))
           (let [board-to (get-default-board org-data)]
             (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))

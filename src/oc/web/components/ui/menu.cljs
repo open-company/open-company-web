@@ -96,7 +96,7 @@
               (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
         (when (and (router/current-org-slug)
                    (not (utils/in? (:route @router/path) "boards-list"))
-                   (responsive/is-mobile-size?))
+                   (responsive/is-tablet-or-mobile?))
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org) :on-click list-boards-click} "Boards List")))
         (when (and (router/current-org-slug)
