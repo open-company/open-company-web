@@ -73,7 +73,6 @@
           final-nav-height (str (+ nav-height
                                    (when mobile-menu-open (+ (* menu-item-height menu-items-count) 14)))
                                 "px")]
-      (js/console.log "menu/setup-mobile-nav-height" nav-item menu-items-count final-nav-height mobile-menu-open)
       (dommy/set-style! nav-item :height final-nav-height))))
 
 (defcomponent menu [{:keys [mobile-menu-open]} owner options]
