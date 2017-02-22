@@ -252,7 +252,8 @@
                                    :show-top-menu (:show-top-menu data)})))
                   (when (and (not (:read-only org-data))
                              (not (:show-add-topic data))
-                             (not (router/current-topic-slug)))
+                             (not (router/current-topic-slug))
+                             (not (responsive/is-tablet-or-mobile?)))
                     (floating-add-topic))
                   ;;Footer
                   (footer total-width-int))))))))))

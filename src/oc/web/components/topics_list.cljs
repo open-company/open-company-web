@@ -55,7 +55,7 @@
                            rerender]}]
     (let [board-slug    (router/current-board-slug)
           board-data    (:board-data data)
-          board-topics  (filter #(contains? board-data %) (vec (map keyword (:topics board-data))))
+          board-topics  (vec (filter #(contains? board-data %) (vec (map keyword (:topics board-data)))))
           card-width    (:card-width data)
           columns-num   (:columns-num data)
           ww            (responsive/ww)
