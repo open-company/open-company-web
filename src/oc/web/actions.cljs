@@ -92,8 +92,10 @@
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
-        (let [board-to (get-default-board org-data)]
-          (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
+        (if (responsive/is-mobile-size?)
+          (router/nav! (oc-urls/boards))
+          (let [board-to (get-default-board org-data)]
+            (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))
         ;; Redirect to create board if no board are present
         :else
         (router/nav! (oc-urls/create-board (:slug org-data))))))
