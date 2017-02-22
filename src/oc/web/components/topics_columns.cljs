@@ -14,7 +14,7 @@
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.topic-view :refer (topic-view)]
             [oc.web.components.add-topic :refer (add-topic)]
-            [oc.web.components.bw-topics-list :refer (bw-topics-list)]))
+            [oc.web.components.bw-boards-list :refer (bw-boards-list)]))
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
@@ -201,7 +201,7 @@
                 (dom/button {:class "btn-reset btn-link"
                              :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
-              (om/build bw-topics-list data))
+              (om/build bw-boards-list data))
             (cond
               (and is-dashboard
                    (not (responsive/is-mobile-size?))
@@ -224,7 +224,7 @@
                                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)})
               ; for each column key contained in best layout
               :else
-              (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}
+              (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-boards-list-width) "px")}}
                 (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
                   (let [column (get topics-layout kw)]
                     (dom/div {:class (str "topics-column col-" (name kw))

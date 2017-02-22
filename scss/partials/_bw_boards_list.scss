@@ -1,17 +1,17 @@
-div.left-topics-list {
+div.left-boards-list {
   float: left;
   padding-left: 5px;
   position: fixed;
   top: 128px;
 
-  div.left-topics-list-top{
+  div.left-boards-list-top{
     border-radius: 4px;
 
     &:hover {
       background-color: rgba(78,90,107,0.2);
     }
 
-    .left-topics-list-top-title {
+    .left-boards-list-top-title {
       font-family: $oc_headers_font;
       font-size: 14px;
       font-weight: 600;
@@ -24,7 +24,7 @@ div.left-topics-list {
       width: 130px;
     }
 
-    button.left-topics-list-top-title {
+    button.left-boards-list-top-title {
       width: 20px;
       height: 20px;
       font-size: 13px;
@@ -33,16 +33,16 @@ div.left-topics-list {
     }
   }
 
-  div.left-topics-list-items{
+  div.left-boards-list-items{
     cursor: pointer;
 
     &.read-only {
-      div.left-topics-list-item:hover {
+      div.left-boards-list-item:hover {
         background-color: rgba(78,90,107,0.2);
       }
     }
 
-    div.left-topics-list-item {
+    div.left-boards-list-item {
       height: 21px;
       padding: 0 5px 0 5px;
       border-radius: 4px;

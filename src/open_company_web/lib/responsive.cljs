@@ -84,7 +84,7 @@
 
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 20)
-(def left-topics-list-width 160)
+(def left-boards-list-width 160)
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies
@@ -102,14 +102,14 @@
       (min (/ (- win-width
                  (* topic-list-x-padding 2)
                  (* topic-total-x-padding 3)
-                 (if (is-tablet-or-mobile?) 0 left-topics-list-width))
+                 (if (is-tablet-or-mobile?) 0 left-boards-list-width))
               3)
            420)
       (= columns 2)
       (max (/ (- win-width
                  (* topic-list-x-padding 2)
                  (* topic-total-x-padding 2)
-                 (if (is-tablet-or-mobile?) 0 left-topics-list-width))
+                 (if (is-tablet-or-mobile?) 0 left-boards-list-width))
               2)
            208))))
 
@@ -137,7 +137,7 @@
       (- win-width 8 8))
     (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
        (* topic-list-x-padding 2)                              ; the padding around all the columns
-       (if (is-tablet-or-mobile?) 0 left-topics-list-width)))) ; the left side panel with the topics list
+       (if (is-tablet-or-mobile?) 0 left-boards-list-width)))) ; the left side panel with the topics list
 
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)
