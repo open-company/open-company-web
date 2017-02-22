@@ -322,16 +322,10 @@
                     {:topics topics})
           json-data (cljs->json payload)]
       (api-patch (:href board-patch-link)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type board-patch-link)}}
+        {:json-params json-data
+         :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:company {:success success
-                                           :status status
-                                           :body (when success (json->cljs body))}]))))))
+          (dispatcher/dispatch! [:board (when success (json->cljs body))]))))))
 
 (defn patch-stakeholder-update [stakeholder-update]
   (when stakeholder-update
