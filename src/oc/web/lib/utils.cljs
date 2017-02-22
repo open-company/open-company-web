@@ -781,14 +781,13 @@
     (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
          (not (nil? (:token (first (:bots jwt)))))))) ; with an installed Slack bot
 
-(defn new-topic-body-placeholder []
-  "What would you like to say...")
+(def new-topic-body-placeholder "What would you like to say...")
 
 (defn new-topic-initial-data [topic title old-topic-data]
   (let [topic-name (name topic)
         initial-data {:topic topic-name
                       :title title
-                      :body-placeholder (new-topic-body-placeholder)
+                      :body-placeholder new-topic-body-placeholder
                       :headline ""
                       :placeholder true
                       :links (:links old-topic-data)}
