@@ -106,7 +106,7 @@
                              :columns-num (:columns-num props)
                              :foce-data-editing? (:foce-data-editing? props)
                              :read-only-board (:read-only board-data)
-                             :currency (:currency org-data)
+                             :currency (:currency (dis/org-data))
                              :foce-key (:foce-key props)
                              :foce-data (:foce-data props)
                              :dashboard-selected-topics (:dashboard-selected-topics props)
