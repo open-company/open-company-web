@@ -357,6 +357,7 @@
                                 :foce-key foce-key
                                 :foce-data foce-data
                                 :show-delete-entry-button (:show-delete-entry-button data)
+                                :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                 :columns-num columns-num}
                                {:opts options
                                 :key (str "topic-foce-" topic "-" (:created-at topic-data))})

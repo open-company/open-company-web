@@ -223,6 +223,7 @@
                                      :show-add-topic (:show-add-topic data)
                                      :dashboard-selected-topics (:dashboard-selected-topics data)
                                      :dashboard-sharing (:dashboard-sharing data)
+                                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                      :is-dashboard true
                                      :show-top-menu (:show-top-menu data)}))
                       (om/build topics-list
@@ -244,6 +245,7 @@
                                    :show-add-topic (:show-add-topic data)
                                    :dashboard-selected-topics (:dashboard-selected-topics data)
                                    :dashboard-sharing (:dashboard-sharing data)
+                                   :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                    :is-dashboard true
                                    :show-top-menu (:show-top-menu data)})))
                   ;;Footer

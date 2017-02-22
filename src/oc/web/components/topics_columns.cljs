@@ -111,6 +111,7 @@
                              :foce-data (:foce-data props)
                              :dashboard-selected-topics (:dashboard-selected-topics props)
                              :dashboard-sharing (:dashboard-sharing props)
+                             :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation props)
                              :is-dashboard is-dashboard
                              :show-editing (and is-dashboard
                                                 (not (:read-only board-data)))
@@ -219,7 +220,8 @@
                                     :foce-key (:foce-key data)
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)
-                                    :new-topics (:new-topics data)})
+                                    :new-topics (:new-topics data)
+                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)})
               ; for each column key contained in best layout
               :else
               (dom/div {:class "right" :style {:width (str (- (int total-width) responsive/left-topics-list-width) "px")}}

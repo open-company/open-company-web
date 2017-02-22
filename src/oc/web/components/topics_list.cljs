@@ -88,9 +88,9 @@
                          :foce-key (:foce-key data)
                          :foce-data (:foce-data data)
                          :show-add-topic (:show-add-topic data)
-                         :selected-topic-view (:selected-topic-view data)
                          :dashboard-selected-topics (:dashboard-selected-topics data)
                          :dashboard-sharing (:dashboard-sharing data)
+                         :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
                          :show-top-menu (:show-top-menu data)}
               sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
