@@ -18,7 +18,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.topics-columns :refer (topics-columns)]
-            [oc.web.components.topics-mobile-layout :refer (topics-mobile-layout)]
+            [oc.web.components.mobile-topics-list :refer (mobile-topics-list)]
             [cljsjs.hammer]))
 
 ;; ===== Topic List Component =====
@@ -93,5 +93,5 @@
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
                          :show-top-menu (:show-top-menu data)}
-              sub-component (if (responsive/is-mobile-size?) topics-mobile-layout topics-columns)]
+              sub-component (if (responsive/is-mobile-size?) mobile-topics-list topics-columns)]
           (om/build sub-component comp-data))))))
