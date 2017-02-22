@@ -44,6 +44,7 @@
 (enable-console-print!)
 
 (defn drv-root [om-component target]
+  (swap! dis/app-state assoc :router-path @router/path)
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component om-component
