@@ -46,7 +46,7 @@
                 [:div
                   [:h3.info-headline "Create beautiful company updates in less time."]]]
               [:div.col-sm-6.col-xs-12.right {:style {:padding-bottom "0px"}}
-                [:img.info-image {:id "company-dashboard" :src "./img/green-labs-mac@4x.png" :alt "Company Dashboard"}]]]]]
+                [:img.info-image {:id "org-dashboard" :src "./img/green-labs-mac@4x.png" :alt "Company Dashboard"}]]]]]
 
         [:div.right-to-left.web-only
           [:div.container.info.second

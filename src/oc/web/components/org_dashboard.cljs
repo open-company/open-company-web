@@ -18,6 +18,7 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.ui.floating-add-topic :refer (floating-add-topic)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -248,5 +249,9 @@
                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                    :is-dashboard true
                                    :show-top-menu (:show-top-menu data)})))
+                  (when (and (not (:read-only org-data))
+                             (not (:show-add-topic data))
+                             (not (router/current-topic-slug)))
+                    (floating-add-topic))
                   ;;Footer
                   (footer total-width-int))))))))))

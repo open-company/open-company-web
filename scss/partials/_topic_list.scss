@@ -23,7 +23,7 @@ body.fullscreen-topic {
   }
 }
 
-div.company-dashboard.selected-topic-view.mobile-or-tablet {
+div.org-dashboard.selected-topic-view.mobile-or-tablet {
   div.topic-list{
     padding-bottom: 0px;
     padding-top: 0px;
@@ -48,7 +48,7 @@ div.topic-list{
   }
 }
 
-div.company-dashboard.small-navbar {
+div.org-dashboard.small-navbar {
   div.topic-list{
     @include big_web(){
       padding-top: #{$mobile_navbar_height}px;

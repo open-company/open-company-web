@@ -1,0 +1,36 @@
+$add_topic_button_size: 32;
+
+div.floating-add-topic {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  width: #{$add_topic_button_size}px;
+  height: #{$add_topic_button_size}px;
+
+  button.floating-add-topic-btn {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    opacity: 0.8;
+    width: #{$add_topic_button_size}px;
+    height: #{$add_topic_button_size}px;
+    border-radius: #{$add_topic_button_size / 2}px;
+    background-image: url("/img/blue_button.png");
+    background-size: #{$add_topic_button_size}px #{$add_topic_button_size}px;
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    
+    &:active, &:focus {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+
+    &:hover {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      opacity: 1;
+    }
+  }
+}

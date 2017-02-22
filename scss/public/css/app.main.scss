@@ -15,8 +15,7 @@
 // Components
 @import "partials/_navbar";
 @import "partials/_org_settings";
-@import "partials/_company_dashboard";
-@import "partials/_company_header";
+@import "partials/_org_dashboard";;
 @import "partials/_topic_list";
 @import "partials/_topic";
 @import "partials/_popover";
@@ -83,3 +82,4 @@
 @import "partials/_welcome_screen";
 @import "partials/_edit_user_profile";
 @import "partials/_team_disclaimer_popover";
+@import "partials/_floating_add_topic";
