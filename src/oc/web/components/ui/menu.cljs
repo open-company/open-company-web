@@ -87,10 +87,11 @@
     (let [menu-classes (str "menu"
                          (if (responsive/is-mobile-size?)
                             (when mobile-menu-open " mobile-menu-open")
-                            " dropdown-menu"))]
+                            " dropdown-menu"))
+          org-data (dis/org-data)]
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
-        (when-let [su-link (utils/link-for (:links (dis/org-data)) "collection" "GET")]
+        (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
           (when (router/current-org-slug)
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
@@ -100,10 +101,11 @@
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org) :on-click list-boards-click} "Boards List")))
         (when (and (router/current-org-slug)
-                   (jwt/is-admin? (:team-id (dis/org-data))))
+                   (jwt/is-admin? (:team-id org-data)))
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Team")))
         (when (and (router/current-org-slug)
+                   (jwt/is-admin? (:team-id org-data))
                    (not (responsive/is-mobile-size?)))
           (dom/li {:class "oc-menu-item menu-separator"}
             (dom/a {:href (oc-urls/org-settings) :on-click org-settings-click} "Company Settings")))

@@ -341,7 +341,7 @@
 
   (render [_]
     (let [org-data (dis/org-data data)]
-      (when (:read-only org-data)
+      (when (not (jwt/is-admin? (:team-id org-data)))
         (router/redirect! (oc-urls/org)))
 
       (dom/div {:class "main-org-settings fullscreen-page"}
