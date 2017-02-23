@@ -165,6 +165,7 @@
     (when (contains? (:query-params params) :access)
         ;login went bad, add the error message to the app-state
         (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+    (swap! dis/app-state dissoc :show-add-topic)
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
