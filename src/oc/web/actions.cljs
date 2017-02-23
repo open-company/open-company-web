@@ -81,8 +81,11 @@
     (cond
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
-      (let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
-        (api/get-board board-data))
+      (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
+        ; Load the board data since there is a link to the board in the org data
+        (api/get-board board-data)
+        ; The board wasn't found, showing a 404 page
+        (router/redirect-404!))
       (and (not (utils/in? (:route @router/path) "create-board"))
            (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
