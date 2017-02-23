@@ -39,7 +39,7 @@
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
-            ; [oc.web.components.email-confirmation :refer (email-confirmation)]
+            [oc.web.components.email-confirmation :refer (email-confirmation)]
             ))
 
 (enable-console-print!)
@@ -234,9 +234,10 @@
       (timbre/info "Rounting pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
 
-    ; (defroute email-confirmation-route urls/email-confirmation {:as params}
-    ;   (pre-routing (:query-params params))
-    ;   (drv-root email-confirmation target))
+    (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
+      (pre-routing (:query-params params))
+      (drv-root email-confirmation target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Rounting confirm-invitation-route" urls/confirm-invitation)
@@ -381,7 +382,7 @@
                                  pricing-route
                                  logout-route
                                  org-create-route
-                                 ;  email-confirmation-route
+                                 email-confirmation-route
                                  confirm-invitation-route
                                  ;  ; subscription-callback-route
                                  home-page-route
