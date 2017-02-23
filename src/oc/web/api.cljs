@@ -263,11 +263,8 @@
         { :json-params json-data
           :headers (headers-for-link topic-link)}
         (fn [{:keys [body success headers]}]
-          (let [fixed-body (if success (json->cljs body) {})
-                response-content-type (get headers "content-type")]
-            (if (= response-content-type "application/vnd.open-company.entry.v1+json")
-              (dispatcher/dispatch! [:topic-entry {:body fixed-body :topic topic :created-at (:created-at fixed-body)}])
-              (dispatcher/dispatch! [:topic {:body fixed-body :topic topic}]))))))))
+          (let [fixed-body (if success (json->cljs body) {})]
+            (dispatcher/dispatch! [:topic {:body fixed-body :topic topic}])))))))
 
 (defn load-entries [topic entries-link]
   (when (and topic entries-link)
