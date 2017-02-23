@@ -105,7 +105,7 @@
           (dom/li {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Team")))
         (when (and (router/current-org-slug)
-                   (jwt/is-admin? (:team-id org-data))
+                   (not (:read-only org-data))
                    (not (responsive/is-mobile-size?)))
           (dom/li {:class "oc-menu-item menu-separator"}
             (dom/a {:href (oc-urls/org-settings) :on-click org-settings-click} "Company Settings")))
