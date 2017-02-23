@@ -157,6 +157,7 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
+                                           :dashboard-sharing (:dashboard-sharing data)
                                            :selected-topic-view (router/current-topic-slug)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :small-navbar (not (utils/company-has-topics? board-data))
@@ -205,7 +206,8 @@
                           (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) ", your dashboard can be viewed after it's been created on a desktop browser."))))
                     (if (:dashboard-sharing data)
                       (for [board (:boards org-data)
-                            :let [board-data (dis/board-data data (router/current-org-slug) (:slug board))]]
+                            :let [board-data (dis/board-data data (router/current-org-slug) (:slug board))]
+                            :when (pos? (count (:topics board-data)))]
                         (om/build topics-list
                                     {:loading (:loading data)
                                      :content-loaded (or (:loading board-data) (:loading data))
@@ -254,7 +256,8 @@
                              (not (:show-add-topic data))
                              (not (router/current-topic-slug))
                              (not (:foce-key data))
-                             (not (responsive/is-tablet-or-mobile?)))
+                             (not (responsive/is-tablet-or-mobile?))
+                             (not (:dashboard-sharing data)))
                     (floating-add-topic))
                   ;;Footer
                   (footer total-width-int))))))))))
