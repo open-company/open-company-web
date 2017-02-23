@@ -828,3 +828,12 @@
     (if-let [author (get-author (:user-id user-data))]
       :author
       :viewer)))
+
+(defn index-of
+  "Given a collection and a function return the index that match make the function truely."
+  [s f]
+  (loop [idx 0 items s]
+    (cond
+      (empty? items) nil
+      (f (first items)) idx
+      :else (recur (inc idx) (rest items)))))
