@@ -123,10 +123,10 @@
       (-> db
         (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
         ;; show add topic if the board loaded is the one currently shown and it has no topics
-        (assoc :show-add-topic (if (and is-currently-shown
-                                        (empty? old-board-data)
-                                        (not (router/current-topic-slug)))
-                                 (zero? (count (:topics fixed-board-data)))
+        (assoc :show-add-topic (if (and is-currently-shown                 ;; Is the currently shown board
+                                        (not (:foce-key db))               ;; User is not editing
+                                        (not (router/current-topic-slug))) ;; There is not a topic shown
+                                 (or (:show-add-topic db) (zero? (count (:topics fixed-board-data))))  ;; Keep add topic if currently shown or show it if the new topics count is 0
                                  (:show-add-topic db)))))))
 
 (defmethod dispatcher/action :company-submit [db _]
@@ -189,8 +189,20 @@
   ;; Refresh topic entries
   (api/load-entries topic (utils/link-for (:links body) "up"))
   (if body
-    (let [fixed-topic (utils/fix-topic body topic)]
-      (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
+    (let [entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic)
+          old-entries (get-in db entries-key)
+          fixed-topic (utils/fix-topic body topic)
+          entry-index (utils/index-of old-entries #(= (:created-at %) created-at))
+          new-entries (if (not (nil? entry-index))
+                        (assoc old-entries entry-index fixed-topic)
+                        (conj old-entries fixed-topic))
+          sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) new-entries))
+          board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+          old-board-data (get-in db board-key)
+          new-board-data (assoc old-board-data (keyword topic) (first sorted-entries))]
+      (-> db
+        (assoc-in entries-key sorted-entries)
+        (assoc-in board-key new-board-data)))
     db))
 
 (defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
