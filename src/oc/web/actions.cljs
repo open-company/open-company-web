@@ -126,9 +126,10 @@
       (-> db
         (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
         ;; show add topic if the board loaded is the one currently shown and it has no topics
-        (assoc :show-add-topic (if (and is-currently-shown                 ;; Is the currently shown board
-                                        (not (:foce-key db))               ;; User is not editing
-                                        (not (router/current-topic-slug))) ;; There is not a topic shown
+        (assoc :show-add-topic (if (and is-currently-shown                   ;; Is the currently shown board
+                                        (not (:foce-key db))                 ;; User is not editing
+                                        (not (router/current-topic-slug))    ;; There is not a topic shown
+                                        (not (:read-only fixed-board-data))) ;; The user has write permissions on the board
                                  (or (:show-add-topic db) (zero? (count (:topics fixed-board-data))))  ;; Keep add topic if currently shown or show it if the new topics count is 0
                                  (:show-add-topic db)))))))
 
