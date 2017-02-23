@@ -103,7 +103,7 @@
                         (when (and (not dashboard-sharing)
                                    (not is-update-preview)
                                    (router/current-board-slug)
-                                   (not (:read-only (dis/org-data)))
+                                   (jwt/is-admin? (:team-id (dis/org-data)))
                                    (pos? (count (:topics (dis/board-data)))))
                           (dom/button {:class "btn-reset invite-others right"
                                        :title "Invite others"
