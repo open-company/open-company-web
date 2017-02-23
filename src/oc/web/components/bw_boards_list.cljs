@@ -60,7 +60,7 @@
                           :data-toggle "tooltip"
                           :data-placement "right"
                           :data-container "body"
-                          :title "Press Enter to submit and Escape to cancel."
+                          :title "Press Enter to submit or Escape to cancel."
                           :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
                           :on-blur #(when (empty? (:create-board data))
                                       (dis/dispatch! [:input [:create-board] nil]))
