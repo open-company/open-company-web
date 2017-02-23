@@ -29,7 +29,7 @@
         with-subject (if (contains? emojied :subject)
                         (assoc with-to :subject (:subject emojied))
                         with-to)]
-    (api/share-update with-subject)))
+    (api/create-update with-subject)))
 
 (defn select-share-link [event]
   (when-let [input (.-target event)]
@@ -398,7 +398,7 @@
               (case share-via
                 :prompt (prompt-dialog #(do
                                           (when (= % :link)
-                                            (api/share-update {:medium :link}))
+                                            (api/create-update {:medium :link}))
                                           (om/set-state! owner :share-via %)))
                 :link  (link-dialog share-link)
                 :email (email-dialog success-cb {:share-link share-link})

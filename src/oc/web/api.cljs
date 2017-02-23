@@ -365,7 +365,7 @@
           (let [fixed-body (if body (json->cljs body) {})]
             (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}])))))))
 
-(defn share-update [update-data]
+(defn create-update [update-data]
   (let [org-data   (dispatcher/org-data)
         share-link (utils/link-for (:links org-data) "create" "POST" {:accept "application/vnd.open-company.update.v1+json"})
         json-data  (merge update-data {:title (:su-title @dispatcher/app-state)
