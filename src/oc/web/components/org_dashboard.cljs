@@ -253,6 +253,7 @@
                   (when (and (not (:read-only org-data))
                              (not (:show-add-topic data))
                              (not (router/current-topic-slug))
+                             (not (:foce-key data))
                              (not (responsive/is-tablet-or-mobile?)))
                     (floating-add-topic))
                   ;;Footer
