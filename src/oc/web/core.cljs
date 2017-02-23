@@ -34,9 +34,9 @@
             [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
+            [oc.web.components.org-logo-setup :refer (org-logo-setup)]
             [oc.web.components.updates :refer (updates-responsive-switcher)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
-            ; [oc.web.components.board-logo-setup :refer (board-logo-setup)]
             [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
             ; [oc.web.components.email-confirmation :refer (email-confirmation)]
@@ -282,20 +282,6 @@
           (drv-root board-editor target))
         (router/redirect! urls/home)))
 
-    ; (defroute board-logo-setup-route (urls/board-logo-setup ":org" ":board") {:as params}
-    ;   (let [org (:org (:params params))
-    ;         board (:board (:params params))
-    ;         query-params (:query-params params)]
-    ;     (pre-routing query-params)
-    ;     ;; save the route
-    ;     (router/set-route! [org company "settings" "logo"] {:org org :board board :query-params query-params})
-    ;     ;; do we have the company data already?
-    ;     (when-not (dis/board-data)
-    ;       ;; load the company data from the API
-    ;       (api/get-company company)
-    ;       (swap! dis/app-state assoc :loading true))
-    ;   (drv-root board-logo-setup target)))
-
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Rounting logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
@@ -314,6 +300,21 @@
       (if (jwt/is-slack-org?)
         (drv-root #(om/component (user-profile)) target)
         (drv-root edit-user-profile target)))
+
+    (defroute org-logo-setup-route (urls/org-logo-setup ":org") {:as params}
+      (timbre/info "Routing org-logo-setup-route" (urls/org-logo-setup ":org"))
+      (let [org (:org (:params params))
+            query-params (:query-params params)]
+        (pre-routing query-params)
+        ;; save the route
+        (router/set-route! [org "org-settings" "logo"] {:org org :query-params query-params})
+        ;; load org data
+        (api/get-entry-point)
+        (api/get-auth-settings)
+        ;; do we have the company data already?
+        (when-not (dis/org-data)
+          (swap! dis/app-state assoc :loading true))
+      (drv-root org-logo-setup target)))
 
     (defroute org-settings-route (urls/org-settings ":org") {:as params}
       (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
@@ -388,10 +389,10 @@
                                  ;; Org routes
                                  org-list-route
                                  org-page-route
+                                 org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
                                  board-create-route
-                                 ; board-logo-setup-route
                                  ;; Updates
                                  create-update-route
                                  updates-list-route
