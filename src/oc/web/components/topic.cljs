@@ -54,16 +54,16 @@
         (str "by " (:name first-author) " on " (utils/date-string (utils/js-date (:updated-at first-author)) [:year]) "\n"
              "edited by " (:name last-author) " on " (utils/date-string (utils/js-date (:updated-at last-author)) [:year]))))))
 
-; (defn- assign-topic-click []
-;   (add-popover {:container-id "assign-topic-wip"
-;                 :message "Coming soon. Assign someone to keep this topic up to date."
-;                 :height "180px"
-;                 :success-title "Ok, got it"
-;                 :success-cb #(do
-;                               (dis/dispatch! [:show-top-menu nil])
-;                               (hide-popover nil "assign-topic-wip"))
-;                 :cancel-title nil
-;                 :cancel-cb nil}))
+(defn- assign-topic-click []
+  (add-popover {:container-id "assign-topic-wip"
+                :message "Coming soon. Assign someone to keep this topic up to date."
+                :height "160px"
+                :success-title "Ok, got it"
+                :success-cb #(do
+                              (dis/dispatch! [:show-top-menu nil])
+                              (hide-popover nil "assign-topic-wip"))
+                :cancel-title nil
+                :cancel-cb nil}))
 
 (defcomponent topic-internal [{:keys [topic-data
                                       entries-data
@@ -131,11 +131,11 @@
                 (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(dis/dispatch! [:start-foce topic-kw topic-data])}
-                (dom/i {:class "fa fa-pencil"})" Edit")))
+                (dom/i {:class "fa fa-pencil"}) " Edit")
               ; Assign action, disabled for now
-              ; (dom/button {:class "topic-top-menu-btn btn-reset"
-              ;              :on-click #(assign-topic-click)}
-              ;   (dom/i {:class "fa fa-user"})" Assign")))
+              (dom/button {:class "topic-top-menu-btn btn-reset"
+                           :on-click #(assign-topic-click)}
+                (dom/i {:class "fa fa-user"}) " Assign")))
 
           (dom/div {:class "topic-title"}
 
