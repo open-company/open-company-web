@@ -68,6 +68,7 @@
    :user-management     [[:base]
                           (fn [base]
                             {:um-invite (:um-invite base)
+                             :slack-access (:slack-access base)
                              :enumerate-users (:enumerate-users base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)})]
