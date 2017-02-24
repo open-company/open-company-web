@@ -1,3 +1,9 @@
+div.org-dashboard.dashboard-sharing{
+  div.topic div.topic-internal div.topic-body {
+    pointer-events: none;
+  }
+}
+
 div.topic {
   height: 100%;
   text-align: left;
