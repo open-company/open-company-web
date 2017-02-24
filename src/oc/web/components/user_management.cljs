@@ -48,7 +48,7 @@
                                                                                  :domain ""}]))
                                           s)}
   [s]
-  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error add-slack-team-error] :as user-man} (drv/react s :user-management)
+  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error] :as user-man} (drv/react s :user-management)
         ro-user-man @(drv/get-ref s :user-management)
         org-data @(drv/get-ref s :org-data)
         user-type (:user-type um-invite)
@@ -136,14 +136,15 @@
               [:div.slack-domain.group
                 {:key (str "slack-org-" (:slack-org-id team))}
                 [:span (:name team)]
-                (when (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})
-                  [:button.btn-reset
-                    {:on-click #(router/redirect! (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"}))
-                     :title "Add Slack bot to this team"
-                     :data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"}
-                     [:i.fa.fa-slack]])
+                (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                  (let [fixed-add-bot-link (clojure.string/replace (:href add-bot-link) team-id (str team-id ":" (:slug org-data)))]
+                    [:button.btn-reset
+                      {:on-click #(router/redirect! fixed-add-bot-link)
+                       :title "Add Slack bot to this team"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"}
+                       [:i.fa.fa-slack]]))
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                    :title "Remove Slack team"
@@ -157,13 +158,16 @@
                 "Add "
                 [:span.slack "Slack"]
                 " Team"]
-            (when add-slack-team-error
+            (when (contains? user-man :slack-access)
               [:div
                 (cond
-                  (= add-slack-team-error :team-exists)
+                  (= (keyword (:slack-access user-man)) :team-exists)
                   [:span.small-caps.red.mt1.left "This team was already added."]
+                  (or (not (:slack-access user-man))
+                      (= (:slack-access user-man) "failed"))
+                  [:span.small-caps.red.mt1.left "An error occurred, please try again."]
                   :else
-                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
+                  [:span.small-caps.green.mt1.left "Bot succesfully added."])])]])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
