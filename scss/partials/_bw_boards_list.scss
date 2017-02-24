@@ -7,10 +7,6 @@ div.left-boards-list {
   div.left-boards-list-top{
     border-radius: 4px;
 
-    &:hover {
-      background-color: rgba(78,90,107,0.2);
-    }
-
     .left-boards-list-top-title {
       font-family: $oc_headers_font;
       font-size: 14px;
