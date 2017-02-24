@@ -158,7 +158,8 @@
         board (:board (:params params))
         topic (:topic (:params params))
         query-params (:query-params params)]
-    (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6))
+    (when board
+      (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
