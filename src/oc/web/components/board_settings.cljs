@@ -103,7 +103,7 @@
               (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Only designed authors can edit and share information."))
             ;; Private choice
             (dom/div {:class "visibility-value"}
-              (dom/div {:on-click #(do
+              (dom/div {:on-click #(when (= access "public")
                                     (om/set-state! owner :has-changes true)
                                     (om/set-state! owner :access "team"))}
                 (dom/h3 {} "Private"
