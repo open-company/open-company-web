@@ -40,7 +40,7 @@
             [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
-            ))
+            [oc.web.components.board-settings :refer (board-settings)]))
 
 (enable-console-print!)
 
@@ -250,7 +250,7 @@
 
     ; (defroute subscription-callback-route urls/subscription-callback {}
     ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
-    ;     (router/redirect! (urls/board-settings s))))
+    ;     (router/redirect! (urls/org-settings s))))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Rounting home-page-route" urls/home)
@@ -348,6 +348,12 @@
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params))
 
+    (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
+      (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
+      ; add force-remove-loading to avoid inifinte spinner
+      (swap! dis/app-state assoc :force-remove-loading true)
+      (board-handler "board-settings" target board-settings params))
+
     (defroute create-update-route (urls/update-preview ":org") {:as params}
       (timbre/info "Routing create-update-route" (urls/update-preview ":org"))
       (board-handler "su-snapshot-preview" target create-update params))
@@ -404,6 +410,7 @@
                                  boards-list-route
                                  board-route
                                  board-route-slash
+                                 board-settings-route
                                  ;; Topics
                                  topic-route
                                  ;; Not found

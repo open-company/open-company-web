@@ -183,6 +183,18 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:board (json->cljs body)])))))
 
+(defn patch-board [data]
+  (when data
+    (let [board-data (dissoc data :links :read-only)
+          json-data (cljs->json board-data)
+          links (:links (dispatcher/board-data))
+          board-patch-link (utils/link-for links "partial-update")]
+      (api-patch (:href board-patch-link)
+        {:json-params json-data
+         :headers (headers-for-link board-patch-link)}
+        (fn [{:keys [success body status]}]
+          (dispatcher/dispatch! [:board (json->cljs body)]))))))
+
 (defn create-company [data]
   (when data
     (let [links (:api-entry-point @dispatcher/app-state)
