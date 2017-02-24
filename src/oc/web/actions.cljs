@@ -729,8 +729,9 @@
 (defmethod dispatcher/action :dashboard-select-all
   [db [_ board-slug]]
   (let [without-board-topics (filter #(not= (:board-slug %) board-slug) (:dashboard-selected-topics db))
-        all-topics (:topics (dispatcher/board-data db (router/current-org-slug) board-slug))
-        new-entries (vec (map #(hash-map :created-at (:created-at board-slug) :board-slug board-slug :topic-slug (keyword %)) all-topics))]
+        board-data (dispatcher/board-data db (router/current-org-slug) board-slug)
+        all-topics (:topics board-data)
+        new-entries (vec (map #(hash-map :created-at (:created-at (get board-data (keyword %))) :board-slug board-slug :topic-slug (keyword %)) all-topics))]
     (assoc db :dashboard-selected-topics (vec (concat without-board-topics new-entries)))))
 
 (defmethod dispatcher/action :dashboard-share-mode
