@@ -18,39 +18,32 @@
             [oc.web.components.su-preview-dialog :refer (su-preview-dialog)]
             [clojure.data :as cd]))
 
-; (defn ordered-topics-list
-;   "Return the list of active topics in the order the user moved them."
-;   []
-;   (let [topics (sel [:div.topics-columns :div.topic-row])
-;         topics-list (for [topic topics] (.data (js/jQuery topic) "topic"))]
-;     (vec (remove nil? topics-list))))
+(defn ordered-topics-list
+  "Return the list of active topics in the order the user moved them."
+  [owner]
+  (let [sorted-topics (sel [:div.topics-columns :div.topic-row])
+        topics-list (for [t sorted-topics] (.data (js/$ t) "topic"))]
+    (vec (map (fn [t]
+               (first
+                (filter
+                 #(= (keyword (:topic-slug %)) (keyword t))
+                 (om/get-props owner :dashboard-selected-topics))))
+          topics-list))))
 
-; (defn patch-stakeholder-update [owner]
-;   (let [title  (om/get-state owner :su-title)
-;        topics (om/get-state owner :su-topics)]
-;     (api/patch-stakeholder-update {:title (or title "")
-;                                    :sections topics})))
-
-; (defn setup-sortable
-;   "Setup the jQuery UI Sortable on the create-update-topics-list div"
-;   [owner]
-;   (when (> (count (om/get-state owner :su-topics)) 1)
-;     (when-let [list-node (js/jQuery "div.topics-columns")]
-;       (-> list-node
-;         (.sortable #js {:scroll true
-;                         :forcePlaceholderSize true
-;                         :items ".topic-row"
-;                         :stop (fn [event ui]
-;                                 ; the user stopped ordering, save the current order
-;                                 (when-let [dragged-item (gobj/get ui "item")]
-;                                   (om/update-state! owner #(merge % {:su-topics (ordered-topics-list)
-;                                                                      :should-update-data false}))
-;                                   (patch-stakeholder-update owner)))
-;                         :axis "y"})
-;         (.disableSelection)))))
+(defn setup-sortable
+  "Setup the jQuery UI Sortable on the create-update-topics-list div"
+  [owner]
+  (when (> (count (om/get-props owner :dashboard-selected-topics)) 1)
+    (when-let [list-node (js/$ "div.topics-columns")]
+      (-> list-node
+        (.sortable #js {:scroll true
+                        :forcePlaceholderSize true
+                        :items ".topic-row"
+                        :stop #(dis/dispatch! [:input [:dashboard-selected-topics] (ordered-topics-list owner)])
+                        :axis "y"})
+        (.disableSelection)))))
 
 (defn share-clicked [owner]
-  ; (patch-stakeholder-update owner)
   (om/set-state! owner :show-su-dialog :prompt))
 
 (defn- share-tooltip []
@@ -64,20 +57,7 @@
     (dis/dispatch! [:start-foce nil])
     {:columns-num (responsive/columns-num)
      :card-width (responsive/calc-card-width)
-     :su-title ""
-     :should-update-data true
-     :did-share false
      :show-su-dialog false})
-
-  ; (will-receive-props [_ next-props]
-  ;   (when (om/get-state owner :should-update-data)
-  ;     (let [company-data (dis/board-data next-props)
-  ;           su-data (:stakeholder-update company-data)
-  ;           su-topics (if (and (not (contains? su-data :sections)) (empty? (:sections su-data)))
-  ;                       (utils/filter-placeholder-sections (vec (:sections company-data)) company-data)
-  ;                       (utils/filter-placeholder-sections (:sections su-data) company-data))]
-  ;       (om/update-state! owner #(merge % {:su-topics (vec su-topics)
-  ;                                          :su-title (:title su-data)})))))
 
   (did-mount [_]
     ; (setup-sortable owner)
@@ -85,14 +65,14 @@
       (events/listen js/window EventType/RESIZE (fn [] (om/update-state! owner #(merge % {:columns-num (responsive/columns-num)
                                                                                           :card-width (responsive/calc-card-width)}))))))
 
-  ; (did-update [_ _ prev-state]
-  ;   (setup-sortable owner))
+  (did-update [_ _ prev-state]
+    (setup-sortable owner))
 
   (will-unmount [_]
     (when-let [resize-listener (om/get-state owner :resize-listener)]
       (events/unlistenByKey resize-listener)))
 
-  (render-state [_ {:keys [columns-num card-width su-title show-su-dialog]}]
+  (render-state [_ {:keys [columns-num card-width show-su-dialog]}]
     (let [org-data (dis/org-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)
           total-width (str total-width-int "px")
@@ -116,10 +96,9 @@
           (dom/div {:class "create-update-inner group navbar-offset"}
             (when show-su-dialog
               (om/build su-preview-dialog {:latest-su (dis/latest-stakeholder-update)
-                                           :su-title su-title
+                                           :su-title (:su-title data)
                                            :dismiss-su-preview #(om/set-state! owner :show-su-dialog false)
-                                           :back-to-dashboard-cb back-to-dashboard-fn
-                                           :did-share-cb #(om/set-state! owner :did-share true)}))
+                                           :back-to-dashboard-cb back-to-dashboard-fn}))
             (dom/div {:class "create-update-content group"
                       :style {:width total-width}}
               (dom/div {:class "create-update-content-list group right"
@@ -148,10 +127,7 @@
                             :value (or (:su-title data) "")
                             :placeholder "Title"
                             :style #js {:width (str (- fixed-card-width 60) "px")}
-                            :on-change (fn [e]
-                                          (dis/dispatch! [:input [:su-title] (.. e -target -value)])
-                                          (om/update-state! owner #(merge % {:su-title (.. e -target -value)
-                                                                             :should-update-data false})))})
+                            :on-change #(dis/dispatch! [:input [:su-title] (.. % -target -value)])})
                 (if (zero? (count (:dashboard-selected-topics data)))
                   (dom/div {:class "create-update-content-cards-no-topics"} "No Topics Selected")
                   (dom/div {:class (str "topics-columns overflow-visible group" (when-not (:loading data) " content-loaded"))}
@@ -164,7 +140,9 @@
                         (for [entry (:dashboard-selected-topics data)
                               :let [board-data (dis/board-data data (router/current-org-slug) (:board-slug entry))
                                     topic-data ((:topic-slug entry) board-data)]]
-                          (dom/div {:class "topic-row"}
+                          (dom/div {:class "topic-row"
+                                    :data-topic (name (:topic-slug entry))
+                                    :key (str "create-update-topic-row-" (name (:topic-slug entry)))}
                             (om/build topic {:loading (:loading data)
                                              :topic (:topic-slug entry)
                                              :is-stakeholder-update true
