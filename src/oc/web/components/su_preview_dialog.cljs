@@ -155,6 +155,9 @@
                           (drv/drv :su-share)
                           emoji-autocomplete
                           (rum/local false ::subject-focused)
+                          {:will-mount (fn [s]
+                                         (dis/dispatch! [:input [:su-share :email :subject] (:su-title @dis/app-state)])
+                                         s)}
   [{:keys [::subject-focused] :as s} {:keys [share-link]}]
   [:div
    (modal-title "Share by Email" :email-84)
@@ -174,7 +177,7 @@
                   :container-node :div.npt.pt1.pr1.pl1.mb3.mh4.overflow-auto
                   :input-node :input.border-none.outline-none.mr.mb1
                   :valid-item? utils/valid-email?
-                  :on-change (fn [val] (dis/dispatch! [:input [:su-share :email :to] val]))})]
+                  :on-change (fn [v] (dis/dispatch! [:input [:su-share :email :to] v]))})]
     [:label.block.small-caps.bold.mb2
       "Subject"
       (when-let [subject-field (->> (drv/react s :su-share) :email :subject)]
@@ -362,7 +365,6 @@
      :sent false})
 
   (did-mount [_]
-    (dis/dispatch! [:input [:su-share :email :subject] (:su-title data)])
     (setup-scroll-height))
 
   (did-update [_ _ prev-state]

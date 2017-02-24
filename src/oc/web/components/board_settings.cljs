@@ -85,10 +85,6 @@
                                    (om/set-state! owner :has-changes true)
                                    (om/set-state! owner :board-name (.. % -target -value)))})
 
-          ; Slug
-          (dom/div {:class "settings-form-input-label"} "BOARD URL")
-          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" (oc-urls/board (:slug org-data) board-slug)))
-
           ;; Visibility
           (dom/div {:class "settings-form-input-label"} "VISIBILITY")
           (dom/div {:class "settings-form-input visibility"}
@@ -130,6 +126,10 @@
                     (when (= access "private")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
                   (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board.")))))
+
+          ; Slug
+          (dom/div {:class "settings-form-input-label"} "BOARD URL")
+          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" (oc-urls/board (:slug org-data) board-slug)))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}
