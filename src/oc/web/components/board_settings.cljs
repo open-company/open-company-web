@@ -92,22 +92,44 @@
           ;; Visibility
           (dom/div {:class "settings-form-input-label"} "VISIBILITY")
           (dom/div {:class "settings-form-input visibility"}
-            (dom/div {:class "visibility-value"
-                      :on-click #(do
-                                  (om/set-state! owner :has-changes true)
-                                  (om/set-state! owner :access "team"))}
-              (dom/h3 {} "Private "
-                (when (= access "team")
-                  (dom/i {:class "fa fa-check"})))
-              (dom/p {} "Only team members can view, edit and share information."))
+            ;; Public
             (dom/div {:class "visibility-value"
                       :on-click #(do
                                   (om/set-state! owner :has-changes true)
                                   (om/set-state! owner :access "public"))}
-              (dom/h3 {} "Public "
+              (dom/h3 {:class "mr1"} "Public"
                 (when (= access "public")
-                  (dom/i {:class "fa fa-check"})))
-              (dom/p {} "Your information is public and will show up in search engines like Google. Only team members can edit and share information.")))
+                  (dom/i {:class "ml1 fa fa-check-square-o"})))
+              (dom/p {} "This board is public to everyone and will show up in search engines like Google. Only designed authors can edit and share information."))
+            ;; Private choice
+            (dom/div {:class "visibility-value"}
+              (dom/div {:on-click #(do
+                                    (om/set-state! owner :has-changes true)
+                                    (om/set-state! owner :access "team"))}
+                (dom/h3 {} "Private"
+                  (when (or (= access "team") (= access "private"))
+                    (dom/i {:class "ml1 fa fa-check-square-o"})))
+                (dom/p {} "Only designed people can view, edit and share."))
+              ;; Team
+              (when (or (= access "team") (= access "private"))
+                (dom/div {:class "visibility-value ml2"
+                          :on-click #(do
+                                      (om/set-state! owner :has-changes true)
+                                      (om/set-state! owner :access "team"))}
+                  (dom/h3 {} "Team"
+                    (when (= access "team")
+                      (dom/i {:class "ml1 fa fa-check-square-o"})))
+                  (dom/p {} "All team members can view this board. Only designed authors can edit and share.")))
+              ;; Private
+              (when (or (= access "team") (= access "private"))
+                (dom/div {:class "visibility-value ml2"
+                          :on-click #(do
+                                      (om/set-state! owner :has-changes true)
+                                      (om/set-state! owner :access "private"))}
+                  (dom/h3 {} "Invite-Only"
+                    (when (= access "private")
+                      (dom/i {:class "ml1 fa fa-check-square-o"})))
+                  (dom/p {} "Only invited team members can view, edit and share this board.")))))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}

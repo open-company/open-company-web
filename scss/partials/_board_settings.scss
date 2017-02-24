@@ -31,7 +31,7 @@ div.main-board-settings {
           cursor: pointer;
           h3 {
             font-size: 14px;
-            font-weight: 400;
+            font-weight: 800;
             font-family: $oc_headers_font;
             color: rgba(78,90,107,1);
             margin-bottom: 5px;
@@ -46,12 +46,6 @@ div.main-board-settings {
             font-weight: 400;
             font-family: $oc_headers_font;
             color: rgba(78,90,107,1);
-          }
-
-          &:hover {
-            h3{
-              text-decoration: underline;
-            }
           }
         }
       }
