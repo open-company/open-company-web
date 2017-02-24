@@ -46,6 +46,10 @@ div.main-board-settings {
             font-weight: 400;
             font-family: $oc_headers_font;
             color: rgba(78,90,107,1);
+
+            &.bold {
+              font-weight: 700;
+            }
           }
         }
       }

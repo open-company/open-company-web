@@ -100,7 +100,7 @@
               (dom/h3 {:class "mr1"} "Public"
                 (when (= access "public")
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
-              (dom/p {} "This board is public to everyone and will show up in search engines like Google. Only designed authors can edit and share information."))
+              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Only designed authors can edit and share information."))
             ;; Private choice
             (dom/div {:class "visibility-value"}
               (dom/div {:on-click #(do
@@ -119,7 +119,7 @@
                   (dom/h3 {} "Team"
                     (when (= access "team")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
-                  (dom/p {} "All team members can view this board. Only designed authors can edit and share.")))
+                  (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designed authors can edit and share.")))
               ;; Private
               (when (or (= access "team") (= access "private"))
                 (dom/div {:class "visibility-value ml2"
@@ -129,7 +129,7 @@
                   (dom/h3 {} "Invite-Only"
                     (when (= access "private")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
-                  (dom/p {} "Only invited team members can view, edit and share this board.")))))
+                  (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board.")))))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}
