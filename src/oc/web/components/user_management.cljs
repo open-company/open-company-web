@@ -113,13 +113,13 @@
                 "Add "
                 [:span.slack "Slack"]
                 " Team"]
-            (when (contains? user-man :slack-access)
+            (when (and (contains? user-man :slack-access)
+                       (not (empty? (:slack-access user-man))))
               [:div
                 (cond
                   (= (keyword (:slack-access user-man)) :team-exists)
                   [:span.small-caps.red.mt1.left "This team was already added."]
-                  (or (not (:slack-access user-man))
-                      (= (:slack-access user-man) "failed"))
+                  (= (:slack-access user-man) "failed")
                   [:span.small-caps.red.mt1.left "An error occurred, please try again."]
                   :else
                   [:span.small-caps.green.mt1.left "Bot succesfully added."])])]])
