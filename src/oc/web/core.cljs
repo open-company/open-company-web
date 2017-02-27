@@ -452,5 +452,5 @@
     (router/setup-navigation! handle-url-change route-dispatch!)))
 
 (defn on-js-reload []
-  ; (.clear js/console)
+  (.clear js/console)
   (route-dispatch! (router/get-token)))
