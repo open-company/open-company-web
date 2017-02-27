@@ -193,7 +193,9 @@
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:board (json->cljs body)]))))))
+          (dispatcher/dispatch! [:board (json->cljs body)])
+          ;; Refresh the org data to make sure the list of boards is updated
+          (get-org (dispatcher/org-data)))))))
 
 (defn create-company [data]
   (when data
