@@ -99,7 +99,8 @@
       (dom/ul {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
         (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
-          (when (router/current-org-slug)
+          (when (and (router/current-org-slug)
+                     (pos? (:count su-link)))
             (dom/li {:class "oc-menu-item menu-separator"}
               (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
         (when (and (router/current-org-slug)
