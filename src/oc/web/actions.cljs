@@ -833,10 +833,12 @@
   [db [_]]
   (let [teams-data (:enumerate-users db)
         org-data (dispatcher/org-data db)
+        team-id (:team-id org-data)
         team-data (get teams-data (:team-id org-data))
-        add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})]
-    (when add-slack-team-link
-      (router/redirect! (:href add-slack-team-link))))
+        add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+        fixed-add-slack-team-link (clojure.string/replace (:href add-slack-team-link) team-id (str team-id ":" (:slug org-data)))]
+    (when fixed-add-slack-team-link
+      (router/redirect! fixed-add-slack-team-link)))
   db)
 
 (defmethod dispatcher/action :refresh-slack-user
