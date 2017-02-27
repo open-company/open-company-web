@@ -20,7 +20,7 @@
   (let [user-links (:links user)
         user-dropdown-id (str "user-row-" (:user-id user))
         add-link (utils/link-for user-links "add" "PUT" {:ref "application/vnd.open-company.user.v1+json"})
-        user-type (utils/get-user-type user)
+        user-type (utils/get-user-type user (dis/org-data))
         admin-type {:ref "application/vnd.open-company.team.admin.v1"}
         remove-user (utils/link-for user-links "remove" "DELETE" {:ref "application/vnd.open-company.user.v1+json"})
         pending? (= (:status user) "pending")
