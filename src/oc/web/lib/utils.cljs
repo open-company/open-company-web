@@ -823,12 +823,11 @@
   [user-data org-data & [board-data]]
   (cond
     ;; if :admin is present and it's true
-    (true? (:admin user-data))
+    (true? (:admin? user-data))
     :admin
     ;; if :admin is present and it's a list of teams
     ;; and it contains the actual org team
-    (and (seq? (:admin user-data))
-         (in? (:admin user-data) (:team-id org-data)))
+    (in? (:admin user-data) (:team-id org-data))
     :admin
     ;; if the user is in the list of authors of the org data
     ;; or if a board is passed and the authors list contains the user-id
