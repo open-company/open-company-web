@@ -813,21 +813,32 @@
 
 (defn get-author
   "Get the author data from the org list of authors"
-  [user-id]
-  (let [org-data (dis/org-data)
-        authors (:authors org-data)]
-    (first (filter #(= (:user-id %) user-id) authors))))
+  [user-id authors]
+  (some #(when (= (:user-id %) user-id) %) authors))
 
 (defn get-user-type
   "Calculate the user type, return admin if it's an admin,
   check if it's in the authors list if not admin
   return viewer else."
-  [user-data]
-  (if (:admin user-data)
+  [user-data org-data & [board-data]]
+  (cond
+    ;; if :admin is present and it's true
+    (true? (:admin user-data))
     :admin
-    (if-let [author (get-author (:user-id user-data))]
-      :author
-      :viewer)))
+    ;; if :admin is present and it's a list of teams
+    ;; and it contains the actual org team
+    (and (seq? (:admin user-data))
+         (in? (:admin user-data) (:team-id org-data)))
+    :admin
+    ;; if the user is in the list of authors of the org data
+    ;; or if a board is passed and the authors list contains the user-id
+    (or (get-author (:user-id user-data) (:authors org-data))
+        (and board-data
+             (get-author (:user-id user-data) (:authors board-data))))
+    :author
+    ;; viewer in all other cases
+    :else
+    :viewer))
 
 (defn index-of
   "Given a collection and a function return the index that match make the function truely."
@@ -837,3 +848,13 @@
       (empty? items) nil
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
+
+(defn name-or-email [user]
+  (let [first-name (:first-name user)
+        last-name (:last-name user)
+        user-name (if-not (empty? (:name user))
+                    (:name user)
+                    (str first-name (when-not (empty? first-name) " ") last-name))]
+    (if (empty? user-name)
+      (:email user)
+      user-name)))
