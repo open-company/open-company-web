@@ -473,7 +473,11 @@
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:teams-loaded (-> fixed-body :collection :items) dont-follow-team-link])))))))
+            (dispatcher/dispatch! [:teams-loaded (-> fixed-body :collection :items) dont-follow-team-link])
+            ;; Reset the enumerate-users-requested to restart the teams load
+            (when (and (>= status 500)
+                       (<= status 599))
+              (dispatcher/dispatch! [:input [:enumerate-users-requested] false]))))))))
 
 (defn get-team [team-link]
   (when team-link
