@@ -14,6 +14,12 @@ div.main-board-settings {
     div.settings-container {
       width: 580px;
 
+      button.rename-button {
+        float: left;
+        padding: 0.5rem;
+        margin-bottom: 2rem;
+      }
+
       div.settings-form-input-label {
         font-family: $oc_headers_font;
         font-weight: 700;

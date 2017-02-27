@@ -91,12 +91,6 @@
   [:div.private-board-setup
     (invite-user)])
 
-(defn- save-board-data [owner]
-  (let [board-slug (router/current-board-slug)]
-    (api/patch-board {:name (om/get-state owner :board-name)
-                      :slug board-slug
-                      :access (om/get-state owner :access)})))
-
 (defn get-state [data current-state]
   (let [board-data (dis/board-data data)]
     {:board-slug (:slug board-data)
@@ -108,6 +102,8 @@
 
 (defn cancel-clicked [owner]
   (om/set-state! owner (get-state (om/get-props owner) nil)))
+
+(def board-name-min-length 2)
 
 (defcomponent board-settings-form [data owner]
 
@@ -131,26 +127,40 @@
   (render-state [_ {board-slug :board-slug board-name :board-name
                     access :access loading :loading
                     has-changes :has-changes show-save-successful :show-save-successful}]
-    (let [org-data (dis/org-data data)]
+    (let [org-data (dis/org-data data)
+          board-data (dis/board-data)]
       (utils/update-page-title (str "OpenCompany - " (:name org-data) " " board-name " settings"))
 
       (dom/div {:class "mx-auto my4 settings-container group"}
+        (dom/div {:class "my1 group"}
+          (when (or (not board-data)
+                    loading)
+            (dom/div {:class "ml2 my1 left board-settings"}
+              (loading/small-loading)))
+
+          (dom/div {:style {:opacity (if show-save-successful "1" "0")}
+                    :class "ml2 my1 left"
+                    :id "board-settings-save-successful"}
+                "Save successful"))
         
-        (when-not board-name
-          (dom/div {:class "settings-form-label board-settings"}
-            (loading/small-loading)))
-        
-        (dom/div {:class "settings-form p3"}
+        (dom/div {:class "settings-form group p3"}
 
           ;; Board name
-          (dom/div {:class "settings-form-input-label"} "BOARD NAME")
-          (dom/input {:class "npt col-8 p1 mb3"
-                      :type "text"
-                      :id "name"
-                      :value (or board-name "")
-                      :on-change #(do
-                                   (om/set-state! owner :has-changes true)
-                                   (om/set-state! owner :board-name (.. % -target -value)))})
+          (dom/div {:class "group"}
+            (dom/div {:class "settings-form-input-label"} "BOARD NAME")
+            (dom/input {:class "npt col-6 left p1 mb3 mr2"
+                        :type "text"
+                        :id "name"
+                        :value (or board-name "")
+                        :on-change #(om/set-state! owner :board-name (.. % -target -value))})
+            (dom/button {:class "btn-reset btn-solid rename-button"
+                         :disabled (or (< (count board-name) board-name-min-length)
+                                       (= board-name (:name board-data)))
+                         :on-click #(when (>= (count board-name) board-name-min-length)
+                                      (om/set-state! owner :loading true)
+                                      (api/patch-board {:slug board-slug
+                                                        :name board-name}))}
+              "RENAME"))
 
           ;; Visibility
           (dom/div {:class "settings-form-input-label"} "VISIBILITY")
@@ -158,8 +168,9 @@
             ;; Public
             (dom/div {:class "visibility-value"
                       :on-click #(do
-                                  (om/set-state! owner :has-changes true)
-                                  (om/set-state! owner :access "public"))}
+                                  (om/set-state! owner :loading true)
+                                  (api/patch-board {:slug (:slug board-data)
+                                                    :access "public"}))}
               (dom/h3 {:class "mr1"} "Public"
                 (when (= access "public")
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
@@ -167,8 +178,9 @@
             ;; Private choice
             (dom/div {:class "visibility-value"}
               (dom/div {:on-click #(when (= access "public")
-                                    (om/set-state! owner :has-changes true)
-                                    (om/set-state! owner :access "team"))}
+                                    (om/set-state! owner :loading true)
+                                    (api/patch-board {:slug (:slug board-data)
+                                                      :access "team"}))}
                 (dom/h3 {} "Private"
                   (when (or (= access "team") (= access "private"))
                     (dom/i {:class "ml1 fa fa-check-square-o"})))
@@ -177,8 +189,9 @@
               (when (or (= access "team") (= access "private"))
                 (dom/div {:class "visibility-value ml2"
                           :on-click #(do
-                                      (om/set-state! owner :has-changes true)
-                                      (om/set-state! owner :access "team"))}
+                                      (om/set-state! owner :loading true)
+                                      (api/patch-board {:slug (:slug board-data)
+                                                        :access "team"}))}
                   (dom/h3 {} "Team"
                     (when (= access "team")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
@@ -187,8 +200,9 @@
               (when (or (= access "team") (= access "private"))
                 (dom/div {:class "visibility-value invite-only-board group ml2"
                           :on-click #(do
-                                      (om/set-state! owner :has-changes true)
-                                      (om/set-state! owner :access "private"))}
+                                      (om/set-state! owner :loading true)
+                                      (api/patch-board {:slug (:slug board-data)
+                                                        :access "private"}))}
                   (dom/h3 {} "Invite-Only"
                     (when (= access "private")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
@@ -203,25 +217,7 @@
               (str "http" (when ls/jwt-cookie-secure "s")
                    "://"
                    ls/web-server
-                   (oc-urls/board (:slug org-data) board-slug))))
-
-          ;; Save button
-          (dom/div {:class "mt2 right-align group"}
-            (dom/button {:class "btn-reset btn-solid right"
-                         :on-click #(save-board-data owner)
-                         :disabled (not has-changes)}
-              (if loading
-                (loading/small-loading)
-                "SAVE"))
-            (dom/button {:class "btn-reset btn-outline right mr2"
-                         :on-click #(cancel-clicked owner)
-                         :disabled (not has-changes)}
-              "CANCEL")
-            (dom/div {:style {:margin-top "5px"
-                              :opacity (if show-save-successful "1" "0")}
-                      :class "mr2 right"
-                      :id "board-settings-save-successful"}
-              "Save successful")))))))
+                   (oc-urls/board (:slug org-data) board-slug)))))))))
 
 (defcomponent board-settings [data owner]
 
