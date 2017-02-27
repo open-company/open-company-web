@@ -5,24 +5,91 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1)]
             [rum.core :as rum]
-            [clojure.string :as string]
-            [oc.web.local-settings :as ls]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.small-loading :as loading]
-            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [oc.web.components.ui.footer :as footer]
-            [oc.web.components.ui.login-required :refer (login-required)]
+            [org.martinklepsch.derivatives :as drv]
+            [oc.web.api :as api]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.urls :as oc-urls]
-            [oc.web.api :as api]
-            [oc.web.dispatcher :as dis]
-            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.iso4217 :as iso4217]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.footer :as footer]
+            [oc.web.components.ui.small-loading :as loading]
+            [oc.web.components.ui.login-required :refer (login-required)]
+            [oc.web.components.ui.user-type-picker :refer (user-type-picker)]
+            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.events :as events]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.Animation.EventType :as AnimationEventType]))
+
+(defn non-added-users
+  [board-authors board-viewers all-users]
+  (filter  all-users))
+
+(rum/defc invite-user-option < rum/static
+  [user]
+  (let [user-type (utils/get-user-type user (dis/org-data) (dis/board-data))]
+    [:option
+      {:value (:user-id user)}
+      (utils/name-or-email user)]))
+
+(rum/defcs invite-user < rum/static
+                         rum/reactive
+                         (drv/drv :user-management)
+                         (drv/drv :org-data)
+                         (drv/drv :board-data)
+                          ;; Before mounting the component setup the invitation variables
+                          ;; to make sure no user and no type is selected by default
+                         {:will-mount (fn [s]
+                                        (when-not (contains? @dis/app-state :private-board-invite)
+                                          (dis/dispatch! [:input [:private-board-invite] {:selected-user-id ""
+                                                                                          :selected-user-type nil}]))
+                                        s)
+                          ;; If it wasn't already, load the users list
+                          :before-render (fn [s]
+                                           (when (and (:auth-settings @dis/app-state)
+                                                      (not (:enumerate-users-requested @dis/app-state)))
+                                             (dis/dispatch! [:enumerate-users]))
+                                           s)}
+  [s]
+  (let [{:keys [enumerate-users private-board-invite]} (drv/react s :user-management)
+        org-data (drv/react s :org-data)
+        board-data (drv/react s :board-data)
+        users (:users (get enumerate-users (:team-id org-data)))
+        selected-user-id (:selected-user-id private-board-invite)
+        selected-user-type (:selected-user-type private-board-invite)
+        selected-user (when selected-user-id (some #(when (= (:user-id %) selected-user-id) %) users))]
+    [:div.private-board-invite
+      [:div.private-board-select-wrapper
+        [:select.private-board-select
+          {:value selected-user-id
+           :on-change (fn [e]
+                        (when-not (empty? (.. e -target -value))
+                          (let [v (.. e -target -value)
+                                actual-selected-user (some #(when (= (:user-id %) v) %) users)
+                                actual-selected-user-type (utils/get-user-type actual-selected-user org-data)
+                                to-user-type (if (or (= actual-selected-user-type :admin)
+                                                     (= actual-selected-user-type :author))
+                                              :author
+                                              :viewer)]
+                            (dis/dispatch! [:input [:private-board-invite :selected-user-id] v])
+                            (dis/dispatch! [:input [:private-board-invite :selected-user-type] to-user-type]))))}
+          [:option {:value "" :disabled true} "Select a user"]
+          (for [user users]
+            (rum/with-key (invite-user-option user) (:user-id user)))]]
+      (user-type-picker selected-user-type (not (empty? selected-user-id)) #(dis/dispatch! [:input [:private-board-invite :selected-user-type] %]) false)
+      [:button.btn-reset.btn-solid.private-board-add-button
+        {:on-click #()
+         :disabled (or (empty? selected-user-id)
+                       (not selected-user-type))}
+        "ADD"]]))
+
+(rum/defc private-board-setup < rum/static
+  []
+  [:div.private-board-setup
+    (invite-user)])
 
 (defn- save-board-data [owner]
   (let [board-slug (router/current-board-slug)]
@@ -118,18 +185,25 @@
                   (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designed authors can edit and share.")))
               ;; Private
               (when (or (= access "team") (= access "private"))
-                (dom/div {:class "visibility-value ml2"
+                (dom/div {:class "visibility-value invite-only-board group ml2"
                           :on-click #(do
                                       (om/set-state! owner :has-changes true)
                                       (om/set-state! owner :access "private"))}
                   (dom/h3 {} "Invite-Only"
                     (when (= access "private")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
-                  (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board.")))))
+                  (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board.")
+                  (when (= access "private")
+                    (private-board-setup))))))
 
           ; Slug
           (dom/div {:class "settings-form-input-label"} "BOARD URL")
-          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" (oc-urls/board (:slug org-data) board-slug)))
+          (dom/div {:class "dashboard-slug"}
+            (when board-slug
+              (str "http" (when ls/jwt-cookie-secure "s")
+                   "://"
+                   ls/web-server
+                   (oc-urls/board (:slug org-data) board-slug))))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}

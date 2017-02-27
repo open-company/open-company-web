@@ -29,6 +29,7 @@ div.main-board-settings {
 
         div.visibility-value {
           cursor: pointer;
+
           h3 {
             font-size: 14px;
             font-weight: 800;
@@ -41,6 +42,7 @@ div.main-board-settings {
               color: $oc_green;
             }
           }
+
           p {
             font-size: 14px;
             font-weight: 400;
@@ -49,6 +51,80 @@ div.main-board-settings {
 
             &.bold {
               font-weight: 700;
+            }
+          }
+
+          &.invite-only-board {
+            div.private-board-setup {
+              margin-top: 30px;
+              cursor: default;
+
+              div.private-board-select-wrapper {
+                position: relative;
+                padding: 0;
+                margin: 0 2rem 0 0;
+                width: 196px;
+                height: 36px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                background-color: white;
+                color: $oc_gray_5;
+                border-radius: 2px;
+                border: 1px solid $oc_gray_2;
+                float: left;
+
+                &:after {
+                  font-family: FontAwesome;
+                  content: "\f0d7";
+                  color: $oc_gray_5;
+                  font-size: 14px;
+                  position: absolute;
+                  right: 0.2rem;
+                  top: 4px;
+                  pointer-events: none;
+                }
+
+                &:avtive:after {
+                  content: "\f0d8";
+                }
+
+                select.private-board-select {
+                  // Remove default browser style
+                  -webkit-appearance: none;
+                  -moz-appearance: none;
+                  appearance: none;       /* remove default arrow */
+
+                  box-sizing: border-box;
+                  -webkit-box-sizing: border-box;
+                  -moz-box-sizing: border-box;
+                  // ----------------------------
+                  border-radius: 0px;
+                  border: none;
+                  padding: 0.3rem 1rem 0.3rem 0.2rem;
+
+                  width: 100%;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  background-color: transparent;
+
+                  width: 186px;
+                  height: 36px;
+
+                  outline: none;
+
+                  &::-ms-expand {
+                    display: none;
+                  }
+                }
+              }
+
+              div.user-type-picker {
+                margin-right: 2rem;
+              }
+
+              button.private-board-add-button {
+                height: 36px;
+              }
             }
           }
         }
