@@ -68,10 +68,12 @@
    :user-management     [[:base]
                           (fn [base]
                             {:um-invite (:um-invite base)
+                             :private-board-invite (:private-board-invite base)
                              :slack-access (:slack-access base)
                              :enumerate-users (:enumerate-users base)
                              :um-domain-invite (:um-domain-invite base)
-                             :add-email-domain-team-error (:add-email-domain-team-error base)})]
+                             :add-email-domain-team-error (:add-email-domain-team-error base)
+                             :enumerate-users-requested (:enumerate-users-requested base)})]
    :jwt                 [[:base] (fn [base] (:jwt base))]
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]
