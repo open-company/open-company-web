@@ -611,7 +611,7 @@
         email-name (:name parsed-email)
         email-address (:address parsed-email)
         user  (first (filter #(= (:email %) email-address) (:users (get (:enumerate-users db) (:team-id org-data)))))
-        old-user-type (when user (utils/get-user-type user))
+        old-user-type (when user (utils/get-user-type user org-data))
         new-user-type (:user-type (:um-invite db))]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
@@ -632,7 +632,7 @@
         ;; but the type changed we need to change the user type too
         (when (and user
                   (not= old-user-type new-user-type))
-          (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user))))
+          (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user) (:authors org-data))))
         (api/send-invitation email-address (:user-type (:um-invite db)) first-name last-name)
         (update-in db [:um-invite] dissoc :error)))))
 
