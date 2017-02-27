@@ -1,35 +1,23 @@
 (ns oc.web.components.user-management
-  (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
+  (:require [rum.core :as rum]
+            [om.core :as om :include-macros true]
             [om-tools.dom :as dom :include-macros true]
-            [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [om-tools.core :as om-core :refer-macros (defcomponent)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.urls :as oc-urls]
             [oc.web.api :as api]
-            [oc.web.dispatcher :as dis]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.users-list :refer (users-list)]
             [oc.web.components.ui.footer :as footer]
             [oc.web.components.ui.login-required :refer (login-required)]
-            [oc.web.components.users-list :refer (users-list)]
-            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
-            [oc.web.components.ui.team-disclaimer-popover :refer (team-disclaimer-popover)]
-            [oc.web.components.ui.popover :as popover :refer (add-popover-with-rum-component hide-popover)]))
+            [oc.web.components.ui.user-type-picker :refer (user-type-picker)]
+            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
 
-(defn show-team-disclaimer-popover [e]
-  (.stopPropagation e)
-  (add-popover-with-rum-component team-disclaimer-popover {:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
-                                                           :width 422
-                                                           :height 230
-                                                           :hide-on-click-out true
-                                                           :z-index-popover 0
-                                                           :container-id "team-disclaimer-popover"}))
-
-(rum/defcs user-management < (rum/local nil ::last-user-type)
-                             rum/reactive
+(rum/defcs user-management < rum/reactive
                              (drv/drv :user-management)
                              (drv/drv :org-data)
                              {:before-render (fn [s]
@@ -69,40 +57,7 @@
                :value (:email um-invite)
                :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
                :placeholder "Email address"}]
-            [:div.user-type-picker
-              {:on-mouse-out #(let [el (or (.-toElement %) (.-relatedTarget %))]
-                                ; mouseOut event is triggerend also when the mouse enter a child so we need to
-                                ; check that it's not entering a child of this
-                                (when (not (utils/is-parent? (sel1 [:div.user-type-picker]) el))
-                                  ; reset the user-type to what was before the user enter this div with the mouse
-                                  (dis/dispatch! [:input [:um-invite :user-type] @(::last-user-type s)])))}
-              [:button.user-type-picker-btn.btn-reset.viewer
-                {:class (str "" (when-not valid-email? "disabled") (when (= user-type :viewer) " active"))
-                 :on-mouse-over #(dis/dispatch! [:input [:um-invite :user-type] :viewer])
-                 :on-click #(do (reset! (::last-user-type s) :viewer) (dis/dispatch! [:input [:um-invite :user-type] :viewer]))}
-                (when (= user-type :viewer)
-                  [:span.user-type-disc.viewer
-                    {:on-click #(show-team-disclaimer-popover %)}
-                    "VIEWER " [:i.fa.fa-question-circle]])
-                [:i.fa.fa-user]]
-              [:button.user-type-picker-btn.btn-reset.author
-                {:class (str "" (when-not valid-email? "disabled") (when (= user-type :author) " active"))
-                 :on-mouse-over #(dis/dispatch! [:input [:um-invite :user-type] :author])
-                 :on-click #(do (reset! (::last-user-type s) :author) (dis/dispatch! [:input [:um-invite :user-type] :author]))}
-                (when (= user-type :author)
-                  [:span.user-type-disc.author
-                    {:on-click #(show-team-disclaimer-popover %)}
-                    "AUTHOR " [:i.fa.fa-question-circle]])
-                [:i.fa.fa-pencil]]
-              [:button.user-type-picker-btn.btn-reset.admin
-                {:class (str "" (when-not valid-email? "disabled") (when (= user-type :admin) " active"))
-                 :on-mouse-over #(dis/dispatch! [:input [:um-invite :user-type] :admin])
-                 :on-click #(do (reset! (::last-user-type s) :admin) (dis/dispatch! [:input [:um-invite :user-type] :admin]))}
-                (when (= user-type :admin)
-                  [:span.user-type-disc.admin
-                    {:on-click #(show-team-disclaimer-popover %)}
-                    "ADMIN " [:i.fa.fa-question-circle]])
-                [:i.fa.fa-gear]]]
+            (user-type-picker user-type valid-email? #(dis/dispatch! [:input [:um-invite :user-type] %]) true)
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (or (not valid-email?)
                              (not user-type))
