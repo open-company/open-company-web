@@ -283,7 +283,7 @@
 
           ; Slug
           (dom/div {:class "settings-form-input-label"} "DASHBOARD URL")
-          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (name slug)))
+          (dom/div {:class "dashboard-slug"} (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/org slug)))
 
           ;; org logo
           (dom/div {:class "settings-form-input-label"} "COMPANY LOGO (square works best, approx. 160px per side)")
