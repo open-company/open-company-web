@@ -750,3 +750,35 @@
         {:headers (headers-for-link archive-link)}
         (fn [{:keys [status success body] :as response}]
           (dispatcher/dispatch! [:archive-topic/success]))))))
+
+
+(defn add-private-board
+  [board-data user-id user-type]
+  (when (and board-data user-id user-type)
+    (let [content-type {:content-type (if (= user-type :viewer)
+                                        "application/vnd.open-company.board.viewer.v1"
+                                        "application/vnd.open-company.board.author.v1")}
+          add-link (utils/link-for (:links board-data) "add" "POST" content-type)]
+      (api-post (:href add-link)
+        {:headers (headers-for-link add-link)
+         :body user-id}
+        (fn [{:keys [status success body]}]
+          (get-board (dispatcher/board-data)))))))
+
+(defn private-board-user-action
+  [user-data action-link & [params]]
+  (when (and user-data action-link)
+    (let [api-req (case (:method action-link)
+                    "POST" api-post
+                    "PUT" api-put
+                    "PATCH" api-patch
+                    "DELETE" api-delete
+                    api-get)
+          headers {:headers (headers-for-link action-link)}
+          with-params (if params
+                        (assoc headers :json-params (cljs->json params))
+                        headers)]
+      (api-req (:href action-link)
+        with-params
+        (fn [{:keys [status success body]}]
+          (get-board (dispatcher/board-data)))))))

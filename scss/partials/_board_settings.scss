@@ -65,10 +65,47 @@ div.main-board-settings {
               margin-top: 30px;
               cursor: default;
 
+              div.private-board-users-list {
+                margin-top: 4rem;
+
+                table {
+                  width: 100%;
+
+                  thead:first-child {
+                    border-bottom: 1px solid rgba(78, 90, 107, 0.5);
+                  }
+
+                  tr th, tr td {
+                    padding: 0 0.4rem;
+                  }
+
+                  tr th {
+                    font-size: 14px;
+                    font-family: $oc_headers_font;
+                    color: rgba(78, 90, 107, 0.5);
+                    font-weight: 700;
+                  }
+
+                  tr td:first-child {
+                    padding-left: 1rem;
+                    color: $oc_gray_5;
+                    font-size: 14px;
+                  }
+
+                  tr td {
+                    font-family: $oc_main_font;
+                    font-size: 14px;
+                    font-weight: 300;
+                    letter-spacing: 1.2px;
+                    color: $oc_gray_5;
+                  }
+                }
+              }
+
               div.private-board-select-wrapper {
                 position: relative;
                 padding: 0;
-                margin: 0 2rem 0 0;
+                margin: 0 1rem 0 0;
                 width: 196px;
                 height: 36px;
                 overflow: hidden;
@@ -125,7 +162,7 @@ div.main-board-settings {
               }
 
               div.user-type-picker {
-                margin-right: 2rem;
+                margin-right: 1rem;
               }
 
               button.private-board-add-button {

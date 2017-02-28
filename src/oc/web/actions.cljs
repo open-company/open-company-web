@@ -866,3 +866,42 @@
     (when-not (string/blank? board-name)
       (api/create-board board-name)))
   db)
+
+(defmethod dispatcher/action :private-board-add
+  [db [_]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        user-type (:selected-user-type (:private-board-invite db))
+        user-id (:selected-user-id (:private-board-invite db))
+        board-data (dispatcher/board-data db)
+        viewers (:viewers board-data)
+        authors (:authors board-data)
+        new-viewers (if (= user-type :viewer)
+                      (conj viewers {:user-id user-id :loading true})
+                      (vec (filter #(not= (:user-id %) user-id) viewers)))
+        new-authors (if (= user-type :author)
+                      (conj authors {:user-id user-id :loading true})
+                      (vec (filter #(not= (:user-id %) user-id) authors)))
+        new-board-data (merge board-data {:viewers new-viewers
+                                          :authors new-authors})]
+    (api/add-private-board board-data user-id user-type)
+    (assoc-in db board-key new-board-data)))
+
+(defmethod dispatcher/action :private-board-action
+  [db [_ user-id user-type link]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (dispatcher/board-data db)
+        viewers (:viewers board-data)
+        authors (:authors board-data)
+        user (if (= user-type :viewer)
+                (first (filter #(= (:user-id %) user-id) viewers))
+                (first (filter #(= (:user-id %) user-id) authors)))
+        new-viewers (if (= user-type :viewer)
+                      (conj (vec (filter #(= (:user-id %) user-id) viewers)) (assoc user :loading true))
+                      viewers)
+        new-authors (if (= user-type :authors)
+                      (conj (vec (filter #(= (:user-id %) user-id) authors)) (assoc user :loading true))
+                      authors)
+        new-board-data (merge board-data {:viewers new-viewers
+                                          :authors new-authors})]
+    (api/private-board-user-action user link)
+    (assoc-in db board-key new-board-data)))

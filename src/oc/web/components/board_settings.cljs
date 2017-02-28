@@ -18,15 +18,15 @@
             [oc.web.components.ui.footer :as footer]
             [oc.web.components.ui.small-loading :as loading]
             [oc.web.components.ui.login-required :refer (login-required)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-picker)]
+            [oc.web.components.ui.user-type-picker :refer (user-type-picker user-type-dropdown)]
             [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.events :as events]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.Animation.EventType :as AnimationEventType]))
 
-(defn non-added-users
-  [board-authors board-viewers all-users]
-  (filter  all-users))
+(defn user-is-on-board [user-id board-data]
+  (or (pos? (count (filter #(= (:user-id %) user-id) (:viewers board-data))))
+      (pos? (count (filter #(= (:user-id %) user-id) (:authors board-data))))))
 
 (rum/defc invite-user-option < rum/static
   [user]
@@ -60,35 +60,88 @@
         users (:users (get enumerate-users (:team-id org-data)))
         selected-user-id (:selected-user-id private-board-invite)
         selected-user-type (:selected-user-type private-board-invite)
-        selected-user (when selected-user-id (some #(when (= (:user-id %) selected-user-id) %) users))]
-    [:div.private-board-invite
-      [:div.private-board-select-wrapper
-        [:select.private-board-select
-          {:value selected-user-id
-           :on-change (fn [e]
-                        (when-not (empty? (.. e -target -value))
-                          (let [v (.. e -target -value)
-                                actual-selected-user (some #(when (= (:user-id %) v) %) users)
-                                actual-selected-user-type (utils/get-user-type actual-selected-user org-data)
-                                to-user-type (if (or (= actual-selected-user-type :admin)
-                                                     (= actual-selected-user-type :author))
-                                              :author
-                                              :viewer)]
-                            (dis/dispatch! [:input [:private-board-invite :selected-user-id] v])
-                            (dis/dispatch! [:input [:private-board-invite :selected-user-type] to-user-type]))))}
-          [:option {:value "" :disabled true} "Select a user"]
-          (for [user users]
-            (rum/with-key (invite-user-option user) (:user-id user)))]]
-      (user-type-picker selected-user-type (not (empty? selected-user-id)) #(dis/dispatch! [:input [:private-board-invite :selected-user-type] %]) false)
-      [:button.btn-reset.btn-solid.private-board-add-button
-        {:on-click #()
-         :disabled (or (empty? selected-user-id)
-                       (not selected-user-type))}
-        "ADD"]]))
+        selected-user (when selected-user-id (some #(when (= (:user-id %) selected-user-id) %) users))
+        users-not-boarded (vec (filter #(not (user-is-on-board (:user-id %) board-data)) users))]
+    (when-not (empty? users-not-boarded)
+      [:div.private-board-invite.mt4
+
+          [:div.private-board-select-wrapper
+            [:select.private-board-select
+              {:value selected-user-id
+               :on-change (fn [e]
+                            (when-not (empty? (.. e -target -value))
+                              (let [v (.. e -target -value)
+                                    actual-selected-user (some #(when (= (:user-id %) v) %) users)
+                                    actual-selected-user-type (utils/get-user-type actual-selected-user org-data)
+                                    to-user-type (if (or (= actual-selected-user-type :admin)
+                                                         (= actual-selected-user-type :author))
+                                                  :author
+                                                  :viewer)]
+                                (dis/dispatch! [:input [:private-board-invite :selected-user-id] v])
+                                (dis/dispatch! [:input [:private-board-invite :selected-user-type] to-user-type]))))}
+              [:option {:value "" :disabled true} "Select a user"]
+              (for [user users-not-boarded]
+                (rum/with-key (invite-user-option user) (:user-id user)))]]
+        (user-type-picker selected-user-type (not (empty? selected-user-id)) #(dis/dispatch! [:input [:private-board-invite :selected-user-type] %]) false)
+        [:button.btn-reset.btn-solid.private-board-add-button
+          {:on-click #(when (and (not (empty? selected-user-id))
+                                 selected-user-type)
+                        (dis/dispatch! [:private-board-add]))
+           :disabled (or (empty? selected-user-id)
+                         (not selected-user-type))}
+          "ADD"]])))
+
+(rum/defc user-row < rum/static
+  [user user-type user-data]
+  [:tbody
+    [:tr
+      [:td
+        (user-type-dropdown
+         (:user-id user)
+         user-type
+         (fn [t]
+           (dis/dispatch! [:input [:private-board-invite] {:selected-user-id (:user-id user)
+                                                           :selected-user-type t}])
+           (utils/after 100 #(dis/dispatch! [:private-board-add])))
+         true)]
+      [:td (utils/name-or-email user-data)]
+      [:td
+        (cond
+          (utils/link-for (:links user) "remove")
+          [:button.btn-reset
+            {:title "Remove this user from this board."
+             :on-click #(dis/dispatch! [:private-board-action (:user-id user) user-type (utils/link-for (:links user) "remove")])}
+            [:i.fa.fa-trash]])]]])
+
+(rum/defcs users-list < rum/static
+                        rum/reactive
+                        (drv/drv :board-data)
+                        (drv/drv :org-data)
+                        (drv/drv :user-management)
+  [s]
+  (let [org-data (drv/react s :org-data)
+        board-data (drv/react s :board-data)
+        {:keys [enumerate-users]} (drv/react s :user-management)
+        all-users (:users (get enumerate-users (:team-id org-data)))]
+    [:div.private-board-users-list
+      [:table
+        [:thead
+          [:tr
+            [:th "ACCESS"]
+            [:th "NAME"]
+            [:th ""]]]
+        (for [v (:viewers board-data)
+              :let [user-data (some #(when (= (:user-id %) (:user-id v)) %) all-users)]]
+          (rum/with-key (user-row v :viewer user-data) (:user-id v)))
+        (for [a (:authors board-data)
+              :let [user-data (some #(when (= (:user-id %) (:user-id a)) %) all-users)]]
+          (rum/with-key (user-row a :author user-data) (:user-id a)))]]))
 
 (rum/defc private-board-setup < rum/static
   []
   [:div.private-board-setup
+    {:on-click #(.stopPropagation %)}
+    (users-list)
     (invite-user)])
 
 (defn get-state [data current-state]
