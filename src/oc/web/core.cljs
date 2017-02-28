@@ -28,6 +28,7 @@
             [oc.web.components.edit-user-profile :refer (edit-user-profile)]
             [oc.web.components.about :refer (about)]
             [oc.web.components.login :refer (login)]
+            [oc.web.components.oc-wall :refer (oc-wall)]
             [oc.web.components.sign-up :refer (sign-up)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.org-editor :refer (org-editor)]
@@ -101,18 +102,22 @@
   (drv-root list-orgs target))
 
 ;; Company list
-(defn org-handler [target params]
+(defn org-handler [route target component params]
   (let [org (:org (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
     ;; save route
-    (router/set-route! [org "boards"] {:org org})
+    (router/set-route! [org route] {:org org})
     ;; load data from api
     (swap! dis/app-state merge {:loading true})
     (api/get-entry-point)
     (api/get-auth-settings)
     ;; render component
-    (drv-root #(om/component) target)))
+    (drv-root component target)))
+
+(defn oc-wall-handler [message target params]
+  (pre-routing (:query-params params))
+  (drv-root #(om/component (oc-wall message :login)) target))
 
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
@@ -260,7 +265,7 @@
       (timbre/info "Rounting org-list-route" urls/orgs)
       (if (jwt/jwt)
         (list-orgs-handler target params)
-        (login-handler target params)))
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute org-create-route urls/create-org {:as params}
       (timbre/info "Rounting org-create-route" urls/create-org)
@@ -271,7 +276,7 @@
           (api/get-entry-point)
           (api/get-auth-settings)
           (drv-root org-editor target))
-        (router/redirect! urls/home)))
+        (oc-wall-handler "Please sign in." target params)))
 
     (defroute board-create-route (urls/create-board ":org") {:as params}
       (timbre/info "Rounting board-create-route" (urls/create-board ":org"))
@@ -282,7 +287,7 @@
           (api/get-entry-point)
           (api/get-auth-settings)
           (drv-root board-editor target))
-        (router/redirect! urls/home)))
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Rounting logout-route" urls/logout)
@@ -292,16 +297,18 @@
 
     (defroute org-page-route (urls/org ":org") {:as params}
       (timbre/info "Rounting org-page-route" (urls/org ":org"))
-      (org-handler target params))
+      (if (jwt/jwt)
+        (org-handler "org" target #(om/component) params)
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
-      (when-not (jwt/jwt)
-        (router/redirect! urls/home))
       (pre-routing (:query-params params))
-      (if (jwt/is-slack-org?)
-        (drv-root #(om/component (user-profile)) target)
-        (drv-root edit-user-profile target)))
+      (if (jwt/jwt)
+        (if (jwt/is-slack-org?)
+          (drv-root #(om/component (user-profile)) target)
+          (drv-root edit-user-profile target))
+        (oc-wall-handler "Please sign in to access this page." target params)))
 
     (defroute org-logo-setup-route (urls/org-logo-setup ":org") {:as params}
       (timbre/info "Routing org-logo-setup-route" (urls/org-logo-setup ":org"))
@@ -316,21 +323,27 @@
         ;; do we have the company data already?
         (when-not (dis/org-data)
           (swap! dis/app-state assoc :loading true))
-      (drv-root org-logo-setup target)))
+      (if (jwt/jwt)
+        (drv-root org-logo-setup target)
+        (oc-wall-handler "Please sign in to access this organization." target params))))
 
     (defroute org-settings-route (urls/org-settings ":org") {:as params}
       (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no topics and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
-      (board-handler "org-settings" target org-settings params))
+      (if (jwt/jwt)
+        (org-handler "org-settings" target org-settings params)
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute org-team-settings-route (urls/org-team-settings ":org") {:as params}
       (timbre/info "Routing org-team-settings-route" (urls/org-team-settings ":org"))
       ; add force-remove-loading to avoid inifinte spinner if the company
       ; has no topics and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
-      (team-handler "org-team-settings" target user-management-wrapper params))
+      (if (jwt/jwt)
+        (team-handler "org-team-settings" target user-management-wrapper params)
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
@@ -338,35 +351,49 @@
       (api/get-entry-point)
       (api/get-auth-settings)
       (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params))})
-      (drv-root mobile-boards-list target))
+      (if (jwt/jwt)
+        (drv-root mobile-boards-list target)
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (board-handler "dashboard" target org-dashboard params))
+      (if (jwt/jwt)
+        (board-handler "dashboard" target org-dashboard params)
+        (oc-wall-handler "Please sign in to access this board." target params)))
 
     (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params))
+      (if (jwt/jwt)
+        (board-handler "dashboard" target org-dashboard params)
+        (oc-wall-handler "Please sign in to access this board." target params)))
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
       ; add force-remove-loading to avoid inifinte spinner
       (swap! dis/app-state assoc :force-remove-loading true)
-      (board-handler "board-settings" target board-settings params))
+      (if (jwt/jwt)
+        (board-handler "board-settings" target board-settings params)
+        (oc-wall-handler "Please sign in to access this board." target params)))
 
     (defroute create-update-route (urls/update-preview ":org") {:as params}
       (timbre/info "Routing create-update-route" (urls/update-preview ":org"))
-      (board-handler "su-snapshot-preview" target create-update params))
+      (if (jwt/jwt)
+        (board-handler "su-snapshot-preview" target create-update params)
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute updates-list-route (urls/updates-list ":org") {:as params}
       (timbre/info "Routing updates-list-route" (urls/updates-list ":org"))
-      (board-handler "updates-list" target updates-responsive-switcher params))
+      (if (jwt/jwt)
+        (board-handler "updates-list" target updates-responsive-switcher params)
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute update-route (urls/updates-list ":org" ":update-slug") {:as params}
       (timbre/info "Routing update-route" (urls/updates-list ":org" ":update-slug"))
-      (if (responsive/is-mobile-size?)
-        (update-handler target su-snapshot params)
-        (board-handler "updates-list" target updates-responsive-switcher params)))
+      (if (jwt/jwt)
+        (if (responsive/is-mobile-size?)
+          (update-handler target su-snapshot params)
+          (board-handler "updates-list" target updates-responsive-switcher params))
+        (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute update-unique-route (urls/update-link ":org" ":update-date" ":update-slug") {:as params}
       (timbre/info "Routing update-unique-route" (urls/update-link ":org" ":update-data" ":update-slug"))
@@ -374,7 +401,9 @@
 
     (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
       (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
-      (board-handler "topic" target org-dashboard params))
+      (if (jwt/jwt)
+        (board-handler "topic" target org-dashboard params)
+        (oc-wall-handler "Please sign in to access this board." target params)))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
