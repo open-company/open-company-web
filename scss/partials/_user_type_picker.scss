@@ -50,3 +50,50 @@ div.user-type-picker {
     }
   }
 }
+
+div.dropdown{
+  position: relative;
+
+  button.user-type-btn {
+    width: 80px;
+    &:after {
+      color: $oc_gray_5;
+      font-size: 13px;
+      font-family: FontAwesome;
+      content: "\f078";
+      margin-left: 5px;
+      opacity: 0;
+    }
+  }
+
+  &:hover {
+    // background-color: $oc_blue_dark;
+    // color: white;
+
+    button.user-type-btn:after {
+      opacity: 1;
+    }
+  }
+
+  ul.user-type-dropdown-menu {
+    padding: 0;
+    font-family: $oc_main_font;
+    font-size: 14px;
+    color: $oc_gray_5;
+    background-color: white;
+    padding: 0.5rem 0;
+    position: absolute;
+    top: 24px;
+    left: 20px;
+
+    li {
+      padding: 0 0.5rem;
+      cursor: pointer;
+
+      &:hover, &.active {
+        background-color: $oc_blue_dark;
+        color: white;
+      }
+    }
+  }
+}

@@ -5,7 +5,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.small-loading :refer (small-loading)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown)]))
 
 (defn user-action [team-id user action method other-link-params & [payload]]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
@@ -18,7 +19,6 @@
                                       s)}
   [team-id user author]
   (let [user-links (:links user)
-        user-dropdown-id (str "user-row-" (:user-id user))
         add-link (utils/link-for user-links "add" "PUT" {:ref "application/vnd.open-company.user.v1+json"})
         user-type (utils/get-user-type user (dis/org-data))
         admin-type {:ref "application/vnd.open-company.team.admin.v1"}
@@ -37,32 +37,7 @@
                           (:email user))]
     [:tr
       [:td
-        [:div.dropdown
-          [:button.btn-reset.user-type-btn.dropdown-toggle
-            {:id user-dropdown-id
-             :data-toggle "dropdown"
-             :aria-haspopup true
-             :aria-expanded false}
-            (case user-type
-              :admin
-              [:i.fa.fa-gear]
-              :author
-              [:i.fa.fa-pencil]
-              [:i.fa.fa-user])]
-          [:ul.dropdown-menu.user-type-dropdown-menu
-            {:aria-labelledby user-dropdown-id}
-            [:li
-              {:class (when (= user-type :viewer) "active")
-               :on-click #(api/switch-user-type user-type :viewer user author)}
-              [:i.fa.fa-user] " Viewer"]
-            [:li
-              {:class (when (= user-type :author) "active")
-               :on-click #(api/switch-user-type user-type :author user author)}
-              [:i.fa.fa-pencil] " Author"]
-            [:li
-              {:class (when (= user-type :admin) "active")
-               :on-click #(api/switch-user-type user-type :admin user author)}
-              [:i.fa.fa-gear] " Admin"]]]]
+        (user-type-dropdown (:user-id user) user-type #(api/switch-user-type user-type % user author))]
       [:td [:div.value
              {:title (if (pos? (count (:email user))) (:email user) "")
               :data-toggle "tooltip"

@@ -7,6 +7,37 @@
             [oc.web.components.ui.popover :as popover :refer (add-popover-with-rum-component
                                                               hide-popover)]))
 
+(rum/defc user-type-dropdown < rum/static
+  [user-id user-type click-cb & [hide-admin?]]
+  (let [user-dropdown-id (str "dropdown-" user-id)]
+    [:div.dropdown
+      [:button.btn-reset.user-type-btn.dropdown-toggle
+        {:id user-dropdown-id
+         :data-toggle "dropdown"
+         :aria-haspopup true
+         :aria-expanded false}
+        (case user-type
+          :admin
+          [:i.fa.fa-gear]
+          :author
+          [:i.fa.fa-pencil]
+          [:i.fa.fa-user])]
+      [:ul.dropdown-menu.user-type-dropdown-menu
+        {:aria-labelledby user-dropdown-id}
+        [:li
+          {:class (when (= user-type :viewer) "active")
+           :on-click #(click-cb :viewer)}
+          [:i.fa.fa-user] " Viewer"]
+        [:li
+          {:class (when (= user-type :author) "active")
+           :on-click #(click-cb :author)}
+          [:i.fa.fa-pencil] " Author"]
+        (when-not hide-admin?
+          [:li
+            {:class (when (= user-type :admin) "active")
+             :on-click #(click-cb :admin)}
+            [:i.fa.fa-gear] " Admin"])]]))
+
 (defn show-team-disclaimer-popover [e]
   (.stopPropagation e)
   (add-popover-with-rum-component team-disclaimer-popover {:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
