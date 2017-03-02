@@ -906,3 +906,13 @@
                                           :authors new-authors})]
     (api/private-board-user-action user link)
     (assoc-in db board-key new-board-data)))
+
+(defmethod dispatcher/action :password-reset
+  [db [_]]
+  (js/console.log "actions/:password-reset" db)
+  (api/password-reset (:email (:password-reset db)))
+  db)
+
+(defmethod dispatcher/action :password-reset/finish
+  [db [_ status]]
+  (assoc-in db [:password-reset :success] (and (>= status 200) (<= status 299))))

@@ -782,3 +782,14 @@
         with-params
         (fn [{:keys [status success body]}]
           (get-board (dispatcher/board-data)))))))
+
+(defn password-reset
+  [email]
+  (js/console.log "api/password-reset" email)
+  (when email
+    (when-let [reset-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "reset")]
+      (api-post (:href reset-link)
+        {:headers (headers-for-link reset-link)
+         :body email}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:password-reset/finish status]))))))

@@ -284,7 +284,7 @@
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
-                              {:did-mount (fn [s] (.focus [:div.sign-in-field-container.email]) s)})
+                              {:did-mount (fn [s] (.focus (sel1 [:div.sign-in-field-container.email])) s)})
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -296,20 +296,29 @@
           (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]]
       [:div.pt2.pl3.pr3.pb2.group
+        (when (contains? (:password-reset (rum/react dis/app-state)) :success)
+          (cond
+            (:success (:password-reset (rum/react dis/app-state)))
+            [:div.green "We sent you an email with the instructions to reset your account password."]
+            :else
+            [:div.red "An error occurred, please try again."]))
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]
           [:div.sign-in-field-container.email
             [:input.sign-in-field
-              {:value ""
+              {:value (:email (:password-reset (rum/react dis/app-state)))
                :tabIndex 1
                :type "email"
                :autoCapitalize "none"
                :auto-focus true
+               :on-change #(dis/dispatch! [:input [:password-reset :email] (.. % -target -value )])
                :name "email"}]]
           [:div.group.pb3.mt3
             [:div.right.ml1
               [:button.btn-reset.btn-solid
+                {:on-click #(dis/dispatch! [:password-reset])
+                 :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
                 "RESET PASSWORD"]]
             [:div.right
               [:button.btn-reset.btn-outline
