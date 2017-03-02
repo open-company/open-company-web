@@ -909,7 +909,6 @@
 
 (defmethod dispatcher/action :password-reset
   [db [_]]
-  (js/console.log "actions/:password-reset" db)
   (api/password-reset (:email (:password-reset db)))
   db)
 

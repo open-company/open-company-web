@@ -785,7 +785,6 @@
 
 (defn password-reset
   [email]
-  (js/console.log "api/password-reset" email)
   (when email
     (when-let [reset-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "reset")]
       (api-post (:href reset-link)
