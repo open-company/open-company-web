@@ -35,7 +35,6 @@
     [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-2"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
-    [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.5.13-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
