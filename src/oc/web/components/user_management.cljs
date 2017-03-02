@@ -117,12 +117,14 @@
                        (not (empty? (:slack-access user-man))))
               [:div
                 (cond
-                  (= (keyword (:slack-access user-man)) :team-exists)
+                  (= (:slack-access user-man) "team-exists")
                   [:span.small-caps.red.mt1.left "This team was already added."]
                   (= (:slack-access user-man) "failed")
                   [:span.small-caps.red.mt1.left "An error occurred, please try again."]
+                  (= (:slack-access user-man) "bot-added")
+                  [:span.small-caps.green.mt1.left "Bot successfully added."]
                   :else
-                  [:span.small-caps.green.mt1.left "Bot succesfully added."])])]])
+                  [:span.small-caps.green.mt1.left "Team successfully added."])])]])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
