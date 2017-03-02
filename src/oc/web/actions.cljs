@@ -837,7 +837,7 @@
         team-id (:team-id org-data)
         team-data (get teams-data (:team-id org-data))
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) team-id (:slug org-slug))]
+        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) team-id (:slug org-data))]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link)))
   db)
