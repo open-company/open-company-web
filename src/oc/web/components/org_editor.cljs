@@ -31,19 +31,27 @@
           (om/set-state! owner :loading true)
           (dis/dispatch! [:create-org]))))))
 
+(defn setup-org-name [data]
+  (when-let [team-data (first (:teams (:enumerate-users data)))]
+    ;; using utils/after here because we can't dispatch inside another dispatch.
+    ;; ultimately we should switch to some event-loop impl that works like a proper queue
+    ;; and does not have these limitations
+    (utils/after 1 #(dis/dispatch! [:input [:create-org] (or (:name team-data) "")]))))
+
 (defcomponent org-editor [data owner]
 
   (init-state [_]
-    {:loading false})
+    {:loading false
+     :name-did-change false})
 
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Organization")
     (when-not (:create-org data)
-      ;; using utils/after here because we can't dispatch inside another dispatch.
-      ;; ultimately we should switch to some event-loop impl that works like a proper queue
-      ;; and does not have these limitations
-      (utils/after 1 #(let [team-data (dis/team-data)]
-                        (dis/dispatch! [:input [:create-org] (or (:name team-data) "")])))))
+      (setup-org-name data)))
+
+  (will-receive-props [_ next-props]
+    (when-not (om/get-state owner :name-did-change)
+      (setup-org-name next-props)))
 
   (render-state [_ {:keys [loading]}]
     (dom/div {:class "org-editor"}
@@ -60,7 +68,9 @@
                           :style #js {:width "100%"}
                           :placeholder "Simple name without the Inc., LLC, etc."
                           :value (or (:create-org data) "")
-                          :on-change #(dis/dispatch! [:input [:create-org] (.. % -target -value)])})))
+                          :on-change #(do
+                                        (om/set-state! owner :name-did-change true)
+                                        (dis/dispatch! [:input [:create-org] (.. % -target -value)]))})))
             (dom/div {:class "center"}
               (dom/button {:class "btn-reset btn-solid get-started-button"
                            :disabled (not (pos? (count (:create-org data))))
