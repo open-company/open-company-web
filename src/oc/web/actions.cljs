@@ -519,12 +519,13 @@
 (defmethod dispatcher/action :auth-bot
   [db [_]]
   (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings db)) "bot")]
-    (when (and (not (.startsWith current oc-urls/login))
-               (not (.startsWith current oc-urls/sign-up))
-               (not (cook/get-cookie :login-redirect)))
-        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    (router/redirect! (:href auth-url)))
+        org-data (dispatcher/org-data db)
+        team-id (:team-id org-data)
+        team (get (:enumerate-users db) team-id)
+        auth-link (utils/link-for (:links team) "bot")
+        fixed-auth-url (clojure.string/replace (:href auth-link) team-id (str team-id ":" (:slug org-data)))]
+    (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+    (router/redirect! fixed-auth-url))
   db)
 
 (defmethod dispatcher/action :login-with-email-change
