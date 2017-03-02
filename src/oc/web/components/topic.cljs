@@ -253,7 +253,7 @@
                    (not (clojure.string/blank? truncated-body)))
           (dom/div {:class "group" :style #js {:position "relative"}}
             (when (and is-dashboard (>= (count (.text (.html (js/$ "<div/>") (:body topic-data)))) utils/topic-body-limit))
-              (dom/div {:class "search-result-card-container-fade"}))
+              (dom/div {:class "topic-body-fade"}))
             (dom/div #js {:className (utils/class-set {:topic-body true
                                                        :italic (:placeholder topic-data)})
                           :ref "topic-body"
