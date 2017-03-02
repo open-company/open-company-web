@@ -74,7 +74,7 @@
   (let [org-slug   (keyword (router/current-org-slug))
         board-slug (keyword (router/current-board-slug))
         all-topics (get-in @dis/app-state (dis/board-new-topics-key org-slug board-slug)) ; get new topics templates from cache
-        growth-defaults (first (filter #(= (:slug %) "growth") all-topics))]
+        growth-defaults (:growth all-topics)]
     {:intervals (:intervals growth-defaults)
      :units (:units growth-defaults)}))
 
@@ -124,7 +124,6 @@
     (let [all-metrics (:metrics data)
           {:keys [metrics intervals prompt] :as presets} presets
           new-metric? (:new-metric? data)]
-
       (dom/div {:class "growth-metric-edit p3 group"}
 
         ;; name
