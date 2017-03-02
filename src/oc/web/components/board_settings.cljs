@@ -219,7 +219,7 @@
           (dom/div {:class "settings-form-input-label"} "VISIBILITY")
           (dom/div {:class "settings-form-input visibility"}
             ;; Public
-            (dom/div {:class "visibility-value"
+            (dom/div {:class "visibility-value highlightable"
                       :on-click #(do
                                   (om/set-state! owner :loading true)
                                   (api/patch-board {:slug (:slug board-data)
@@ -229,8 +229,9 @@
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
               (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Only designed authors can edit and share information."))
             ;; Private choice
-            (dom/div {:class "visibility-value"}
-              (dom/div {:on-click #(when (= access "public")
+            (dom/div {}
+              (dom/div {:class (str "visibility-value" (when (= access "public") " highlightable"))
+                        :on-click #(when (= access "public")
                                     (om/set-state! owner :loading true)
                                     (api/patch-board {:slug (:slug board-data)
                                                       :access "team"}))}
@@ -240,7 +241,7 @@
                 (dom/p {} "Only designed people can view, edit and share."))
               ;; Team
               (when (or (= access "team") (= access "private"))
-                (dom/div {:class "visibility-value ml2"
+                (dom/div {:class "visibility-value highlightable ml2"
                           :on-click #(do
                                       (om/set-state! owner :loading true)
                                       (api/patch-board {:slug (:slug board-data)
@@ -251,7 +252,7 @@
                   (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designed authors can edit and share.")))
               ;; Private
               (when (or (= access "team") (= access "private"))
-                (dom/div {:class "visibility-value invite-only-board group ml2"
+                (dom/div {:class "visibility-value highlightable invite-only-board group ml2"
                           :on-click #(do
                                       (om/set-state! owner :loading true)
                                       (api/patch-board {:slug (:slug board-data)

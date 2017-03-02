@@ -35,13 +35,24 @@ div.main-board-settings {
 
         div.visibility-value {
           cursor: pointer;
+          padding: 0.5rem 0.2rem;
+
+          &.highlightable:hover {
+            background-color: $oc_blue_dark;
+            color: white;
+            border-radius: 4px;
+
+            h3, i, p {
+              color: white;
+            }
+          }
 
           h3 {
             font-size: 14px;
             font-weight: 800;
             font-family: $oc_headers_font;
             color: rgba(78,90,107,1);
-            margin-bottom: 5px;
+            margin-bottom: 0px;
             margin-top: 0px;
 
             i.fa {
@@ -54,6 +65,7 @@ div.main-board-settings {
             font-weight: 400;
             font-family: $oc_headers_font;
             color: rgba(78,90,107,1);
+            margin-bottom: 0px;
 
             &.bold {
               font-weight: 700;
