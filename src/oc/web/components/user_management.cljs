@@ -91,15 +91,16 @@
               [:div.slack-domain.group
                 {:key (str "slack-org-" (:slack-org-id team))}
                 [:span (:name team)]
-                (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
-                  (let [fixed-add-bot-link (clojure.string/replace (:href add-bot-link) team-id (str team-id ":" (:slug org-data)))]
-                    [:button.btn-reset
-                      {:on-click #(router/redirect! fixed-add-bot-link)
-                       :title "Add Slack bot to this team"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"}
-                       [:i.fa.fa-slack]]))
+                (when-not (contains? (jwt/get-key :bot) team-id)
+                  (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) team-id (:slug org-data))]
+                      [:button.btn-reset
+                        {:on-click #(router/redirect! fixed-add-bot-link)
+                         :title "Add Slack bot to this team"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"}
+                         [:i.fa.fa-slack]])))
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                    :title "Remove Slack team"

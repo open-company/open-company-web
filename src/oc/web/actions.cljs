@@ -523,7 +523,7 @@
         team-id (:team-id org-data)
         team (get (:enumerate-users db) team-id)
         auth-link (utils/link-for (:links team) "bot")
-        fixed-auth-url (clojure.string/replace (:href auth-link) team-id (str team-id ":" (:slug org-data)))]
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) team-id (:slug org-data))]
     (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
     (router/redirect! fixed-auth-url))
   db)
@@ -837,7 +837,7 @@
         team-id (:team-id org-data)
         team-data (get teams-data (:team-id org-data))
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-        fixed-add-slack-team-link (clojure.string/replace (:href add-slack-team-link) team-id (str team-id ":" (:slug org-data)))]
+        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) team-id (:slug org-slug))]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link)))
   db)

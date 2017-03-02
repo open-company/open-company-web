@@ -857,3 +857,6 @@
     (if (empty? user-name)
       (:email user)
       user-name)))
+
+(defn slack-link-with-state [original-url team-id org-slug]
+  (clojure.string/replace original-url team-id (str team-id ":" (:slug org-data))))
