@@ -194,7 +194,7 @@
           ;; Company profile
           :else
           (dom/div {}
-            (back-to-dashboard-btn {:title (if (responsive/is-mobile-size?) "Invite" "Invite and Manage Team")})
+            (back-to-dashboard-btn {:title (if (responsive/is-mobile-size?) "Invite" "Invite and Manage Team") :click-cb #(router/nav! (oc-urls/org))})
             (dom/div {:class "company-settings-container"}
               (user-management))))
 
