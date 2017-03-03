@@ -217,19 +217,20 @@
           (om/build topic-headline topic-data))
 
         ;; Topic data
+        (js/console.log "topic/render" topic topic-kw is-growth-finances?)
         (when (and (or (not is-dashboard)
                        (not is-mobile?))
                    is-growth-finances?
                    (utils/data-topic-has-data topic topic-data))
           (dom/div {:class ""}
             (cond
-              (= topic "growth")
+              (= topic-kw :growth)
               (om/build topic-growth {:topic-data topic-data
                                       :topic topic
                                       :card-width card-width
                                       :columns-num columns-num
                                       :currency currency} {:opts chart-opts})
-              (= topic "finances")
+              (= topic-kw :finances)
               (om/build topic-finances {:topic-data (utils/fix-finances topic-data)
                                         :topic topic
                                         :card-width card-width
