@@ -11,7 +11,7 @@
             [oc.web.lib.responsive :as responsive]))
 
 (defn sorted-boards [boards]
-  (into [] (sort #(compare (utils/js-date (:created-at %1)) (utils/js-date (:created-at %2))) boards)))
+  (into [] (sort #(compare (:name %1) (:name %2)) boards)))
 
 (defcomponent bw-boards-list
   [{:keys [org-data board-data card-width show-add-topic] :as data} owner options]

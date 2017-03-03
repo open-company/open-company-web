@@ -64,7 +64,7 @@
     (do (router/redirect-500!) db)))
 
 (defn newest-board [boards]
-  (first (sort #(compare (utils/js-date (:created-at %2)) (utils/js-date (:created-at %1))) boards)))
+  (first (sort #(compare (:name %1) (:name %2)) boards)))
 
 (defn get-default-board [org-data]
   (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
