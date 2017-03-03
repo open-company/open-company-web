@@ -217,7 +217,6 @@
           (om/build topic-headline topic-data))
 
         ;; Topic data
-        (js/console.log "topic/render" topic topic-kw is-growth-finances?)
         (when (and (or (not is-dashboard)
                        (not is-mobile?))
                    is-growth-finances?
@@ -259,6 +258,25 @@
                                                        :italic (:placeholder topic-data)})
                           :ref "topic-body"
                           :dangerouslySetInnerHTML (utils/emojify truncated-body)})))))))
+
+(defn anchor-clicked? [e]
+  (loop [element (.-target e)]
+    (if element
+      (if (= (.-tagName element) "A")
+        (if (empty? (.-href element))
+          false
+          true)
+        (recur (.-parentElement element)))
+      false)))
+
+(defn topic-click [e data board-slug]
+  (when (and (nil? (:foce-key data))
+             (or (responsive/is-mobile-size?)
+                 (not (:read-only-company data))
+                 (> (count (:entries-data data)) 1)
+                 (html-text-exceeds-limit (:body (:topic-data data)) utils/topic-body-limit))
+             (not (anchor-clicked? e)))
+    (router/nav! (oc-urls/topic (keyword (router/current-org-slug)) board-slug (keyword (:topic data))))))
 
 (defcomponent topic [{:keys [active-topics
                              topic-data
@@ -334,14 +352,9 @@
                     :onClick #(when (and is-dashboard
                                          (not is-current-foce)
                                          (nil? (:show-top-menu data)))
-                               (if (:dashboard-sharing data)
-                                 (dis/dispatch! [:dashboard-select-topic board-slug topic-kw])
-                                 (when (and (nil? (:foce-key data))
-                                            (or (responsive/is-mobile-size?)
-                                                (not read-only-company)
-                                                (> (count entries-data) 1)
-                                                (html-text-exceeds-limit (:body topic-data) utils/topic-body-limit)))
-                                   (router/nav! (oc-urls/topic org-slug board-slug topic-kw)))))
+                                (if (:dashboard-sharing data)
+                                  (dis/dispatch! [:dashboard-select-topic board-slug topic-kw])
+                                  (topic-click % data board-slug)))
                     :style topic-style
                     :ref "topic"
                     :data-topic (name topic)
