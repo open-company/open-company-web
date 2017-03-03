@@ -130,8 +130,8 @@
       [:div.add-topic.group
         [:div.add-topic-title
           (if (pos? (count topics))
-            "Choose a topic to get started"
-            "Add another topic")]
+            "Add another topic"
+            "Choose a topic to get started")]
         [:hr]
         (when (pos? (count topics))
           [:span.close-add-topic
