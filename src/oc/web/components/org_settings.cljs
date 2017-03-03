@@ -20,6 +20,7 @@
             [oc.web.dispatcher :as dis]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.iso4217 :as iso4217]
+            [oc.web.lib.image-upload :as iu]
             [goog.events :as events]
             [goog.fx.dom :refer (Fade)]
             [goog.fx.Animation.EventType :as AnimationEventType]))
@@ -115,27 +116,22 @@
                  :disabled (and (contains? :value data) (= (count (:value data)) 0))}
       (:text data))))
 
-(defn- upload-file! [owner file]
-  (js/filepicker.setKey ls/filestack-key)
-  (let [success-cb  (fn [success]
-                      (let [url    (.-url success)]
-                        (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
-                                                                          :file-upload-progress nil
-                                                                          :logo-did-change true
-                                                                          :state-logo url}))))
-        error-cb    (fn [error]
-                      (js/alert "An error occurred while uploading the image. Please retry.")
-                      (om/update-state! owner #(merge % {:file-upload-state nil
-                                                         :file-upload-progress nil})))
-        progress-cb (fn [progress]
-                      (let [state (om/get-state owner)]
-                        (om/set-state! owner (merge state {:file-upload-state :show-progress
-                                                           :file-upload-progress progress}))))]
-    (cond
-      (and (string? file) (not (string/blank? file)))
-      (js/filepicker.storeUrl file success-cb error-cb progress-cb)
-      file
-      (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+(defn- success-cb [owner res]
+  (let [url (.-url res)]
+    (om/update-state! owner #(merge % {:file-upload-state nil
+                                       :file-upload-progress nil
+                                       :logo-did-change true
+                                       :state-logo url}))))
+
+(defn- error-cb [owner res error]
+  (js/alert "An error occurred while uploading the image. Please retry.")
+  (om/update-state! owner #(merge % {:file-upload-state nil
+                                     :file-upload-progress nil})))
+
+(defn- progress-cb [owner res progress]
+  (let [state (om/get-state owner)]
+    (om/set-state! owner (merge state {:file-upload-state :show-progress
+                                       :file-upload-progress progress}))))
 
 (defcomponent org-logo-setup [{:keys [logo-url logo-did-change-cb logo-did-load-cb] :as data} owner]
   (init-state [_]
@@ -147,7 +143,6 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (js/filepicker.setKey ls/filestack-key)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (will-receive-props [_ next-props]
@@ -164,38 +159,16 @@
 
   (render-state [_ {:keys [file-upload-state file-upload-progress upload-remote-url state-logo logo-did-change]}]
     (dom/div {}
-      (dom/div {}
-        (if (not= file-upload-state :show-url-field)
-          (dom/div {:class "org-logo-container"}
-            (when-not (string/blank? state-logo)
-              (dom/img {:src state-logo
-                        :class "org-logo"
-                        :on-load #(when (and logo-did-change (fn? logo-did-load-cb))
-                                    (logo-did-load-cb state-logo (.width (js/$ "img.org-logo")) (.height (js/$ "img.org-logo"))))
-                        :on-error #(when (and logo-did-change (fn? logo-did-load-cb))
-                                    (logo-did-load-cb state-logo nil nil))})))
-          (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))}
-              (dom/input {:type "text"
-                          :class "npt col-7 p1 mb3"
-                          :on-change #(om/set-state! owner :upload-remote-url (-> % .-target .-value))
-                          :placeholder "http://site.com/img.png"
-                          :value (or upload-remote-url "")})
-              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                           :class "btn-reset btn-solid"
-                           :disabled (string/blank? upload-remote-url)
-                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                "add")
-              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                           :class "btn-reset btn-outline"
-                           :on-click #(om/set-state! owner :file-upload-state nil)}
-                "cancel"))))
+      (when-not (empty? state-logo)
+        (dom/div {:class "org-logo-container"}
+          (dom/img {:src state-logo
+                    :class "org-logo"
+                    :on-load #(when (and logo-did-change (fn? logo-did-load-cb))
+                                (logo-did-load-cb state-logo (.width (js/$ "img.org-logo")) (.height (js/$ "img.org-logo"))))
+                    :on-error #(when (and logo-did-change (fn? logo-did-load-cb))
+                                (logo-did-load-cb state-logo nil nil))})))
       (dom/div {:class "group"
                 :style {:margin-bottom "2rem"}}
-        (dom/input {:id "foce-file-upload-ui--select-trigger"
-                    :style {:display "none"}
-                    :type "file"
-                    :accept "image/x-png, image/gif, image/jpeg"
-                    :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
         (dom/button {:class "btn-reset camera left"
                      :title "Upload a logo"
                      :type "button"
@@ -203,7 +176,10 @@
                      :data-container "body"
                      :data-placement "bottom"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
-                     :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+                     :on-click #(iu/upload!
+                                 (partial success-cb owner)
+                                 (partial progress-cb owner)
+                                 (partial error-cb owner))}
           (dom/i {:class "fa fa-camera"}))
         (dom/button {:class "btn-reset image-url left"
                      :title "Provide a link to your logo"
@@ -249,7 +225,6 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (js/filepicker.setKey ls/filestack-key)
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
@@ -288,9 +263,9 @@
           ;; org logo
           (dom/div {:class "settings-form-input-label"} "COMPANY LOGO (square works best, approx. 160px per side)")
           (om/build org-logo-setup {:logo-url logo-url
-                                    :logo-did-change-cb #(do
-                                                           (om/set-state! owner :has-changes true)
-                                                           (om/set-state! owner :logo-url %))})
+                                    :logo-did-load-cb #(do
+                                                        (om/set-state! owner :has-changes true)
+                                                        (om/set-state! owner :logo-url %))})
 
           ;; Currency
           (dom/div {:class "settings-form-input-label"} "DISPLAY CURRENCY IN CHARTS AS")
