@@ -11,6 +11,7 @@
             [oc.web.lib.utils :as utils]
             ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.oc-colors :as oc-colors]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
@@ -117,33 +118,29 @@
                                :image-height (.-clientHeight img)}])
   (gdom/removeNode img))
 
-(defn- upload-file! [owner file]
-  (let [success-cb  (fn [success]
-                      (let [url    (googobj/get success "url")
-                            node   (gdom/createDom "img")]
-                        (if-not url
-                          (js/alert "An error has occurred while processing the image URL. Please try again.")
-                          (do
-                            (set! (.-onload node) #(img-on-load owner node))
-                            (gdom/append (.-body js/document) node)
-                            (set! (.-src node) url)))
-                        (dis/dispatch! [:foce-input {:image-url url}])
-                        (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
-                                                                          :file-upload-progress nil
-                                                                          :has-changes true}))))
-        error-cb    (fn [error] (js/alert "An error has occurred while processing the image URL. Please try again.")
-                                (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
-                                                                                  :file-upload-progress nil
-                                                                                  :has-changes true})))
-        progress-cb (fn [progress]
-                      (let [state (om/get-state owner)]
-                        (om/set-state! owner (merge state {:file-upload-state :show-progress
-                                                           :file-upload-progress progress}))))]
-    (cond
-      (and (string? file) (not (string/blank? file)))
-      (js/filepicker.storeUrl file success-cb error-cb progress-cb)
-      file
-      (js/filepicker.store file #js {:name (.-name file)} success-cb error-cb progress-cb))))
+(defn img-upload-success-cb [owner res]
+  (let [url    (googobj/get res "url")
+        node   (gdom/createDom "img")]
+    (if-not url
+      (js/alert "An error has occurred while processing the image URL. Please try again.")
+      (do
+        (set! (.-onload node) #(img-on-load owner node))
+        (gdom/append (.-body js/document) node)
+        (set! (.-src node) url)))
+    (dis/dispatch! [:foce-input {:image-url url}])
+    (om/set-state! owner (merge (om/get-state owner) {:file-upload-state nil
+                                                      :file-upload-progress nil
+                                                      :has-changes true}))))
+
+(defn img-upload-error-cb [owner res error]
+  (js/alert "An error has occurred while processing the image URL. Please try again.")
+  (om/update-state! owner #(merge % {:file-upload-state nil
+                                     :file-upload-progress nil
+                                     :has-changes true})))
+
+(defn img-upload-progress-cb [owner res progress]
+  (om/update-state! owner #(merge % {:file-upload-state :show-progress
+                                     :file-upload-progress progress})))
 
 (defn- dismiss-editing [topic]
   (dis/dispatch! [:rollback-add-topic (keyword topic)]))
@@ -303,7 +300,6 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (js/filepicker.setKey ls/filestack-key)
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
       (setup-body-editor owner)
@@ -458,10 +454,6 @@
                         :contentEditable true
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
-            (dom/input {:id "foce-file-upload-ui--select-trigger"
-                        :style {:display "none"}
-                        :type "file"
-                        :on-change #(upload-file! owner (-> % .-target .-files (aget 0)))})
             (dom/div {:class "left mr2"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (emoji-picker {:add-emoji-cb (fn [editor emoji]
@@ -487,7 +479,10 @@
                          :data-container "body"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+                         :on-click #(iu/upload!
+                                     (partial img-upload-success-cb owner)
+                                     (partial img-upload-progress-cb owner)
+                                     (partial img-upload-error-cb owner))}
                 (dom/i {:class "fa fa-camera"})))
 
             ;; Topic chart button
@@ -514,25 +509,7 @@
           ;; Hidden (initially) file upload UI
           (dom/div {:class "topic-foce-footer group"}
             (dom/div {:class "divider"})
-            (dom/div {:class (str "upload-remote-url-container left" (when-not (= file-upload-state :show-url-field) " hidden"))
-                      :style {:display (if file-upload-state "block" "none")}}
-              (dom/input {:type "text"
-                          :class "upload-remote-url-field"
-                          :style {:width (str (- card-width 122 50) "px")}
-                          :on-change #(om/set-state! owner :upload-remote-url (or (-> % .-target .-value) ""))
-                          :placeholder "http://site.com/img.png"
-                          :value (or upload-remote-url "")})
-              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                           :class "btn-reset btn-solid"
-                           :disabled (string/blank? upload-remote-url)
-                           :on-click #(upload-file! owner (om/get-state owner :upload-remote-url))}
-                "add")
-              (dom/button {:style {:font-size "14px" :margin-left "5px" :padding "0.3rem"}
-                           :class "btn-reset btn-outline"
-                           :on-click #(om/set-state! owner :file-upload-state nil)}
-                "cancel"))
-            (dom/div {:class "topic-foce-footer-left"
-                      :style {:display (if (nil? file-upload-state) "block" "none")}}
+            (dom/div {:class "topic-foce-footer-left"}
               (dom/label {:class (utils/class-set {:char-counter true
                                                    :char-count-alert char-count-alert})} char-count))
             (dom/div {:class "topic-foce-footer-right"
