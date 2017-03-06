@@ -1,5 +1,6 @@
 (ns oc.web.lib.jwt
   (:require [oc.web.lib.cookies :as cook]
+            [taoensso.timbre :as timbre]
             [goog.date.DateTime :as gdt]
             [goog.date :as gd]))
 
@@ -8,7 +9,11 @@
 
 (defn decode [encoded-jwt]
   (when (exists? js/jwt_decode)
-    (js/jwt_decode encoded-jwt)))
+    (try
+      (js/jwt_decode encoded-jwt)
+      (catch js/Object e
+        (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
+        nil))))
 
 (defn get-contents []
   (some-> (jwt) decode (js->clj :keywordize-keys true)))
