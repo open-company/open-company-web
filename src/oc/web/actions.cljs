@@ -43,7 +43,8 @@
           (api/get-org org-data)
           (router/redirect-404!))
         ; If not redirect the user to the first useful org or to the create org UI
-        (and (not (utils/in? (:route @router/path) "create-org"))
+        (and (jwt/jwt)
+             (not (utils/in? (:route @router/path) "create-org"))
              (not (utils/in? (:route @router/path) "create-board")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
