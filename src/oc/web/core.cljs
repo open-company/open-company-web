@@ -70,6 +70,12 @@
 (defn pre-routing [query-params]
   ; make sure the menu is closed
   (swap! router/path {})
+  (when (and (contains? query-params :jwt)
+             (map? (js->clj (jwt/decode (:jwt query-params)))))
+    ; contains :jwt, so saving it
+    (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+  (api/get-entry-point)
+  (api/get-auth-settings)
   (if (jwt/jwt)
     (dommy/add-class! (sel1 [:body]) :small-footer)
     (dommy/remove-class! (sel1 [:body]) :small-footer))
@@ -83,8 +89,6 @@
   (router/set-route! ["home"] {})
   (when (jwt/jwt)
     ;; load data from api
-    (api/get-entry-point)
-    (api/get-auth-settings)
     (swap! dis/app-state assoc :loading true))
   ;; render component
   (drv-root home target))
@@ -96,8 +100,6 @@
   (router/set-route! ["orgs"] {})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
-  (api/get-entry-point)
-  (api/get-auth-settings)
   ;; render component
   (drv-root list-orgs target))
 
@@ -110,8 +112,6 @@
     (router/set-route! [org route] {:org org})
     ;; load data from api
     (swap! dis/app-state merge {:loading true})
-    (api/get-entry-point)
-    (api/get-auth-settings)
     ;; render component
     (drv-root component target)))
 
@@ -122,40 +122,30 @@
 ;; Handle successful and unsuccessful logins
 (defn login-handler [target params]
   (pre-routing (:query-params params))
-  (if (contains? (:query-params params) :jwt)
-    (do ; contains :jwt so auth went well
-      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-entry-point)
-      (api/get-auth-settings))
-    (do
-      (router/set-route! ["login"] {:query-params (:query-params params)})
-      (when (contains? (:query-params params) :login-redirect)
-        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-      (when (contains? (:query-params params) :access)
-        ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
-      ;; render component
-      (drv-root #(om/component (login)) target))))
+  (when-not (contains? (:query-params params) :jwt)
+    (router/set-route! ["login"] {:query-params (:query-params params)})
+    (when (contains? (:query-params params) :login-redirect)
+      (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    (when (contains? (:query-params params) :access)
+      ;login went bad, add the error message to the app-state
+      (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+    ;; render component
+    (drv-root #(om/component (login)) target)))
 
 (defn simple-handler [component route-name target params]
   (pre-routing (:query-params params))
-  (if (contains? (:query-params params) :jwt)
-    (do ; contains :jwt so auth went well
-      (cook/set-cookie! :jwt (:jwt (:query-params params)) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-entry-point)
-      (api/get-auth-settings))
-    (do
-      (when (contains? (:query-params params) :login-redirect)
-        (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-      ;; save route
-      (router/set-route! [route-name] {})
-      (when (contains? (:query-params params) :access)
-        ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
-      ; remove om component if mounted to the same node
-      (om/detach-root target)
-      ;; render component
-      (drv-root #(om/component (component)) target))))
+  (when-not (contains? (:query-params params) :jwt)
+    (when (contains? (:query-params params) :login-redirect)
+      (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    ;; save route
+    (router/set-route! [route-name] {})
+    (when (contains? (:query-params params) :access)
+      ;login went bad, add the error message to the app-state
+      (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+    ; remove om component if mounted to the same node
+    (om/detach-root target)
+    ;; render component
+    (drv-root #(om/component (component)) target)))
 
 ;; Component specific to a company
 (defn board-handler [route target component params]
@@ -176,8 +166,6 @@
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
-      (api/get-entry-point)
-      (api/get-auth-settings)
       (reset! dis/app-state (-> @dis/app-state
                                (assoc :loading true))))
     ;; render component
@@ -188,8 +176,6 @@
   (let [org (:org (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
-    (api/get-entry-point)
-    (api/get-auth-settings)
     ;; save the route
     (router/set-route! [org route] {:org org :query-params query-params})
     (when (contains? (:query-params params) :access)
