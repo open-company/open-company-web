@@ -168,10 +168,12 @@
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
              (contains? (:query-params @router/path) :token))
-        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path))))))
+        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+      (assoc db :auth-settings body))
     ; if the auth-settings call failed retry it in 2 seconds
-    (utils/after 2000 #(api/get-auth-settings)))
-  (assoc db :auth-settings body))
+    (let [auth-settings-retry (or (:auth-settings-retry db) 1000)]
+      (utils/after auth-settings-retry #(api/get-auth-settings))
+      (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
 (defmethod dispatcher/action :entry [db [_ body]]
   (if body
