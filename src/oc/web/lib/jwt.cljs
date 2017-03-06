@@ -30,4 +30,8 @@
   (let [admins (get-key :admin)]
     (some #{team-id} admins)))
 
+(defn team-has-bot? [team-id]
+  (let [slack-bots (get-key :slack-bots)]
+    (some #(= team-id (first %)) slack-bots)))
+
 (set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))
