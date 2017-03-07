@@ -65,11 +65,11 @@
                           (fn [base org-slug]
                             (when org-slug
                               (:items (get-in base (updates-list-key org-slug)))))]
-   :user-management     [[:base]
-                          (fn [base]
+   :user-management     [[:base :route]
+                          (fn [base route]
                             {:um-invite (:um-invite base)
                              :private-board-invite (:private-board-invite base)
-                             :slack-access (:slack-access base)
+                             :query-params (:query-params route)
                              :enumerate-users (:enumerate-users base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
