@@ -92,6 +92,7 @@
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "updates-list"))
+           (not (utils/in? (:route @router/path) "su-snapshot"))
            (not (utils/in? (:route @router/path) "su-snapshot-preview")))
       (cond
         ;; Redirect to the first board if only one is presnet
