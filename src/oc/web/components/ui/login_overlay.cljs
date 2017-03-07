@@ -128,11 +128,10 @@
             (= (:login-with-email-error (rum/react dis/app-state)) 401)
             [:span.small-caps.red
               "The email or password you entered is incorrect."
-              ; [:br]
-              ; "Please try again, or "
-              ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
-              ; "."
-              ]
+              [:br]
+              "Please try again, or "
+              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
+              "."]
             :else
             [:span.small-caps.red
               "System troubles logging in."
@@ -165,8 +164,8 @@
                :tabIndex 2
                :name "pswd"}]]
           [:div.group.pb3.mt3
-            ;;[:div.left.forgot-password
-            ;;  [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+            [:div.left.forgot-password
+              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
@@ -200,11 +199,10 @@
             [:span.small-caps.red
               "This email address already has an account. "
               [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :login-with-email])} "Would you like to sign in with that account?"]
-              ; [:br]
-              ; "Please try again, or "
-              ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
-              ; "."
-              ]
+              [:br]
+              "Please try again, or "
+              [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
+              "."]
             (= (:signup-with-email-error (rum/react dis/app-state)) 400)
             [:span.small-caps.red
               "An error occurred while processing your data, please check the fields and try again."]
@@ -265,8 +263,8 @@
                :tabIndex 4
                :name "pswd"}]]
           [:div.group.pb3.mt3
-            ;;[:div.left.forgot-password
-            ;;  [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
+            [:div.left.forgot-password
+              [:a {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "FORGOT PASSWORD?"]]
             [:div.right
               [:button.btn-reset.btn-solid
                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
@@ -348,22 +346,12 @@
             (small-loading))]]
       [:div.pt2.pl3.pr3.pb2.group
         (when-not (nil? (:collect-name-pswd-error (rum/react dis/app-state)))
-          (cond
-            (= (:collect-name-password-error (rum/react dis/app-state)) 409)
-            [:span.small-caps.red
-              "The email or password you entered is incorrect."
-              ; [:br]
-              ; "Please try again, or "
-              ; [:a.underline.red {:on-click #(dis/dispatch! [:show-login-overlay :password-reset])} "reset your password"]
-              ; "."
-              ]
-            :else
-            [:span.small-caps.red
-              "System troubles logging in."
-              [:br]
-              "Please try again, then "
-              [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
-              "."]))
+          [:span.small-caps.red
+            "System troubles logging in."
+            [:br]
+            "Please try again, then "
+            [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
+            "."])
         [:form.sign-in-form
           [:div.sign-in-label-container
             [:label.sign-in-label {:for "collect-name-pswd-firstname"} "YOUR NAME"]]
@@ -407,6 +395,53 @@
                               (dis/dispatch! [:collect-name-pswd]))}
                 "LET ME IN"]]]]]]])
 
+(rum/defcs collect-password < rum/reactive
+                              (merge
+                                dont-scroll
+                                {:did-mount (fn [s]
+                                              ; initialise the keys to string to avoid jumps in UI focus
+                                              (utils/after 500
+                                                 #(dis/dispatch! [:input [:collect-pswd] {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
+                                             (utils/after 100 #(.focus (sel1 [:input.pswd])))
+                                             s)})
+  [state]
+  [:div.login-overlay-container.group
+    {:on-click #(utils/event-stop %)}
+    [:div.login-overlay.collect-pswd.group
+      [:div.login-overlay-cta.pl2.pr2.group
+        [:div.sign-in-cta "Insert a New Password"
+          (when-not (:auth-settings (rum/react dis/app-state))
+            (small-loading))]]
+      [:div.pt2.pl3.pr3.pb2.group
+        (when-not (nil? (:collect-password-error (rum/react dis/app-state)))
+          [:span.small-caps.red
+            "System troubles logging in."
+            [:br]
+            "Please try again, then "
+            [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
+            "."])
+        [:form.sign-in-form
+          [:div.sign-in-label-container
+            [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
+          [:div.sign-in-field-container
+            [:input.sign-in-field.pswd
+              {:value (:pswd (:collect-pswd (rum/react dis/app-state)))
+               :id "collect-pswd-pswd"
+               :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.-value (sel1 [:input.pswd]))])
+               :pattern ".{4,}"
+               :placeholder "at least 5 characters"
+               :type "password"
+               :tabIndex 4
+               :name "pswd"}]]
+          [:div.group.my3
+            [:div.right
+              [:button.btn-reset.btn-solid
+                {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 5)
+                 :on-click #(do
+                              (utils/event-stop %)
+                              (dis/dispatch! [:collect-pswd]))}
+                "LET ME IN"]]]]]]])
+
 (rum/defcs login-overlays-handler < rum/static
                                     rum/reactive
                                     (drv/drv :show-login-overlay)
@@ -424,6 +459,9 @@
     ; form to collect name and password
     (= (drv/react s :show-login-overlay) :collect-name-password)
     (collect-name-password)
+    ; form to insert a new password
+    (= (drv/react s :show-login-overlay) :collect-password)
+    (collect-password)
     ; login via slack as default
     (or (= (drv/react s :show-login-overlay) :login-with-slack)
         (= (drv/react s :show-login-overlay) :signup-with-slack))
