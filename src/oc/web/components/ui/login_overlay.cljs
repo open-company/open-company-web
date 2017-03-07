@@ -6,6 +6,7 @@
             [goog.style :as gstyle]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-url]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as occ]
@@ -72,7 +73,7 @@
           (if @(::sign-up-slack-clicked state)
             [:div
               [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
-              (when (:slack-access (rum/react dis/app-state)) slack-error)
+              (when (:access (:query-params @router/path)) slack-error)
               [:button.btn-reset.btn-solid.login-button
                 {:on-click #(do
                               (.preventDefault %)
@@ -82,7 +83,7 @@
                 "GOT IT"]]
             [:div
               [:div.slack-disclaimer [:span.bold "Slack sign up"] " makes it " [:span.bold "easy for your teammates"] " to signup to view your OpenCompany dashboard."]
-              (when (:slack-access (rum/react dis/app-state)) slack-error)
+              (when (:access (:query-params @router/path)) slack-error)
               [:button.btn-reset.mt2.login-button.slack-button
                 {:on-click #(reset! (::sign-up-slack-clicked state) true)}
                 (str action-title " with ")
