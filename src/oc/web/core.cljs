@@ -41,6 +41,7 @@
             [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
+            [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]))
 
 (enable-console-print!)
@@ -146,12 +147,13 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         topic (:topic (:params params))
+        update-slug (:update-slug (:params params))
         query-params (:query-params params)]
     (when board
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
+    (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :update-slug update-slug :query-params query-params})
     (swap! dis/app-state dissoc :show-add-topic)
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
@@ -218,6 +220,12 @@
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (pre-routing (:query-params params))
       (drv-root email-confirmation target))
+
+    (defroute password-reset-route urls/password-reset {:as params}
+      (timbre/info "Routing password-reset-route" urls/password-reset)
+      (pre-routing (:query-params params))
+      (router/set-route! ["password-reset"] {:query-params (:query-params params)})
+      (drv-root password-reset target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Rounting confirm-invitation-route" urls/confirm-invitation)
@@ -394,6 +402,7 @@
                                  org-create-route
                                  email-confirmation-route
                                  confirm-invitation-route
+                                 password-reset-route
                                  ;  ; subscription-callback-route
                                  home-page-route
                                  user-profile-route

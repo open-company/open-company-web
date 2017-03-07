@@ -453,6 +453,28 @@
               :else
               (dispatcher/dispatch! [:login-with-email/failed 500]))))))))
 
+(defn auth-with-token [token]
+  (when token
+    (let [token-links (:links (:auth-settings @dispatcher/app-state))
+          auth-url (utils/link-for token-links "authenticate" "GET" {:auth-source "email"})]
+      (auth-get (:href auth-url)
+        {:headers (merge (headers-for-link auth-url)
+                   {; required by Chrome
+                    "Access-Control-Allow-Headers" "Content-Type, Authorization"
+                    "Authorization" (str "Bearer " token)})}
+        (fn [{:keys [success body status]}]
+         (if success
+            (do
+              (update-jwt-cookie! body)
+              (cook/set-cookie! :show-login-overlay "collect-password")
+              (dispatcher/dispatch! [:jwt (j/get-contents)])
+              (dispatcher/dispatch! [:auth-with-token/success body]))
+            (cond
+              (= status 401)
+              (dispatcher/dispatch! [:auth-with-token/failed 401])
+              :else
+              (dispatcher/dispatch! [:auth-with-token/failed 500]))))))))
+
 (defn signup-with-email [first-name last-name email pswd]
   (when (and first-name last-name email pswd)
     (let [email-links (:links (:auth-settings @dispatcher/app-state))
@@ -544,6 +566,18 @@
           (when success
             (dispatcher/dispatch! [:user-data (json->cljs body)]))
           (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
+
+(defn collect-password [pswd]
+  (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
+    (when (and pswd update-link)
+      (auth-patch (:href update-link)
+        {:json-params {
+          :password pswd}
+         :headers (headers-for-link update-link)}
+        (fn [{:keys [status body success]}]
+          (when success
+            (dispatcher/dispatch! [:user-data (json->cljs body)]))
+          (utils/after 100 #(dispatcher/dispatch! [:collect-pswd-finish status])))))))
 
 (defn delete-entry [topic entry-data should-redirect-to-board]
   (when (and topic entry-data)
@@ -787,7 +821,7 @@
   [email]
   (when email
     (when-let [reset-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "reset")]
-      (api-post (:href reset-link)
+      (auth-post (:href reset-link)
         {:headers (headers-for-link reset-link)
          :body email}
         (fn [{:keys [status success body]}]

@@ -37,6 +37,8 @@
 
 (def confirm-invitation "/invite")
 
+(def password-reset "/reset")
+
 ;; User
 
 (def user-profile "/profile")

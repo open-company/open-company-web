@@ -92,6 +92,7 @@
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "updates-list"))
+           (not (utils/in? (:route @router/path) "su-snapshot"))
            (not (utils/in? (:route @router/path) "su-snapshot-preview")))
       (cond
         ;; Redirect to the first board if only one is presnet
@@ -480,7 +481,8 @@
                   (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
                   db)]
     (when (and (cook/get-cookie :show-login-overlay)
-               (not= (cook/get-cookie :show-login-overlay) "collect-name-password"))
+               (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
+               (not= (cook/get-cookie :show-login-overlay) "collect-password"))
       (cook/remove-cookie! :show-login-overlay))
     (assoc next-db :jwt (jwt/get-contents))))
 
@@ -548,6 +550,20 @@
   [db [_ jwt]]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
   (.reload js/location)
+  db)
+
+(defmethod dispatcher/action :auth-with-token
+  [db]
+  (api/auth-with-token (:token (:query-params @router/path)))
+  db)
+
+(defmethod dispatcher/action :auth-with-token/failed
+  [db [_ error]]
+  (assoc db :collect-pswd-error error))
+
+(defmethod dispatcher/action :auth-with-token/success
+  [db [_ jwt]]
+  (router/redirect! oc-urls/home)
   db)
 
 (defmethod dispatcher/action :signup-with-email-change
@@ -693,6 +709,21 @@
       (cook/remove-cookie! :show-login-overlay)
       (dissoc db :show-login-overlay))
     (assoc db :collect-name-password-error status)))
+
+(defmethod dispatcher/action :collect-pswd
+  [db [_]]
+  (let [form-data (:collect-pswd db)]
+    (api/collect-password (:pswd form-data)))
+  db)
+
+(defmethod dispatcher/action :collect-pswd-finish
+  [db [_ status]]
+  (if (and (>= status 200)
+           (<= status 299))
+    (do
+      (cook/remove-cookie! :show-login-overlay)
+      (dissoc db :show-login-overlay))
+    (assoc db :collect-password-error status)))
 
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
