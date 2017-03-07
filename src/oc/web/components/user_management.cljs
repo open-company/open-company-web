@@ -36,7 +36,7 @@
                                                                                  :domain ""}]))
                                           s)}
   [s]
-  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error] :as user-man} (drv/react s :user-management)
+  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error query-params] :as user-man} (drv/react s :user-management)
         ro-user-man @(drv/get-ref s :user-management)
         org-data @(drv/get-ref s :org-data)
         user-type (:user-type um-invite)
@@ -114,15 +114,15 @@
                 "Add "
                 [:span.slack "Slack"]
                 " Team"]
-            (when (and (contains? user-man :slack-access)
-                       (not (empty? (:slack-access user-man))))
+            (when (and (contains? query-params :access)
+                       (not (empty? (:access query-params))))
               [:div
                 (cond
-                  (= (:slack-access user-man) "team-exists")
+                  (= (:access query-params) "team-exists")
                   [:span.small-caps.red.mt1.left "This team was already added."]
-                  (= (:slack-access user-man) "failed")
+                  (= (:access query-params) "false")
                   [:span.small-caps.red.mt1.left "An error occurred, please try again."]
-                  (= (:slack-access user-man) "bot-added")
+                  (= (:access query-params) "bot")
                   [:span.small-caps.green.mt1.left "Bot successfully added."]
                   :else
                   [:span.small-caps.green.mt1.left "Team successfully added."])])]])
