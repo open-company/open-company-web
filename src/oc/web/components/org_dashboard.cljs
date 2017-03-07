@@ -199,6 +199,7 @@
                                   :is-dashboard (not (router/current-topic-slug))}))
               (if (and (not (cook/get-cookie :bot-access-requested))
                        (jwt/is-slack-org?)
+                       (not (jwt/team-has-bot? (:team-id org-data)))
                        (not hide-prompt-add-bot))
                 (bot-access-prompt #(do
                                       (cook/set-cookie! :bot-access-requested true (* 60 60 24 30))

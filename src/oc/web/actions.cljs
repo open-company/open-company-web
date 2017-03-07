@@ -43,7 +43,8 @@
           (api/get-org org-data)
           (router/redirect-404!))
         ; If not redirect the user to the first useful org or to the create org UI
-        (and (not (utils/in? (:route @router/path) "create-org"))
+        (and (jwt/jwt)
+             (not (utils/in? (:route @router/path) "create-org"))
              (not (utils/in? (:route @router/path) "create-board")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
@@ -168,10 +169,12 @@
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
              (contains? (:query-params @router/path) :token))
-        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path))))))
+        (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+      (assoc db :auth-settings body))
     ; if the auth-settings call failed retry it in 2 seconds
-    (utils/after 2000 #(api/get-auth-settings)))
-  (assoc db :auth-settings body))
+    (let [auth-settings-retry (or (:auth-settings-retry db) 1000)]
+      (utils/after auth-settings-retry #(api/get-auth-settings))
+      (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
 (defmethod dispatcher/action :entry [db [_ body]]
   (if body
@@ -523,7 +526,7 @@
         team-id (:team-id org-data)
         team (get (:enumerate-users db) team-id)
         auth-link (utils/link-for (:links team) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) team-id (:slug org-data))]
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) team-id (oc-urls/org (:slug org-data)))]
     (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
     (router/redirect! fixed-auth-url))
   db)
@@ -837,7 +840,7 @@
         team-id (:team-id org-data)
         team-data (get teams-data (:team-id org-data))
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) team-id (:slug org-data))]
+        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) team-id (oc-urls/org-team-settings (:slug org-data)))]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link)))
   db)

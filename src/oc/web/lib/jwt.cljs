@@ -1,5 +1,6 @@
 (ns oc.web.lib.jwt
   (:require [oc.web.lib.cookies :as cook]
+            [taoensso.timbre :as timbre]
             [goog.date.DateTime :as gdt]
             [goog.date :as gd]))
 
@@ -8,7 +9,11 @@
 
 (defn decode [encoded-jwt]
   (when (exists? js/jwt_decode)
-    (js/jwt_decode encoded-jwt)))
+    (try
+      (js/jwt_decode encoded-jwt)
+      (catch js/Object e
+        (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
+        nil))))
 
 (defn get-contents []
   (some-> (jwt) decode (js->clj :keywordize-keys true)))
@@ -29,5 +34,13 @@
 (defn is-admin? [team-id]
   (let [admins (get-key :admin)]
     (some #{team-id} admins)))
+
+(defn team-has-bot? [team-id]
+  (let [slack-bots (get-key :slack-bots)]
+    ;; Since the team-id is a string on clj side the key in slakc-bots has quotes around that are
+    ;; interpreted as part of the key from the JSON parser.
+    ;; When decode keywordize the keys it keeps them in the key so we need to add them to check
+    ;; for the team value
+    (some #(= (keyword (str "\"" team-id "\"")) (first %)) slack-bots)))
 
 (set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))
