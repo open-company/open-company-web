@@ -684,11 +684,6 @@
   (api/get-teams)
   db)
 
-(defmethod dispatcher/action :confirm-invitation
-  [db [_]]
-  (api/confirm-invitation (:token (:query-params @router/path)))
-  (dissoc db :email-confirmed))
-
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
   (when (= status 201)
