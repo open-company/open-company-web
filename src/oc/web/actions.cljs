@@ -170,7 +170,7 @@
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
              (contains? (:query-params @router/path) :token)
-             (contains? db :email-confirmed))
+             (not (contains? db :email-confirmed)))
         (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
       (assoc db :auth-settings body))
     ; if the auth-settings call failed retry it in 2 seconds
