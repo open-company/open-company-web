@@ -169,7 +169,8 @@
         (utils/after 100 #(api/get-teams true))
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
-             (contains? (:query-params @router/path) :token))
+             (contains? (:query-params @router/path) :token)
+             (contains? db :email-confirmed))
         (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
       (assoc db :auth-settings body))
     ; if the auth-settings call failed retry it in 2 seconds
@@ -683,11 +684,6 @@
   ; refresh the list of users once the invitation action complete
   (api/get-teams)
   db)
-
-(defmethod dispatcher/action :confirm-invitation
-  [db [_]]
-  (api/confirm-invitation (:token (:query-params @router/path)))
-  (dissoc db :email-confirmed))
 
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
