@@ -86,7 +86,7 @@
 (defn home-handler [target params]
   (pre-routing (:query-params params))
   ;; save route
-  (router/set-route! ["home"] {})
+  (router/set-route! ["home"] {:query-params (:query-params params)})
   (when (jwt/jwt)
     ;; load data from api
     (swap! dis/app-state assoc :loading true))
@@ -97,7 +97,7 @@
 (defn list-orgs-handler [target params]
   (pre-routing (:query-params params))
   ;; save route
-  (router/set-route! ["orgs"] {})
+  (router/set-route! ["orgs"] {:query-params (:query-params params)})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
   ;; render component
@@ -109,7 +109,7 @@
         query-params (:query-params params)]
     (pre-routing query-params)
     ;; save route
-    (router/set-route! [org route] {:org org})
+    (router/set-route! [org route] {:org org :query-params (:query-params params)})
     ;; load data from api
     (swap! dis/app-state merge {:loading true})
     ;; render component
@@ -126,9 +126,6 @@
     (router/set-route! ["login"] {:query-params (:query-params params)})
     (when (contains? (:query-params params) :login-redirect)
       (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    (when (contains? (:query-params params) :access)
-      ;login went bad, add the error message to the app-state
-      (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     ;; render component
     (drv-root #(om/component (login)) target)))
 
@@ -138,10 +135,7 @@
     (when (contains? (:query-params params) :login-redirect)
       (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
     ;; save route
-    (router/set-route! [route-name] {})
-    (when (contains? (:query-params params) :access)
-      ;login went bad, add the error message to the app-state
-      (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
+    (router/set-route! [route-name] {:query-params (:query-params params)})
     ; remove om component if mounted to the same node
     (om/detach-root target)
     ;; render component
@@ -158,9 +152,6 @@
     (pre-routing query-params)
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :query-params query-params})
-    (when (contains? (:query-params params) :access)
-        ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     (swap! dis/app-state dissoc :show-add-topic)
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
@@ -178,9 +169,6 @@
     (pre-routing query-params)
     ;; save the route
     (router/set-route! [org route] {:org org :query-params query-params})
-    (when (contains? (:query-params params) :access)
-        ;login went bad, add the error message to the app-state
-        (swap! dis/app-state assoc :slack-access (:access (:query-params params))))
     ;; render component
     (drv-root component target)))
 
@@ -336,7 +324,7 @@
       (swap! dis/app-state assoc :loading true)
       (api/get-entry-point)
       (api/get-auth-settings)
-      (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params))})
+      (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
       (if (jwt/jwt)
         (drv-root mobile-boards-list target)
         (oc-wall-handler "Please sign in to access this organization." target params)))
