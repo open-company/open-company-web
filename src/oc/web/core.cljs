@@ -275,6 +275,7 @@
       (timbre/info "Rounting logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :login-redirect)
+      (cook/remove-cookie! :show-login-overlay)
       (router/redirect! urls/home))
 
     (defroute org-page-route (urls/org ":org") {:as params}
