@@ -6,7 +6,8 @@
     [tolitius/boot-check "0.1.4" :scope "test"]
 
     [org.clojure/clojure "1.9.0-alpha14"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.9.495"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    ;; NB: do not update to 1.9.493+ since it's broken w/ advanced compilation
+    [org.clojure/clojurescript "1.9.473"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     [org.omcljs/om "1.0.0-alpha48" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
 
