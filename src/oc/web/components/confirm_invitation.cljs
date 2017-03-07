@@ -45,11 +45,7 @@
           (when confirmed
             (dom/button {:class "btn-reset btn-solid confirm-invitation-get-started"
                          :disabled loading
-                         :on-click #(if-not confirmed
-                                      (do
-                                        (om/set-state! owner :loading true)
-                                        (dis/dispatch! [:confirm-invitation]))
-                                      (router/redirect! oc-urls/home))}
+                         :on-click #(router/redirect! oc-urls/home)}
               (if loading
                 (small-loading)
                 "OK! LET’S GET STARTED →"))))
