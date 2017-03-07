@@ -41,6 +41,7 @@
             [oc.web.components.create-update :refer (create-update)]
             [oc.web.components.su-snapshot :refer (su-snapshot)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
+            [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]))
 
 (enable-console-print!)
@@ -219,6 +220,12 @@
       (pre-routing (:query-params params))
       (drv-root email-confirmation target))
 
+    (defroute password-reset-route urls/password-reset {:as params}
+      (timbre/info "Routing password-reset-route" urls/password-reset)
+      (pre-routing (:query-params params))
+      (router/set-route! ["password-reset"] {:query-params (:query-params params)})
+      (drv-root password-reset target))
+
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Rounting confirm-invitation-route" urls/confirm-invitation)
       (when (jwt/jwt)
@@ -394,6 +401,7 @@
                                  org-create-route
                                  email-confirmation-route
                                  confirm-invitation-route
+                                 password-reset-route
                                  ;  ; subscription-callback-route
                                  home-page-route
                                  user-profile-route
