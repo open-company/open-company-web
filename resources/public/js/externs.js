@@ -65,3 +65,8 @@ var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
 var OCWebPrintUpdatesListData = function(){};
 var OCWebPrintUpdateData = function(){};
+// Filestack
+var filestack = {};
+filestack.init = function(){};
+filestack.pick = function(){};
+filestack.then = function(){};
