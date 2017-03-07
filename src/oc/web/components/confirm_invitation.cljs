@@ -18,10 +18,7 @@
      :confirmed false})
 
   (did-mount [_]
-    (if (contains? (:query-params @router/path) :token)
-      ; start loading the auth settings,
-      ; then the token will be automatically exchanged
-      (dis/dispatch! [:get-auth-settings])
+    (when-not (contains? (:query-params @router/path) :token)
       ; if the token is not present show an error message
       (om/update-state! owner #(merge % {:loading false
                                          :confirmed false}))))
