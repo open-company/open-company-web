@@ -1,5 +1,6 @@
 (ns oc.web.components.user-management
   (:require [rum.core :as rum]
+            [dommy.core :refer-macros (sel1)]
             [om.core :as om :include-macros true]
             [om-tools.dom :as dom :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
@@ -15,7 +16,8 @@
             [oc.web.components.ui.footer :as footer]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.user-type-picker :refer (user-type-picker)]
-            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]))
+            [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
+            [goog.fx.dom :refer (Fade)]))
 
 (rum/defcs user-management < rum/reactive
                              (drv/drv :user-management)
@@ -30,6 +32,10 @@
                                                   (dis/dispatch! [:input [:um-invite :user-type] :viewer]))
                                                s)
                              :did-mount (fn [s]
+                                          (when (not (empty? (:access (:query-params @router/path))))
+                                            (utils/after 5000
+                                             #(let [fade-animation (new Fade (sel1 [:div#result-message]) 1 0 utils/oc-animation-duration)]
+                                               (.play fade-animation))))
                                           (when-not (utils/is-test-env?)
                                             (dis/dispatch! [:input [:um-invite] {:email ""
                                                                                  :user-type nil
@@ -111,23 +117,23 @@
                    :data-container "body"}
                   [:i.fa.fa-trash]]])]
           [:div.group
-            [:button.btn-reset.mt2.add-slack-team.slack-button
-                {:on-click #(dis/dispatch! [:add-slack-team])}
-                "Add "
-                [:span.slack "Slack"]
-                " Team"]
-            (when (and (contains? query-params :access)
-                       (not (empty? (:access query-params))))
-              [:div
+            (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+              [:button.btn-reset.mt2.add-slack-team.slack-button
+                  {:on-click #(dis/dispatch! [:add-slack-team])}
+                  "Add "
+                  [:span.slack "Slack"]
+                  " Team"])
+            (when (not (empty? (:access query-params)))
+              [:div#result-message
                 (cond
                   (= (:access query-params) "team-exists")
                   [:span.small-caps.red.mt1.left "This team was already added."]
-                  (= (:access query-params) "false")
-                  [:span.small-caps.red.mt1.left "An error occurred, please try again."]
+                  (= (:access query-params) "team")
+                  [:span.small-caps.green.mt1.left "Team successfully added."]
                   (= (:access query-params) "bot")
                   [:span.small-caps.green.mt1.left "Bot successfully added."]
                   :else
-                  [:span.small-caps.green.mt1.left "Team successfully added."])])]])
+                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
