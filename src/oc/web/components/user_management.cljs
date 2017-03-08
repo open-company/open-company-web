@@ -19,6 +19,7 @@
 
 (rum/defcs user-management < rum/reactive
                              (drv/drv :user-management)
+                             (drv/drv :current-user-data)
                              (drv/drv :org-data)
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)
@@ -40,6 +41,7 @@
         ro-user-man @(drv/get-ref s :user-management)
         org-data @(drv/get-ref s :org-data)
         user-type (:user-type um-invite)
+        cur-user-data @(drv/get-ref s :current-user-data)
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
@@ -93,7 +95,7 @@
                 [:span (:name team)]
                 (when-not (contains? (jwt/get-key :bot) team-id)
                   (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
-                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) team-id (oc-urls/org-team-settings (:slug org-data)))]
+                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
                       [:button.btn-reset
                         {:on-click #(router/redirect! fixed-add-bot-link)
                          :title "Add Slack bot to this team"
