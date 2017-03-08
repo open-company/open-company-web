@@ -122,8 +122,10 @@
     )
 
   (will-update [_ next-props _]
-    (let [org-data (dis/org-data next-props)]
-      (om/set-state! owner :hide-prompt-add-bot (cook/get-cookie (bot-access-requested-cookie (:slug org-data))))))
+    (let [org-data (dis/org-data next-props)
+          next-hide-prompt-add-bot (cook/get-cookie (bot-access-requested-cookie (:slug org-data)))]
+      (when (not= (om/get-state owner :hide-prompt-add-bot) next-hide-prompt-add-bot)
+        (om/set-state! owner :hide-prompt-add-bot next-hide-prompt-add-bot))))
 
   ; (did-update [_ prev-props prev-state]
   ;   (let [board-data (dis/board-data data)]
