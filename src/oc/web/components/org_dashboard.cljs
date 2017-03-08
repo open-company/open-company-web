@@ -69,6 +69,9 @@
   (when (not (router/current-topic-slug))
     (api/get-board (dis/board-data))))
 
+(defn bot-access-requested-cookie [org-slug]
+  (str org-slug "-bot-access-requested"))
+
 (defcomponent org-dashboard [data owner]
 
   (init-state [_]
@@ -79,7 +82,7 @@
      :share-tooltip-dismissed false
      :add-second-topic-tt-shown false
      :new-topics-requested false
-     :hide-prompt-add-bot (cook/get-cookie :bot-access-requested)
+     :hide-prompt-add-bot (cook/get-cookie (bot-access-requested-cookie (:slug (dis/org-data data))))
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    (responsive/calc-card-width))
@@ -117,6 +120,10 @@
     ;   (t/hide (str add-second-topic-tt-prefix (:slug board-data)))
     ;   (t/hide (share-tooltip-id (:slug board-data))))
     )
+
+  (will-update [_ next-props _]
+    (let [org-data (dis/org-data next-props)]
+      (om/set-state! owner :hide-prompt-add-bot (cook/get-cookie (bot-access-requested-cookie (:slug org-data))))))
 
   ; (did-update [_ prev-props prev-state]
   ;   (let [board-data (dis/board-data data)]
@@ -197,12 +204,12 @@
                                   :show-navigation-bar (utils/company-has-topics? board-data)
                                   :is-topic-view (router/current-topic-slug)
                                   :is-dashboard (not (router/current-topic-slug))}))
-              (if (and (not (cook/get-cookie :bot-access-requested))
+              (if (and (not (cook/get-cookie (bot-access-requested-cookie (:slug org-data))))
                        (jwt/is-slack-org?)
                        (not (jwt/team-has-bot? (:team-id org-data)))
                        (not hide-prompt-add-bot))
                 (bot-access-prompt #(do
-                                      (cook/set-cookie! :bot-access-requested true (* 60 60 24 30))
+                                      (cook/set-cookie! (bot-access-requested-cookie (:slug org-data)) true (* 60 60 24 30))
                                       (om/set-state! owner :hide-prompt-add-bot true)))
                 (if (:show-welcome-screen data)
                   (welcome-screen)
