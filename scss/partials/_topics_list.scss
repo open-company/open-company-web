@@ -32,9 +32,12 @@ div.org-dashboard.selected-topic-view.mobile-or-tablet {
   }
 }
 
+div.org-dashboard:not(.dashboard-sharing) div.topic-list{
+  min-height: calc(100vh - #{$footer_height}px);
+}
+
 div.topic-list{
   padding-bottom: 20px;
-  min-height: calc(100vh - #{$footer_height}px);
   background-color: $oc_gray_8;
 
   @include big_web(){
