@@ -172,17 +172,15 @@
                           (let [fade-animation (new Fade (sel1 [:div#board-settings-save-successful]) 1 0 utils/oc-animation-duration)]
                             (doto fade-animation
                               (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
-                              (.play))))))
-    (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
+                              (.play)))))
+      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)}))))
 
   (did-mount [_]
     (when (and (not (utils/is-test-env?))
                (not (responsive/is-tablet-or-mobile?)))
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
-  (render-state [_ {board-slug :board-slug board-name :board-name
-                    access :access loading :loading
-                    has-changes :has-changes show-save-successful :show-save-successful}]
+  (render-state [_ {:keys [board-slug board-name access loading has-changes show-save-successful]}]
     (let [org-data (dis/org-data data)
           board-data (dis/board-data)]
       (utils/update-page-title (str "OpenCompany - " (:name org-data) " " board-name " settings"))
