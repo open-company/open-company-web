@@ -68,7 +68,13 @@
   (let [target (sel1 [:div#oc-loading])]
     (drv-root loading target)))
 
-(defn pre-routing [query-params]
+(defn rewrite-url []
+  (let [l (.-location js/window)
+        rewrite-to (str (.-pathname l) (.-hash l))]
+    (js/console.log "oc.web.core/rewrite-url" (.-href l) "->" rewrite-to)
+    (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to)))
+
+(defn pre-routing [query-params & [should-rewrite-url]]
   ; make sure the menu is closed
   (swap! router/path {})
   (when (and (contains? query-params :jwt)
@@ -81,6 +87,8 @@
     (dommy/add-class! (sel1 [:body]) :small-footer)
     (dommy/remove-class! (sel1 [:body]) :small-footer))
   (check-get-params query-params)
+  (when should-rewrite-url
+    (rewrite-url))
   (inject-loading))
 
 ;; home
@@ -168,7 +176,7 @@
 (defn team-handler [route target component params]
   (let [org (:org (:params params))
         query-params (:query-params params)]
-    (pre-routing query-params)
+    (pre-routing query-params true)
     ;; save the route
     (router/set-route! [org route] {:org org :query-params query-params})
     ;; render component
