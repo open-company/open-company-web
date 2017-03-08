@@ -487,7 +487,10 @@
                          :data-container "body"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(.click (sel1 [:input#foce-file-upload-ui--select-trigger]))}
+                         :on-click (fn [e]
+                                      (.click (sel1 [:input#foce-file-upload-ui--select-trigger]))
+                                      (.blur (.-target e))
+                                      (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")))}
                 (dom/i {:class "fa fa-camera"})))
 
             ;; Topic chart button
