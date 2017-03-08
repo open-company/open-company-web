@@ -479,10 +479,13 @@
                          :data-container "body"
                          :data-placement "top"
                          :style {:display (if (nil? file-upload-state) "block" "none")}
-                         :on-click #(iu/upload!
+                         :on-click (fn [e]
+                                    (.blur (.-target e))
+                                    (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
+                                    (iu/upload!
                                      (partial img-upload-success-cb owner)
                                      (partial img-upload-progress-cb owner)
-                                     (partial img-upload-error-cb owner))}
+                                     (partial img-upload-error-cb owner)))}
                 (dom/i {:class "fa fa-camera"})))
 
             ;; Topic chart button

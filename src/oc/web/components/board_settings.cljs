@@ -172,17 +172,15 @@
                           (let [fade-animation (new Fade (sel1 [:div#board-settings-save-successful]) 1 0 utils/oc-animation-duration)]
                             (doto fade-animation
                               (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
-                              (.play))))))
-    (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
+                              (.play)))))
+      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)}))))
 
   (did-mount [_]
     (when (and (not (utils/is-test-env?))
                (not (responsive/is-tablet-or-mobile?)))
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
-  (render-state [_ {board-slug :board-slug board-name :board-name
-                    access :access loading :loading
-                    has-changes :has-changes show-save-successful :show-save-successful}]
+  (render-state [_ {:keys [board-slug board-name access loading has-changes show-save-successful]}]
     (let [org-data (dis/org-data data)
           board-data (dis/board-data)]
       (utils/update-page-title (str "OpenCompany - " (:name org-data) " " board-name " settings"))
@@ -255,15 +253,16 @@
                   (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designed authors can edit and share.")))
               ;; Private
               (when (or (= access "team") (= access "private"))
-                (dom/div {:class "visibility-value highlightable invite-only-board group ml2"
+                (dom/div {:class "visibility-value invite-only-board group ml2"
                           :on-click #(do
                                       (om/set-state! owner :loading true)
                                       (api/patch-board {:slug (:slug board-data)
                                                         :access "private"}))}
-                  (dom/h3 {} "Invite-Only"
-                    (when (= access "private")
-                      (dom/i {:class "ml1 fa fa-check-square-o"})))
-                  (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board.")
+                  (dom/div {:class "invite-only highlightable"}
+                    (dom/h3 {} "Invite-Only"
+                      (when (= access "private")
+                        (dom/i {:class "ml1 fa fa-check-square-o"})))
+                    (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board."))
                   (when (= access "private")
                     (private-board-setup))))))
 

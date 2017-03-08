@@ -42,9 +42,18 @@
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
           (api/get-org org-data)
           (router/redirect-404!))
+        ; In password reset flow, when the token is exchanged and the user is authed
+        ; i reload the entry point to get the list of orgs
+        ; and redirect the user to its first organization
+        ; if he has no orgs to the user profile page
+        (and (utils/in? (:route @router/path) "password-reset")
+             (:password-reset-redirect db))
+        (let [first-org (first orgs)]
+          (router/redirect! (if first-org (oc-urls/org (:slug first-org)) oc-urls/user-profile)))
         ; If not redirect the user to the first useful org or to the create org UI
         (and (jwt/jwt)
              (not (utils/in? (:route @router/path) "create-org"))
+             (not (utils/in? (:route @router/path) "user-profile"))
              (not (utils/in? (:route @router/path) "create-board")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
@@ -565,8 +574,8 @@
 
 (defmethod dispatcher/action :auth-with-token/success
   [db [_ jwt]]
-  (router/redirect! oc-urls/home)
-  db)
+  (api/get-entry-point)
+  (assoc db :password-reset-redirect true))
 
 (defmethod dispatcher/action :signup-with-email-change
   [db [_ k v]]

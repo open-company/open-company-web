@@ -295,6 +295,7 @@
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
+      (router/set-route! ["user-profile"] {:query-prams (:query-params params)})
       (if (jwt/jwt)
         (if (jwt/is-slack-org?)
           (drv-root #(om/component (user-profile)) target)

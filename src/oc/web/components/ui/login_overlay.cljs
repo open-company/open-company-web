@@ -409,7 +409,7 @@
     {:on-click #(utils/event-stop %)}
     [:div.login-overlay.collect-pswd.group
       [:div.login-overlay-cta.pl2.pr2.group
-        [:div.sign-in-cta "Insert a New Password"
+        [:div.sign-in-cta "Enter your new password"
           (when-not (:auth-settings (rum/react dis/app-state))
             (small-loading))]]
       [:div.pt2.pl3.pr3.pb2.group
