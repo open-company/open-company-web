@@ -27,7 +27,7 @@
           mobile?      (responsive/is-tablet-or-mobile?)
           fixed-card-width (responsive/calc-update-width (responsive/columns-num))
           title        (if (clojure.string/blank? (:title su-data))
-                          (str (:name org-data) " Update")
+                          (str (:org-name su-data) " Update")
                           (:title su-data))
           card-width   (responsive/calc-card-width)]
       (dom/div {:class (utils/class-set {:su-snapshot true
