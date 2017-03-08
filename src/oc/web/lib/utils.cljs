@@ -859,4 +859,4 @@
       user-name)))
 
 (defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace original-url team-id (str user-id ":" team-id ":" redirect)))
+  (clojure.string/replace original-url team-id (str team-id ":" user-id ":" redirect)))
