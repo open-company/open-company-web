@@ -41,7 +41,8 @@
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
           (api/get-org org-data)
-          (router/redirect-404!))
+          (when (not (utils/in? (:route @router/path) "su-snapshot"))
+            (router/redirect-404!)))
         ; In password reset flow, when the token is exchanged and the user is authed
         ; i reload the entry point to get the list of orgs
         ; and redirect the user to its first organization
