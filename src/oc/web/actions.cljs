@@ -45,6 +45,7 @@
         ; If not redirect the user to the first useful org or to the create org UI
         (and (jwt/jwt)
              (not (utils/in? (:route @router/path) "create-org"))
+             (not (utils/in? (:route @router/path) "user-profile"))
              (not (utils/in? (:route @router/path) "create-board")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
