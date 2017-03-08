@@ -42,8 +42,8 @@ div.main-board-settings {
             color: white;
             border-radius: 4px;
 
-            h3, i, p {
-              color: white;
+            h3, i, p, th, tr, td {
+              color: white !important;
             }
           }
 
@@ -82,6 +82,7 @@ div.main-board-settings {
 
                 table {
                   width: 100%;
+                  color: $oc_gray_5;
 
                   thead:first-child {
                     border-bottom: 1px solid rgba(78, 90, 107, 0.5);
@@ -91,7 +92,7 @@ div.main-board-settings {
                     padding: 0 0.4rem;
                   }
 
-                  tr th {
+                  th {
                     font-size: 14px;
                     font-family: $oc_headers_font;
                     color: rgba(78, 90, 107, 0.5);
@@ -100,7 +101,6 @@ div.main-board-settings {
 
                   tr td:first-child {
                     padding-left: 1rem;
-                    color: $oc_gray_5;
                     font-size: 14px;
                   }
 
@@ -109,7 +109,6 @@ div.main-board-settings {
                     font-size: 14px;
                     font-weight: 300;
                     letter-spacing: 1.2px;
-                    color: $oc_gray_5;
                   }
                 }
               }

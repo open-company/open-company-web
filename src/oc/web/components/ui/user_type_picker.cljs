@@ -38,11 +38,13 @@
              :on-click #(click-cb :admin)}
             [:i.fa.fa-gear] " Admin"])]]))
 
-(defn show-team-disclaimer-popover [e]
+(defn show-team-disclaimer-popover [e & [hide-admin]]
   (.stopPropagation e)
-  (add-popover-with-rum-component team-disclaimer-popover {:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
+  (js/console.log "show-team-disclaimer-popover" hide-admin)
+  (add-popover-with-rum-component team-disclaimer-popover {;:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
+                                                           :hide-admin hide-admin
                                                            :width 422
-                                                           :height 230
+                                                           :height (if hide-admin 170 230)
                                                            :hide-on-click-out true
                                                            :z-index-popover 0
                                                            :container-id "team-disclaimer-popover"}))

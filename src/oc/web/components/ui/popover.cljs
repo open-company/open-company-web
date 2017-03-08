@@ -65,7 +65,7 @@
                      (fn []
                        ; render the popover component
                        (ru/drv-root {:state dis/app-state
-                                     :component #(om/component (component {:hide-popover-cb (fn [] (hide-popover nil container-id))}))
+                                     :component #(om/component (component (merge data {:hide-popover-cb (fn [] (hide-popover nil container-id))})))
                                      :drv-spec (dis/drv-spec dis/app-state router/path)
                                      :target (sel1 (str "#" container-id))})
                        (.addClass body "no-scroll")
@@ -129,7 +129,7 @@
     (assert-param success-title string? "popover success-title is not a string")
     (assert-param success-cb fn? "popover success-cb is not a function")
     (assert-param z-index-offset number? "z-index-offset must be a number")
-
+    (js/console.log "popover/render" height)
     (let [style {}
           w-style (if width
                     (assoc style :width width)
