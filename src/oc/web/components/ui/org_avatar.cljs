@@ -36,7 +36,6 @@
                   :style {:cursor (if should-show-link "pointer" "default")}
                   :on-click (fn [e]
                               (.preventDefault e)
-                              (dis/dispatch! [:show-add-topic false])
                               (dis/dispatch! [:dashboard-share-mode false])
                               (when should-show-link
                                 (router/nav! avatar-link)))}
