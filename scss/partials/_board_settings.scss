@@ -33,19 +33,24 @@ div.main-board-settings {
       div.settings-form-input.visibility {
         margin-bottom: 2rem;
 
+        div.invite-only {
+          padding: 0.5rem 0.2rem;
+          margin-left: -0.2rem;
+        }
+
+        div.highlightable:hover {
+          background-color: $oc_blue_dark;
+          color: white;
+          border-radius: 4px;
+
+          h3, i, p {
+            color: white !important;
+          }
+        }
+
         div.visibility-value {
           cursor: pointer;
           padding: 0.5rem 0.2rem;
-
-          &.highlightable:hover {
-            background-color: $oc_blue_dark;
-            color: white;
-            border-radius: 4px;
-
-            h3, i, p, th, tr, td {
-              color: white !important;
-            }
-          }
 
           h3 {
             font-size: 14px;
@@ -86,6 +91,17 @@ div.main-board-settings {
 
                   thead:first-child {
                     border-bottom: 1px solid rgba(78, 90, 107, 0.5);
+                  }
+
+                  tr:hover {
+                    td {
+                      background-color: $oc_blue_dark;
+                      color: white;
+
+                      div button.user-type-btn:after {
+                        color: white;
+                      }
+                    }
                   }
 
                   tr th, tr td {

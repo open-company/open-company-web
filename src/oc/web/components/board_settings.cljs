@@ -255,15 +255,16 @@
                   (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designed authors can edit and share.")))
               ;; Private
               (when (or (= access "team") (= access "private"))
-                (dom/div {:class "visibility-value highlightable invite-only-board group ml2"
+                (dom/div {:class "visibility-value invite-only-board group ml2"
                           :on-click #(do
                                       (om/set-state! owner :loading true)
                                       (api/patch-board {:slug (:slug board-data)
                                                         :access "private"}))}
-                  (dom/h3 {} "Invite-Only"
-                    (when (= access "private")
-                      (dom/i {:class "ml1 fa fa-check-square-o"})))
-                  (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board.")
+                  (dom/div {:class "invite-only highlightable"}
+                    (dom/h3 {} "Invite-Only"
+                      (when (= access "private")
+                        (dom/i {:class "ml1 fa fa-check-square-o"})))
+                    (dom/p {:class (str (when (= access "private") "bold"))} "Only invited team members can view, edit and share this board."))
                   (when (= access "private")
                     (private-board-setup))))))
 
