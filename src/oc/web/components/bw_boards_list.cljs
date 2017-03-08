@@ -54,7 +54,6 @@
                 (or (:name board) (:slug board)))))
           (when-not (nil? (:create-board data))
             (dom/div {:class "left-boards-list-item group"}
-              (dom/span {:class "left"} "#")
               (dom/input {:class "board-name left"
                           :value (:create-board data)
                           :data-toggle "tooltip"
