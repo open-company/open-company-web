@@ -77,7 +77,7 @@
           su-data (dis/update-data data (:slug org-data) selected-su)
           update-title (if su-data
                           (if (clojure.string/blank? (:title su-data))
-                            (str (:name org-data) " Update")
+                            (str (:org-name su-data) " Update")
                             (:title su-data))
                           "")]
       (dom/div {:class "updates-inner group navbar-offset"}
