@@ -54,7 +54,7 @@
                 :target target}))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+; (defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -71,7 +71,6 @@
 (defn rewrite-url []
   (let [l (.-location js/window)
         rewrite-to (str (.-pathname l) (.-hash l))]
-    (js/console.log "oc.web.core/rewrite-url" (.-href l) "->" rewrite-to)
     (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to)))
 
 (defn pre-routing [query-params & [should-rewrite-url]]
@@ -226,7 +225,10 @@
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
+      ;; Logout the user if it has a JWT to get the authenticate link from auth settings
+      (cook/remove-cookie! :jwt)
       (pre-routing (:query-params params))
+      (router/set-route! ["email-verification"] {:query-params (:query-params params)})
       (drv-root email-confirmation target))
 
     (defroute password-reset-route urls/password-reset {:as params}
@@ -295,7 +297,7 @@
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
-      (router/set-route! ["user-profile"] {:query-prams (:query-params params)})
+      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
       (if (jwt/jwt)
         (if (jwt/is-slack-org?)
           (drv-root #(om/component (user-profile)) target)
