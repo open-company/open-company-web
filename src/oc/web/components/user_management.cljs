@@ -119,11 +119,15 @@
                         "Add OpenCompany bot"])))])]
           [:div.group
             (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-              [:button.btn-reset.mt2.add-slack-team.slack-button
+              (if (zero? (count (:slack-orgs team-data)))
+                [:button.btn-reset.mt2.add-slack-team.slack-button
+                    {:on-click #(dis/dispatch! [:add-slack-team])}
+                    "Add "
+                    [:span.slack "Slack"]
+                    " Team"]
+                [:button.btn-reset.btn-link.another-slack-team
                   {:on-click #(dis/dispatch! [:add-slack-team])}
-                  "Add "
-                  [:span.slack "Slack"]
-                  " Team"])
+                  "Add anothor Slack team"]))
             (when (not (empty? (:access query-params)))
               [:div#result-message
                 (cond

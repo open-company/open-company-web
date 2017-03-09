@@ -104,9 +104,17 @@ div.company-settings-container {
               letter-spacing: 0;
               line-height: 1;
               padding: 0 5px;
+              text-transform: none;
             }
           }
         }
+      }
+
+      button.another-slack-team {
+        font-size: 10px;
+        padding: 0;
+        line-height: normal;
+        letter-spacing: 0;
       }
 
       div.item-input-container {
