@@ -244,8 +244,8 @@
                           (let [fade-animation (new Fade (sel1 [:div#org-settings-save-successful]) 1 0 utils/oc-animation-duration)]
                             (doto fade-animation
                               (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
-                              (.play))))))
-    (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
+                              (.play)))))
+      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)}))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
