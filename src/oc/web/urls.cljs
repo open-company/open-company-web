@@ -33,7 +33,7 @@
 
 (def subscription-callback "/subscription-completed")
 
-(def email-confirmation "/email-confirmation")
+(def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")
 
