@@ -98,24 +98,25 @@
             (for [team (:slack-orgs team-data)]
               [:div.slack-domain.group
                 {:key (str "slack-org-" (:slack-org-id team))}
+                [:img.slack-logo {:src "/img/slack.png"}]
                 [:span (:name team)]
-                (when-not (contains? (jwt/get-key :bot) team-id)
-                  (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
-                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
-                      [:button.btn-reset
-                        {:on-click #(router/redirect! fixed-add-bot-link)
-                         :title "Add Slack bot to this team"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"}
-                         [:i.fa.fa-slack]])))
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                    :title "Remove Slack team"
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"}
-                  [:i.fa.fa-trash]]])]
+                  [:i.fa.fa-trash]]
+                (when-not (contains? (jwt/get-key :bot) team-id)
+                  (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
+                      [:button.btn-reset.btn-link
+                        {:on-click #(router/redirect! fixed-add-bot-link)
+                         :title "The OpenCompany Slack bot enables Slack invites, assignments and sharing."
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"}
+                        "Add OpenCompany bot"])))])]
           [:div.group
             (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
               [:button.btn-reset.mt2.add-slack-team.slack-button
