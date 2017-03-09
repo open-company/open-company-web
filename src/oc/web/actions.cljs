@@ -563,9 +563,12 @@
 
 (defmethod dispatcher/action :login-with-email/success
   [db [_ jwt]]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (.reload js/location)
-  db)
+  (if (empty? jwt)
+    (assoc db :login-with-email-error :verify-email)
+    (do
+      (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (.reload js/location)
+      db)))
 
 (defmethod dispatcher/action :auth-with-token
   [db [ _ token-type]]
@@ -600,9 +603,12 @@
 
 (defmethod dispatcher/action :signup-with-email/success
   [db [_ jwt]]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (router/redirect! oc-urls/home)
-  db)
+  (if (empty? jwt)
+    (assoc db :signup-with-email-error :verify-email)
+    (do
+      (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (router/redirect! oc-urls/home)
+      db)))
 
 (defmethod dispatcher/action :get-auth-settings
   [db [_]]
