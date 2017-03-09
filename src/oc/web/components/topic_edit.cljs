@@ -274,7 +274,9 @@
           body-placeholder (:body-placeholder topic-data)
           fixed-body-placeholder (if (pos? (count body-placeholder)) (str (string/lower-case (first body-placeholder)) (subs body-placeholder 1)) "")]
       {:initial-headline (utils/emojify (:headline topic-data))
-       :body-placeholder (if (:new topic-data) (str "What would you like to say? For example, " fixed-body-placeholder) utils/new-topic-body-placeholder)
+       :body-placeholder (if (string/starts-with? (name topic) "custom-")
+                            body-placeholder
+                            (if (:new topic-data) (str "What would you like to say? For example, " fixed-body-placeholder) utils/new-topic-body-placeholder))
        :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
        :char-count nil
        :char-count-alert false
