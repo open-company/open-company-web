@@ -82,7 +82,6 @@
                  :disabled (not (:auth-settings (rum/react dis/app-state)))}
                 "GOT IT"]]
             [:div
-              [:div.slack-disclaimer [:span.bold "Slack sign up"] " makes it " [:span.bold "easy for your teammates"] " to signup to view your OpenCompany dashboard."]
               (when (:access (:query-params @router/path)) slack-error)
               [:button.btn-reset.mt2.login-button.slack-button
                 {:on-click #(reset! (::sign-up-slack-clicked state) true)}
