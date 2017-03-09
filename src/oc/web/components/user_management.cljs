@@ -93,36 +93,41 @@
           [:div.um-invite-label
               "SLACK TEAMS"]
           [:div.um-invite-label-2
-            "Connect with Slack to seamlessly onboard your Slack teammates as viewers."]
+            "Anyone who signs in with your Slack team will have view access to your team boards."]
           [:div.team-list
             (for [team (:slack-orgs team-data)]
               [:div.slack-domain.group
                 {:key (str "slack-org-" (:slack-org-id team))}
+                [:img.slack-logo {:src "/img/slack.png"}]
                 [:span (:name team)]
-                (when-not (contains? (jwt/get-key :bot) team-id)
-                  (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
-                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
-                      [:button.btn-reset
-                        {:on-click #(router/redirect! fixed-add-bot-link)
-                         :title "Add Slack bot to this team"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"}
-                         [:i.fa.fa-slack]])))
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                    :title "Remove Slack team"
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"}
-                  [:i.fa.fa-trash]]])]
+                  [:i.fa.fa-trash]]
+                (when-not (contains? (jwt/get-key :bot) team-id)
+                  (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
+                      [:button.btn-reset.btn-link
+                        {:on-click #(router/redirect! fixed-add-bot-link)
+                         :title "The OpenCompany Slack bot enables Slack invites, assignments and sharing."
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"}
+                        "Add OpenCompany bot"])))])]
           [:div.group
             (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-              [:button.btn-reset.mt2.add-slack-team.slack-button
+              (if (zero? (count (:slack-orgs team-data)))
+                [:button.btn-reset.mt2.add-slack-team.slack-button
+                    {:on-click #(dis/dispatch! [:add-slack-team])}
+                    "Add "
+                    [:span.slack "Slack"]
+                    " Team"]
+                [:button.btn-reset.btn-link.another-slack-team
                   {:on-click #(dis/dispatch! [:add-slack-team])}
-                  "Add "
-                  [:span.slack "Slack"]
-                  " Team"])
+                  "Add anothor Slack team"]))
             (when (not (empty? (:access query-params)))
               [:div#result-message
                 (cond
@@ -139,7 +144,7 @@
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
-            "Anyone who signs up with this email domain will be a viewer on your team."]
+            "Anyone who signs up with this email domain will have view access to your team boards."]
           [:div.team-list
             (for [team (:email-domains team-data)]
               [:div.email-domain.group
@@ -156,7 +161,7 @@
                :value (:domain um-domain-invite)
                :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :placeholder "Email domain"}]
+               :placeholder "Domain e.g. company.com"}]
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (not valid-domain-email?)
                :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
