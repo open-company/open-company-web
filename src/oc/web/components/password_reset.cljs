@@ -12,11 +12,11 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn exchange-token-when-ready [owner]
-  (when (and (not (om/get-state owner :exchange-stated))
-             (om/get-props owner :auth-settings)
-             (utils/link-for (:links (om/get-props owner :auth-settings)) "authenticate" "GET" {:auth-source "email"}))
-    (om/set-state! owner :exchange-stated true)
-    (dis/dispatch! [:auth-with-token])))
+  (when-let [auth-settings (om/get-props owner :auth-settings)]
+    (when (and (not (om/get-state owner :exchange-started))
+               (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"}))
+      (om/set-state! owner :exchange-started true)
+      (dis/dispatch! [:auth-with-token :password-reset]))))
 
 (defcomponent password-reset [data owner]
 
