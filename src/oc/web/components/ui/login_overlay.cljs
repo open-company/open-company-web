@@ -125,6 +125,9 @@
       [:div.pt2.pl3.pr3.pb2.group
         (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
           (cond
+            (= (:login-with-email-error (rum/react dis/app-state)) :verify-email)
+            [:span.small-caps.green
+              "Hey buddy, go verify your email, again, eh?"]
             (= (:login-with-email-error (rum/react dis/app-state)) 401)
             [:span.small-caps.red
               "The email or password you entered is incorrect."
@@ -195,6 +198,9 @@
       [:div.pt2.pl3.pr3.pb2.group
         (when-not (nil? (:signup-with-email-error (rum/react dis/app-state)))
           (cond
+            (= (:signup-with-email-error (rum/react dis/app-state)) :verify-email)
+            [:span.small-caps.green
+              "Hey buddy, go verify your email, eh?"]
             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
             [:span.small-caps.red
               "This email address already has an account. "
