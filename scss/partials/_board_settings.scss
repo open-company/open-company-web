@@ -76,125 +76,127 @@ div.main-board-settings {
               font-weight: 700;
             }
           }
+        }
 
-          &.invite-only-board {
-            div.private-board-setup {
-              margin-top: 30px;
-              cursor: default;
+        div.invite-only-board {
+          margin-left: 1rem;
+          margin-bottom: 2rem;
 
-              div.private-board-users-list {
-                margin-top: 4rem;
+          div.private-board-setup {
+            cursor: default;
 
-                table {
-                  width: 100%;
-                  color: $oc_gray_5;
+            div.private-board-users-list {
+              margin-top: 1rem;
 
-                  thead:first-child {
-                    border-bottom: 1px solid rgba(78, 90, 107, 0.5);
-                  }
+              table {
+                width: 100%;
+                color: $oc_gray_5;
 
-                  tr:hover {
-                    td {
-                      background-color: $oc_blue_dark;
+                thead:first-child {
+                  border-bottom: 1px solid rgba(78, 90, 107, 0.5);
+                }
+
+                tr:hover {
+                  td {
+                    background-color: $oc_blue_dark;
+                    color: white;
+
+                    div button.user-type-btn:after {
                       color: white;
-
-                      div button.user-type-btn:after {
-                        color: white;
-                      }
                     }
                   }
+                }
 
-                  tr th, tr td {
-                    padding: 0 0.4rem;
-                  }
+                tr th, tr td {
+                  padding: 0 0.4rem;
+                }
 
-                  th {
-                    font-size: 14px;
-                    font-family: $oc_headers_font;
-                    color: rgba(78, 90, 107, 0.5);
-                    font-weight: 700;
-                  }
+                th {
+                  font-size: 14px;
+                  font-family: $oc_headers_font;
+                  color: rgba(78, 90, 107, 0.5);
+                  font-weight: 700;
+                }
 
-                  tr td:first-child {
-                    padding-left: 1rem;
-                    font-size: 14px;
-                  }
+                tr td:first-child {
+                  padding-left: 1rem;
+                  font-size: 14px;
+                }
 
-                  tr td {
-                    font-family: $oc_main_font;
-                    font-size: 14px;
-                    font-weight: 300;
-                    letter-spacing: 1.2px;
-                  }
+                tr td {
+                  font-family: $oc_main_font;
+                  font-size: 14px;
+                  font-weight: 300;
+                  letter-spacing: 1.2px;
                 }
               }
+            }
 
-              div.private-board-select-wrapper {
-                position: relative;
-                padding: 0;
-                margin: 0 1rem 0 0;
-                width: 196px;
-                height: 36px;
+            div.private-board-select-wrapper {
+              position: relative;
+              padding: 0;
+              margin: 0 1rem 0 0;
+              width: 196px;
+              height: 36px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              background-color: white;
+              color: $oc_gray_5;
+              border-radius: 2px;
+              border: 1px solid $oc_gray_2;
+              float: left;
+
+              &:after {
+                font-family: FontAwesome;
+                content: "\f0d7";
+                color: $oc_gray_5;
+                font-size: 14px;
+                position: absolute;
+                right: 0.2rem;
+                top: 4px;
+                pointer-events: none;
+              }
+
+              &:avtive:after {
+                content: "\f0d8";
+              }
+
+              select.private-board-select {
+                // Remove default browser style
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;       /* remove default arrow */
+
+                box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                // ----------------------------
+                border-radius: 0px;
+                border: none;
+                padding: 0.3rem 1rem 0.3rem 0.2rem;
+
+                width: 100%;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                background-color: white;
-                color: $oc_gray_5;
-                border-radius: 2px;
-                border: 1px solid $oc_gray_2;
-                float: left;
+                background-color: transparent;
 
-                &:after {
-                  font-family: FontAwesome;
-                  content: "\f0d7";
-                  color: $oc_gray_5;
-                  font-size: 14px;
-                  position: absolute;
-                  right: 0.2rem;
-                  top: 4px;
-                  pointer-events: none;
-                }
-
-                &:avtive:after {
-                  content: "\f0d8";
-                }
-
-                select.private-board-select {
-                  // Remove default browser style
-                  -webkit-appearance: none;
-                  -moz-appearance: none;
-                  appearance: none;       /* remove default arrow */
-
-                  box-sizing: border-box;
-                  -webkit-box-sizing: border-box;
-                  -moz-box-sizing: border-box;
-                  // ----------------------------
-                  border-radius: 0px;
-                  border: none;
-                  padding: 0.3rem 1rem 0.3rem 0.2rem;
-
-                  width: 100%;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  background-color: transparent;
-
-                  width: 186px;
-                  height: 36px;
-
-                  outline: none;
-
-                  &::-ms-expand {
-                    display: none;
-                  }
-                }
-              }
-
-              div.user-type-picker {
-                margin-right: 1rem;
-              }
-
-              button.private-board-add-button {
+                width: 186px;
                 height: 36px;
+
+                outline: none;
+
+                &::-ms-expand {
+                  display: none;
+                }
               }
+            }
+
+            div.user-type-picker {
+              margin-right: 1rem;
+            }
+
+            button.private-board-add-button {
+              height: 36px;
             }
           }
         }
