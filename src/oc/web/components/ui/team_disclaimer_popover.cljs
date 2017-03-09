@@ -3,7 +3,6 @@
 
 (rum/defc team-disclaimer-popover < rum/static
   [{:keys [hide-popover-cb hide-admin] :as data}]
-  (js/console.log "team-disclaimer-popover/render" hide-admin data)
   [:div.oc-popover-container-internal
     {:on-click #(hide-popover-cb)}
     [:button.close-button]

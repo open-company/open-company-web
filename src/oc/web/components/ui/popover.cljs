@@ -129,7 +129,6 @@
     (assert-param success-title string? "popover success-title is not a string")
     (assert-param success-cb fn? "popover success-cb is not a function")
     (assert-param z-index-offset number? "z-index-offset must be a number")
-    (js/console.log "popover/render" height)
     (let [style {}
           w-style (if width
                     (assoc style :width width)

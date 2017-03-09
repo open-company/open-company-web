@@ -40,7 +40,6 @@
 
 (defn show-team-disclaimer-popover [e & [hide-admin]]
   (.stopPropagation e)
-  (js/console.log "show-team-disclaimer-popover" hide-admin)
   (add-popover-with-rum-component team-disclaimer-popover {;:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
                                                            :hide-admin hide-admin
                                                            :width 422
