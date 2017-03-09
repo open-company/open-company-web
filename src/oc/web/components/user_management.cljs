@@ -93,7 +93,7 @@
           [:div.um-invite-label
               "SLACK TEAMS"]
           [:div.um-invite-label-2
-            "Connect with Slack to seamlessly onboard your Slack teammates as viewers."]
+            "Anyone who signs in with your Slack team will have view access to your team boards."]
           [:div.team-list
             (for [team (:slack-orgs team-data)]
               [:div.slack-domain.group
@@ -139,7 +139,7 @@
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
-            "Anyone who signs up with this email domain will be a viewer on your team."]
+            "Anyone who signs up with this email domain will have view access to your team boards."]
           [:div.team-list
             (for [team (:email-domains team-data)]
               [:div.email-domain.group
@@ -156,7 +156,7 @@
                :value (:domain um-domain-invite)
                :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :placeholder "Email domain"}]
+               :placeholder "Domain e.g. company.com"}]
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (not valid-domain-email?)
                :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
