@@ -228,7 +228,7 @@
               (dom/h3 {:class "mr1"} "Public"
                 (when (= access "public")
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
-              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Only designed authors can edit and share information."))
+              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Only designated authors can edit and share information."))
             ;; Private choice
             (dom/div {}
               (dom/div {:class (str "visibility-value" (when (= access "public") " highlightable"))
@@ -250,7 +250,7 @@
                   (dom/h3 {} "Team"
                     (when (= access "team")
                       (dom/i {:class "ml1 fa fa-check-square-o"})))
-                  (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designed authors can edit and share.")))
+                  (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designated authors can edit and share.")))
               ;; Private
               (when (or (= access "team") (= access "private"))
                 (dom/div {:class "visibility-value invite-only-board group ml2"

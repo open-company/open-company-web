@@ -346,7 +346,9 @@
       (api/get-auth-settings)
       (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
       (if (jwt/jwt)
-        (drv-root mobile-boards-list target)
+        (if (responsive/is-mobile-size?)
+          (drv-root mobile-boards-list target)
+          (org-handler "org" target #(om/component) params))
         (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
