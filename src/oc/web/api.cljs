@@ -466,7 +466,6 @@
          (if success
             (do
               (update-jwt-cookie! body)
-              (cook/set-cookie! :show-login-overlay "collect-password")
               (dispatcher/dispatch! [:jwt (j/get-contents)])
               (dispatcher/dispatch! [:auth-with-token/success body]))
             (cond
