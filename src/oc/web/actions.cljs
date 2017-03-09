@@ -47,15 +47,17 @@
         ; i reload the entry point to get the list of orgs
         ; and redirect the user to its first organization
         ; if he has no orgs to the user profile page
-        (and (utils/in? (:route @router/path) "password-reset")
-             (:password-reset-redirect db))
+        (and (or (utils/in? (:route @router/path) "password-reset")
+                 (utils/in? (:route @router/path) "email-verification"))
+             (:first-org-redirect db))
         (let [first-org (first orgs)]
           (router/redirect! (if first-org (oc-urls/org (:slug first-org)) oc-urls/user-profile)))
         ; If not redirect the user to the first useful org or to the create org UI
         (and (jwt/jwt)
              (not (utils/in? (:route @router/path) "create-org"))
              (not (utils/in? (:route @router/path) "user-profile"))
-             (not (utils/in? (:route @router/path) "create-board")))
+             (not (utils/in? (:route @router/path) "create-board"))
+             (not (utils/in? (:route @router/path) "email-verification")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
@@ -103,7 +105,8 @@
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "updates-list"))
            (not (utils/in? (:route @router/path) "su-snapshot"))
-           (not (utils/in? (:route @router/path) "su-snapshot-preview")))
+           (not (utils/in? (:route @router/path) "su-snapshot-preview"))
+           (not (utils/in? (:route @router/path) "email-verification")))
       (cond
         ;; Redirect to the first board if only one is presnet
         (>= (count boards) 1)
@@ -565,18 +568,22 @@
   db)
 
 (defmethod dispatcher/action :auth-with-token
-  [db]
+  [db [ _ token-type]]
   (api/auth-with-token (:token (:query-params @router/path)))
-  db)
+  (assoc db :auth-with-token-type token-type))
 
 (defmethod dispatcher/action :auth-with-token/failed
   [db [_ error]]
-  (assoc db :collect-pswd-error error))
+  (if (= (:auth-with-token-type db) :password-reset)
+    (assoc db :collect-pswd-error error)
+    (assoc db :email-verification-error error)))
 
 (defmethod dispatcher/action :auth-with-token/success
   [db [_ jwt]]
   (api/get-entry-point)
-  (assoc db :password-reset-redirect true))
+  (when (= (:auth-with-token-type db) :password-reset)
+    (cook/set-cookie! :show-login-overlay "collect-password"))
+  (assoc db :first-org-redirect true))
 
 (defmethod dispatcher/action :signup-with-email-change
   [db [_ k v]]
