@@ -266,6 +266,9 @@
                          :burn-rate
                          :runway])
 
+(def topic-finances-data-private-keys [:burn-rate
+                                       :runway])
+
 (defn save-or-create-topic [topic-data]
   (when topic-data
     (let [links (:links topic-data)
@@ -293,34 +296,15 @@
   (when (and topic topic-data)
     (let [partial-update-link (utils/link-for (:links topic-data) "partial-update" "PATCH")
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
-          json-data (cljs->json cleaned-topic-data)]
+          cleaned-chart-data (map #(apply dissoc % topic-finances-data-private-keys) (:data cleaned-topic-data))
+          with-fixed-chart-data (assoc cleaned-topic-data :data cleaned-chart-data)
+          json-data (cljs->json with-fixed-chart-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
           :headers (headers-for-link partial-update-link)}
         (fn [{:keys [success body]}]
           (let [fixed-body (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:topic-entry {:body fixed-body :topic topic :created-at (:created-at fixed-body)}]))))))))
-
-(defn update-finances-data[finances-data]
-  (when finances-data
-    (let [links (:links finances-data)
-          slug (router/current-board-slug)
-          data {:data (map #(apply dissoc % topic-private-keys) (:data finances-data))}
-          json-data (cljs->json data)
-          finances-link (utils/link-for links "partial-update" "PATCH")]
-      (api-patch (:href finances-link)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type finances-link)}}
-        (fn [response]
-          (let [body (if (:success response) (json->cljs (:body response)) {})
-                dispatch-body {:body (merge {:topic :finances} body)
-                               :topic :finances
-                               :slug (keyword slug)}]
-            (dispatcher/dispatch! [:topic dispatch-body])))))))
 
 (defn patch-topics [topics & [new-topic topic-name]]
   (when topics
