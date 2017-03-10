@@ -778,8 +778,7 @@
 
 (defn slack-share? []
   (if-let [jwt (:jwt @dis/app-state)]
-    (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
-         (not (nil? (:token (first (:bots jwt)))))))) ; with an installed Slack bot
+    (pos? (count (:slack-bots jwt))))) ; we have at least one team with the bot added
 
 (def new-topic-body-placeholder "What would you like to say...")
 
