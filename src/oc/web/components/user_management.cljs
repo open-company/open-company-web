@@ -100,13 +100,6 @@
                 {:key (str "slack-org-" (:slack-org-id team))}
                 [:img.slack-logo {:src "/img/slack.png"}]
                 [:span (:name team)]
-                [:button.btn-reset
-                  {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                   :title "Remove Slack team"
-                   :data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"}
-                  [:i.fa.fa-trash]]
                 (when-not (contains? (jwt/get-key :bot) team-id)
                   (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
                     (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
@@ -116,7 +109,14 @@
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :data-container "body"}
-                        "Add OpenCompany bot"])))])]
+                        "Add OpenCompany Slack bot"])))
+                [:button.btn-reset
+                  {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                   :title "Remove Slack team"
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"}
+                  [:i.fa.fa-trash]]])]
           [:div.group
             (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
               (if (zero? (count (:slack-orgs team-data)))
@@ -127,7 +127,7 @@
                     " Team"]
                 [:button.btn-reset.btn-link.another-slack-team
                   {:on-click #(dis/dispatch! [:add-slack-team])}
-                  "Add anothor Slack team"]))
+                  "Add another Slack team"]))
             (when (not (empty? (:access query-params)))
               [:div#result-message
                 (cond
