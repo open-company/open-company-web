@@ -160,7 +160,7 @@
                :value (:domain um-domain-invite)
                :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :placeholder "Domain e.g. company.com"}]
+               :placeholder "Domain, e.g. @company.com"}]
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (not valid-domain-email?)
                :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
