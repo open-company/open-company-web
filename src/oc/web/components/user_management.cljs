@@ -85,7 +85,6 @@
                 [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
-          [:div.um-invite-label "TEAM MEMBERS"]
           (when (contains? enumerate-users team-id)
             (users-list team-id (:users (get enumerate-users team-id)) (:authors org-data)))])
       (when-not (responsive/is-mobile-size?)
