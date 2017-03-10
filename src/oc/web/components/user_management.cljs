@@ -112,7 +112,7 @@
                         "Add OpenCompany Slack bot"])))
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                   :title "Remove Slack team"
+                   :title (str "Remove " (:name team) " Slack team")
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"}
