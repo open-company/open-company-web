@@ -493,7 +493,9 @@
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:team-loaded fixed-body])))))))
+            (if (= (:rel team-link) "roster")
+              (dispatcher/dispatch! [:team-roster-loaded fixed-body])
+              (dispatcher/dispatch! [:team-loaded fixed-body]))))))))
 
 (defn enumerate-channels []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]

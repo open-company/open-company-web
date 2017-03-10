@@ -637,6 +637,15 @@
     (assoc-in db [:enumerate-users (:team-id team-data)] team-data)
     db))
 
+(defmethod dispatcher/action :team-roster-loaded
+  [db [_ roster-data]]
+  (if roster-data
+    (let [fixed-roster-data {:team-id (:team-id roster-data)
+                             :links (:links (:collection roster-data))
+                             :users (:items (:collection roster-data))}]
+      (assoc-in db [:enumerate-users (:team-id roster-data)] fixed-roster-data))
+    db))
+
 (defmethod dispatcher/action :enumerate-channels
   [db [_]]
   (api/enumerate-channels)
