@@ -144,7 +144,7 @@
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
-            "Anyone who signs up with this email domain will have view access to your team boards."]
+            "Anyone who signs in with your Slack teams can view team boards."]
           [:div.team-list
             (for [team (:email-domains team-data)]
               [:div.email-domain.group
