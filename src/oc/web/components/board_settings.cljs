@@ -251,7 +251,7 @@
               (dom/h3 {:class "mr1"} "Public"
                 (when (= access "public")
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
-              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Authors can edit and share information.")))
+              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and could show up in search engines like Google. Authors can edit and share information.")))
 
           ; Slug
           (dom/div {:class "settings-form-input-label"} "BOARD URL")
