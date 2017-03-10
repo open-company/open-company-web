@@ -181,7 +181,7 @@
         [:div.my2.um-byemail-container.group
           [:div.group
             [:span.left.ml1.um-byemail-anyone-span
-              "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
+              "Anyone who signs up with this email domain can view team boards."]]
           [:div.mt2.um-byemail.group
             [:span.left.um-byemail-at "@"]
             [:input.left.um-byemail-email
