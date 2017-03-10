@@ -225,8 +225,6 @@
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
-      ;; Logout the user if it has a JWT to get the authenticate link from auth settings
-      (cook/remove-cookie! :jwt)
       (pre-routing (:query-params params))
       (router/set-route! ["email-verification"] {:query-params (:query-params params)})
       (drv-root email-confirmation target))
