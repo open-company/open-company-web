@@ -50,12 +50,13 @@ div.org-dashboard {
         }
       }
 
-      div.sharing-board-container:first-child {
-        padding-top: 80px;
-      }
-
       div.sharing-board-container {
         background-color: transparent;
+        min-height: calc(100vh - #{$footer_small_height}px);
+
+        &:first-child {
+          padding-top: 80px;
+        }
 
         div.topic-list {
           padding-top: 0px;

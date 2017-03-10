@@ -85,7 +85,6 @@
                 [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
-          [:div.um-invite-label "TEAM MEMBERS"]
           (when (contains? enumerate-users team-id)
             (users-list team-id (:users (get enumerate-users team-id)) (:authors org-data)))])
       (when-not (responsive/is-mobile-size?)
@@ -112,7 +111,7 @@
                         "Add OpenCompany Slack bot"])))
                 [:button.btn-reset
                   {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                   :title "Remove Slack team"
+                   :title (str "Remove " (:name team) " Slack team")
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"}
@@ -144,7 +143,7 @@
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
-            "Anyone who signs up with this email domain will have view access to your team boards."]
+            "Anyone who signs in with your Slack teams can view team boards."]
           [:div.team-list
             (for [team (:email-domains team-data)]
               [:div.email-domain.group
@@ -161,7 +160,7 @@
                :value (:domain um-domain-invite)
                :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :placeholder "Domain e.g. company.com"}]
+               :placeholder "Domain, e.g. @company.com"}]
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (not valid-domain-email?)
                :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
@@ -181,7 +180,7 @@
         [:div.my2.um-byemail-container.group
           [:div.group
             [:span.left.ml1.um-byemail-anyone-span
-              "ANYONE WITH THIS EMAIL DOMAIN HAS USER ACCESS"]]
+              "Anyone who signs up with this email domain can view team boards."]]
           [:div.mt2.um-byemail.group
             [:span.left.um-byemail-at "@"]
             [:input.left.um-byemail-email
