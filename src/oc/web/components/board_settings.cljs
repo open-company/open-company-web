@@ -92,6 +92,10 @@
           "ADD"]])))
 
 (rum/defc user-row < rum/static
+                     {:after-render (fn [s]
+                                      (when-not (utils/is-test-env?)
+                                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                      s)}
   [user user-type user-data]
   [:tbody
     [:tr
@@ -104,7 +108,12 @@
                                                            :selected-user-type t}])
            (utils/after 100 #(dis/dispatch! [:private-board-add])))
          true)]
-      [:td (utils/name-or-email user-data)]
+      [:td [:div
+             {:data-toggle "tooltip"
+              :data-placement "top"
+              :data-container "body"
+              :title (:email user-data)}
+             (utils/name-or-email user-data)]]
       [:td
         (cond
           (utils/link-for (:links user) "remove")
@@ -167,13 +176,15 @@
     (get-state data nil))
 
   (will-receive-props [_ next-props]
-    (when (om/get-state owner :loading)
-      (utils/after 1500 (fn []
-                          (let [fade-animation (new Fade (sel1 [:div#board-settings-save-successful]) 1 0 utils/oc-animation-duration)]
-                            (doto fade-animation
-                              (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
-                              (.play)))))
-      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)}))))
+    (if (om/get-state owner :loading)
+      (do
+        (utils/after 1500 (fn []
+                            (let [fade-animation (new Fade (sel1 [:div#board-settings-save-successful]) 1 0 utils/oc-animation-duration)]
+                              (doto fade-animation
+                                (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
+                                (.play)))))
+        (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
+      (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
   (did-mount [_]
     (when (and (not (utils/is-test-env?))
@@ -182,7 +193,7 @@
 
   (render-state [_ {:keys [board-slug board-name access loading has-changes show-save-successful]}]
     (let [org-data (dis/org-data data)
-          board-data (dis/board-data)]
+          board-data (dis/board-data data)]
       (utils/update-page-title (str "OpenCompany - " (:name org-data) " " board-name " settings"))
 
       (dom/div {:class "mx-auto my4 settings-container group"}

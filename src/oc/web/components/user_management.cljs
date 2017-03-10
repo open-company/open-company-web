@@ -55,7 +55,7 @@
     [:div.user-management.mx-auto.p3.my4.group
       [:div.um-invite.group.mb3
         [:div.um-invite-label
-          "INVITE TEAM MEMBERS"]
+          "TEAM MEMBERS"]
         [:div
           [:div.group
             [:input.left.um-invite-field.email
@@ -92,7 +92,7 @@
           [:div.um-invite-label
               "SLACK TEAMS"]
           [:div.um-invite-label-2
-            "Anyone who signs in with your Slack team will have view access to your team boards."]
+            "Anyone who signs up with your Slack team can view team boards."]
           [:div.team-list
             (for [team (:slack-orgs team-data)]
               [:div.slack-domain.group
@@ -143,7 +143,7 @@
           [:div.um-invite-label
               "TEAM EMAIL DOMAINS"]
           [:div.um-invite-label-2
-            "Anyone who signs in with your Slack teams can view team boards."]
+            "Anyone who signs up with this email domain can view team boards."]
           [:div.team-list
             (for [team (:email-domains team-data)]
               [:div.email-domain.group
@@ -160,7 +160,7 @@
                :value (:domain um-domain-invite)
                :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :placeholder "Domain, e.g. @company.com"}]
+               :placeholder "Domain, e.g. @acme.com"}]
             [:button.right.btn-reset.btn-solid.um-invite-send
               {:disabled (not valid-domain-email?)
                :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
