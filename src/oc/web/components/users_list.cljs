@@ -25,16 +25,7 @@
         remove-user (utils/link-for user-links "remove" "DELETE" {:ref "application/vnd.open-company.user.v1+json"})
         pending? (= (:status user) "pending")
         is-self? (= (j/get-key :user-id) (:user-id user))
-        visualized-name (cond
-                          (and (not (s/blank? (:first-name user)))
-                               (not (s/blank? (:last-name user))))
-                          (str (:first-name user) " " (:last-name user))
-                          (not (s/blank? (:first-name user)))
-                          (:first-name user)
-                          (not (s/blank? (:last-name user)))
-                          (:last-name user)
-                          :else
-                          (:email user))]
+        visualized-name (utils/name-or-email user)]
     [:tr
       [:td
         (user-type-dropdown (:user-id user) user-type #(api/switch-user-type user-type % user author))]
