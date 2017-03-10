@@ -228,7 +228,7 @@
               (dom/h3 {:class "mr1"} "Team"
                 (when (= access "team")
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
-              (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Only designated authors can edit and share."))
+              (dom/p {:class (str (when (= access "team") "bold"))} "All team members can view this board. Authors can edit and share."))
             ;; Private
             (dom/div {:class "visibility-value highlightable"
                       :on-click #(do
@@ -251,7 +251,7 @@
               (dom/h3 {:class "mr1"} "Public"
                 (when (= access "public")
                   (dom/i {:class "ml1 fa fa-check-square-o"})))
-              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Only designated authors can edit and share information.")))
+              (dom/p {:class (str (when (= access "public") "bold"))} "This board is public to everyone and will show up in search engines like Google. Authors can edit and share information.")))
 
           ; Slug
           (dom/div {:class "settings-form-input-label"} "BOARD URL")
