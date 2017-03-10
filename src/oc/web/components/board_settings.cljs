@@ -94,7 +94,7 @@
 (rum/defc user-row < rum/static
                      {:after-render (fn [s]
                                       (when-not (utils/is-test-env?)
-                                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                        (utils/after 1000 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
                                       s)}
   [user user-type user-data]
   [:tbody
