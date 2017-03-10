@@ -21,6 +21,12 @@ div.org-dashboard {
     }
   }
 
+  &.dashboard-sharing {
+    div.dashboard-container div.sharing-boards {
+      min-height: calc(100vh - #{$footer_small_height}px);
+    }
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */
@@ -52,7 +58,6 @@ div.org-dashboard {
 
       div.sharing-board-container {
         background-color: transparent;
-        min-height: calc(100vh - #{$footer_small_height}px);
 
         &:first-child {
           padding-top: 80px;

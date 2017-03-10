@@ -206,33 +206,34 @@
                         (dom/p {:class "empty-dashboard-msg"}
                           (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) ", your dashboard can be viewed after it's been created on a desktop browser."))))
                     (if (:dashboard-sharing data)
-                      (for [board (:boards org-data)
-                            :let [board-data (dis/board-data data (router/current-org-slug) (:slug board))]
-                            :when (pos? (count (:topics board-data)))]
-                        (dom/div {:class "sharing-board-container"}
-                          (dom/h3 {:class "board-title"} (:name board-data))
-                          (om/build topics-list
-                                      {:loading (:loading data)
-                                       :content-loaded (or (:loading board-data) (:loading data))
-                                       :org-data org-data
-                                       :board-data board-data
-                                       :entries-data []
-                                       :create-board (:create-board data)
-                                       :new-topics nil
-                                       :latest-su (dis/latest-stakeholder-update)
-                                       :force-edit-topic (:force-edit-topic data)
-                                       :foce-data-editing? (:foce-data-editing? data)
-                                       :card-width card-width
-                                       :columns-num columns-num
-                                       :show-login-overlay (:show-login-overlay data)
-                                       :foce-key (:foce-key data)
-                                       :foce-data (:foce-data data)
-                                       :show-add-topic (:show-add-topic data)
-                                       :dashboard-selected-topics (:dashboard-selected-topics data)
-                                       :dashboard-sharing (:dashboard-sharing data)
-                                       :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                                       :is-dashboard true
-                                       :show-top-menu (:show-top-menu data)})))
+                      (dom/div {:class "sharing-boards"}
+                        (for [board (:boards org-data)
+                              :let [board-data (dis/board-data data (router/current-org-slug) (:slug board))]
+                              :when (pos? (count (:topics board-data)))]
+                          (dom/div {:class "sharing-board-container"}
+                            (dom/h3 {:class "board-title"} (:name board-data))
+                            (om/build topics-list
+                                        {:loading (:loading data)
+                                         :content-loaded (or (:loading board-data) (:loading data))
+                                         :org-data org-data
+                                         :board-data board-data
+                                         :entries-data []
+                                         :create-board (:create-board data)
+                                         :new-topics nil
+                                         :latest-su (dis/latest-stakeholder-update)
+                                         :force-edit-topic (:force-edit-topic data)
+                                         :foce-data-editing? (:foce-data-editing? data)
+                                         :card-width card-width
+                                         :columns-num columns-num
+                                         :show-login-overlay (:show-login-overlay data)
+                                         :foce-key (:foce-key data)
+                                         :foce-data (:foce-data data)
+                                         :show-add-topic (:show-add-topic data)
+                                         :dashboard-selected-topics (:dashboard-selected-topics data)
+                                         :dashboard-sharing (:dashboard-sharing data)
+                                         :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                                         :is-dashboard true
+                                         :show-top-menu (:show-top-menu data)}))))
                       (om/build topics-list
                                   {:loading (:loading data)
                                    :content-loaded (or (:loading board-data) (:loading data))
