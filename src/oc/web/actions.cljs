@@ -624,8 +624,11 @@
   [db [_ teams dont-follow-team-link]]
   (when-not dont-follow-team-link
     (doseq [team teams
-            :let [team-link (utils/link-for (:links team) "item" "GET")]]
-      (api/get-team team-link)))
+            :let [team-link (utils/link-for (:links team) "item" "GET")
+                  roster-link (utils/link-for (:links team) "roster" "GET")]]
+      (if team-link
+        (api/get-team team-link)
+        (api/get-team roster-link))))
   (assoc-in db [:enumerate-users :teams] teams))
 
 (defmethod dispatcher/action :team-loaded
