@@ -7,7 +7,6 @@
             [clojure.string :as string]
             [goog.dom :as gdom]
             [goog.style :as gstyle]
-            [goog.object :as gobj]
             [oc.web.api :as api]
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
