@@ -7,10 +7,12 @@
             [clojure.string :as string]
             [goog.dom :as gdom]
             [goog.style :as gstyle]
+            [goog.object :as gobj]
             [oc.web.api :as api]
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]
             [oc.web.components.ui.small-loading :as loading]
@@ -28,8 +30,12 @@
                   post-data)
         with-subject (if (contains? emojied :subject)
                         (assoc with-to :subject (:subject emojied))
-                        with-to)]
-    (api/create-update with-subject)))
+                        with-to)
+        with-slack (if (= type :slack)
+                      (merge with-subject {:channel (:channel emojied)
+                                           :slack-org-id (:slack-org-id emojied)})
+                      with-subject)]
+    (api/create-update with-slack)))
 
 (defn select-share-link [event]
   (when-let [input (.-target event)]
@@ -210,25 +216,53 @@
                     [:su-share :slack :note]
                     slack-notes])))
 
+(def everyone "__everyone__")
+
 (rum/defcs slack-dialog < rum/static
                          rum/reactive
                          (drv/drv :su-share)
+                         (drv/drv :team-channels)
                          emoji-autocomplete
   [s]
   [:div
     (modal-title "Share to Slack" :slack)
     [:div.p3
-      
-      (let [channels (or (:enumerate-channels (rum/react dis/app-state)) [])]
+      (let [channels (or (drv/react s :team-channels) [])
+            sep "=#="
+            select-default-value (str (:name (first channels)) sep everyone)]
         [:div
           [:label.block.small-caps.bold.mb2 "To"]
           [:select {:id "channel"
-                    :value (or (->> (drv/react s :su-share) :slack :channel) "__everyone__")
-                    :on-change #(dis/dispatch! [:input [:su-share :slack :channel] (.. % -target -value)])
-                    :class "npt col-11 p1 mb3 slack-channel"}
-            [:option {:value "__everyone__"} "All non-guest members of your Slack organization"]
-            (for [channel channels]
-              [:option {:value (:id channel) :key (:id channel)} (str "#" (:name channel))])]])
+                    :value (or
+                            (str
+                             (->> (drv/react s :su-share) :slack :slack-org-id)
+                             sep
+                             (->> (drv/react s :su-share) :slack :channel))
+                            select-default-value)
+                    :on-change #(let [v (.. % -target -value)
+                                      vs (string/split v (re-pattern sep))]
+                                  (dis/dispatch! [:input [:su-share :slack :slack-org-id] (first vs)])
+                                  (dis/dispatch! [:input [:su-share :slack :channel] (second vs)]))
+                    :class "npt col-12 p1 mb3 slack-channel"}
+            (for [team-ch channels
+                  :let [slack-team-name (:name team-ch)
+                        slack-team-id (:slack-org-id team-ch)
+                        team-channels (:channels team-ch)]]
+              [:optgroup
+                {:label (if (> (count channels) 1) slack-team-name "")
+                 :key (str "optgroup-" slack-team-id)}
+                [:option
+                  {:value (str slack-team-id sep everyone)
+                   :key (str slack-team-id sep everyone)}
+                  (str "Directly to all non-guest members of " slack-team-name)]
+                (for [channel team-channels
+                      :let [unique-ch-id (str slack-team-id sep (:id channel))]]
+                  [:option
+                    {:value unique-ch-id
+                     :data-slackorg slack-team-id
+                     :data-slackch (:id channel)
+                     :key unique-ch-id}
+                    (str "#" (:name channel))])])]])
     
       [:label.block.small-caps.bold.mb2 "Your Note"]
       [:div.npt.group
@@ -269,22 +303,26 @@
       {:href link :target "_blank"}
       "Open in New Window"]]]])
 
-(rum/defc prompt-dialog < rum/static
+(rum/defcs prompt-dialog < rum/static
+                           rum/reactive
+                           (drv/drv :jwt)
+                           (drv/drv :org-data)
   {:before-render (fn [s] ; Start request for Slack channels so it'll be ready if needed
-                    (let [jwt (:jwt @dis/app-state)]
+                    (let [jwt @(drv/get-ref s :jwt)
+                          team-id (:team-id @(drv/get-ref s :org-data))
+                          team-id-k (jwt/slack-bots-team-key team-id)]
                       ;; Decide if we should ask for Slack channels (pro-actively so they are already loaded)
-                      (when (and (= (:auth-source jwt) "slack") ; auth'd w/ Slack
-                                 (not (nil? (:token (first (:bots jwt))))) ; with an installed Slack bot
-                                 (:auth-settings @dis/app-state) ; know where Auth APIs are
+                      (when (and (jwt/team-has-bot? team-id) ; auth'd w/ Slack
+                                 (some #(not (nil? (:token %))) (get (:slack-bots jwt) team-id-k)) ; with an installed Slack bot
                                  (not (:enumerate-channels-requested @dis/app-state))) ; haven't already requested
                         ;; Ask for public Slack channels
-                        (dis/dispatch! [:enumerate-channels])))
+                        (dis/dispatch! [:enumerate-channels team-id])))
                     s)}
-  [prompt-cb]
+  [s prompt-cb]
   [:div
    (modal-title "Share Update" nil)
    [:div.p3
-    (when (utils/slack-share?)
+    (when (jwt/team-has-bot? (:team-id (drv/react s :org-data)))
       [:div.group
        [:button.btn-reset {:on-click #(prompt-cb :slack)}
         [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
@@ -331,8 +369,8 @@
        :email "Recipients will get your update by email."
        :slack (let [ch (->> @dis/app-state :su-share :slack :channel)
                     ch-id (filter #(= (:id %) ch) (or (:enumerate-channels @dis/app-state) []))
-                    ch-name (if (pos? (count ch-id)) (:name (first ch-id)) "__everyone__")]
-                (if (= ch-name "__everyone__")
+                    ch-name (if (pos? (count ch-id)) (:name (first ch-id)) everyone)]
+                (if (= ch-name everyone)
                   "This update has been shared with your team."
                   (str "This update has been shared with #" ch-name "."))))]
     [:div.right-align.mt3
@@ -385,7 +423,7 @@
       (om/set-state! owner :sent true)))
 
   (render-state [_ {:keys [share-via share-link sending sent] :as state}]
-    (let [success-cb   (:did-share-cb data)
+    (let [success-cb   (or (:did-share-cb data) #())
           back-to-dashboard-cb (:back-to-dashboard-cb data)
           cancel-fn    (:dismiss-su-preview data)]
       (dom/div {:class "su-preview-dialog"}
