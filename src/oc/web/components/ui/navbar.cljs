@@ -24,8 +24,8 @@
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
 
-(defn- share-new-tooltip []
-  (if (utils/slack-share?)
+(defn- share-new-tooltip [team-id]
+  (if (jwt/team-has-bot? team-id)
     "Select topics to share by Slack, email or link."
     "Select topics to share by email or link."))
 
@@ -118,7 +118,7 @@
                           (if dashboard-sharing
                             (dom/div {:class "sharing-button-container"}
                               (dom/button {:class "btn-reset share-selected-topics-button right btn-solid"
-                                           :title (share-new-tooltip)
+                                           :title (share-new-tooltip (:team-id org-data))
                                            :data-toggle "tooltip"
                                            :data-container "body"
                                            :data-placement "left"
@@ -135,7 +135,7 @@
                                 "Cancel"))
                             (dom/div {:class "sharing-button-container"}
                               (dom/button {:class "btn-reset sharing-button right"
-                                           :title (share-new-tooltip)
+                                           :title (share-new-tooltip (:team-id org-data))
                                            :data-toggle "tooltip"
                                            :data-container "body"
                                            :data-placement "left"
