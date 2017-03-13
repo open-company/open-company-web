@@ -53,6 +53,14 @@
 (defn entry-key [org-slug board-slug topic-slug as-of]
   (vec (conj (topic-entries-key org-slug board-slug topic-slug) (str as-of))))
 
+(def teams-data-key [:enumerate-users :teams])
+
+(defn team-data-key [team-id]
+  [:enumerate-users team-id :data])
+
+(defn team-channels-key [team-id]
+  [:enumerate-users team-id :channels])
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -83,6 +91,14 @@
                           (fn [base org-slug]
                             (when org-slug
                               (get-in base (org-data-key org-slug))))]
+   :team-data           [[:base :org-data]
+                          (fn [base org-data]
+                            (when org-data
+                              (get-in base (team-data-key (:team-id org-data)))))]
+   :team-channels       [[:base :org-data]
+                          (fn [base org-data]
+                            (when org-data
+                              (get-in base (team-channels-key (:team-id org-data)))))]
    :board-new-topics    [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
@@ -197,12 +213,17 @@
 
 (defn teams-data
   ([] (teams-data @app-state))
-  ([data] (get-in data [:enumerate-users :teams])))
+  ([data] (get-in data teams-data-key)))
 
 (defn team-data
   ([] (team-data (:team-id (org-data))))
   ([team-id] (team-data team-id @app-state))
-  ([team-id data] (get-in data [:enumerate-users team-id])))
+  ([team-id data] (get-in data (team-data-key team-id))))
+
+(defn team-channels
+  ([] (team-channels (:team-id (org-data))))
+  ([team-id] (team-channels team-id @app-state))
+  ([team-id data] (get-in data (team-channels-key team-id))))
 
 (defn foce-topic-key []
   (:foce-key @app-state))
@@ -221,6 +242,9 @@
 (defn print-org-data []
   (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
+(defn print-team-data []
+  (js/console.log (get-in @app-state (team-data-key (:team-id (org-data))))))
+
 (defn print-updates-list-data []
   (js/console.log (get-in @app-state (updates-list-key (router/current-org-slug)))))
 
@@ -235,6 +259,7 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
+(set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintUpdatesListData js/window) print-updates-list-data)
 (set! (.-OCWebPrintUpdateData js/window) print-update-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
