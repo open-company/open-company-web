@@ -35,12 +35,18 @@
   (let [admins (get-key :admin)]
     (some #{team-id} admins)))
 
+(defn slack-bots-team-key
+  "Keys of slack-bots are strings converted to keywords, since JSON adds the double quotes
+   when it gets keywordized on this side it becomes :\"team-id\"."
+  [team-id]
+  (keyword (str "\"" team-id "\"")))
+
 (defn team-has-bot? [team-id]
   (let [slack-bots (get-key :slack-bots)]
     ;; Since the team-id is a string on clj side the key in slakc-bots has quotes around that are
     ;; interpreted as part of the key from the JSON parser.
     ;; When decode keywordize the keys it keeps them in the key so we need to add them to check
     ;; for the team value
-    (some #(= (keyword (str "\"" team-id "\"")) (first %)) slack-bots)))
+    (some #(= (slack-bots-team-key team-id) %) (keys slack-bots))))
 
 (set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))
