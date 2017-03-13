@@ -776,10 +776,6 @@
         host     (.. js/document -location -host)]
     (str protocol "//" host relative-su-url)))
 
-(defn slack-share? []
-  (if-let [jwt (:jwt @dis/app-state)]
-    (pos? (count (:slack-bots jwt))))) ; we have at least one team with the bot added
-
 (def new-topic-body-placeholder "What would you like to say...")
 
 (defn new-topic-initial-data [topic title old-topic-data]
