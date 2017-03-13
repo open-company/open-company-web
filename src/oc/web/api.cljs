@@ -497,14 +497,17 @@
               (dispatcher/dispatch! [:team-roster-loaded fixed-body])
               (dispatcher/dispatch! [:team-loaded fixed-body]))))))))
 
-(defn enumerate-channels []
-  (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "channels" "GET")]
-    (auth-get (:href enumerate-link)
-      {:headers (headers-for-link enumerate-link)}
-      (fn [{:keys [success body status]}]
-        (let [fixed-body (if success (json->cljs body) {})]
-          (if success
-            (dispatcher/dispatch! [:enumerate-channels/success (-> fixed-body :collection :channels)])))))))
+(defn enumerate-channels [team-id]
+  (when team-id
+    (let [team-data (dispatcher/team-data team-id)
+          enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
+      (when enumerate-link
+        (auth-get (:href enumerate-link)
+          {:headers (headers-for-link enumerate-link)}
+          (fn [{:keys [success body status]}]
+            (let [fixed-body (if success (json->cljs body) {})]
+              (if success
+                (dispatcher/dispatch! [:enumerate-channels/success team-id (-> fixed-body :collection :items)])))))))))
 
 (defn user-action [action-link payload]
   (when action-link
