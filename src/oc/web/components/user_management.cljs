@@ -44,14 +44,14 @@
                                           s)}
   [s]
   (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error query-params] :as user-man} (drv/react s :user-management)
-        ro-user-man @(drv/get-ref s :user-management)
-        org-data @(drv/get-ref s :org-data)
+        ro-user-man (drv/react s :user-management)
+        org-data (drv/react s :org-data)
         user-type (:user-type um-invite)
-        cur-user-data @(drv/get-ref s :current-user-data)
+        cur-user-data (drv/react s :current-user-data)
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
-        team-data (get enumerate-users team-id)]
+        team-data (get-in enumerate-users [team-id :data])]
     [:div.user-management.mx-auto.p3.my4.group
       [:div.um-invite.group.mb3
         [:div.um-invite-label
@@ -85,8 +85,8 @@
                 [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
-          (when (contains? enumerate-users team-id)
-            (users-list team-id (:users (get enumerate-users team-id)) (:authors org-data)))])
+          (when team-data
+            (users-list team-id (:users team-data) (:authors org-data)))])
       (when-not (responsive/is-mobile-size?)
         [:div.mb3.um-invite.group
           [:div.um-invite-label
