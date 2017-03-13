@@ -57,6 +57,7 @@ var Tooltip = function(){};
 // Debug app state
 var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};
+var OCWebPrintTeamData = function(){};
 var OCWebPrintBoardData = function(){};
 var OCWebPrintEntriesData = function(){};
 var OCWebPrintJWTContents = function(){};

@@ -37,11 +37,7 @@
              visualized-name]]
       [:td
         [:div
-          (when (:status user)
-            (let [upper-status (clojure.string/upper-case (:status user))]
-              (if (= upper-status "UNVERIFIED")
-                "ACTIVE"
-                upper-status)))]]
+          (when (:status user) (clojure.string/upper-case (:status user)))]]
       [:td {:style {:text-align "center"}}
         (if (:loading user)
           ; if it's loading show the spinner

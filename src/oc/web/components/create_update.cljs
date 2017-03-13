@@ -10,6 +10,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.topic :refer (topic)]
@@ -46,18 +47,27 @@
 (defn share-clicked [owner]
   (om/set-state! owner :show-su-dialog :prompt))
 
-(defn- share-tooltip []
-  (if (utils/slack-share?)
+(defn- share-tooltip [team-id]
+  (if (jwt/team-has-bot? team-id)
     "Share this update by Slack, email or link"
     "Share this update by email or link"))
+
+(defn load-team-data [data]
+  (when (and (:auth-settings data)
+             (not (:enumerate-users-requested data)))
+    (dis/dispatch! [:enumerate-users])))
 
 (defcomponent create-update [data owner]
 
   (init-state [_]
     (dis/dispatch! [:start-foce nil])
+    (load-team-data data)
     {:columns-num (responsive/columns-num)
      :card-width (responsive/calc-card-width)
      :show-su-dialog false})
+
+  (will-receive-props [_ next-props]
+    (load-team-data next-props))
 
   (did-mount [_]
     ; (setup-sortable owner)
@@ -111,7 +121,7 @@
                                :data-placement "left"
                                :on-click back-to-dashboard-fn} "CANCEL")
                   (dom/button {:class "share btn-reset btn-solid"
-                               :title (share-tooltip)
+                               :title (share-tooltip (:team-id org-data))
                                :data-toggle "tooltip"
                                :data-container "body"
                                :data-placement "left"
