@@ -634,7 +634,7 @@
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
   (if team-data
-    (assoc-in db [:enumerate-users (:team-id team-data)] team-data)
+    (assoc-in db (dispatcher/team-data-key (:team-id team-data)) team-data)
     db))
 
 (defmethod dispatcher/action :team-roster-loaded
@@ -643,21 +643,22 @@
     (let [fixed-roster-data {:team-id (:team-id roster-data)
                              :links (:links (:collection roster-data))
                              :users (:items (:collection roster-data))}]
-      (assoc-in db [:enumerate-users (:team-id roster-data)] fixed-roster-data))
+      (assoc-in db (dispatcher/team-data-key (:team-id roster-data)) fixed-roster-data))
     db))
 
 (defmethod dispatcher/action :enumerate-channels
-  [db [_]]
-  (api/enumerate-channels)
+  [db [_ team-id]]
+  (api/enumerate-channels team-id)
   (assoc db :enumerate-channels-requested true))
 
 (defmethod dispatcher/action :enumerate-channels/success
-  [db [_ channels]]
-  (if channels
-    (-> db
-      (assoc :enumerate-channels channels)
-      (dissoc :enumerate-channels-requested))
-    (dissoc db :enumerate-channels)))
+  [db [_ team-id channels]]
+  (let [channels-key (dispatcher/team-channels-key team-id)]
+    (if channels
+      (assoc-in db channels-key channels)
+      (-> db
+        (update-in (butlast channels-key) dissoc (last channels-key))
+        (dissoc :enumerate-channels-requested)))))
 
 (defmethod dispatcher/action :invite-by-email
   [db [_]]
@@ -709,11 +710,10 @@
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]
-  (let [teams (:enumerate-users db)
-        team-data (get teams team-id)
+  (let [team-data (dispatcher/team-data team-id)
         idx (.indexOf (:users team-data) invitation)]
     (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload)
-    (assoc-in db [:enumerate-users idx :loading] true)))
+    (assoc-in db (concat (dispatcher/team-data-key team-id) [:users idx :loading]) true)))
 
 (defmethod dispatcher/action :user-action/complete
   [db [_]]
