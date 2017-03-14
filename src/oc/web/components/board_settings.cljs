@@ -46,13 +46,7 @@
                                         (when-not (contains? @dis/app-state :private-board-invite)
                                           (dis/dispatch! [:input [:private-board-invite] {:selected-user-id ""
                                                                                           :selected-user-type nil}]))
-                                        s)
-                          ;; If it wasn't already, load the users list
-                          :before-render (fn [s]
-                                           (when (and (:auth-settings @dis/app-state)
-                                                      (not (:enumerate-users-requested @dis/app-state)))
-                                             (dis/dispatch! [:enumerate-users]))
-                                           s)}
+                                        s)}
   [s]
   (let [{:keys [enumerate-users private-board-invite]} (drv/react s :user-management)
         org-data (drv/react s :org-data)
@@ -131,7 +125,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         {:keys [enumerate-users]} (drv/react s :user-management)
-        all-users (:users (get enumerate-users (:team-id org-data)))]
+        all-users (get-in enumerate-users [(:team-id org-data) :data :users])]
     [:div.private-board-users-list
       [:table
         [:thead
@@ -170,12 +164,18 @@
 
 (def board-name-min-length 2)
 
+(defn load-team-data-if-needed [owner]
+  (when (and (om/get-props owner :auth-settings)
+             (not (om/get-props owner  :enumerate-users-requested)))
+    (dis/dispatch! [:enumerate-users])))
+
 (defcomponent board-settings-form [data owner]
 
   (init-state [_]
     (get-state data nil))
 
   (will-receive-props [_ next-props]
+    (load-team-data-if-needed owner)
     (if (om/get-state owner :loading)
       (do
         (utils/after 1500 (fn []
@@ -187,6 +187,7 @@
       (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
   (did-mount [_]
+    (load-team-data-if-needed owner)
     (when (and (not (utils/is-test-env?))
                (not (responsive/is-tablet-or-mobile?)))
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
@@ -289,7 +290,7 @@
           (:loading data)
           (dom/div (dom/h4 "Loading data..."))
 
-          (get-in data [(keyword (router/current-org-slug)) (keyword (router/current-board-slug)) :error])
+          (get-in data (dis/board-access-error-key (router/current-org-slug) (router/current-board-slug)))
           (login-required)
 
           ;; Org profile
