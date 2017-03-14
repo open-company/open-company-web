@@ -318,17 +318,23 @@
                :auto-focus true
                :on-change #(dis/dispatch! [:input [:password-reset :email] (.. % -target -value )])
                :name "email"}]]
-          [:div.group.pb3.mt3
-            [:div.right.ml1
-              [:button.btn-reset.btn-solid
-                {:on-click #(dis/dispatch! [:password-reset])
-                 :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
-                "RESET PASSWORD"]]
-            [:div.right
-              [:button.btn-reset.btn-outline
-                {:on-click #(dis/dispatch! [:show-login-overlay nil])
-                 :disabled (not (:auth-settings (rum/react dis/app-state)))}
-                "CANCEL"]]]]]]])
+          (if (:success (:password-reset (rum/react dis/app-state)))
+            [:div.group.pb3.mt3
+              [:div.right
+                [:dubtton.btn-reset.btn-solid
+                  {:on-click #(dis/dispatch! [:show-login-overlay nil])}
+                  "DONE"]]]
+            [:div.group.pb3.mt3
+              [:div.right.ml1
+                [:button.btn-reset.btn-solid
+                  {:on-click #(dis/dispatch! [:password-reset])
+                   :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
+                  "RESET PASSWORD"]]
+              [:div.right
+                [:button.btn-reset.btn-outline
+                  {:on-click #(dis/dispatch! [:show-login-overlay nil])
+                   :disabled (not (:auth-settings (rum/react dis/app-state)))}
+                  "CANCEL"]]])]]]])
 
 (rum/defcs collect-name-password < rum/reactive
                                    (merge

@@ -119,7 +119,8 @@
     ;; save route
     (router/set-route! [org route] {:org org :query-params (:query-params params)})
     ;; load data from api
-    (swap! dis/app-state merge {:loading true})
+    (when-not (dis/org-data)
+      (swap! dis/app-state merge {:loading true}))
     ;; render component
     (drv-root component target)))
 
@@ -166,8 +167,7 @@
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
-      (reset! dis/app-state (-> @dis/app-state
-                               (assoc :loading true))))
+      (swap! dis/app-state merge {:loading true}))
     ;; render component
     (drv-root component target)))
 
