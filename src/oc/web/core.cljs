@@ -119,7 +119,8 @@
     ;; save route
     (router/set-route! [org route] {:org org :query-params (:query-params params)})
     ;; load data from api
-    (swap! dis/app-state merge {:loading true})
+    (when-not (dis/org-data)
+      (swap! dis/app-state merge {:loading true}))
     ;; render component
     (drv-root component target)))
 
