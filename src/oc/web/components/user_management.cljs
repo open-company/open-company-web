@@ -191,10 +191,10 @@
 
 (defcomponent user-management-wrapper [data owner]
   (render [_]
-    (let [company-data (dis/board-data data)]
+    (let [org-data (dis/org-data data)]
 
-      (when (:read-only company-data)
-        (router/redirect! (oc-urls/board)))
+      (when (:read-only org-data)
+        (router/redirect! (oc-urls/org)))
 
       (dom/div {:class "main-company-settings fullscreen-page"}
 
@@ -203,7 +203,7 @@
           (:loading data)
           (dom/div (dom/h4 "Loading data..."))
 
-          (get-in data (conj (dis/board-data-key (router/current-org-slug) (router/current-board-slug)) :error))
+          (get-in data (conj (dis/org-data-key (router/current-org-slug)) :error))
           (login-required)
 
           ;; Company profile
