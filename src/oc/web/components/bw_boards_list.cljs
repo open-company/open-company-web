@@ -8,13 +8,30 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.popover :refer (add-popover hide-popover)]))
+
+(defn- delete-board-alert [e board-slug]
+  (utils/event-stop e)
+  (add-popover {:container-id "delete-board-alert"
+                :message "Are you sure you want to delete this board?"
+                :height "130px"
+                :success-title "DELETE"
+                :success-cb #(do
+                                (dis/dispatch! [:delete-board board-slug])
+                                (hide-popover nil "delete-board-alert"))
+                :cancel-title "KEEP IT"
+                :cancel-cb #(hide-popover nil "delete-board-alert")}))
 
 (defn sorted-boards [boards]
   (into [] (sort #(compare (:name %1) (:name %2)) boards)))
 
 (defcomponent bw-boards-list
   [{:keys [org-data board-data card-width show-add-topic] :as data} owner options]
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (did-update [_ prev-props _]
     (when (and (nil? (:create-board prev-props))
@@ -51,7 +68,15 @@
                                    (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
               (dom/div {:class "internal"
                         :key (str "bw-board-list-" (name (:slug board)) "-internal")}
-                (or (:name board) (:slug board)))))
+                (or (:name board) (:slug board)))
+              (when (utils/link-for (:links board) "delete")
+                (dom/button {:class "remove-board btn-reset"
+                             :title "Delete this board"
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :data-container "body"
+                             :on-click #(delete-board-alert % (:slug board))}
+                  (dom/i {:class "fa fa-times"})))))
           (when-not (nil? (:create-board data))
             (dom/div {:class "left-boards-list-item group"}
               (dom/input {:class "board-name left"
