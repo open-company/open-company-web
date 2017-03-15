@@ -224,7 +224,8 @@
                                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)})
               ; for each column key contained in best layout
               :else
-              (dom/div {:class "right mt2" :style {:width (str (- (int total-width) responsive/left-boards-list-width) "px")}}
+              (dom/div {:class (str "right" (when (:dashboard-sharing data) " mt2"))
+                        :style {:width (str (- (int total-width) responsive/left-boards-list-width) "px")}}
                 (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
                   (let [column (get topics-layout kw)]
                     (dom/div {:class (str "topics-column col-" (name kw))
