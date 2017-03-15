@@ -29,7 +29,7 @@
   (render [_]
     (dom/div {:class (utils/class-set {:email-confirmation true
                                        :main-scroll true})}
-      (dom/div {:class (str "group fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
+      (dom/div {:class "group fullscreen-page with-small-footer"}
         (dom/div {:class "email-confirmation-center center group"}
           (cond
             (= (:email-verification-error data) 401)

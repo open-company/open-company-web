@@ -80,9 +80,6 @@
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
     (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-  (if (jwt/jwt)
-    (dommy/add-class! (sel1 [:body]) :small-footer)
-    (dommy/remove-class! (sel1 [:body]) :small-footer))
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url))
