@@ -170,7 +170,7 @@
             ;show login overlays if needed
             (login-overlays-handler))
           (if board-error
-            (dom/div {:class (str "fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
+            (dom/div {:class "fullscreen-page with-small-footer"}
               (login-required data)
               ;;Footer
                (footer total-width-int))

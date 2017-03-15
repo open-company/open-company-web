@@ -31,7 +31,7 @@
   (render-state [_ {:keys [loading confirmed] :as state}]
     (dom/div {:class (utils/class-set {:confirm-invitation true
                                        :main-scroll true})}
-      (dom/div {:class (str "group fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
+      (dom/div {:class "group fullscreen-page with-small-footer"}
         (dom/div {:class "confirm-invitation-center center group"}
           (dom/h1 {:class "confirm-invitation-cta"}
             (if loading

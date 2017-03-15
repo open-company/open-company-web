@@ -55,7 +55,7 @@
 
   (render-state [_ {:keys [loading logo-url]}]
     (dom/div {:class "org-editor org-logo-setup"}
-      (dom/div {:class (str "group fullscreen-page "  (if (jwt/jwt) "with-small-footer" "with-footer"))
+      (dom/div {:class "group fullscreen-page with-small-footer"
                 :style {:background-color "white"}}
         (dom/div {:class "col-md-7 col-md-offset-2 p0"}
           (dom/h2 {:class "domine mb3"} "Company Setup"))

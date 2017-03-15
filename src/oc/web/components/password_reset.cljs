@@ -29,7 +29,7 @@
   (render [_]
     (dom/div {:class (utils/class-set {:password-reset true
                                        :main-scroll true})}
-      (dom/div {:class (str "group fullscreen-page " (if (jwt/jwt) "with-small-footer" "with-footer"))}
+      (dom/div {:class "group fullscreen-page with-small-footer"}
         (dom/div {:class "password-reset-center center group"}
           (cond
             (= (:collect-pswd-error data) 401)
