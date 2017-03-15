@@ -817,3 +817,15 @@
          :body email}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:password-reset/finish status]))))))
+
+(defn delete-board [board-slug]
+  (when board-slug
+    (let [board-data (dispatcher/board-data @dispatcher/app-state (router/current-org-slug) board-slug)
+          delete-board-link (utils/link-for (:links board-data) "delete")]
+      (when delete-board-link
+        (api-delete (:href delete-board-link)
+          {:headers (headers-for-link delete-board-link)}
+          (fn [{:keys [status success body]}]
+            (if success
+              (router/nav! (oc-urls/org (router/current-org-slug)))
+              (.reload (.-location js/window)))))))))

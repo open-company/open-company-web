@@ -982,3 +982,8 @@
 (defmethod dispatcher/action :password-reset/finish
   [db [_ status]]
   (assoc-in db [:password-reset :success] (and (>= status 200) (<= status 299))))
+
+(defmethod dispatcher/action :delete-board
+  [db [_ board-slug]]
+  (api/delete-board board-slug)
+  db)

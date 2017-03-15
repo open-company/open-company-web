@@ -55,7 +55,26 @@ div.left-boards-list {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        width: 125px;
+        width: 120px;
+        float: left;
+      }
+
+      button.remove-board {
+        float: right;
+        margin-right: 2px;
+        color: $oc_gray_5;
+        opacity: 0;
+        width: 20px;
+        height: 20px;
+        font-weight: 300;
+        font-size: 14px;
+        margin-top: -3px;
+      }
+
+      &:hover {
+        button.remove-board {
+          opacity: 0.8;
+        }
       }
 
       &.selected {
@@ -67,20 +86,6 @@ div.left-boards-list {
 
         &:hover {
           background-color: rgba(78,90,107,0.2);
-        }
-      }
-
-      &.dnd:hover {
-        &:after, &::after {
-          font-size: 13px;
-          font-family: FontAwesome;
-          font-weight: 400;
-          color: $oc_gray_5;
-          content: "\f0c9";
-          cursor: move;
-          margin-top: -20px;
-          margin-left: 129px;
-          opacity: 0.7;
         }
       }
 
