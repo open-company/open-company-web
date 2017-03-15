@@ -139,13 +139,10 @@
      [:div.col-md-12
       [:div.error-page
        [:h1 "404"]
-       [:h2 "Hmm, this does not look right."]
-       [:p
-        "You seem to have come across a page that does not yet exist."
-        [:br]
-        "Please try again or contact support: "
-        [:a {:href contact-mail-to} contact-email]]
-       [:a.btn {:href "/"} "Return To Home"]
+       [:h2 "Hmm, this does not look right!!!"]
+       [:p "You are accessing a page that doesn’t exist or requires authentication."]
+       [:a.btn {:href "/"} "RETURN TO HOME"]
+       [:a.btn.ml2 {:href "/login"} "SIGN IN / SIGN UP"]
        [:script {:src "/js/set-path.js"}]]]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
