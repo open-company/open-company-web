@@ -158,9 +158,12 @@
     (fn [_])))
 
 (defn get-entry-point []
-  (api-get "/" nil (fn [{:keys [success body]}]
-                     (let [fixed-body (if success (json->cljs body) {})]
-                       (dispatcher/dispatch! [:entry-point {:success success :collection (:collection fixed-body)}])))))
+  (let [entry-point-href (str "/" (when (:org @router/path) (str "?requested=" (:org @router/path))))]
+    (api-get entry-point-href
+     nil
+     (fn [{:keys [success body]}]
+       (let [fixed-body (if success (json->cljs body) {})]
+         (dispatcher/dispatch! [:entry-point {:success success :collection (:collection fixed-body)}]))))))
 
 (defn get-subscription [company-uuid]
   (pay-get (str "/subscriptions/" company-uuid)

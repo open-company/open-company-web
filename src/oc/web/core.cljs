@@ -80,8 +80,6 @@
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
     (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-  (api/get-entry-point)
-  (api/get-auth-settings)
   (if (jwt/jwt)
     (dommy/add-class! (sel1 [:body]) :small-footer)
     (dommy/remove-class! (sel1 [:body]) :small-footer))
@@ -89,6 +87,10 @@
   (when should-rewrite-url
     (rewrite-url))
   (inject-loading))
+
+(defn post-routing []
+  (api/get-entry-point)
+  (api/get-auth-settings))
 
 ;; home
 (defn home-handler [target params]
@@ -98,6 +100,7 @@
   (when (jwt/jwt)
     ;; load data from api
     (swap! dis/app-state assoc :loading true))
+  (post-routing)
   ;; render component
   (drv-root home target))
 
@@ -108,6 +111,7 @@
   (router/set-route! ["orgs"] {:query-params (:query-params params)})
   ;; load data from api
   (swap! dis/app-state assoc :loading true)
+  (post-routing)
   ;; render component
   (drv-root list-orgs target))
 
@@ -121,11 +125,13 @@
     ;; load data from api
     (when-not (dis/org-data)
       (swap! dis/app-state merge {:loading true}))
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
 (defn oc-wall-handler [message target params]
   (pre-routing (:query-params params))
+  (post-routing)
   (drv-root #(om/component (oc-wall message :login)) target))
 
 ;; Handle successful and unsuccessful logins
@@ -136,15 +142,17 @@
     (when (contains? (:query-params params) :login-redirect)
       (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
     ;; render component
+    (post-routing)
     (drv-root #(om/component (login)) target)))
 
 (defn simple-handler [component route-name target params]
   (pre-routing (:query-params params))
+  ;; save route
+  (router/set-route! [route-name] {:query-params (:query-params params)})
+  (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     (when (contains? (:query-params params) :login-redirect)
       (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    ;; save route
-    (router/set-route! [route-name] {:query-params (:query-params params)})
     ; remove om component if mounted to the same node
     (om/detach-root target)
     ;; render component
@@ -168,6 +176,7 @@
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
@@ -178,6 +187,7 @@
     (pre-routing query-params true)
     ;; save the route
     (router/set-route! [org route] {:org org :query-params query-params})
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
@@ -197,6 +207,7 @@
       (api/get-update-with-slug org update-slug true)
       (let [su-loading-key (conj su-key :loading)]
         (swap! dis/app-state assoc-in su-loading-key true)))
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
@@ -265,6 +276,7 @@
           (router/set-route! ["create-org"] {:query-params (:query-params params)})
           (api/get-entry-point)
           (api/get-auth-settings)
+          (post-routing)
           (drv-root org-editor target))
         (oc-wall-handler "Please sign in." target params)))
 
@@ -274,8 +286,7 @@
         (let [org (:org (:params params))]
           (pre-routing (:query-params params))
           (router/set-route! [org "create-board"] {:org org :query-params (:query-params params)})
-          (api/get-entry-point)
-          (api/get-auth-settings)
+          (post-routing)
           (drv-root board-editor target))
         (oc-wall-handler "Please sign in to access this organization." target params)))
 
@@ -288,14 +299,13 @@
 
     (defroute org-page-route (urls/org ":org") {:as params}
       (timbre/info "Rounting org-page-route" (urls/org ":org"))
-      (if (jwt/jwt)
-        (org-handler "org" target #(om/component) params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+      (org-handler "org" target #(om/component) params))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
       (router/set-route! ["user-profile"] {:query-params (:query-params params)})
+      (post-routing)
       (if (jwt/jwt)
         (if (jwt/is-slack-org?)
           (drv-root #(om/component (user-profile)) target)
@@ -310,8 +320,7 @@
         ;; save the route
         (router/set-route! [org "org-settings" "logo"] {:org org :query-params query-params})
         ;; load org data
-        (api/get-entry-point)
-        (api/get-auth-settings)
+        (post-routing)
         ;; do we have the company data already?
         (when-not (dis/org-data)
           (swap! dis/app-state assoc :loading true))
@@ -343,23 +352,17 @@
       (api/get-entry-point)
       (api/get-auth-settings)
       (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
-      (if (jwt/jwt)
-        (if (responsive/is-mobile-size?)
-          (drv-root mobile-boards-list target)
-          (org-handler "org" target #(om/component) params))
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+      (if (responsive/is-mobile-size?)
+        (drv-root mobile-boards-list target)
+        (org-handler "org" target #(om/component) params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (if (jwt/jwt)
-        (board-handler "dashboard" target org-dashboard params)
-        (oc-wall-handler "Please sign in to access this board." target params)))
+      (board-handler "dashboard" target org-dashboard params))
 
     (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (if (jwt/jwt)
-        (board-handler "dashboard" target org-dashboard params)
-        (oc-wall-handler "Please sign in to access this board." target params)))
+      (board-handler "dashboard" target org-dashboard params))
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))

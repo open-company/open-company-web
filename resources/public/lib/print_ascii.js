@@ -3,6 +3,7 @@ function OCWebHelp(){
 OpenCompany Web help:
 OCWebHelp(): print this help,
 OCWebPrintAppState(): print the whole app-state,
+OCWebPrintRouterPath(): to print the current router setup.
 OCWebPrintOrgData(): to print the current org data,
 OCWebPrintUpdatesListData(): to print the current loaded list of updates,
 OCWebPrintUpdateData(): to print the current update data,
