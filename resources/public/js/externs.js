@@ -66,3 +66,4 @@ var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
 var OCWebPrintUpdatesListData = function(){};
 var OCWebPrintUpdateData = function(){};
+var OCWebPrintRouterPath = function(){};

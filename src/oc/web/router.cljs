@@ -125,3 +125,8 @@
   "Cookie to save the last accessed board"
   [org-slug]
   (str "last-board-" (name org-slug)))
+
+(defn print-router-path []
+  (js/console.log @path))
+
+(set! (.-OCWebPrintRouterPath js/window) print-router-path)
