@@ -628,8 +628,7 @@
           (router/redirect! oc-urls/logout))))))
 
 (defn patch-team [team-id new-team-data redirect-url]
-  (when-let* [teams-data (dispatcher/teams-data)
-              team-data (first (filter #(= (:team-id %) team-id) teams-data))
+  (when-let* [team-data (dispatcher/team-data team-id)
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-patch (:href team-patch)
       {:headers (headers-for-link team-patch)
@@ -649,8 +648,7 @@
         (fn [{:keys [success status body]}]
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
-            (let [teams-data (dispatcher/teams-data)
-                  team-data (first (filter #(= (:team-id %) team-id) teams-data))
+            (let [team-data (dispatcher/team-data team-id)
                   board-url (oc-urls/org (:slug org-data))]
               (if (and (s/blank? (:name team-data))
                        (utils/link-for (:links team-data) "partial-update"))

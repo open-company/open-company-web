@@ -540,8 +540,8 @@
   (let [current (router/get-token)
         org-data (dispatcher/org-data db)
         team-id (:team-id org-data)
-        team (get (:enumerate-users db) team-id)
-        auth-link (utils/link-for (:links team) "bot")
+        team-data (dispatcher/team-data team-id)
+        auth-link (utils/link-for (:links team-data) "bot")
         user-data (:current-user-data db)
         fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (oc-urls/org (:slug org-data)))]
     (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -898,10 +898,9 @@
 
 (defmethod dispatcher/action :add-slack-team
   [db [_]]
-  (let [teams-data (:enumerate-users db)
-        org-data (dispatcher/org-data db)
+  (let [org-data (dispatcher/org-data db)
         team-id (:team-id org-data)
-        team-data (get teams-data (:team-id org-data))
+        team-data (dispatcher/team-data team-id)
         user-data (:current-user-data db)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
         fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) (:user-id user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
