@@ -16,6 +16,7 @@
             [oc.web.components.ui.footer :as footer]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.user-type-picker :refer (user-type-picker)]
+            [oc.web.components.ui.loading :refer (rloading)]
             [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.fx.dom :refer (Fade)]))
 
@@ -51,143 +52,146 @@
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
-        team-data (get-in enumerate-users [team-id :data])]
+        team-data (dis/team-data team-id)]
     [:div.user-management.mx-auto.p3.my4.group
-      [:div.um-invite.group.mb3
-        [:div.um-invite-label
-          "TEAM MEMBERS"]
+      (if-not team-data
+        (rloading {:loading true})
         [:div
-          [:div.group
-            [:input.left.um-invite-field.email
-              {:name "um-invite"
-               :type "text"
-               :autoCapitalize "none"
-               :value (:email um-invite)
-               :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
-               :placeholder "Email address"}]
-            (user-type-picker user-type valid-email? #(dis/dispatch! [:input [:um-invite :user-type] %]) true)
-            [:button.right.btn-reset.btn-solid.um-invite-send
-              {:disabled (or (not valid-email?)
-                             (not user-type))
-               :on-click #(let [email (:email (:um-invite ro-user-man))]
-                            (if (and (utils/valid-email? email)
-                                     (not (nil? (:user-type (:um-invite ro-user-man)))))
-                              (dis/dispatch! [:invite-by-email])
-                              (dis/dispatch! [:input [:um-invite :error] true])))}
-             "SEND INVITE"]]
-          (when (:error um-invite)
+          [:div.um-invite.group.mb3
+            [:div.um-invite-label
+              "TEAM MEMBERS"]
             [:div
-              (cond
-                (and (= (:error um-invite) :user-exists)
-                     (:email um-invite))
-                [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
-                :else
-                [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
-      (when-not (responsive/is-mobile-size?)
-        [:div.mb3.um-invite.group
-          (when team-data
-            (users-list team-id (:users team-data) (:authors org-data)))])
-      (when-not (responsive/is-mobile-size?)
-        [:div.mb3.um-invite.group
-          [:div.um-invite-label
-              "SLACK TEAMS"]
-          [:div.um-invite-label-2
-            "Anyone who signs up with your Slack team can view team boards."]
-          [:div.team-list
-            (for [team (:slack-orgs team-data)]
-              [:div.slack-domain.group
-                {:key (str "slack-org-" (:slack-org-id team))}
-                [:img.slack-logo {:src "/img/slack.png"}]
-                [:span (:name team)]
-                (when-not (contains? (jwt/get-key :bot) team-id)
-                  (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
-                    (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
-                      [:button.btn-reset.btn-link
-                        {:on-click #(router/redirect! fixed-add-bot-link)
-                         :title "The OpenCompany Slack bot enables Slack invites, assignments and sharing."
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"}
-                        "Add OpenCompany Slack bot"])))
-                [:button.btn-reset
-                  {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                   :title (str "Remove " (:name team) " Slack team")
-                   :data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"}
-                  [:i.fa.fa-trash]]])]
-          [:div.group
-            (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-              (if (zero? (count (:slack-orgs team-data)))
-                [:button.btn-reset.mt2.add-slack-team.slack-button
-                    {:on-click #(dis/dispatch! [:add-slack-team])}
-                    "Add "
-                    [:span.slack "Slack"]
-                    " Team"]
-                [:button.btn-reset.btn-link.another-slack-team
-                  {:on-click #(dis/dispatch! [:add-slack-team])}
-                  "Add another Slack team"]))
-            (when (not (empty? (:access query-params)))
-              [:div#result-message
-                (cond
-                  (= (:access query-params) "team-exists")
-                  [:span.small-caps.red.mt1.left "This team was already added."]
-                  (= (:access query-params) "team")
-                  [:span.small-caps.green.mt1.left "Team successfully added."]
-                  (= (:access query-params) "bot")
-                  [:span.small-caps.green.mt1.left "Bot successfully added."]
-                  :else
-                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
-      (when-not (responsive/is-mobile-size?)
-        [:div.mb3.um-invite.group
-          [:div.um-invite-label
-              "TEAM EMAIL DOMAINS"]
-          [:div.um-invite-label-2
-            "Anyone who signs up with this email domain can view team boards."]
-          [:div.team-list
-            (for [team (:email-domains team-data)]
-              [:div.email-domain.group
-                [:span (str "@" (:domain team))]
-                [:button.btn-reset
-                  {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                   :title "Remove email domain team"}
-                  [:i.fa.fa-trash]]])]
-          [:div.group
-            [:input.left.um-invite-field.email
-              {:name "um-domain-invite"
-               :type "text"
-               :autoCapitalize "none"
-               :value (:domain um-domain-invite)
-               :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
-               :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :placeholder "Domain, e.g. @acme.com"}]
-            [:button.right.btn-reset.btn-solid.um-invite-send
-              {:disabled (not valid-domain-email?)
-               :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
-                            (if (utils/valid-domain? domain)
-                              (dis/dispatch! [:add-email-domain-team])
-                              (dis/dispatch! [:input [:add-email-domain-team-error] true])))}
-             "ADD"]
-            (when add-email-domain-team-error
-              [:div
-                (cond
-                  (and (= add-email-domain-team-error :domain-exists)
-                       (:domain um-domain-invite))
-                  [:span.small-caps.red.mt1.left (str (:domain um-domain-invite) " was already added.")]
-                  :else
-                  [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
-      (comment
-        [:div.my2.um-byemail-container.group
-          [:div.group
-            [:span.left.ml1.um-byemail-anyone-span
-              "Anyone who signs up with this email domain can view team boards."]]
-          [:div.mt2.um-byemail.group
-            [:span.left.um-byemail-at "@"]
-            [:input.left.um-byemail-email
-              {:type "text"
-               :name "um-byemail-email"
-               :placeholder "your email domain without @"}]
-            [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])]))
+              [:div.group
+                [:input.left.um-invite-field.email
+                  {:name "um-invite"
+                   :type "text"
+                   :autoCapitalize "none"
+                   :value (:email um-invite)
+                   :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
+                   :placeholder "Email address"}]
+                (user-type-picker user-type valid-email? #(dis/dispatch! [:input [:um-invite :user-type] %]) true)
+                [:button.right.btn-reset.btn-solid.um-invite-send
+                  {:disabled (or (not valid-email?)
+                                 (not user-type))
+                   :on-click #(let [email (:email (:um-invite ro-user-man))]
+                                (if (and (utils/valid-email? email)
+                                         (not (nil? (:user-type (:um-invite ro-user-man)))))
+                                  (dis/dispatch! [:invite-by-email])
+                                  (dis/dispatch! [:input [:um-invite :error] true])))}
+                 "SEND INVITE"]]
+              (when (:error um-invite)
+                [:div
+                  (cond
+                    (and (= (:error um-invite) :user-exists)
+                         (:email um-invite))
+                    [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
+                    :else
+                    [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
+              (when-not (responsive/is-mobile-size?)
+                [:div.mb3.um-invite.group
+                  (when team-data
+                    (users-list team-id (:users team-data) (:authors org-data)))])
+              (when-not (responsive/is-mobile-size?)
+                [:div.mb3.um-invite.group
+                  [:div.um-invite-label
+                      "SLACK TEAMS"]
+                  [:div.um-invite-label-2
+                    "Anyone who signs up with your Slack team can view team boards."]
+                  [:div.team-list
+                    (for [team (:slack-orgs team-data)]
+                      [:div.slack-domain.group
+                        {:key (str "slack-org-" (:slack-org-id team))}
+                        [:img.slack-logo {:src "/img/slack.png"}]
+                        [:span (:name team)]
+                        (when-not (contains? (jwt/get-key :bot) team-id)
+                          (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                            (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
+                              [:button.btn-reset.btn-link
+                                {:on-click #(router/redirect! fixed-add-bot-link)
+                                 :title "The OpenCompany Slack bot enables Slack invites, assignments and sharing."
+                                 :data-toggle "tooltip"
+                                 :data-placement "top"
+                                 :data-container "body"}
+                                "Add OpenCompany Slack bot"])))
+                        [:button.btn-reset
+                          {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                           :title (str "Remove " (:name team) " Slack team")
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"}
+                          [:i.fa.fa-trash]]])]
+                  [:div.group
+                    (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+                      (if (zero? (count (:slack-orgs team-data)))
+                        [:button.btn-reset.mt2.add-slack-team.slack-button
+                            {:on-click #(dis/dispatch! [:add-slack-team])}
+                            "Add "
+                            [:span.slack "Slack"]
+                            " Team"]
+                        [:button.btn-reset.btn-link.another-slack-team
+                          {:on-click #(dis/dispatch! [:add-slack-team])}
+                          "Add another Slack team"]))
+                    (when (not (empty? (:access query-params)))
+                      [:div#result-message
+                        (cond
+                          (= (:access query-params) "team-exists")
+                          [:span.small-caps.red.mt1.left "This team was already added."]
+                          (= (:access query-params) "team")
+                          [:span.small-caps.green.mt1.left "Team successfully added."]
+                          (= (:access query-params) "bot")
+                          [:span.small-caps.green.mt1.left "Bot successfully added."]
+                          :else
+                          [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
+              (when-not (responsive/is-mobile-size?)
+                [:div.mb3.um-invite.group
+                  [:div.um-invite-label
+                      "TEAM EMAIL DOMAINS"]
+                  [:div.um-invite-label-2
+                    "Anyone who signs up with this email domain can view team boards."]
+                  [:div.team-list
+                    (for [team (:email-domains team-data)]
+                      [:div.email-domain.group
+                        [:span (str "@" (:domain team))]
+                        [:button.btn-reset
+                          {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                           :title "Remove email domain team"}
+                          [:i.fa.fa-trash]]])]
+                  [:div.group
+                    [:input.left.um-invite-field.email
+                      {:name "um-domain-invite"
+                       :type "text"
+                       :autoCapitalize "none"
+                       :value (:domain um-domain-invite)
+                       :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                       :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
+                       :placeholder "Domain, e.g. @acme.com"}]
+                    [:button.right.btn-reset.btn-solid.um-invite-send
+                      {:disabled (not valid-domain-email?)
+                       :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
+                                    (if (utils/valid-domain? domain)
+                                      (dis/dispatch! [:add-email-domain-team])
+                                      (dis/dispatch! [:input [:add-email-domain-team-error] true])))}
+                     "ADD"]
+                    (when add-email-domain-team-error
+                      [:div
+                        (cond
+                          (and (= add-email-domain-team-error :domain-exists)
+                               (:domain um-domain-invite))
+                          [:span.small-caps.red.mt1.left (str (:domain um-domain-invite) " was already added.")]
+                          :else
+                          [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
+          (comment
+            [:div.my2.um-byemail-container.group
+              [:div.group
+                [:span.left.ml1.um-byemail-anyone-span
+                  "Anyone who signs up with this email domain can view team boards."]]
+              [:div.mt2.um-byemail.group
+                [:span.left.um-byemail-at "@"]
+                [:input.left.um-byemail-email
+                  {:type "text"
+                   :name "um-byemail-email"
+                   :placeholder "your email domain without @"}]
+                [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])])]))
 
 (defcomponent user-management-wrapper [data owner]
   (render [_]
