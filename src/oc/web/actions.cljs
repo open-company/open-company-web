@@ -615,10 +615,10 @@
   (api/get-auth-settings)
   db)
 
-(defmethod dispatcher/action :enumerate-users
+(defmethod dispatcher/action :get-teams
   [db [_]]
   (api/get-teams)
-  (assoc db :enumerate-users-requested true))
+  (assoc db :teams-data-requested true))
 
 (defmethod dispatcher/action :teams-loaded
   [db [_ teams dont-follow-team-link]]
@@ -629,7 +629,7 @@
       (if team-link
         (api/get-team team-link)
         (api/get-team roster-link))))
-  (assoc-in db [:enumerate-users :teams] teams))
+  (assoc-in db [:teams-data :teams] teams))
 
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
@@ -668,14 +668,15 @@
         parsed-email (utils/parse-input-email email)
         email-name (:name parsed-email)
         email-address (:address parsed-email)
-        user  (first (filter #(= (:email %) email-address) (:users (get (:enumerate-users db) (:team-id org-data)))))
+        team-data (dispatcher/team-data (:team-id org-data))
+        user  (first (filter #(= (:email %) email-address) (:users team-data)))
         old-user-type (when user (utils/get-user-type user org-data))
         new-user-type (:user-type (:um-invite db))]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
     (when (or (not user)
               (and user
-                   (= (:status user) "pending")))
+                   (= (string/lower-case (:status user)) "pending")))
       (let [splitted-name (string/split email-name #"\s")
             name-size (count splitted-name)
             splittable-name? (= name-size 2)

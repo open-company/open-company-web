@@ -26,8 +26,8 @@
                              (drv/drv :org-data)
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)
-                                                          (not (:enumerate-users-requested @dis/app-state)))
-                                                 (dis/dispatch! [:enumerate-users]))
+                                                          (not (:teams-data-requested @dis/app-state)))
+                                                 (dis/dispatch! [:get-teams]))
                                                (when (and (nil? (:user-type (:um-invite @(drv/get-ref s :team-management))))
                                                           (utils/valid-email? (:email (:um-invite @(drv/get-ref s :team-management)))))
                                                   (dis/dispatch! [:input [:um-invite :user-type] :viewer]))
@@ -44,7 +44,7 @@
                                                                                  :domain ""}]))
                                           s)}
   [s]
-  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error query-params] :as user-man} (drv/react s :team-management)
+  (let [{:keys [um-invite um-domain-invite teams-data add-email-domain-team-error query-params] :as user-man} (drv/react s :team-management)
         ro-user-man (drv/react s :team-management)
         org-data (drv/react s :org-data)
         user-type (:user-type um-invite)
@@ -52,7 +52,7 @@
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
-        team-data (dis/team-data team-id)]
+        team-data (get-in teams-data [team-id :data])]
     [:div.team-management.mx-auto.p3.my4.group
       (if-not team-data
         (rloading {:loading true})

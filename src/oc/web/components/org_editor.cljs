@@ -32,7 +32,7 @@
           (dis/dispatch! [:create-org]))))))
 
 (defn setup-org-name [data]
-  (when-let [team-data (first (:teams (:enumerate-users data)))]
+  (when-let [team-data (first (:teams (:teams-data data)))]
     ;; using utils/after here because we can't dispatch inside another dispatch.
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
