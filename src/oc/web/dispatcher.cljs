@@ -73,7 +73,7 @@
                           (fn [base org-slug]
                             (when org-slug
                               (:items (get-in base (updates-list-key org-slug)))))]
-   :user-management     [[:base :route]
+   :team-management     [[:base :route]
                           (fn [base route]
                             {:um-invite (:um-invite base)
                              :private-board-invite (:private-board-invite base)

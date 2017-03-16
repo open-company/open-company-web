@@ -37,7 +37,7 @@
 
 (rum/defcs invite-user < rum/static
                          rum/reactive
-                         (drv/drv :user-management)
+                         (drv/drv :team-management)
                          (drv/drv :org-data)
                          (drv/drv :board-data)
                           ;; Before mounting the component setup the invitation variables
@@ -48,7 +48,7 @@
                                                                                           :selected-user-type nil}]))
                                         s)}
   [s]
-  (let [{:keys [enumerate-users private-board-invite]} (drv/react s :user-management)
+  (let [{:keys [enumerate-users private-board-invite]} (drv/react s :team-management)
         org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         users (:users (get enumerate-users (:team-id org-data)))
@@ -120,11 +120,11 @@
                         rum/reactive
                         (drv/drv :board-data)
                         (drv/drv :org-data)
-                        (drv/drv :user-management)
+                        (drv/drv :team-management)
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        {:keys [enumerate-users]} (drv/react s :user-management)
+        {:keys [enumerate-users]} (drv/react s :team-management)
         all-users (get-in enumerate-users [(:team-id org-data) :data :users])]
     [:div.private-board-users-list
       [:table

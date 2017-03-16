@@ -22,7 +22,7 @@
             [oc.web.components.home :refer (home)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.list-orgs :refer (list-orgs)]
-            [oc.web.components.user-management :refer (user-management-wrapper)]
+            [oc.web.components.team-management :refer (team-management-wrapper)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.edit-user-profile :refer (edit-user-profile)]
@@ -340,7 +340,7 @@
       ; has no topics and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
       (if (jwt/jwt)
-        (team-handler "org-team-settings" target user-management-wrapper params)
+        (team-handler "org-team-settings" target team-management-wrapper params)
         (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}

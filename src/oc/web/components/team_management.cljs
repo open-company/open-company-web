@@ -1,4 +1,4 @@
-(ns oc.web.components.user-management
+(ns oc.web.components.team-management
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [om.core :as om :include-macros true]
@@ -20,16 +20,16 @@
             [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.fx.dom :refer (Fade)]))
 
-(rum/defcs user-management < rum/reactive
-                             (drv/drv :user-management)
+(rum/defcs team-management < rum/reactive
+                             (drv/drv :team-management)
                              (drv/drv :current-user-data)
                              (drv/drv :org-data)
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)
                                                           (not (:enumerate-users-requested @dis/app-state)))
                                                  (dis/dispatch! [:enumerate-users]))
-                                               (when (and (nil? (:user-type (:um-invite @(drv/get-ref s :user-management))))
-                                                          (utils/valid-email? (:email (:um-invite @(drv/get-ref s :user-management)))))
+                                               (when (and (nil? (:user-type (:um-invite @(drv/get-ref s :team-management))))
+                                                          (utils/valid-email? (:email (:um-invite @(drv/get-ref s :team-management)))))
                                                   (dis/dispatch! [:input [:um-invite :user-type] :viewer]))
                                                s)
                              :did-mount (fn [s]
@@ -44,8 +44,8 @@
                                                                                  :domain ""}]))
                                           s)}
   [s]
-  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error query-params] :as user-man} (drv/react s :user-management)
-        ro-user-man (drv/react s :user-management)
+  (let [{:keys [um-invite um-domain-invite enumerate-users add-email-domain-team-error query-params] :as user-man} (drv/react s :team-management)
+        ro-user-man (drv/react s :team-management)
         org-data (drv/react s :org-data)
         user-type (:user-type um-invite)
         cur-user-data (drv/react s :current-user-data)
@@ -53,7 +53,7 @@
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
         team-data (dis/team-data team-id)]
-    [:div.user-management.mx-auto.p3.my4.group
+    [:div.team-management.mx-auto.p3.my4.group
       (if-not team-data
         (rloading {:loading true})
         [:div
@@ -193,7 +193,7 @@
                    :placeholder "your email domain without @"}]
                 [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])])]))
 
-(defcomponent user-management-wrapper [data owner]
+(defcomponent team-management-wrapper [data owner]
   (render [_]
     (let [org-data (dis/org-data data)]
 
@@ -215,7 +215,7 @@
           (dom/div {}
             (back-to-dashboard-btn {:title (if (responsive/is-mobile-size?) "Invite" "Invite and Manage Team") :click-cb #(router/nav! (oc-urls/org))})
             (dom/div {:class "company-settings-container"}
-              (user-management))))
+              (team-management))))
 
         (let [columns-num (responsive/columns-num)
               card-width (responsive/calc-card-width)]
