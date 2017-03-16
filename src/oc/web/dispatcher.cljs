@@ -53,13 +53,13 @@
 (defn entry-key [org-slug board-slug topic-slug as-of]
   (vec (conj (topic-entries-key org-slug board-slug topic-slug) (str as-of))))
 
-(def teams-data-key [:enumerate-users :teams])
+(def teams-data-key [:teams-data :teams])
 
 (defn team-data-key [team-id]
-  [:enumerate-users team-id :data])
+  [:teams-data team-id :data])
 
 (defn team-channels-key [team-id]
-  [:enumerate-users team-id :channels])
+  [:teams-data team-id :channels])
 
 ;; Derived Data ================================================================
 
@@ -73,15 +73,15 @@
                           (fn [base org-slug]
                             (when org-slug
                               (:items (get-in base (updates-list-key org-slug)))))]
-   :user-management     [[:base :route]
+   :team-management     [[:base :route]
                           (fn [base route]
                             {:um-invite (:um-invite base)
                              :private-board-invite (:private-board-invite base)
                              :query-params (:query-params route)
-                             :enumerate-users (:enumerate-users base)
+                             :teams-data (:teams-data base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
-                             :enumerate-users-requested (:enumerate-users-requested base)})]
+                             :teams-data-requested (:teams-data-requested base)})]
    :jwt                 [[:base] (fn [base] (:jwt base))]
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]

@@ -54,8 +54,8 @@
 
 (defn load-team-data [data]
   (when (and (:auth-settings data)
-             (not (:enumerate-users-requested data)))
-    (dis/dispatch! [:enumerate-users])))
+             (not (:teams-data-requested data)))
+    (dis/dispatch! [:get-teams])))
 
 (defcomponent create-update [data owner]
 

@@ -37,7 +37,7 @@
 
 (rum/defcs invite-user < rum/static
                          rum/reactive
-                         (drv/drv :user-management)
+                         (drv/drv :team-management)
                          (drv/drv :org-data)
                          (drv/drv :board-data)
                           ;; Before mounting the component setup the invitation variables
@@ -48,10 +48,10 @@
                                                                                           :selected-user-type nil}]))
                                         s)}
   [s]
-  (let [{:keys [enumerate-users private-board-invite]} (drv/react s :user-management)
+  (let [{:keys [teams-data private-board-invite]} (drv/react s :team-management)
         org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        users (:users (get enumerate-users (:team-id org-data)))
+        users (get-in teams-data [(:team-id org-data) :data :users])
         selected-user-id (:selected-user-id private-board-invite)
         selected-user-type (:selected-user-type private-board-invite)
         selected-user (when selected-user-id (some #(when (= (:user-id %) selected-user-id) %) users))
@@ -120,12 +120,12 @@
                         rum/reactive
                         (drv/drv :board-data)
                         (drv/drv :org-data)
-                        (drv/drv :user-management)
+                        (drv/drv :team-management)
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        {:keys [enumerate-users]} (drv/react s :user-management)
-        all-users (get-in enumerate-users [(:team-id org-data) :data :users])]
+        {:keys [teams-data]} (drv/react s :team-management)
+        all-users (get-in teams-data [(:team-id org-data) :data :users])]
     [:div.private-board-users-list
       [:table
         [:thead
@@ -166,8 +166,8 @@
 
 (defn load-team-data-if-needed [owner]
   (when (and (om/get-props owner :auth-settings)
-             (not (om/get-props owner  :enumerate-users-requested)))
-    (dis/dispatch! [:enumerate-users])))
+             (not (om/get-props owner  :teams-data-requested)))
+    (dis/dispatch! [:get-teams])))
 
 (defcomponent board-settings-form [data owner]
 

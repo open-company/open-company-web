@@ -5,8 +5,8 @@
 (rum/defcs bot-access-prompt < rum/static
                                {:before-render (fn [s]
                                                  (when (and (:auth-settings @dis/app-state)
-                                                            (not (:enumerate-users-requested @dis/app-state)))
-                                                   (dis/dispatch! [:enumerate-users]))
+                                                            (not (:teams-data-requested @dis/app-state)))
+                                                   (dis/dispatch! [:get-teams]))
                                                  s)}
   [s maybe-later-cb]
   [:div.bot-access-prompt.fullscreen-page.group

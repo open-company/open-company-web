@@ -540,8 +540,8 @@
   (let [current (router/get-token)
         org-data (dispatcher/org-data db)
         team-id (:team-id org-data)
-        team (get (:enumerate-users db) team-id)
-        auth-link (utils/link-for (:links team) "bot")
+        team-data (dispatcher/team-data team-id)
+        auth-link (utils/link-for (:links team-data) "bot")
         user-data (:current-user-data db)
         fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (oc-urls/org (:slug org-data)))]
     (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -615,10 +615,10 @@
   (api/get-auth-settings)
   db)
 
-(defmethod dispatcher/action :enumerate-users
+(defmethod dispatcher/action :get-teams
   [db [_]]
   (api/get-teams)
-  (assoc db :enumerate-users-requested true))
+  (assoc db :teams-data-requested true))
 
 (defmethod dispatcher/action :teams-loaded
   [db [_ teams dont-follow-team-link]]
@@ -629,7 +629,7 @@
       (if team-link
         (api/get-team team-link)
         (api/get-team roster-link))))
-  (assoc-in db [:enumerate-users :teams] teams))
+  (assoc-in db [:teams-data :teams] teams))
 
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
@@ -668,14 +668,15 @@
         parsed-email (utils/parse-input-email email)
         email-name (:name parsed-email)
         email-address (:address parsed-email)
-        user  (first (filter #(= (:email %) email-address) (:users (get (:enumerate-users db) (:team-id org-data)))))
+        team-data (dispatcher/team-data (:team-id org-data))
+        user  (first (filter #(= (:email %) email-address) (:users team-data)))
         old-user-type (when user (utils/get-user-type user org-data))
         new-user-type (:user-type (:um-invite db))]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
     (when (or (not user)
               (and user
-                   (= (:status user) "pending")))
+                   (= (string/lower-case (:status user)) "pending")))
       (let [splitted-name (string/split email-name #"\s")
             name-size (count splitted-name)
             splittable-name? (= name-size 2)
@@ -898,10 +899,9 @@
 
 (defmethod dispatcher/action :add-slack-team
   [db [_]]
-  (let [teams-data (:enumerate-users db)
-        org-data (dispatcher/org-data db)
+  (let [org-data (dispatcher/org-data db)
         team-id (:team-id org-data)
-        team-data (get teams-data (:team-id org-data))
+        team-data (dispatcher/team-data team-id)
         user-data (:current-user-data db)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
         fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) (:user-id user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
