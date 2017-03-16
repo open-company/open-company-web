@@ -140,9 +140,9 @@
       [:div.error-page
        [:h1 "404"]
        [:h2 "Hmm, this does not look right!!!"]
-       [:p "You are accessing a page that doesn’t exist or requires authentication."]
+       [:p {:id "oc-404-disclaimer"} "You are accessing a page that doesn’t exist or requires authentication."]
        [:a.btn {:href "/"} "RETURN TO HOME"]
-       [:a.btn.ml2 {:href "/login"} "SIGN IN / SIGN UP"]
+       [:a.btn.ml2 {:id "oc-signin-logout-btn" :href "/login"} "SIGN IN / SIGN UP"]
        [:script {:src "/js/set-path.js"}]]]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
