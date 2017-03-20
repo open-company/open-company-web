@@ -42,17 +42,6 @@
     (.focus body)
     (utils/to-end-of-content-editable body)))
 
-(defn- scroll-to-topic-top [topic]
-  (let [body-scroll (.-scrollTop (.-body js/document))
-        topic-scroll-top (utils/offset-top topic)]
-    (utils/scroll-to-y (- (+ topic-scroll-top body-scroll) 90))))
-
-(defn- force-hide-placeholder [owner]
-  (let [editor       (om/get-state owner :body-editor)
-        topic-name (name (:topic (dis/foce-topic-data)))
-        body-el      (sel1 [(str "div#foce-body-" topic-name)])]
-    (utils/medium-editor-hide-placeholder editor body-el)))
-
 (defn- headline-on-change [owner]
   (when-let* [topic-kw     (dis/foce-topic-key)
               headline       (sel1 (str "div#foce-headline-" (name topic-kw)))]
@@ -97,11 +86,8 @@
 
 (defn- setup-body-editor [owner]
   (when-let* [topic-kw   (dis/foce-topic-key)
-              topic-name (name topic-kw)
-              body-id      (str "div#foce-body-" topic-name)
-              body-el      (sel1 [body-id])
-              headline-id  (str "div#foce-headline-" topic-name)
-              headline-el  (sel1 [headline-id])]
+              body-el      (sel1 [(str "div#foce-body-" (name topic-kw))])
+              headline-el  (sel1 [(str "div#foce-headline-" (name topic-kw))])]
     (let [body-editor      (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "" false)))]
       (.subscribe body-editor
                   "editableInput"
@@ -274,7 +260,7 @@
        :body-placeholder (if (string/starts-with? (name topic) "custom-")
                             body-placeholder
                             (if (:new topic-data) (str "What would you like to say? For example, " fixed-body-placeholder) utils/new-topic-body-placeholder))
-       :initial-body  (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
+       :initial-body (utils/emojify (if (and (:placeholder topic-data) (not has-data?)) "" body))
        :char-count nil
        :char-count-alert false
        :has-changes false
@@ -370,8 +356,7 @@
       (let [onbeforeunload-cb (when has-changes #(str before-unload-message))]
         (set! (.-onbeforeunload js/window) onbeforeunload-cb))
       (when topic
-        (dom/div #js {:className "topic-foce group"
-                      :ref "topic-internal"}
+        (dom/div #js {:className "topic-foce group"}
           (when (and (not is-data?)
                      image-header)
             (dom/div {:class "card-header card-image"}
@@ -448,19 +433,14 @@
           (dom/div #js {:className "topic-body emoji-autocomplete emojiable"
                         :id (str "foce-body-" (name topic))
                         :key (str "foce-body-" (name topic))
-                        :ref "topic-body"
                         :role "textbox"
                         :aria-multiline true
-                        :placeholder body-placeholder
-                        :data-placeholder body-placeholder
                         :contentEditable true
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
             (dom/div {:class "left mr2"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (emoji-picker {:add-emoji-cb (fn [editor emoji]
-                                             (when (= editor (sel1 (str "div#foce-body-" (name topic-kw))))
-                                               (force-hide-placeholder owner))
                                              (let [headline (sel1 (str "#foce-headline-" (name topic)))
                                                    body     (sel1 (str "#foce-body-" (name topic)))]
                                                (when (= (.-activeElement js/document) headline)
