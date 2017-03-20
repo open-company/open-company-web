@@ -26,36 +26,36 @@ button.user-avatar-button{
     border: 0px solid tranparent;
   }
 
-  div.user-avatar-name {
-    width: #{$avatar_size}px;
-    height: #{$avatar_size}px;
-    font-size: 22px;
-    font-family: $oc_headers_font;
-    padding: 0px 7px 7px 5px;
-    color: rgba(78, 90, 107, 1);
-    font-weight: 400;
-    float: left;
-    margin-right: 5px;
-
-    background-color: $oc_gray_8;
-
-    &:empty {
-      width: 0px;
-      height: 0px;
-      margin: 0;
-      padding: 0;
-    }
-  }
-
   &:hover {
     div.user-avatar-name {
       background-color: rgba(78, 90, 107, 0.2);
     }
   }
+}
 
-  img.user-avatar-img {
-    max-width: #{$avatar_size}px;
-    max-height: #{$avatar_size}px;
-    margin-right: 5px;
+img.user-avatar-img {
+  max-width: #{$avatar_size}px;
+  max-height: #{$avatar_size}px;
+  margin-right: 5px;
+}
+
+div.user-avatar-name {
+  min-width: #{$avatar_size}px;
+  height: #{$avatar_size}px;
+  font-size: 22px;
+  font-family: $oc_headers_font;
+  padding: 0px 7px 7px 5px;
+  color: rgba(78, 90, 107, 1);
+  font-weight: 400;
+  float: left;
+  margin-right: 5px;
+
+  background-color: $oc_gray_8;
+
+  &:empty {
+    width: 0px;
+    height: 0px;
+    margin: 0;
+    padding: 0;
   }
 }

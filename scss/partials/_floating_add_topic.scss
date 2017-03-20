@@ -1,0 +1,42 @@
+$add_topic_button_size: 32;
+$min_screen_height: 1000;
+
+div.floating-add-topic {
+  @media screen and (max-height: #{$min_screen_height}px){
+    position: fixed;
+  }
+  @media screen and (min-height: #{$min_screen_height + 1}px){
+    position: absolute;
+  }
+  right: 30px;
+  bottom: 110px;
+  width: #{$add_topic_button_size}px;
+  height: #{$add_topic_button_size}px;
+
+  button.floating-add-topic-btn {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    opacity: 0.8;
+    width: #{$add_topic_button_size}px;
+    height: #{$add_topic_button_size}px;
+    border-radius: #{$add_topic_button_size / 2}px;
+    background-image: url("/img/blue_button.png");
+    background-size: #{$add_topic_button_size}px #{$add_topic_button_size}px;
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    
+    &:active, &:focus {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+
+    &:hover {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      opacity: 1;
+    }
+  }
+}

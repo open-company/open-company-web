@@ -100,11 +100,6 @@ div.navbar-header > a.navbar-brand:hover {
   font-size: 28px;
 }
 
-nav.navbar-default ul.navbar-nav > li > a,
-nav.navbar-default ul.navbar-nav > li > a:hover {
-    color:white;
-}
-
 div.tagline {
   display: flex;
   align-items: center;
@@ -159,12 +154,12 @@ div.early-access div.form-group {
   margin-bottom: 0px;
 }
 
-/*--- Sections ---*/
+/*--- sectors ---*/
 
-div.section-text {
+div.sector-text {
   width: 50%;
   float: right;
-  /* vectically center the section text */
+  /* vectically center the sector text */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -194,36 +189,36 @@ div.public-image {
   height: 309px;
 }
 
-/* md size and above, reverse the left/right order of the even numbered section text and section image */
+/* md size and above, reverse the left/right order of the even numbered sector text and sector image */
 @media (min-width: 992px) {
-  div.section-box.even div.section-text {
+  div.sector-box.even div.sector-text {
     float: left;
   }
-  div.section-box.even div.section-image {
+  div.sector-box.even div.sector-image {
     float: right;
   }
 }
 
-/* sm size and below, make the text and section image vertically stacked */
+/* sm size and below, make the text and sector image vertically stacked */
 @media (max-width: 991px) {
-  div.section-text {
+  div.sector-text {
     width: 100%;
     float: left;
-    /* When section text and section image are vertically stacked, make the text centered */
+    /* When sector text and sector image are vertically stacked, make the text centered */
     text-align: center;
   }
-  div.section-image {
+  div.sector-image {
     width: 100%;
     float: right;
   }
 }
 
 /* 
-  md and above, when the section text and section image are side by side, add row top margin
+  md and above, when the sector text and sector image are side by side, add row top margin
   and force the text to image height. 
 */
 @media (min-width: 992px) {
-  div.section-box {
+  div.sector-box {
     margin-top: 60px;
   }
   

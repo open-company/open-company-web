@@ -15,7 +15,7 @@
    [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-   [:title "OPENcompany - Startup Transparency Simplified"]
+   [:title "OpenCompany - Startup Transparency Simplified"]
    ;; Bootstrap
    ;; Latest compiled and minified CSS
    [:link {:crossorigin "anonymous",

@@ -1,0 +1,121 @@
+div.org-dashboard.editing-topic {
+  nav > *, div.left-topics-list, div.footer{
+    opacity: 0.2 !important;
+  }
+
+  div.topic.topic-edit, div.topic-topic-with-menu-open {
+    opacity: 1 !important;
+  }
+}
+
+div.org-dashboard {
+  background-color: $oc_gray_8;
+
+  div.login-required {
+    min-height: calc(100vh - #{$footer_small_height}px - 44px);
+  }
+
+  &.selected-topic-view.mobile-or-tablet {
+    div.page{
+      padding-top: 0px;
+    }
+  }
+
+  &.dashboard-sharing {
+    div.dashboard-container div.sharing-boards {
+      min-height: calc(100vh - #{$footer_small_height}px);
+    }
+  }
+
+  div.page{
+    position: relative; /* Set the position property so z-index will apply */
+    z-index: 20; /* Make sure this is higher than #menu */
+    top: 0px !important;
+   
+    background: #fff;
+    min-height: calc(100vh - #{$footer_height}px);
+
+    @include mobile(){
+      background-color: $oc_gray_8;
+      padding-top: #{$mobile_navbar_height}px;
+    }
+
+    div.dashboard-container {
+      background-color: $oc_gray_8;
+
+      div.empty-dashboard {
+        min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px - #{$top_border_height}px + 30px);
+        padding: 80px 20px;
+        margin-top: -20px;
+
+        h3.empty-dashboard-title {
+          font-family: $oc_headers_font;
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 1.5;
+        }
+      }
+
+      div.sharing-board-container {
+        background-color: transparent;
+
+        &:first-child {
+          padding-top: 80px;
+        }
+
+        div.topic-list {
+          padding-top: 0px;
+
+          div.topics-column-container {
+            padding: 20px;
+          }
+        }
+
+        h3.board-title {
+          background-color: transparent;
+          color: $oc_gray_5;
+          font-size: 18px;
+          font-weight: 700;
+          font-family: $oc_headers_font;
+          line-height: 1.5;
+          margin-left: 200px;
+        }
+      }
+    }
+  }
+}
+
+div.org-dashboard.small-navbar {
+  div.page {
+    div.empty-dashboard {
+      min-height: calc(100vh - #{$footer_small_height}px - #{$top_border_height}px + 24px);
+
+      @include mobile(){
+        min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px - #{$top_border_height}px + 24px);
+      }
+    }
+  }
+}
+
+body.small-footer {
+  div.org-dashboard {
+    div.page {
+      min-height: calc(100vh - #{$footer_small_height}px);
+    }
+  }
+}
+
+body.fullscreen-topic {
+  @include mobile(){
+    div.org-dashboard {
+      overflow: hidden;
+      div.page {
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+div.add-more-tooltip {
+  margin-left: -15px;
+}

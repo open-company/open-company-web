@@ -1,7 +1,7 @@
 (ns oc.privacy)
 
 (defn privacy [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.section.content
+  [:div.container.outer.topic.content
     [:div.row
      [:div.col-md-12
 
@@ -93,7 +93,7 @@
         [:li "OpenCompany does not control these choices, or default settings, which are offered by makers of your browser or mobile device."]]
 
       [:h2 "Sharing and disclosure"]
-      [:p "There are times when communications and related content and other user information may be shared by OpenCompany. This section discusses only how OpenCompany may share user information. Organizations that use OpenCompany may have their own policies for sharing and disclosure of information they can access through OpenCompany. OpenCompany may share information:"]
+      [:p "There are times when communications and related content and other user information may be shared by OpenCompany. This topic discusses only how OpenCompany may share user information. Organizations that use OpenCompany may have their own policies for sharing and disclosure of information they can access through OpenCompany. OpenCompany may share information:"]
       [:ul
         [:li
           [:strong "With consent, to comply with legal process, or to protect OpenCompany and our users. "]
