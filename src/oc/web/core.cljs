@@ -249,6 +249,7 @@
         (router/redirect! urls/home))
       (pre-routing query-params)
       (router/set-route! ["confirm-invitation"] {:query-params query-params})
+      (post-routing)
       (drv-root confirm-invitation target))
 
     ; (defroute subscription-callback-route urls/subscription-callback {}
