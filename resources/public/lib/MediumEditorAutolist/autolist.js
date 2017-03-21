@@ -19,7 +19,7 @@ var AutoList = MediumEditor.Extension.extend({
     onKeypress: function (keyPressEvent) {
      if (MediumEditor.util.isKey(keyPressEvent, [MediumEditor.util.keyCode.SPACE])) {
           var list_start = this.base.getSelectedParentElement().textContent.slice(0, 1);
-          if( list_start == "-" && this.base.getExtensionByName('unorderedlist')){
+          if( (list_start == "-" || list_start == "*") && this.base.getExtensionByName('unorderedlist')){
             this.base.execAction('insertunorderedlist');
             this.base.getSelectedParentElement().textContent = this.base.getSelectedParentElement().textContent.slice(1).trim();
           }
