@@ -109,7 +109,7 @@
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true
-             :namespaces #{"test.open-company-web.*"}
+             :namespaces #{"test.oc.web.*"}
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.js"

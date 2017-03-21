@@ -117,7 +117,8 @@
                                               :label-presenter #(:sub-label %2)
                                               :label-color (occ/get-color-by-kw :oc-gray-5)}}
                              :hide-nav (:hide-nav options)}}]
-      (dom/div {:class (utils/class-set {:fake-chart (:fake-chart data)
+      (dom/div {:class (utils/class-set {:growth-metric true
+                                         :fake-chart (:fake-chart data)
                                          :read-only (:read-only data)})
                 :key slug
                 :on-click (:start-editing-cb data)}

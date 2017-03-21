@@ -1,12 +1,12 @@
-(ns test.open-company-web.components.growth.growth-metric
+(ns test.oc.web.components.growth.growth-metric
     (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
               [cljs-react-test.simulate :as sim]
               [cljs-react-test.utils :as tu]
               [om.core :as om :include-macros true]
               [dommy.core :as dommy :refer-macros [sel1 sel]]
-              [open-company-web.components.growth.growth-metric :refer [growth-metric]]
+              [oc.web.components.growth.growth-metric :refer [growth-metric]]
               [om.dom :as dom :include-macros true]
-              [open-company-web.router :as router]))
+              [oc.web.router :as router]))
 
 (enable-console-print!)
 
@@ -32,11 +32,10 @@
 (deftest test-growth-metric-component
   (testing "Growth metric component"
     (router/set-route! ["companies" "buffer" "growth"]
-                       {:slug "buffer" :section "growth"})
+                       {:org "buffer" :topic "growth"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root growth-metric app-state {:target c})
-          growth-metric-class (keyword (str "div." metric-slug))
-          growth-metric-node (sel1 c [growth-metric-class])]
+          growth-metric-node (sel1 c [:div.growth-metric])]
       (is (not (nil? growth-metric-node)))
       (tu/unmount! c))))

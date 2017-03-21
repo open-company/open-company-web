@@ -1,6 +1,6 @@
-(ns test.open-company-web.lib.oc-lib
+(ns test.oc.web.lib.oc-lib
   (:require [cljs.test :refer-macros [deftest async testing is]]
-            [open-company-web.lib.oc-lib :as oc-lib]))
+            [oc.web.lib.oc-lib :as oc-lib]))
 
 (deftest test-oc-lib
   "About returning contiguous periods"

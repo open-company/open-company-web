@@ -1,12 +1,12 @@
-(ns test.open-company-web.components.ui.company-avatar
+(ns test.oc.web.components.ui.org-avatar
   (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
             [cljs-react-test.simulate :as sim]
             [cljs-react-test.utils :as tu]
             [om.core :as om :include-macros true]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
-            [open-company-web.components.ui.company-avatar :refer [company-avatar]]
+            [oc.web.components.ui.org-avatar :refer [org-avatar]]
             [om.dom :as dom :include-macros true]
-            [open-company-web.router :as router]))
+            [oc.web.router :as router]))
 
 (enable-console-print!)
 
@@ -14,17 +14,17 @@
 (def ^:dynamic c)
 
 (def test-atom {
-  :company-data {
+  :org-data {
     :name "test"
     :slug "test"}})
 
-(deftest test-company-avatar-component
-  (testing "Company avatar component"
+(deftest test-org-avatar-component
+  (testing "Org avatar component"
     (router/set-route! ["companies" "test"]
-                       {:slug "test"})
+                       {:org "test"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
-          _ (om/root company-avatar app-state {:target c})
-          company-avatar-node (sel1 c [:div.company-avatar])]
-      (is (not (nil? company-avatar-node)))
+          _ (om/root org-avatar app-state {:target c})
+          org-avatar-node (sel1 c [:div.org-avatar])]
+      (is (not (nil? org-avatar-node)))
       (tu/unmount! c))))

@@ -1,13 +1,13 @@
-(ns test.open-company-web.components.growth.growth-metric-edit
+(ns test.oc.web.components.growth.growth-metric-edit
   (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
             [cljs-react-test.simulate :as sim]
             [cljs-react-test.utils :as tu]
             [om.core :as om :include-macros true]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
-            [open-company-web.components.growth.growth-metric-edit :refer [growth-metric-edit]]
+            [oc.web.components.growth.growth-metric-edit :refer [growth-metric-edit]]
             [om.dom :as dom :include-macros true]
-            [open-company-web.router :as router]
-            [open-company-web.lib.utils :as utils]))
+            [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]))
 
 (enable-console-print!)
 
@@ -33,7 +33,7 @@
 (deftest test-growth-metric-edit-component
   (testing "Growth metric edit component"
     (router/set-route! ["companies" "buffer"]
-                       {:slug "buffer"})
+                       {:org "buffer"})
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root growth-metric-edit app-state {:target c})

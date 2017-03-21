@@ -130,7 +130,7 @@ If the REPL doesn't connect to the browser window, refresh the page in the brows
 At this point, you should be able to use the project's namespaces:
 
 ```console
-cljs.user=> (require '[open-company-web.lib.utils :as utils])
+cljs.user=> (require '[oc.web.lib.utils :as utils])
 nil
 cljs.user=> (utils/vec-dissoc [:a :b :c] :a)
 [:b :c]

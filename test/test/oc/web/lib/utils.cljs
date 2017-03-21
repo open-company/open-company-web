@@ -1,6 +1,6 @@
-(ns test.open-company-web.lib.utils
+(ns test.oc.web.lib.utils
   (:require [cljs.test :refer-macros [deftest async testing is]]
-            [open-company-web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]))
 
 (deftest test-utils
   (testing "Metric prefix functions"

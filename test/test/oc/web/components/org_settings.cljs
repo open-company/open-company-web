@@ -1,4 +1,4 @@
-(ns test.open-company-web.components.company-settings
+(ns test.oc.web.components.org-settings
   (:require [cljs.test :refer-macros (deftest async testing is are use-fixtures)]
             [cljs-react-test.simulate :as sim]
             [cljs-react-test.utils :as tu]
@@ -6,11 +6,11 @@
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1 sel)]
-            [open-company-web.rum-utils :as ru]
-            [open-company-web.dispatcher :as dis]
-            [open-company-web.components.company-settings :as cs]
-            [open-company-web.data.company :refer (company)]
-            [open-company-web.router :as router]))
+            [oc.web.rum-utils :as ru]
+            [oc.web.dispatcher :as dis]
+            [oc.web.components.org-settings :as cs]
+            [oc.web.data.company :refer (company)]
+            [oc.web.router :as router]))
 
 (enable-console-print!)
 
@@ -20,12 +20,12 @@
          :buffer company
          :jwt {:real-name "Ada Lovelace"}}))
 
-(deftest test-company-settings-component
-  (testing "Company Settings component"
+(deftest test-org-settings-component
+  (testing "Org Settings component"
     (let [c (tu/new-container!)]
       (ru/drv-root {:state test-atom
                     :drv-spec (dis/drv-spec test-atom (atom {}))
                     :target c
-                    :component cs/company-settings})
+                    :component cs/org-settings})
       (is (not (nil? (sel1 c [:div.settings-container]))))
       (tu/unmount! c))))
