@@ -35,13 +35,13 @@
     [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-2"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
-    [cljsjs/filestack "2.4.10-0"] ; Filestack https://clojars.org/cljsjs/filestack
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.5.13-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
+    [com.taoensso/timbre "4.8.0"] ; Pure Clojure/Script logging library https://www.taoensso.com
 
     [binaryage/devtools "0.8.3"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
@@ -145,7 +145,7 @@
         (build-site)
         (cljs-repl)
         (reload :asset-path "/public"
-                :on-jsload 'open-company-web.core/on-js-reload)
+                :on-jsload 'oc.web.core/on-js-reload)
         (cljs :optimizations :none
               :compiler-options {:source-map-timestamp true
                                  :preloads '[devtools.preload]})))
@@ -161,13 +161,18 @@
         (build-site)
         ; reload is broken with simple/advanced compilation https://github.com/adzerk-oss/boot-reload/issues/89
         ; (reload :asset-path "/public"
-        ;         :on-jsload 'open-company-web.core/on-js-reload)
+        ;         :on-jsload 'oc.web.core/on-js-reload)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {
                 :pretty-print true
                 :pseudo-names true
-                :externs ["public/js/externs.js"]})))
+                :externs ["public/js/externs.js"]
+                :preloads '[devtools.preload]
+                :external-config {
+                  :devtools/config {
+                    :print-config-overrides true
+                    :disable-advanced-mode-check true}}})))
 
 (deftask staging-build
   "OC Staging build."
@@ -178,7 +183,11 @@
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]
-                                 :preloads '[devtools.preload]})))
+                                 :preloads '[devtools.preload]
+                                 :external-config {
+                                  :devtools/config {
+                                    :print-config-overrides true
+                                    :disable-advanced-mode-check true}}})))
 
 (deftask prod-build
   "OC Production build."
