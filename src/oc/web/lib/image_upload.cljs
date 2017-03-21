@@ -8,6 +8,9 @@
   (when js/filestack
     (.init js/filestack ls/filestack-key)))
 
+(defn make-droppable-area [el]
+  )
+
 (defn upload!
   [success-cb progress-cb error-cb & [finished-cb selected-cb started-cb]]
   (when-not @fs
@@ -17,6 +20,13 @@
       (clj->js {
         :accept "image/*"
         :maxFiles 1
+        :transformOptions {
+          :transformations {
+            :crop true
+            :rotate true
+            :circle true
+          }
+        }
         :fromSources ["local_file_system" "imagesearch" "googledrive" "dropbox" "onedrive" "gmail" "clouddrive"]
         ;; Selected cb
         :onFileSelected (fn [res]
