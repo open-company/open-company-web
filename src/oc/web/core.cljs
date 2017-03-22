@@ -42,7 +42,8 @@
             [oc.web.components.su-snapshot :refer (su-snapshot)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
-            [oc.web.components.board-settings :refer (board-settings)]))
+            [oc.web.components.board-settings :refer (board-settings)]
+            [oc.web.components.error-banner :refer (error-banner)]))
 
 (enable-console-print!)
 
@@ -474,6 +475,8 @@
   (dis/dispatch! [:jwt (jwt/get-contents)])
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
+  ; mount the error banner
+  (drv-root #(om/component (error-banner)) (sel1 [:div#oc-error-banner]))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)

@@ -199,6 +199,7 @@
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
+          [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Custom Tooltips
           [:script {:type "text/javascript" :src "/lib/tooltip/tooltip.js"}]

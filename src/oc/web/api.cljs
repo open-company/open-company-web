@@ -113,6 +113,10 @@
                   (and (>= status 500) (<= status 599))
                   (= status 400)
                   (= status 422))
+          ; If it was a 5xx or a 0 show a banner for network issues
+          (when (or (= status 0)
+                    (and (>= status 500) (<= status 599)))
+            (dispatcher/dispatch! [:show-error-banner "Unable to connect. There may be a problem with your network or with our servers. Please try later." 10000]))
           (let [report {:response response
                         :path path
                         :method (method-name method)

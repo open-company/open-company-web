@@ -74,7 +74,9 @@
           (dissoc :loading)
           (assoc :orgs orgs)
           (assoc-in dispatcher/api-entry-point-key (:links collection))))
-    (do (router/redirect-500!) db)))
+    (-> db
+      (assoc :error-banner-message "Network error, please try later")
+      (assoc :error-banner-time 0))))
 
 (defn newest-board [boards]
   (first (sort #(compare (:name %1) (:name %2)) boards)))
@@ -987,3 +989,13 @@
   [db [_ board-slug]]
   (api/delete-board board-slug)
   db)
+
+(defmethod dispatcher/action :show-error-banner
+  [db [_ error-message error-time]]
+  (if (empty? error-message)
+    (-> db (dissoc :error-banner-message) (dissoc :error-banner-time))
+    (if (not (:error-banner db))
+      (-> db
+       (assoc :error-banner-message error-message)
+       (assoc :error-banner-time error-time))
+      db)))

@@ -110,7 +110,11 @@
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
-                              (get-in base (board-data-key org-slug board-slug))))]})
+                              (get-in base (board-data-key org-slug board-slug))))]
+   :error-banner        [[:base]
+                          (fn [base]
+                            {:error-banner-message (:error-banner-message base)
+                             :error-banner-time (:error-banner-time base)})]})
 
 ;; Action Loop =================================================================
 
