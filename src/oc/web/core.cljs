@@ -235,12 +235,14 @@
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (pre-routing (:query-params params))
       (router/set-route! ["email-verification"] {:query-params (:query-params params)})
+      (post-routing)
       (drv-root email-confirmation target))
 
     (defroute password-reset-route urls/password-reset {:as params}
       (timbre/info "Routing password-reset-route" urls/password-reset)
       (pre-routing (:query-params params))
       (router/set-route! ["password-reset"] {:query-params (:query-params params)})
+      (post-routing)
       (drv-root password-reset target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
@@ -347,12 +349,13 @@
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
-      (api/get-entry-point)
-      (api/get-auth-settings)
-      (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
       (if (responsive/is-mobile-size?)
-        (drv-root mobile-boards-list target)
-        (org-handler "org" target #(om/component) params)))
+        (do
+          (pre-routing (:query-params params))
+          (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
+          (post-routing)
+          (drv-root mobile-boards-list target))
+        (org-handler "boards-list" target #(om/component) params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
