@@ -9,6 +9,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.footer :refer (footer)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.object :as googobj]
@@ -56,6 +57,7 @@
   {:email-did-change false
    :will-save false
    :first-name "iac"
+   :show-save-successful false
    :has-changes false})
 
 (defcomponent edit-user-profile [data owner]
@@ -76,9 +78,10 @@
     (when (and (not (utils/is-test-env?))
                (om/get-state owner :will-save))
       (dis/dispatch! [:reset-user-profile])
-      (om/update-state! owner #(merge % initial-state))))
+      (om/update-state! owner #(merge % initial-state {:show-save-successful true}))
+      (utils/after 2000 #(om/set-state! owner :show-save-successful false))))
 
-  (render-state [_ {:keys [first-name has-changes email-did-change] :as st}]
+  (render-state [_ {:keys [first-name has-changes email-did-change will-save show-save-successful] :as st}]
     (let [columns-num (responsive/columns-num)
           card-width (responsive/calc-card-width)]
       (dom/div {:class "edit-user-profile fullscreen-page"}
@@ -147,5 +150,12 @@
                                             (and email-did-change
                                                  (or (not email-did-change)
                                                      (not (utils/valid-email? (:email (:edit-user-profile data)))))))
-                             :on-click #(save-user-profile-data owner %)} "SAVE")))))
+                             :on-click #(save-user-profile-data owner %)}
+                  "SAVE"
+                  (when will-save
+                   (small-loading)))))
+          (dom/div {:style {:margin-top "5px"
+                            :opacity (if show-save-successful "1" "0")}
+                  :class "mr2 right green"}
+            "Save successful!")))
         (footer (responsive/total-layout-width-int card-width columns-num))))))

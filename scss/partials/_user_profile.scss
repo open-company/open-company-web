@@ -37,6 +37,10 @@ div.user-profile {
       font-weight: 400;
     }
 
+    button.user-profile-refresh.success {
+      color: $oc_green_regular;
+    }
+
     div.user-profile-content {
       padding: 28px;
       background-color: rgba(78, 90, 107, 0.05);
