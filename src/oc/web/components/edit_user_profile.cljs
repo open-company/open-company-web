@@ -66,8 +66,7 @@
 
   (did-mount [_]
     (when-not (responsive/is-tablet-or-mobile?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-      (js/filepicker.setKey ls/filestack-key)))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (did-update [_ _ _]
     (when-not (utils/is-test-env?)
