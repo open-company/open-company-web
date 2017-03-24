@@ -26,7 +26,7 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (js/alert "An error has occurred while processing the image URL. Please try again.")
+      (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000])
       (do
         (set! (.-onload node) #(img-on-load owner node))
         (gdom/append (.-body js/document) node)
@@ -37,7 +37,7 @@
 (defn progress-cb [owner res progress])
 
 (defn error-cb [owner res error]
-  (js/alert "An error has occurred while processing the image URL. Please try again."))
+  (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000]))
 
 (defn change! [owner k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
@@ -138,7 +138,7 @@
                                :data-toggle "tooltip"
                                :data-container "body"
                                :data-placement "top"
-                               :on-click #(iu/upload! (partial success-cb owner) (partial progress-cb owner) (partial error-cb owner))}
+                               :on-click #(iu/upload! "image/*" (partial success-cb owner) (partial progress-cb owner) (partial error-cb owner))}
                       (dom/i {:class "fa fa-camera"}))))
               (dom/div {:class "right mt2"}
                 (dom/button {:class "btn-reset btn-outline mr2"
