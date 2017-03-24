@@ -9,6 +9,7 @@
             [oc.web.lib.oc-colors :as oc-colors]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.topic-edit :refer (topic-edit)]
+            [oc.web.components.topic-attachments :refer (topic-attachments)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
@@ -99,7 +100,8 @@
           truncated-body      (if should-truncate-text
                                  (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
                                  topic-body)
-          showing-menu (= show-top-menu topic)]
+          showing-menu        (= show-top-menu topic)
+          attachments         (:attachments topic-data)]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name topic))
                     :ref "topic-internal"}
@@ -257,7 +259,10 @@
             (dom/div #js {:className (utils/class-set {:topic-body true
                                                        :italic (:placeholder topic-data)})
                           :ref "topic-body"
-                          :dangerouslySetInnerHTML (utils/emojify truncated-body)})))))))
+                          :dangerouslySetInnerHTML (utils/emojify truncated-body)})))
+
+        ;; Attachments
+        (topic-attachments attachments nil)))))
 
 (defn anchor-clicked? [e]
   (loop [element (.-target e)]
