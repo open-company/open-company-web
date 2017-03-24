@@ -2,7 +2,8 @@
   (:require [oc.web.lib.cookies :as cook]
             [taoensso.timbre :as timbre]
             [goog.date.DateTime :as gdt]
-            [goog.date :as gd]))
+            [goog.date :as gd]
+            [cljsjs.jwt-decode]))
 
 (defn jwt []
   (cook/get-cookie :jwt))

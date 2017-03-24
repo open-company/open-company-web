@@ -40,6 +40,7 @@
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.5.13-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
+    [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens; useful for browser applications. https://github.com/auth0/jwt-decode
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
     [com.taoensso/timbre "4.9.0-alpha1"] ; Pure Clojure/Script logging library https://www.taoensso.com
