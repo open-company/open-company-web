@@ -870,10 +870,14 @@
 (defn icon-for-mimetype
   "Thanks to https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922"
   [mimetype]
-  (case mimetype
+  (case (s/lower mimetype)
     ;; Media
     "image" "fa-file-image-o"
     "image/png" "fa-file-image-o"
+    "image/bmp" "fa-file-image-o"
+    "image/jpg" "fa-file-image-o"
+    "image/jpeg" "fa-file-image-o"
+    "image/gif" "fa-file-image-o"
     ".jpg" "fa-file-image-o"
     "audio" "fa-file-audio-o"
     "video" "fa-file-video-o"
