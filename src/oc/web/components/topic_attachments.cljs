@@ -11,7 +11,10 @@
      :target "_blank"}
     [:i.file-mimetype.fa {:class (utils/icon-for-mimetype (:file-type attachment))}]
     [:label.topic-attachment-title (:file-name attachment)]
-    [:label.topic-attachment-subtitle (filesize (:file-size attachment) :binary false :format " %.2f "" ")]
+    (let [prefix (if (:created-at attachment)
+                    (str (utils/date-string (utils/js-date (:created-at topic-attachment))) " - ")
+                    "")]
+      [:label.topic-attachment-subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))])
     (when (fn? remove-fn)
       [:button.btn-reset.remove-attachment
         {:title "Remove attachment"
