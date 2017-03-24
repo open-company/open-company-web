@@ -1,7 +1,8 @@
 (ns oc.web.components.topic-attachments
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [clojure.contrib.humanize :refer (filesize)]))
 
 (rum/defc topic-attachment < rum/static
   [attachment remove-fn]
@@ -10,7 +11,7 @@
      :target "_blank"}
     [:i.file-mimetype.fa {:class (utils/icon-for-mimetype (:file-type attachment))}]
     [:label.topic-attachment-title (:file-name attachment)]
-    [:label.topic-attachment-subtitle (str (:file-size attachment) " bytes")]
+    [:label.topic-attachment-subtitle (filesize (:file-size attachment) :binary false :format " %.2f "" ")]
     (when (fn? remove-fn)
       [:button.btn-reset.remove-attachment
         {:title "Remove attachment"
