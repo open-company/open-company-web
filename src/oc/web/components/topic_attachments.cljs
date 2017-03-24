@@ -13,7 +13,7 @@
     [:label.topic-attachment-title (:file-name attachment)]
     (let [prefix (if (:created-at attachment)
                     (str (utils/date-string (utils/js-date (:created-at topic-attachment))) " - ")
-                    "")]
+                    "Draft - ")]
       [:label.topic-attachment-subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))])
     (when (fn? remove-fn)
       [:button.btn-reset.remove-attachment
