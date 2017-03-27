@@ -480,14 +480,14 @@
             (dispatcher/dispatch! [:signup-with-email/success body])
             (dispatcher/dispatch! [:signup-with-email/failed status])))))))
 
-(defn get-teams [& [dont-follow-team-link]]
+(defn get-teams []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "collection" "GET")]
     (auth-get (:href enumerate-link)
       {:headers (headers-for-link enumerate-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
           (if success
-            (dispatcher/dispatch! [:teams-loaded (-> fixed-body :collection :items) dont-follow-team-link])
+            (dispatcher/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
             ;; Reset the team-data-requested to restart the teams load
             (when (and (>= status 500)
                        (<= status 599))
@@ -653,16 +653,16 @@
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
             (let [team-data (dispatcher/team-data team-id)
-                  board-url (oc-urls/org (:slug org-data))]
+                  org-url (oc-urls/org (:slug org-data))]
               (if (and (s/blank? (:name team-data))
                        (utils/link-for (:links team-data) "partial-update"))
                 ; if the current team has no name and
                 ; the user has write permission on it
                 ; use the org name
                 ; for it and patch it back
-                (patch-team (:team-id org-data) {:name org-name} board-url)
+                (patch-team (:team-id org-data) {:name org-name} org-url)
                 ; if not refirect the user to the slug
-                (router/redirect! board-url)))))))))
+                (router/redirect! org-url)))))))))
 
 (defn create-board [board-name]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]

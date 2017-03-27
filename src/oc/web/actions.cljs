@@ -181,7 +181,7 @@
         ; to use the team name as suggestion and to PATCH the name back
         ; if it doesn't has one yet
         (utils/in? (:route @router/path) "create-org")
-        (utils/after 100 #(api/get-teams true))
+        (utils/after 100 #(api/get-teams))
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
              (contains? (:query-params @router/path) :token)
@@ -623,14 +623,13 @@
   (assoc db :teams-data-requested true))
 
 (defmethod dispatcher/action :teams-loaded
-  [db [_ teams dont-follow-team-link]]
-  (when-not dont-follow-team-link
-    (doseq [team teams
-            :let [team-link (utils/link-for (:links team) "item" "GET")
-                  roster-link (utils/link-for (:links team) "roster" "GET")]]
-      (if team-link
-        (api/get-team team-link)
-        (api/get-team roster-link))))
+  [db [_ teams]]
+  (doseq [team teams
+          :let [team-link (utils/link-for (:links team) "item" "GET")
+                roster-link (utils/link-for (:links team) "roster" "GET")]]
+    (if team-link
+      (api/get-team team-link)
+      (api/get-team roster-link)))
   (assoc-in db [:teams-data :teams] teams))
 
 (defmethod dispatcher/action :team-loaded
