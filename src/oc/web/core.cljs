@@ -214,25 +214,28 @@
 (if-let [target (sel1 :div#app)]
   (do
     (defroute login-route urls/login {:as params}
-      (timbre/info "Rounting login-route" urls/login)
+      (timbre/info "Routing login-route" urls/login)
       (when-not (contains? (:query-params params) :jwt)
         (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
       (simple-handler sign-up "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
-      (timbre/info "Rounting signup-route" urls/sign-up)
+      (timbre/info "Routing signup-route" urls/sign-up)
       (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
       (simple-handler sign-up "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
-      (timbre/info "Rounting about-route" urls/about)
+      (timbre/info "Routing about-route" urls/about)
       (simple-handler about "about" target params))
 
     (defroute pricing-route urls/pricing {:as params}
-      (timbre/info "Rounting pricing-route" urls/pricing)
+      (timbre/info "Routing pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (cook/remove-cookie! :jwt)
+      (cook/remove-cookie! :login-redirect)
+      (cook/remove-cookie! :show-login-overlay)
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (pre-routing (:query-params params))
       (router/set-route! ["email-verification"] {:query-params (:query-params params)})
@@ -247,7 +250,7 @@
       (drv-root password-reset target))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
-      (timbre/info "Rounting confirm-invitation-route" urls/confirm-invitation)
+      (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
       (when (jwt/jwt)
         (router/redirect! urls/home))
       (pre-routing query-params)
@@ -260,17 +263,17 @@
     ;     (router/redirect! (urls/org-settings s))))
 
     (defroute home-page-route urls/home {:as params}
-      (timbre/info "Rounting home-page-route" urls/home)
+      (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
 
     (defroute org-list-route urls/orgs {:as params}
-      (timbre/info "Rounting org-list-route" urls/orgs)
+      (timbre/info "Routing org-list-route" urls/orgs)
       (if (jwt/jwt)
         (list-orgs-handler target params)
         (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute org-create-route urls/create-org {:as params}
-      (timbre/info "Rounting org-create-route" urls/create-org)
+      (timbre/info "Routing org-create-route" urls/create-org)
       (if (jwt/jwt)
         (do
           (pre-routing (:query-params params))
@@ -282,7 +285,7 @@
         (oc-wall-handler "Please sign in." target params)))
 
     (defroute board-create-route (urls/create-board ":org") {:as params}
-      (timbre/info "Rounting board-create-route" (urls/create-board ":org"))
+      (timbre/info "Routing board-create-route" (urls/create-board ":org"))
       (if (jwt/jwt)
         (let [org (:org (:params params))]
           (pre-routing (:query-params params))
@@ -292,14 +295,14 @@
         (oc-wall-handler "Please sign in to access this organization." target params)))
 
     (defroute logout-route urls/logout {:as params}
-      (timbre/info "Rounting logout-route" urls/logout)
+      (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :login-redirect)
       (cook/remove-cookie! :show-login-overlay)
       (router/redirect! urls/home))
 
     (defroute org-page-route (urls/org ":org") {:as params}
-      (timbre/info "Rounting org-page-route" (urls/org ":org"))
+      (timbre/info "Routing org-page-route" (urls/org ":org"))
       (org-handler "org" target #(om/component) params))
 
     (defroute user-profile-route urls/user-profile {:as params}
