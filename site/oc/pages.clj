@@ -221,6 +221,8 @@
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
+          ;; JWT Decode lib
+          [:script {:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
           [:script {:src "/js/oc.js?oc_deploy_key" :type "text/javascript"}]
           ;; Utilities
