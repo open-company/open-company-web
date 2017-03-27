@@ -120,7 +120,7 @@
 
 (defmulti action (fn [db [action-type & _]]
                    (when (not= action-type :input)
-                     (timbre/info "Dipatching action:" action-type))
+                     (timbre/info "Dispatching action:" action-type _))
                    action-type))
 
 (def actions (flux/dispatcher))
