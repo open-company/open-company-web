@@ -10,7 +10,10 @@
 
 (defn upload!
   [type success-cb progress-cb error-cb & [finished-cb selected-cb started-cb]]
-  (let [base-config   {:maxFiles 1
+  (let [from-sources (if (= type "image/*")
+                        ["local_file_system" "imagesearch" "googledrive" "dropbox" "onedrive" "box"]
+                        ["local_file_system" "googledrive" "dropbox" "onedrive" "box"])
+        base-config   {:maxFiles 1
                        :maxSize (* 20 1024 1024) ; Limit the uploaded file to be at most 20MB
                        :storeTo {
                         :location "s3"
@@ -22,7 +25,7 @@
                            :circle true
                          }
                        }
-                       :fromSources ["local_file_system" "imagesearch" "googledrive" "dropbox" "onedrive" "gmail" "clouddrive"]
+                       :fromSources from-sources
                        ;; Selected cb
                        :onFileSelected (fn [res]
                          (when (fn? selected-cb)
