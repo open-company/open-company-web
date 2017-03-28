@@ -33,6 +33,36 @@
   (router/redirect! "/")
   (dissoc db :jwt))
 
+;; Get the board to show counting the last accessed and the last created
+
+(defn newest-org [orgs]
+  (first (sort #(compare (:created-at %1) (:created-at %2)) orgs)))
+
+(defn get-default-org [orgs]
+  (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
+    (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
+      (if last-org
+        ; Get the last accessed board from the saved cookie
+        last-org
+        ; Fallback to the newest board if the saved board was not found
+        (newest-org orgs)))
+    (newest-org orgs)))
+
+;; Get the board to show counting the last accessed and the last created
+
+(defn newest-board [boards]
+  (first (sort #(compare (:name %1) (:name %2)) boards)))
+
+(defn get-default-board [org-data]
+  (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+    (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
+      (if board
+        ; Get the last accessed board from the saved cookie
+        board
+        ; Fallback to the newest board if the saved board was not found
+        (newest-board (:boards org-data))))
+    (newest-board (:boards org-data))))
+
 (defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
   (if success
     (let [orgs (:items collection)]
@@ -50,8 +80,8 @@
         (and (or (utils/in? (:route @router/path) "password-reset")
                  (utils/in? (:route @router/path) "email-verification"))
              (:first-org-redirect db))
-        (let [first-org (first orgs)]
-          (router/redirect! (if first-org (oc-urls/org (:slug first-org)) oc-urls/user-profile)))
+        (let [to-org (get-default-org orgs)]
+          (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))
         ; If not redirect the user to the first useful org or to the create org UI
         (and (jwt/jwt)
              (not (utils/in? (:route @router/path) "create-org"))
@@ -67,9 +97,7 @@
                                               (cook/remove-cookie! :login-redirect)
                                               (router/redirect! login-redirect))
             ; if the user has only one company, send him to the company dashboard
-            (= (count orgs) 1)        (router/nav! (oc-urls/boards (:slug (first orgs))))
-            ; if the user has more than one company send him to the companies page
-            (> (count orgs) 1)        (router/nav! oc-urls/orgs))))
+            (pos? (count orgs))        (router/nav! (oc-urls/org (:slug (get-default-org orgs)))))))
       (-> db
           (dissoc :loading)
           (assoc :orgs orgs)
@@ -77,19 +105,6 @@
     (-> db
       (assoc :error-banner-message "Network error, please try later")
       (assoc :error-banner-time 0))))
-
-(defn newest-board [boards]
-  (first (sort #(compare (:name %1) (:name %2)) boards)))
-
-(defn get-default-board [org-data]
-  (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (let [boards (filter #(= (:slug %) last-board-slug) (:boards org-data))]
-      (if (pos? (count boards))
-        ; Get the last accessed board from the saved cookie
-        (first boards)
-        ; Fallback to the newest board if the saved board was not found
-        (newest-board (:boards org-data))))
-    (newest-board (:boards org-data))))
 
 (defmethod dispatcher/action :org [db [_ org-data]]
   (let [boards (:boards org-data)]

@@ -117,6 +117,8 @@
 (defn org-handler [route target component params]
   (let [org (:org (:params params))
         query-params (:query-params params)]
+    (when org
+      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save route
     (router/set-route! [org route] {:org org :query-params (:query-params params)})
@@ -163,6 +165,8 @@
         topic (:topic (:params params))
         update-slug (:update-slug (:params params))
         query-params (:query-params params)]
+    (when org
+      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params)
