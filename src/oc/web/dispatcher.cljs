@@ -66,6 +66,7 @@
 (defn drv-spec [db route-db]
   {:base                [[] db]
    :route               [[] route-db]
+   :orgs                [[:base] (fn [base] (:orgs base))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
@@ -120,7 +121,7 @@
 
 (defmulti action (fn [db [action-type & _]]
                    (when (not= action-type :input)
-                     (timbre/info "Dispatching action:" action-type _))
+                     (timbre/info "Dispatching action:" action-type))
                    action-type))
 
 (def actions (flux/dispatcher))

@@ -5,8 +5,12 @@ div.org-avatar {
     width: 80%;
   }
 
-  a, a:hover {
-    text-decoration: none;
+  a {
+    padding: 0;
+
+    &:hover {
+      text-decoration: none;
+    }
   }
 
   div.org-avatar-container {

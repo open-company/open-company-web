@@ -20,6 +20,7 @@
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.small-loading :as loading]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [om-bootstrap.random :as r]
             [om-bootstrap.button :as b]))
@@ -86,7 +87,11 @@
                     (not (router/current-org-slug)))
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
                 (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
-              (om/build org-avatar data))
+              (if (:su-navbar data)
+                ;; If it's showing an update link the org avatar only if there is a link to the company
+                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))
+                ;; Show the orgs dropdown instead
+                (orgs-dropdown)))
             (when-not (:hide-right-menu data)
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}

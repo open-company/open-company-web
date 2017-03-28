@@ -121,10 +121,15 @@
 (defn current-as-of []
   (:as-of (:query-params @path)))
 
+(defn last-org-cookie
+  "Cookie to save the last accessed org"
+  []
+  (str "last-org-" (when (jwt/jwt) (jwt/get-key :user-id))))
+
 (defn last-board-cookie
   "Cookie to save the last accessed board"
   [org-slug]
-  (str "last-board-" (name org-slug)))
+  (str "last-board-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
 
 (defn print-router-path []
   (js/console.log @path))
