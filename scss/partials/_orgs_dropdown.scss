@@ -1,0 +1,34 @@
+div.orgs-dropdown {
+  height: 41px;
+  float: left;
+
+  button.dropdown-toggle {
+    border: none;
+    outline: none;
+    background-color: transparent;
+  }
+
+  ul.dropdown-menu {
+    width: 300px;
+    float: initial;
+    padding-top: 0.3rem;
+    padding-top: 0.3rem;
+    li {
+      a {
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+        span.org-name {
+          white-space: nowrap;
+          width: 245px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          &.no-logo {
+            margin-top: 0px;
+            width: 265px;
+          }
+        }
+      }
+    }
+  }
+}
