@@ -5,6 +5,7 @@
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as s]
             [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
             [oc.web.actions]
@@ -76,6 +77,10 @@
 
 (defn pre-routing [query-params & [should-rewrite-url]]
   ; make sure the menu is closed
+  (let [pathname (.. js/window -location -pathname)]
+    (when (not= pathname (s/lower pathname))
+      (let [lower-location (str (s/lower pathname) (.. js/window -location -search) (.. js/window -location -hash))]
+        (set! (.-location js/window) lower-location))))
   (swap! router/path {})
   (when (and (contains? query-params :jwt)
              (map? (js->clj (jwt/decode (:jwt query-params)))))
