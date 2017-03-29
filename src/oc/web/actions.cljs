@@ -103,7 +103,7 @@
           (assoc :orgs orgs)
           (assoc-in dispatcher/api-entry-point-key (:links collection))))
     (-> db
-      (assoc :error-banner-message "Network error, please try later")
+      (assoc :error-banner-message utils/generic-network-error)
       (assoc :error-banner-time 0))))
 
 (defmethod dispatcher/action :org [db [_ org-data]]

@@ -866,3 +866,5 @@
 
 (defn slack-link-with-state [original-url user-id team-id redirect]
   (clojure.string/replace original-url team-id (str team-id ":" user-id ":" redirect)))
+
+(def generic-network-error "There may be a problem with your network, or with our servers. Please try again later.")
