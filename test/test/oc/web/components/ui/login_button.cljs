@@ -1,25 +1,24 @@
 (ns test.oc.web.components.ui.login-button
-  (:require [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
-            [dommy.core :as dommy :refer-macros [sel1 sel]]
+  (:require [cljs-react-test.utils :as tu]
+            [cljs-react-test.simulate :as sim]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [cljs-react-test.simulate :as sim]
-            [cljs-react-test.utils :as tu]
+            [dommy.core :as dommy :refer-macros [sel1 sel]]
+            [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
             [oc.web.rum-utils :as ru]
-            [oc.web.components.ui.login-button :refer [login-button]]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]))
+            [oc.web.dispatcher :as dis]
+            [oc.web.components.ui.login-button :refer (login-button)]))
 
 (enable-console-print!)
 
 ; dynamic mount point for components
 (def ^:dynamic c)
-; Test atom
+
 (def test-atom (atom {}))
 
 (deftest test-login-button-component
   (testing "Login button component"
-    (router/set-route! [:test] {:org :test})
     (let [c (tu/new-container!)]
       (ru/drv-root {:state test-atom
                     :drv-spec (dis/drv-spec test-atom (atom {}))

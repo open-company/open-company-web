@@ -1,12 +1,14 @@
 (ns test.oc.web.components.ui.loading
-  (:require [cljs.test :refer-macros (deftest async testing is are use-fixtures)]
+  (:require [cljs-react-test.utils :as tu]
             [cljs-react-test.simulate :as sim]
-            [cljs-react-test.utils :as tu]
             [om.core :as om :include-macros true]
-            [dommy.core :as dommy :refer-macros (sel1 sel)]
-            [oc.web.components.ui.loading :refer (loading)]
             [om.dom :as dom :include-macros true]
-            [oc.web.router :as router]))
+            [dommy.core :as dommy :refer-macros [sel1 sel]]
+            [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
+            [oc.web.rum-utils :as ru]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
+            [oc.web.components.ui.loading :refer (loading rloading)]))
 
 (enable-console-print!)
 
@@ -16,14 +18,18 @@
 (def test-atom {:loading true})
 
 (deftest test-loading-component
-  (testing "Loading component"
-    (router/set-route! ["companies" "buffer"]
-                       {:org "buffer"})
+  (testing "Loading Om component"
     (let [c (tu/new-container!)
           app-state (atom test-atom)
           _ (om/root loading app-state {:target c})
-          loading-node (sel1 c [:div.oc-loading])
-          loading-internal-node (sel1 [:i.fa.fa-circle-o-notch])]
+          loading-node (sel1 c [:div.oc-loading])]
       (is (not (nil? loading-node)))
-      (is (not (nil? loading-internal-node)))
+      (tu/unmount! c)))
+  (testing "Loading Rum component"
+    (let [c (tu/new-container!)]
+      (ru/drv-root {:state test-atom
+                    :drv-spec (dis/drv-spec test-atom (atom {}))
+                    :target c
+                    :component #(om/component (rloading))})
+      (is (not (nil? (sel1 c [:div.oc-loading]))))
       (tu/unmount! c))))

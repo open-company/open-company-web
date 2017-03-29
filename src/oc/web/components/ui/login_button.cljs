@@ -3,7 +3,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
-(rum/defcs login-button < rum/reactive
+(rum/defcs login-button < rum/static
+                          rum/reactive
                           {:will-mount (fn [s]
                                         (when-not (utils/is-test-env?)
                                           (dis/dispatch! [:get-auth-settings]))
