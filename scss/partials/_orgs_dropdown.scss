@@ -39,10 +39,10 @@ div.orgs-dropdown {
           width: 245px;
           overflow: hidden;
           text-overflow: ellipsis;
+          margin-left: 54px !important;
 
           &.no-logo {
             margin-top: 0px;
-            width: 265px;
           }
         }
       }
