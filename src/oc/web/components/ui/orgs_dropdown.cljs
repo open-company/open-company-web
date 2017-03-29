@@ -20,7 +20,7 @@
         should-show-dropdown? (> (count orgs) 1)]
     [:div.orgs-dropdown
       {:class (when should-show-dropdown? "dropdown")}
-      [:button
+      [:button.orgs-dropdown-btn
         {:id "orgs-dropdown"
          :class (when should-show-dropdown? "dropdown-toggle")
          :data-toggle (when should-show-dropdown? "dropdown")

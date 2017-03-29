@@ -901,3 +901,5 @@
     "application/zip" "fa-file-archive-o",
     ;; Generic case
     "fa-file"))
+
+(def generic-network-error "There may be a problem with your network, or with our servers. Please try again later.")
