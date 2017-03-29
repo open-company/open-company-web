@@ -5,6 +5,24 @@ div.orgs-dropdown {
     border: none;
     outline: none;
     background-color: transparent;
+    position: relative;
+
+    &:hover {
+      &.dropdown-toggle:after {
+        opacity: 1;
+      }
+    }
+
+    &.dropdown-toggle:after {
+      position: absolute;
+      top: 20px;
+      right: -15px;
+      font-family: FontAwesome;
+      content: "\f078";
+      color: $oc_gray_5;
+      font-size: 14px;
+      opacity: 0.4;
+    }
   }
 
   ul.dropdown-menu {
