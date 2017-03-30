@@ -13,13 +13,17 @@
 
 (def emojiable-class "emojiable")
 
+(defn remove-markers [s]
+  (when @(::caret-pos s)
+    (.removeMarkers js/rangy @(::caret-pos s))))
+
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
-    (when @(::caret-pos s)
-      (.removeMarkers js/rangy @(::caret-pos s)))
+    (remove-markers s)
     (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
+  (remove-markers s)
   (let [caret-pos (::caret-pos s)]
     (if (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0)
       (do
@@ -30,6 +34,7 @@
 (defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
     (.restoreSelection js/rangy @caret-pos)
+    (remove-markers s)
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
           unicode-c (apply str (map utils/unicode-char unicodes))
