@@ -233,4 +233,5 @@
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; MediumEditorAutolist
-          [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]]})
+          [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
+          [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
