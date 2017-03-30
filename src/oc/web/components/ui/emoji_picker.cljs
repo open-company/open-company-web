@@ -15,6 +15,8 @@
 
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
+    (when @(::caret-pos s)
+      (.removeMarkers js/rangy @(::caret-pos s)))
     (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
