@@ -100,13 +100,6 @@ span.num.red {
   margin-bottom: 25px;
 }
 
-/* Emoji One */
-.emojione {
-  @include emoji-size(18px);
-  display: inline-block;
-  vertical-align: text-top;
-}
-
 /* Reset bootstrap 3.3.5 help block overflow */
 .input-group[class*=col-] {
   float: left;

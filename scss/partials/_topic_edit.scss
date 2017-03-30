@@ -200,7 +200,7 @@ div.topic.topic-edit {
       }
 
       .emojione {
-        @include emoji-size(18px);
+        @include emoji-size(18);
       }
     }
 
@@ -236,7 +236,8 @@ div.topic.topic-edit {
       }
 
       .emojione {
-        @include emoji-size(14px);
+        @include emoji-size(14);
+        pointer-events: none;
       }
 
       *{
