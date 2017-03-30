@@ -412,9 +412,7 @@
 
     (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
       (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
-      (if (jwt/jwt)
-        (board-handler "topic" target org-dashboard params)
-        (oc-wall-handler "Please sign in to access this board." target params)))
+      (board-handler "topic" target org-dashboard params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
