@@ -46,7 +46,7 @@ function emojiAutocomplete() {
               return emojiStrategy[shortname].unicode;
             },
             imageTemplate: function(shortname, unicode){
-              return '<img class="emojione emojione-'+unicode+'"  data-unicode="'+unicodeChar(unicode)+'" title=":'+shortname+':"/>';
+              return '<img class="emojione emojione-'+unicode+'"  alt="'+unicodeChar(unicode)+'" title=":'+shortname+':"/>';
             },
             SVGImageFromShortname: function(shortname){
               return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="'+this.spritePath+'.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg>';

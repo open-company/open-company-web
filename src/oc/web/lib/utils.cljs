@@ -703,9 +703,7 @@
     (set! (.-id div) "temp-emojing")
     (set! (.-innerHTML div) html)
     (.appendChild (.-body js/document) div)
-    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (if (not (empty? (.-alt this)))
-                                                                                (.-alt this)
-                                                                                (.-unicode (.-dataset this))))))
+    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (.-alt this))))
     (let [$div       (js/$ "#temp-emojing")
           inner-html (.html $div)]
       (.remove $div)
