@@ -622,13 +622,17 @@
   [text & [plain-text]]
   ;; use an SVG sprite map
   (set! (.-imageType js/emojione) "png")
-  ;; convert textual emoji's into SVG elements
+  (set! (.-sprites js/emojione) true)
+  ;; convert ascii emoji's (like  :) and :D) into emojis
   (set! (.-ascii js/emojione) true)
   (let [text-string (or text "") ; handle nil
-        unicode-string (.toImage js/emojione text-string)]
+        unicode-string (.toImage js/emojione text-string)
+        r (js/RegExp "<span " "ig")
+        with-img (.replace unicode-string r "<img ")
+        without-span (.replace with-img (js/RegExp ">.{1,2}</span>" "ig") "/>")]
     (if plain-text
-      unicode-string
-      #js {"__html" unicode-string})))
+      without-span
+      #js {"__html" without-span})))
 
 (defn strip-HTML-tags [text]
   (when text
@@ -694,15 +698,14 @@
       (.collapse rg false)
       (.select rg))))
 
-(defn aspect-ration-image-height [original-width original-height final-width]
-  (* (/ original-height original-width) final-width))
-
 (defn emoji-images-to-unicode [html]
   (let [div (.createElement js/document "div")]
     (set! (.-id div) "temp-emojing")
     (set! (.-innerHTML div) html)
     (.appendChild (.-body js/document) div)
-    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (.-alt this))))
+    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (if (not (empty? (.-alt this)))
+                                                                                (.-alt this)
+                                                                                (.-unicode (.-dataset this))))))
     (let [$div       (js/$ "#temp-emojing")
           inner-html (.html $div)]
       (.remove $div)

@@ -142,7 +142,7 @@ div.topic {
         line-height: normal;
 
         .emojione {
-          @include emoji-size(13px);
+          @include emoji-size(13);
         }
       }
     }
@@ -337,7 +337,7 @@ div.topic {
       color: $oc_gray_7;
 
       .emojione {
-        @include emoji-size(18px);
+        @include emoji-size(18);
       }
     }
 
@@ -369,7 +369,7 @@ div.topic {
       line-height: 22px;
 
       .emojione {
-        @include emoji-size(14px);
+        @include emoji-size(14);
       }
 
       *{
