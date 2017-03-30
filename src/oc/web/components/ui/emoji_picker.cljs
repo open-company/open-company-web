@@ -7,6 +7,7 @@
             [goog.events.EventType :as EventType]
             [goog.object :as googobj]
             [cljsjs.emojione-picker]
+            [cljsjs.rangy-selectionsaverestore]
             [cljsjs.react]
             [cljsjs.react.dom]))
 
@@ -19,20 +20,21 @@
 (defn save-caret-position [s]
   (let [caret-pos (::caret-pos s)]
     (if (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0)
-      (do (reset! (::last-active-element s) (.-activeElement js/document))
-        (if (.-getSelection js/window)
-          (reset! caret-pos (js/window.getSelection))
-          (reset! caret-pos (js/document.selection))))
+      (do
+        (reset! (::last-active-element s) (.-activeElement js/document))
+        (reset! caret-pos (.saveSelection js/rangy)))
       (reset! caret-pos nil))))
 
 (defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
+    (.restoreSelection js/rangy @caret-pos)
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
           unicode-c (apply str (map utils/unicode-char unicodes))
           shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
-          new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")]
-      (js/pasteHtmlAtCaret new-html @caret-pos false))))
+          ; new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")
+          new-html  (str "<img class=\"emojione emojione-" unicode-str "\" data-unicode=\"" unicode-c "\" title=\":" shortname ":\" />")]
+      (js/pasteHtmlAtCaret new-html (.getSelection js/rangy) false))))
 
 (defn check-focus [s _]
   (let [active-element (googobj/get js/document "activeElement")]
@@ -51,7 +53,8 @@
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
   
-  {:did-mount (fn [s] (when-not (utils/is-test-env?)
+  {:init (fn [s p] (js/rangy.init) s)
+   :did-mount (fn [s] (when-not (utils/is-test-env?)
                         (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))
                               focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
                               focusout (events/listen js/document EventType/FOCUSOUT (partial check-focus s))]
@@ -94,9 +97,13 @@
                  :top (if (= position "bottom") "25px" "-220px")
                  :left "0"}}
         (when-not (utils/is-test-env?)
-          (react-utils/build js/EmojionePicker {:search "" :onChange (fn [emoji]
-                                                                         (replace-with-emoji caret-pos emoji)
-                                                                         (reset! visible false)
-                                                                         (.focus @last-active-element)
-                                                                         (when add-emoji-cb
-                                                                            (add-emoji-cb @last-active-element emoji)))}))]]))
+          (react-utils/build js/EmojionePicker {:search ""
+                                                :emojione #js {:sprites true
+                                                               :imageType "png"
+                                                               :spritePath "/img/emojione.sprites.png"}
+                                                :onChange (fn [emoji]
+                                                           (replace-with-emoji caret-pos emoji)
+                                                           (reset! visible false)
+                                                           (.focus @last-active-element)
+                                                           (when add-emoji-cb
+                                                              (add-emoji-cb @last-active-element emoji)))}))]]))
