@@ -120,7 +120,8 @@
 ;; Action Loop =================================================================
 
 (defmulti action (fn [db [action-type & _]]
-                   (when (not= action-type :input)
+                   (when (and (not= action-type :input)
+                              (not= action-type :foce-input))
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 
