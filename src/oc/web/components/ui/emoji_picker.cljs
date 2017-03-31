@@ -34,7 +34,6 @@
 (defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
     (.restoreSelection js/rangy @caret-pos)
-    (remove-markers s)
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
           unicode-c (apply str (map utils/unicode-char unicodes))
@@ -109,6 +108,7 @@
                                                                :imageType "png"
                                                                :spritePath "/img/emojione.sprites.png"}
                                                 :onChange (fn [emoji]
+                                                           (remove-markers s)
                                                            (replace-with-emoji caret-pos emoji)
                                                            (reset! visible false)
                                                            (.focus @last-active-element)
