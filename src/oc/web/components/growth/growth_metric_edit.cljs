@@ -164,8 +164,8 @@
                          :default-value interval
                          :id "mtr-interval"
                          ; if there are data the interval can't be changed
-                         :disabled (and (pos? (:metric-count data))
-                                        (not (:new-metric? data)))}
+                         :disabled (or (pos? (:metric-count data))
+                                       (not (:new-metric? data)))}
               (for [interval intervals]
                 (dom/option {:value interval} (utils/camel-case-str interval)))))
           (dom/label {:class "col-1 left"} " ")
