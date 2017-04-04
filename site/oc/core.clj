@@ -127,3 +127,8 @@
   (hp/html5 {:lang "en"}
             (:head pages/app-shell)
             (:body pages/app-shell)))
+
+(defn prod-app-shell [_]
+  (hp/html5 {:lang "en"}
+            (:head pages/prod-app-shell)
+            (:body pages/prod-app-shell)))
