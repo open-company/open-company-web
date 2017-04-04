@@ -133,7 +133,7 @@
   (-> (read-string (slurp (:full-path f)))
       :page name (str ".html")))
 
-(deftask build-site []
+(deftask build-site [prod?]
   (comp (p/base)
         (p/permalink :permalink-fn page->permalink
                      :filterer page?)
@@ -141,7 +141,7 @@
                   :filterer page?)
         ;; We're not actually rendering a collection here but using the collection task
         ;; is often a handy hack to render pages which are "unique"
-        (p/collection :renderer 'oc.core/app-shell
+        (p/collection :renderer (if prod? 'oc.core/prod-app-shell 'oc.core/app-shell)
                       :page "app-shell.html"
                       :filterer identity)))
 
@@ -153,7 +153,7 @@
         (from-jars)
         (watch)
         (sass)
-        (build-site)
+        (build-site false)
         (cljs-repl)
         (reload :asset-path "/public"
                 :on-jsload 'oc.web.core/on-js-reload)
@@ -167,12 +167,8 @@
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
-        (watch)
         (sass)
-        (build-site)
-        ; reload is broken with simple/advanced compilation https://github.com/adzerk-oss/boot-reload/issues/89
-        ; (reload :asset-path "/public"
-        ;         :on-jsload 'oc.web.core/on-js-reload)
+        (build-site true)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {
@@ -190,7 +186,7 @@
   []
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-site)
+        (build-site true)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]
@@ -205,7 +201,7 @@
   []
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-site)
+        (build-site true)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))
