@@ -289,7 +289,7 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
-          [:script {:src "/js/oc.js?oc_deploy_key"}]
+          [:script {:src "https://s3.amazonaws.com/open-company-assets/js/oc_oc_deploy_key.js"}]
           ;; Compiled assents
-          [:script {:src "/js/oc_assets_oc_deploy_key.js"}]
+          [:script {:src "https://s3.amazonaws.com/open-company-assets/js/oc_assets_oc_deploy_key.js"}]
           [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
