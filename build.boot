@@ -33,6 +33,7 @@
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
+    [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     [cljsjs/rangy-selectionsaverestore "1.3.0-1"]
     [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-3"] ; d3 externs https://clojars.org/cljsjs/d3
@@ -133,7 +134,7 @@
   (-> (read-string (slurp (:full-path f)))
       :page name (str ".html")))
 
-(deftask build-site [prod?]
+(deftask build-site []
   (comp (p/base)
         (p/permalink :permalink-fn page->permalink
                      :filterer page?)
@@ -141,7 +142,19 @@
                   :filterer page?)
         ;; We're not actually rendering a collection here but using the collection task
         ;; is often a handy hack to render pages which are "unique"
-        (p/collection :renderer (if prod? 'oc.core/prod-app-shell 'oc.core/app-shell)
+        (p/collection :renderer 'oc.core/app-shell
+                      :page "app-shell.html"
+                      :filterer identity)))
+
+(deftask build-prod-site []
+  (comp (p/base)
+        (p/permalink :permalink-fn page->permalink
+                     :filterer page?)
+        (p/render :renderer 'oc.core/static-page
+                  :filterer page?)
+        ;; We're not actually rendering a collection here but using the collection task
+        ;; is often a handy hack to render pages which are "unique"
+        (p/collection :renderer 'oc.core/prod-app-shell
                       :page "app-shell.html"
                       :filterer identity)))
 
@@ -153,7 +166,7 @@
         (from-jars)
         (watch)
         (sass)
-        (build-site false)
+        (build-site)
         (cljs-repl)
         (reload :asset-path "/public"
                 :on-jsload 'oc.web.core/on-js-reload)
@@ -167,8 +180,9 @@
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
+        (watch)
         (sass)
-        (build-site true)
+        (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {
@@ -186,7 +200,7 @@
   []
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-site true)
+        (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]
@@ -201,7 +215,7 @@
   []
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-site true)
+        (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))

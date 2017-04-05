@@ -223,8 +223,6 @@
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
-          ;; JWT Decode lib
-          [:script {:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
           [:script {:src "/js/oc.js?oc_deploy_key" :type "text/javascript"}]
           ;; Utilities
@@ -272,13 +270,14 @@
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css?oc_deploy_key"}]
           ;; Filestack
-          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]]
+          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
+          ;; jQuery needed by Bootstrap JavaScript
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
-          ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
@@ -290,5 +289,7 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
-          [:script {:src "/js/oc.min.js?oc_deploy_key"}]
+          [:script {:src "/js/oc.js?oc_deploy_key"}]
+          ;; Compiled assents
+          [:script {:src "/js/oc_assets.js?oc_deploy_key"}]
           [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
