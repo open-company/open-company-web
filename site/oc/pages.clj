@@ -291,5 +291,5 @@
           ;; Compiled oc.min.js from our CDN
           [:script {:src "/js/oc.js?oc_deploy_key"}]
           ;; Compiled assents
-          [:script {:src "/js/oc_assets.js?oc_deploy_key"}]
+          [:script {:src "/js/oc_assets_oc_deploy_key.js"}]
           [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
