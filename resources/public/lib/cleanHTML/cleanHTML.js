@@ -320,3 +320,7 @@ function replaceSelectedText(replacementText) {
         range.text = replacementText;
     }
 }
+
+function pleaseGiveMeAnError(){
+  return notExistingVar + 1;
+}
