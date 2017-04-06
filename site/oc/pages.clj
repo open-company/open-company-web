@@ -247,28 +247,14 @@
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
-          ;; Normalize.css //necolas.github.io/normalize.css/
-          ;; TODO inline this into app.main.css
-          [:link {:rel "stylesheet" :href "/css/normalize.css?oc_deploy_key"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
-          ;; OpenCompany CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css?oc_deploy_key"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
-          ;; Emoji One Autocomplete CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
-          ;;  Medium Editor css
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css?oc_deploy_key"}]
-          ;; Emojione CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css?oc_deploy_key"}]
-          ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]
-          ;; Emojone Sprites CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css?oc_deploy_key"}]
+          ;; App single CSS
+          [:link {:type "text/css" :rel "stylesheet" :href "https://s3.amazonaws.com/open-company-assets/css/main_oc_deploy_key.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
