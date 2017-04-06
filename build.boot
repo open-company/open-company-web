@@ -186,7 +186,7 @@
         (sass)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :source-map "target/public/js/oc.js.map"
+              :source-map true
               :compiler-options {
                 :pretty-print true
                 :pseudo-names true
@@ -204,7 +204,8 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :source-map "https://staging.opencompany.com/js/oc.js.map"
+              :source-map true
+              :source-map-path "https://staging.opencompany.com/js"
               :compiler-options {:externs ["public/js/externs.js"]
                                  :preloads '[devtools.preload]
                                  :external-config {
@@ -219,5 +220,6 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :source-map "https://beta.opencompany.com/js/oc.js.map"
+              :source-map true
+              :source-map-path "https://beta.opencompany.com/js"
               :compiler-options {:externs ["public/js/externs.js"]})))
