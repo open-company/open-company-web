@@ -35,6 +35,6 @@
             ;; else
             "SIGN IN")]]
       [:div.logo-container
-        [:img.logo-gold {:src "/img/oc-logo-gold.svg"}]
+        [:img.logo-gold {:src "https://d1wc0stj82keig.cloudfront.net/img/oc-logo-gold.svg"}]
         [:div.logo-cta "Build team alignment together."]]]
     (footer)])

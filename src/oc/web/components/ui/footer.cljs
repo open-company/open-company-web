@@ -10,7 +10,7 @@
       [:div.footer-bottom
         {:style {:width (if footer-width (str footer-width "px") "100%")}}
         [:a.oc-logo {:href oc-urls/home}
-          [:img {:src "/img/oc-wordmark.svg"}]]
+          [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/oc-wordmark.svg"}]]
         [:div.footer-bottom-right
           [:a.contact {:href oc-urls/contact-mail-to
                        :title "Contact OpenCompany"
@@ -19,9 +19,9 @@
                        :href oc-urls/oc-twitter
                        :title "OpenCompany on Twitter"
                        :alt "twitter"}
-            [:img {:src "/img/twitter.svg"}]]
+            [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/twitter.svg"}]]
             [:a.github {:target "_blank"
                         :href oc-urls/oc-github
                         :title "OpenCompany on GitHub"
                         :alt "github"}
-              [:img {:src "/img/github.svg"}]]]]]])
+              [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/github.svg"}]]]]]])

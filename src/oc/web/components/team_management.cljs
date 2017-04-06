@@ -101,7 +101,7 @@
                     (for [team (:slack-orgs team-data)]
                       [:div.slack-domain.group
                         {:key (str "slack-org-" (:slack-org-id team))}
-                        [:img.slack-logo {:src "/img/slack.png"}]
+                        [:img.slack-logo {:src "https://d1wc0stj82keig.cloudfront.net/img/slack.png"}]
                         [:span (:name team)]
                         (when-not (contains? (jwt/get-key :bot) team-id)
                           (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]

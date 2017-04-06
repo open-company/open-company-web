@@ -40,4 +40,4 @@
        :aria-haspopup true
        :aria-expanded false}
       (user-avatar-image (drv/react s :current-user-data))
-      [:img {:src "/img/vert-ellipsis.svg" :width 5 :height 24}]]))
+      [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/vert-ellipsis.svg" :width 5 :height 24}]]))

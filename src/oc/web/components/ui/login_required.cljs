@@ -36,5 +36,5 @@
             "Log Out"]
             (login-button))]
      [:div.logo-container
-       [:img.logo-gold {:src "/img/oc-logo-gold.svg"}]
+       [:img.logo-gold {:src "https://d1wc0stj82keig.cloudfront.net/img/oc-logo-gold.svg"}]
        [:div.logo-cta "OpenCompany makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."]]]])

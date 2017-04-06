@@ -44,7 +44,7 @@
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href "/"}
-          [:img {:alt "OpenCompany" :src "/img/oc-wordmark.svg"}]]
+          [:img {:alt "OpenCompany" :src "https://d1wc0stj82keig.cloudfront.net/img/oc-wordmark.svg"}]]
         [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]
@@ -76,7 +76,7 @@
   [:nav.navbar.navbar-default.navbar-bottom
     [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
       [:li [:a.navbar-logo {:href "/"}
-        [:img {:alt "OpenCompany" :src "/img/oc-logo-grey.svg"}]]]
+        [:img {:alt "OpenCompany" :src "https://d1wc0stj82keig.cloudfront.net/img/oc-logo-grey.svg"}]]]
       [:li.web-only
         [:a {:href "/pricing"} "Pricing"]]
       [:li.web-only

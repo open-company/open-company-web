@@ -324,7 +324,7 @@
     (when (jwt/team-has-bot? (:team-id (drv/react s :org-data)))
       [:div.group
        [:button.btn-reset {:on-click #(prompt-cb :slack)}
-        [:div.circle50.left [:img {:src "/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
+        [:div.circle50.left [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/Slack_Icon.png" :style {:width "20px" :height "20px"}}]]
         [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]])
     [:div.group
      [:button.btn-reset {:on-click #(prompt-cb :email)}

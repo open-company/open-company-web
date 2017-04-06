@@ -52,21 +52,21 @@
     [:div.row.features
      [:div.col-md-4
       [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "/img/archive@4x.png"}]]
+       [:img.feature-icon {:src "https://d1wc0stj82keig.cloudfront.net/img/archive@4x.png"}]]
       [:div.col-sm-10.col-xs-12
        [:h2 "All in One Place"]
        [:p
         "All your company information; organized and easy to find."]]]
      [:div.col-md-4
       [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "/img/best-practices@4x.png"}]]
+       [:img.feature-icon {:src "https://d1wc0stj82keig.cloudfront.net/img/best-practices@4x.png"}]]
       [:div.col-sm-10.col-xs-12
        [:h2 "Best Practices"]
        [:p
         "Core topics and guidelines help you decide what to share."]]]
      [:div.col-md-4
       [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "/img/concierge@4x.png"}]]
+       [:img.feature-icon {:src "https://d1wc0stj82keig.cloudfront.net/img/concierge@4x.png"}]]
       [:div.col-sm-10.col-xs-12
        [:h2 "Concierge Service"]
        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
@@ -278,4 +278,4 @@
           [:script {:src "https://d1wc0stj82keig.cloudfront.net/oc_deploy_key/oc.js"}]
           ;; Compiled assents
           [:script {:src "https://d1wc0stj82keig.cloudfront.net/oc_deploy_key/oc_assets.js"}]
-          [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
+          [:div.hidden [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/emojione.sprites.png"}]]]})

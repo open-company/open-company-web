@@ -46,13 +46,13 @@
                 [:div
                   [:h3.info-headline "Create beautiful company updates in less time."]]]
               [:div.col-sm-6.col-xs-12.right {:style {:padding-bottom "0px"}}
-                [:img.info-image {:id "org-dashboard" :src "./img/green-labs-mac@4x.png" :alt "Company Dashboard"}]]]]]
+                [:img.info-image {:id "org-dashboard" :src "https://d1wc0stj82keig.cloudfront.net/img/green-labs-mac@4x.png" :alt "Company Dashboard"}]]]]]
 
         [:div.right-to-left.web-only
           [:div.container.info.second
             [:div.row
               [:div.col-sm-6.col-xs-12.left.no-bottom
-                [:img.info-image.investor-update {:src "./img/green-labs-iphone@4x.png" :alt "Investor Update"}]]
+                [:img.info-image.investor-update {:src "https://d1wc0stj82keig.cloudfront.net/img/green-labs-iphone@4x.png" :alt "Investor Update"}]]
               [:div.col-sm-6.col-xs-12.right
                 [:div
                   [:h3.info-headline "Keep your team engaged and on the same page. Impress investors and advisors."]]]]]]
@@ -64,7 +64,7 @@
                 [:div
                   [:h3.info-headline "Keep your team engaged and on the same page. Impress investors and advisors."]]]
               [:div.col-sm-6.col-xs-12.left.no-bottom
-                [:img.info-image.investor-update {:src "./img/green-labs-iphone@4x.png" :alt "Investor Update"}]]]]]
+                [:img.info-image.investor-update {:src "https://d1wc0stj82keig.cloudfront.net/img/green-labs-iphone@4x.png" :alt "Investor Update"}]]]]]
 
         [:div.left-to-right
           [:div.container.info.third
@@ -74,7 +74,7 @@
                   [:h3.info-headline "Expand your audience with optional public transparency."]
                   [:p "Ideal for crowdfunded ventures, Kickstarter campaigns, social enterprises, and others interested in being more open."]]]
               [:div.col-sm-6.col-xs-12.right
-                [:img.info-image {:id "transparency" :src "./img/transparency.png" :alt "Transparency toggle"}]]]]]
+                [:img.info-image {:id "transparency" :src "https://d1wc0stj82keig.cloudfront.net/img/transparency.png" :alt "Transparency toggle"}]]]]]
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 

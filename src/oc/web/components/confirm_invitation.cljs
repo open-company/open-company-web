@@ -47,7 +47,7 @@
                 (small-loading)
                 "OK! LET’S GET STARTED →"))))
         (dom/div {:class "mt5 center group"}
-          (dom/img {:src "/img/oc-logo-gold.png"})
+          (dom/img {:src "https://d1wc0stj82keig.cloudfront.net/img/oc-logo-gold.png"})
           (dom/div {:class "confirm-invitation-p group"}
             (dom/p {:class ""} "OpenCompany makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
       (let [columns-num (responsive/columns-num)

@@ -38,7 +38,7 @@
           [:div.col-sm-3.col-xs-0]
           [:div.col-sm-6.col-xs-12
             [:div.concierge-logo
-              [:img {:id "oc-logo-gold" :src "./img/oc-logo-gold.png" :alt "OpenCompany Logo"}]]
+              [:img {:id "oc-logo-gold" :src "https://d1wc0stj82keig.cloudfront.net/img/oc-logo-gold.png" :alt "OpenCompany Logo"}]]
             [:h1 "Concierge"]
             [:p "Want us to build and maintain your dashboards for you? Our team will make it
             beautiful, and we can prepare team and investor updates for you to approve and send."]

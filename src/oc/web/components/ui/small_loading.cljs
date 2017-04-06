@@ -6,4 +6,4 @@
    (small-loading {:style {:padding "2px"} :class "inline mr1"}))
   ([attributes]
    [:div attributes
-    [:img {:style {:height "15px" :width "15px"} :src "/img/small_loading.gif"}]]))
+    [:img {:style {:height "15px" :width "15px"} :src "https://d1wc0stj82keig.cloudfront.net/img/small_loading.gif"}]]))

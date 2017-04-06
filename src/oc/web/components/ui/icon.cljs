@@ -33,5 +33,5 @@
                        :vertical-align v-align}
                ;; use tag isn't supported by react 0.14.7 and 0.14.8 isn't on cljsjs
                ;; Also their changelog doesn't mention it at all so I'm not sure if .8 would work
-               :dangerouslySetInnerHTML {:__html (str "<use xlink:href=/img/oc-icons.svg?" ls/deploy-key
+               :dangerouslySetInnerHTML {:__html (str "<use xlink:href=https://d1wc0stj82keig.cloudfront.net/img/oc-icons.svg?" ls/deploy-key
                                                     "#nc-icon-" (name fixed-id) ">")}}]])))

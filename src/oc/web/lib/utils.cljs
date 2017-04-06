@@ -623,6 +623,7 @@
   ;; use an SVG sprite map
   (set! (.-imageType js/emojione) "png")
   (set! (.-sprites js/emojione) true)
+  (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/img/emojione.sprites.png")
   ;; convert ascii emoji's (like  :) and :D) into emojis
   (set! (.-ascii js/emojione) true)
   (let [text-string (or text "") ; handle nil

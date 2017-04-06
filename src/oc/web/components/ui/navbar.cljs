@@ -86,7 +86,7 @@
             (if (or (utils/in? (:route @router/path) "orgs")
                     (not (router/current-org-slug)))
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
-                (dom/img {:src "/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
+                (dom/img {:src "https://d1wc0stj82keig.cloudfront.net/img/oc-wordmark.svg" :style {:height "25px" :margin-top "12px"}}))
               (if (:su-navbar data)
                 ;; If it's showing an update link the org avatar only if there is a link to the company
                 (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))
@@ -98,7 +98,7 @@
                   (if (responsive/is-mobile-size?)
                     (dom/button {:class "btn-reset mobile-menu group"
                                  :on-click #(dis/dispatch! [:mobile-menu-toggle])}
-                      ; (dom/img {:src "/img/vert-ellipsis.svg" :width 8})
+                      ; (dom/img {:src "https://d1wc0stj82keig.cloudfront.net/img/vert-ellipsis.svg" :width 8})
                       (dom/div {:class "vertical-ellipses"}))
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
