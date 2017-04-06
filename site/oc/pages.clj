@@ -254,7 +254,7 @@
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; App single CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "https://s3.amazonaws.com/open-company-assets/css/main_oc_deploy_key.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "https://s3.amazonaws.com/open-company-assets/oc_deploy_key/main.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -275,7 +275,7 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
-          [:script {:src "https://s3.amazonaws.com/open-company-assets/js/oc_oc_deploy_key.js"}]
+          [:script {:src "https://s3.amazonaws.com/open-company-assets/oc_deploy_key/oc.js"}]
           ;; Compiled assents
-          [:script {:src "https://s3.amazonaws.com/open-company-assets/js/oc_assets_oc_deploy_key.js"}]
+          [:script {:src "https://s3.amazonaws.com/open-company-assets/oc_deploy_key/oc_assets.js"}]
           [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
