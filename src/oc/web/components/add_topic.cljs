@@ -129,7 +129,7 @@
         archived-category {:name "Archived" :order 2 :topics archived}]
       [:div.add-topic.group
         [:div.add-topic-title
-          :on-click (fn [_] (js/pleaseGiveMeAnError))
+          {:on-click (fn [_] (js/pleaseGiveMeAnError))}
           (if (pos? (count topics))
             "Add another topic"
             "Choose a topic to get started")]
