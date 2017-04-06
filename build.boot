@@ -95,9 +95,11 @@
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/css/emojione.min.css"
                         "public/css/emojione.min.css"]
-                      ['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.css"
-                        "public/css/emojione.sprites.css"]
+                       ;; We have a local copy of the sprites css
+                       ;; to make sure it's loaded from our CDN
+                       ; ['cljsjs/emojione
+                       ;   "cljsjs/emojione/common/sprites/emojione.sprites.css"
+                       ;   "public/css/emojione.sprites.css"]
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/sprites/emojione.sprites.png"
                         "public/css/emojione.sprites.png"]
