@@ -102,7 +102,7 @@
                        ;   "public/css/emojione.sprites.css"]
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/sprites/emojione.sprites.png"
-                        "public/css/emojione.sprites.png"]
+                        "public/img/emojione.sprites.png"]
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/sprites/emojione.sprites.svg"
                         "public/img/emojione.sprites.svg"]
