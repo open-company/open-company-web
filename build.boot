@@ -204,9 +204,9 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "resources/public/js/oc.js"
-              :output-dir "resources/public/js"
-              :source-map "https://staging.opencompany.com/js/oc.js.map"
+              ; :output-to "resources/public/js/oc.js"
+              ; :output-dir "resources/public/js"
+              ; :source-map "https://staging.opencompany.com/js/oc.js.map"
               ; :source-map-path "public/js"
               ; :source-map-asset-path "https://staging.opencompany.com/js/oc.out"
               :verbose true
@@ -227,9 +227,9 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "resources/public/js/oc.js"
-              :output-dir "resources/public/js"
-              :source-map "https://beta.opencompany.com/js/oc.js.map"
+              ; :output-to "resources/public/js/oc.js"
+              ; :output-dir "resources/public/js"
+              ; :source-map "https://beta.opencompany.com/js/oc.js.map"
               ; :source-map-path "public/js"
               ; :source-map-asset-path "https://beta.opencompany.com/js/oc.out"
               :verbose true
