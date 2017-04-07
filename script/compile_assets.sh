@@ -1,6 +1,6 @@
 #!/bin/bash
 
-java -jar ~/closure_compiler/closure-compiler-v{{ closure_compiler_version }}.jar /
+java -jar ~/closure_compiler/closure-compiler-v$1.jar /
 -W QUIET \
 --js_output_file resources/public/js/oc_assets.js \
 --create_source_map public/js/oc_assets.js.map \
@@ -13,4 +13,4 @@ java -jar ~/closure_compiler/closure-compiler-v{{ closure_compiler_version }}.ja
 --js resources/public/lib/cleanHTML/cleanHTML.js \
 --js resources/public/lib/MediumEditorAutolist/autolist.js \
 --js resources/public/lib/select2/js/select2.js \
---output_wrapper '%output%\n//# sourceMappingURL={{ web_endpoint }}/js/oc_assets.js.map'
+--output_wrapper '%output%\n//# sourceMappingURL=$2/js/oc_assets.js.map'
