@@ -204,7 +204,7 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :source-map "public/js/oc.js.map"
+              :source-map true
               :output-wrapper "%output%\n//# sourceMappingURL=https://staging.opencompany.com/js/oc.js.map"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]
@@ -221,7 +221,7 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :source-map "public/js/oc.js.map"
+              :source-map true
               :output-wrapper "%output%\n//# sourceMappingURL=https://beta.opencompany.com/js/oc.js.map"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]})))
