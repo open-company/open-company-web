@@ -13,4 +13,5 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js $2/resources/public/lib/cleanHTML/cleanHTML.js \
 --js $2/resources/public/lib/MediumEditorAutolist/autolist.js \
 --js $2/resources/public/lib/select2/js/select2.js \
---output_wrapper '%output%\n//# sourceMappingURL=$3/js/oc_assets.js.map'
+--output_wrapper '%output%
+//# sourceMappingURL=$3/js/oc_assets.js.map'
