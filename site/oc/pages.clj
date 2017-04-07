@@ -232,7 +232,7 @@
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
-          [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
+          [:div.hidden [:img {:src "/img/emojione.sprites.png"}]]]})
 
 (def prod-app-shell
   {:head [:head
