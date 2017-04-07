@@ -205,7 +205,7 @@
         (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
-              :output-wrapper "%output%\n//# sourceMappingURL=https://staging.opencompany.com/js/oc.js.map"
+              :source-map-asset-path "https://staging.opencompany.com/js/out"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]
                                  :preloads '[devtools.preload]
@@ -222,6 +222,6 @@
         (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
-              :output-wrapper "%output%\n//# sourceMappingURL=https://beta.opencompany.com/js/oc.js.map"
+              :source-map-asset-path "https://beta.opencompany.com/js/out"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]})))
