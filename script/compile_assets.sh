@@ -3,7 +3,8 @@
 java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 -W QUIET \
 --js_output_file $2/resources/public/js/oc_assets.js \
---create_source_map $2/public/js/oc_assets.js.map \
+--create_source_map $2/resources/public/js/oc_assets.js.map \
+--module_output_path_prefix "../" \
 --js $2/resources/public/lib/print_ascii.js \
 --js $2/resources/public/lib/truncate/jquery.truncate.js \
 --js $2/resources/public/lib/scrollTo/scrollTo.min.js \
