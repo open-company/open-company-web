@@ -205,6 +205,7 @@
         (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
+              :source-map-path "public/js"
               :source-map-asset-path "https://staging.opencompany.com/js/out"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]
@@ -222,6 +223,7 @@
         (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
+              :source-map-path "public/js"
               :source-map-asset-path "https://beta.opencompany.com/js/out"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]})))
