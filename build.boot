@@ -209,6 +209,9 @@
               :source-map-asset-path "https://staging.opencompany.com/js/oc.out"
               :verbose true
               :compiler-options {:externs ["public/js/externs.js"]
+                                 :source-map true
+                                 :source-map-path "public/js"
+                                 :source-map-asset-path "https://staging.opencompany.com/js/oc.out"
                                  :preloads '[devtools.preload]
                                  :external-config {
                                   :devtools/config {
@@ -226,4 +229,7 @@
               :source-map-path "public/js"
               :source-map-asset-path "https://beta.opencompany.com/js/oc.out"
               :verbose true
-              :compiler-options {:externs ["public/js/externs.js"]})))
+              :compiler-options {:externs ["public/js/externs.js"]
+                                 :source-map true
+                                 :source-map-path "public/js"
+                                 :source-map-asset-path "https://beta.opencompany.com/js/oc.out"})))
