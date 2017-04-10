@@ -2,5 +2,4 @@
  :init-fns [oc.web.core/init]
  :compiler-options {:asset-path "/oc.out"
                     :output-to "oc.js"
-                    :source-map "oc.js.map"
-                    :output-wrapper "%output%\n //# sourceMappingURL=https://staging.opencompany.com/oc.js.map"}}
+                    :source-map "oc.js.map"}}
