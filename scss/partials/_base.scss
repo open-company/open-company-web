@@ -145,7 +145,7 @@ button.slack-button {
 
   &:before {
     content: "";
-    background-image: cdnUrl( $oc_web_cdn_url, "/img/slack.png");
+    background-image: cdnUrl( $cdn_url, "/img/slack.png");
     background-position: 0px 0px;
     background-size: 20px 20px;
     width: 20px;
