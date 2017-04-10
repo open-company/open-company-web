@@ -8,68 +8,68 @@
 (defn privacy [options]
   (privacy/privacy options))
 
-(defn index [options]
-  [:div
-   [:div.container.outer.sector
-    [:div.container.inner
-     [:div.sector-box
-      [:div.sector-text.team-text
-       [:h2 "Make Employees Great"]
-       [:p
-        "Everyone is on the same page with open access to company information."]
-       [:h2 "Easy to Update"]
-       [:p
-        "Our "
-        [:i.fa.fa-slack]
-        " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
-      [:div.team-image]]]]
-   [:hr]
-   [:div.container.outer.sector
-    [:div.container.inner
-     [:div.sector-box.even
-      [:div.sector-text.update-text
-       [:h2 "Impress Investors and Advisors"]
-       [:p
-        "Send regular investor updates that follow best practices and increase engagement."]
-       [:h2 "Updates are Automatic"]
-       [:p
-        "Stakeholder updates are generated from your company's content for your approval."]]
-      [:div.update-image]]]]
-   [:hr]
-   [:div.container.outer.sector
-    [:div.container.inner
-     [:div.sector-box
-      [:div.sector-text.public-text
-       [:h2 "Go Public!"]
-       [:p
-        "Share publicly to build trust and attract new investors, employees, and customers."]
-       [:h2 "Play to the Crowd"]
-       [:p
-        "Keep crowd supporters and investors informed of your progress."]]
-      [:div.public-image]]]]
-   [:hr]
-   [:div.container.outer.sector
-    [:div.row.features
-     [:div.col-md-4
-      [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "https://d1wc0stj82keig.cloudfront.net/img/archive@4x.png"}]]
-      [:div.col-sm-10.col-xs-12
-       [:h2 "All in One Place"]
-       [:p
-        "All your company information; organized and easy to find."]]]
-     [:div.col-md-4
-      [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "https://d1wc0stj82keig.cloudfront.net/img/best-practices@4x.png"}]]
-      [:div.col-sm-10.col-xs-12
-       [:h2 "Best Practices"]
-       [:p
-        "Core topics and guidelines help you decide what to share."]]]
-     [:div.col-md-4
-      [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "https://d1wc0stj82keig.cloudfront.net/img/concierge@4x.png"}]]
-      [:div.col-sm-10.col-xs-12
-       [:h2 "Concierge Service"]
-       [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
+; (defn index [options]
+;   [:div
+;    [:div.container.outer.sector
+;     [:div.container.inner
+;      [:div.sector-box
+;       [:div.sector-text.team-text
+;        [:h2 "Make Employees Great"]
+;        [:p
+;         "Everyone is on the same page with open access to company information."]
+;        [:h2 "Easy to Update"]
+;        [:p
+;         "Our "
+;         [:i.fa.fa-slack]
+;         " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
+;       [:div.team-image]]]]
+;    [:hr]
+;    [:div.container.outer.sector
+;     [:div.container.inner
+;      [:div.sector-box.even
+;       [:div.sector-text.update-text
+;        [:h2 "Impress Investors and Advisors"]
+;        [:p
+;         "Send regular investor updates that follow best practices and increase engagement."]
+;        [:h2 "Updates are Automatic"]
+;        [:p
+;         "Stakeholder updates are generated from your company's content for your approval."]]
+;       [:div.update-image]]]]
+;    [:hr]
+;    [:div.container.outer.sector
+;     [:div.container.inner
+;      [:div.sector-box
+;       [:div.sector-text.public-text
+;        [:h2 "Go Public!"]
+;        [:p
+;         "Share publicly to build trust and attract new investors, employees, and customers."]
+;        [:h2 "Play to the Crowd"]
+;        [:p
+;         "Keep crowd supporters and investors informed of your progress."]]
+;       [:div.public-image]]]]
+;    [:hr]
+;    [:div.container.outer.sector
+;     [:div.row.features
+;      [:div.col-md-4
+;       [:div.col-sm-2.feature-icon
+;        [:img.feature-icon {:src "oc_web_cdn_url/img/archive@4x.png"}]]
+;       [:div.col-sm-10.col-xs-12
+;        [:h2 "All in One Place"]
+;        [:p
+;         "All your company information; organized and easy to find."]]]
+;      [:div.col-md-4
+;       [:div.col-sm-2.feature-icon
+;        [:img.feature-icon {:src "oc_web_cdn_url/img/best-practices@4x.png"}]]
+;       [:div.col-sm-10.col-xs-12
+;        [:h2 "Best Practices"]
+;        [:p
+;         "Core topics and guidelines help you decide what to share."]]]
+;      [:div.col-md-4
+;       [:div.col-sm-2.feature-icon
+;        [:img.feature-icon {:src "oc_web_cdn_url/img/concierge@4x.png"}]]
+;       [:div.col-sm-10.col-xs-12
+;        [:h2 "Concierge Service"]
+;        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
 
 (defn pricing [options]
    [:div.container.outer.sector.content
@@ -254,7 +254,7 @@
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; App single CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "https://d1wc0stj82keig.cloudfront.net/oc_deploy_key/main.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/main.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -275,7 +275,7 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
-          [:script {:src "https://d1wc0stj82keig.cloudfront.net/oc_deploy_key/oc.js"}]
+          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc.js"}]
           ;; Compiled assents
-          [:script {:src "https://d1wc0stj82keig.cloudfront.net/oc_deploy_key/oc_assets.js"}]
-          [:div.hidden [:img {:src "https://d1wc0stj82keig.cloudfront.net/img/emojione.sprites.png"}]]]})
+          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc_assets.js"}]
+          [:div.hidden [:img {:src "oc_web_cdn_url/img/emojione.sprites.png"}]]]})
