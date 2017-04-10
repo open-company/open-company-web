@@ -204,8 +204,8 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "public/oc.js"
-              :output-dir "public"
+              :output-to "resources/public/oc.js"
+              ; :output-dir "resources/public/js/oc.out"
               :source-map true
               :source-map-path "public/oc.js.map"
               :compiler-options {:externs ["public/js/externs.js"]
