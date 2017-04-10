@@ -35,3 +35,6 @@
 
 ;; Log level
 (def log-level "debug")
+
+;; CDN URL
+(def cdn-url "")
