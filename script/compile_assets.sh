@@ -20,5 +20,5 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 cd $2/target/public/ && \
 cat <<EOT >> oc.js
 
-//# sourceMappingURL=$3/oc.js.map"
+//# sourceMappingURL=$3/oc.js.map
 EOT
