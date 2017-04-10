@@ -1,5 +1,6 @@
 @import "../modules/_colors";
 @import "../modules/_fonts";
+@import "../modules/_deploy";
 
 /*
 Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
@@ -144,7 +145,7 @@ button.slack-button {
 
   &:before {
     content: "";
-    background-image: url("https://d1wc0stj82keig.cloudfront.net/img/slack.png");
+    background-image: cdnUrl( $oc_web_cdn_url, "/img/slack.png");
     background-position: 0px 0px;
     background-size: 20px 20px;
     width: 20px;

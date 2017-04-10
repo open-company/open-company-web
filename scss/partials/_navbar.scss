@@ -173,7 +173,7 @@ nav.oc-navbar {
           background: $oc_gray_5;
           width: 8px;
           height: 24px;
-          -webkit-mask: url("https://d1wc0stj82keig.cloudfront.net/img/vert-ellipsis.svg") center / contain no-repeat;
+          -webkit-mask: cdnUrl( $oc_web_cdn_url, "/img/vert-ellipsis.svg") center / contain no-repeat;
         }
       }
     }

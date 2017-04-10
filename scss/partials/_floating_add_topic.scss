@@ -21,7 +21,7 @@ div.floating-add-topic {
     width: #{$add_topic_button_size}px;
     height: #{$add_topic_button_size}px;
     border-radius: #{$add_topic_button_size / 2}px;
-    background-image: url("https://d1wc0stj82keig.cloudfront.net/img/blue_button.png");
+    background-image: cdnUrl( $oc_web_cdn_url, "/img/blue_button.png");
     background-size: #{$add_topic_button_size}px #{$add_topic_button_size}px;
     background-position: 0px 0px;
     background-repeat: no-repeat;
