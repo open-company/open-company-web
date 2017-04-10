@@ -164,7 +164,8 @@
                 (utils/time-since (if is-topic-view (:created-at topic-data) (:updated-at topic-data)) [:short-month])))
             (when (and is-dashboard
                        (not is-mobile?)
-                       (> (count entries-data) 1))
+                       (or (> (count entries-data) 1)
+                           (> (:count (utils/link-for (:links topic-data) "collection")) 1)))
               (dom/button {:class "topic-history-button btn-reset"
                            :data-placement "top"
                            :data-container "body"
