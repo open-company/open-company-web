@@ -204,17 +204,11 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "public/js/oc.js"
-              :output-dir "public/js"
+              :output-to "public/oc.js"
+              :output-dir "public"
               :source-map true
-              :source-map-path "public/js/oc.js.map"
-              ; :source-map-asset-path "https://staging.opencompany.com/js/oc.js.map"
-              ; :verbose true
+              :source-map-path "public/oc.js.map"
               :compiler-options {:externs ["public/js/externs.js"]
-                                 ; :output-to "js/oc.js"
-                                 ; :output-dir "js"
-                                 ; :source-map "https://staging.opencompany.com/js/oc.js.map"
-                                 ; :source-map-asset-path "https://staging.opencompany.com/js/oc.js.map"
                                  :preloads '[devtools.preload]
                                  :external-config {
                                   :devtools/config {
@@ -228,14 +222,10 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              ; :output-to "js/oc.js"
-              ; :output-dir "js"
+              :output-to "public/oc.js"
+              :output-dir "public"
               :source-map true
-              :source-map-path "public/js/oc.js.map"
+              :source-map-path "public/oc.js.map"
               ; :source-map-asset-path "https://beta.opencompany.com/js/oc.js.map"
               ; :verbose true
-              :compiler-options {:externs ["public/js/externs.js"]
-                                 ; :output-to "js/oc.js"
-                                 ; :output-dir "js"
-                                 ; :source-map "https://beta.opencompany.com/js/oc.js.map"
-                                 :source-map-asset-path "https://beta.opencompany.com/js/oc.js.map"})))
+              :compiler-options {:externs ["public/js/externs.js"]})))

@@ -224,7 +224,7 @@
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
-          [:script {:src "/js/oc.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/oc.js?oc_deploy_key" :type "text/javascript"}]
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
