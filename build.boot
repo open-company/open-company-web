@@ -204,10 +204,7 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              ; :output-to "target/public/oc.js"
-              ; :output-dir "resources/public/js/oc.out"
               :source-map true
-              ; :source-map-path "target/public/oc.js.map"
               :compiler-options {:externs ["public/js/externs.js"]
                                  :preloads '[devtools.preload]
                                  :external-config {
@@ -222,10 +219,5 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "public/oc.js"
-              :output-dir "public"
               :source-map true
-              :source-map-path "public/oc.js.map"
-              ; :source-map-asset-path "https://beta.opencompany.com/js/oc.js.map"
-              ; :verbose true
               :compiler-options {:externs ["public/js/externs.js"]})))
