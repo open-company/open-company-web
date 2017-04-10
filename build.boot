@@ -204,7 +204,7 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "target/public/oc.js"
+              ; :output-to "target/public/oc.js"
               ; :output-dir "resources/public/js/oc.out"
               :source-map true
               ; :source-map-path "target/public/oc.js.map"
