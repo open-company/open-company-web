@@ -1,11 +1,10 @@
 #!/bin/bash
 
-cd $2/target/public/ && \
+cd $2/resources/public/ && \
 java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 -W QUIET \
 --js_output_file js/oc_assets.js \
 --create_source_map js/oc_assets.js.map \
---module_output_path_prefix "../" \
 --js lib/print_ascii.js \
 --js lib/truncate/jquery.truncate.js \
 --js lib/scrollTo/scrollTo.min.js \
