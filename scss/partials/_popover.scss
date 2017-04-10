@@ -6,7 +6,7 @@ div.oc-popover-container {
   top: 0;
   left: 0;
   background-color: rgba(78, 90, 107, 0.5);
-  z-index: 1031;
+  z-index: #{$navbar_zindex + 1};
 
   button.close-button {
     right: -30px;
@@ -16,7 +16,7 @@ div.oc-popover-container {
     display: block;
     border: none;
     background-color: transparent;
-    z-index: 1033;
+    z-index: #{$navbar_zindex + 3};
     outline: none;
 
     &:active {
@@ -38,7 +38,7 @@ div.oc-popover-container {
     border-radius: 4px;
     padding: 20px;
     display: block;
-    z-index: 1032;
+    z-index: #{$navbar_zindex + 2};
 
     h3.title {
       margin-top: 0px;
