@@ -204,10 +204,10 @@
         (sass :output-style :compressed)
         (build-prod-site)
         (cljs :optimizations :advanced
-              :output-to "resources/public/oc.js"
+              :output-to "target/public/oc.js"
               ; :output-dir "resources/public/js/oc.out"
               :source-map true
-              :source-map-path "public/oc.js.map"
+              ; :source-map-path "target/public/oc.js.map"
               :compiler-options {:externs ["public/js/externs.js"]
                                  :preloads '[devtools.preload]
                                  :external-config {
