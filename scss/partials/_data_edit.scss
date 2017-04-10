@@ -1,4 +1,4 @@
-div#section-finances.editing, div#section-growth.editing {
+div#topic-finances.editing, div#topic-growth.editing {
 
   div.metric-name {
     padding: 32px 8px 0px 30px;
@@ -129,7 +129,7 @@ div.finances, div.growth {
     }
   }
 
-  div.section.new-metric-slug-placeholder.fake-chart, div.bordered-chart.fake-chart {
+  div.topic.new-metric-slug-placeholder.fake-chart, div.bordered-chart.fake-chart {
     position: relative;
 
     &:after {

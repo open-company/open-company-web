@@ -14,7 +14,9 @@ function emojiAutocomplete() {
 
     $(".emoji-autocomplete").textcomplete([ {
             match: /\B:([\-+\w]{1,30})$/,
-            spritePath: '/img/emojione.sprites',
+            sprites: true,
+            imageType: 'png',
+            spritePath: '/img/emojione.sprites.png',
             search: function (term, callback) {
                 var results = [];
                 var results2 = [];
@@ -44,7 +46,7 @@ function emojiAutocomplete() {
               return emojiStrategy[shortname].unicode;
             },
             imageTemplate: function(shortname, unicode){
-              return '<img class="emojione" alt="'+unicodeChar(unicode)+'" src="//cdn.jsdelivr.net/emojione/assets/png/' +unicode+ '.png" />';
+              return '<img class="emojione emojione-'+unicode+'"  alt="'+unicodeChar(unicode)+'" title=":'+shortname+':"/>';
             },
             SVGImageFromShortname: function(shortname){
               return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="'+this.spritePath+'.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg>';

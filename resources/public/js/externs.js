@@ -54,5 +54,21 @@ var replaceSelectedText = function(){};
 var AutoList = function(){};
 // Tooltip http://darsa.in/tooltip/
 var Tooltip = function(){};
-// Print app state
-var OCDispatcherPrintAppState = function(){};
+// Debug app state
+var OCWebPrintAppState = function(){};
+var OCWebPrintOrgData = function(){};
+var OCWebPrintTeamData = function(){};
+var OCWebPrintBoardData = function(){};
+var OCWebPrintEntriesData = function(){};
+var OCWebPrintJWTContents = function(){};
+var OCWebHelp = function(){};
+var OCWebPrintAsciiArt = function(){};
+var OCWebConfigLogLevel = function(){};
+var OCWebPrintUpdatesListData = function(){};
+var OCWebPrintUpdateData = function(){};
+var OCWebPrintRouterPath = function(){};
+// Filestack
+var filestack = {};
+filestack.init = function(){};
+filestack.pick = function(){};
+filestack.then = function(){};

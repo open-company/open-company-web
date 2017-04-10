@@ -1,36 +1,3 @@
-div.mobile-company-dashboard{
-  div.topics-columns {
-    div.topics-column-container {
-      padding: 20px 0px;
-      margin: 0 8px;
-
-      div.topics-column {
-        min-width: initial;
-        max-width: initial;
-
-        div.topic-row {
-          margin: 0px 0px 8px 0px;
-          border-left: 0px solid transparent;
-          border-right: 0px solid transparent;
-        }
-      }
-
-      &.tot-col-2 {
-        div.topics-column.col-1 {
-          div.topic-row {
-            margin-right: 4px;
-          }
-        }
-        div.topics-column.col-2 {
-          div.topic-row {
-            margin-left: 4px;
-          }
-        }
-      }
-    }
-  }
-}
-
 div.topics-columns {
   padding: 0;
   width: 100%;
@@ -52,7 +19,7 @@ div.topics-columns {
     div.dashboard-sharing-select-all {
       position: absolute;
       right: 2px;
-      top: 3px;
+      top: 0px;
       padding-top: 5px;
       
       span {

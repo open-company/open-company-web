@@ -1,3 +1,9 @@
+div.org-dashboard.dashboard-sharing{
+  div.topic div.topic-internal div.topic-body {
+    pointer-events: none;
+  }
+}
+
 div.topic {
   height: 100%;
   text-align: left;
@@ -136,7 +142,7 @@ div.topic {
         line-height: normal;
 
         .emojione {
-          @include emoji-size(13px);
+          @include emoji-size(13);
         }
       }
     }
@@ -216,7 +222,7 @@ div.topic {
         width:100%;
       }
 
-      div.section-container {
+      div.topic-container {
         margin: 10px 10px 0px 10px;
       }
 
@@ -331,7 +337,7 @@ div.topic {
       color: $oc_gray_7;
 
       .emojione {
-        @include emoji-size(18px);
+        @include emoji-size(18);
       }
     }
 
@@ -342,8 +348,8 @@ div.topic {
       opacity: 0;
     }
 
-    div.search-result-card-container-fade{
-
+    div.topic-body-fade{
+      pointer-events: none;
       background: -webkit-linear-gradient(bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
       background: linear-gradient(to top, rgba(255,255,255,1) 0px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0) 46px, rgba(255,255,255,0) 10000px);
       bottom:0;
@@ -363,7 +369,7 @@ div.topic {
       line-height: 22px;
 
       .emojione {
-        @include emoji-size(14px);
+        @include emoji-size(14);
       }
 
       *{

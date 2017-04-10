@@ -17,3 +17,11 @@ div.emoji-picker {
     display: none;
   }
 }
+
+// Override emojione-picker.css
+
+.emoji-dialog span.emojione {
+  width: 64px;
+  height: 64px;
+  zoom: 0.35;
+}

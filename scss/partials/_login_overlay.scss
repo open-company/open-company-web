@@ -113,7 +113,7 @@ div.login-overlay-container {
       }
     }
 
-    &.login-with-email, &.signup-with-email, &.password-reset, &.collect-name-pswd {
+    &.login-with-email, &.signup-with-email, &.password-reset, &.collect-name-pswd, &.collect-pswd {
 
       div.sign-in-label-container {
         margin-top: 20px;
@@ -229,32 +229,6 @@ div.login-overlay-container {
 
     button.login-button {
       margin-top: 37px;
-
-      &.with-slack {
-        height: 40px;
-        font-size: 15px;
-        font-weight: 600;
-        font-family: $oc_headers_font;
-        padding: 5px;
-        border-radius: 5px;
-        border: 1px solid rgba(78,90,107,0.4);
-
-        &:before {
-          content: "";
-          background-image: url("/img/slack.png");
-          background-position: 0px 0px;
-          background-size: 20px 20px;
-          width: 20px;
-          height: 20px;
-          display: inline-block;
-          margin-right: 5px;
-          margin-bottom: -4px;
-        }
-
-        span.slack {
-          font-weight: 700;
-        }
-      }
     }
 
     div.login-overlay-footer {

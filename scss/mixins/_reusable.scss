@@ -105,15 +105,13 @@
   }
 }
 
-@mixin emoji-size($size: 16px){
-  width: $size;
-  height: $size;
-  font-size: $size;
-  min-width: initial;
-  min-height: initial;
+@mixin emoji-size($size: 16){
+  zoom: #{$size / 64};
+  width: 64px;
+  height: 64px;
 }
 
-@mixin rich-editor-body($text_color: #444444, $font_size: 18px){
+@mixin rich-editor-body($text_color: #444444, $font_size: 18){
   border: 0px solid transparent;
 
   &:focus,
@@ -157,10 +155,6 @@
     }
   }
 
-  .emojione {
-    @include emoji-size($font_size);
-  }
-
   h1, h2, h3, h4, h5 {
     font-weight: 700;
     font-family: $oc_headers_font;
@@ -168,54 +162,7 @@
   }
 
   ul {
-    padding-left: 0em;
-    list-style-type: none;
-
-    &>li {
-      padding-left: 0em;
-    }
-  }
-
-  li:before{
-    /* Unicode bullet symbol */
-    content: '\25A0 ';
-    /* Bullet color */
-    color: $oc_yellow;
-    left: 0;
-    position: absolute;
-  }
-
-  &>ul, div>ul, p>ul {
-    padding-left: 1.5em;
-    list-style-type: none;
-
-    &>li{
-      overflow: visible;
-      padding-left: 1.5em;
-      position: relative;
-    }
-  }
-
-  ol {
-    padding-left: 1.5em;
-    counter-reset: item;
-    list-style-type: none;
-    display: table;
-
-    li {
-      overflow: visible;
-      padding-left: 1.5em;
-      display: relative;
-
-      &:before {
-        padding-left: 3em;
-        content: counter(item) ". ";
-        counter-increment: item;
-        color: $text_color;
-        left: 0;
-        position: absolute;
-      }
-    }
+    margin-left: 1.5rem;
   }
 
   img:not(.emojione) {

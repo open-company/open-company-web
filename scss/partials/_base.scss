@@ -100,13 +100,6 @@ span.num.red {
   margin-bottom: 25px;
 }
 
-/* Emoji One */
-.emojione {
-  @include emoji-size(18px);
-  display: inline-block;
-  vertical-align: text-top;
-}
-
 /* Reset bootstrap 3.3.5 help block overflow */
 .input-group[class*=col-] {
   float: left;
@@ -133,4 +126,35 @@ span.num.red {
 
 div#wrap {
   min-height: 100vh;
+}
+
+button.slack-button {
+  height: 40px;
+  font-size: 15px;
+  font-weight: 400;
+  font-family: $oc_headers_font;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(78,90,107,0.4);
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:before {
+    content: "";
+    background-image: url("/img/slack.png");
+    background-position: 0px 0px;
+    background-size: 20px 20px;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: -4px;
+  }
+
+  span.slack {
+    font-weight: 700;
+  }
 }
