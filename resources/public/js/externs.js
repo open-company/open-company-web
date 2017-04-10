@@ -72,5 +72,3 @@ var filestack = {};
 filestack.init = function(){};
 filestack.pick = function(){};
 filestack.then = function(){};
-// temp
-var pleaseGiveMeAnError = function(){};
