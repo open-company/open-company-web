@@ -3,6 +3,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.cookies :as cook]
             [oc.web.components.ui.login-button :refer (login-button)]
@@ -36,5 +37,5 @@
             "Log Out"]
             (login-button))]
      [:div.logo-container
-       [:img.logo-gold {:src "https://d1wc0stj82keig.cloudfront.net/img/oc-logo-gold.svg"}]
+       [:img.logo-gold {:src (str ls/cdn-url "/img/oc-logo-gold.svg")}]
        [:div.logo-cta "OpenCompany makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."]]]])

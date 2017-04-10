@@ -3,6 +3,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -14,7 +15,7 @@
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
-          [:img {:alt "OpenCompany" :src "https://d1wc0stj82keig.cloudfront.net/img/oc-wordmark.svg"}]]
+          [:img {:alt "OpenCompany" :src (str ls/cdn-url "/img/oc-wordmark.svg")}]]
         [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]
