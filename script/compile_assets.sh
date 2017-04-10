@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $2/resources/public/ && \
+cd $2/target/public/ && \
 java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 -W QUIET \
 --js_output_file oc_assets.js \
