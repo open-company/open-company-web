@@ -129,14 +129,9 @@
         archived-category {:name "Archived" :order 2 :topics archived}]
       [:div.add-topic.group
         [:div.add-topic-title
-          {:on-click (fn [_] (let [x 0]
-                              (js/console.log "first" (/ 2 hello) "a" (/ 4 (/ 2 hello)))
-                              (js/console.log "second" hello)
-                              (/ 2 x)))}
           (if (pos? (count topics))
             "Add another topic"
-            "Choose a topic to get started")
-          {:asd "1"}]
+            "Choose a topic to get started")]
         [:hr]
         (when (pos? (count topics))
           [:span.close-add-topic
