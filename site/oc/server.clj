@@ -10,8 +10,8 @@
 (defn app-shell []
   (res/resource-response "/app-shell.html" {:root "public"}))
 
-(defn index []
-  (res/resource-response "/index.html" {:root "public"}))
+; (defn index []
+;   (res/resource-response "/index.html" {:root "public"}))
 
 (defn not-found []
   (assoc (res/resource-response "/404.html" {:root "public"}) :status 404))
