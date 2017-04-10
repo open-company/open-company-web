@@ -29,6 +29,7 @@
     [funcool/cuerdas "2.0.3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "0.8.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
+    [environ "1.1.0"] ; Get environment settings from different sources https://github.com/weavejester/environ
 
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
