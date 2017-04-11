@@ -26,6 +26,12 @@
         [:i.fa.fa-times]])])
 
 (rum/defc topic-attachments < rum/static
+                              {:after-render (fn [s]
+                                              (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                                              s)
+                               :before-render (fn [s]
+                                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
+                                                s)}
   [attachments remove-cb]
   (when (pos? (count attachments))
     (let [sorted-attachments (sort #(compare (:created-at %2) (:created-at %1)) attachments)]
