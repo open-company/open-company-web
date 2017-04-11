@@ -16,6 +16,7 @@
         base-config   {:maxFiles 1
                        :maxSize (* 20 1024 1024) ; Limit the uploaded file to be at most 20MB
                        :storeTo {
+                        :container ls/attachments-bucket
                         :location "s3"
                        }
                        :transformOptions {
