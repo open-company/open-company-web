@@ -28,7 +28,7 @@
 (rum/defc topic-attachments < rum/static
   [attachments remove-cb]
   (when (pos? (count attachments))
-    (let [sorted-attachments (sort #(compare (:created-at %1) (:created-at %2)) attachments)]
+    (let [sorted-attachments (sort #(compare (:created-at %2) (:created-at %1)) attachments)]
       [:div.topic-attachments
         (for [atc sorted-attachments
               :let [remove-fn (when (fn? remove-cb)
