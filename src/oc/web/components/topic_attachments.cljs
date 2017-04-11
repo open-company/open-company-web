@@ -28,11 +28,12 @@
 (rum/defc topic-attachments < rum/static
   [attachments remove-cb]
   (when (pos? (count attachments))
-    [:div.topic-attachments
-      (for [atc attachments
-            :let [remove-fn (when (fn? remove-cb)
-                              (fn [e]
-                                (utils/event-stop e)
-                                (dis/dispatch! [:foce-input {:attachments (filter #(not= (:file-url %) (:file-url atc)) attachments)}])
-                                (remove-cb (:file-url atc))))]]
-        (rum/with-key (topic-attachment atc remove-fn) (str "topic-attachment-" (:file-url atc))))]))
+    (let [sorted-attachments (sort #(compare (:created-at %1) (:created-at %2)) attachments)]
+      [:div.topic-attachments
+        (for [atc sorted-attachments
+              :let [remove-fn (when (fn? remove-cb)
+                                (fn [e]
+                                  (utils/event-stop e)
+                                  (dis/dispatch! [:foce-input {:attachments (filter #(not= (:file-url %) (:file-url atc)) attachments)}])
+                                  (remove-cb (:file-url atc))))]]
+          (rum/with-key (topic-attachment atc remove-fn) (str "topic-attachment-" (:file-url atc))))])))
