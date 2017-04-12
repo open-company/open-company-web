@@ -127,7 +127,10 @@
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.js"
-                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js"}]}))
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js"}
+                                        {:provides ["cljsjs.raven"]
+                                         :file "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.14.0/raven.min.js"
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.14.0/raven.min.js"}]}))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
