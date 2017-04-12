@@ -79,9 +79,10 @@
     (when (and (not (utils/is-test-env?))
                (om/get-state owner :will-save))
       (dis/dispatch! [:reset-user-profile])
-      (om/update-state! owner #(merge % initial-state {:show-save-successful (not (:edit-user-profile-failed data))
-                                                       :show-save-failed (:edit-user-profile-failed data)}))
-      (utils/after 2000 #(om/set-state! owner :show-save-successful false))))
+      (om/update-state! owner #(merge % initial-state {:show-save-successful (not (:edit-user-profile-failed next-props))
+                                                       :show-save-failed (:edit-user-profile-failed next-props)}))
+      (utils/after 2000 (fn [] (om/update-state! owner #(merge % {:show-save-successful false
+                                                                  :show-save-failed false}))))))
 
   (render-state [_ {:keys [first-name has-changes email-did-change will-save show-save-successful show-save-failed] :as st}]
     (let [columns-num (responsive/columns-num)
