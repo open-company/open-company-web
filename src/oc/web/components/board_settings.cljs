@@ -179,10 +179,11 @@
     (if (om/get-state owner :loading)
       (do
         (utils/after 1500 (fn []
-                            (let [fade-animation (new Fade (sel1 [:div#board-settings-save-successful]) 1 0 utils/oc-animation-duration)]
-                              (doto fade-animation
-                                (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
-                                (.play)))))
+                            (when-let [save-successful-el (sel1 [:div#board-settings-save-successful])]
+                              (let [fade-animation (new Fade save-successful-el 1 0 utils/oc-animation-duration)]
+                                (doto fade-animation
+                                  (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
+                                  (.play))))))
         (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
       (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
