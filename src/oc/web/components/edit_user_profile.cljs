@@ -58,6 +58,7 @@
    :will-save false
    :first-name "iac"
    :show-save-successful false
+   :show-save-failed false
    :has-changes false})
 
 (defcomponent edit-user-profile [data owner]
@@ -74,14 +75,15 @@
     (when-not (utils/is-test-env?)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
-  (will-receive-props [_ _]
+  (will-receive-props [_ next-props]
     (when (and (not (utils/is-test-env?))
                (om/get-state owner :will-save))
       (dis/dispatch! [:reset-user-profile])
-      (om/update-state! owner #(merge % initial-state {:show-save-successful true}))
+      (om/update-state! owner #(merge % initial-state {:show-save-successful (not (:edit-user-profile-failed data))
+                                                       :show-save-failed (:edit-user-profile-failed data)}))
       (utils/after 2000 #(om/set-state! owner :show-save-successful false))))
 
-  (render-state [_ {:keys [first-name has-changes email-did-change will-save show-save-successful] :as st}]
+  (render-state [_ {:keys [first-name has-changes email-did-change will-save show-save-successful show-save-failed] :as st}]
     (let [columns-num (responsive/columns-num)
           card-width (responsive/calc-card-width)]
       (dom/div {:class "edit-user-profile fullscreen-page"}
@@ -103,6 +105,15 @@
                               :name "last-name"
                               :on-change #(change! owner :last-name (.. % -target -value))
                               :value (or (:last-name (:edit-user-profile data)) "")})
+                  (dom/div {:class "edit-user-profile-title data-title"} "CURRENT PASSWORD")
+                  (dom/input {:class "edit-user-profile"
+                              :name "current-password"
+                              :min-length 5
+                              :on-change #(change! owner :current-password (.. % -target -value))
+                              :type "password"
+                              :pattern ".{4,}"
+                              :placeholder "at least 5 characters"
+                              :value (or (:current-password (:edit-user-profile data)) "")})
                   (dom/div {:class "edit-user-profile-title data-title"} "PASSWORD")
                   (dom/input {:class "edit-user-profile"
                               :name "password"
@@ -145,8 +156,12 @@
                              :on-click #(reset-user-profile-data owner %)} "CANCEL")
                 (dom/button {:class "btn-reset btn-solid"
                              :disabled (or (not has-changes)
+                                           (and (pos? (count (:current-password (:edit-user-profile data))))
+                                                (not (pos? (count (:password (:edit-user-profile data))))))
                                            (and (pos? (count (:password (:edit-user-profile data))))
                                                 (< (count (:password (:edit-user-profile data))) 5))
+                                            (and (pos? (count (:password (:edit-user-profile data))))
+                                                 (not (pos? (count (:current-password (:edit-user-profile data))))))
                                             (and email-did-change
                                                  (or (not email-did-change)
                                                      (not (utils/valid-email? (:email (:edit-user-profile data)))))))
@@ -155,7 +170,12 @@
                   (when will-save
                    (small-loading)))))
           (dom/div {:style {:margin-top "5px"
-                            :opacity (if show-save-successful "1" "0")}
-                  :class "mr2 right green"}
-            "Save successful!")))
+                            :opacity (if (or show-save-successful show-save-failed) "1" "0")}
+                  :class (utils/class-set {:mr2 true
+                                           :right true
+                                           :green show-save-successful
+                                           :red show-save-failed})}
+            (if show-save-successful
+              "Save successful!"
+              "Save failed!"))))
         (footer (responsive/total-layout-width-int card-width columns-num))))))

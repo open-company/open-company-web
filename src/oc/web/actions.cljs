@@ -873,13 +873,16 @@
 
 (defmethod dispatcher/action :reset-user-profile
   [db [_]]
-  (assoc db :edit-user-profile (assoc (:current-user-data db) :password "")))
+  (-> db
+    (assoc :edit-user-profile (assoc (:current-user-data db) :password ""))
+    (dissoc :edit-user-profile-failed)))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]
   (-> db
       (assoc :current-user-data user-data)
-      (assoc :edit-user-profile user-data)))
+      (assoc :edit-user-profile user-data)
+      (dissoc :edit-user-profile-failed)))
 
 (defmethod dispatcher/action :save-user-profile
   [db [_]]
@@ -1013,3 +1016,7 @@
        (assoc :error-banner-message error-message)
        (assoc :error-banner-time error-time))
       db)))
+
+(defmethod dispatcher/action :user-profile-update-failed
+  [db [_]]
+  (assoc db :edit-user-profile-failed true))
