@@ -335,6 +335,7 @@ div.topic {
       font-size: 18px;
       line-height: 25px;
       color: $oc_gray_7;
+      word-wrap: break-word;
 
       .emojione {
         @include emoji-size(18);
@@ -367,6 +368,7 @@ div.topic {
       overflow: hidden;
       font-size: 14px;
       line-height: 22px;
+      word-wrap: break-word;
 
       .emojione {
         @include emoji-size(14);
