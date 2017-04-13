@@ -193,7 +193,7 @@
      {:type "text"
       :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
       :on-blur #(reset! subject-focused true)
-      :value (-> (drv/react s :su-share) :email :subject)}]
+      :value (or (-> (drv/react s :su-share) :email :subject) "")}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:div.npt.group
       [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.email-note
