@@ -16,6 +16,7 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.lib.growth-utils :as growth-utils]
+            [oc.web.components.chart :refer (chart)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
             [oc.web.components.ui.icon :as i]
@@ -267,7 +268,9 @@
        :file-upload-state nil
        :file-upload-progress 0
        :headline-exceeds false
-       :first-foce-tt-shown false}))
+       :first-foce-tt-shown false
+       :chart-url (or (:chart-url topic-data) "")
+       :show-chart-url-input false}))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -334,6 +337,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url
+                           chart-url show-chart-url-input
                            headline-exceeds has-changes]}]
     (let [board-slug        (router/current-board-slug)
           topic             (dis/foce-topic-key)
@@ -374,6 +378,8 @@
                                         :stroke 4
                                         :color "white"
                                         :accent-color "white"}))))
+          ;; Chart
+          (chart chart-url (- card-width (* 16 2)))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (or (:title topic-data) "")
@@ -388,7 +394,6 @@
                                       (om/update-state! owner #(merge % {:has-changes true
                                                                          :char-count remaining-chars
                                                                          :char-count-alert (< remaining-chars title-alert-limit)}))))})
-          
           ;; Topic data
           (when is-data?
             (dom/div {:class ""}
@@ -470,26 +475,49 @@
                                      (partial img-upload-error-cb owner)))}
                 (dom/i {:class "fa fa-camera"})))
 
-            ;; Topic chart button
-            (when (or (= is-data? :growth)
-                      (and (= is-data? :finances)
-                           (not (dis/foce-topic-data-editing?))))
-              (dom/button {:class "btn-reset chart-button left"
-                           :title (if (and (= is-data? :growth)
-                                           (pos? (count (:metrics topic-data))))
-                                    "Add another chart"
-                                    "Add a chart")
-                           :type "button"
-                           :data-toggle "tooltip"
-                           :data-container "body"
-                           :data-placement "top"
-                           :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
-                           :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
-                (dom/i {:class "fa fa-line-chart"})))
+            ; Topic chart button
+            ; (when (or (= is-data? :growth)
+            ;           (and (= is-data? :finances)
+            ;                (not (dis/foce-topic-data-editing?))))
+            ;   (dom/button {:class "btn-reset chart-button left"
+            ;                :title (if (and (= is-data? :growth)
+            ;                                (pos? (count (:metrics topic-data))))
+            ;                         "Add another chart"
+            ;                         "Add a chart")
+            ;                :type "button"
+            ;                :data-toggle "tooltip"
+            ;                :data-container "body"
+            ;                :data-placement "top"
+            ;                :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
+            ;                :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
+            ;     (dom/i {:class "fa fa-line-chart"})))
+            (dom/button {:class "btn-reset chart-button left"
+                         :title "Add a chart"
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-container "body"
+                         :data-placement "top"
+                         :on-click #(om/set-state! owner :show-chart-url-input true)}
+              (dom/i {:class "fa fa-line-chart"}))
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
               (str file-upload-progress "%")))
+
+            (when show-chart-url-input
+              (dom/div {:class "topic-chart-url-field"}
+                (dom/input
+                  {:type "text"
+                   :value chart-url
+                   :on-change #(om/set-state! owner :chart-url (or (.. % -target -value) ""))})
+                (dom/button
+                  {:type "button"
+                   :class "btn-reset btn-solid"
+                   :on-click #(do
+                                (om/set-state! owner :show-chart-url-input false)
+                                (om/set-state! owner :has-changes true)
+                                (dis/dispatch! [:foce-input {:chart-url chart-url}]))}
+                  "ADD")))
           
           ;; Hidden (initially) file upload UI
           (dom/div {:class "topic-foce-footer group"}

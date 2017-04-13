@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as oc-colors]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.chart :refer (chart)]
             [oc.web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
@@ -136,7 +137,7 @@
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(assign-topic-click)}
                 (dom/i {:class "fa fa-user"}) " Assign")))
-
+          (chart (:chart-url topic-data) (- card-width (* 16 2)))
           (dom/div {:class "topic-title"}
 
             (when-not (and is-topic-view
