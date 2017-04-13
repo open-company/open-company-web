@@ -24,6 +24,6 @@
           (dotimes [idx (.-length src-scripts)]
             (let [src (.-src (.get src-scripts idx))
                   splitted (clojure.string/split src #"/")
-                  final-src (str "https://docs.google.com/" (clojure.string/join "/" (subvec splitted 3)))]
+                  final-src (str "https://docs.google.com/" (clojure.string/join "/" (subvec splitted 3)) "?no-cache=" (rand 4))]
               (.append (js/$ "body") (js/$ (str "<script type='text/javascript' src='" final-src "' />")))))
         ))))
