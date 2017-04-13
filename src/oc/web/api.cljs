@@ -379,9 +379,10 @@
               {:json-params (cljs->json json-data)
                :headers (headers-for-link share-link)}
       (fn [{:keys [success body]}]
-        (when success
+        (if success
           (let [fixed-body (json->cljs body)]
-            (dispatcher/dispatch! [:su-edit {:su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
+            (dispatcher/dispatch! [:su-edit {:su-slug (:slug fixed-body) :su-date (:created-at fixed-body) :medium (:medium fixed-body)}]))
+          (dispatcher/dispatch! [:su-edit nil]))))))
 
 (defn get-updates []
   (let [org-data (dispatcher/org-data)

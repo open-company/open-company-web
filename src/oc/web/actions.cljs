@@ -319,19 +319,23 @@
     (assoc :updates-list-loaded true)
     (assoc-in (dispatcher/updates-list-key (router/current-org-slug)) (:collection response))))
 
-(defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug]}]]
-  (let [su-url   (oc-urls/update-link (router/current-org-slug) (utils/su-date-from-created-at su-date) su-slug)
-        latest-su-key (dispatcher/latest-update-key (router/current-org-slug))
-        org-data-links (:links (dispatcher/org-data))
-        updates-list-link (utils/link-for org-data-links "collection" "GET" {:accept "application/vnd.collection+vnd.open-company.update+json;version=1"})
-        updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
-        new-links (conj (utils/vec-dissoc org-data-links updates-list-link) updated-link)]
-    (-> db
-      (assoc-in latest-su-key su-url)
-      (dissoc :loading)
-      (assoc-in (conj (dispatcher/org-data-key (router/current-org-slug)) :links) new-links)
-      ; refresh the su list
-      (get-updates))))
+(defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug medium] :as update-data}]]
+  (let [latest-su-key (dispatcher/latest-update-key (router/current-org-slug))]
+    (if (nil? update-data)
+      (-> db
+        (dissoc :loading)
+        (assoc-in latest-su-key ""))
+      (let [su-url   (oc-urls/update-link (router/current-org-slug) (utils/su-date-from-created-at su-date) su-slug)
+            org-data-links (:links (dispatcher/org-data))
+            updates-list-link (utils/link-for org-data-links "collection" "GET" {:accept "application/vnd.collection+vnd.open-company.update+json;version=1"})
+            updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
+            new-links (conj (utils/vec-dissoc org-data-links updates-list-link) updated-link)]
+        (-> db
+          (assoc-in latest-su-key su-url)
+          (dissoc :loading)
+          (assoc-in (conj (dispatcher/org-data-key (router/current-org-slug)) :links) new-links)
+          ; refresh the su list
+          (get-updates))))))
 
 (defmethod dispatcher/action :update-loaded [db [_ {:keys [org-slug update-slug response load-org-data]}]]
   (let [org-data-keys [:logo-url :logo-width :logo-height :currency]

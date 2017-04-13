@@ -777,9 +777,11 @@
   (.remove (js/$ "div.tooltip")))
 
 (defn complete-su-url [relative-su-url]
-  (let [protocol (.. js/document -location -protocol)
-        host     (.. js/document -location -host)]
-    (str protocol "//" host relative-su-url)))
+  (if (empty? relative-su-url)
+    ""
+    (let [protocol (.. js/document -location -protocol)
+          host     (.. js/document -location -host)]
+      (str protocol "//" host relative-su-url))))
 
 (def new-topic-body-placeholder "What would you like to say...")
 
