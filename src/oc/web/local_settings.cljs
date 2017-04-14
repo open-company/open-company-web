@@ -40,4 +40,4 @@
 (def cdn-url "")
 
 ;; Attachments bucket
-(def attachments-bucket "open-company-staging-attachments")
+(def attachments-bucket "open-company-attachments-non-prod")
