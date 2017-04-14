@@ -22,7 +22,7 @@
           logo-width (om/get-state owner :logo-width)
           logo-height (om/get-state owner :logo-height)]
       (if (empty? logo-url)
-        (js/alert "Please insert a logo image")
+        (dis/dispatch! [:show-error-banner "Please insert a logo image" 5000])
         (do
           (om/set-state! owner :redirect-to-org true)
           (api/patch-org {:logo-width (js/parseInt logo-width)
