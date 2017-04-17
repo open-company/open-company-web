@@ -115,7 +115,7 @@
                               :pattern ".{4,}"
                               :placeholder "at least 5 characters"
                               :value (or (:current-password (:edit-user-profile data)) "")})
-                  (dom/div {:class "edit-user-profile-title data-title"} "PASSWORD")
+                  (dom/div {:class "edit-user-profile-title data-title"} "NEW PASSWORD")
                   (dom/input {:class "edit-user-profile"
                               :name "password"
                               :min-length 5
