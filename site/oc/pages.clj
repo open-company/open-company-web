@@ -234,6 +234,4 @@
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
-          ;; Google Charts
-          [:script {:type "text/javascript" :src "//www.gstatic.com/charts/loader.js"}]
           [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
