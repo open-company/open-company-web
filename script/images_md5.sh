@@ -2,7 +2,6 @@
 
 for f in $(find ./target/public/img/ -type f)
 do
-  echo $f >> /tmp/partial_$1.txt
   (echo $f; cat $f) | md5sum >> /tmp/partial_$1.txt
 done
 
