@@ -194,7 +194,7 @@
      {:type "text"
       :on-change #(dis/dispatch! [:input [:su-share :email :subject] (.. % -target -value)])
       :on-blur #(reset! subject-focused true)
-      :value (-> (drv/react s :su-share) :email :subject)}]
+      :value (or (-> (drv/react s :su-share) :email :subject) "")}]
     [:label.block.small-caps.bold.mb2 "Your Note"]
     [:div.npt.group
       [:div.domine.p1.col-12.emoji-autocomplete.ta-mh.no-outline.emojiable.email-note
@@ -358,25 +358,27 @@
 
 (rum/defc confirmation < rum/static
                          {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
-  [type back-to-dashboard-cb]
+  [type back-to-dashboard-cb cancel-fn share-link]
   [:div
    (case type
-     :email (modal-title "Email Sent!" :email-84)
-     :slack (modal-title "Shared via Slack!" :slack))
+     :email (modal-title (if (empty? share-link) "Email share error." "Email Sent!") :email-84)
+     :slack (modal-title (if (empty? share-link) "Slack share error." "Shared via Slack!") :slack))
    [:div.p3
     [:p.domine
      (case type
-       :email "Recipients will get your update by email."
-       :slack (let [ch (->> @dis/app-state :su-share :slack :channel)
-                    ch-id (filter #(= (:id %) ch) (or (:enumerate-channels @dis/app-state) []))
-                    ch-name (if (pos? (count ch-id)) (:name (first ch-id)) everyone)]
-                (if (= ch-name everyone)
-                  "This update has been shared with your team."
-                  (str "This update has been shared with #" ch-name "."))))]
+       :email (if (empty? share-link) "An error occurred, please try again." "Recipients will get your update by email.")
+       :slack (if (empty? share-link)
+                "An error occurred, please try again."
+                (let [ch (->> @dis/app-state :su-share :slack :channel)
+                      ch-id (filter #(= (:id %) ch) (or (:enumerate-channels @dis/app-state) []))
+                      ch-name (if (pos? (count ch-id)) (:name (first ch-id)) everyone)]
+                  (if (= ch-name everyone)
+                    "This update has been shared with your team."
+                    (str "This update has been shared with #" ch-name ".")))))]
     [:div.right-align.mt3
      [:button.btn-reset.btn-solid
-      {:on-click back-to-dashboard-cb}
-      "RETURN TO DASHBOARD"]]]])
+      {:on-click (if (empty? share-link) cancel-fn back-to-dashboard-cb)}
+      (if (empty? share-link) "OK" "RETURN TO DASHBOARD")]]]])
 
 (defn reset-scroll-height []
   (let [main-scroll (gdom/getElementByClass "main-scroll")]
@@ -414,9 +416,7 @@
 
   (will-receive-props [_ next-props]
     ; slack SU posted
-    (when (and (= (om/get-state owner :share-via) :link)
-               (:latest-su next-props))
-      (om/set-state! owner :share-link (utils/complete-su-url (:latest-su next-props))))
+    (om/set-state! owner :share-link (utils/complete-su-url (:latest-su next-props)))
     (when (and (#{:email :slack} (om/get-state owner :share-via))
                (om/get-state owner :sending)
                (not (om/get-state owner :sent)))
@@ -433,7 +433,7 @@
                :on-click #(cancel-fn)}
             (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color "white" :accent-color "white"}))
           (if sent
-            (confirmation share-via back-to-dashboard-cb)
+            (confirmation share-via back-to-dashboard-cb cancel-fn share-link)
             (dom/div {:class "su-preview-box"}
               (case share-via
                 :prompt (prompt-dialog #(do

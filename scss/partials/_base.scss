@@ -159,3 +159,8 @@ button.slack-button {
     font-weight: 700;
   }
 }
+
+/* Remove the files counter from Filestack picker */
+div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span.fsp-nav__right span.fsp-badge {
+  display: none;
+}
