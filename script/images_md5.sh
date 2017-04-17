@@ -1,9 +1,9 @@
 #!/bin/sh
 
-cat /dev/null > $1
+cat /dev/null > /tmp/partial_$1.txt
 for f in $(find ./target/public/img/ -type f)
 do
-  (stat -c %Y $f; echo $f; cat $f) | md5sum >> $1
+  (stat -c %Y $f; echo $f; cat $f) | md5sum >> /tmp/partial_$1.txt
 done
 
-cat $1 | md5sum
+cat /tmp/partial_$1.txt | md5sum
