@@ -82,7 +82,7 @@
     ; there was an error loading the logo, could be an invalid URL
     ; or the link doesn't contain an image
     (do
-      (js/alert "Invalid image url")
+      (dis/dispatch! [:show-error-banner "Invalid image url." 5000])
       (om/set-state! owner :logo-url (om/get-state owner :initial-logo))
       (om/set-state! owner :loading false))
     (save-org-data data (om/get-state owner :logo-url) (.-width img) (.-height img))))
@@ -124,7 +124,7 @@
                                        :state-logo url}))))
 
 (defn- error-cb [owner res error]
-  (js/alert "An error occurred while uploading the image. Please retry.")
+  (dis/dispatch! [:show-error-banner "An error occurred while uploading the image. Please retry." 5000])
   (om/update-state! owner #(merge % {:file-upload-state nil
                                      :file-upload-progress nil})))
 
@@ -177,6 +177,7 @@
                      :data-placement "bottom"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(iu/upload!
+                                 "image/*"
                                  (partial success-cb owner)
                                  (partial progress-cb owner)
                                  (partial error-cb owner))}

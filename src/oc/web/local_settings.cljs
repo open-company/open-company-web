@@ -35,3 +35,6 @@
 
 ;; Log level
 (def log-level "debug")
+
+;; Attachments bucket
+(def attachments-bucket "open-company-staging-attachments")
