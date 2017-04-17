@@ -37,4 +37,4 @@
 (def log-level "debug")
 
 ;; Attachments bucket
-(def attachments-bucket "open-company-staging-attachments")
+(def attachments-bucket "open-company-attachments-non-prod")
