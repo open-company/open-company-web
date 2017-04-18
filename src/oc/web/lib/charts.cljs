@@ -24,8 +24,7 @@
       (let [resp (<! (http/get chart-proxy-url {:with-credentials? false})) ; get the chart via the proxy
             chart-dom (js/$ (str "<div>" (:body resp) "</div>"))
             non-src-scripts (js/$ "script[type='text/javascript']:not([src])" chart-dom)
-            src-scripts (js/$ "script[src]" chart-dom)
-            l (.-length src-scripts)]
+            src-scripts (js/$ "script[src]" chart-dom)]
 
         (dotimes [idx (.-length non-src-scripts)]
           (let [script-js-str (.-innerHTML (.get non-src-scripts idx))
