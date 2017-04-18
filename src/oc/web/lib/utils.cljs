@@ -907,3 +907,6 @@
     "fa-file"))
 
 (def generic-network-error "There may be a problem with your network, or with our servers. Please try again later.")
+
+(defn clean-google-chart-url [gchart-url]
+  (.replace gchart-url #"(?i)/u/\d+" ""))

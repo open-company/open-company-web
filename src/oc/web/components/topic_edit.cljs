@@ -551,10 +551,10 @@
                 (dom/button
                   {:type "button"
                    :class "btn-reset btn-solid"
-                   :on-click #(do
+                   :on-click #(let [cleaned-url (utils/clean-google-chart-url chart-url)]
                                 (om/set-state! owner :show-chart-url-input false)
                                 (om/set-state! owner :has-changes true)
-                                (dis/dispatch! [:foce-input {:chart-url chart-url}]))}
+                                (dis/dispatch! [:foce-input {:chart-url cleaned-url}]))}
                   "ADD"))))
 
           (topic-attachments attachments #(om/set-state! owner :has-changes true))
