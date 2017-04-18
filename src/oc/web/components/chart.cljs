@@ -27,9 +27,11 @@
   (let [topic-data (first (:rum/args s))
         chart-url (:chart-url topic-data)
         chart-id (chart-uid topic-data)]
+    (js/console.log "charts/render-chart" topic-data)
     (when (and (not (empty? topic-data))
                (not (empty? chart-url))
                (not= @(::last-url s) chart-url))
+      (js/console.log "   !!rendering the chart:" (:chart-url topic-data))
       (c/load-chart-url chart-url chart-id (second (:rum/args s)))
       (utils/after (* @(::retry s) 1500) #(check-chart s)))))
 
