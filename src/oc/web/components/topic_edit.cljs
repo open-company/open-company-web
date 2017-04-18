@@ -264,6 +264,13 @@
 ;                                                                     :config {:place "right-bottom"}})
 ;           (t/show first-foce))))))
 
+(defn add-chart-url [owner]
+  (let [chart-url (om/get-state owner :chart-url)
+        cleaned-url (utils/clean-google-chart-url chart-url)]
+    (om/set-state! owner :show-chart-url-input false)
+    (om/set-state! owner :has-changes true)
+    (dis/dispatch! [:foce-input {:chart-url cleaned-url}])))
+
 (defcomponent topic-edit [{:keys [currency
                                   card-width
                                   columns-num
@@ -530,7 +537,7 @@
             ;                :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
             ;     (dom/i {:class "fa fa-line-chart"})))
             (dom/button {:class "btn-reset chart-button left"
-                         :title "Add a chart"
+                         :title "Add Chart from Google Sheets"
                          :type "button"
                          :data-toggle "tooltip"
                          :data-container "body"
@@ -547,15 +554,25 @@
                 (dom/input
                   {:type "text"
                    :value chart-url
+                   :on-key-up (fn [e]
+                                (cond
+                                  (= "Enter" (.-key e))
+                                  (when (utils/check-google-chart-url chart-url)
+                                    (add-chart-url owner))
+                                  (= "Escape" (.-key e))
+                                  (om/set-state! owner :show-chart-url-input false)))
                    :on-change #(om/set-state! owner :chart-url (or (.. % -target -value) ""))})
                 (dom/button
                   {:type "button"
+                   :class "btn-reset btn-outline mr1"
+                   :on-click #(om/set-state! owner :show-chart-url-input false)}
+                  "CANCEL")
+                (dom/button
+                  {:type "button"
                    :class "btn-reset btn-solid"
-                   :on-click #(let [cleaned-url (utils/clean-google-chart-url chart-url)]
-                                (om/set-state! owner :show-chart-url-input false)
-                                (om/set-state! owner :has-changes true)
-                                (dis/dispatch! [:foce-input {:chart-url cleaned-url}]))}
-                  "ADD"))))
+                   :disabled (not (utils/check-google-chart-url chart-url))
+                   :on-click #(add-chart-url owner)}
+                  "ADD CHART"))))
 
           (topic-attachments attachments #(om/set-state! owner :has-changes true))
           
@@ -566,7 +583,7 @@
               (dom/label {:class (utils/class-set {:char-counter true
                                                    :char-count-alert char-count-alert})} char-count))
             (dom/div {:class "topic-foce-footer-right"
-                      :style {:display (if (nil? file-upload-state) "block" "none")}}
+                      :style {:display (if (and (not show-chart-url-input) (nil? file-upload-state)) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress)
                                          (not has-changes)
