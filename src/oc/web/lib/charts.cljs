@@ -16,7 +16,7 @@
   Our proxy request URLs look like:
   /_/sheets-proxy/1X5Ar6_JJ3IviO64-cJ0DeklFuS42BSdXxZV6x5W0qOc/pubchart?oid=1033950253&format=interactive
   "
-  [chart-url card-width]
+  [chart-url chart-id card-width]
   
   (let [url-fragment (last (clojure.string/split chart-url #"/spreadsheets/d/"))
         chart-proxy-url (str "/_/sheets-proxy/" url-fragment)]
@@ -24,17 +24,19 @@
       (let [resp (<! (http/get chart-proxy-url {:with-credentials? false})) ; get the chart via the proxy
             chart-dom (js/$ (str "<div>" (:body resp) "</div>"))
             non-src-scripts (js/$ "script[type='text/javascript']:not([src])" chart-dom)
-            src-scripts (js/$ "script[src]" chart-dom)]
-          (dotimes [idx (.-length non-src-scripts)]
-            (let [script-js-str (.-innerHTML (.get non-src-scripts idx))
-                  rp (js/RegExp "(\"width\":\\d+)" "gi")
-                  fixed-string (.replace script-js-str rp (str "\"width\":" card-width))
-                  r-chart (js/RegExp "safeDraw\\(document.getElementById\\('c'\\)\\)" "gi")
-                  fixed-string-c (.replace fixed-string r-chart (str "safeDraw(document.getElementById('chart-" chart-url "'))"))]
-              (.call js/eval js/window fixed-string-c)))
+            src-scripts (js/$ "script[src]" chart-dom)
+            l (.-length src-scripts)]
 
-          (dotimes [idx (.-length src-scripts)]
-            (let [src (.-src (.get src-scripts idx))
-                  splitted (clojure.string/split src #"/")
-                  final-src (str "https://docs.google.com/" (clojure.string/join "/" (subvec splitted 3)) "?no-cache=" (rand 4))]
-              (.append (js/$ "body") (js/$ (str "<script type='text/javascript' src='" final-src "' />")))))))))
+        (dotimes [idx (.-length non-src-scripts)]
+          (let [script-js-str (.-innerHTML (.get non-src-scripts idx))
+                rp (js/RegExp "(\"width\":\\d+)" "gi")
+                fixed-string (.replace script-js-str rp (str "\"width\":" card-width))
+                r-chart (js/RegExp "safeDraw\\(document.getElementById\\('c'\\)\\)" "gi")
+                fixed-string-c (.replace fixed-string r-chart (str "safeDraw(document.getElementById('" chart-id "'))"))]
+            (.call js/eval js/window fixed-string-c)))
+
+        (dotimes [idx (.-length src-scripts)]
+          (let [src (.-src (.get src-scripts idx))
+                splitted (clojure.string/split src #"/")
+                final-src (str "https://docs.google.com/" (clojure.string/join "/" (subvec splitted 3)))]
+            (.append (js/$ "body") (js/$ (str "<script type='text/javascript' src='" final-src "' />")))))))))
