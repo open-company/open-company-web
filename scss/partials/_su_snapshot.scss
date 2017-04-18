@@ -19,7 +19,7 @@ div.su-snapshot {
     box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
     background-color: white;
     border-top: 4px solid $oc_yellow;
-    z-index: 1034;
+    z-index: #{$navbar_zindex + 4};
 
     div.su-mobile-navigation-title {
       color: $oc_gray_7;

@@ -46,6 +46,10 @@ div.edit-user-profile {
         font-size: 16px;
         line-height: 1.8;
         color: $oc_gray_5;
+
+        @include placeholder(){
+          color: rgba(78,90,107,0.4);
+        }
       }
 
       div.left-column{

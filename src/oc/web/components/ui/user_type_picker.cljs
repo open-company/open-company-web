@@ -27,11 +27,11 @@
         [:li
           {:class (when (= user-type :viewer) "active")
            :on-click #(click-cb :viewer)}
-          [:i.fa.fa-user] " Viewer"]
+          [:i.fa.fa-user] " View"]
         [:li
           {:class (when (= user-type :author) "active")
            :on-click #(click-cb :author)}
-          [:i.fa.fa-pencil] " Author"]
+          [:i.fa.fa-pencil] " Edit"]
         (when-not hide-admin?
           [:li
             {:class (when (= user-type :admin) "active")
@@ -64,7 +64,7 @@
       (when (= user-type :viewer)
         [:span.user-type-disc.viewer
           {:on-click #(show-team-disclaimer-popover %)}
-          "VIEWER " [:i.fa.fa-question-circle]])
+          "VIEW " [:i.fa.fa-question-circle]])
       [:i.fa.fa-user]]
     [:button.user-type-picker-btn.btn-reset.author
       {:class (str "" (when-not enabled? "disabled") (when (= user-type :author) " active"))
@@ -73,7 +73,7 @@
       (when (= user-type :author)
         [:span.user-type-disc.author
           {:on-click #(show-team-disclaimer-popover %)}
-          "AUTHOR " [:i.fa.fa-question-circle]])
+          "EDIT " [:i.fa.fa-question-circle]])
       [:i.fa.fa-pencil]]
     (when show-admins?
       [:button.user-type-picker-btn.btn-reset.admin

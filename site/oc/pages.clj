@@ -8,68 +8,68 @@
 (defn privacy [options]
   (privacy/privacy options))
 
-(defn index [options]
-  [:div
-   [:div.container.outer.sector
-    [:div.container.inner
-     [:div.sector-box
-      [:div.sector-text.team-text
-       [:h2 "Make Employees Great"]
-       [:p
-        "Everyone is on the same page with open access to company information."]
-       [:h2 "Easy to Update"]
-       [:p
-        "Our "
-        [:i.fa.fa-slack]
-        " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
-      [:div.team-image]]]]
-   [:hr]
-   [:div.container.outer.sector
-    [:div.container.inner
-     [:div.sector-box.even
-      [:div.sector-text.update-text
-       [:h2 "Impress Investors and Advisors"]
-       [:p
-        "Send regular investor updates that follow best practices and increase engagement."]
-       [:h2 "Updates are Automatic"]
-       [:p
-        "Stakeholder updates are generated from your company's content for your approval."]]
-      [:div.update-image]]]]
-   [:hr]
-   [:div.container.outer.sector
-    [:div.container.inner
-     [:div.sector-box
-      [:div.sector-text.public-text
-       [:h2 "Go Public!"]
-       [:p
-        "Share publicly to build trust and attract new investors, employees, and customers."]
-       [:h2 "Play to the Crowd"]
-       [:p
-        "Keep crowd supporters and investors informed of your progress."]]
-      [:div.public-image]]]]
-   [:hr]
-   [:div.container.outer.sector
-    [:div.row.features
-     [:div.col-md-4
-      [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "/img/archive@4x.png"}]]
-      [:div.col-sm-10.col-xs-12
-       [:h2 "All in One Place"]
-       [:p
-        "All your company information; organized and easy to find."]]]
-     [:div.col-md-4
-      [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "/img/best-practices@4x.png"}]]
-      [:div.col-sm-10.col-xs-12
-       [:h2 "Best Practices"]
-       [:p
-        "Core topics and guidelines help you decide what to share."]]]
-     [:div.col-md-4
-      [:div.col-sm-2.feature-icon
-       [:img.feature-icon {:src "/img/concierge@4x.png"}]]
-      [:div.col-sm-10.col-xs-12
-       [:h2 "Concierge Service"]
-       [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
+; (defn index [options]
+;   [:div
+;    [:div.container.outer.sector
+;     [:div.container.inner
+;      [:div.sector-box
+;       [:div.sector-text.team-text
+;        [:h2 "Make Employees Great"]
+;        [:p
+;         "Everyone is on the same page with open access to company information."]
+;        [:h2 "Easy to Update"]
+;        [:p
+;         "Our "
+;         [:i.fa.fa-slack]
+;         " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
+;       [:div.team-image]]]]
+;    [:hr]
+;    [:div.container.outer.sector
+;     [:div.container.inner
+;      [:div.sector-box.even
+;       [:div.sector-text.update-text
+;        [:h2 "Impress Investors and Advisors"]
+;        [:p
+;         "Send regular investor updates that follow best practices and increase engagement."]
+;        [:h2 "Updates are Automatic"]
+;        [:p
+;         "Stakeholder updates are generated from your company's content for your approval."]]
+;       [:div.update-image]]]]
+;    [:hr]
+;    [:div.container.outer.sector
+;     [:div.container.inner
+;      [:div.sector-box
+;       [:div.sector-text.public-text
+;        [:h2 "Go Public!"]
+;        [:p
+;         "Share publicly to build trust and attract new investors, employees, and customers."]
+;        [:h2 "Play to the Crowd"]
+;        [:p
+;         "Keep crowd supporters and investors informed of your progress."]]
+;       [:div.public-image]]]]
+;    [:hr]
+;    [:div.container.outer.sector
+;     [:div.row.features
+;      [:div.col-md-4
+;       [:div.col-sm-2.feature-icon
+;        [:img.feature-icon {:src "oc_web_cdn_url/img/archive@4x.png"}]]
+;       [:div.col-sm-10.col-xs-12
+;        [:h2 "All in One Place"]
+;        [:p
+;         "All your company information; organized and easy to find."]]]
+;      [:div.col-md-4
+;       [:div.col-sm-2.feature-icon
+;        [:img.feature-icon {:src "oc_web_cdn_url/img/best-practices@4x.png"}]]
+;       [:div.col-sm-10.col-xs-12
+;        [:h2 "Best Practices"]
+;        [:p
+;         "Core topics and guidelines help you decide what to share."]]]
+;      [:div.col-md-4
+;       [:div.col-sm-2.feature-icon
+;        [:img.feature-icon {:src "oc_web_cdn_url/img/concierge@4x.png"}]]
+;       [:div.col-sm-10.col-xs-12
+;        [:h2 "Concierge Service"]
+;        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
 
 (defn pricing [options]
    [:div.container.outer.sector.content
@@ -197,7 +197,7 @@
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css?oc_deploy_key"}]
           ;; Filestack
-          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
+          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
@@ -223,10 +223,8 @@
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
-          ;; JWT Decode lib
-          [:script {:src "/lib/jwt-decode/jwt-decode.min.js?oc_deploy_key" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
-          [:script {:src "/js/oc.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/oc.js?oc_deploy_key" :type "text/javascript"}]
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
@@ -234,4 +232,50 @@
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
-          [:div.hidden [:img {:src "/css/emojione.sprites.png"}]]]})
+          [:div.hidden [:img {:src "/img/emojione.sprites.png"}]]]})
+
+(def prod-app-shell
+  {:head [:head
+          [:meta {:charset "utf-8"}]
+          [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
+          [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
+          [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          ;; The above 3 meta tags *must* come first in the head;
+          ;; any other head content must come *after* these tags
+          [:title "OpenCompany - Startup Transparency Made Simple"]
+          ;; Reset IE
+          "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
+          ;; Bootstrap CSS //getbootstrap.com/
+          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
+          ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
+          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          ;; jQuery UI CSS
+          [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
+          ;; Google fonts Domine and OpenSans
+          [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
+          ;; App single CSS
+          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/main.css"}]
+          ;; Filestack
+          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
+          ;; jQuery needed by Bootstrap JavaScript
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
+   :body [:body.small-footer
+          [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
+          [:div#oc-error-banner]
+          [:div#oc-loading]
+          
+          ;; jQuery textcomplete needed by Emoji One autocomplete
+          [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
+          ;; WURFL used for mobile/tablet detection
+          [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
+          ;; jQuery UI
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
+          ;; Resolve jQuery UI and Bootstrap tooltip conflict
+          [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
+          ;; Bootstrap JavaScript //getf.com/
+          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
+          ;; Compiled oc.min.js from our CDN
+          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc.js"}]
+          ;; Compiled assents
+          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc_assets.js"}]
+          [:div.hidden [:img {:src "oc_web_cdn_url/img/emojione.sprites.png"}]]]})

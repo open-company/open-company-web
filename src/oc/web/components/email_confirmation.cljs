@@ -5,6 +5,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -39,7 +40,7 @@
             :else
             (small-loading)))
         (dom/div {:class "mt5 center group"}
-          (dom/img {:src "/img/oc-logo-gold.png"})
+          (dom/img {:src (str ls/cdn-url "/img/oc-logo-gold.png")})
           (dom/div {:class "email-confirmation-p group"}
             (dom/p {:class ""} "OpenCompany makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
       (let [columns-num (responsive/columns-num)

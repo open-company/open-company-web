@@ -31,29 +31,32 @@
           (om/set-state! owner :loading true)
           (dis/dispatch! [:create-org]))))))
 
-(defn setup-org-name [data]
+(defn setup-org-name [owner data]
   (when-let [team-data (first (:teams (:teams-data data)))]
     ;; using utils/after here because we can't dispatch inside another dispatch.
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
-    (utils/after 1 #(dis/dispatch! [:input [:create-org] (or (:name team-data) "")]))))
+    (utils/after 1 #(dis/dispatch! [:input [:create-org] (or (:name team-data) "")]))
+    (when-not (empty? (:name team-data))
+      (om/set-state! owner :message "Is this the organization name you’d like to use?"))))
 
 (defcomponent org-editor [data owner]
 
   (init-state [_]
     {:loading false
+     :message "What's the name of your organization?"
      :name-did-change false})
 
   (did-mount [_]
     (utils/update-page-title "OpenCompany - Setup Your Organization")
     (when-not (:create-org data)
-      (setup-org-name data)))
+      (setup-org-name owner data)))
 
   (will-receive-props [_ next-props]
     (when-not (om/get-state owner :name-did-change)
-      (setup-org-name next-props)))
+      (setup-org-name owner next-props)))
 
-  (render-state [_ {:keys [loading]}]
+  (render-state [_ {:keys [loading message]}]
     (dom/div {:class "org-editor"}
       (dom/div {:class "fullscreen-page group"}
         (om/build navbar {:hide-right-menu true :show-navigation-bar true})
@@ -62,7 +65,7 @@
             (dom/div {:class "form-group"}
               (when (and (jwt/jwt) (jwt/get-key :first-name))
                 (dom/label {:class "org-editor-message"} (str "Hi " (s/capital (jwt/get-key :first-name)) "!")))
-              (dom/label {:class "org-editor-message"} "What's the name of your organization?")
+              (dom/label {:class "org-editor-message"} message)
               (dom/input {:type "text"
                           :class "org-editor-input domine h4"
                           :style #js {:width "100%"}

@@ -106,7 +106,7 @@
           (react-utils/build js/EmojionePicker {:search ""
                                                 :emojione #js {:sprites true
                                                                :imageType "png"
-                                                               :spritePath "/img/emojione.sprites.png"}
+                                                               :spritePath "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png"}
                                                 :onChange (fn [emoji]
                                                            (remove-markers s)
                                                            (replace-with-emoji caret-pos emoji)

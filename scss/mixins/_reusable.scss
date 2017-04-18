@@ -191,3 +191,19 @@
     font-weight: 700 !important;
   }
 }
+
+@function cdnUrl($cdn, $path) {
+  @if $cdn == 'oc_web_cdn_url' {
+    @return url( $path );
+  } @else {
+    @return url( $cdn + $path );
+  }
+}
+
+@mixin cdn-url($cdn, $path) {
+  @if $cdn == 'oc_web_cdn_url' {
+    background-image: url( #{ $path } );
+  } @else {
+    background-image: url( #{ $cdn + $path } );
+  }
+}

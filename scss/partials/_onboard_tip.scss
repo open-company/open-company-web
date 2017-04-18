@@ -6,7 +6,7 @@ div.onboard-tip-container {
   top: 50%;
   margin-left: -110px;
   margin-top: -116px;
-  z-index: 10000;
+  z-index: #{$navbar_zindex + 2000};
   padding: 0px;
 
   &.large {

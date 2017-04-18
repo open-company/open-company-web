@@ -9,6 +9,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -101,7 +102,7 @@
                     (for [team (:slack-orgs team-data)]
                       [:div.slack-domain.group
                         {:key (str "slack-org-" (:slack-org-id team))}
-                        [:img.slack-logo {:src "/img/slack.png"}]
+                        [:img.slack-logo {:src (str ls/cdn-url "/img/slack.png")}]
                         [:span (:name team)]
                         (when-not (contains? (jwt/get-key :bot) team-id)
                           (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]

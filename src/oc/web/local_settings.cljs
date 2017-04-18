@@ -35,3 +35,9 @@
 
 ;; Log level
 (def log-level "debug")
+
+;; CDN URL
+(def cdn-url "")
+
+;; Attachments bucket
+(def attachments-bucket "open-company-attachments-non-prod")

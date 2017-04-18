@@ -1,7 +1,8 @@
 (ns oc.core
   (:require [oc.pages :as pages]
             [boot.util :as util]
-            [hiccup.page :as hp]))
+            [hiccup.page :as hp]
+            [environ.core :refer (env)]))
 
 (def contact-email "hello@opencompany.com")
 (def contact-mail-to (str "mailto:" contact-email))
@@ -44,7 +45,7 @@
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href "/"}
-          [:img {:alt "OpenCompany" :src "/img/oc-wordmark.svg"}]]
+          [:img {:alt "OpenCompany" :src (str (env :oc_web_cdn_url) "/img/oc-wordmark.svg")}]]
         [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]
@@ -76,7 +77,7 @@
   [:nav.navbar.navbar-default.navbar-bottom
     [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
       [:li [:a.navbar-logo {:href "/"}
-        [:img {:alt "OpenCompany" :src "/img/oc-logo-grey.svg"}]]]
+        [:img {:alt "OpenCompany" :src (str (env :oc_web_cdn_url) "/img/oc-logo-grey.svg")}]]]
       [:li.web-only
         [:a {:href "/pricing"} "Pricing"]]
       [:li.web-only
@@ -114,7 +115,7 @@
                   (nav (is? :index))
                   (when (is? :index) (tagline))]]
                 (case page
-                  :index   (pages/index options)
+                  ; :index   (pages/index options)
                   :about   (pages/about options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
@@ -127,3 +128,8 @@
   (hp/html5 {:lang "en"}
             (:head pages/app-shell)
             (:body pages/app-shell)))
+
+(defn prod-app-shell [_]
+  (hp/html5 {:lang "en"}
+            (:head pages/prod-app-shell)
+            (:body pages/prod-app-shell)))

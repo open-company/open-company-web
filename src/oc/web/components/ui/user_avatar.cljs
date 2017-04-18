@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
@@ -40,4 +41,4 @@
        :aria-haspopup true
        :aria-expanded false}
       (user-avatar-image (drv/react s :current-user-data))
-      [:img {:src "/img/vert-ellipsis.svg" :width 5 :height 24}]]))
+      [:img {:src (str ls/cdn-url "/img/vert-ellipsis.svg") :width 5 :height 24}]]))

@@ -69,7 +69,7 @@ div.selected-topic-container{
   top: 0px;
   left: 0px;
   position: absolute;
-  z-index: 1036;
+  z-index: #{$navbar_zindex + 6};
 
   div.selected-topic, div.tr-selected-topic {
     position: absolute;

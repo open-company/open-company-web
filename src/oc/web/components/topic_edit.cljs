@@ -17,6 +17,7 @@
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.lib.growth-utils :as growth-utils]
             [oc.web.components.chart :refer (chart)]
+            [oc.web.components.topic-attachments :refer (topic-attachments)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
             [oc.web.components.ui.icon :as i]
@@ -109,7 +110,7 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (js/alert "An error has occurred while processing the image URL. Please try again.")
+      (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000])
       (do
         (set! (.-onload node) #(img-on-load owner node))
         (gdom/append (.-body js/document) node)
@@ -120,7 +121,7 @@
                                                       :has-changes true}))))
 
 (defn img-upload-error-cb [owner res error]
-  (js/alert "An error has occurred while processing the image URL. Please try again.")
+  (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000])
   (om/update-state! owner #(merge % {:file-upload-state nil
                                      :file-upload-progress nil
                                      :has-changes true})))
@@ -128,6 +129,22 @@
 (defn img-upload-progress-cb [owner res progress]
   (om/update-state! owner #(merge % {:file-upload-state :show-progress
                                      :file-upload-progress progress})))
+
+(defn attachment-upload-success-cb [owner res]
+  (let [url    (googobj/get res "url")]
+    (if-not url
+      (dis/dispatch! [:show-error-banner "An error has occurred while processing the file URL. Please try again." 5000])
+      (let [current-foce-data (dis/foce-topic-data)
+            attachments (or (:attachments current-foce-data) [])
+            attachment-data {:file-name (googobj/get res "filename")
+                             :file-type (googobj/get res "mimetype")
+                             :file-size (googobj/get res "size")
+                             :file-url url}]
+        (om/set-state! owner :has-changes true)
+        (dis/dispatch! [:foce-input {:attachments (conj attachments attachment-data)}])))))
+
+(defn attachment-upload-error-cb [owner res error]
+  (dis/dispatch! [:show-error-banner "An error has occurred while processing the file. Please try again." 5000]))
 
 (defn- dismiss-editing [topic]
   (dis/dispatch! [:rollback-add-topic (keyword topic)]))
@@ -176,6 +193,9 @@
   (if (or (not image-header) (string/blank? image-header))
     "Add an image"
     "Replace image"))
+
+(defn- add-attachment-tooltip [attachments]
+  (str "Add " (when (pos? (count attachments)) "another ") "attachment"))
 
 (defn remove-navigation-listener [owner]
   (when (om/get-state owner :history-listener-id)
@@ -345,6 +365,7 @@
           topic-data          (dis/foce-topic-data)
           gray-color          (oc-colors/get-color-by-kw :oc-gray-5)
           image-header        (:image-url topic-data)
+          attachments         (:attachments topic-data)
           is-data?            (#{:growth :finances} topic-kw)
           finances-data       (:data topic-data)
           growth-data         (growth-utils/growth-data-map (:data topic-data))
@@ -443,7 +464,7 @@
                         :contentEditable true
                         :dangerouslySetInnerHTML initial-body})
           (dom/div {:class "topic-foce-buttons group"}
-            (dom/div {:class "left mr2"
+            (dom/div {:class "left mr2 group"
                       :style {:display (if (nil? file-upload-state) "block" "none")}}
               (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                              (let [headline (sel1 (str "#foce-headline-" (name topic)))
@@ -470,10 +491,27 @@
                                     (.blur (.-target e))
                                     (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
                                     (iu/upload!
+                                     "image/*"
                                      (partial img-upload-success-cb owner)
                                      (partial img-upload-progress-cb owner)
                                      (partial img-upload-error-cb owner)))}
                 (dom/i {:class "fa fa-camera"})))
+            (dom/button {:class "btn-reset attachment left"
+                         :title (add-attachment-tooltip attachments)
+                         :type "button"
+                         :data-toggle "tooltip"
+                         :data-container "body"
+                         :data-placement "top"
+                         :style {:display (if (nil? file-upload-state) "block" "none")}
+                         :on-click (fn [e]
+                                    (.blur (.-target e))
+                                    (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
+                                    (iu/upload!
+                                     nil
+                                     (partial attachment-upload-success-cb owner)
+                                     nil
+                                     (partial attachment-upload-error-cb owner)))}
+                (dom/i {:class "fa fa-paperclip"}))
 
             ; Topic chart button
             ; (when (or (= is-data? :growth)
@@ -502,7 +540,7 @@
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
-              (str file-upload-progress "%")))
+              (str file-upload-progress "%"))
 
             (when show-chart-url-input
               (dom/div {:class "topic-chart-url-field"}
@@ -517,7 +555,9 @@
                                 (om/set-state! owner :show-chart-url-input false)
                                 (om/set-state! owner :has-changes true)
                                 (dis/dispatch! [:foce-input {:chart-url chart-url}]))}
-                  "ADD")))
+                  "ADD"))))
+
+          (topic-attachments attachments #(om/set-state! owner :has-changes true))
           
           ;; Hidden (initially) file upload UI
           (dom/div {:class "topic-foce-footer group"}

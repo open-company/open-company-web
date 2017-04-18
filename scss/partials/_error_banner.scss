@@ -4,7 +4,7 @@ div#oc-error-banner{
   top: 50px;
   left: 50%;
   margin-left: -200px;
-  z-index: 10000;
+  z-index: #{$navbar_zindex + 3000};
 
   div.error-banner {
     background-color: $oc_red_light;

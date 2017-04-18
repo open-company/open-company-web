@@ -379,9 +379,10 @@
               {:json-params (cljs->json json-data)
                :headers (headers-for-link share-link)}
       (fn [{:keys [success body]}]
-        (when success
+        (if success
           (let [fixed-body (json->cljs body)]
-            (dispatcher/dispatch! [:su-edit {:su-slug (:slug fixed-body) :su-date (:created-at fixed-body)}])))))))
+            (dispatcher/dispatch! [:su-edit {:su-slug (:slug fixed-body) :su-date (:created-at fixed-body) :medium (:medium fixed-body)}]))
+          (dispatcher/dispatch! [:su-edit nil]))))))
 
 (defn get-updates []
   (let [org-data (dispatcher/org-data)
@@ -599,16 +600,18 @@
         {:headers (headers-for-link user-update-link)
          :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
          (fn [{:keys [status body success]}]
-           (when success
-              (utils/after 1000
-                (fn []
-                  (go
-                    (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
-                      (let [res (<! (refresh-jwt refresh-url))]
-                        (if (:success res)
-                          (update-jwt-cookie! (:body res))
-                          (dispatcher/dispatch! [:logout])))))))
-              (dispatcher/dispatch! [:user-data (json->cljs body)])))))))
+           (if (= status 422)
+              (dispatcher/dispatch! [:user-profile-update-failed])
+             (when success
+                (utils/after 1000
+                  (fn []
+                    (go
+                      (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
+                        (let [res (<! (refresh-jwt refresh-url))]
+                          (if (:success res)
+                            (update-jwt-cookie! (:body res))
+                            (dispatcher/dispatch! [:logout])))))))
+                (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn add-email-domain [domain]
   (when domain

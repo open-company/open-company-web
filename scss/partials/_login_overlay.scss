@@ -4,7 +4,7 @@ div.login-overlay-container {
   left: 0px;
   width: 100%;
   height: 100%;
-  z-index: 10000;
+  z-index: #{$navbar_zindex + 150};
   padding: 0px;
   opacity: 1;
   transition: 230ms;
@@ -36,7 +36,7 @@ div.login-overlay-container {
     @include mobile(){
       top: 20px;
       left: 30px;
-      z-index: 100;
+      z-index: 99;
       color: $oc_gray_5;
     }
 

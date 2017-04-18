@@ -16,7 +16,7 @@ function emojiAutocomplete() {
             match: /\B:([\-+\w]{1,30})$/,
             sprites: true,
             imageType: 'png',
-            spritePath: '/img/emojione.sprites.png',
+            spritePath: 'https://d1wc0stj82keig.cloudfront.net/img/emojione.sprites.png',
             search: function (term, callback) {
                 var results = [];
                 var results2 = [];

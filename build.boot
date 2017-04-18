@@ -29,10 +29,13 @@
     [funcool/cuerdas "2.0.3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "0.8.4"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
+    [environ "1.1.0"] ; Get environment settings from different sources https://github.com/weavejester/environ
+    [clojure-humanize "0.2.2"] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
 
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
 
+    [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     [cljsjs/rangy-selectionsaverestore "1.3.0-1"]
     [cljsjs/raven "3.9.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-3"] ; d3 externs https://clojars.org/cljsjs/d3
@@ -97,12 +100,14 @@
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/css/emojione.min.css"
                         "public/css/emojione.min.css"]
-                      ['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.css"
-                        "public/css/emojione.sprites.css"]
+                       ;; We have a local copy of the sprites css
+                       ;; to make sure it's loaded from our CDN
+                       ; ['cljsjs/emojione
+                       ;   "cljsjs/emojione/common/sprites/emojione.sprites.css"
+                       ;   "public/css/emojione.sprites.css"]
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/sprites/emojione.sprites.png"
-                        "public/css/emojione.sprites.png"]
+                        "public/img/emojione.sprites.png"]
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/sprites/emojione.sprites.svg"
                         "public/img/emojione.sprites.svg"]
@@ -126,7 +131,10 @@
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.js"
-                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js"}]}))
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js"}
+                                        {:provides ["cljsjs.raven"]
+                                         :file "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.14.0/raven.min.js"
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.14.0/raven.min.js"}]}))
 
 (defn page? [f]
   (and (.startsWith (:path f) "pages/")
@@ -145,6 +153,18 @@
         ;; We're not actually rendering a collection here but using the collection task
         ;; is often a handy hack to render pages which are "unique"
         (p/collection :renderer 'oc.core/app-shell
+                      :page "app-shell.html"
+                      :filterer identity)))
+
+(deftask build-prod-site []
+  (comp (p/base)
+        (p/permalink :permalink-fn page->permalink
+                     :filterer page?)
+        (p/render :renderer 'oc.core/static-page
+                  :filterer page?)
+        ;; We're not actually rendering a collection here but using the collection task
+        ;; is often a handy hack to render pages which are "unique"
+        (p/collection :renderer 'oc.core/prod-app-shell
                       :page "app-shell.html"
                       :filterer identity)))
 
@@ -172,10 +192,7 @@
         (from-jars)
         (watch)
         (sass)
-        (build-site)
-        ; reload is broken with simple/advanced compilation https://github.com/adzerk-oss/boot-reload/issues/89
-        ; (reload :asset-path "/public"
-        ;         :on-jsload 'oc.web.core/on-js-reload)
+        (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {
@@ -193,7 +210,7 @@
   []
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-site)
+        (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]
@@ -208,7 +225,7 @@
   []
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-site)
+        (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))

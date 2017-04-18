@@ -19,7 +19,7 @@ nav.oc-navbar {
     transition: 230ms;
     overflow: hidden;
   }
-  z-index: 1030;
+  z-index: $navbar_zindex;
   background-color: white;
   border-top: 4px solid $oc_yellow;
   margin: 0px;
@@ -173,7 +173,7 @@ nav.oc-navbar {
           background: $oc_gray_5;
           width: 8px;
           height: 24px;
-          -webkit-mask: url("/img/vert-ellipsis.svg") center / contain no-repeat;
+          -webkit-mask: cdnUrl( $cdn_url, "/img/vert-ellipsis.svg") center / contain no-repeat;
         }
       }
     }
