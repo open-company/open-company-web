@@ -47,6 +47,8 @@
 
     [binaryage/devtools "0.9.2"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
+    [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
+
     ;; ------- Deps for project repl ------------------
     ;; The following dependencies are from: https://github.com/adzerk-oss/boot-cljs-repl
     [adzerk/boot-cljs-repl   "0.3.3"] ;; latest release
