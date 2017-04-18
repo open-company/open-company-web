@@ -337,6 +337,23 @@ div.topic.topic-edit {
         }
       }
 
+      div.topic-chart-url-field {
+        input {
+          width: 100%;
+        }
+
+        button {
+          margin-top: 5px;
+          height: 29px;
+          float: left;
+          font-size: 0.75rem;
+
+          &:first {
+            margin-right: 5px;
+          }
+        }
+      }
+
       span.file-upload-progress {
         margin-top: 7px;
         padding-bottom: 0px;
