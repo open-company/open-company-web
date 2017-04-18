@@ -379,7 +379,7 @@
                                         :color "white"
                                         :accent-color "white"}))))
           ;; Chart
-          (chart chart-url (- card-width (* 16 2)))
+          (chart topic-data (- card-width (* 16 2)))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (or (:title topic-data) "")

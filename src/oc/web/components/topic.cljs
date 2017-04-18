@@ -137,7 +137,7 @@
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(assign-topic-click)}
                 (dom/i {:class "fa fa-user"}) " Assign")))
-          (chart (:chart-url topic-data) (- card-width (* 16 2)))
+          (chart topic-data (- card-width (* 16 2)))
           (dom/div {:class "topic-title"}
 
             (when-not (and is-topic-view
