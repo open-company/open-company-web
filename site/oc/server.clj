@@ -23,8 +23,8 @@
 
 (defn proxy-sheets
   "Proxy requests to Google Sheets (needed for CORs). Done by nginx in production."
-  [sheets-id params]
-  (let [url (str "https://docs.google.com/spreadsheets/d/" sheets-id "/pubchart?" (ring.util.codec/form-encode params))]
+  [sheets-id chart-type params]
+  (let [url (str "https://docs.google.com/spreadsheets/d/" sheets-id "/" chart-type "?" (ring.util.codec/form-encode params))]
     (println "Proxying request to:" url)
     (let [{:keys [status body error]} @(http/request {:method :get
                                                       :url url
@@ -40,7 +40,7 @@
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/" [] (app-shell))
-  (GET "/_/sheets-proxy/:sheets-id/pubchart" [sheets-id & params] (proxy-sheets sheets-id params))
+  (GET "/_/sheets-proxy/:sheets-id/:chart-type" [sheets-id chart-type & params] (proxy-sheets sheets-id chart-type params))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
 
 ;; Some routes like /, /404 and similar can't have their content-type
