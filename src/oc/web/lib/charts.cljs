@@ -30,9 +30,18 @@
           (let [script-js-str (.-innerHTML (.get non-src-scripts idx))
                 rp (js/RegExp "(\"width\":\\d+)" "gi")
                 fixed-string (.replace script-js-str rp (str "\"width\":" card-width))
-                r-chart (js/RegExp "safeDraw\\(document.getElementById\\('c'\\)\\)" "gi")
-                fixed-string-c (.replace fixed-string r-chart (str "safeDraw(document.getElementById('" chart-id "'))"))]
-            (.call js/eval js/window fixed-string-c)))
+                ;; Regexp to match charts exported as simple charts
+                r1 (js/RegExp "safeDraw\\(document.getElementById\\('c'\\)\\)" "gi")
+                ;; Regexp to match charts exported as HTML page
+                r2 (js/RegExp "activeSheetId = '\\d+'; switchToSheet\\('\\d+'\\);" "gi")
+                r3 (js/RegExp "\"containerId\":\"embed_\\d+\"" "gi")
+                r4 (js/RegExp "posObj\\('\\d+', 'embed_\\d+', 0, 0, 0, 0\\);};" "gi")
+                ;; Replace all regexp
+                fixed-string-1 (.replace fixed-string r1 (str "safeDraw(document.getElementById('" chart-id "'))"))
+                fixed-string-2 (.replace fixed-string-1 r2 (str "activeSheetId = '" chart-id "'; switchToSheet('" chart-id "');"))
+                fixed-string-3 (.replace fixed-string-2 r3 (str "\"containerId\":\"" chart-id "\""))
+                fixed-string-4 (.replace fixed-string-3 r4 (str "posObj('" chart-id "', '" chart-id "', 0, 0, 0, 0);};"))]
+            (.call js/eval js/window fixed-string-4)))
 
         (dotimes [idx (.-length src-scripts)]
           (let [src (.-src (.get src-scripts idx))
