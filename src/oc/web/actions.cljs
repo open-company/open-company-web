@@ -646,7 +646,7 @@
   (doseq [team teams
           :let [team-link (utils/link-for (:links team) "item" "GET")
                 roster-link (utils/link-for (:links team) "roster" "GET")]]
-    (if team-link
+    (if team-link ; team link may not be present for non-admins, if so they can still get team users from the roster
       (api/get-team team-link)
       (api/get-team roster-link)))
   (assoc-in db [:teams-data :teams] teams))
