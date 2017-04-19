@@ -661,8 +661,8 @@
   [db [_ roster-data]]
   (if roster-data
     (let [fixed-roster-data {:team-id (:team-id roster-data)
-                             :links (:links (:collection roster-data))
-                             :users (:items (:collection roster-data))}]
+                             :links (-> roster-data :collection :links)
+                             :users (-> roster-data :collection :items)}]
       (assoc-in db (dispatcher/team-data-key (:team-id roster-data)) fixed-roster-data))
     db))
 
