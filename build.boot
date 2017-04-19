@@ -31,6 +31,7 @@
     [defun "0.3.0-RC1"] ; defun used mostly to port some fn from oc-lib https://github.com/killme2008/defun
     [environ "1.1.0"] ; Get environment settings from different sources https://github.com/weavejester/environ
     [clojure-humanize "0.2.2"] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
+    [hickory "0.7.1"] ; HTML as data https://github.com/davidsantiago/hickory
 
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
