@@ -6,6 +6,7 @@ pom.xml
 /out/
 /target/
 resources/public/js/compiled/
+resources/public/css/main.css
 .lein-*
 .repl
 .nrepl-*

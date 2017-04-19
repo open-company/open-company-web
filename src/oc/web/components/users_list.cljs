@@ -6,7 +6,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown show-team-disclaimer-popover)]))
+            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown show-role-explainer-popover)]))
 
 (defn user-action [team-id user action method other-link-params & [payload]]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
@@ -79,7 +79,7 @@
       [:thead
         [:tr
           [:th.pointer
-            {:on-click #(show-team-disclaimer-popover %)}
+            {:on-click #(show-role-explainer-popover %)}
             "ACCESS "
             [:i.fa.fa-question-circle]]
           [:th "NAME"]

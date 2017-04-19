@@ -1,4 +1,11 @@
 (ns oc.web.components.team-management
+  "
+  Namespace for two components, `team-management-wrapper` and `team-management`.
+
+  The `team-management-wrapper` component manages the loading state, page layout and exiting action.
+
+  The `team-management` component manages user invites, security and Slack and email domains for teams.
+  "
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [om.core :as om :include-macros true]
@@ -54,10 +61,16 @@
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
         team-data (get-in teams-data [team-id :data])]
+
     [:div.team-management.mx-auto.p3.my4.group
       (if-not team-data
+        ;; Still loading
         (rloading {:loading true})
+
+        ;; Render team management UI
         [:div
+
+          ;; Invite team members, mobile and web
           [:div.um-invite.group.mb3
             [:div.um-invite-label
               "TEAM MEMBERS"]
@@ -88,10 +101,14 @@
                     [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
                     :else
                     [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]]
+
+              ;; List of current team members, web only
               (when-not (responsive/is-mobile-size?)
                 [:div.mb3.um-invite.group
                   (when team-data
                     (users-list team-id (:users team-data) (:authors org-data)))])
+
+              ;; Slack team management, web only
               (when-not (responsive/is-mobile-size?)
                 [:div.mb3.um-invite.group
                   [:div.um-invite-label
@@ -143,6 +160,8 @@
                           [:span.small-caps.green.mt1.left "Bot successfully added."]
                           :else
                           [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
+              
+              ;; Email domains, web only
               (when-not (responsive/is-mobile-size?)
                 [:div.mb3.um-invite.group
                   [:div.um-invite-label
@@ -180,19 +199,7 @@
                                (:domain um-domain-invite))
                           [:span.small-caps.red.mt1.left (str (:domain um-domain-invite) " was already added.")]
                           :else
-                          [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])
-          (comment
-            [:div.my2.um-byemail-container.group
-              [:div.group
-                [:span.left.ml1.um-byemail-anyone-span
-                  "Anyone who signs up with this email domain can view team boards."]]
-              [:div.mt2.um-byemail.group
-                [:span.left.um-byemail-at "@"]
-                [:input.left.um-byemail-email
-                  {:type "text"
-                   :name "um-byemail-email"
-                   :placeholder "your email domain without @"}]
-                [:button.left.um-byemail-save.btn-reset.btn-outline "SAVE"]]])])]))
+                          [:span.small-caps.red.mt1.left "An error occurred, please try again."])])]])])]))
 
 (defcomponent team-management-wrapper [data owner]
   (render [_]
