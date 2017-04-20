@@ -14,7 +14,7 @@
   (when (not (empty? (:chart-url topic-data)))
     (let [chart-id (chart-uid topic-data)
           url-fragment (last (clojure.string/split (:chart-url topic-data) #"/spreadsheets/d/"))
-          chart-proxy-url (str "/_/sheets-proxy/spreadsheets/d/" url-fragment "&chart-width=" card-width "&chart-height=410&chart-id=" chart-id)]
+          chart-proxy-url (str "/_/sheets-proxy/spreadsheets/d/" url-fragment "&chart-id=" chart-id)]
       [:div.chart
         {:key chart-id
          :data-chart-src (:chart-url topic-data)}
