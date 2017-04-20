@@ -5,11 +5,9 @@
 
 (defn chart-uid [topic-data]
   (when (:chart-url topic-data)
-    (str (:topic topic-data) "-" (:created-at topic-data) "-" (gh/hash :md5 (:chart-url topic-data)))))
+    (str (:topic topic-data) "-" (gh/hash :md5 (:chart-url topic-data)))))
 
-(rum/defcs chart < (rum/local "" ::last-url)
-                   (rum/local 1 ::retry)
-
+(rum/defcs chart
   [s topic-data card-width]
   (when (not (empty? (:chart-url topic-data)))
     (let [chart-id (chart-uid topic-data)
