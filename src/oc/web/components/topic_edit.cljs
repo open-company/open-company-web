@@ -22,7 +22,8 @@
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
             [oc.web.components.ui.icon :as i]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.popover :refer (add-popover hide-popover)]
+            [oc.web.components.ui.popover :refer (add-popover-with-rum-component add-popover hide-popover)]
+            [oc.web.components.ui.collect-chart-popover :refer (collect-chart-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
             [goog.object :as googobj]
@@ -264,13 +265,6 @@
 ;                                                                     :config {:place "right-bottom"}})
 ;           (t/show first-foce))))))
 
-(defn add-chart-url [owner]
-  (let [chart-url (om/get-state owner :chart-url)
-        cleaned-url (utils/clean-google-chart-url chart-url)]
-    (om/set-state! owner :show-chart-url-input false)
-    (om/set-state! owner :has-changes true)
-    (dis/dispatch! [:foce-input {:chart-url cleaned-url}])))
-
 (defcomponent topic-edit [{:keys [currency
                                   card-width
                                   columns-num
@@ -296,7 +290,6 @@
        :file-upload-progress 0
        :headline-exceeds false
        :first-foce-tt-shown false
-       :chart-url (or (:chart-url topic-data) "")
        :show-chart-url-input false}))
 
   (will-unmount [_]
@@ -345,7 +338,17 @@
             image-header      (:image-url topic-data)
             add-image-tooltip (add-image-tooltip image-header)
             add-image-el      (js/$ (gdom/getElementByClass "camera"))
-            add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
+            add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))
+            show-chart-url-input (om/get-state owner :show-chart-url-input)]
+        (js/console.log "topic-edit/did-update")
+        (when (not= (:show-chart-url-input prev-state) show-chart-url-input)
+          (js/console.log "   show-chart-url-input different:" show-chart-url-input)
+          (if show-chart-url-input
+            (add-popover-with-rum-component collect-chart-popover {:hide-popover-cb #(om/set-state! owner :show-chart-url-input false)
+                                                                   :container-id "add-chart-popover"
+                                                                   :width 500
+                                                                   :height 400})
+            (hide-popover nil "add-chart-popover")))
         (doto add-image-el
           (.tooltip "hide")
           (.attr "data-original-title" add-image-tooltip)
@@ -364,8 +367,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url
-                           chart-url show-chart-url-input
-                           headline-exceeds has-changes]}]
+                           show-chart-url-input headline-exceeds has-changes]}]
     (let [board-slug        (router/current-board-slug)
           topic             (dis/foce-topic-key)
           topic-kw          (keyword topic)
@@ -407,7 +409,16 @@
                                         :color "white"
                                         :accent-color "white"}))))
           ;; Chart
-          (chart topic-data (- card-width (* 16 2)))
+          (dom/div {:class "topic-edit-chart-container"}
+            (when-not (empty? (:chart-url topic-data))
+              (dom/button {:class "btn-reset remove-chart-btn"
+                           :title "Remove Chart from Google Sheets"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :on-click #(dis/dispatch! [:foce-input [:chart-url nil]])}
+                (dom/i {:class "fa fa-times"})))
+            (chart topic-data (- card-width (* 16 2))))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (or (:title topic-data) "")
@@ -537,7 +548,7 @@
             ;                :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
             ;     (dom/i {:class "fa fa-line-chart"})))
             (dom/button {:class "btn-reset chart-button left"
-                         :title "Add Chart from Google Sheets"
+                         :title (if (empty? (:chart-url topic-data)) "Add Chart from Google Sheets" "Edit Chart from Google Sheets")
                          :type "button"
                          :data-toggle "tooltip"
                          :data-container "body"
@@ -549,30 +560,8 @@
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
               (str file-upload-progress "%"))
 
-            (when show-chart-url-input
-              (dom/div {:class "topic-chart-url-field"}
-                (dom/input
-                  {:type "text"
-                   :value chart-url
-                   :on-key-up (fn [e]
-                                (cond
-                                  (= "Enter" (.-key e))
-                                  (when (utils/check-google-chart-url chart-url)
-                                    (add-chart-url owner))
-                                  (= "Escape" (.-key e))
-                                  (om/set-state! owner :show-chart-url-input false)))
-                   :on-change #(om/set-state! owner :chart-url (or (.. % -target -value) ""))})
-                (dom/button
-                  {:type "button"
-                   :class "btn-reset btn-outline mr1"
-                   :on-click #(om/set-state! owner :show-chart-url-input false)}
-                  "CANCEL")
-                (dom/button
-                  {:type "button"
-                   :class "btn-reset btn-solid"
-                   :disabled (not (utils/check-google-chart-url chart-url))
-                   :on-click #(add-chart-url owner)}
-                  "ADD CHART"))))
+            (when (:chart-url topic-data)
+              (dom/span {:class ""})))
 
           (topic-attachments attachments #(om/set-state! owner :has-changes true))
           

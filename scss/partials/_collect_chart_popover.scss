@@ -1,0 +1,44 @@
+div.oc-popover-container-internal {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+
+  div.oc-popover.collect-chart-popover {
+    width: 500px;
+    height: 350px;
+    margin-left: -250px;
+    margin-top: -175px;
+    color: $oc_gray_5;
+    text-align: left;
+    position: relative;
+
+    button.close-button {
+      position: absolute;
+      right: -30px;
+      top: -10px;
+    }
+
+    h3.title {
+      font-size: 16px;
+    }
+
+    ol li {
+      font-size: 14px;
+    }
+
+    div input {
+      border-radius: 2px;
+      color: $oc_gray_5;
+      width: 100%;
+      outline: none;
+      border: 1px solid rgba(90,78,107,0.5);
+      &:focus, &:active {
+        border: 1px solid rgba(90,78,107,0.8);
+      }
+    }
+    button {
+      margin-left: 0.4rem;
+      margin-top: 0.5rem;
+    }
+  }
+}
