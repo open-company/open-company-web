@@ -161,12 +161,12 @@
                       :height "150px"
                       :message before-unload-message
                       :cancel-title "STAY"
-                      :cancel-cb #(do
+                      :cancel-cb (fn [_]
                                     ;; Go back to the previous token
                                     (.setToken @router/history current-token)
                                     (hide-popover nil "leave-topic-confirm"))
                       :success-title "LEAVE"
-                      :success-cb #(do
+                      :success-cb (fn [_]
                                     (hide-popover nil "leave-topic-confirm")
                                     ;; cancel any FoCE
                                     (if (:new (dis/foce-topic-data))
@@ -401,7 +401,7 @@
                             :data-placement "top"
                             :data-container "body"
                             :title "Remove this image"
-                            :on-click #(do
+                            :on-click (fn [_]
                                         (om/set-state! owner :has-changes true)
                                         (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
                 (i/icon :simple-remove {:size 15
@@ -416,7 +416,9 @@
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
-                           :on-click #(dis/dispatch! [:foce-input [:chart-url nil]])}
+                           :on-click (fn [_]
+                                        (om/set-state! owner :has-changes true)
+                                        (dis/dispatch! [:foce-input [:chart-url nil]]))}
                 (dom/i {:class "fa fa-times"})))
             (chart topic-data (- card-width (* 16 2))))
           ;; Topic title
@@ -469,8 +471,8 @@
                         :onKeyUp   #(check-headline-count owner % true)
                         :onKeyDown #(check-headline-count owner % true)
                         :onFocus    #(check-headline-count owner % false)
-                        :onBlur #(do
-                                    (check-headline-count owner % false)
+                        :onBlur (fn [e]
+                                    (check-headline-count owner e false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
           ;; Topic body
