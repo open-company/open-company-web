@@ -25,9 +25,9 @@
                         :logout
                         (router/redirect! oc-urls/logout)
                         :signup
-                        (dis/dispatch! [:show-login-overlay :signup-with-email])
+                        (dis/dispatch! [:login-overlay-show :signup-with-email])
                         ;; else
-                        (dis/dispatch! [:show-login-overlay :login-with-email]))}
+                        (dis/dispatch! [:login-overlay-show :login-with-email]))}
           (case button-type
             :logout
             "LOG OUT"

@@ -24,7 +24,7 @@
                                   (when (pos? showing-time)
                                     (utils/after showing-time
                                      (fn []
-                                      (dis/dispatch! [:show-error-banner nil 0])
+                                      (dis/dispatch! [:error-banner-show nil 0])
                                       (reset! (::showing s) false))))))
                              s)}
   [s]

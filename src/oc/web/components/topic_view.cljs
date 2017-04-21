@@ -24,7 +24,7 @@
                 :success-title "ARCHIVE"
                 :success-cb (fn []
                               (let [topic (router/current-topic-slug)]
-                                (dis/dispatch! [:archive-topic topic])
+                                (dis/dispatch! [:topic-archive topic])
                                 (hide-popover nil "archive-topic-confirm")))}))
 
 (defn load-entries [owner]
@@ -62,7 +62,7 @@
               (if (and new-topic
                        (contains? new-topic :links)
                        (not is-archived?))
-                (dis/dispatch! [:add-topic topic-kw new-topic-data])
+                (dis/dispatch! [:topic-add topic-kw new-topic-data])
                 (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))))
 
 (defcomponent topic-view [{:keys [card-width
@@ -76,7 +76,7 @@
     {:entries-requested false})
 
   (did-mount [_]
-    (dis/dispatch! [:show-add-topic false])
+    (dis/dispatch! [:add-topic-show false])
     (load-entries-if-needed owner)
     (om/set-state! owner :entries-reload-interval (js/setInterval #(load-entries owner) (* 60 1000)))
     (let [props (om/get-props owner)]
@@ -153,7 +153,7 @@
                           with-data (if (#{:growth :finances} topic-kw) (assoc initial-data :data (:data topic-data)) initial-data)
                           with-metrics (if (= :growth topic-kw) (assoc with-data :metrics (:metrics topic-data)) with-data)]
                       (dom/div {:class "fake-textarea-internal"
-                                :on-click #(dis/dispatch! [:start-foce topic-kw with-metrics])}
+                                :on-click #(dis/dispatch! [:foce-start topic-kw with-metrics])}
                         (:title topic-data)
                         (dom/br)
                         (dom/span {:class "new-entry"} "Start a new entry...")))

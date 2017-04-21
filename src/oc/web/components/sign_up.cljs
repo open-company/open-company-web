@@ -32,7 +32,7 @@
                                               :type "submit"
                                               :onClick #(do
                                                           (.preventDefault %)
-                                                          (dis/dispatch! [:show-login-overlay :signup-with-slack]))}
+                                                          (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
                         "Get Started →"]]]]]]]]
 
         [:div.sub-tag

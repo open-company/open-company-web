@@ -97,7 +97,7 @@
                                                  (when (and (:show-top-menu @dis/app-state)
                                                             (not (utils/event-inside? e (sel1 [(str "div.topic[data-topic=" (name (:show-top-menu @dis/app-state)) "]")]))))
                                                    (utils/event-stop e)
-                                                   (dis/dispatch! [:show-top-menu nil])))))
+                                                   (dis/dispatch! [:top-menu-show nil])))))
     ; (when (pos? (:count (utils/link-for (:links (dis/board-data data)) "stakeholder-updates")))
     ;   (om/set-state! owner :share-tooltip-dismissed (t/tooltip-already-shown? (share-tooltip-id (:slug (dis/board-data data))))))
     (refresh-board-data)

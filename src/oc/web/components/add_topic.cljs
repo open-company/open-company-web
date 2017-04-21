@@ -135,7 +135,7 @@
         [:hr]
         (when (pos? (count topics))
           [:span.close-add-topic
-            {:on-click #(dis/dispatch! [:show-add-topic false])}
+            {:on-click #(dis/dispatch! [:add-topic-show false])}
             (i/icon :simple-remove {:color "rgba(78, 90, 107, 0.8)" :size 16 :stroke 8 :accent-color "rgba(78, 90, 107, 1.0)"})])
         [:div.mxn2.clearfix
           ;; column 1
