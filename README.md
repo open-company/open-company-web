@@ -211,3 +211,89 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
 
 Copyright © 2015-2017 OpenCompany, LLC.
+
+## Actions
+
+|  **Action** |  | **Caller** | **Description** |
+|  ------ | ------ | ------ | ------ |
+|  :add-email-domain-team | :email-domain-team-add | UI | Add an email domain to the user team. |
+|  :add-email-domain-team/finish | :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
+|  :add-slack-team | :slack-team-add | UI | Start the request to add a Slack team to the current team. |
+|  :add-topic | :topic-add | UI | Give a topic and its data add the topic to the current board. |
+|  :archive-topic | :topic-archive | UI | Start the archive topic action. Call the API function to archive. |
+|  :archive-topic/success | :topic-archive/success | API | Archive succesfully done, navigate to the board to reload the data without the topic. |
+|  :auth-bot | :bot-auth | UI | Start the bot add for a give slack team. |
+|  :auth-settings | :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
+|  :auth-with-token | :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
+|  :auth-with-token/failed | :auth-with-token/failed | API | Token exchange failed, cleanup the app-state of the token exchange stuff. |
+|  :auth-with-token/success | :auth-with-token/success | API | Token exchange succeeded. Show the collect name and password overlay if it was an invitation token, load the orgs associated with the user and redirect. |
+|  :board | :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
+|  :collect-name-pswd | :name-pswd-collect | UI | Start the request to save the user name and password. |
+|  :collect-name-pswd/finish | :name-pswd-collect/finish | API | Collect name and password request finished. |
+|  :collect-pswd | :pswd-collect | UI | Start the request to save the new user password on password request. |
+|  :collect-pswd/finish | :pswd-collect/finish | API | Collect password request finished. |
+|  :create-board | :board-create | UI | Start the request to create a new board for the current org. |
+|  :create-org | :org-create | UI | Start the request to create a new org. |
+|  :dashboard-select-all | :dashboard-select-all | UI | Given a board select all the topics for the share. |
+|  :dashboard-select-topic | :dashboard-select-topic | UI | When in sharing mode toggle a topic in the selected set. |
+|  :dashboard-share-mode | :dashboard-share-mode | UI | Toggle the sharing mode. |
+|  :default | :default | - | Default action, never used, it's only a fallback |
+|  :delete-board | :board-delete | UI | Delete a board of the current org. |
+|  :delete-entry | :entry-delete | UI | Start the delete entry action. Call the proper API function. It also takes care of removing the topic from the board if it's the last entry or to replace it with the previous entry if it was the latest. |
+|  :delete-entry/success | :entry-delete/success | API | Entry succesfully deleted, navigate to the board to reload the data without the entry. |
+|  :entries-loaded | :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entry-point | :entry-point | API | Read the Api entry point and save the data in the app state. |
+|  :enumerate-channels | :channels-enumerate | UI | Start the request to load the Slack channels give a Slack team. |
+|  :enumerate-channels/success | :channels-enumerate/success | API | Slack channels loaded, it saves them in the proper place of the app-state. |
+|  :foce-input | :foce-input | UI | Save a new data for the current edited entry. |
+|  :foce-save | :foce-save | UI | Call the proper API function to save the topic data collected during FoCE. |
+|  :get-auth-settings | :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
+|  :get-teams | :teams-get | UI | Start the request to load the list of teams. |
+|  :get-updates-list | :udpates-list-get | UI | Start the request to load the list of the prior updates for a certain org. |
+|  :hide-welcome-screen | :welcome-screen-hide | UI | Remove the welcome screen shown the first time the first org user open the dashboard. |
+|  :input | :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
+|  :invitation-confirmed | :invitation-confirmed | API | Confirm invitation request succeeded. |
+|  :invite-by-email | :invite-by-email | UI | Start the request to invite a user, check if the email is already present and use the resend link if possible. No-op if the user is already an active user of the team. |
+|  :invite-by-email/failed | :invite-by-email/failed | API | Invitation request failed, add the proper error in the app-state. |
+|  :invite-by-email/success | :invite-by-email/success | API | Reload the team data to show the new invited user, reset the app-state for invitation data. |
+|  :jwt | :jwt | UI | Given the JWT decoded data, save them in the app-state. |
+|  :load-other-boards | :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
+|  :login-with-email | :login-with-email | UI | Show the login with email overlay. |
+|  :login-with-email/failed | :login-with-email/failed | API | Login via email failed, add the proper error message to the app-state. |
+|  :login-with-email/success | :login-with-email/success | API | Login via email succeeded. Save the returned JWT in the cookie and load the entry-point data. |
+|  :login-with-slack | :login-with-slack | UI | Show the login with slack overlay. |
+|  :logout | :logout | UI | Logout action: remove the JWT from the app-state and the jwt cookie. Redirect to /. |
+|  :mobile-menu-toggle | :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
+|  :new-topic | :new-topics-load/finish | API | Read the available new topics and save them in the app-state for later use. |
+|  :org | :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
+|  :password-reset | :password-reset | UI | Start the request to reset the user password. |
+|  :password-reset/finish | :password-reset/finish | API | Password reset request finished. |
+|  :private-board-action | :private-board-action | UI | Given a private board, a user of this board and an action perform the action: change role or remove the user. |
+|  :private-board-add | :private-board-add | UI | Add a user to a private board with a specific role. |
+|  :refresh-slack-user | :slack-token-refresh | UI | Refresh the data of the user signed in with Slack. |
+|  :reset-user-profile | :user-profile-reset | UI | Reset the user profile data edited by the user but not yet saved. |
+|  :rollback-add-topic | :add-topic-rollback | UI | Rollback the add topic to the board. User canceled action. |
+|  :save-user-profile | :user-profile-save | UI | Save the edited user data. |
+|  :set-board-cache! | :set-board-cache! | UI | Save some data of the current board, used for example by the growth topic to remember the last focused metric in the UI. |
+|  :show-add-topic | :add-topic-show | UI | Show the add topic view in the dashboard. |
+|  :show-error-banner | :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
+|  :show-login-overlay | :login-overlay-show | UI | Set the login overlay type in the app-state to show login, signup, password reset or collect name and password views. |
+|  :show-top-menu | :top-menu-show | UI | Toggle the dropdown menu of the topic in the dashboard. |
+|  :signup-with-email | :signup-with-email | UI | Show the signup with email overlay. |
+|  :signup-with-email/failed | :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
+|  :signup-with-email/success | :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |
+|  :start-foce | :foce-start | UI | Setup the app-state for FoCE initializing the data with the given entry data (empty if new entry). |
+|  :start-foce-data-editing | :foce-data-editing-start | UI | Start the data edit for growth and finances topics. |
+|  :su-edit | :su-edit | API | When a new update is created it saves the link and the data of the update in the app-state. |
+|  :subscription | :subscription | API | Save the new subscription data in the app-state. |
+|  :team-loaded | :team-loaded | API | Save the team loaded data in the app-state. |
+|  :team-roster-loaded | :team-roster-loaded | API | Save the roster in the team data. |
+|  :teams-loaded | :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
+|  :topic | :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
+|  :topic-entry | :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
+|  :update-loaded | :update-loaded | API | Read and save the data of certain update in the app-state |
+|  :updates-list | :updates-list | API | Read and save the list of the prior updates in the app-state given an org. |
+|  :user-action | :user-action | UI | Start a user action: given a team-id, a user data object, the action and a method make a request to complete the action. Can pass optional payload (if it's not a GET request). |
+|  :user-action/complete | :user-action/complete | API | Refresh the team data to show the completed user action. |
+|  :user-data | :user-data | API | Current user data loaded, save them in the app-state. |
+|  :user-profile-update/failed | :user-profile-update/failed | API | User profile update request failed. |
