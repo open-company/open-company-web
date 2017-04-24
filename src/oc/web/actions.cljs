@@ -646,8 +646,10 @@
   (doseq [team teams
           :let [team-link (utils/link-for (:links team) "item" "GET")
                 roster-link (utils/link-for (:links team) "roster" "GET")]]
-    (if team-link ; team link may not be present for non-admins, if so they can still get team users from the roster
-      (api/get-team team-link)
+    ; team link may not be present for non-admins, if so they can still get team users from the roster
+    (when team-link
+      (api/get-team team-link))
+    (when roster-link
       (api/get-team roster-link)))
   (assoc-in db [:teams-data :teams] teams))
 
@@ -663,7 +665,7 @@
     (let [fixed-roster-data {:team-id (:team-id roster-data)
                              :links (-> roster-data :collection :links)
                              :users (-> roster-data :collection :items)}]
-      (assoc-in db (dispatcher/team-data-key (:team-id roster-data)) fixed-roster-data))
+      (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) fixed-roster-data))
     db))
 
 (defmethod dispatcher/action :enumerate-channels

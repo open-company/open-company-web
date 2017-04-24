@@ -58,6 +58,9 @@
 (defn team-data-key [team-id]
   [:teams-data team-id :data])
 
+(defn team-roster-key [team-id]
+  [:teams-data team-id :roster])
+
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
@@ -96,6 +99,10 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-data-key (:team-id org-data)))))]
+   :team-roster         [[:base :org-data]
+                          (fn [base org-data]
+                            (when org-data
+                              (get-in base (team-roster-key (:team-id org-data)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -226,6 +233,11 @@
   ([team-id] (team-data team-id @app-state))
   ([team-id data] (get-in data (team-data-key team-id))))
 
+(defn team-roster
+  ([] (team-roster (:team-id (org-data))))
+  ([team-id] (team-roster team-id @app-state))
+  ([team-id data] (get-in data (team-roster-key team-id))))
+
 (defn team-channels
   ([] (team-channels (:team-id (org-data))))
   ([team-id] (team-channels team-id @app-state))
@@ -251,6 +263,9 @@
 (defn print-team-data []
   (js/console.log (get-in @app-state (team-data-key (:team-id (org-data))))))
 
+(defn print-team-roster []
+  (js/console.log (get-in @app-state (team-roster-key (:team-id (org-data))))))
+
 (defn print-updates-list-data []
   (js/console.log (get-in @app-state (updates-list-key (router/current-org-slug)))))
 
@@ -266,6 +281,7 @@
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
+(set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintUpdatesListData js/window) print-updates-list-data)
 (set! (.-OCWebPrintUpdateData js/window) print-update-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)

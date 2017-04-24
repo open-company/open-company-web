@@ -58,6 +58,7 @@ var Tooltip = function(){};
 var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintTeamData = function(){};
+var OCWebPrintTeamRoster = function(){};
 var OCWebPrintBoardData = function(){};
 var OCWebPrintEntriesData = function(){};
 var OCWebPrintJWTContents = function(){};
