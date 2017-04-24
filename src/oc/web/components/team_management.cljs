@@ -60,7 +60,8 @@
         valid-email? (utils/valid-email? (:email um-invite))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
-        team-data (get-in teams-data [team-id :data])]
+        team-data (get-in teams-data [team-id :data])
+        team-roster (get-in teams-data [team-id :roster])]
 
     [:div.team-management.mx-auto.p3.my4.group
       (if-not team-data
@@ -75,18 +76,54 @@
             [:div.um-invite-label
               "TEAM MEMBERS"]
             [:div
+              [:div.invite-from
+                "From: "
+                [:span.ml2 "  "]
+                [:input
+                  {:type "radio"
+                   :id "invite-from-email"
+                   :checked (or (not (:invite-from um-invite)) (= (:invite-from um-invite) "email"))
+                   :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
+                   :value "email"}]
+                [:label.ml1
+                  {:for "invite-from-email"}
+                  "Email"]
+                [:span.ml2 "  "]
+                [:input
+                  {:type "radio"
+                   :id "invite-from-slack"
+                   :checked (= (:invite-from um-invite) "slack")
+                   :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
+                   :value "slack"}]
+                [:label.ml1
+                  {:for "invite-from-slack"}
+                  "Slack"]]
               [:div.group
-                [:input.left.um-invite-field.email
-                  {:name "um-invite"
-                   :type "text"
-                   :autoCapitalize "none"
-                   :value (:email um-invite)
-                   :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
-                   :placeholder "Email address"}]
+                (if (= (:invite-from um-invite) "slack")
+                  [:select.left.um-invite-field.slack
+                    {:value (:slack-id um-invite)
+                     :on-change #(dis/dispatch! [:input [:um-invite :slack-id] (.. % -target -value)])
+                     :placeholder "Select a Slack user from the list"}
+                     (for [s (filter #(= (:status %) "uninvited") (:users team-roster))]
+                        [:option
+                          {:key (str "slack-invite-" (:slack-id s))
+                           :value (:slack-id s)}
+                          (utils/name-or-email s)])]
+                  [:input.left.um-invite-field.email
+                    {:name "um-invite"
+                     :type "text"
+                     :autoCapitalize "none"
+                     :value (:email um-invite)
+                     :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
+                     :placeholder "Email address"}])
                 (user-type-picker user-type valid-email? #(dis/dispatch! [:input [:um-invite :user-type] %]) true)
                 [:button.right.btn-reset.btn-solid.um-invite-send
-                  {:disabled (or (not valid-email?)
-                                 (not user-type))
+                  {:disabled (not (and (not (empty? user-type))
+                                       (or (and (or (empty? (:invite-from um-invite))
+                                                    (= (:invite-from um-invite) "email"))
+                                                valid-email?)
+                                           (and (= (:invite-from um-invite) "email")
+                                                (empty? (:slack-id um-invite))))))
                    :on-click #(let [email (:email (:um-invite ro-user-man))]
                                 (if (and (utils/valid-email? email)
                                          (not (nil? (:user-type (:um-invite ro-user-man)))))
