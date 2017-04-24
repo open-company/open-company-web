@@ -856,8 +856,6 @@
         first-name (:first-name user)
         last-name (:last-name user)]
     (cond
-      (not (empty? user-name))
-      user-name
       (and (not (empty? first-name))
            (not (empty? last-name)))
       (str first-name " " last-name)
@@ -865,6 +863,8 @@
       first-name
       (not (empty? last-name))
       last-name
+      (not (empty? user-name))
+      user-name
       :else
       (:email user))))
 
