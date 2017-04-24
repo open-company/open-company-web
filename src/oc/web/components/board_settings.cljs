@@ -51,7 +51,7 @@
   (let [{:keys [teams-data private-board-invite]} (drv/react s :team-management)
         org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        users (filter :user-id (get-in teams-data [(:team-id org-data) :data :users])) ; filter Slack only users
+        users (get-in teams-data [(:team-id org-data) :data :users])
         selected-user-id (:selected-user-id private-board-invite)
         selected-user-type (:selected-user-type private-board-invite)
         selected-user (when selected-user-id (some #(when (= (:user-id %) selected-user-id) %) users))
@@ -125,7 +125,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         {:keys [teams-data]} (drv/react s :team-management)
-        all-users (filter :user-id (get-in teams-data [(:team-id org-data) :data :users]))] ; filter Slack only users
+        all-users (get-in teams-data [(:team-id org-data) :data :users])]
     [:div.private-board-users-list
       [:table
         [:thead

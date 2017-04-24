@@ -86,6 +86,6 @@
           [:th "STATUS"]
           [:th {:style {:text-align "center"}} "ACTIONS"]]]
       [:tbody
-        (for [user (filter :user-id users) ; filter Slack only users
+        (for [user users
               :let [author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)]]
           (rum/with-key (user-row team-id user author) (str "user-tr-" team-id "-" (:user-id user))))]]])
