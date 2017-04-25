@@ -125,7 +125,11 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         {:keys [teams-data]} (drv/react s :team-management)
-        all-users (get-in teams-data [(:team-id org-data) :data :users])]
+        team-users (get-in teams-data [(:team-id org-data) :data :users])
+        roster-users (get-in teams-data [(:team-id org-data) :roster :users])
+        all-users (if (empty? team-users)
+                    (filter #(not= (:status %) "uninvited") roster-users)
+                    team-users)]
     [:div.private-board-users-list
       [:table
         [:thead
