@@ -111,7 +111,6 @@
                        :on-change (fn [e]
                                     (let [selected-slack-id (.. e -target -value)
                                           selected-slack-user (first (filter #(= (:slack-id %) selected-slack-id) slack-uninvited-users))]
-                                      (js/console.log "selected-slack-id:" selected-slack-id "selected-slack-user" selected-slack-user)
                                       (when selected-slack-user
                                         (dis/dispatch! [:input [:um-invite :slack-user] selected-slack-user]))))
                        :placeholder "Select a Slack user from the list"}
