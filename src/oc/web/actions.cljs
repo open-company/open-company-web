@@ -702,7 +702,7 @@
         new-user-type (:user-type invite-data)]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
-    (when (or (not user)
+    (if (or (not user)
               (and user
                    (= (string/lower-case (:status user)) "pending")))
       (let [splitted-name (string/split email-name #"\s")
@@ -723,7 +723,8 @@
                   (not= old-user-type new-user-type))
           (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user) (:authors org-data))))
         (api/send-invitation (if (= invite-from "email") email-address (:slack-id slack-user)) invite-from user-type first-name last-name)
-        (update-in db [:um-invite] dissoc :error)))))
+        (update-in db [:um-invite] dissoc :error))
+      db)))
 
 (defmethod dispatcher/action :invite-user/success
   [db [_]]
