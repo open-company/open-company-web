@@ -178,6 +178,7 @@
         (reload :asset-path "/public"
                 :on-jsload 'oc.web.core/on-js-reload)
         (cljs :optimizations :none
+              :source-map true
               :compiler-options {:source-map-timestamp true
                                  :preloads '[devtools.preload]})))
 
