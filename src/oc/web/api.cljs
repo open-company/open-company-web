@@ -705,8 +705,8 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the logo of the company if possible"
-  [user-id invite-from user-type first-name last-name]
-  (when (and user-id invite-from user-type)
+  [invited-user invite-from user-type first-name last-name]
+  (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
           invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
@@ -715,9 +715,9 @@
           json-params {:first-name first-name
                        :last-name last-name
                        :admin (= user-type :admin)}
-          with-user-id (if (= invite-from "slack")
-                          (assoc json-params :slack-id user-id)
-                          (assoc json-params :email user-id))
+          with-invited-user (if (= invite-from "slack")
+                              (merge json-params {:slack-id (:slack-id invited-user) :slack-org-id (:slack-org-id invited-user)})
+                              (assoc json-params :email invited-user))
           with-company-name (merge with-user-id {:org-name (:name org-data)
                                                  :logo-url (:logo-url org-data)})]
       (auth-post (:href invitation-link)

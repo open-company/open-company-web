@@ -722,7 +722,7 @@
         (when (and user
                   (not= old-user-type new-user-type))
           (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user) (:authors org-data))))
-        (api/send-invitation (if (= invite-from "email") email-address (:slack-id slack-user)) invite-from user-type first-name last-name)
+        (api/send-invitation (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
         (update-in db [:um-invite] dissoc :error))
       (if (and user
                (not= (string/lower-case (:status user)) "pending"))
