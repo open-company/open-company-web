@@ -705,19 +705,21 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the logo of the company if possible"
-  [email user-type first-name last-name]
-  (when (and email user-type)
+  [user-id invite-from user-type first-name last-name]
+  (when (and user-id invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
           invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
           api-entry-point-links (:api-entry-point @dispatcher/app-state)
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
-          json-params {:email email
-                       :first-name first-name
+          json-params {:first-name first-name
                        :last-name last-name
                        :admin (= user-type :admin)}
-          with-company-name (merge json-params {:org-name (:name org-data)
-                                                :logo-url (:logo-url org-data)})]
+          with-user-id (if (= invite-from "slack")
+                          (assoc json-params :slack-id user-id)
+                          (assoc json-params :email user-id))
+          with-company-name (merge with-user-id {:org-name (:name org-data)
+                                                 :logo-url (:logo-url org-data)})]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
@@ -729,10 +731,10 @@
                     (= user-type :admin))
               (let [new-user (json->cljs body)]
                 (add-author (:user-id new-user))
-                (dispatcher/dispatch! [:invite-by-email/success]))
+                (dispatcher/dispatch! [:invite-user/success]))
               ;; if not reload the users list immediately
-              (dispatcher/dispatch! [:invite-by-email/success]))
-            (dispatcher/dispatch! [:invite-by-email/failed])))))))
+              (dispatcher/dispatch! [:invite-user/success]))
+            (dispatcher/dispatch! [:invite-user/failed])))))))
 
 (defn switch-user-type
   "Given an existing user switch user type"
@@ -754,16 +756,16 @@
           {:headers (headers-for-link add-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
-              (dispatcher/dispatch! [:invite-by-email/success])
-              (dispatcher/dispatch! [:invite-by-email/failed])))))
+              (dispatcher/dispatch! [:invite-user/success])
+              (dispatcher/dispatch! [:invite-user/failed])))))
       ;; Remove admin call
       (when (and remove-admin? remove-admin-link)
         (auth-delete (:href remove-admin-link)
           {:headers (headers-for-link remove-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
-              (dispatcher/dispatch! [:invite-by-email/success])
-              (dispatcher/dispatch! [:invite-by-email/failed])))))
+              (dispatcher/dispatch! [:invite-user/success])
+              (dispatcher/dispatch! [:invite-user/failed])))))
       ;; Add author call
       (when (and add-author? add-author-link)
         (add-author (:user-id user)))
