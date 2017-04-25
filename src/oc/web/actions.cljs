@@ -682,18 +682,24 @@
         (update-in (butlast channels-key) dissoc (last channels-key))
         (dissoc :enumerate-channels-requested)))))
 
-(defmethod dispatcher/action :invite-by-email
+(defmethod dispatcher/action :invite-user
   [db [_]]
   (let [org-data (dispatcher/org-data)
-        email (:email (:um-invite db))
-        user-type (:user-type (:um-invite db))
+        invite-data (:um-invite db)
+        invite-from (:invite-from invite-data)
+        email (:email invite-data)
+        slack-user (:slack-user invite-data)
+        user-type (:user-type invite-data)
         parsed-email (utils/parse-input-email email)
         email-name (:name parsed-email)
         email-address (:address parsed-email)
         team-data (dispatcher/team-data (:team-id org-data))
-        user  (first (filter #(= (:email %) email-address) (:users team-data)))
+        ;; check if the user being invited by email is already present in the users list.
+        ;; from slack is not possible to select a user already invited since they are filtered by status before
+        user  (when (= invite-from "email")
+                (first (filter #(= (:email %) email-address) (:users team-data))))
         old-user-type (when user (utils/get-user-type user org-data))
-        new-user-type (:user-type (:um-invite db))]
+        new-user-type (:user-type invite-data)]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
     (when (or (not user)
@@ -703,21 +709,23 @@
             name-size (count splitted-name)
             splittable-name? (= name-size 2)
             first-name (cond
-                        (= name-size 1) email-name
-                        splittable-name? (first splitted-name)
+                        (and (= invite-from "email") (= name-size 1)) email-name
+                        (and (= invite-from "email") splittable-name?) (first splitted-name)
+                        (and (= invite-from "slack") (not (empty? (:first-name slack-user)))) (:first-name slack-user)
                         :else "")
             last-name (cond
-                        splittable-name? (second splitted-name)
+                        (and (= invite-from "email") splittable-name?) (second splitted-name)
+                        (and (= invite-from "slack") (not (empty? (:last-name slack-user)))) (:last-name slack-user)
                         :else "")]
         ;; If the user is already in the list
         ;; but the type changed we need to change the user type too
         (when (and user
                   (not= old-user-type new-user-type))
           (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user) (:authors org-data))))
-        (api/send-invitation email-address (:user-type (:um-invite db)) first-name last-name)
+        (api/send-invitation (if (= invite-from "email") email-address (:slack-id slack-user)) invite-from user-type first-name last-name)
         (update-in db [:um-invite] dissoc :error)))))
 
-(defmethod dispatcher/action :invite-by-email/success
+(defmethod dispatcher/action :invite-user/success
   [db [_]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
@@ -725,7 +733,7 @@
                         :user-type nil
                         :error nil}))
 
-(defmethod dispatcher/action :invite-by-email/failed
+(defmethod dispatcher/action :invite-user/failed
   [db [_ email]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
