@@ -48,6 +48,8 @@
                                           (when-not (utils/is-test-env?)
                                             (dis/dispatch! [:input [:um-invite] {:email ""
                                                                                  :user-type nil
+                                                                                 :slack-user nil
+                                                                                 :invite-from "email"
                                                                                  :error nil
                                                                                  :domain ""}]))
                                           s)}
@@ -56,13 +58,14 @@
         ro-user-man (drv/react s :team-management)
         org-data (drv/react s :org-data)
         user-type (:user-type um-invite)
+        invite-from (:invite-from um-invite)
         cur-user-data (drv/react s :current-user-data)
         valid-email? (utils/valid-email? (:email um-invite))
+        valid-slack-user? (not (empty? (:slack-id (:slack-user um-invite))))
         valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
         team-id (:team-id org-data)
         team-data (get-in teams-data [team-id :data])
         team-roster (get-in teams-data [team-id :roster])]
-
     [:div.team-management.mx-auto.p3.my4.group
       (if-not team-data
         ;; Still loading
@@ -82,7 +85,8 @@
                 [:input
                   {:type "radio"
                    :id "invite-from-email"
-                   :checked (or (not (:invite-from um-invite)) (= (:invite-from um-invite) "email"))
+                   :checked (or (not (:invite-from um-invite)) (= invite-from "email"))
+                   :on-click #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
                    :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
                    :value "email"}]
                 [:label.ml1
@@ -92,23 +96,34 @@
                 [:input
                   {:type "radio"
                    :id "invite-from-slack"
-                   :checked (= (:invite-from um-invite) "slack")
+                   :checked (= invite-from "slack")
+                   :on-click #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
                    :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
                    :value "slack"}]
                 [:label.ml1
                   {:for "invite-from-slack"}
                   "Slack"]]
               [:div.group
-                (if (= (:invite-from um-invite) "slack")
-                  [:select.left.um-invite-field.slack
-                    {:value (:slack-id um-invite)
-                     :on-change #(dis/dispatch! [:input [:um-invite :slack-id] (.. % -target -value)])
-                     :placeholder "Select a Slack user from the list"}
-                     (for [s (filter #(= (:status %) "uninvited") (:users team-roster))]
-                        [:option
-                          {:key (str "slack-invite-" (:slack-id s))
-                           :value (:slack-id s)}
-                          (utils/name-or-email s)])]
+                (if (= invite-from "slack")
+                  (let [slack-uninvited-users (filter #(= (:status %) "uninvited") (:users team-roster))]
+                    [:select.left.um-invite-field.slack
+                      {:value (:slack-id (:slack-user um-invite))
+                       :on-change (fn [e]
+                                    (let [selected-slack-id (.. e -target -value)
+                                          selected-slack-user (first (filter #(= (:slack-id %) selected-slack-id) slack-uninvited-users))]
+                                      (js/console.log "selected-slack-id:" selected-slack-id "selected-slack-user" selected-slack-user)
+                                      (when selected-slack-user
+                                        (dis/dispatch! [:input [:um-invite :slack-user] selected-slack-user]))))
+                       :placeholder "Select a Slack user from the list"}
+                       [:option
+                         {:value ""
+                          :key "slack-id-none"}
+                         "Select a Slack user form the list"]
+                       (for [s slack-uninvited-users]
+                          [:option
+                            {:key (str "slack-invite-" (:slack-id s))
+                             :value (:slack-id s)}
+                            (utils/name-or-email s)])])
                   [:input.left.um-invite-field.email
                     {:name "um-invite"
                      :type "text"
@@ -116,18 +131,20 @@
                      :value (:email um-invite)
                      :on-change #(dis/dispatch! [:input [:um-invite :email] (.. % -target -value)])
                      :placeholder "Email address"}])
-                (user-type-picker user-type valid-email? #(dis/dispatch! [:input [:um-invite :user-type] %]) true)
+                (user-type-picker user-type (or (and (= invite-from "email") valid-email?)
+                                                (and (= invite-from "slack") valid-slack-user?))
+                                  #(dis/dispatch! [:input [:um-invite :user-type] %]) true)
                 [:button.right.btn-reset.btn-solid.um-invite-send
-                  {:disabled (not (and (not (empty? user-type))
-                                       (or (and (or (empty? (:invite-from um-invite))
-                                                    (= (:invite-from um-invite) "email"))
+                  {:disabled (not (and user-type
+                                       (or (and (= invite-from "email")
                                                 valid-email?)
-                                           (and (= (:invite-from um-invite) "email")
-                                                (empty? (:slack-id um-invite))))))
+                                           (and (= invite-from "slack")
+                                                valid-slack-user?))))
                    :on-click #(let [email (:email (:um-invite ro-user-man))]
-                                (if (and (utils/valid-email? email)
+                                (if (and (or (and (= invite-from "email") valid-email?)
+                                             (and (= invite-from "slack") valid-slack-user?))
                                          (not (nil? (:user-type (:um-invite ro-user-man)))))
-                                  (dis/dispatch! [:invite-by-email])
+                                  (dis/dispatch! [:invite-user])
                                   (dis/dispatch! [:input [:um-invite :error] true])))}
                  "SEND INVITE"]]
               (when (:error um-invite)
