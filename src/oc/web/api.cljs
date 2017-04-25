@@ -718,8 +718,8 @@
           with-invited-user (if (= invite-from "slack")
                               (merge json-params {:slack-id (:slack-id invited-user) :slack-org-id (:slack-org-id invited-user)})
                               (assoc json-params :email invited-user))
-          with-company-name (merge with-user-id {:org-name (:name org-data)
-                                                 :logo-url (:logo-url org-data)})]
+          with-company-name (merge with-invited-user {:org-name (:name org-data)
+                                                      :logo-url (:logo-url org-data)})]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
