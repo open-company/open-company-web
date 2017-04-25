@@ -55,7 +55,7 @@
                               (dis/dispatch! [:input [:um-invite] {:email (:email user)
                                                                    :user-type user-type
                                                                    :error nil}])
-                              (utils/after 100 #(dis/dispatch! [:invite-by-email])))}
+                              (utils/after 100 #(dis/dispatch! [:invite-user])))}
                 [:i.fa.fa-share]])
             ; if it has a delete link
             (when remove-user
