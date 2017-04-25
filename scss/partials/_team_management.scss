@@ -50,8 +50,14 @@ div.company-settings-container {
     }
 
     div.um-invite {
-      div.invite-from {
+      div.invite-from, div.invite-from label {
         margin-bottom: 1rem;
+        font-family: $oc_main_font;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 1.5;
+        letter-spacing: 1.2px;
+        color: $oc_gray_5;
       }
 
       div.um-invite-label {
