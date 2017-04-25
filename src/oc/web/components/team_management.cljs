@@ -79,30 +79,31 @@
             [:div.um-invite-label
               "TEAM MEMBERS"]
             [:div
-              [:div.invite-from
-                "From: "
-                [:span.ml2 "  "]
-                [:input
-                  {:type "radio"
-                   :id "invite-from-email"
-                   :checked (or (not (:invite-from um-invite)) (= invite-from "email"))
-                   :on-click #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
-                   :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
-                   :value "email"}]
-                [:label.ml1
-                  {:for "invite-from-email"}
-                  "Email"]
-                [:span.ml2 "  "]
-                [:input
-                  {:type "radio"
-                   :id "invite-from-slack"
-                   :checked (= invite-from "slack")
-                   :on-click #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
-                   :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
-                   :value "slack"}]
-                [:label.ml1
-                  {:for "invite-from-slack"}
-                  "Slack"]]
+              (when (jwt/team-has-bot? team-id)
+                [:div.invite-from
+                  "From: "
+                  [:span.ml2 "  "]
+                  [:input
+                    {:type "radio"
+                     :id "invite-from-email"
+                     :checked (or (not (:invite-from um-invite)) (= invite-from "email"))
+                     :on-click #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
+                     :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "email"])
+                     :value "email"}]
+                  [:label.ml1
+                    {:for "invite-from-email"}
+                    "Email"]
+                  [:span.ml2 "  "]
+                  [:input
+                    {:type "radio"
+                     :id "invite-from-slack"
+                     :checked (= invite-from "slack")
+                     :on-click #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
+                     :on-change #(dis/dispatch! [:input [:um-invite :invite-from] "slack"])
+                     :value "slack"}]
+                  [:label.ml1
+                    {:for "invite-from-slack"}
+                    "Slack"]])
               [:div.group
                 (if (= invite-from "slack")
                   (let [slack-uninvited-users (filter #(= (:status %) "uninvited") (:users team-roster))]
