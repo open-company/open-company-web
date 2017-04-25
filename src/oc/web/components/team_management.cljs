@@ -149,6 +149,8 @@
               (when (:error um-invite)
                 [:div
                   (cond
+                    (string? (:error um-invite))
+                    [:span.small-caps.red.mt1.left (:error um-invite)]
                     (and (= (:error um-invite) :user-exists)
                          (:email um-invite))
                     [:span.small-caps.red.mt1.left (str (:email um-invite) " is already a user.")]
