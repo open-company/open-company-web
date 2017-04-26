@@ -960,9 +960,9 @@
 
 (defmethod dispatcher/action :create-org
   [db [_]]
-  (let [org-name (:create-org db)]
-    (when-not (string/blank? org-name)
-      (api/create-org org-name)))
+  (let [org-data (:create-org db)]
+    (when-not (string/blank? (:name org-data))
+      (api/create-org (:name org-data) (:logo-url org-data))))
   db)
 
 (defmethod dispatcher/action :create-board

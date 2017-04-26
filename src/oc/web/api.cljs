@@ -645,13 +645,17 @@
                    (not (s/blank? redirect-url)))
           (router/redirect! redirect-url))))))
 
-(defn create-org [org-name]
+(defn create-org [org-name logo-url]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
-        team-id (first (j/get-key :teams))]
+        team-id (first (j/get-key :teams))
+        org-data {:name org-name :team-id team-id}
+        with-logo (if-not (empty? logo-url)
+                    (assoc org-data :logo-url logo-url)
+                    org-data)]
     (when (and org-name create-org-link)
       (api-post (:href create-org-link)
         {:headers (headers-for-link create-org-link)
-         :json-params (cljs->json {:name org-name :team-id team-id})}
+         :json-params (cljs->json with-logo)}
         (fn [{:keys [success status body]}]
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
