@@ -114,11 +114,11 @@
                                           selected-slack-user (first (filter #(= (:slack-id %) selected-slack-id) slack-uninvited-users))]
                                       (when selected-slack-user
                                         (dis/dispatch! [:input [:um-invite :slack-user] selected-slack-user]))))
-                       :placeholder "Select a Slack user"}
+                       :placeholder "Select a Slack member"}
                        [:option
                          {:value ""
                           :key "slack-id-none"}
-                         "Select a Slack user"]
+                         "Select a Slack member"]
                        (for [s slack-uninvited-users]
                           [:option
                             {:key (str "slack-invite-" (:slack-id s))
