@@ -53,6 +53,7 @@
                  :title "RESEND INVITE"
                  :on-click (fn []
                               (dis/dispatch! [:input [:um-invite] {:email (:email user)
+                                                                   :invite-from "email"
                                                                    :user-type user-type
                                                                    :error nil}])
                               (utils/after 100 #(dis/dispatch! [:invite-user])))}
