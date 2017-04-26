@@ -10,10 +10,15 @@
     [:div.role-explainer-popover.oc-popover
       {:style {:width (str (:width data) "px") :height (str (:height data) "px")}}
       [:div.role-explainer-row
-        [:span.title [:i.fa.fa-user] " View"] "- read only access to the dashboard"]
-      [:div.role-explainer-row
-        [:span.title [:i.fa.fa-pencil] " Edit"] "- edit entries, add new entries, add and archive topics, share company updates"]
-      (when-not (true? hide-admin)
+        [:span.title [:i.fa.fa-user] " View"] "- read only access"]
+      (if hide-admin
+         ; board settings
+        [:div.role-explainer-row
+          [:span.title [:i.fa.fa-pencil] " Edit"] "- add, edit and delete entries, add and archive topics, archive the board"]
+         ; not board settings
+        [:div.role-explainer-row
+          [:span.title [:i.fa.fa-pencil] " Edit"] "- add, edit and delete entries, add and archive boards and topics, share company updates"])
+      (when-not (true? hide-admin) ; not board settings
         [:div.role-explainer-row
           [:span.title [:i.fa.fa-gear] " Admin"] "- company settings, payments, manage team members"])
       [:div.center
