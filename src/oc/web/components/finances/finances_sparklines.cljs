@@ -152,7 +152,7 @@
            :data-container "body"
            :data-toggle "tooltip"
            :title "Edit chart"
-           :on-click #(dis/dispatch! [:start-foce-data-editing true])}
+           :on-click #(dis/dispatch! [:foce-data-editing-start true])}
           (dom/i {:class "fa fa-pencil"}))
         (dom/button
           {:class "btn-reset"

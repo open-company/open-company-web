@@ -34,7 +34,7 @@
 (defn start-foce-click [owner]
   (let [topic-kw (keyword (om/get-props owner :topic))
         topic-data (om/get-props owner :topic-data)]
-    (dis/dispatch! [:start-foce topic-kw (assoc topic-data :topic (name topic-kw))])))
+    (dis/dispatch! [:foce-start topic-kw (assoc topic-data :topic (name topic-kw))])))
 
 (defn get-author-string
   "Return the a formatted string that shows the topic creator and the last editor."
@@ -62,7 +62,7 @@
                 :height "160px"
                 :success-title "Ok, got it"
                 :success-cb #(do
-                              (dis/dispatch! [:show-top-menu nil])
+                              (dis/dispatch! [:top-menu-show nil])
                               (hide-popover nil "assign-topic-wip"))
                 :cancel-title nil
                 :cancel-cb nil}))
@@ -125,7 +125,7 @@
                                                :left-column (not= fixed-column columns-num)
                                                :right-column (= fixed-column columns-num)})}
               (dom/button {:class "topic-top-menu-btn btn-reset"
-                           :on-click #(dis/dispatch! [:start-foce topic-kw {:placeholder true
+                           :on-click #(dis/dispatch! [:foce-start topic-kw {:placeholder true
                                                                             :topic (name topic-kw)
                                                                             :title (:title topic-data)
                                                                             :data (:data topic-data)
@@ -133,7 +133,7 @@
                                                                             :links (:links topic-data)}])}
                 (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
-                           :on-click #(dis/dispatch! [:start-foce topic-kw topic-data])}
+                           :on-click #(dis/dispatch! [:foce-start topic-kw topic-data])}
                 (dom/i {:class "fa fa-pencil"}) " Edit")
               ; Assign action, disabled for now
               (dom/button {:class "topic-top-menu-btn btn-reset"
@@ -205,7 +205,7 @@
             (dom/button {:class "top-right-button topic-top-menu-button btn-reset"
                          :on-click #(do
                                       (utils/event-stop %)
-                                      (dis/dispatch! [:show-top-menu (if showing-menu nil topic)]))}
+                                      (dis/dispatch! [:top-menu-show (if showing-menu nil topic)]))}
               (dom/i {:class "fa fa-ellipsis-v"}))))
 
         ;; Topic image for dashboard

@@ -281,7 +281,6 @@
 (rum/defcs link-dialog < (rum/local false ::copied)
                          (rum/local false ::clipboard)
                          (clipboard-mixin ".js-copy-btn")
-                         {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
   [{:keys [::copied] :as _state} link]
   [:div
    (modal-title  "Share a Link" :link-72)
@@ -316,7 +315,7 @@
                                  (some #(not (nil? (:token %))) (get (:slack-bots jwt) team-id-k)) ; with an installed Slack bot
                                  (not (:enumerate-channels-requested @dis/app-state))) ; haven't already requested
                         ;; Ask for public Slack channels
-                        (dis/dispatch! [:enumerate-channels team-id])))
+                        (dis/dispatch! [:channels-enumerate team-id])))
                     s)}
   [s prompt-cb]
   [:div
@@ -357,7 +356,6 @@
         "Send")])])
 
 (rum/defc confirmation < rum/static
-                         {:will-unmount (fn [s] (dis/dispatch! [:su-share/reset]) s)}
   [type back-to-dashboard-cb cancel-fn share-link]
   [:div
    (case type
@@ -411,7 +409,6 @@
     (setup-scroll-height))
 
   (will-unmount [_]
-    (dis/dispatch! [:su-share/reset])
     (reset-scroll-height))
 
   (will-receive-props [_ next-props]

@@ -44,7 +44,7 @@
   (will-receive-props [_ next-props]
     (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
                 new-topic-data (-> next-props :board-data new-topic-foce)]
-      (dispatcher/dispatch! [:start-foce new-topic-foce new-topic-data]))
+      (dispatcher/dispatch! [:foce-start new-topic-foce new-topic-data]))
     (when (om/get-state owner :redirect-to-preview)
       (utils/after 100 #(router/nav! (oc-urls/update-preview))))
     (when-not (= (:board-data next-props) (:board-data data))
