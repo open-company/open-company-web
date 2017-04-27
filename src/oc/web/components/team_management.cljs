@@ -85,7 +85,7 @@
             [:div
               (when (jwt/team-has-bot? team-id)
                 [:div.invite-from
-                  "From: "
+                  "Invite from: "
                   [:span.ml2 "  "]
                   [:input
                     {:type "radio"
