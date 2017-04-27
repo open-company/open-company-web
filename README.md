@@ -179,43 +179,16 @@ One of the most important component trees is the company dashboard. This provide
 
 ![Company Dashboard Diagram](https://cdn.rawgit.com/open-company/open-company-web/mainline/docs/dashboard-viewing-component-tree.svg)
 
+### Actions
 
-## Testing
+The OpenCompany web app dispatches *actions* from the UI, often resulting in asynchronous API requests, and dispatches
+them from asynchronous API request results, often resulting in state changes that cause a new render of
+certain web components of the UI. The list of these actions, the caller that initiates the action, and a
+description of when the action is used is provided in the table below:
 
-Install [PhantomJS](https://http://phantomjs.org/) downloading the latest 2.x binary from [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
-
-Then move the `phantomjs` binary somewhere reachable by your `PATH` so you can run:
-
-```console
-phantomjs -v
-```
-
-Then run:
-
-```console
-boot test!
-```
-
-For more info on testing:
-
-- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
-
-
-## Participation
-
-Please note that this project is released with a [Contributor Code of Conduct](https://github.com/open-company/open-company-web/blob/mainline/CODE-OF-CONDUCT.md). By participating in this project you agree to abide by its terms.
-
-
-## License
-
-Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
-
-Copyright © 2015-2017 OpenCompany, LLC.
-
-## Actions
-
-|  :add-topic-rollback | UI | Rollback the add topic to the board. User canceled action. |
+|  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
+|  :add-topic-rollback | UI | Rollback the add topic to the board. User canceled action. |
 |  :add-topic-show | UI | Show the add topic view in the dashboard. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
@@ -296,4 +269,35 @@ Copyright © 2015-2017 OpenCompany, LLC.
 |  :user-profile-save | UI | Save the edited user data. |
 |  :user-profile-update/failed | API | User profile update request failed. |
 |  :welcome-screen-hide | UI | Remove the welcome screen shown the first time the first org user open the dashboard. |
-|  **Action** | **Caller** | **Description** |
+
+## Testing
+
+Install [PhantomJS](https://http://phantomjs.org/) downloading the latest 2.x binary from [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
+
+Then move the `phantomjs` binary somewhere reachable by your `PATH` so you can run:
+
+```console
+phantomjs -v
+```
+
+Then run:
+
+```console
+boot test!
+```
+
+For more info on testing:
+
+- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
+
+
+## Participation
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/open-company/open-company-web/blob/mainline/CODE-OF-CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+
+## License
+
+Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
+
+Copyright © 2015-2017 OpenCompany, LLC.
