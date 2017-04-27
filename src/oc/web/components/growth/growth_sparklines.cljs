@@ -63,7 +63,7 @@
            :data-container "body"
            :data-toggle "tooltip"
            :title "Edit chart"
-           :on-click #(dis/dispatch! [:start-foce-data-editing (:slug metric-metadata)])}
+           :on-click #(dis/dispatch! [:foce-data-editing-start (:slug metric-metadata)])}
           (dom/i {:class "fa fa-pencil"}))
         (dom/button
           {:class "btn-reset"

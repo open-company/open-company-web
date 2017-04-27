@@ -29,7 +29,7 @@
   (when (and (dispatcher/org-data)
              (not (:updates-list-loading @dispatcher/app-state))
              (not (:updates-list-loaded @dispatcher/app-state)))
-    (dispatcher/dispatch! [:get-updates-list])))
+    (dispatcher/dispatch! [:udpates-list-get])))
 
 (defun- medium-for
   ;; one possible initial case, just one medium

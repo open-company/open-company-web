@@ -167,7 +167,7 @@
 (defn load-team-data-if-needed [owner]
   (when (and (om/get-props owner :auth-settings)
              (not (om/get-props owner  :teams-data-requested)))
-    (dis/dispatch! [:get-teams])))
+    (dis/dispatch! [:teams-get])))
 
 (defcomponent board-settings-form [data owner]
 

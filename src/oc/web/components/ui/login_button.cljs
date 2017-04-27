@@ -7,16 +7,16 @@
                           rum/reactive
                           {:will-mount (fn [s]
                                         (when-not (utils/is-test-env?)
-                                          (dis/dispatch! [:get-auth-settings]))
+                                          (dis/dispatch! [:auth-settings-get]))
                                         s)}
   [s {:keys [button-classes]}]
   [:div.login-button
     [:button
       {:class (str "btn-reset signup-signin " (when button-classes button-classes))
-       :on-click #(dis/dispatch! [:show-login-overlay :login-with-slack])}
+       :on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
       "Sign In"]
     [:span.signup-signin " / "]
     [:button
       {:class (str "btn-reset signup-signin " (when button-classes button-classes))
-       :on-click #(dis/dispatch! [:show-login-overlay :signup-with-slack])}
+       :on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
       "Sign Up"]])

@@ -29,7 +29,7 @@
         (create-org-alert owner)
         (do
           (om/set-state! owner :loading true)
-          (dis/dispatch! [:create-org]))))))
+          (dis/dispatch! [:org-create]))))))
 
 (defn setup-org-name [owner data]
   (when-let [team-data (first (:teams (:teams-data data)))]
