@@ -729,19 +729,27 @@
         (assoc-in db [:um-invite :error] "User already active.")
         db))))
 
+(defmethod dispatcher/action :invite-user-reset
+  [db [_]]
+  (update-in db [:um-invite] dissoc :last-action-success))
+
 (defmethod dispatcher/action :invite-user/success
   [db [_]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
   (assoc db :um-invite {:email ""
                         :user-type nil
+                        :invite-from "email"
+                        :last-action-success true
                         :error nil}))
 
 (defmethod dispatcher/action :invite-user/failed
   [db [_ email]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
-  (assoc-in db [:um-invite :error] true))
+  (-> db
+      (assoc-in [:um-invite :error] true)
+      (assoc-in [:um-invite :last-action-success] false)))
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]

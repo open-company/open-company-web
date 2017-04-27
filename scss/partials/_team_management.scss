@@ -1,6 +1,10 @@
 div.company-settings-container {
   min-height: calc(100vh - #{$footer_height}px - 52px);
 
+  div.action-result {
+    width: 580px;
+  }
+
   div.team-management {
     padding: 2rem;
     background-color: rgba(78, 90, 107, 0.05);
