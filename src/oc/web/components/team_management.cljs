@@ -79,7 +79,7 @@
         [:div.action-result.mx-auto
           {:id "action-finished"
            :class (if (:last-action-success um-invite) "green" "red")}
-          (if (:last-action-success um-invite) "Action completed." "An error occurred, please retry.")])
+          (if (:last-action-success um-invite) "Successful!" "An error occurred, please retry.")])
       [:div.team-management.mx-auto.p3.mb4.group
         {:style {:margin-top (if (contains? um-invite :last-action-success) "0px" "22px")}}
         (if-not team-data
