@@ -26,7 +26,7 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000])
+      (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000])
       (do
         (set! (.-onload node) #(img-on-load owner node))
         (gdom/append (.-body js/document) node)
@@ -37,7 +37,7 @@
 (defn progress-cb [owner res progress])
 
 (defn error-cb [owner res error]
-  (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000]))
+  (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000]))
 
 (defn change! [owner k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
@@ -45,13 +45,13 @@
 
 (defn reset-user-profile-data [owner e]
   (.preventDefault e)
-  (dis/dispatch! [:reset-user-profile])
+  (dis/dispatch! [:user-profile-reset])
   (om/set-state! owner {:has-changes false}))
 
 (defn save-user-profile-data [owner e]
   (.preventDefault e)
   (om/set-state! owner :will-save true)
-  (dis/dispatch! [:save-user-profile (om/get-state owner :email-did-change)]))
+  (dis/dispatch! [:user-profile-save (om/get-state owner :email-did-change)]))
 
 (def initial-state
   {:email-did-change false
@@ -64,7 +64,7 @@
 (defcomponent edit-user-profile [data owner]
 
   (init-state [_]
-    (dis/dispatch! [:reset-user-profile])
+    (dis/dispatch! [:user-profile-reset])
     initial-state)
 
   (did-mount [_]
@@ -78,7 +78,7 @@
   (will-receive-props [_ next-props]
     (when (and (not (utils/is-test-env?))
                (om/get-state owner :will-save))
-      (dis/dispatch! [:reset-user-profile])
+      (dis/dispatch! [:user-profile-reset])
       (om/update-state! owner #(merge % initial-state {:show-save-successful (not (:edit-user-profile-failed next-props))
                                                        :show-save-failed (:edit-user-profile-failed next-props)}))
       (utils/after 2000 (fn [] (om/update-state! owner #(merge % {:show-save-successful false

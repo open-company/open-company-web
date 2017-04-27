@@ -60,7 +60,7 @@
 (defn sign-in-sign-up-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
   (.preventDefault e)
-  (dis/dispatch! [:show-login-overlay :login-with-slack]))
+  (dis/dispatch! [:login-overlay-show :login-with-slack]))
 
 (defn list-boards-click [e]
   (dis/dispatch! [:mobile-menu-toggle])

@@ -6,7 +6,7 @@
                                {:before-render (fn [s]
                                                  (when (and (:auth-settings @dis/app-state)
                                                             (not (:teams-data-requested @dis/app-state)))
-                                                   (dis/dispatch! [:get-teams]))
+                                                   (dis/dispatch! [:teams-get]))
                                                  s)}
   [s maybe-later-cb]
   [:div.bot-access-prompt.fullscreen-page.group
@@ -19,5 +19,5 @@
           {:on-click maybe-later-cb}
           "MAYBE LATER"]
         [:botton.btn-reset.btn-solid
-          {:on-click #(dis/dispatch! [:auth-bot])}
+          {:on-click #(dis/dispatch! [:bot-auth])}
           "LET’S ADD IT!"]]]])

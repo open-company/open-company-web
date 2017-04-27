@@ -6,4 +6,4 @@
   []
   [:div.floating-add-topic
     [:button.btn-reset.floating-add-topic-btn
-      {:on-click #(dis/dispatch! [:show-add-topic true])}]])
+      {:on-click #(dis/dispatch! [:add-topic-show true])}]])

@@ -126,7 +126,7 @@
                                             :new (not (:was-archived topic-data))
                                             :loading (:was-archived topic-data)})
         new-topics (conj (:topics board-data) new-topic)]
-    (dis/dispatch! [:add-topic new-topic-kw fixed-topic-data])
+    (dis/dispatch! [:topic-add new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
     (when (:was-archived topic-data)
       (router/nav! (oc-urls/topic (router/current-org-slug) (:slug board-data) new-topic)))))
