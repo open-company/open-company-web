@@ -181,7 +181,7 @@ One of the most important component trees is the company dashboard. This provide
 
 ### Actions
 
-The OpenCompany web app dispatches *actions* from the UI, often resulting in asynchronous API requests, and dispatches
+The OpenCompany web app dispatches **actions** from the UI, often resulting in asynchronous API requests, and dispatches
 them from asynchronous API request results, often resulting in state changes that cause a new render of
 certain web components of the UI. The list of these actions, the caller that initiates the action, and a
 description of when the action is used is provided in the table below:
