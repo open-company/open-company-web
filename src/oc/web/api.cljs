@@ -116,7 +116,7 @@
           ; If it was a 5xx or a 0 show a banner for network issues
           (when (or (= status 0)
                     (and (>= status 500) (<= status 599)))
-            (dispatcher/dispatch! [:show-error-banner utils/generic-network-error 10000]))
+            (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
           (let [report {:response response
                         :path path
                         :method (method-name method)
@@ -203,35 +203,6 @@
           (dispatcher/dispatch! [:board (json->cljs body)])
           ;; Refresh the org data to make sure the list of boards is updated
           (get-org (dispatcher/org-data)))))))
-
-(defn create-company [data]
-  (when data
-    (let [links (:api-entry-point @dispatcher/app-state)
-          create-company-link (utils/link-for links "company-create" "POST")
-          data-with-org-id (assoc data :org-id (first (j/get-key :teams)))
-          post-data (cljs->json data-with-org-id)]
-      (api-post (:href create-company-link)
-        {:json-params post-data}
-        #(dispatch-body :company-created %)))))
-
-(defn patch-company [slug data]
-  (when data
-    (let [company-data (dissoc data :links :read-only :entries :updates-list :updates-list-loaded :entries :topic)
-          json-data (cljs->json company-data)
-          links (:links (dispatcher/board-data))
-          company-link (utils/link-for links "partial-update" "PATCH")]
-      (api-patch (:href company-link)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type company-link)
-          }}
-        (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:company {:success success
-                                           :status status
-                                           :body (when success (json->cljs body))}]))))))
 
 (defn patch-org [data]
   (when data
@@ -329,24 +300,6 @@
         (fn [{:keys [success body status]}]
           (dispatcher/dispatch! [:board (when success (json->cljs body))]))))))
 
-(defn patch-stakeholder-update [stakeholder-update]
-  (when stakeholder-update
-    (let [slug (keyword (router/current-board-slug))
-          company-data (dispatcher/board-data)
-          company-patch-link (utils/link-for (:links company-data) "partial-update" "PATCH")
-          json-data (cljs->json {:stakeholder-update stakeholder-update})]
-      (api-patch (:href company-patch-link)
-        { :json-params json-data
-          :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (:type company-patch-link)}}
-        (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:company {:success success
-                                           :status status
-                                           :body (when success (json->cljs body))}]))))))
-
 (defn remove-topic [topic-name]
   (when (and topic-name)
     (let [board-data (dispatcher/board-data)
@@ -368,7 +321,7 @@
         { :headers (headers-for-link add-topic-link)}
         (fn [{:keys [success body]}]
           (let [fixed-body (if body (json->cljs body) {})]
-            (dispatcher/dispatch! [:new-topic {:response fixed-body :slug slug}])))))))
+            (dispatcher/dispatch! [:new-topics-load/finish {:response fixed-body :slug slug}])))))))
 
 (defn create-update [update-data]
   (let [org-data   (dispatcher/org-data)
@@ -515,7 +468,7 @@
           (fn [{:keys [success body status]}]
             (let [fixed-body (if success (json->cljs body) {})]
               (if success
-                (dispatcher/dispatch! [:enumerate-channels/success team-id (-> fixed-body :collection :items)])))))))))
+                (dispatcher/dispatch! [:channels-enumerate/success team-id (-> fixed-body :collection :items)])))))))))
 
 (defn user-action [action-link payload]
   (when action-link
@@ -561,7 +514,7 @@
         (fn [{:keys [status body success]}]
           (when success
             (dispatcher/dispatch! [:user-data (json->cljs body)]))
-          (utils/after 100 #(dispatcher/dispatch! [:collect-name-pswd-finish status])))))))
+          (utils/after 100 #(dispatcher/dispatch! [:name-pswd-collect/finish status])))))))
 
 (defn collect-password [pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
@@ -573,7 +526,7 @@
         (fn [{:keys [status body success]}]
           (when success
             (dispatcher/dispatch! [:user-data (json->cljs body)]))
-          (utils/after 100 #(dispatcher/dispatch! [:collect-pswd-finish status])))))))
+          (utils/after 100 #(dispatcher/dispatch! [:pswd-collect/finish status])))))))
 
 (defn delete-entry [topic entry-data should-redirect-to-board]
   (when (and topic entry-data)
@@ -583,7 +536,7 @@
         (api-delete (:href delete-link)
           {:headers (headers-for-link delete-link)}
           (fn [_]
-            (dispatcher/dispatch! [:delete-entry/success should-redirect-to-board])))))))
+            (dispatcher/dispatch! [:entry-delete/success should-redirect-to-board])))))))
 
 (defn get-current-user [auth-links]
   (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
@@ -601,7 +554,7 @@
          :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
          (fn [{:keys [status body success]}]
            (if (= status 422)
-              (dispatcher/dispatch! [:user-profile-update-failed])
+              (dispatcher/dispatch! [:user-profile-update/failed])
              (when success
                 (utils/after 1000
                   (fn []
@@ -621,7 +574,7 @@
         {:headers (headers-for-link add-domain-team-link)
          :body domain}
         (fn [{:keys [status body success]}]
-          (dispatcher/dispatch! [:add-email-domain-team/finish (= status 204)]))))))
+          (dispatcher/dispatch! [:email-domain-team-add/finish (= status 204)]))))))
 
 (defn refresh-slack-user []
   (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
@@ -785,7 +738,7 @@
       (api-delete (:href archive-link)
         {:headers (headers-for-link archive-link)}
         (fn [{:keys [status success body] :as response}]
-          (dispatcher/dispatch! [:archive-topic/success]))))))
+          (dispatcher/dispatch! [:topic-archive/success]))))))
 
 
 (defn add-private-board

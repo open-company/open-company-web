@@ -55,12 +55,12 @@
 (defn load-team-data [data]
   (when (and (:auth-settings data)
              (not (:teams-data-requested data)))
-    (dis/dispatch! [:get-teams])))
+    (dis/dispatch! [:teams-get])))
 
 (defcomponent create-update [data owner]
 
   (init-state [_]
-    (dis/dispatch! [:start-foce nil])
+    (dis/dispatch! [:foce-start nil])
     (load-team-data data)
     {:columns-num (responsive/columns-num)
      :card-width (responsive/calc-card-width)

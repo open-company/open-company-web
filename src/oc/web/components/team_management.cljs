@@ -220,12 +220,12 @@
                       (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
                         (if (zero? (count (:slack-orgs team-data)))
                           [:button.btn-reset.mt2.add-slack-team.slack-button
-                              {:on-click #(dis/dispatch! [:add-slack-team])}
+                              {:on-click #(dis/dispatch! [:slack-team-add])}
                               "Add "
                               [:span.slack "Slack"]
                               " Team"]
                           [:button.btn-reset.btn-link.another-slack-team
-                            {:on-click #(dis/dispatch! [:add-slack-team])}
+                            {:on-click #(dis/dispatch! [:slack-team-add])}
                             "Add another Slack team"]))
                       (when (not (empty? (:access query-params)))
                         [:div#result-message
@@ -267,7 +267,7 @@
                         {:disabled (not valid-domain-email?)
                          :on-click #(let [domain (:domain (:um-domain-invite ro-user-man))]
                                       (if (utils/valid-domain? domain)
-                                        (dis/dispatch! [:add-email-domain-team])
+                                        (dis/dispatch! [:email-domain-team-add])
                                         (dis/dispatch! [:input [:add-email-domain-team-error] true])))}
                        "ADD"]
                       (when add-email-domain-team-error

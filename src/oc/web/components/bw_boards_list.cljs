@@ -18,7 +18,7 @@
                 :height "130px"
                 :success-title "DELETE"
                 :success-cb #(do
-                                (dis/dispatch! [:delete-board board-slug])
+                                (dis/dispatch! [:board-delete board-slug])
                                 (hide-popover nil "delete-board-alert"))
                 :cancel-title "KEEP IT"
                 :cancel-cb #(hide-popover nil "delete-board-alert")}))
@@ -91,6 +91,6 @@
                           :on-key-up (fn [e]
                                           (cond
                                             (= "Enter" (.-key e))
-                                            (dis/dispatch! [:create-board])
+                                            (dis/dispatch! [:board-create])
                                             (= "Escape" (.-key e))
                                             (dis/dispatch! [:input [:create-board] nil])))}))))))))

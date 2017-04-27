@@ -109,7 +109,7 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000])
+      (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000])
       (do
         (set! (.-onload node) #(img-on-load owner node))
         (gdom/append (.-body js/document) node)
@@ -120,7 +120,7 @@
                                                       :has-changes true}))))
 
 (defn img-upload-error-cb [owner res error]
-  (dis/dispatch! [:show-error-banner "An error has occurred while processing the image URL. Please try again." 5000])
+  (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000])
   (om/update-state! owner #(merge % {:file-upload-state nil
                                      :file-upload-progress nil
                                      :has-changes true})))
@@ -132,7 +132,7 @@
 (defn attachment-upload-success-cb [owner res]
   (let [url    (googobj/get res "url")]
     (if-not url
-      (dis/dispatch! [:show-error-banner "An error has occurred while processing the file URL. Please try again." 5000])
+      (dis/dispatch! [:error-banner-show "An error has occurred while processing the file URL. Please try again." 5000])
       (let [current-foce-data (dis/foce-topic-data)
             attachments (or (:attachments current-foce-data) [])
             attachment-data {:file-name (googobj/get res "filename")
@@ -143,10 +143,10 @@
         (dis/dispatch! [:foce-input {:attachments (conj attachments attachment-data)}])))))
 
 (defn attachment-upload-error-cb [owner res error]
-  (dis/dispatch! [:show-error-banner "An error has occurred while processing the file. Please try again." 5000]))
+  (dis/dispatch! [:error-banner-show "An error has occurred while processing the file. Please try again." 5000]))
 
 (defn- dismiss-editing [topic]
-  (dis/dispatch! [:rollback-add-topic (keyword topic)]))
+  (dis/dispatch! [:add-topic-rollback (keyword topic)]))
 
 (defn handle-navigate-event [current-token owner e]
     ;; only when the URL is changing
@@ -169,7 +169,7 @@
                                     ;; cancel any FoCE
                                     (if (:new (dis/foce-topic-data))
                                       (dismiss-editing (dis/foce-topic-key))
-                                      (dis/dispatch! [:start-foce nil]))
+                                      (dis/dispatch! [:foce-start nil]))
                                     ;; Dispatch the current url
                                     (@router/route-dispatcher (router/get-token)))})
         
@@ -185,7 +185,7 @@
                 :success-title "DELETE"
                 :success-cb #(let [topic (dis/foce-topic-key)
                                    entries (dis/topic-entries-data topic)]
-                               (dis/dispatch! [:delete-entry topic (:created-at (dis/foce-topic-data))])
+                               (dis/dispatch! [:entry-delete topic (:created-at (dis/foce-topic-data))])
                                (hide-popover nil "delete-entry-confirm"))}))
 
 (defn- add-image-tooltip [image-header]
@@ -246,7 +246,7 @@
     (utils/to-end-of-content-editable headline-el)))
 
 (defn- data-editing-cb [owner value]
-  (dis/dispatch! [:start-foce-data-editing value])) ; global atom state
+  (dis/dispatch! [:foce-data-editing-start value])) ; global atom state
 
 ; (defn show-edit-tt [owner]
 ;   (let [board-data (dis/board-data)]
@@ -296,7 +296,7 @@
       (when (and (dis/foce-topic-key)
                  (or (:new (dis/foce-topic-data))
                      (:was-archvied (dis/foce-topic-data))))
-        (dis/dispatch! [:rollback-add-topic (dis/foce-topic-key)]))
+        (dis/dispatch! [:add-topic-rollback (dis/foce-topic-key)]))
       ; ; hide FoCE editing tooltip
       ; (t/hide (str "first-foce-" (:slug (dis/board-data))))
       ; re enable the route dispatcher
@@ -522,7 +522,7 @@
                            :data-container "body"
                            :data-placement "top"
                            :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
-                           :on-click #(dis/dispatch! [:start-foce-data-editing (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
+                           :on-click #(dis/dispatch! [:foce-data-editing-start (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
                 (dom/i {:class "fa fa-line-chart"})))
             
             ;; Hidden (initially) file upload progress
@@ -550,7 +550,7 @@
                                         (do
                                           (dismiss-editing topic)
                                           (router/nav! (oc-urls/board)))
-                                        (dis/dispatch! [:start-foce nil]))} "CANCEL")
+                                        (dis/dispatch! [:foce-start nil]))} "CANCEL")
               ;; Topic archive button
             (when (:show-delete-entry-button data)
               (dom/button {:class "btn-reset archive-button right"

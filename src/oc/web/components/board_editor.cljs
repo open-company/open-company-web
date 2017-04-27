@@ -29,7 +29,7 @@
         (create-board-alert)
         (do
           (om/set-state! owner :loading true)
-          (dis/dispatch! [:create-board board-name]))))))
+          (dis/dispatch! [:board-create board-name]))))))
 
 (defcomponent board-editor [data owner]
 

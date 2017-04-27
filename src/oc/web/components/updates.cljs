@@ -30,7 +30,7 @@
              (not (:updates-list-loaded data))
              (not (om/get-state owner :updates-list-loading)))
     (om/set-state! owner :updates-list-loading true)
-    (dis/dispatch! [:get-updates-list])))
+    (dis/dispatch! [:udpates-list-get])))
 
 (defcomponent updates [data owner]
 
@@ -125,7 +125,7 @@
 (defcomponent updates-responsive-switcher [data owner]
 
   (init-state [_]
-    (dis/dispatch! [:start-foce nil])
+    (dis/dispatch! [:foce-start nil])
     {:columns-num (responsive/columns-num)
      :card-width (responsive/calc-card-width)})
 

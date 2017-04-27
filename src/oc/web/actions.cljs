@@ -139,7 +139,7 @@
     (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
     (assoc :updates-list-loading (utils/in? (:route @router/path) "updates-list"))))
 
-(defmethod dispatcher/action :load-other-boards [db [_]]
+(defmethod dispatcher/action :boards-load-other [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
         :when (not= (:slug board) (router/current-board-slug))]
     (api/get-board board))
@@ -148,7 +148,7 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
-      (utils/after 2000 #(dispatcher/dispatch! [:load-other-boards])))
+      (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
     (let [fixed-board-data (utils/fix-board board-data)
           old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
@@ -165,18 +165,7 @@
                                  (or (:show-add-topic db) (zero? (count (:topics fixed-board-data))))  ;; Keep add topic if currently shown or show it if the new topics count is 0
                                  (:show-add-topic db)))))))
 
-(defmethod dispatcher/action :company-submit [db _]
-  (api/create-company (:company-editor db))
-  db)
-
-(defmethod dispatcher/action :company-created [db [_ body]]
-  (if (:links body)
-    (let [updated (utils/fix-board body)]
-      (router/redirect! (oc-urls/board (:slug updated)))
-      (assoc-in db (dispatcher/org-data-key (:slug updated)) updated))
-    db))
-
-(defmethod dispatcher/action :new-topic [db [_ body]]
+(defmethod dispatcher/action :new-topics-load/finish [db [_ body]]
   (if body
     ;; signal to the app-state that the new-topics have been loaded
     (-> db
@@ -208,14 +197,6 @@
       (utils/after auth-settings-retry #(api/get-auth-settings))
       (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
-(defmethod dispatcher/action :entry [db [_ body]]
-  (if body
-    (let [fixed-topic (utils/fix-topic (:body body) (:topic-slug body) true)
-          assoc-in-coll (dispatcher/entry-key (:org-slug body) (:board-slug body) (:topic-slug body) (:as-of body))
-          next-db (assoc-in db assoc-in-coll true)]
-      next-db)
-    db))
-
 (defmethod dispatcher/action :topic [db [_ {:keys [topic body]}]]
   ;; Refresh topic entries
   (api/load-entries topic (utils/link-for (:links body) "up"))
@@ -244,72 +225,11 @@
         (assoc-in board-key new-board-data)))
     db))
 
-(defmethod dispatcher/action :company [db [_ {:keys [slug success status body]}]]
-  (cond
-    success
-    ;; add topic name inside each topic
-    (let [org (router/current-org-slug)
-          board (router/current-board-slug)
-          updated-body (utils/fix-board body)
-          board-data-key (dispatcher/board-data-key org board)
-          board-topics-key (conj board-data-key :topics)
-          topic-entries-data-key (when (router/current-topic-slug)
-                                      (dispatcher/topic-entries-key org board (keyword (router/current-topic-slug))))
-          board-editing-topic-key (when (:foce-key db) (conj board-data-key (keyword (:foce-key db))))
-          board-already-loaded-key (conj board-data-key :board-data-loaded)
-          already-loaded? (get-in db board-already-loaded-key)
-          with-board-data (assoc-in db board-data-key updated-body)
-          with-open-add-topic (if (and (not (responsive/is-tablet-or-mobile?))
-                                       (zero? (count (:topics updated-body)))
-                                       (not already-loaded?))
-                                (assoc with-board-data :show-add-topic true)
-                                with-board-data)
-          with-welcome-screen (if (and (not (responsive/is-tablet-or-mobile?))
-                                       (not (:foce-key db))
-                                       (zero? (count (:topics updated-body)))
-                                       (zero? (count (:archived updated-body)))
-                                       (not already-loaded?))
-                                (assoc with-open-add-topic :show-welcome-screen true)
-                                with-open-add-topic)
-          keep-topics-edits (if (not (nil? (:foce-key db)))
-                                (assoc-in with-welcome-screen board-topics-key (get-in db board-topics-key))
-                                with-welcome-screen)
-          keep-editing-topic (if (and (not (nil? (:foce-key db)))
-                                        (get-in db board-editing-topic-key))
-                                  (assoc-in keep-topics-edits board-editing-topic-key (get-in db board-editing-topic-key))
-                                  keep-topics-edits)
-          keeping-entries (if (router/current-topic-slug)
-                              (assoc-in keep-editing-topic topic-entries-data-key (get-in db topic-entries-data-key))
-                              keep-editing-topic)
-          with-already-loaded (assoc-in keeping-entries board-already-loaded-key true)]
-      ; async preload the SU list
-      (utils/after 100 #(api/get-updates))
-      (if (or (:read-only updated-body)
-              (pos? (count (:topics updated-body)))
-              (:force-remove-loading with-board-data))
-          (dissoc with-already-loaded :loading :force-remove-loading)
-          with-already-loaded))
-    (= 401 status)
-    (-> db
-        (assoc-in (dispatcher/board-access-error-key (router/current-org-slug) (router/current-board-slug)) :forbidden)
-        (dissoc :loading))
-    (= 404 status)
-    (do
-      (router/redirect-404!)
-      db)
-    (and (>= 500 status)
-         (<= 599 status))
-    (do
-      (router/redirect-500!)
-      db)
-    ;; probably some default failure handling should be added here
-    :else db))
-
 (defn- get-updates [db]
   (api/get-updates)
   (assoc db :updates-list-loading true))
 
-(defmethod dispatcher/action :get-updates-list [db [_ {:keys [slug response]}]]
+(defmethod dispatcher/action :udpates-list-get [db [_ {:keys [slug response]}]]
   (get-updates db))
 
 (defmethod dispatcher/action :updates-list [db [_ {:keys [response]}]]
@@ -372,12 +292,12 @@
       (dissoc :foce-data-editing?))))
 
 ;; Front of Card Edit topic
-(defmethod dispatcher/action :start-foce [db [_ topic-key topic-data]]
+(defmethod dispatcher/action :foce-start [db [_ topic-key topic-data]]
   (if topic-key
     (start-foce db topic-key topic-data)
     (stop-foce db)))
 
-(defmethod dispatcher/action :start-foce-data-editing [db [_ value]]
+(defmethod dispatcher/action :foce-data-editing-start [db [_ value]]
   (assoc db :foce-data-editing? value))
 
 (defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
@@ -391,28 +311,7 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
-(defmethod dispatcher/action :new-topics [db [_ new-topics]]
-  (let [board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
-    (api/patch-topics new-topics)
-    (assoc-in db (conj board-data-key :topics) new-topics)))
-
 (defmethod dispatcher/action :topic-archive [db [_ topic]]
-  (let [board-data (dispatcher/board-data)
-        old-topics (:topics board-data)
-        new-topics (utils/vec-dissoc old-topics (name topic))
-        old-archived (:archived board-data)
-        new-archived (vec (conj old-archived {:title (:title ((keyword topic) board-data)) :topic (name topic)}))
-        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
-    (api/patch-topics new-topics)
-    (-> db
-      (dissoc :foce-key)
-      (dissoc :foce-data)
-      (dissoc :foce-data-editing?)
-      (assoc :show-add-topic (zero? (count new-topics)))
-      (assoc-in (conj board-key :topics) new-topics)
-      (assoc-in (conj board-key :archived) new-archived))))
-
-(defmethod dispatcher/action :archive-topic [db [_ topic]]
   (let [board-data (dispatcher/board-data)
         topic-data ((keyword topic) board-data)
         old-topics (:topics board-data)
@@ -428,12 +327,12 @@
       (assoc-in (conj board-key :topics) new-topics)
       (assoc-in (conj board-key :archived) new-archived))))
 
-(defmethod dispatcher/action :archive-topic/success
+(defmethod dispatcher/action :topic-archive/success
   [db [_]]
   (router/nav! (oc-urls/board))
   (dissoc db :prevent-topic-not-found-navigation))
 
-(defmethod dispatcher/action :delete-entry [db [_ topic as-of]]
+(defmethod dispatcher/action :entry-delete [db [_ topic as-of]]
   (let [board-data (dispatcher/board-data)
         old-topic-data ((keyword topic) board-data)
         entries (dispatcher/topic-entries-data (router/current-org-slug) (router/current-board-slug) topic db)
@@ -457,7 +356,7 @@
       (assoc-in board-data-key with-fixed-topics)
       (assoc-in (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) new-entries))))
 
-(defmethod dispatcher/action :delete-entry/success
+(defmethod dispatcher/action :entry-delete/success
   [db [_ should-redirect-to-board]]
   (when should-redirect-to-board
     (router/nav! (oc-urls/board)))
@@ -485,28 +384,11 @@
       (assoc-in topic-entries-key sorted-entries)
       (stop-foce))))
 
-(defmethod dispatcher/action :force-fullscreen-edit [db [_ topic]]
-  (if topic
-    (assoc-in db [:force-edit-topic] topic)
-    (dissoc db :force-edit-topic)))
-
 (defn- save-topic [db topic topic-data]
   (let [old-topic-data (get (dispatcher/board-data db) (keyword topic))
         new-data (dissoc (merge old-topic-data topic-data) :placeholder)]
     (api/partial-update-topic topic (dissoc topic-data :placeholder))
     (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) new-data)))
-
-(defmethod dispatcher/action :save-topic [db [_ topic topic-data]]
-  (save-topic db topic topic-data))
-
-(defmethod dispatcher/action :save-topic-data [db [_ topic topic-data]]
-  ;; save topic data for the company
-  (save-topic db topic topic-data)
-  ;; update topic data for the still in-progress FoCE
-  (assoc db :foce-data (merge (:foce-data db) topic-data)))
-
-(defmethod dispatcher/action :su-share/reset [db _]
-  (dissoc db :su-share))
 
 ;; Store JWT in App DB so it can be easily accessed in actions etc.
 
@@ -529,7 +411,7 @@
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
 
-(defmethod dispatcher/action :show-login-overlay
+(defmethod dispatcher/action :login-overlay-show
  [db [_ show-login-overlay]]
  (cond
     (= show-login-overlay :login-with-email)
@@ -556,7 +438,7 @@
     (router/redirect! (:href auth-url)))
   db)
 
-(defmethod dispatcher/action :auth-bot
+(defmethod dispatcher/action :bot-auth
   [db [_]]
   (let [current (router/get-token)
         org-data (dispatcher/org-data db)
@@ -568,10 +450,6 @@
     (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
     (router/redirect! fixed-auth-url))
   db)
-
-(defmethod dispatcher/action :login-with-email-change
-  [db [_ k v]]
-  (assoc-in db [:login-with-email k] v))
 
 (defmethod dispatcher/action :login-with-email
   [db [_]]
@@ -609,10 +487,6 @@
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (assoc db :first-org-redirect true))
 
-(defmethod dispatcher/action :signup-with-email-change
-  [db [_ k v]]
-  (assoc-in db [:signup-with-email k] v))
-
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
   (api/signup-with-email (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
@@ -631,12 +505,12 @@
       (api/get-entry-point)
       (dissoc db :show-login-overlay))))
 
-(defmethod dispatcher/action :get-auth-settings
+(defmethod dispatcher/action :auth-settings-get
   [db [_]]
   (api/get-auth-settings)
   db)
 
-(defmethod dispatcher/action :get-teams
+(defmethod dispatcher/action :teams-get
   [db [_]]
   (api/get-teams)
   (assoc db :teams-data-requested true))
@@ -668,12 +542,12 @@
       (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) fixed-roster-data))
     db))
 
-(defmethod dispatcher/action :enumerate-channels
+(defmethod dispatcher/action :channels-enumerate
   [db [_ team-id]]
   (api/enumerate-channels team-id)
   (assoc db :enumerate-channels-requested true))
 
-(defmethod dispatcher/action :enumerate-channels/success
+(defmethod dispatcher/action :channels-enumerate/success
   [db [_ team-id channels]]
   (let [channels-key (dispatcher/team-channels-key team-id)]
     (if channels
@@ -770,13 +644,13 @@
     (cook/set-cookie! :show-login-overlay "collect-name-password"))
   (assoc db :email-confirmed (= status 201)))
 
-(defmethod dispatcher/action :collect-name-pswd
+(defmethod dispatcher/action :name-pswd-collect
   [db [_]]
   (let [form-data (:collect-name-pswd db)]
     (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
   db)
 
-(defmethod dispatcher/action :collect-name-pswd-finish
+(defmethod dispatcher/action :name-pswd-collect/finish
   [db [_ status]]
   (if (and (>= status 200)
            (<= status 299))
@@ -785,13 +659,13 @@
       (dissoc db :show-login-overlay))
     (assoc db :collect-name-password-error status)))
 
-(defmethod dispatcher/action :collect-pswd
+(defmethod dispatcher/action :pswd-collect
   [db [_]]
   (let [form-data (:collect-pswd db)]
     (api/collect-password (:pswd form-data)))
   db)
 
-(defmethod dispatcher/action :collect-pswd-finish
+(defmethod dispatcher/action :pswd-collect/finish
   [db [_ status]]
   (if (and (>= status 200)
            (<= status 299))
@@ -818,7 +692,7 @@
         sorted-fixed-entries (vec (sort sort-pred fixed-entries))]
     (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
-(defmethod dispatcher/action :show-add-topic
+(defmethod dispatcher/action :add-topic-show
   [db [_ active]]
   (if active
     (do
@@ -851,7 +725,7 @@
     (dissoc :show-add-topic)
     (assoc :dashboard-selected-topics [])))
 
-(defmethod dispatcher/action :add-topic
+(defmethod dispatcher/action :topic-add
   [db [_ topic topic-data]]
   (let [board-data (dispatcher/board-data)
         archived-topics (:archived board-data)
@@ -871,7 +745,7 @@
      next-db
      (start-foce next-db topic topic-data))))
 
-(defmethod dispatcher/action :rollback-add-topic
+(defmethod dispatcher/action :add-topic-rollback
   [db [_ topic-kw]]
   (let [board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-data-key)
@@ -890,14 +764,14 @@
       (assoc-in board-data-key updated-board-data)
       (stop-foce))))
 
-(defmethod dispatcher/action :show-top-menu [db [_ topic]]
+(defmethod dispatcher/action :top-menu-show [db [_ topic]]
   (assoc db :show-top-menu topic))
 
-(defmethod dispatcher/action :hide-welcome-screen
+(defmethod dispatcher/action :welcome-screen-hide
   [db [_]]
   (dissoc db :show-welcome-screen))
 
-(defmethod dispatcher/action :reset-user-profile
+(defmethod dispatcher/action :user-profile-reset
   [db [_]]
   (-> db
     (assoc :edit-user-profile (assoc (:current-user-data db) :password ""))
@@ -910,7 +784,7 @@
       (assoc :edit-user-profile user-data)
       (dissoc :edit-user-profile-failed)))
 
-(defmethod dispatcher/action :save-user-profile
+(defmethod dispatcher/action :user-profile-save
   [db [_]]
   (let [new-password (:password (:edit-user-profile db))
         password-did-change (pos? (count new-password))
@@ -927,14 +801,14 @@
     (api/patch-user-profile (:current-user-data db) with-email))
   db)
 
-(defmethod dispatcher/action :add-email-domain-team
+(defmethod dispatcher/action :email-domain-team-add
   [db [_]]
   (let [domain (:domain (:um-domain-invite db))]
     (when (utils/valid-domain? domain))
       (api/add-email-domain (if (.startsWith domain "@") (subs domain 1) domain)))
   (assoc db :add-email-domain-team-error false))
 
-(defmethod dispatcher/action :add-email-domain-team/finish
+(defmethod dispatcher/action :email-domain-team-add/finish
   [db [_ success]]
   (when success
     (api/get-teams))
@@ -942,7 +816,7 @@
       (assoc-in [:um-domain-invite :domain] (if success "" (:domain (:um-domain-invite db))))
       (assoc :add-email-domain-team-error (if success false true))))
 
-(defmethod dispatcher/action :add-slack-team
+(defmethod dispatcher/action :slack-team-add
   [db [_]]
   (let [org-data (dispatcher/org-data db)
         team-id (:team-id org-data)
@@ -966,14 +840,14 @@
       (update-in db cache-key dissoc k)
       (assoc-in db (conj cache-key k) v))))
 
-(defmethod dispatcher/action :create-org
+(defmethod dispatcher/action :org-create
   [db [_]]
   (let [org-data (:create-org db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data))))
   db)
 
-(defmethod dispatcher/action :create-board
+(defmethod dispatcher/action :board-create
   [db [_]]
   (let [board-name (:create-board db)]
     (when-not (string/blank? board-name)
@@ -1028,12 +902,12 @@
   [db [_ status]]
   (assoc-in db [:password-reset :success] (and (>= status 200) (<= status 299))))
 
-(defmethod dispatcher/action :delete-board
+(defmethod dispatcher/action :board-delete
   [db [_ board-slug]]
   (api/delete-board board-slug)
   db)
 
-(defmethod dispatcher/action :show-error-banner
+(defmethod dispatcher/action :error-banner-show
   [db [_ error-message error-time]]
   (if (empty? error-message)
     (-> db (dissoc :error-banner-message) (dissoc :error-banner-time))
@@ -1043,6 +917,6 @@
        (assoc :error-banner-time error-time))
       db)))
 
-(defmethod dispatcher/action :user-profile-update-failed
+(defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
   (assoc db :edit-user-profile-failed true))
