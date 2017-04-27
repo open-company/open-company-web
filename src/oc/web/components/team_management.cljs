@@ -39,7 +39,7 @@
                              {:before-render (fn [s]
                                                (when (and (:auth-settings @dis/app-state)
                                                           (not (:teams-data-requested @dis/app-state)))
-                                                 (dis/dispatch! [:get-teams]))
+                                                 (dis/dispatch! [:teams-get]))
                                                (when (and (nil? (:user-type (:um-invite @(drv/get-ref s :team-management))))
                                                           (utils/valid-email? (:email (:um-invite @(drv/get-ref s :team-management)))))
                                                   (dis/dispatch! [:input [:um-invite :user-type] :viewer]))
