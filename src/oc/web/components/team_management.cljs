@@ -28,6 +28,10 @@
             [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.fx.dom :refer (Fade)]))
 
+(defn slack-org-name [slack-org-id team-data]
+  (let [slack-org (first (filter #(= (:slack-org-id %) slack-org-id) (:slack-orgs team-data)))]
+    (:name slack-org)))
+
 (rum/defcs team-management < rum/reactive
                              (drv/drv :team-management)
                              (drv/drv :current-user-data)
@@ -106,24 +110,32 @@
                     "Slack"]])
               [:div.group
                 (if (= invite-from "slack")
-                  (let [slack-uninvited-users (filter #(= (:status %) "uninvited") (:users team-roster))]
+                  (let [slack-uninvited-users (filter #(= (:status %) "uninvited") (:users team-roster))
+                        all-slack-teams (distinct (map :slack-org-id slack-uninvited-users))
+                        slack-teams (map #(hash-map :slack-org-id % :slack-org-name (slack-org-name % team-data)) all-slack-teams)]
                     [:select.left.um-invite-field.slack
-                      {:value (:slack-id (:slack-user um-invite))
+                      {:value (str (:slack-org-id (:slack-user um-invite)) "-" (:slack-id (:slack-user um-invite)))
                        :on-change (fn [e]
-                                    (let [selected-slack-id (.. e -target -value)
-                                          selected-slack-user (first (filter #(= (:slack-id %) selected-slack-id) slack-uninvited-users))]
+                                    (let [v (.. e -target -value)
+                                          splitted (clojure.string/split v #"-")
+                                          selected-slack-user (first (filter #(and (= (:slack-id %) (second splitted)) (= (:slack-org-id %) (first splitted))) slack-uninvited-users))]
                                       (when selected-slack-user
                                         (dis/dispatch! [:input [:um-invite :slack-user] selected-slack-user]))))
                        :placeholder "Select a Slack member"}
                        [:option
                          {:value ""
                           :key "slack-id-none"}
-                         "Select a Slack member"]
-                       (for [s slack-uninvited-users]
-                          [:option
-                            {:key (str "slack-invite-" (:slack-id s))
-                             :value (:slack-id s)}
-                            (utils/name-or-email s)])])
+                         (if (zero? (count slack-uninvited-users)) "All Slack members have been invited" "Select a Slack member")]
+                       (for [slack-org slack-teams
+                             :let [slack-org-users (filter #(= (:slack-org-id %) (:slack-org-id slack-org)) slack-uninvited-users)]]
+                         [:optgroup
+                           {:key (str "slack-team-" (:slack-org-id slack-org))
+                            :label (if (> (count slack-teams) 1) (:slack-org-name slack-org) "")}
+                           (for [s slack-org-users]
+                             [:option
+                               {:key (str "slack-invite-" (:slack-org-id s) "-" (:slack-id s))
+                                :value (str (:slack-org-id s) "-" (:slack-id s))}
+                               (utils/name-or-email s)])])])
                   [:input.left.um-invite-field.email
                     {:name "um-invite"
                      :type "text"
