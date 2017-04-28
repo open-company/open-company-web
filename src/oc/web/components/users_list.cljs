@@ -6,7 +6,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown show-team-disclaimer-popover)]))
+            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown show-role-explainer-popover)]))
 
 (defn user-action [team-id user action method other-link-params & [payload]]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
@@ -53,9 +53,10 @@
                  :title "RESEND INVITE"
                  :on-click (fn []
                               (dis/dispatch! [:input [:um-invite] {:email (:email user)
+                                                                   :invite-from "email"
                                                                    :user-type user-type
                                                                    :error nil}])
-                              (utils/after 100 #(dis/dispatch! [:invite-by-email])))}
+                              (utils/after 100 #(dis/dispatch! [:invite-user])))}
                 [:i.fa.fa-share]])
             ; if it has a delete link
             (when remove-user
@@ -79,13 +80,13 @@
       [:thead
         [:tr
           [:th.pointer
-            {:on-click #(show-team-disclaimer-popover %)}
+            {:on-click #(show-role-explainer-popover %)}
             "ACCESS "
             [:i.fa.fa-question-circle]]
           [:th "NAME"]
           [:th "STATUS"]
           [:th {:style {:text-align "center"}} "ACTIONS"]]]
       [:tbody
-        (for [user users
+        (for [user (sort #(compare (utils/name-or-email %1) (utils/name-or-email %2)) users)
               :let [author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)]]
           (rum/with-key (user-row team-id user author) (str "user-tr-" team-id "-" (:user-id user))))]]])

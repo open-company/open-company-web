@@ -1,17 +1,20 @@
 function OCWebHelp(){
   console.log(`
 OpenCompany Web help:
-OCWebHelp(): print this help,
 OCWebPrintAppState(): print the whole app-state,
-OCWebPrintRouterPath(): to print the current router setup.
 OCWebPrintOrgData(): to print the current org data,
-OCWebPrintUpdatesListData(): to print the current loaded list of updates,
-OCWebPrintUpdateData(): to print the current update data,
+OCWebPrintTeamData(): to print the current team data,
+OCWebPrintTeamRoster(): to print the current team roster of users,
 OCWebPrintBoardData(): to print the current board data,
 OCWebPrintEntriesData(): to print all the entries loaded,
 OCWebPrintJWTContents(): to print the content of the JWT.
-OCWebConfigLogLevel("debug"): to change log level.`)
-}
+OCWebHelp(): print this help,
+OCWebPrintAsciiArt(): print beautiful ASCII art,
+OCWebConfigLogLevel("debug"): to change log level.
+OCWebPrintUpdatesListData(): to print the current loaded list of updates,
+OCWebPrintUpdateData(): to print the current update data,
+OCWebPrintRouterPath(): to print the current router setup.
+`)}
 
 function printArt(){
   console.group();

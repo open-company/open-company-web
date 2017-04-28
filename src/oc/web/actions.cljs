@@ -520,8 +520,10 @@
   (doseq [team teams
           :let [team-link (utils/link-for (:links team) "item" "GET")
                 roster-link (utils/link-for (:links team) "roster" "GET")]]
-    (if team-link
-      (api/get-team team-link)
+    ; team link may not be present for non-admins, if so they can still get team users from the roster
+    (when team-link
+      (api/get-team team-link))
+    (when roster-link
       (api/get-team roster-link)))
   (assoc-in db [:teams-data :teams] teams))
 
@@ -535,9 +537,9 @@
   [db [_ roster-data]]
   (if roster-data
     (let [fixed-roster-data {:team-id (:team-id roster-data)
-                             :links (:links (:collection roster-data))
-                             :users (:items (:collection roster-data))}]
-      (assoc-in db (dispatcher/team-data-key (:team-id roster-data)) fixed-roster-data))
+                             :links (-> roster-data :collection :links)
+                             :users (-> roster-data :collection :items)}]
+      (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) fixed-roster-data))
     db))
 
 (defmethod dispatcher/action :channels-enumerate
@@ -554,54 +556,74 @@
         (update-in (butlast channels-key) dissoc (last channels-key))
         (dissoc :enumerate-channels-requested)))))
 
-(defmethod dispatcher/action :invite-by-email
+(defmethod dispatcher/action :invite-user
   [db [_]]
   (let [org-data (dispatcher/org-data)
-        email (:email (:um-invite db))
-        user-type (:user-type (:um-invite db))
+        invite-data (:um-invite db)
+        invite-from (:invite-from invite-data)
+        email (:email invite-data)
+        slack-user (:slack-user invite-data)
+        user-type (:user-type invite-data)
         parsed-email (utils/parse-input-email email)
         email-name (:name parsed-email)
         email-address (:address parsed-email)
         team-data (dispatcher/team-data (:team-id org-data))
-        user  (first (filter #(= (:email %) email-address) (:users team-data)))
+        ;; check if the user being invited by email is already present in the users list.
+        ;; from slack is not possible to select a user already invited since they are filtered by status before
+        user  (when (= invite-from "email")
+                (first (filter #(= (:email %) email-address) (:users team-data))))
         old-user-type (when user (utils/get-user-type user org-data))
-        new-user-type (:user-type (:um-invite db))]
+        new-user-type (:user-type invite-data)]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
-    (when (or (not user)
-              (and user
-                   (= (string/lower-case (:status user)) "pending")))
+    (if (or (not user)
+            (and user
+                 (= (string/lower-case (:status user)) "pending")))
       (let [splitted-name (string/split email-name #"\s")
             name-size (count splitted-name)
             splittable-name? (= name-size 2)
             first-name (cond
-                        (= name-size 1) email-name
-                        splittable-name? (first splitted-name)
+                        (and (= invite-from "email") (= name-size 1)) email-name
+                        (and (= invite-from "email") splittable-name?) (first splitted-name)
+                        (and (= invite-from "slack") (not (empty? (:first-name slack-user)))) (:first-name slack-user)
                         :else "")
             last-name (cond
-                        splittable-name? (second splitted-name)
+                        (and (= invite-from "email") splittable-name?) (second splitted-name)
+                        (and (= invite-from "slack") (not (empty? (:last-name slack-user)))) (:last-name slack-user)
                         :else "")]
         ;; If the user is already in the list
         ;; but the type changed we need to change the user type too
         (when (and user
                   (not= old-user-type new-user-type))
           (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user) (:authors org-data))))
-        (api/send-invitation email-address (:user-type (:um-invite db)) first-name last-name)
-        (update-in db [:um-invite] dissoc :error)))))
+        (api/send-invitation (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
+        (update-in db [:um-invite] dissoc :error))
+      (if (and user
+               (not= (string/lower-case (:status user)) "pending"))
+        (assoc-in db [:um-invite :error] "User already active.")
+        db))))
 
-(defmethod dispatcher/action :invite-by-email/success
+(defmethod dispatcher/action :invite-user-reset
+  [db [_]]
+  (update-in db [:um-invite] dissoc :last-action-success))
+
+(defmethod dispatcher/action :invite-user/success
   [db [_]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
   (assoc db :um-invite {:email ""
                         :user-type nil
+                        :invite-from "email"
+                        :last-action-success true
                         :error nil}))
 
-(defmethod dispatcher/action :invite-by-email/failed
+(defmethod dispatcher/action :invite-user/failed
   [db [_ email]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
-  (assoc-in db [:um-invite :error] true))
+  (-> db
+      (assoc-in [:um-invite :error] true)
+      (assoc-in [:um-invite :last-action-success] false)))
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]
@@ -820,9 +842,9 @@
 
 (defmethod dispatcher/action :org-create
   [db [_]]
-  (let [org-name (:create-org db)]
-    (when-not (string/blank? org-name)
-      (api/create-org org-name)))
+  (let [org-data (:create-org db)]
+    (when-not (string/blank? (:name org-data))
+      (api/create-org (:name org-data) (:logo-url org-data))))
   db)
 
 (defmethod dispatcher/action :board-create

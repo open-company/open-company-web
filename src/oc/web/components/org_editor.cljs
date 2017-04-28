@@ -24,7 +24,7 @@
   (utils/event-stop e)
   (when-not (om/get-state owner :loading)
     (let [data         (om/get-props owner)
-          org-name (:create-org data)]
+          org-name (:name (:create-org data))]
       (if (clojure.string/blank? org-name)
         (create-org-alert owner)
         (do
@@ -36,7 +36,7 @@
     ;; using utils/after here because we can't dispatch inside another dispatch.
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
-    (utils/after 1 #(dis/dispatch! [:input [:create-org] (or (:name team-data) "")]))
+    (utils/after 1 #(dis/dispatch! [:input [:create-org] {:name (or (:name team-data) "") :logo-url (or (:logo-url team-data) "")}]))
     (when-not (empty? (:name team-data))
       (om/set-state! owner :message "Is this the organization name you’d like to use?"))))
 
@@ -70,13 +70,13 @@
                           :class "org-editor-input domine h4"
                           :style #js {:width "100%"}
                           :placeholder "Simple name without the Inc., LLC, etc."
-                          :value (or (:create-org data) "")
+                          :value (or (:name (:create-org data)) "")
                           :on-change #(do
                                         (om/set-state! owner :name-did-change true)
-                                        (dis/dispatch! [:input [:create-org] (.. % -target -value)]))})))
+                                        (dis/dispatch! [:input [:create-org :name] (.. % -target -value)]))})))
             (dom/div {:class "center"}
               (dom/button {:class "btn-reset btn-solid get-started-button"
-                           :disabled (not (pos? (count (:create-org data))))
+                           :disabled (not (pos? (count (:name (:create-org data)))))
                            :on-click (partial create-org-clicked owner)}
                           (when loading
                             (loading/small-loading {:class "left mt1"}))

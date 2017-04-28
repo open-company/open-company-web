@@ -3,7 +3,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]            
-            [oc.web.components.ui.team-disclaimer-popover :refer (team-disclaimer-popover)]
+            [oc.web.components.ui.role-explainer-popover :refer (role-explainer-popover)]
             [oc.web.components.ui.popover :as popover :refer (add-popover-with-rum-component
                                                               hide-popover)]))
 
@@ -38,15 +38,15 @@
              :on-click #(click-cb :admin)}
             [:i.fa.fa-gear] " Admin"])]]))
 
-(defn show-team-disclaimer-popover [e & [hide-admin]]
+(defn show-role-explainer-popover [e & [hide-admin]]
   (.stopPropagation e)
-  (add-popover-with-rum-component team-disclaimer-popover {;:hide-popover-cb #(hide-popover nil "team-disclaimer-popover")
+  (add-popover-with-rum-component role-explainer-popover {;:hide-popover-cb #(hide-popover nil "role-explainer-popover")
                                                            :hide-admin hide-admin
                                                            :width 422
                                                            :height (if hide-admin 170 230)
                                                            :hide-on-click-out true
                                                            :z-index-popover 0
-                                                           :container-id "team-disclaimer-popover"}))
+                                                           :container-id "role-explainer-popover"}))
 
 (rum/defcs user-type-picker < (rum/local nil ::last-user-type)
   [s user-type enabled? did-select-cb show-admins?]
@@ -63,7 +63,7 @@
        :on-click #(do (reset! (::last-user-type s) :viewer) (did-select-cb :viewer))}
       (when (= user-type :viewer)
         [:span.user-type-disc.viewer
-          {:on-click #(show-team-disclaimer-popover %)}
+          {:on-click #(show-role-explainer-popover %)}
           "VIEW " [:i.fa.fa-question-circle]])
       [:i.fa.fa-user]]
     [:button.user-type-picker-btn.btn-reset.author
@@ -72,7 +72,7 @@
        :on-click #(do (reset! (::last-user-type s) :author) (did-select-cb :author))}
       (when (= user-type :author)
         [:span.user-type-disc.author
-          {:on-click #(show-team-disclaimer-popover %)}
+          {:on-click #(show-role-explainer-popover %)}
           "EDIT " [:i.fa.fa-question-circle]])
       [:i.fa.fa-pencil]]
     (when show-admins?
@@ -82,6 +82,6 @@
          :on-click #(do (reset! (::last-user-type s) :admin) (did-select-cb :admin))}
         (when (= user-type :admin)
           [:span.user-type-disc.admin
-            {:on-click #(show-team-disclaimer-popover %)}
+            {:on-click #(show-role-explainer-popover %)}
             "ADMIN " [:i.fa.fa-question-circle]])
       [:i.fa.fa-gear]])])

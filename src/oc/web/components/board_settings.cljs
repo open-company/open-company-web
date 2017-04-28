@@ -18,7 +18,7 @@
             [oc.web.components.ui.footer :as footer]
             [oc.web.components.ui.small-loading :as loading]
             [oc.web.components.ui.login-required :refer (login-required)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-picker user-type-dropdown show-team-disclaimer-popover)]
+            [oc.web.components.ui.user-type-picker :refer (user-type-picker user-type-dropdown show-role-explainer-popover)]
             [oc.web.components.ui.back-to-dashboard-btn :refer (back-to-dashboard-btn)]
             [goog.events :as events]
             [goog.fx.dom :refer (Fade)]
@@ -125,13 +125,17 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         {:keys [teams-data]} (drv/react s :team-management)
-        all-users (get-in teams-data [(:team-id org-data) :data :users])]
+        team-users (get-in teams-data [(:team-id org-data) :data :users])
+        roster-users (get-in teams-data [(:team-id org-data) :roster :users])
+        all-users (if (empty? team-users)
+                    (filter #(not= (:status %) "uninvited") roster-users)
+                    team-users)]
     [:div.private-board-users-list
       [:table
         [:thead
           [:tr
             [:th.pointer
-              {:on-click #(show-team-disclaimer-popover % true)}
+              {:on-click #(show-role-explainer-popover % true)}
             "ACCESS "
             [:i.fa.fa-question-circle]]
             [:th "NAME"]

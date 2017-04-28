@@ -598,13 +598,17 @@
                    (not (s/blank? redirect-url)))
           (router/redirect! redirect-url))))))
 
-(defn create-org [org-name]
+(defn create-org [org-name logo-url]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
-        team-id (first (j/get-key :teams))]
+        team-id (first (j/get-key :teams))
+        org-data {:name org-name :team-id team-id}
+        with-logo (if-not (empty? logo-url)
+                    (assoc org-data :logo-url logo-url)
+                    org-data)]
     (when (and org-name create-org-link)
       (api-post (:href create-org-link)
         {:headers (headers-for-link create-org-link)
-         :json-params (cljs->json {:name org-name :team-id team-id})}
+         :json-params (cljs->json with-logo)}
         (fn [{:keys [success status body]}]
           (when-let [org-data (if success (json->cljs body) {})]
             (dispatcher/dispatch! [:org org-data])
@@ -658,19 +662,21 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the logo of the company if possible"
-  [email user-type first-name last-name]
-  (when (and email user-type)
+  [invited-user invite-from user-type first-name last-name]
+  (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
           invitation-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.invite.v1"})
           api-entry-point-links (:api-entry-point @dispatcher/app-state)
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
-          json-params {:email email
-                       :first-name first-name
+          json-params {:first-name first-name
                        :last-name last-name
                        :admin (= user-type :admin)}
-          with-company-name (merge json-params {:org-name (:name org-data)
-                                                :logo-url (:logo-url org-data)})]
+          with-invited-user (if (= invite-from "slack")
+                              (merge json-params {:slack-id (:slack-id invited-user) :slack-org-id (:slack-org-id invited-user)})
+                              (assoc json-params :email invited-user))
+          with-company-name (merge with-invited-user {:org-name (:name org-data)
+                                                      :logo-url (:logo-url org-data)})]
       (auth-post (:href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
@@ -682,10 +688,10 @@
                     (= user-type :admin))
               (let [new-user (json->cljs body)]
                 (add-author (:user-id new-user))
-                (dispatcher/dispatch! [:invite-by-email/success]))
+                (dispatcher/dispatch! [:invite-user/success]))
               ;; if not reload the users list immediately
-              (dispatcher/dispatch! [:invite-by-email/success]))
-            (dispatcher/dispatch! [:invite-by-email/failed])))))))
+              (dispatcher/dispatch! [:invite-user/success]))
+            (dispatcher/dispatch! [:invite-user/failed])))))))
 
 (defn switch-user-type
   "Given an existing user switch user type"
@@ -707,16 +713,16 @@
           {:headers (headers-for-link add-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
-              (dispatcher/dispatch! [:invite-by-email/success])
-              (dispatcher/dispatch! [:invite-by-email/failed])))))
+              (dispatcher/dispatch! [:invite-user/success])
+              (dispatcher/dispatch! [:invite-user/failed])))))
       ;; Remove admin call
       (when (and remove-admin? remove-admin-link)
         (auth-delete (:href remove-admin-link)
           {:headers (headers-for-link remove-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
-              (dispatcher/dispatch! [:invite-by-email/success])
-              (dispatcher/dispatch! [:invite-by-email/failed])))))
+              (dispatcher/dispatch! [:invite-user/success])
+              (dispatcher/dispatch! [:invite-user/failed])))))
       ;; Add author call
       (when (and add-author? add-author-link)
         (add-author (:user-id user)))
