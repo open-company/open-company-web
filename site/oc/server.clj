@@ -8,8 +8,7 @@
             [org.httpkit.client :as http]
             [compojure.core :refer (defroutes GET)]
             [compojure.route :as route]
-            [hickory.core :as h]
-            [hickory.select :as s]))
+            [oc.lib.proxy.sheets-chart :as sheets-chart]))
 
 (defn app-shell []
   (res/resource-response "/app-shell.html" {:root "public"}))
@@ -23,84 +22,14 @@
 (defn server-error []
   (assoc (res/resource-response "/500.html" {:root "public"}) :status 500))
 
-(defn inject-js []
-  (str "<script type=\"text/javascript\">
-function getViewportWidth(){
-  return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-}
-function getViewportHeight(){
-  return Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-}
-document.addEventListener(\"DOMContentLoaded\", function(event) {
-  window.addEventListener(\"resize\", function(event) {
-    if(window.onNumberFormatApiLoad !== undefined){
-      onNumberFormatApiLoad();
-    }
-  });
-});</script>"))
-
-(defn proxy-sheets-pass
-  "Proxy requests to Google Sheets (needed for CORs). Done by nginx in production."
-  [sheet-path params]
-  (let [url (str "https://docs.google.com/" sheet-path "?" (ring.util.codec/form-encode params))]
-    (println "Proxying request to:" url)
-    (let [{:keys [status body error]} @(http/request {:method :get
-                                                      :url url
-                                                      :headers {
-                                                        "User-Agent" "curl/7.43.0"
-                                                        "Accept" "*/*"}})]
-      (println "Proxy request status:" status)
-      (if error
-        (do (println body) {:status status :body body})
-        {:status 200 :body body :headers {"Content-Type" "text/html"}}))))
-
-(defn fix-script-string [s chart-id]
-  (let [r0 #"(?i)(\"width\":\d+)" ;(js/RegExp  "gi")
-        r01 #"(?i)(\"height\":\d+)" ;(js/RegExp  "gi")
-        r1 #"(?i)safeDraw\(document.getElementById\('c'\)\)" ;(js/RegExp  "gi")
-        ;; Regexp to match charts exported as HTML page
-        r2 #"(?i)activeSheetId = '\d+'; switchToSheet\('\d+'\);" ;(js/RegExp  "gi")
-        r3 #"(?i)\"containerId\":\"embed_\d+\"" ;(js/RegExp  "gi")
-        r4 #"(?i)posObj\('\d+', 'embed_\d+', 0, 0, 0, 0\);};" ;(js/RegExp  "gi")
-        ;; Replace all regexp
-        fixed-string (clojure.string/replace s r0 (str "\"width\": getViewportWidth()"))
-        fixed-string-01 (clojure.string/replace fixed-string r01 (str "\"height\": getViewportHeight()"))
-        fixed-string-1 (clojure.string/replace fixed-string-01 r1 (str "safeDraw(document.getElementById('" chart-id "'))"))
-        fixed-string-2 (clojure.string/replace fixed-string-1 r2 (str "activeSheetId = '" chart-id "'; switchToSheet('" chart-id "');"))
-        fixed-string-3 (clojure.string/replace fixed-string-2 r3 (str "\"containerId\":\"" chart-id "\""))
-        fixed-string-4 (clojure.string/replace fixed-string-3 r4 (str "posObj('" chart-id "', '" chart-id "', 0, 0, 0, 0);};"))]
-    fixed-string-4))
-
-(defn get-script-tag [s chart-id]
-  (if (empty? (:src (:attrs s)))
-    (str "<script type=\"text/javascript\">" (fix-script-string (apply str (:content s)) chart-id) "</script>")
-    (str "<script type=\"text/javascript\" src=\"/_/sheets-proxy-pass" (:src (:attrs s)) "\"></script>")))
-
-(defn proxy-sheets
-  "Proxy requests to Google Sheets (needed for CORs). Done by nginx in production."
-  [sheet-path params]
-  (let [url (str "https://docs.google.com/" sheet-path "?" (ring.util.codec/form-encode params))]
-    (println "Loading chart for:" url)
-    (let [{:keys [status body error]} @(http/request {:method :get
-                                                      :url url
-                                                      :headers {
-                                                        "User-Agent" "curl/7.43.0"
-                                                        "Accept" "*/*"}})]
-      (println "Proxy request status:" status)
-      (if error
-        (do (println body) {:status status :body body})
-        (let [parsed-html (h/as-hickory (h/parse body))
-              scripts (s/select (s/tag :script) parsed-html)
-              script-strings (apply str (map #(get-script-tag % (get params "chart-id")) scripts))
-              output-html (str "<html><head>" (inject-js) "<style type=\"text/css\">html,body{margin:0;padding:0;border:none;overflow:hidden;}</style></head><body>" script-strings "<div id=\"" (get params "chart-id") "\"></div></body></html>")]
-          {:status 200 :body output-html})))))
+(defn- sheets-proxy [path params]
+  (sheets-chart/proxy-sheets path params))
 
 (defroutes resources
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/" [] (app-shell))
-  (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (proxy-sheets path params))
-  (GET ["/_/sheets-proxy-pass/:path" :path #".*"] [path & params] (proxy-sheets-pass path params))
+  (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (sheets-proxy path params))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
 
 ;; Some routes like /, /404 and similar can't have their content-type
