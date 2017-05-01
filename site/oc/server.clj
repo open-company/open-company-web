@@ -22,14 +22,18 @@
 (defn server-error []
   (assoc (res/resource-response "/500.html" {:root "public"}) :status 500))
 
+(defn- chart-proxy [path params]
+  (sheets-chart/proxy-sheets-chart path params))
+
 (defn- sheets-proxy [path params]
-  (sheets-chart/proxy-sheets path params))
+  (sheets-chart/proxy-sheets-pass-through path params))
 
 (defroutes resources
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/" [] (app-shell))
-  (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (sheets-proxy path params))
+  (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
+  (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
 
 ;; Some routes like /, /404 and similar can't have their content-type
