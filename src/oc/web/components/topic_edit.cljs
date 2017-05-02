@@ -340,11 +340,10 @@
             add-image-el      (js/$ (gdom/getElementByClass "camera"))
             add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))
             show-chart-url-input (om/get-state owner :show-chart-url-input)]
-        (js/console.log "topic-edit/did-update")
         (when (not= (:show-chart-url-input prev-state) show-chart-url-input)
-          (js/console.log "   show-chart-url-input different:" show-chart-url-input)
           (if show-chart-url-input
             (add-popover-with-rum-component collect-chart-popover {:hide-popover-cb #(om/set-state! owner :show-chart-url-input false)
+                                                                   :collect-chart-cb #(om/set-state! owner :has-changes true)
                                                                    :container-id "add-chart-popover"
                                                                    :width 500
                                                                    :height 400})
