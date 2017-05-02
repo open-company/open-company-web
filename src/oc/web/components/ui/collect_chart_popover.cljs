@@ -30,12 +30,14 @@
           [:li "Click the desired chart"]
           [:li "In the chart’s top right, click the down arrow and " [:b "Publish Chart"]]
           [:li "Click the " [:b "Publish"] " button and paste the link URL provided"]]
+        [:hr.divider-line]
         [:div
           [:label.left "Chart URL"]
           [:input.right
             {:type "text"
              :style {:width "360px"}
              :value @(::chart-url s)
+             :placeholder "https://docs.google.com/spreadsheets/d/unique-url?oid=unique"
              :on-change #(reset! (::chart-url s) (.. % -target -value))}]]
         [:div.right
           [:button.btn-reset.btn-outline
