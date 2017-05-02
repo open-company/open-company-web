@@ -265,6 +265,16 @@
 ;                                                                     :config {:place "right-bottom"}})
 ;           (t/show first-foce))))))
 
+(defn refresh-chart-url [owner topic-data]
+  (om/set-state! owner :has-changes true)
+  (let [chart-url (:chart-url topic-data)
+        chart-rg #"(?i)(cache-buster=[0-9a-f]{4})"
+        new-uuid (utils/my-uuid)
+        next-chart-url (if (.match chart-url chart-rg)
+                          (.replace chart-url chart-rg (str "cache-buster=" new-uuid))
+                          (str chart-url "&cache-buster=" new-uuid))]
+    (dis/dispatch! [:foce-input [:chart-url next-chart-url]])))
+
 (defcomponent topic-edit [{:keys [currency
                                   card-width
                                   columns-num
@@ -346,7 +356,7 @@
                                                                    :collect-chart-cb #(om/set-state! owner :has-changes true)
                                                                    :container-id "add-chart-popover"
                                                                    :width 500
-                                                                   :height 400})
+                                                                   :height 300})
             (hide-popover nil "add-chart-popover")))
         (doto add-image-el
           (.tooltip "hide")
@@ -410,7 +420,15 @@
           ;; Chart
           (dom/div {:class "topic-edit-chart-container"}
             (when-not (empty? (:chart-url topic-data))
-              (dom/button {:class "btn-reset remove-chart-btn"
+              (dom/button {:class "btn-reset chart-btn refresh-chart-btn"
+                           :title "Charts refresh automatically every 10 minutes, click here to refresh it now."
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :on-click #(refresh-chart-url owner topic-data)}
+                (dom/i {:class "fa fa-refresh"})))
+            (when-not (empty? (:chart-url topic-data))
+              (dom/button {:class "btn-reset chart-btn remove-chart-btn"
                            :title "Remove Chart from Google Sheets"
                            :data-toggle "tooltip"
                            :data-container "body"
@@ -532,14 +550,15 @@
                                      (partial attachment-upload-error-cb owner)))}
                 (dom/i {:class "fa fa-paperclip"}))
 
-            (dom/button {:class "btn-reset chart-button left"
-                         :title (if (empty? (:chart-url topic-data)) "Add Chart from Google Sheets" "Edit Chart from Google Sheets")
-                         :type "button"
-                         :data-toggle "tooltip"
-                         :data-container "body"
-                         :data-placement "top"
-                         :on-click #(om/set-state! owner :show-chart-url-input true)}
-              (dom/i {:class "fa fa-line-chart"}))
+            (when (empty? (:chart-url topic-data))
+              (dom/button {:class "btn-reset chart-button left"
+                           :title (if (empty? (:chart-url topic-data)) "Add Chart from Google Sheets" "Edit Chart from Google Sheets")
+                           :type "button"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :on-click #(om/set-state! owner :show-chart-url-input true)}
+                (dom/i {:class "fa fa-line-chart"})))
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}

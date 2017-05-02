@@ -22,7 +22,8 @@ div.topic.topic-edit {
 
     div.topic-edit-chart-container {
       position: relative;
-      button.remove-chart-btn {
+
+      button.chart-btn {
         position: absolute;
         top: 10px;
         right: 10px;
@@ -32,6 +33,14 @@ div.topic.topic-edit {
         &:hover {
           opacity: 1;
         }
+      }
+
+      button.remove-chart-btn {
+        right: 10px;
+      }
+
+      button.refresh-chart-btn {
+        right: 30px;
       }
     }
 
