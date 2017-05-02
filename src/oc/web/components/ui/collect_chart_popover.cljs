@@ -22,17 +22,19 @@
         [:button.btn-reset.close-button
           {:on-click #(hide-popover-cb %)}
           [:i.fa.fa-times]]
-        [:h3.title "You can include any chart from Google Sheets by publishing it using the steps below:"]
+        [:h3.title "Include a chart from "
+          [:b "Google Sheets"]
+          ":"]
         [:ol
           [:li "Open the spreadsheet in Google Sheets"]
-          [:li "Click the chart"]
-          [:li "In the top right of the chart, click the down arrow and Publish Chart"]
-          [:li "Click the Publish button and copy and paste the link URL provided"]]
+          [:li "Click the desired chart"]
+          [:li "In the chart’s top right, click the down arrow and " [:b "Publish Chart"]]
+          [:li "Click the " [:b "Publish"] " button and paste the link URL provided"]]
         [:div
-          [:label "Published chart URL:"]]
-        [:div
-          [:input
+          [:label.left "Chart URL"]
+          [:input.right
             {:type "text"
+             :style {:width "360px"}
              :value @(::chart-url s)
              :on-change #(reset! (::chart-url s) (.. % -target -value))}]]
         [:div.right
