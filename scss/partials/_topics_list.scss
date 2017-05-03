@@ -33,7 +33,12 @@ div.org-dashboard.selected-topic-view.mobile-or-tablet {
 }
 
 div.org-dashboard:not(.dashboard-sharing) div.topic-list{
-  min-height: calc(100vh - #{$footer_height}px);
+  @include big_web(){
+    min-height: calc(100vh - #{$footer_height}px);
+  }
+  @include mobile(){
+    min-height: calc(100vh - #{$mobile_navbar_height + $footer_small_height + 22}px);
+  }
 }
 
 div.topic-list{
