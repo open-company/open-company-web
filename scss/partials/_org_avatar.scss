@@ -51,17 +51,17 @@ div.org-avatar {
       margin-top: -34px;
       margin-left: 54px;
       float: left;
+      white-space: pre;
+
       @include mobile(){
         text-overflow: ellipsis;
         overflow: hidden;
-        width: 80%;
       }
 
       &.no-logo {
         @include mobile(){
           margin-left: 9px;
           margin-top: 13px;
-          width: 100%;
         }
 
         @include big_web(){
