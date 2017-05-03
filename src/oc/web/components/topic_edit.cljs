@@ -421,7 +421,7 @@
           (dom/div {:class "topic-edit-chart-container"}
             (when-not (empty? (:chart-url topic-data))
               (dom/button {:class "btn-reset chart-btn refresh-chart-btn"
-                           :title "Charts refresh automatically every 10 minutes, click here to refresh it now."
+                           :title "Charts sync with Google every 10 min, or you can refresh now."
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
