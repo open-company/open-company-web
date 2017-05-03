@@ -17,5 +17,5 @@
         {:key chart-id
          :data-chart-src (:chart-url topic-data)}
         [:iframe
-          {:style {:border "none" :margin "0" :padding "0" :width (str card-width "px") :height "410px"}
+          {:style {:border "none" :margin "0" :padding "0" :width (str card-width "px") :height "350px"}
            :src chart-proxy-url}]])))
