@@ -28,7 +28,7 @@
         [:ol
           [:li "Open the spreadsheet in Google Sheets"]
           [:li "Click the desired chart"]
-          [:li "In the chart’s top right, click the down arrow and " [:b "Publish Chart"]]
+          [:li "In the top right, click the down arrow and " [:b "Publish Chart"]]
           [:li "Click the " [:b "Publish"] " button and paste the link URL provided"]]
         [:hr.divider-line]
         [:div
