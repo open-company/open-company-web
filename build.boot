@@ -44,11 +44,19 @@
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.5.13-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
-    [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"]
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
     [com.taoensso/timbre "4.9.0-alpha1"] ; Pure Clojure/Script logging library https://www.taoensso.com
+    [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
+    [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
-    [binaryage/devtools "0.9.2"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
+    [open-company/lib "0.8.2-9e1642e"] ; Library for OC projects https://github.com/open-company/open-company-lib
+    ; In addition to common functions, brings in the following common dependencies used by this project:
+    ; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
+    ; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
+    ; Timbre - Pure Clojure/Script logging library https://github.com/ptaoussanis/timbre
+    ; environ - Get environment settings from different sources https://github.com/weavejester/environ
+    ; hickory - HTML as data https://github.com/davidsantiago/hickory
+    ; com.taoensso/sente - Handle WebSocket client https://github.com/ptaoussanis/sente
 
     ;; ------- Deps for project repl ------------------
     [adzerk/boot-cljs-repl   "0.3.3"] ;; latest release
@@ -56,6 +64,7 @@
     [weasel                  "0.7.0"  :scope "test"]
     [org.clojure/tools.nrepl "0.2.12" :scope "test"]
     ;; ------------------------------------------------
+
 ])
 
 (def static-site-deps
