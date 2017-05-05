@@ -20,17 +20,17 @@
 (defn handle-event [arg]
   nil)
 
-(declare test-session)
+(declare send-message)
 
 (defn event-loop
   "Handle inbound events."
   []
   (go (loop [[op arg] (:event (<! ch-chsk))]
-        #_(js/console.log "-" op)
+        (js/console.log "wsclient receive -" op)
         (case op
           :chsk/recv (handle-event arg)
           ;; we ignore other Sente events
-          (test-session))
+          (js/console.log "   no handler"))
         (recur (:event (<! ch-chsk))))))
 
 (defn send-message
