@@ -73,7 +73,6 @@
           (if @(::sign-up-slack-clicked state)
             [:div
               [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
-              (when (:access (:query-params @router/path)) slack-error)
               [:button.btn-reset.btn-solid.login-button
                 {:on-click #(do
                               (.preventDefault %)
