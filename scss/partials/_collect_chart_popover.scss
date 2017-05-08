@@ -33,13 +33,18 @@ div.oc-popover-container-internal {
     }
 
     div input {
-      border-radius: 2px;
       color: $oc_gray_5;
       width: 100%;
-      height: 28px;
-      margin-top: -5px;
+      margin-top: -6px;
       outline: none;
-      border: 1px solid rgba(90,78,107,0.5);
+      background-color: white;
+      border: 1px solid rgba(78, 90, 107, 0.1);
+      border-radius: 2px;
+      font-size: 14px;
+      line-height: 1.2;
+      transition: border-color 0.25s;
+      padding: .5rem;
+
       &:focus, &:active {
         border: 1px solid rgba(90,78,107,0.8);
       }
