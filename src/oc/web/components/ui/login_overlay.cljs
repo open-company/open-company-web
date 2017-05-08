@@ -61,7 +61,7 @@
                                      dont-scroll
   [state]
   (let [action-title (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) "Sign Up" "Sign In")
-        slack-error [:span.block.red "There is a temporary error validating with Slack. Please try again later."]]
+        slack-error [:span.block.red "There was an issue validating with Slack."]]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       (close-button)
