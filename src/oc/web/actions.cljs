@@ -10,7 +10,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.lib.wsclient :as wsc]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -394,6 +395,8 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
+  (js/console.log "dispatcher/action :jwt" jwt-data)
+  (wsc/reconnect (:user-id jwt-data))
   (let [next-db (if (cook/get-cookie :show-login-overlay)
                   (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
                   db)]
