@@ -44,8 +44,7 @@
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]
-            [oc.web.components.error-banner :refer (error-banner)]
-            [oc.web.lib.wsclient :as wsc]))
+            [oc.web.components.error-banner :refer (error-banner)]))
 
 (enable-console-print!)
 
@@ -57,7 +56,7 @@
                 :target target}))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+; (defonce raven (sentry/raven-setup))
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -488,8 +487,6 @@
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner
   (drv-root #(om/component (error-banner)) (sel1 [:div#oc-error-banner]))
-
-  (wsc/event-loop)
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
@@ -498,5 +495,3 @@
 (defn on-js-reload []
   (.clear js/console)
   (route-dispatch! (router/get-token)))
-
-(set! (.-asd js/window) #(wsc/test-session))
