@@ -499,4 +499,4 @@
   (.clear js/console)
   (route-dispatch! (router/get-token)))
 
-(set! (.-asd js/window) #(wsc/send-message (vec (map keyword %))))
+(set! (.-asd js/window) #(wsc/test-session))

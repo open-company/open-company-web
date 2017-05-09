@@ -17,10 +17,32 @@
   (def chsk-send! send-fn)
   (def chsk-state chsk-state))
 
-(defn handle-event [arg]
-  nil)
+(defmulti handle-event
+  "Handle events based on the event ID."
+  (fn [[ev-id ev-arg] app owner] ev-id))
 
-(declare send-message)
+;; Process the server's reply by updating the application state:
+
+(defmethod handle-event :test/reply
+  [[_ msg] app owner]
+  (js/console.log "handle-event/:test/reply"))
+
+;; Ignore unknown events (we just print to the console):
+
+(defmethod handle-event :default
+  [event app owner]
+  (js/console.log "handle-event/:default"))
+
+;; Remember the session state in the application component's local state:
+
+(defmethod handle-event :session/state
+  [[_ state] app owner]
+  (js/console.log "handle-event/:session/state"))
+
+(defn test-session
+  "Ping the server to update the sesssion state."
+  []
+  (chsk-send! [:session/status]))
 
 (defn event-loop
   "Handle inbound events."
@@ -30,11 +52,5 @@
         (case op
           :chsk/recv (handle-event arg)
           ;; we ignore other Sente events
-          (js/console.log "   no handler"))
+          (test-session))
         (recur (:event (<! ch-chsk))))))
-
-(defn send-message
-  "Ping the server to update the sesssion state."
-  [msg]
-  (js/console.log "Sending ws message " msg)
-  (chsk-send! msg))
