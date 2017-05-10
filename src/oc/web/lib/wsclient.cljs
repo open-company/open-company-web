@@ -13,14 +13,20 @@
 
 (def ws-server "localhost")
 
+(def channelsk (atom nil))
 (def ch-chsk (atom nil))
 (def chsk-send! (atom nil))
 
 ;; Auth
 
+(defn should-disconnect? [rep]
+  (when-not (:valid rep)
+    (js/console.log "disconnecting client due to not valid JWT!")
+    (s/chsk-disconnect! @channelsk)))
+
 (defn post-handshake-auth []
   (js/console.log "wsc/post-handshake-auth")
-  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 #(js/console.log "reply" %)))
+  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
 
 ;; Event handlers
 
@@ -82,6 +88,7 @@
                                            :packer :edn
                                            :uid uid
                                            :params {:user-id uid}})]
+    (reset! channelsk chsk)
     (reset! ch-chsk ch-recv)
     (reset! chsk-send! send-fn)
     (start-router!)))
