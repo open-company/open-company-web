@@ -5,7 +5,9 @@
             [sablono.core :as html :refer-macros [html]]
             [taoensso.sente :as s]
             [cljs.core.async :as async :refer [<! >! chan]]
-            [taoensso.encore :as encore :refer-macros (have)]))
+            [taoensso.encore :as encore :refer-macros (have)]
+            [oc.web.lib.jwt :as j]
+            [oc.web.local-settings :as ls]))
 
 (def ws-port 3000)
 
@@ -13,6 +15,12 @@
 
 (def ch-chsk (atom nil))
 (def chsk-send! (atom nil))
+
+;; Auth
+
+(defn post-handshake-auth []
+  (js/console.log "wsc/post-handshake-auth")
+  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 #(js/console.log "reply" %)))
 
 ;; Event handlers
 
@@ -44,8 +52,9 @@
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
+  (post-handshake-auth)
   (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (js/console.log (encore/format "Handshake: %s" ?data))))
+    (js/console.log "Handshake:" ?uid ?csrf-token ?handshake-data)))
 
 ;; Session test
 
@@ -69,16 +78,10 @@
   (let [{:keys [chsk ch-recv send-fn state] :as x}
           (s/make-channel-socket! "/chsk" {:type :auto
                                            :host (encore/format "%s:%d" ws-server ws-port)
+                                           :protocol (if ls/jwt-cookie-secure :https :http)
                                            :packer :edn
-                                           :uid uid})]
-    (js/console.log "   - x" x)
-    (js/console.log "   - chsk" chsk)
-    (js/console.log "   - ch-recv" ch-recv)
-    (js/console.log "   - send-fn" send-fn)
-    (js/console.log "   - state" state)
-    ; (reset! chsk chsk)
+                                           :uid uid
+                                           :params {:user-id uid}})]
     (reset! ch-chsk ch-recv)
     (reset! chsk-send! send-fn)
-    ; (reset! chsk-state state)
-    ; (if (:is-open?))
     (start-router!)))
