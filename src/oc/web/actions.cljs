@@ -396,7 +396,8 @@
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
   (js/console.log "dispatcher/action :jwt" jwt-data)
-  (wsc/reconnect (:user-id jwt-data))
+  (when (and jwt-data (:user-id jwt-data))
+    (wsc/reconnect (:user-id jwt-data)))
   (let [next-db (if (cook/get-cookie :show-login-overlay)
                   (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
                   db)]
