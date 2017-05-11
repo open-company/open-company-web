@@ -429,7 +429,7 @@
                 (dom/i {:class "fa fa-refresh"})))
             (when-not (empty? (:chart-url topic-data))
               (dom/button {:class "btn-reset chart-btn remove-chart-btn"
-                           :title "Remove Chart from Google Sheets"
+                           :title "Remove Chart"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"

@@ -244,9 +244,6 @@
                          :burn-rate
                          :runway])
 
-(def topic-finances-data-private-keys [:burn-rate
-                                       :runway])
-
 (defn save-or-create-topic [topic-data]
   (when topic-data
     (let [links (:links topic-data)
@@ -274,9 +271,7 @@
   (when (and topic topic-data)
     (let [partial-update-link (utils/link-for (:links topic-data) "partial-update" "PATCH")
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
-          cleaned-chart-data (map #(apply dissoc % topic-finances-data-private-keys) (:data cleaned-topic-data))
-          with-fixed-chart-data (assoc cleaned-topic-data :data cleaned-chart-data)
-          json-data (cljs->json with-fixed-chart-data)]
+          json-data (cljs->json cleaned-topic-data)]
       (api-patch (:href partial-update-link)
         { :json-params json-data
           :headers (headers-for-link partial-update-link)}

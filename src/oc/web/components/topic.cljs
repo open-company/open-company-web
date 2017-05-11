@@ -128,8 +128,6 @@
                            :on-click #(dis/dispatch! [:foce-start topic-kw {:placeholder true
                                                                             :topic (name topic-kw)
                                                                             :title (:title topic-data)
-                                                                            :data (:data topic-data)
-                                                                            :metrics (:metrics topic-data)
                                                                             :links (:links topic-data)}])}
                 (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
