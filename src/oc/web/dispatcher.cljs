@@ -50,8 +50,8 @@
 (defn topic-entries-key [org-slug board-slug topic-slug]
   (vec (conj (entries-key org-slug board-slug) (keyword topic-slug))))
 
-(defn entry-key [org-slug board-slug topic-slug as-of]
-  (vec (conj (topic-entries-key org-slug board-slug topic-slug) (str as-of))))
+(defn entry-key [org-slug board-slug topic-slug entry-slug]
+  (vec (conj (topic-entries-key org-slug board-slug topic-slug) (keyword entry-slug))))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -72,6 +72,8 @@
    :orgs                [[:base] (fn [base] (:orgs base))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
+   :topic-slug          [[:route] (fn [route] (:topic route))]
+   :entry-slug          [[:route] (fn [route] (:entry route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :updates-list        [[:base :org-slug]
                           (fn [base org-slug]
@@ -120,6 +122,14 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
+   :topic-data          [[:base :org-slug :board-slug :topic-slug]
+                          (fn [base org-slug board-slug topic-slug]
+                            (when (and org-slug board-slug topic-slug)
+                              (get-in base (board-topic-key org-slug board-slug topic-slug))))]
+   :entry-data          [[:topic-data]
+                          (fn [base org-slug board-slug topic-slug entry-slug]
+                            (when (and org-slug board-slug topic-slug entry-slug)
+                              (get-in base (entry-key org-slug board-slug topic-slug entry-slug))))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
@@ -212,8 +222,8 @@
   (:force-edit-topic @app-state))
 
 (defn entry
-  ([org-slug board-slug topic-slug as-of] (entry org-slug board-slug topic-slug as-of @app-state))
-  ([org-slug board-slug topic-slug as-of data] (get-in data (entry-key org-slug board-slug topic-slug as-of))))
+  ([org-slug board-slug topic-slug entry-slug] (entry org-slug board-slug topic-slug entry-slug @app-state))
+  ([org-slug board-slug topic-slug entry-slug data] (get-in data (entry-key org-slug board-slug topic-slug entry-slug))))
 
 (defn entries-data
   ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))
