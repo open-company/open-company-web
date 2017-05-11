@@ -11,6 +11,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.topic-edit :refer (topic-edit)]
+            [oc.web.components.comments :refer (comments)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [oc.web.components.ui.loading :refer (loading)]
             [cuerdas.core :as s]))
@@ -102,7 +103,8 @@
 
   (render [_]
     (let [topic-kw (keyword (router/current-topic-slug))
-          topic-view-width (responsive/topic-view-width card-width columns-num)
+          comment-view-width 320
+          topic-view-width (- (responsive/topic-view-width card-width columns-num) comment-view-width)
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get board-data topic-kw)
           is-custom-topic (s/starts-with? (:topic topic-data) "custom-")
@@ -112,11 +114,13 @@
           loading-topic-data (and (contains? board-data topic-kw)
                                   (:loading topic-data))]
       (dom/div {:class "topic-view-container group"
-                :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str topic-card-width "px"))
+                :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str (+ topic-card-width comment-view-width) "px"))
                         :margin-right (if (responsive/is-tablet-or-mobile?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
                 :key (str "topic-view-inner-" (router/current-topic-slug))}
+        (comments)
         (dom/div {:class (utils/class-set {:topic-view true
                                            :group true
+                                           :left true
                                            :tablet-view (responsive/is-tablet-or-mobile?)
                                            :topic-404 (nil? topic-data)})}
           (when (responsive/is-tablet-or-mobile?)
@@ -202,9 +206,9 @@
                                       :key (str "topic-"
                                             (when foce-key
                                               "foce-")
-                                            (router/current-topic-slug) "-" (:updated-at rev))})))))))
-        (when (and (not loading-topic-data)
-                   (not (responsive/is-tablet-or-mobile?))
-                   (not (:read-only board-data)))
-          (dom/button {:class "btn-reset btn-link archive-topic"
-                       :on-click (partial remove-topic-click owner)} "Archive this topic"))))))
+                                            (router/current-topic-slug) "-" (:updated-at rev))}))))
+              (when (and (not loading-topic-data)
+                         (not (responsive/is-tablet-or-mobile?))
+                         (not (:read-only board-data)))
+                (dom/button {:class "btn-reset btn-link archive-topic"
+                             :on-click (partial remove-topic-click owner)} "Archive this topic")))))))))
