@@ -91,6 +91,7 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
+   :foce-data           [[:base] (fn [base] (:foce-data base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

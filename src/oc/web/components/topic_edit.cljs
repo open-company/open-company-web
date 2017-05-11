@@ -16,12 +16,14 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.lib.growth-utils :as growth-utils]
+            [oc.web.components.chart :refer (chart)]
             [oc.web.components.topic-attachments :refer (topic-attachments)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
             [oc.web.components.ui.icon :as i]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.popover :refer (add-popover hide-popover)]
+            [oc.web.components.ui.popover :refer (add-popover-with-rum-component add-popover hide-popover)]
+            [oc.web.components.ui.collect-chart-popover :refer (collect-chart-popover)]
             [cljsjs.medium-editor] ; pulled in for cljsjs externs
             [goog.dom :as gdom]
             [goog.object :as googobj]
@@ -159,12 +161,12 @@
                       :height "150px"
                       :message before-unload-message
                       :cancel-title "STAY"
-                      :cancel-cb #(do
+                      :cancel-cb (fn [_]
                                     ;; Go back to the previous token
                                     (.setToken @router/history current-token)
                                     (hide-popover nil "leave-topic-confirm"))
                       :success-title "LEAVE"
-                      :success-cb #(do
+                      :success-cb (fn [_]
                                     (hide-popover nil "leave-topic-confirm")
                                     ;; cancel any FoCE
                                     (if (:new (dis/foce-topic-data))
@@ -263,6 +265,16 @@
 ;                                                                     :config {:place "right-bottom"}})
 ;           (t/show first-foce))))))
 
+(defn refresh-chart-url [owner topic-data]
+  (om/set-state! owner :has-changes true)
+  (let [chart-url (:chart-url topic-data)
+        chart-rg #"(?i)(cache-buster=[0-9a-f]{4})"
+        new-uuid (utils/my-uuid)
+        next-chart-url (if (.match chart-url chart-rg)
+                          (.replace chart-url chart-rg (str "cache-buster=" new-uuid))
+                          (str chart-url "&cache-buster=" new-uuid))]
+    (dis/dispatch! [:foce-input [:chart-url next-chart-url]])))
+
 (defcomponent topic-edit [{:keys [currency
                                   card-width
                                   columns-num
@@ -287,7 +299,8 @@
        :file-upload-state nil
        :file-upload-progress 0
        :headline-exceeds false
-       :first-foce-tt-shown false}))
+       :first-foce-tt-shown false
+       :show-chart-url-input false}))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
@@ -335,7 +348,16 @@
             image-header      (:image-url topic-data)
             add-image-tooltip (add-image-tooltip image-header)
             add-image-el      (js/$ (gdom/getElementByClass "camera"))
-            add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))]
+            add-chart-el      (js/$ (gdom/getElementByClass "chart-button"))
+            show-chart-url-input (om/get-state owner :show-chart-url-input)]
+        (when (not= (:show-chart-url-input prev-state) show-chart-url-input)
+          (if show-chart-url-input
+            (add-popover-with-rum-component collect-chart-popover {:hide-popover-cb #(om/set-state! owner :show-chart-url-input false)
+                                                                   :collect-chart-cb #(om/set-state! owner :has-changes true)
+                                                                   :container-id "add-chart-popover"
+                                                                   :width 500
+                                                                   :height 300})
+            (hide-popover nil "add-chart-popover")))
         (doto add-image-el
           (.tooltip "hide")
           (.attr "data-original-title" add-image-tooltip)
@@ -354,7 +376,7 @@
 
   (render-state [_ {:keys [initial-headline initial-body body-placeholder char-count char-count-alert
                            file-upload-state file-upload-progress upload-remote-url
-                           headline-exceeds has-changes]}]
+                           show-chart-url-input headline-exceeds has-changes]}]
     (let [board-slug        (router/current-board-slug)
           topic             (dis/foce-topic-key)
           topic-kw          (keyword topic)
@@ -388,13 +410,34 @@
                             :data-placement "top"
                             :data-container "body"
                             :title "Remove this image"
-                            :on-click #(do
+                            :on-click (fn [_]
                                         (om/set-state! owner :has-changes true)
                                         (dis/dispatch! [:foce-input {:image-url nil :image-height 0 :image-width 0}]))}
                 (i/icon :simple-remove {:size 15
                                         :stroke 4
                                         :color "white"
                                         :accent-color "white"}))))
+          ;; Chart
+          (dom/div {:class "topic-edit-chart-container"}
+            (when-not (empty? (:chart-url topic-data))
+              (dom/button {:class "btn-reset chart-btn refresh-chart-btn"
+                           :title "Charts sync with Google every 10 min, or you can refresh now."
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :on-click #(refresh-chart-url owner topic-data)}
+                (dom/i {:class "fa fa-refresh"})))
+            (when-not (empty? (:chart-url topic-data))
+              (dom/button {:class "btn-reset chart-btn remove-chart-btn"
+                           :title "Remove Chart from Google Sheets"
+                           :data-toggle "tooltip"
+                           :data-container "body"
+                           :data-placement "top"
+                           :on-click (fn [_]
+                                        (om/set-state! owner :has-changes true)
+                                        (dis/dispatch! [:foce-input [:chart-url nil]]))}
+                (dom/i {:class "fa fa-times"})))
+            (chart topic-data (- card-width (* 16 2))))
           ;; Topic title
           (dom/input {:class "topic-title"
                       :value (or (:title topic-data) "")
@@ -409,7 +452,6 @@
                                       (om/update-state! owner #(merge % {:has-changes true
                                                                          :char-count remaining-chars
                                                                          :char-count-alert (< remaining-chars title-alert-limit)}))))})
-          
           ;; Topic data
           (when is-data?
             (dom/div {:class ""}
@@ -446,8 +488,8 @@
                         :onKeyUp   #(check-headline-count owner % true)
                         :onKeyDown #(check-headline-count owner % true)
                         :onFocus    #(check-headline-count owner % false)
-                        :onBlur #(do
-                                    (check-headline-count owner % false)
+                        :onBlur (fn [e]
+                                    (check-headline-count owner e false)
                                     (om/set-state! owner :char-count nil))
                         :dangerouslySetInnerHTML initial-headline})
           ;; Topic body
@@ -508,26 +550,22 @@
                                      (partial attachment-upload-error-cb owner)))}
                 (dom/i {:class "fa fa-paperclip"}))
 
-            ;; Topic chart button
-            (when (or (= is-data? :growth)
-                      (and (= is-data? :finances)
-                           (not (dis/foce-topic-data-editing?))))
+            (when (empty? (:chart-url topic-data))
               (dom/button {:class "btn-reset chart-button left"
-                           :title (if (and (= is-data? :growth)
-                                           (pos? (count (:metrics topic-data))))
-                                    "Add another chart"
-                                    "Add a chart")
+                           :title (if (empty? (:chart-url topic-data)) "Add Chart from Google Sheets" "Edit Chart from Google Sheets")
                            :type "button"
                            :data-toggle "tooltip"
                            :data-container "body"
                            :data-placement "top"
-                           :style {:display (if (or (and (= is-data? :finances) no-data?) (= is-data? :growth)) "block" "none")}
-                           :on-click #(dis/dispatch! [:foce-data-editing-start (if (= is-data? :growth) growth-utils/new-metric-slug-placeholder :new)])}
+                           :on-click #(om/set-state! owner :show-chart-url-input true)}
                 (dom/i {:class "fa fa-line-chart"})))
             
             ;; Hidden (initially) file upload progress
             (dom/span {:class (str "file-upload-progress left" (when-not (= file-upload-state :show-progress) " hidden"))}
-              (str file-upload-progress "%")))
+              (str file-upload-progress "%"))
+
+            (when (:chart-url topic-data)
+              (dom/span {:class ""})))
 
           (topic-attachments attachments #(om/set-state! owner :has-changes true))
           
@@ -538,7 +576,7 @@
               (dom/label {:class (utils/class-set {:char-counter true
                                                    :char-count-alert char-count-alert})} char-count))
             (dom/div {:class "topic-foce-footer-right"
-                      :style {:display (if (nil? file-upload-state) "block" "none")}}
+                      :style {:display (if (and (not show-chart-url-input) (nil? file-upload-state)) "block" "none")}}
               (dom/button {:class "btn-reset btn-solid"
                            :disabled (or (= file-upload-state :show-progress)
                                          (not has-changes)

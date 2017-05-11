@@ -1,11 +1,14 @@
 (ns oc.server
   "Development-time server. This role is played by an nginx proxy in production."
   (:require [ring.util.response :as res]
-            [ring.middleware.resource :refer [wrap-resource]]
-            [ring.middleware.file :refer [wrap-file]]
-            [ring.middleware.reload :refer [wrap-reload]]
+            [ring.middleware.params :refer (wrap-params)]
+            [ring.middleware.resource :refer (wrap-resource)]
+            [ring.middleware.file :refer (wrap-file)]
+            [ring.middleware.reload :refer (wrap-reload)]
+            [org.httpkit.client :as http]
             [compojure.core :refer (defroutes GET)]
-            [compojure.route :as route]))
+            [compojure.route :as route]
+            [oc.lib.proxy.sheets-chart :as sheets-chart]))
 
 (defn app-shell []
   (res/resource-response "/app-shell.html" {:root "public"}))
@@ -19,12 +22,19 @@
 (defn server-error []
   (assoc (res/resource-response "/500.html" {:root "public"}) :status 500))
 
+(defn- chart-proxy [path params]
+  (sheets-chart/proxy-sheets-chart path params))
+
+(defn- sheets-proxy [path params]
+  (sheets-chart/proxy-sheets-pass-through path params))
+
 (defroutes resources
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/" [] (app-shell))
+  (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
+  (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
-
 
 ;; Some routes like /, /404 and similar can't have their content-type
 ;; derived automatically, because of that we set it with the middleware below
@@ -44,6 +54,7 @@
 
 (def handler
   (-> resources
+      (wrap-params)
       (wrap-resource "public")
       (wrap-reload {:dirs "site"})
       (wrap-default-content-type)))

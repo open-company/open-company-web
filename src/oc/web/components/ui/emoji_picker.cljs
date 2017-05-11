@@ -28,7 +28,7 @@
     (if (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0)
       (do
         (reset! (::last-active-element s) (.-activeElement js/document))
-        (reset! caret-pos (.saveSelection js/rangy)))
+        (reset! caret-pos (.saveSelection js/rangy js/window)))
       (reset! caret-pos nil))))
 
 (defn replace-with-emoji [caret-pos emoji]
@@ -40,7 +40,7 @@
           shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
           ; new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")
           new-html  (str "<img class=\"emojione emojione-" unicode-str "\" data-unicode=\"" unicode-c "\" title=\":" shortname ":\" />")]
-      (js/pasteHtmlAtCaret new-html (.getSelection js/rangy) false))))
+        (js/pasteHtmlAtCaret new-html (.getSelection js/rangy js/window) false))))
 
 (defn check-focus [s _]
   (let [active-element (googobj/get js/document "activeElement")]
@@ -108,8 +108,8 @@
                                                                :imageType "png"
                                                                :spritePath "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png"}
                                                 :onChange (fn [emoji]
-                                                           (remove-markers s)
                                                            (replace-with-emoji caret-pos emoji)
+                                                           (remove-markers s)
                                                            (reset! visible false)
                                                            (.focus @last-active-element)
                                                            (when add-emoji-cb
