@@ -69,10 +69,10 @@
         show-footer (::show-footer s)
         fixed-show-footer (or @show-footer (not (empty? @v)))]
     [:div.add-comment-box
+      {:class (if fixed-show-footer "expanded" "")}
       [:div.add-comment-internal
         [:textarea.add-comment
           {:value @v
-           :class (if fixed-show-footer "open" "")
            :on-focus #(reset! show-footer true)
            :on-blur #(reset! show-footer false)
            :on-change #(reset! v (.. % -target -value))

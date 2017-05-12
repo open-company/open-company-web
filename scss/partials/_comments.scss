@@ -6,6 +6,8 @@ div.comments {
   margin-left: 20px;
   margin-top: 20px;
   float: right;
+  max-height: 300px;
+  overflow: scroll;
 
   div.comment {
     margin: 10px 0;
@@ -53,6 +55,14 @@ div.comments {
     padding: 0.5rem;
     transition: 230ms;
 
+    &.expanded{
+      div.add-comment-internal {
+        textarea.add-comment {
+          height: 80px;
+        }
+      }
+    }
+
     div.add-comment-internal{
       textarea.add-comment {
         resize: none;
@@ -64,10 +74,6 @@ div.comments {
         height: 30px;
         font-size: 14px;
         transition: 230ms;
-
-        &.open{
-          height: 80px;
-        }
 
         @include placeholder {
           color: rgba(78,90,107,0.6);
