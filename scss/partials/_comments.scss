@@ -1,7 +1,87 @@
+$comment_avatar_size: 23;
+
 div.comments {
   width: 300px;
   padding: 10px;
   margin-left: 20px;
   margin-top: 20px;
   float: right;
+
+  div.comment {
+    margin: 10px 0;
+
+    div.comment-header {
+      div.comment-avatar {
+        width: #{$comment_avatar_size}px;
+        height: #{$comment_avatar_size}px;
+        background-position: center;
+        background-size: #{$comment_avatar_size}px #{$comment_avatar_size}px;
+        border-radius: #{$comment_avatar_size / 2}px;
+      }
+      div.comment-author {
+        margin-left: 20px;
+        font-size: 14px;
+        color: $oc_gray_5;
+        font-weight: 700;
+      }
+
+      div.comment-timestamp {
+        margin-left: 5px;
+        margin-top: 4px;
+        font-size: 11px;
+        color: rgba(78,90,107,0.6);
+      }
+    }
+
+    div.comment-body {
+      font-size: 13px;
+      color: rgba(78,90,107,0.8);
+      font-weight: 300;
+      margin-left: #{$comment-avatar-size + 20}px;
+    }
+
+    div.comment-footer {
+      color: rgba(78,90,107,0.4);
+      font-size: 11px;
+    }
+  }
+
+  div.add-comment-box {
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid rgba(78,90,107,0.3);
+    padding: 0.5rem;
+    transition: 230ms;
+
+    div.add-comment-internal{
+      textarea.add-comment {
+        resize: none;
+        width: 100%;
+        border: none;
+        outline: none;
+        background-color: transparent;
+        color: $oc_gray_5;
+        height: 30px;
+        font-size: 14px;
+        transition: 230ms;
+
+        &.open{
+          height: 80px;
+        }
+
+        @include placeholder {
+          color: rgba(78,90,107,0.6);
+        }
+      }
+
+      div.add-comment-footer {
+        transition: 230ms;
+        div.add-comment-counter {
+          float: right;
+          margin-right: 5px;
+          margin-top: 5px;
+        }
+      }
+    }
+  }
 }
