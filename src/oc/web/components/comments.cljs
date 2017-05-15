@@ -16,7 +16,7 @@
 })
 
 (def comments-data {
-  :entry-slug "1234-1234-1234-1234"
+  :entry-uuid "1234-1234-1234-1234"
   :id "1234"
   :topic-slug "product"
   :body "Body"
@@ -90,9 +90,10 @@
                       rum/static
   [s]
   (let [entry-data (drv/react s :entry-data)
-        entry-comments (:comments comments-data)];(:comments entry-data)]
-    [:div.comments
-      (when (pos? (count entry-comments))
-        (for [c entry-comments]
-         (rum/with-key (comment-row c) (str "entry-" (:created-at entry-data) "comment-" (:comment-id c)))))
-      (add-comment)]))
+        entry-comments (:comments comments-data)] ; (:comments entry-data)]
+    (when (:show-comments entry-data)
+      [:div.comments
+        (when (pos? (count entry-comments))
+          (for [c entry-comments]
+           (rum/with-key (comment-row c) (str "entry-" (:created-at entry-data) "comment-" (:comment-id c)))))
+        (add-comment)])))
