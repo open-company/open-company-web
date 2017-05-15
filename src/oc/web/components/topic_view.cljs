@@ -101,9 +101,9 @@
     (when (om/get-state owner :entries-reload-interval)
       (js/clearInterval (om/get-state owner :entries-reload-interval))))
 
-  (render [_]
+  (render-state [_ {:keys [comments-open?]}]
     (let [topic-kw (keyword (router/current-topic-slug))
-          comment-view-width 320
+          comment-view-width (if (= (:topic-slug (:comments-open data)) topic-kw) 320 0)
           topic-view-width (- (responsive/topic-view-width card-width columns-num) comment-view-width)
           topic-card-width (responsive/calc-update-width columns-num)
           topic-data (get board-data topic-kw)
@@ -180,7 +180,8 @@
                                    :foce-data-editing? foce-data-editing?
                                    :foce-key foce-key
                                    :foce-data foce-data
-                                   :show-editing false}
+                                   :show-editing false
+                                   :comments-open (:comments-open data)}
                                    {:opts {:topic-name (router/current-topic-slug)}})))
               (for [idx (range (count entries))
                     :let [rev (get entries idx)]]
@@ -201,7 +202,8 @@
                                      :foce-key foce-key
                                      :foce-data foce-data
                                      :show-delete-entry-button true
-                                     :show-editing true}
+                                     :show-editing true
+                                     :comments-open (:comments-open data)}
                                      {:opts {:topic-name (router/current-topic-slug)}
                                       :key (str "topic-"
                                             (when foce-key

@@ -233,7 +233,8 @@
                                          :dashboard-sharing (:dashboard-sharing data)
                                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                          :is-dashboard true
-                                         :show-top-menu (:show-top-menu data)}))))
+                                         :show-top-menu (:show-top-menu data)
+                                         :comments-open (:comments-open data)}))))
                       (om/build topics-list
                                   {:loading (:loading data)
                                    :content-loaded (or (:loading board-data) (:loading data))
@@ -255,7 +256,8 @@
                                    :dashboard-sharing (:dashboard-sharing data)
                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                    :is-dashboard true
-                                   :show-top-menu (:show-top-menu data)})))
+                                   :show-top-menu (:show-top-menu data)
+                                   :comments-open (:comments-open data)})))
                   (when (and (not (:read-only org-data))
                              (not (:show-add-topic data))
                              (not (router/current-topic-slug))
