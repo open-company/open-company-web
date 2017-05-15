@@ -196,9 +196,7 @@
                      is-topic-view
                      (not foce-active))
             (dom/button {:class "top-right-button topic-comments-button btn-reset"
-                         :on-click #(if (nil? (:comments-open data))
-                                      (dis/dispatch! [:comments-show topic-kw (:created-at topic-data)])
-                                      (dis/dispatch! [:comments-show nil nil]))}
+                         :on-click #(dis/dispatch! [:comments-show topic-kw (:created-at topic-data)])}
               (dom/i {:class "fa fa-comments-o"
                       :title "Comments"
                       :data-toggle "tooltip"

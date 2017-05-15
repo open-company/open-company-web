@@ -923,6 +923,7 @@
 
 (defmethod dispatcher/action :comments-show
   [db [_ topic-slug entry-uuid]]
-  (if (nil? topic-slug)
+  (if (and (= (:topic-slug (:comments-open db)) topic-slug)
+           (= (:entry-uuid (:comments-open db)) entry-uuid))
     (dissoc db :comments-open)
     (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
