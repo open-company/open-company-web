@@ -920,3 +920,9 @@
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
   (assoc db :edit-user-profile-failed true))
+
+(defmethod dispatcher/action :comments-show
+  [db [_ topic-slug entry-uuid]]
+  (if (nil? topic-slug)
+    (dissoc db :comments-open)
+    (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
