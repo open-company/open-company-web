@@ -191,6 +191,21 @@
                       :data-placement "top"})))
           (when (and show-editing
                      (not is-stakeholder-update)
+                     (not is-dashboard)
+                     (not is-mobile?)
+                     is-topic-view
+                     (not foce-active))
+            (dom/button {:class "top-right-button topic-comments-button btn-reset"
+                         :on-click #(if (nil? (:comments-open data))
+                                      (dis/dispatch! [:comments-show topic-kw (:created-at topic-data)])
+                                      (dis/dispatch! [:comments-show nil nil]))}
+              (dom/i {:class "fa fa-comments-o"
+                      :title "Comments"
+                      :data-toggle "tooltip"
+                      :data-container "body"
+                      :data-placement "top"})))
+          (when (and show-editing
+                     (not is-stakeholder-update)
                      is-dashboard
                      (not dashboard-sharing)
                      (not is-mobile?)
@@ -395,6 +410,7 @@
                                     :is-topic-view is-topic-view
                                     :show-editing show-editing
                                     :column column
-                                    :show-top-menu (:show-top-menu data)}
+                                    :show-top-menu (:show-top-menu data)
+                                    :comments-open (:comments-open data)}
                                    {:opts options
                                     :key (str "topic-" topic)}))))))
