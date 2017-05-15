@@ -50,8 +50,8 @@
 (defn topic-entries-key [org-slug board-slug topic-slug]
   (vec (conj (entries-key org-slug board-slug) (keyword topic-slug))))
 
-(defn entry-key [org-slug board-slug topic-slug entry-slug]
-  (vec (conj (topic-entries-key org-slug board-slug topic-slug) (keyword entry-slug))))
+(defn entry-key [org-slug board-slug topic-slug entry-uuid]
+  (vec (conj (topic-entries-key org-slug board-slug topic-slug) entry-uuid)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -73,7 +73,7 @@
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :topic-slug          [[:route] (fn [route] (:topic route))]
-   :entry-slug          [[:route] (fn [route] (:entry route))]
+   :entry-uuid          [[:route] (fn [route] (:entry route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :updates-list        [[:base :org-slug]
                           (fn [base org-slug]
@@ -126,10 +126,12 @@
                           (fn [base org-slug board-slug topic-slug]
                             (when (and org-slug board-slug topic-slug)
                               (get-in base (board-topic-key org-slug board-slug topic-slug))))]
-   :entry-data          [[:topic-data]
-                          (fn [base org-slug board-slug topic-slug entry-slug]
-                            (when (and org-slug board-slug topic-slug entry-slug)
-                              (get-in base (entry-key org-slug board-slug topic-slug entry-slug))))]
+   :entry-data          [[:base :org-slug :board-slug :topic-slug :entry-uuid]
+                          (fn [base org-slug board-slug topic-slug entry-uuid]
+                            (when (and org-slug board-slug topic-slug)
+                              (let [entry-data (get-in base (board-topic-key org-slug board-slug topic-slug))
+                                    comments-open (:comments-open base)]
+                                (assoc entry-data :show-comments (= (:topic-slug comments-open) (keyword topic-slug))))))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
@@ -222,8 +224,8 @@
   (:force-edit-topic @app-state))
 
 (defn entry
-  ([org-slug board-slug topic-slug entry-slug] (entry org-slug board-slug topic-slug entry-slug @app-state))
-  ([org-slug board-slug topic-slug entry-slug data] (get-in data (entry-key org-slug board-slug topic-slug entry-slug))))
+  ([org-slug board-slug topic-slug entry-uuid] (entry org-slug board-slug topic-slug entry-uuid @app-state))
+  ([org-slug board-slug topic-slug entry-uuid data] (get-in data (entry-key org-slug board-slug topic-slug entry-uuid))))
 
 (defn entries-data
   ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))
