@@ -92,7 +92,6 @@
   [s]
   (let [comments-data (drv/react s :comments-data)
         entry-comments (:comments comments-data)]
-    (js/console.log "comments/render" comments-data)
     (if (:loading comments-data)
       [:div.comments
         (small-loading)]
