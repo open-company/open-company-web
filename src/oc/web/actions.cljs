@@ -927,3 +927,17 @@
            (= (:entry-uuid (:comments-open db)) entry-uuid))
     (dissoc db :comments-open)
     (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
+
+(defmethod dispatcher/action :comments-get
+  [db [_ entry-uuid]]
+  (js/console.log "comments-get" entry-uuid)
+  (api/get-comments entry-uuid)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (router/current-topic-slug)]
+    (assoc-in db (conj (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid) :loading) true)))
+
+(defmethod dispatcher/action :comments-get/finish
+  [db [_ {:keys [success error body entry-uuid]}]]
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)]
+    (assoc-in db comments-key body)))
