@@ -13,6 +13,9 @@
 ;; Pay location
 (def pay-server-domain "http://localhost:3004")
 
+;; Interaction location
+(def interaction-server-domain "http://localhost:3002")
+
 ;; Web location
 (def web-server "localhost:3559")
 
