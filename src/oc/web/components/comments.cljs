@@ -1,7 +1,8 @@
 (ns oc.web.components.comments
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (def comment-author-me {
   :name "Iacopo Carraro"
@@ -85,15 +86,19 @@
           [:div.add-comment-counter
             (str (- 300 (count @v)))]]]]))
 
-(rum/defcs comments < (drv/drv :entry-data)
+(rum/defcs comments < (drv/drv :comments-data)
                       rum/reactive
                       rum/static
   [s]
-  (let [entry-data (drv/react s :entry-data)
-        entry-comments (:comments comments-data)] ; (:comments entry-data)]
-    (when (:show-comments entry-data)
+  (let [comments-data (drv/react s :comments-data)
+        entry-comments (:comments comments-data)]
+    (js/console.log "comments/render" comments-data)
+    (if (:loading comments-data)
       [:div.comments
-        (when (pos? (count entry-comments))
-          (for [c entry-comments]
-           (rum/with-key (comment-row c) (str "entry-" (:created-at entry-data) "comment-" (:comment-id c)))))
-        (add-comment)])))
+        (small-loading)]
+      (when (:show-comments comments-data)
+        [:div.comments
+          (when (pos? (count entry-comments))
+            (for [c entry-comments]
+              (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "comment-" (:comment-id c)))))
+          (add-comment)]))))
