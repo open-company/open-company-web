@@ -254,9 +254,6 @@
     (entry org-slug board-slug topic-slug entry-uuid @app-state))
   ([org-slug board-slug topic-slug entry-uuid data]
     (let [entries-data (get-in data (topic-entries-key org-slug board-slug topic-slug))]
-      (js/console.log "dispatcher/entry" org-slug board-slug topic-slug entry-uuid "->" (topic-entries-key org-slug board-slug topic-slug))
-      (js/console.log "entries-data" entries-data)
-      (js/console.log "filter" (first (filter #(= (:uuid %) entry-uuid) entries-data)))
       (first (filter #(= (:uuid %) entry-uuid) entries-data)))))
 
 (defn comments-data
