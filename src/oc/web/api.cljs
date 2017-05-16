@@ -22,6 +22,8 @@
 
 (def ^:private pay-endpoint ls/pay-server-domain)
 
+(def ^:private interaction-endpoint ls/interaction-server-domain)
+
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
 
@@ -142,6 +144,9 @@
 
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
+
+(def ^:private interaction-get (partial req interaction-endpoint http/get))
+(def ^:private interaction-post (partial req interaction-endpoint http/post))
 
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -788,3 +793,16 @@
             (if success
               (router/nav! (oc-urls/org (router/current-org-slug)))
               (.reload (.-location js/window)))))))))
+
+(defn get-comments [entry-uuid]
+  (when entry-uuid
+    (let [entry-data (dispatcher/entry entry-uuid)
+          comments-link (utils/link-for (:links entry-data) "comments")
+          comments-href (str "/" (s/join "/" (subvec (s/split (:href comments-link) #"/") 3)))]
+      (interaction-get comments-href
+        {:headers (headers-for-link comments-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:comments-get/finish {:success success
+                                                       :error (when-not success body)
+                                                       :body (json->cljs body)
+                                                       :entry-uuid entry-uuid}]))))))
