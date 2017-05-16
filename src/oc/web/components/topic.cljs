@@ -84,6 +84,11 @@
                                       column
                                       show-top-menu] :as data} owner options]
 
+  (did-mount [_]
+    (when (and is-topic-view
+               (not is-mobile?))
+      (dis/dispatch! [:comments-get (:uuid topic-data)])))
+
   (render [_]
     (let [topic-kw          (keyword topic)
           chart-opts          {:chart-size {:width 230}
@@ -102,7 +107,15 @@
                                  (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
                                  topic-body)
           showing-menu        (= show-top-menu topic)
-          attachments         (:attachments topic-data)]
+          attachments         (:attachments topic-data)
+          comments-link       (utils/link-for (:links topic-data) "comments")
+          should-show-comments-button (and comments-link
+                                           show-editing
+                                           (not is-stakeholder-update)
+                                           (not is-dashboard)
+                                           (not is-mobile?)
+                                           is-topic-view
+                                           (not foce-active))]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name topic))
                     :ref "topic-internal"}
@@ -138,7 +151,8 @@
                            :on-click #(assign-topic-click)}
                 (dom/i {:class "fa fa-user"}) " Assign")))
           (chart topic-data (- card-width (* 16 2)))
-          (dom/div {:class "topic-title"}
+          (dom/div {:class (utils/class-set {:topic-title true
+                                             :has-comments should-show-comments-button})}
 
             (when-not (and is-topic-view
                        is-mobile?)
@@ -189,19 +203,15 @@
                       :data-toggle "tooltip"
                       :data-container "body"
                       :data-placement "top"})))
-          (when (and show-editing
-                     (not is-stakeholder-update)
-                     (not is-dashboard)
-                     (not is-mobile?)
-                     is-topic-view
-                     (not foce-active))
+          (when should-show-comments-button
             (dom/button {:class "top-right-button topic-comments-button btn-reset"
-                         :on-click #(dis/dispatch! [:comments-show topic-kw (:created-at topic-data)])}
-              (dom/i {:class "fa fa-comments-o"
-                      :title "Comments"
-                      :data-toggle "tooltip"
-                      :data-container "body"
-                      :data-placement "top"})))
+                         :on-click #(dis/dispatch! [:comments-show topic-kw (:created-at topic-data)])
+                         :title "Comments"
+                         :data-toggle "tooltip"
+                         :data-container "body"
+                         :data-placement "top"}
+              (dom/i {:class "fa fa-comments-o"})
+              (str "(" (:count comments-link) ")")))
           (when (and show-editing
                      (not is-stakeholder-update)
                      is-dashboard
