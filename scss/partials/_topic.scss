@@ -174,7 +174,7 @@ div.topic {
 
     button.top-right-button {
       width: 30px;
-      height: 20px;
+      height: 25px;
       float: right;
       opacity: 0;
       transition: 230ms;
@@ -185,6 +185,14 @@ div.topic {
 
       &:hover {
         color: rgba(78,90,107,1);
+      }
+
+      &.topic-comments-button {
+        width: 67px;
+        margin-right: 5px;
+        i.fa {
+          margin-right: 5px;
+        }
       }
     }
 
@@ -321,6 +329,10 @@ div.topic {
         float: left;
         @include big_web(){
           width: 85%;
+
+          &.has-comments {
+            width: 75%;
+          }
         }
 
         @include mobile(){
