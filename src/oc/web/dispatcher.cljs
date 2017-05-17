@@ -328,6 +328,9 @@
 (defn print-entries-data []
   (js/console.log (get-in @app-state (entries-key (router/current-org-slug) (router/current-board-slug)))))
 
+(defn print-topic-entries-data []
+  (js/console.log (get-in @app-state (topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -336,3 +339,4 @@
 (set! (.-OCWebPrintUpdateData js/window) print-update-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintEntriesData js/window) print-entries-data)
+(set! (.-OCWebPrintTopicEntriesData js/window) print-topic-entries-data)

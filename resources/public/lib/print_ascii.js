@@ -7,6 +7,7 @@ OCWebPrintTeamData(): to print the current team data,
 OCWebPrintTeamRoster(): to print the current team roster of users,
 OCWebPrintBoardData(): to print the current board data,
 OCWebPrintEntriesData(): to print all the entries loaded,
+OCWebPrintTopicEntriesData(): to print all the entries of the currently selected topic,
 OCWebPrintJWTContents(): to print the content of the JWT.
 OCWebHelp(): print this help,
 OCWebPrintAsciiArt(): print beautiful ASCII art,
