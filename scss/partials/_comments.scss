@@ -35,11 +35,11 @@ div.comments {
       }
     }
 
-    div.comment-body {
+    p.comment-body {
       font-size: 13px;
       color: rgba(78,90,107,0.8);
       font-weight: 300;
-      margin-left: #{$comment-avatar-size + 20}px;
+      margin: 0 0 0 #{$comment-avatar-size + 20}px;
     }
 
     div.comment-footer {

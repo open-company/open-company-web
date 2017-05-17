@@ -16,7 +16,7 @@
           (:name author)]
         [:div.comment-timestamp.left
           (utils/time-since (:created-at c))]]
-      [:div.comment-body.group
+      [:p.comment-body.group
         (:body c)]
       [:div.comment-footer.group]]))
 
@@ -48,9 +48,21 @@
           [:div.add-comment-counter
             (str (- 300 (count @v)))]]]]))
 
+(defn scroll-to-bottom [s]
+  (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
+    (let [component (:rum/react-component s)
+          dom-node  (js/ReactDOM.findDOMNode component)]
+      (set! (.-scrollTop dom-node) (.-scrollHeight dom-node)))))
+
 (rum/defcs comments < (drv/drv :comments-data)
                       rum/reactive
                       rum/static
+                      {:did-mount (fn [s]
+                                    (utils/after 100 #(scroll-to-bottom s))
+                                  s)
+                       :did-remount (fn [_ s]
+                                      (utils/after 100 #(scroll-to-bottom s))
+                                    s)}
   [s]
   (let [comments-data (drv/react s :comments-data)
         entry-comments (:comments comments-data)]
