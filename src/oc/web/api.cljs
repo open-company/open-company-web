@@ -815,10 +815,11 @@
 (defn add-comment [entry-uuid comment-body]
   (when (and entry-uuid comment-body)
     (let [entry-data (dispatcher/entry entry-uuid)
-          add-comment-link (utils/link-for (:links entry-data) "comment" "POST")]
+          add-comment-link (utils/link-for (:links entry-data) "comment" "POST")
+          json-data (cljs->json {:body comment-body})]
       (interaction-post (relative-href (:href add-comment-link))
         {:headers (headers-for-link add-comment-link)
-         :body comment-body}
+         :json-params json-data}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:comment-add/finish {:success success
                                                       :error (when-not success body)
