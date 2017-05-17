@@ -139,7 +139,8 @@
                                     comments-data (get-in base (comments-key org-slug board-slug topic-slug (:entry-uuid comments-open)))
                                     should-show-comments (and (= (:topic-slug comments-open) (keyword topic-slug))
                                                               (= (:entry-uuid comments-open) entry-uuid))]
-                                (assoc comments-data :show-comments comments-open))))]
+                                {:comments comments-data
+                                 :show-comments comments-open})))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
