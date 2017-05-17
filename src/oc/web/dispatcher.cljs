@@ -48,13 +48,10 @@
   [(keyword org-slug) :boards (keyword board-slug) :entries-data])
 
 (defn topic-entries-key [org-slug board-slug topic-slug]
-  (vec (conj (entries-key org-slug board-slug) (keyword topic-slug))))
-
-(defn entry-key [org-slug board-slug topic-slug entry-uuid]
-  (vec (conj (topic-entries-key org-slug board-slug topic-slug) entry-uuid :entry-data)))
+  (vec (conj (entries-key org-slug board-slug) (keyword topic-slug) :entries)))
 
 (defn comments-key [org-slug board-slug topic-slug entry-uuid]
-  (vec (conj (topic-entries-key org-slug board-slug topic-slug) entry-uuid :comments-data)))
+ (vec (conj (entries-key org-slug board-slug) (keyword topic-slug) entry-uuid :comments-data)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -137,9 +134,9 @@
                                 (assoc entry-data :show-comments (= (:topic-slug comments-open) (keyword topic-slug))))))]
    :comments-data       [[:base :org-slug :board-slug :topic-slug :entry-uuid]
                           (fn [base org-slug board-slug topic-slug entry-uuid]
-                            (when (and org-slug board-slug topic-slug entry-uuid)
-                              (let [comments-data (get-in base (comments-key org-slug board-slug topic-slug entry-uuid))
-                                    comments-open (:comments-open base)
+                            (when (and org-slug board-slug topic-slug)
+                              (let [comments-open (:comments-open base)
+                                    comments-data (get-in base (comments-key org-slug board-slug topic-slug (:entry-uuid comments-open)))
                                     should-show-comments (and (= (:topic-slug comments-open) (keyword topic-slug))
                                                               (= (:entry-uuid comments-open) entry-uuid))]
                                 (assoc comments-data :show-comments comments-open))))]
