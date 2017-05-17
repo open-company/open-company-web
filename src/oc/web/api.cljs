@@ -25,7 +25,7 @@
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
 (defn- relative-href [href]
-  (if (s/starts-with? href "http")
+  (if (and href (s/starts-with? href "http"))
     (str "/" (s/join "/" (subvec (s/split href #"/") 3)))
     href))
 
@@ -803,10 +803,24 @@
   (when entry-uuid
     (let [entry-data (dispatcher/entry entry-uuid)
           comments-link (utils/link-for (:links entry-data) "comments")]
-      (interaction-get (relative-href (:href comments-link))
-        {:headers (headers-for-link comments-link)}
+      (when comments-link
+        (interaction-get (relative-href (:href comments-link))
+          {:headers (headers-for-link comments-link)}
+          (fn [{:keys [status success body]}]
+            (dispatcher/dispatch! [:comments-get/finish {:success success
+                                                         :error (when-not success body)
+                                                         :body (if (not (empty? body)) (json->cljs body) nil)
+                                                         :entry-uuid entry-uuid}])))))))
+
+(defn add-comment [entry-uuid comment-body]
+  (when (and entry-uuid comment-body)
+    (let [entry-data (dispatcher/entry entry-uuid)
+          add-comment-link (utils/link-for (:links entry-data) "comment" "POST")]
+      (interaction-post (relative-href (:href add-comment-link))
+        {:headers (headers-for-link add-comment-link)
+         :body comment-body}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:comments-get/finish {:success success
-                                                       :error (when-not success body)
-                                                       :body (json->cljs body)
-                                                       :entry-uuid entry-uuid}]))))))
+          (dispatcher/dispatch! [:comment-add/finish {:success success
+                                                      :error (when-not success body)
+                                                      :body (if (not (empty? body)) (json->cljs body) nil)
+                                                      :entry-uuid entry-uuid}]))))))
