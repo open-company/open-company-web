@@ -847,7 +847,7 @@
     :viewer))
 
 (defn index-of
-  "Given a collection and a function return the index that match make the function truely."
+  "Given a collection and a function return the index that make the function truely."
   [s f]
   (loop [idx 0 items s]
     (cond
