@@ -205,7 +205,7 @@
                       :data-placement "top"})))
           (when should-show-comments-button
             (dom/button {:class "top-right-button topic-comments-button btn-reset"
-                         :on-click #(dis/dispatch! [:comments-show topic-kw (:created-at topic-data)])
+                         :on-click #(dis/dispatch! [:comments-show topic-kw (:uuid topic-data)])
                          :title "Comments"
                          :data-toggle "tooltip"
                          :data-container "body"
