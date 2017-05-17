@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.dispatcher :as dis]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (def comment-author-me {
@@ -82,7 +83,11 @@
           ; {:style {:opacity (if fixed-show-footer 1 0)}}
           {:style {:display (if fixed-show-footer "block" "none")}}
           [:div.right
-            [:button.btn-reset.btn-solid "Post"]]
+            [:button.btn-reset.btn-solid
+              {:on-click #(do
+                            (dis/dispatch! [:comment-add @v])
+                            (reset! v ""))}
+              "Post"]]
           [:div.add-comment-counter
             (str (- 300 (count @v)))]]]]))
 
