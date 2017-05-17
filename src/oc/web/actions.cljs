@@ -942,8 +942,9 @@
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body entry-uuid]}]]
-  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)]
-    (assoc-in db comments-key (:items (:collection body)))))
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)
+        sorted-comments (sort #(compare (:created-at %1) (:created-at %2)) (:items (:collection body)))]
+    (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
   [db [_ comment-body]]
@@ -952,4 +953,12 @@
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [entry-uuid]}]]
-  (get-comments db entry-uuid))
+  (let [next-db (get-comments db entry-uuid)
+        entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug))
+        entries-data (get-in next-db entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)
+        link-idx (utils/index-of (:links entry-data) #(= (:rel %) "comments"))
+        current-count-link (get (:links entry-data) link-idx)
+        next-entries-data (update-in entries-data [entry-idx :links link-idx :count] inc)]
+    (assoc-in next-db entries-key next-entries-data)))
