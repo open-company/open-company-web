@@ -185,6 +185,15 @@
                            :data-toggle "tooltip"
                            :title "This topic has prior history"}
                 (dom/i {:class "fa fa-history"}))))
+          (when should-show-comments-button
+            (dom/button {:class "top-right-button topic-comments-button btn-reset"
+                         :on-click #(dis/dispatch! [:comments-show topic-kw (:uuid topic-data)])
+                         :title "Comments"
+                         :data-toggle "tooltip"
+                         :data-container "body"
+                         :data-placement "top"}
+              (dom/i {:class "fa fa-comments-o"})
+              (str "(" (:count comments-link) ")")))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (not is-dashboard)
@@ -203,15 +212,6 @@
                       :data-toggle "tooltip"
                       :data-container "body"
                       :data-placement "top"})))
-          (when should-show-comments-button
-            (dom/button {:class "top-right-button topic-comments-button btn-reset"
-                         :on-click #(dis/dispatch! [:comments-show topic-kw (:uuid topic-data)])
-                         :title "Comments"
-                         :data-toggle "tooltip"
-                         :data-container "body"
-                         :data-placement "top"}
-              (dom/i {:class "fa fa-comments-o"})
-              (str "(" (:count comments-link) ")")))
           (when (and show-editing
                      (not is-stakeholder-update)
                      is-dashboard
