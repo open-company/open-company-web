@@ -194,7 +194,7 @@
                          :data-placement "top"}
               (dom/i {:class "fa fa-comments-o"})
               (when (pos? (:count comments-link))
-                (dom/span {:class "counter"} "(" (:count comments-link) ")"))))
+                (dom/span {:class "counter"} (str "(" (:count comments-link) ")")))))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (not is-dashboard)
