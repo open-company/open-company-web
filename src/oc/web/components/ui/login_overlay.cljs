@@ -402,7 +402,7 @@
                                (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 5))
                  :on-click #(do
                               (utils/event-stop %)
-                              (dis/dispatch! [:collect-name-pswd]))}
+                              (dis/dispatch! [:name-pswd-collect]))}
                 "LET ME IN"]]]]]]])
 
 (rum/defcs collect-password < rum/reactive
