@@ -48,32 +48,47 @@
           [:div.add-comment-counter
             (str (- 300 (count @v)))]]]]))
 
-(defn scroll-to-bottom [s]
+(defn get-dom-node [s]
   (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
     (let [component (:rum/react-component s)
           dom-node  (js/ReactDOM.findDOMNode component)]
-      ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
       (when (and dom-node (.-parentElement dom-node))
-        (set! (.-scrollTop dom-node) (.-scrollHeight dom-node))))))
+        dom-node))))
+
+(defn scroll-to-bottom [s]
+  (when-let [dom-node (get-dom-node s)]
+    ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
+    (when (and dom-node (.-parentElement dom-node))
+      (set! (.-scrollTop dom-node) (.-scrollHeight dom-node)))))
 
 (rum/defcs comments < (drv/drv :comments-data)
                       rum/reactive
                       rum/static
+                      (rum/local false ::needs-gradient)
                       {:did-mount (fn [s]
                                     (utils/after 100 #(scroll-to-bottom s))
                                   s)
+                       :before-render (fn [s]
+                                        (when-let [dom-node (get-dom-node s)]
+                                          ;; Show the gradient at the top only if the contains has some content to scroll
+                                          (reset! (::needs-gradient s) (>= (.-scrollHeight dom-node) 300)))
+                                        s)
                        :did-remount (fn [_ s]
                                       (utils/after 100 #(scroll-to-bottom s))
                                     s)}
   [s]
   (let [comments-data (drv/react s :comments-data)
-        entry-comments (:comments comments-data)]
+        entry-comments (:comments comments-data)
+        needs-gradient @(::needs-gradient s)]
     (if (:loading comments-data)
       [:div.comments
         (small-loading)]
       (when (:show-comments comments-data)
         [:div.comments
-          (when (pos? (count entry-comments))
-            (for [c entry-comments]
-              (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
-          (add-comment)]))))
+          (when needs-gradient
+            [:div.top-gradient])
+          [:div.comments-internal
+            (when (pos? (count entry-comments))
+              (for [c entry-comments]
+                (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
+            (add-comment)]]))))
