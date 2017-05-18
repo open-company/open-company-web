@@ -52,7 +52,9 @@
   (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
     (let [component (:rum/react-component s)
           dom-node  (js/ReactDOM.findDOMNode component)]
-      (set! (.-scrollTop dom-node) (.-scrollHeight dom-node)))))
+      ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
+      (when (and dom-node (.-parentElement dom-node))
+        (set! (.-scrollTop dom-node) (.-scrollHeight dom-node))))))
 
 (rum/defcs comments < (drv/drv :comments-data)
                       rum/reactive
