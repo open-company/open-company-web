@@ -700,7 +700,6 @@
   (let [fixed-entries (map #(utils/fix-topic % topic) (:items (:collection entries)))
         sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))
         sorted-fixed-entries (vec (map #(merge % (reactions)) (vec (sort sort-pred fixed-entries))))]
-    (js/console.log "action/:entries-loaded" sorted-fixed-entries)
     (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
 (defmethod dispatcher/action :add-topic-show
