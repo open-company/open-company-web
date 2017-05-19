@@ -685,11 +685,22 @@
   ; Reset flag to reload su list when needed
   (dissoc db :updates-list-loaded))
 
+(defn reactions []
+  (let [reacted-1 (> (int (rand 10)) 8)
+        reacted-2 (if reacted-1 false (> (int (rand 10)) 8))
+        reacted-3 (if (or reacted-1 reacted-2) false (> (int (rand 10)) 8))]
+  {:reactions [
+    {:reaction "😂" :reacted reacted-1 :count (int (rand 15)) :links [{:rel "react" :method (if reacted-1 "DELETE" "PUT") :href ".../😂/on"}]}
+    {:reaction "🤔" :reacted reacted-2 :count (int (rand 15)) :links [{:rel "react" :method (if reacted-2 "DELETE" "PUT") :href ".../🤔/on"}]}
+    {:reaction "👍" :reacted reacted-3 :count (int (rand 15)) :links [{:rel "react" :method (if reacted-3 "DELETE" "PUT") :href ".../👍/on"}]}
+  ]}))
+
 (defmethod dispatcher/action :entries-loaded
   [db [_ {:keys [topic entries]}]]
   (let [fixed-entries (map #(utils/fix-topic % topic) (:items (:collection entries)))
         sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))
-        sorted-fixed-entries (vec (sort sort-pred fixed-entries))]
+        sorted-fixed-entries (vec (map #(merge % (reactions)) (vec (sort sort-pred fixed-entries))))]
+    (js/console.log "action/:entries-loaded" sorted-fixed-entries)
     (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
 (defmethod dispatcher/action :add-topic-show
