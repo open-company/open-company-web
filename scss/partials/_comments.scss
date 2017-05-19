@@ -30,6 +30,7 @@ div.comments {
     overflow-y: auto;
     max-height: 300px;
     padding: 10px;
+    transition: 230ms;
 
     div.comment {
       margin: 10px 0;

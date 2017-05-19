@@ -1,4 +1,6 @@
 (ns oc.web.components.comments
+  (:require-macros [if-let.core :refer (when-let*)]
+                   [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
@@ -23,7 +25,7 @@
 (rum/defcs add-comment < (rum/local "" ::v)
                          (rum/local false ::show-footer)
                          rum/static
-  [s]
+  [s did-expand-cb]
   (let [v (::v s)
         show-footer (::show-footer s)
         fixed-show-footer (or @show-footer (not (empty? @v)))]
@@ -32,7 +34,7 @@
       [:div.add-comment-internal
         [:textarea.add-comment
           {:value @v
-           :on-focus #(reset! show-footer true)
+           :on-focus (fn [_] (reset! show-footer true) (when (fn? did-expand-cb) (did-expand-cb)))
            :on-blur #(reset! show-footer false)
            :on-change #(reset! v (.. % -target -value))
            :placeholder "Add a comment..."}]
@@ -50,32 +52,31 @@
 
 (defn get-dom-node [s]
   (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
-    (let [component (:rum/react-component s)
-          dom-node  (js/ReactDOM.findDOMNode component)]
-      (when (and dom-node (.-parentElement dom-node))
-        dom-node))))
+    (let [component (:rum/react-component s)]
+      (js/ReactDOM.findDOMNode component))))
 
 (defn scroll-to-bottom [s]
-  (when-let [dom-node (get-dom-node s)]
+  (when-let* [dom-node (get-dom-node s)
+              comments-internal (sel1 dom-node :div.comments-internal)]
     ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
-    (when (and dom-node (.-parentElement dom-node))
-      (set! (.-scrollTop dom-node) (.-scrollHeight dom-node)))))
+    (when comments-internal
+      (set! (.-scrollTop comments-internal) (.-scrollHeight comments-internal)))))
 
 (rum/defcs comments < (drv/drv :comments-data)
                       rum/reactive
                       rum/static
                       (rum/local false ::needs-gradient)
-                      {:did-mount (fn [s]
-                                    (utils/after 100 #(scroll-to-bottom s))
-                                  s)
-                       :before-render (fn [s]
-                                        (when-let [dom-node (get-dom-node s)]
-                                          ;; Show the gradient at the top only if the contains has some content to scroll
-                                          (reset! (::needs-gradient s) (>= (.-scrollHeight dom-node) 300)))
-                                        s)
-                       :did-remount (fn [_ s]
-                                      (utils/after 100 #(scroll-to-bottom s))
-                                    s)}
+                      {:after-render (fn [s]
+                                       (when-let* [dom-node (get-dom-node s)
+                                                   comments-internal (sel1 dom-node :div.comments-internal)
+                                                   next-needs-gradient (>= (.-scrollHeight comments-internal) 300)]
+                                         ;; Show the gradient at the top only if there are at least 5 comments
+                                         ;; or the container has some scroll
+                                         (when (not= @(::needs-gradient s) next-needs-gradient)
+                                           (reset! (::needs-gradient s) next-needs-gradient)))
+                                       ;; recall scroll to bottom if needed
+                                       (scroll-to-bottom s)
+                                       s)}
   [s]
   (let [comments-data (drv/react s :comments-data)
         entry-comments (:comments comments-data)
@@ -91,4 +92,4 @@
             (when (pos? (count entry-comments))
               (for [c entry-comments]
                 (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
-            (add-comment)]]))))
+            (add-comment (fn [] (utils/after 200 #(scroll-to-bottom s))))]]))))
