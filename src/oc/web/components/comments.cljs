@@ -68,12 +68,12 @@
                       (rum/local false ::needs-gradient)
                       {:after-render (fn [s]
                                        (when-let* [dom-node (get-dom-node s)
-                                                   comments-internal (sel1 dom-node :div.comments-internal)
-                                                   next-needs-gradient (>= (.-scrollHeight comments-internal) 300)]
-                                         ;; Show the gradient at the top only if there are at least 5 comments
-                                         ;; or the container has some scroll
-                                         (when (not= @(::needs-gradient s) next-needs-gradient)
-                                           (reset! (::needs-gradient s) next-needs-gradient)))
+                                                   comments-internal (sel1 dom-node :div.comments-internal)]
+                                         (let [next-needs-gradient (> (.-scrollHeight comments-internal) 300)]
+                                           ;; Show the gradient at the top only if there are at least 5 comments
+                                           ;; or the container has some scroll
+                                           (when (not= @(::needs-gradient s) next-needs-gradient)
+                                             (reset! (::needs-gradient s) next-needs-gradient))))
                                        ;; recall scroll to bottom if needed
                                        (scroll-to-bottom s)
                                        s)}
