@@ -11,7 +11,7 @@
               span-reaction (sel1 target :span.reaction)]
     (doseq [i (range 8)]
       (let [cloned-el (.cloneNode span-reaction true)
-            translate-y {:transform ["translateY(0px)" "translateY(-120px)"]
+            translate-y {:transform ["translateY(0px)" "translateY(-80px)"]
                          :opacity [1 0]}
             v (+ 7 (* 3 (int (rand 4))))]
         (set! (.-opacity (.-style cloned-el)) 0)
@@ -19,7 +19,7 @@
         (set! (.-left (.-style cloned-el)) (str v "px"))
         (set! (.-top (.-style cloned-el)) "2px")
         (.appendChild (.-parentElement span-reaction) cloned-el)
-        (.animate cloned-el (clj->js translate-y) (clj->js {:duration 600 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))))))
+        (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))))))
 
 (rum/defcs reactions
   [s topic-slug entry-uuid reactions-data]
