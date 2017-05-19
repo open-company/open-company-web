@@ -133,7 +133,7 @@
             (dom/div {:class "topic-view-internal loading group"}
               (om/build loading {:loading true}))
             (dom/div {:class "topic-view-internal"
-                      :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str topic-card-width "px"))}}
+                      :style {:width (if (responsive/is-tablet-or-mobile?) "auto" (str (- topic-card-width responsive/topic-total-x-padding) "px"))}}
               (when (and (not (:read-only board-data))
                          (not (responsive/is-tablet-or-mobile?)))
                 (dom/div {:class (str "fake-textarea group " (when is-another-foce "disabled"))}
