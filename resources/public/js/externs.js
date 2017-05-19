@@ -68,6 +68,7 @@ var OCWebConfigLogLevel = function(){};
 var OCWebPrintUpdatesListData = function(){};
 var OCWebPrintUpdateData = function(){};
 var OCWebPrintRouterPath = function(){};
+var OCWebPrintTopicEntriesData = function(){};
 // Filestack
 var filestack = {};
 filestack.init = function(){};

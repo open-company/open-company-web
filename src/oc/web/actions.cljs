@@ -920,3 +920,45 @@
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
   (assoc db :edit-user-profile-failed true))
+
+(defmethod dispatcher/action :comments-show
+  [db [_ topic-slug entry-uuid]]
+  (if (and (= (:topic-slug (:comments-open db)) topic-slug)
+           (= (:entry-uuid (:comments-open db)) entry-uuid))
+    (dissoc db :comments-open)
+    (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
+
+(defn get-comments [db entry-uuid]
+  (api/get-comments entry-uuid)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (router/current-topic-slug)
+        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
+    (assoc-in db comments-key {:loading true})))
+
+(defmethod dispatcher/action :comments-get
+  [db [_ entry-uuid]]
+  (get-comments db entry-uuid))
+
+(defmethod dispatcher/action :comments-get/finish
+  [db [_ {:keys [success error body entry-uuid]}]]
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)
+        sorted-comments (sort #(compare (:created-at %1) (:created-at %2)) (:items (:collection body)))]
+    (assoc-in db comments-key sorted-comments)))
+
+(defmethod dispatcher/action :comment-add
+  [db [_ comment-body]]
+  (api/add-comment (:entry-uuid (:comments-open db)) comment-body)
+  db)
+
+(defmethod dispatcher/action :comment-add/finish
+  [db [_ {:keys [entry-uuid]}]]
+  (let [next-db (get-comments db entry-uuid)
+        entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug))
+        entries-data (get-in next-db entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)
+        link-idx (utils/index-of (:links entry-data) #(= (:rel %) "comments"))
+        current-count-link (get (:links entry-data) link-idx)
+        next-entries-data (update-in entries-data [entry-idx :links link-idx :count] inc)]
+    (assoc-in next-db entries-key next-entries-data)))

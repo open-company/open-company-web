@@ -22,6 +22,13 @@
 
 (def ^:private pay-endpoint ls/pay-server-domain)
 
+(def ^:private interaction-endpoint ls/interaction-server-domain)
+
+(defn- relative-href [href]
+  (if (and href (s/starts-with? href "http"))
+    (str "/" (s/join "/" (subvec (s/split href #"/") 3)))
+    href))
+
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
 
@@ -59,7 +66,7 @@
 
 (defn refresh-jwt [refresh-link]
   (let [refresh-url (if (map? refresh-link)
-                      (str ls/auth-server-domain (:href refresh-link))
+                      (str ls/auth-server-domain (relative-href (:href refresh-link)))
                       refresh-link)
         headers (if (map? refresh-link) {:headers (headers-for-link refresh-link)} {})]
   (http/get refresh-url (complete-params headers))))
@@ -143,6 +150,9 @@
 (def ^:private pay-get (partial req pay-endpoint http/get))
 (def ^:private pay-post (partial req pay-endpoint http/post))
 
+(def ^:private interaction-get (partial req interaction-endpoint http/get))
+(def ^:private interaction-post (partial req interaction-endpoint http/post))
+
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
     (dispatcher/dispatch! [action body])))
@@ -178,14 +188,14 @@
 
 (defn get-org [org-data]
   (when-let [org-link (or (utils/link-for (:links org-data) "item" "GET") (utils/link-for (:links org-data) "self" "GET"))]
-    (api-get (:href org-link)
+    (api-get (relative-href (:href org-link))
       {:headers (headers-for-link org-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org (json->cljs body)])))))
 
 (defn get-board [board-data]
   (when-let [board-link (or (utils/link-for (:links board-data) "item" "GET") (utils/link-for (:links board-data) "self" "GET"))]
-    (api-get (:href board-link)
+    (api-get (relative-href (:href board-link))
       {:headers (headers-for-link board-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:board (json->cljs body)])))))
@@ -196,7 +206,7 @@
           json-data (cljs->json board-data)
           links (:links (dispatcher/board-data))
           board-patch-link (utils/link-for links "partial-update")]
-      (api-patch (:href board-patch-link)
+      (api-patch (relative-href (:href board-patch-link))
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
@@ -210,7 +220,7 @@
           json-data (cljs->json org-data)
           links (:links (dispatcher/org-data))
           org-patch-link (utils/link-for links "partial-update")]
-      (api-patch (:href org-patch-link)
+      (api-patch (relative-href (:href org-patch-link))
         {:json-params json-data
          :headers (headers-for-link org-patch-link)}
         (fn [{:keys [success body status]}]
@@ -251,7 +261,7 @@
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
           json-data (cljs->json cleaned-topic-data)
           topic-link (utils/link-for links "create" "POST")]
-      (api-post (:href topic-link)
+      (api-post (relative-href (:href topic-link))
         { :json-params json-data
           :headers (headers-for-link topic-link)}
         (fn [{:keys [body success headers]}]
@@ -260,7 +270,7 @@
 
 (defn load-entries [topic entries-link]
   (when (and topic entries-link)
-    (api-get (:href entries-link)
+    (api-get (relative-href (:href entries-link))
       {:headers (headers-for-link entries-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:entries-loaded {:topic topic :entries (if success (json->cljs body) {})}])))))
@@ -272,7 +282,7 @@
     (let [partial-update-link (utils/link-for (:links topic-data) "partial-update" "PATCH")
           cleaned-topic-data (apply dissoc topic-data topic-private-keys)
           json-data (cljs->json cleaned-topic-data)]
-      (api-patch (:href partial-update-link)
+      (api-patch (relative-href (:href partial-update-link))
         { :json-params json-data
           :headers (headers-for-link partial-update-link)}
         (fn [{:keys [success body]}]
@@ -289,7 +299,7 @@
                      (keyword topic-name) new-topic}
                     {:topics topics})
           json-data (cljs->json payload)]
-      (api-patch (:href board-patch-link)
+      (api-patch (relative-href (:href board-patch-link))
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
@@ -312,7 +322,7 @@
         links (:links board-data)
         add-topic-link (utils/link-for links "new" "GET")]
     (when add-topic-link
-      (api-get (:href add-topic-link)
+      (api-get (relative-href (:href add-topic-link))
         { :headers (headers-for-link add-topic-link)}
         (fn [{:keys [success body]}]
           (let [fixed-body (if body (json->cljs body) {})]
@@ -323,7 +333,7 @@
         share-link (utils/link-for (:links org-data) "create" "POST" {:accept "application/vnd.open-company.update.v1+json"})
         json-data  (merge update-data {:title (:su-title @dispatcher/app-state)
                                        :entries (vec (map #(dissoc % :board-slug) (:dashboard-selected-topics @dispatcher/app-state)))})]
-    (api-post (:href share-link)
+    (api-post (relative-href (:href share-link))
               {:json-params (cljs->json json-data)
                :headers (headers-for-link share-link)}
       (fn [{:keys [success body]}]
@@ -337,7 +347,7 @@
         links (:links org-data)
         su-link (utils/link-for links "collection" "GET")]
     (when su-link
-      (api-get (:href su-link)
+      (api-get (relative-href (:href su-link))
         {:headers (headers-for-link su-link)}
         (fn [{:keys [success body]}]
           (let [fixed-body (if success (json->cljs body) {})]
@@ -347,7 +357,7 @@
   ([update-data load-org-data]
     (when update-data
       (let [update-link (utils/link-for (:links update-data) "self")]
-        (api-get (:href update-link)
+        (api-get (relative-href (:href update-link))
           {:headers (headers-for-link update-link)}
           (fn [{:keys [success body] :as response}]
             (let [fixed-body (if success (json->cljs body) {})
@@ -379,7 +389,7 @@
   (when (and email pswd)
     (let [email-links (:links (:auth-settings @dispatcher/app-state))
           auth-url (utils/link-for email-links "authenticate" "GET" {:auth-source "email"})]
-      (auth-get (:href auth-url)
+      (auth-get (relative-href (:href auth-url))
         {:basic-auth {
           :username email
           :password pswd}
@@ -397,7 +407,7 @@
   (when token
     (let [token-links (:links (:auth-settings @dispatcher/app-state))
           auth-url (utils/link-for token-links "authenticate" "GET" {:auth-source "email"})]
-      (auth-get (:href auth-url)
+      (auth-get (relative-href (:href auth-url))
         {:headers (merge (headers-for-link auth-url)
                    {; required by Chrome
                     "Access-Control-Allow-Headers" "Content-Type, Authorization"
@@ -418,7 +428,7 @@
   (when (and first-name last-name email pswd)
     (let [email-links (:links (:auth-settings @dispatcher/app-state))
           auth-url (utils/link-for email-links "create" "POST" {:auth-source "email"})]
-      (auth-post (:href auth-url)
+      (auth-post (relative-href (:href auth-url))
         {:json-params {:first-name first-name
                        :last-name last-name
                        :email email
@@ -431,7 +441,7 @@
 
 (defn get-teams []
   (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "collection" "GET")]
-    (auth-get (:href enumerate-link)
+    (auth-get (relative-href (:href enumerate-link))
       {:headers (headers-for-link enumerate-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
@@ -444,7 +454,7 @@
 
 (defn get-team [team-link]
   (when team-link
-    (auth-get (:href team-link)
+    (auth-get (relative-href (:href team-link))
       {:headers (headers-for-link team-link)}
       (fn [{:keys [success body status]}]
         (let [fixed-body (if success (json->cljs body) {})]
@@ -458,7 +468,7 @@
     (let [team-data (dispatcher/team-data team-id)
           enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
       (when enumerate-link
-        (auth-get (:href enumerate-link)
+        (auth-get (relative-href (:href enumerate-link))
           {:headers (headers-for-link enumerate-link)}
           (fn [{:keys [success body status]}]
             (let [fixed-body (if success (json->cljs body) {})]
@@ -477,7 +487,7 @@
           with-payload (if payload
                           (assoc headers :json-params payload)
                           headers)]
-      (auth-req (:href action-link)
+      (auth-req (relative-href (:href action-link))
         with-payload
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:user-action/complete]))))))
@@ -485,7 +495,7 @@
 (defn confirm-invitation [token]
   (let [auth-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "authenticate" "GET" {:auth-source "email"})]
     (when (and token auth-link)
-      (auth-get (:href auth-link)
+      (auth-get (relative-href (:href auth-link))
         {:headers (merge (headers-for-link auth-link)
                          {; required by Chrome
                           "Access-Control-Allow-Headers" "Content-Type, Authorization"
@@ -499,7 +509,7 @@
 (defn collect-name-password [firstname lastname pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
     (when (and (or firstname lastname) pswd update-link)
-      (auth-patch (:href update-link)
+      (auth-patch (relative-href (:href update-link))
         {:json-params {
           :first-name firstname
           :last-name lastname
@@ -514,7 +524,7 @@
 (defn collect-password [pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
     (when (and pswd update-link)
-      (auth-patch (:href update-link)
+      (auth-patch (relative-href (:href update-link))
         {:json-params {
           :password pswd}
          :headers (headers-for-link update-link)}
@@ -528,14 +538,14 @@
     (let [links (:links entry-data)
           delete-link (utils/link-for links "delete")]
       (when delete-link
-        (api-delete (:href delete-link)
+        (api-delete (relative-href (:href delete-link))
           {:headers (headers-for-link delete-link)}
           (fn [_]
             (dispatcher/dispatch! [:entry-delete/success should-redirect-to-board])))))))
 
 (defn get-current-user [auth-links]
   (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
-    (auth-get (:href user-link)
+    (auth-get (relative-href (:href user-link))
       {:headers (headers-for-link user-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:user-data (json->cljs body)])))))
@@ -544,7 +554,7 @@
   (when (and (:links old-user-data)
              (map? new-user-data))
     (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")]
-      (auth-patch (:href user-update-link)
+      (auth-patch (relative-href (:href user-update-link))
         {:headers (headers-for-link user-update-link)
          :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
          (fn [{:keys [status body success]}]
@@ -565,7 +575,7 @@
   (when domain
     (let [team-data (dispatcher/team-data)
           add-domain-team-link (utils/link-for (:links team-data) "add" "POST" {:content-type "application/vnd.open-company.team.email-domain.v1"})]
-      (auth-post (:href add-domain-team-link)
+      (auth-post (relative-href (:href add-domain-team-link))
         {:headers (headers-for-link add-domain-team-link)
          :body domain}
         (fn [{:keys [status body success]}]
@@ -573,7 +583,7 @@
 
 (defn refresh-slack-user []
   (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
-    (auth-get (:href refresh-url)
+    (auth-get (relative-href (:href refresh-url))
       {:headers (headers-for-link refresh-url)}
       (fn [{:keys [status body success]}]
         (if success
@@ -585,7 +595,7 @@
 (defn patch-team [team-id new-team-data redirect-url]
   (when-let* [team-data (dispatcher/team-data team-id)
               team-patch (utils/link-for (:links team-data) "partial-update")]
-    (auth-patch (:href team-patch)
+    (auth-patch (relative-href (:href team-patch))
       {:headers (headers-for-link team-patch)
        :json-params (cljs->json new-team-data)}
       (fn [{:keys [success body status]}]
@@ -601,7 +611,7 @@
                     (assoc org-data :logo-url logo-url)
                     org-data)]
     (when (and org-name create-org-link)
-      (api-post (:href create-org-link)
+      (api-post (relative-href (:href create-org-link))
         {:headers (headers-for-link create-org-link)
          :json-params (cljs->json with-logo)}
         (fn [{:keys [success status body]}]
@@ -622,7 +632,7 @@
 (defn create-board [board-name]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
     (when (and board-name create-link)
-      (api-post (:href create-link)
+      (api-post (relative-href (:href create-link))
         {:headers (headers-for-link create-link)
          :json-params (cljs->json {:name board-name})}
         (fn [{:keys [success status body]}]
@@ -635,7 +645,7 @@
   Refresh the user list and the org-data when finished."
   [user-id]
   (when-let [add-author-link (utils/link-for (:links (dispatcher/org-data)) "add")]
-    (api-post (:href add-author-link)
+    (api-post (relative-href (:href add-author-link))
       {:headers (headers-for-link add-author-link)
        :body user-id}
       (fn [{:keys [status success body]}]
@@ -648,7 +658,7 @@
   [user-author]
   (let [remove-author-link (utils/link-for (:links user-author) "remove")]
     (when remove-author-link
-      (api-delete (:href remove-author-link)
+      (api-delete (relative-href (:href remove-author-link))
         {:headers (headers-for-link remove-author-link)}
         (fn [{:keys [status success body]}]
           (utils/after 1 #(get-org (dispatcher/org-data))))))))
@@ -672,7 +682,7 @@
                               (assoc json-params :email invited-user))
           with-company-name (merge with-invited-user {:org-name (:name org-data)
                                                       :logo-url (:logo-url org-data)})]
-      (auth-post (:href invitation-link)
+      (auth-post (relative-href (:href invitation-link))
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
         (fn [{:keys [success body status]}]
@@ -704,7 +714,7 @@
           remove-author?     (= new-user-type :viewer)]
       ;; Add an admin call
       (when (and add-admin? add-admin-link)
-        (auth-put (:href add-admin-link)
+        (auth-put (relative-href (:href add-admin-link))
           {:headers (headers-for-link add-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
@@ -712,7 +722,7 @@
               (dispatcher/dispatch! [:invite-user/failed])))))
       ;; Remove admin call
       (when (and remove-admin? remove-admin-link)
-        (auth-delete (:href remove-admin-link)
+        (auth-delete (relative-href (:href remove-admin-link))
           {:headers (headers-for-link remove-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
@@ -730,7 +740,7 @@
   [topic topic-data]
   (when (and topic topic-data)
     (when-let [archive-link (utils/link-for (:links topic-data) "archive")]
-      (api-delete (:href archive-link)
+      (api-delete (relative-href (:href archive-link))
         {:headers (headers-for-link archive-link)}
         (fn [{:keys [status success body] :as response}]
           (dispatcher/dispatch! [:topic-archive/success]))))))
@@ -743,7 +753,7 @@
                                         "application/vnd.open-company.board.viewer.v1"
                                         "application/vnd.open-company.board.author.v1")}
           add-link (utils/link-for (:links board-data) "add" "POST" content-type)]
-      (api-post (:href add-link)
+      (api-post (relative-href (:href add-link))
         {:headers (headers-for-link add-link)
          :body user-id}
         (fn [{:keys [status success body]}]
@@ -762,7 +772,7 @@
           with-params (if params
                         (assoc headers :json-params (cljs->json params))
                         headers)]
-      (api-req (:href action-link)
+      (api-req (relative-href (:href action-link))
         with-params
         (fn [{:keys [status success body]}]
           (get-board (dispatcher/board-data)))))))
@@ -771,7 +781,7 @@
   [email]
   (when email
     (when-let [reset-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "reset")]
-      (auth-post (:href reset-link)
+      (auth-post (relative-href (:href reset-link))
         {:headers (headers-for-link reset-link)
          :body email}
         (fn [{:keys [status success body]}]
@@ -782,9 +792,36 @@
     (let [board-data (dispatcher/board-data @dispatcher/app-state (router/current-org-slug) board-slug)
           delete-board-link (utils/link-for (:links board-data) "delete")]
       (when delete-board-link
-        (api-delete (:href delete-board-link)
+        (api-delete (relative-href (:href delete-board-link))
           {:headers (headers-for-link delete-board-link)}
           (fn [{:keys [status success body]}]
             (if success
               (router/nav! (oc-urls/org (router/current-org-slug)))
               (.reload (.-location js/window)))))))))
+
+(defn get-comments [entry-uuid]
+  (when entry-uuid
+    (let [entry-data (dispatcher/entry entry-uuid)
+          comments-link (utils/link-for (:links entry-data) "comments")]
+      (when comments-link
+        (interaction-get (relative-href (:href comments-link))
+          {:headers (headers-for-link comments-link)}
+          (fn [{:keys [status success body]}]
+            (dispatcher/dispatch! [:comments-get/finish {:success success
+                                                         :error (when-not success body)
+                                                         :body (if (not (empty? body)) (json->cljs body) nil)
+                                                         :entry-uuid entry-uuid}])))))))
+
+(defn add-comment [entry-uuid comment-body]
+  (when (and entry-uuid comment-body)
+    (let [entry-data (dispatcher/entry entry-uuid)
+          add-comment-link (utils/link-for (:links entry-data) "comment" "POST")
+          json-data (cljs->json {:body comment-body})]
+      (interaction-post (relative-href (:href add-comment-link))
+        {:headers (headers-for-link add-comment-link)
+         :json-params json-data}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:comment-add/finish {:success success
+                                                      :error (when-not success body)
+                                                      :body (if (not (empty? body)) (json->cljs body) nil)
+                                                      :entry-uuid entry-uuid}]))))))

@@ -221,7 +221,8 @@
                                     :foce-data (:foce-data data)
                                     :foce-data-editing? (:foce-data-editing? data)
                                     :new-topics (:new-topics data)
-                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)})
+                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                                    :comments-open (:comments-open data)})
               ; for each column key contained in best layout
               :else
               (dom/div {:class (str "right" (when (:dashboard-sharing data) " mt2"))

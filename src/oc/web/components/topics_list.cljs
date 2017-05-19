@@ -92,6 +92,7 @@
                          :dashboard-sharing (:dashboard-sharing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
-                         :show-top-menu (:show-top-menu data)}
+                         :show-top-menu (:show-top-menu data)
+                         :comments-open (:comments-open data)}
               sub-component (if (responsive/is-mobile-size?) mobile-topics-list topics-columns)]
           (om/build sub-component comp-data))))))

@@ -185,7 +185,8 @@
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
-        hours-interval (.floor js/Math (/ seconds 3600))]
+        hours-interval (.floor js/Math (/ seconds 3600))
+        minutes-interval (.floor js/Math (/ seconds 60))]
     (cond
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
@@ -198,6 +199,9 @@
 
       (pos? hours-interval)
       (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+
+      (pos? minutes-interval)
+      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
       :else
       "just now")))
@@ -843,7 +847,7 @@
     :viewer))
 
 (defn index-of
-  "Given a collection and a function return the index that match make the function truely."
+  "Given a collection and a function return the index that make the function truely."
   [s f]
   (loop [idx 0 items s]
     (cond
