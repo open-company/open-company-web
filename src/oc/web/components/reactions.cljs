@@ -19,7 +19,8 @@
         (set! (.-left (.-style cloned-el)) (str v "px"))
         (set! (.-top (.-style cloned-el)) "2px")
         (.appendChild (.-parentElement span-reaction) cloned-el)
-        (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))))))
+        (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
+        (utils/after (+ 800 200 (* 7 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (rum/defcs reactions
   [s topic-slug entry-uuid reactions-data]
