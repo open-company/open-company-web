@@ -99,7 +99,8 @@
 
   (will-unmount [_]
     (when (om/get-state owner :entries-reload-interval)
-      (js/clearInterval (om/get-state owner :entries-reload-interval))))
+      (js/clearInterval (om/get-state owner :entries-reload-interval)))
+    (dis/dispatch! [:comments-show nil nil]))
 
   (render-state [_ {:keys [comments-open?]}]
     (let [topic-kw (keyword (router/current-topic-slug))
@@ -117,7 +118,8 @@
                 :style {:width (if (responsive/is-tablet-or-mobile?) "100%" (str (+ topic-card-width comment-view-width) "px"))
                         :margin-right (if (responsive/is-tablet-or-mobile?) "0px" (str (max 0 (- topic-view-width topic-card-width 50)) "px"))}
                 :key (str "topic-view-inner-" (router/current-topic-slug))}
-        (comments)
+        (when (= (:topic-slug (:comments-open data)) topic-kw)
+          (comments))
         (dom/div {:class (utils/class-set {:topic-view true
                                            :group true
                                            :left true
