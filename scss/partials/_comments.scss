@@ -26,7 +26,8 @@ div.comments {
   }
 
   div.comments-internal {
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
     max-height: 300px;
     padding: 10px;
 
