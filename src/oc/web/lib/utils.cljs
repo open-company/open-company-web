@@ -921,3 +921,8 @@
   (when (string? url)
     (let [cleaned-url (clean-google-chart-url url)]
       (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))
+
+(defn rum-dom-node [s]
+  (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
+    (let [component (:rum/react-component s)]
+      (js/ReactDOM.findDOMNode component))))
