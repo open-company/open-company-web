@@ -975,7 +975,7 @@
         entries-data (get-in db topic-entries-key)
         entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
         entry-data (get entries-data entry-idx)
-        updated-entry-data (assoc entry-data :loading true)
+        updated-entry-data (assoc entry-data :loading (:reaction reaction-data))
         updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
     (api/toggle-reaction topic-slug entry-uuid reaction-data)
     (assoc-in db topic-entries-key updated-entries-data)))
