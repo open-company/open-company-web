@@ -22,23 +22,21 @@
         (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 7 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
-(rum/defcs reactions < (rum/local nil ::last-clicked)
+(rum/defcs reactions
   [s topic-slug entry-uuid entry-data]
-  (let [reactions-data (:reactions entry-data)
-        last-clicked (::last-clicked s)]
+  (let [reactions-data (:reactions entry-data)]
     [:div.reactions
       (for [idx (range (count reactions-data))
             :let [reaction-data (get reactions-data idx)
-                  r (if (and (:loading entry-data)
-                             (= (:reaction @last-clicked) (:reaction reaction-data)))
-                      (update reaction-data :count (:count-fn @last-clicked))
+                  r (if (= (:loading entry-data) (:reaction reaction-data))
+                      (merge reaction-data {:count (if (:reacted reaction-data) (dec (:count reaction-data)) (inc (:count reaction-data)))
+                                            :reacted (not (:reacted reaction-data))})
                       reaction-data)]]
         [:button.reaction-btn.btn-reset
           {:key (str "topic-" topic-slug "-entry-" entry-uuid "-" idx)
            :class (if (:reacted r) "reacted" "")
            :on-click (fn [e]
                        (when-not (:loading reactions-data)
-                         (reset! (::last-clicked s) {:reaction (:reaction r) :count-fn (if (:reacted r) dec inc)})
                          (when-not (:reacted r)
                            (animate-reaction e s))
                          (dis/dispatch! [:reaction-toggle topic-slug entry-uuid r])))}
