@@ -22,7 +22,9 @@ div.reactions {
     }
 
     &:hover {
+      border: 1px solid rgba(77,103,255,1);
       opacity: 1;
+      background-color: rgba(228,232,255,1);
 
       span.count {
         color: rgba(78,90,107,1);
@@ -33,6 +35,12 @@ div.reactions {
       border: 1px solid rgba(77,103,255,1);
       opacity: 1;
       background-color: rgba(228,232,255,1);
+
+      &:hover {
+        border: 1px solid rgba(78,90,107,1);
+        opacity: 1;
+        background-color: transparent;
+      }
 
       span.count {
         color: rgba(78,90,107,1);
