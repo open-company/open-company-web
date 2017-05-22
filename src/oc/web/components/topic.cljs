@@ -289,7 +289,7 @@
         ;; Reactions
         (when is-topic-view
           (dom/div {:class "reactions-row group"}
-            (reactions (:topic-slug topic-data) (:uuid topic-data) (:reactions topic-data))))
+            (reactions (:topic-slug topic-data) (:uuid topic-data) topic-data)))
         ;; Attachments
         (topic-attachments attachments nil)))))
 
