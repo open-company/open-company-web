@@ -685,21 +685,17 @@
   ; Reset flag to reload su list when needed
   (dissoc db :updates-list-loaded))
 
-(defn reactions []
-  (let [reacted-1 (> (int (rand 10)) 8)
-        reacted-2 (if reacted-1 false (> (int (rand 10)) 8))
-        reacted-3 (if (or reacted-1 reacted-2) false (> (int (rand 10)) 8))]
-  {:reactions [
-    {:reaction "😂" :reacted reacted-1 :count (int (rand 15)) :links [{:rel "react" :method (if reacted-1 "DELETE" "PUT") :href ".../😂/on"}]}
-    {:reaction "🤔" :reacted reacted-2 :count (int (rand 15)) :links [{:rel "react" :method (if reacted-2 "DELETE" "PUT") :href ".../🤔/on"}]}
-    {:reaction "👍" :reacted reacted-3 :count (int (rand 15)) :links [{:rel "react" :method (if reacted-3 "DELETE" "PUT") :href ".../👍/on"}]}
-  ]}))
+(defn sort-reactions [entry]
+  (let [reactions (:reactions entry)
+        sorted-reactions (vec (sort #(compare (:reaction %1) (:reaction %2)) reactions))]
+    (assoc entry :reactions sorted-reactions)))
 
 (defmethod dispatcher/action :entries-loaded
   [db [_ {:keys [topic entries]}]]
   (let [fixed-entries (map #(utils/fix-topic % topic) (:items (:collection entries)))
+        with-sorted-reactions (vec (map #(sort-reactions %) fixed-entries))
         sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))
-        sorted-fixed-entries (vec (map #(merge % (reactions)) (vec (sort sort-pred fixed-entries))))]
+        sorted-fixed-entries (vec (sort sort-pred with-sorted-reactions))]
     (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
 (defmethod dispatcher/action :add-topic-show
@@ -972,3 +968,34 @@
         current-count-link (get (:links entry-data) link-idx)
         next-entries-data (update-in entries-data [entry-idx :links link-idx :count] inc)]
     (assoc-in next-db entries-key next-entries-data)))
+
+(defmethod dispatcher/action :reaction-toggle
+  [db [_ topic-slug entry-uuid reaction-data]]
+  (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
+        entries-data (get-in db topic-entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)
+        updated-entry-data (assoc entry-data :loading true)
+        updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
+    (api/toggle-reaction topic-slug entry-uuid reaction-data)
+    (assoc-in db topic-entries-key updated-entries-data)))
+
+(defmethod dispatcher/action :reaction-toggle/finish
+  [db [_ topic-slug entry-uuid reaction-data]]
+  (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
+        entries-data (get-in db topic-entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)]
+    (if (nil? reaction-data)
+      (let [updated-entry-data (dissoc entry-data :loading)
+            updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
+        (assoc-in db topic-entries-key updated-entries-data))
+      (let [reaction (first (keys reaction-data))
+            next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
+            reactions-data (:reactions entry-data)
+            reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
+            updated-entry-data (-> entry-data
+                                (dissoc :loading)
+                                (assoc-in [:reactions reaction-idx] next-reaction-data))
+            updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
+        (assoc-in db topic-entries-key updated-entries-data)))))
