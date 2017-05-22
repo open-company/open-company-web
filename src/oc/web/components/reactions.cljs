@@ -27,7 +27,6 @@
   (let [reactions-data (:reactions entry-data)
         last-clicked (::last-clicked s)]
     [:div.reactions
-      (when (:loading entry-data) [:span.right "Loading..."])
       (for [idx (range (count reactions-data))
             :let [reaction-data (get reactions-data idx)
                   r (if (and (:loading entry-data)
