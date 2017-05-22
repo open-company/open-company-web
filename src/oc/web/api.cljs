@@ -152,6 +152,8 @@
 
 (def ^:private interaction-get (partial req interaction-endpoint http/get))
 (def ^:private interaction-post (partial req interaction-endpoint http/post))
+(def ^:private interaction-put (partial req interaction-endpoint http/put))
+(def ^:private interaction-delete (partial req interaction-endpoint http/delete))
 
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -825,3 +827,14 @@
                                                       :error (when-not success body)
                                                       :body (if (not (empty? body)) (json->cljs body) nil)
                                                       :entry-uuid entry-uuid}]))))))
+
+(defn toggle-reaction
+  [topic-slug entry-uuid reaction-data]
+  (when (and topic-slug entry-uuid)
+    (let [reaction-link (or (utils/link-for (:links reaction-data) "react" "PUT")
+                            (utils/link-for (:links reaction-data) "react" "DELETE"))
+          interaction-method (if (= (:method reaction-link) "PUT") interaction-put interaction-delete)]
+      (interaction-method (relative-href (:href reaction-link))
+        {:headers (headers-for-link reaction-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:reaction-toggle/finish topic-slug entry-uuid (if success (json->cljs body) nil)]))))))
