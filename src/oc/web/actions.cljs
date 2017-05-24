@@ -975,7 +975,9 @@
         entries-data (get-in db topic-entries-key)
         entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
         entry-data (get entries-data entry-idx)
-        updated-entry-data (assoc entry-data :loading (:reaction reaction-data))
+        old-reactions-loading (or (:reactions-loading entry-data) [])
+        next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
+        updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
         updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
     (api/toggle-reaction topic-slug entry-uuid reaction-data)
     (assoc-in db topic-entries-key updated-entries-data)))
@@ -985,9 +987,10 @@
   (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
         entries-data (get-in db topic-entries-key)
         entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-        entry-data (get entries-data entry-idx)]
+        entry-data (get entries-data entry-idx)
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) (:reaction reaction-data))]
     (if (nil? reaction-data)
-      (let [updated-entry-data (dissoc entry-data :loading)
+      (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
             updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
         (assoc-in db topic-entries-key updated-entries-data))
       (let [reaction (first (keys reaction-data))
@@ -995,7 +998,7 @@
             reactions-data (:reactions entry-data)
             reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
             updated-entry-data (-> entry-data
-                                (dissoc :loading)
+                                (assoc :reactions-loading next-reactions-loading)
                                 (assoc-in [:reactions reaction-idx] next-reaction-data))
             updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
         (assoc-in db topic-entries-key updated-entries-data)))))
