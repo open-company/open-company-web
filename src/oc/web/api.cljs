@@ -836,4 +836,4 @@
       (interaction-method (relative-href (:href reaction-link))
         {:headers (headers-for-link reaction-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:reaction-toggle/finish topic-slug entry-uuid (if success (json->cljs body) nil)]))))))
+          (dispatcher/dispatch! [:reaction-toggle/finish topic-slug entry-uuid (:reaction reaction-data) (if success (json->cljs body) nil)]))))))
