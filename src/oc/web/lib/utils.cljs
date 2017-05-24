@@ -18,7 +18,8 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
-            [cljsjs.emojione]) ; pulled in for cljsjs externs
+            [cljsjs.emojione] ; pulled in for cljsjs externs
+            [defun.core :refer (defun)])
   (:import  [goog.i18n NumberFormat]))
 
 (defn abs
@@ -237,11 +238,23 @@
   "Get the topic names, as a vector of keywords."
   (vec (map keyword (:topics company-data))))
 
-(defn link-for
+(defun link-for
+
   ([links rel]
    (some #(when (= (:rel %) rel) %) links))
-  ([links rel method]
+
+  ([links rel :guard string? method :guard string?]
    (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links))
+
+  ([links rels :guard sequential? method :guard string?]
+   (some #(when (and (= (:method %) method) (in? rels (:rel %))) %) links))
+
+  ([links rel :guard string? methods :guard sequential?]
+   (some #(when (and (in? methods (:method %)) (= (:rel %) rel)) %) links))
+
+  ([links rels :guard sequential? methods :guard sequential?]
+   (some #(when (and (in? methods (:method %)) (in? rels (:rel %))) %) links))
+
   ([links rel method params]
    (some (fn [link]
           (when (and (= (:method link) method)
