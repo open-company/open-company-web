@@ -983,12 +983,12 @@
     (assoc-in db topic-entries-key updated-entries-data)))
 
 (defmethod dispatcher/action :reaction-toggle/finish
-  [db [_ topic-slug entry-uuid reaction-data]]
+  [db [_ topic-slug entry-uuid reaction reaction-data]]
   (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
         entries-data (get-in db topic-entries-key)
         entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
         entry-data (get entries-data entry-idx)
-        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) (:reaction reaction-data))]
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)]
     (if (nil? reaction-data)
       (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
             updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
