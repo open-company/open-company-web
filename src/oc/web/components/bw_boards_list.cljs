@@ -24,7 +24,7 @@
                 :cancel-cb #(hide-popover nil "delete-board-alert")}))
 
 (defn sorted-boards [boards]
-  (into [] (sort #(compare (:name %1) (:name %2)) boards)))
+  (into [] (sort-by :name boards)))
 
 (defcomponent bw-boards-list
   [{:keys [org-data board-data card-width show-add-topic] :as data} owner options]

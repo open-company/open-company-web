@@ -93,7 +93,7 @@
                            rum/reactive
   [s standalone-component current-update]
   (let [org-slug (router/current-org-slug)
-        updates (vec (sort #(compare (:created-at %2) (:created-at %1)) (drv/react s :updates-list)))
+        updates (vec (reverse (sort-by :created-at (drv/react s :updates-list))))
         none? (empty? updates)
         org-data (dispatcher/org-data)]
     (when standalone-component

@@ -36,7 +36,7 @@
 ;; Get the board to show counting the last accessed and the last created
 
 (defn newest-org [orgs]
-  (first (sort #(compare (:created-at %1) (:created-at %2)) orgs)))
+  (first (sort-by :created-at orgs)))
 
 (defn get-default-org [orgs]
   (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
@@ -51,7 +51,7 @@
 ;; Get the board to show counting the last accessed and the last created
 
 (defn newest-board [boards]
-  (first (sort #(compare (:name %1) (:name %2)) boards)))
+  (first (sort-by :name boards)))
 
 (defn get-default-board [org-data]
   (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
@@ -216,7 +216,7 @@
           new-entries (if (not (nil? entry-index))
                         (assoc old-entries entry-index fixed-topic)
                         (conj old-entries fixed-topic))
-          sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) new-entries))
+          sorted-entries (vec (reverse (sort-by :created-at new-entries)))
           board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
           old-board-data (get-in db board-key)
           new-board-data (assoc old-board-data (keyword topic) (first sorted-entries))]
@@ -375,7 +375,7 @@
         entries-data (or (get-in db topic-entries-key) []) ;(or (:entries-data (get (dispatcher/board-data db) topic)) [])
         without-current-entry (vec (filter #(not= (:created-at %) created-at) entries-data))
         with-new-entry (conj without-current-entry without-placeholder)
-        sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-entry))]
+        sorted-entries (vec (reverse (sort-by :created-at with-new-entry)))]
     (if (not (:placeholder topic-data))
       (api/partial-update-topic topic without-placeholder)
       (api/save-or-create-topic without-placeholder))
@@ -687,7 +687,7 @@
 
 (defn sort-reactions [entry]
   (let [reactions (:reactions entry)
-        sorted-reactions (vec (sort #(compare (:reaction %1) (:reaction %2)) reactions))]
+        sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
 (defmethod dispatcher/action :entries-loaded
@@ -949,7 +949,7 @@
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body entry-uuid]}]]
   (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)
-        sorted-comments (sort #(compare (:created-at %1) (:created-at %2)) (:items (:collection body)))]
+        sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add

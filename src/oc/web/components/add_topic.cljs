@@ -26,7 +26,7 @@
   (when-let [all-categories (vec (map :column new-topic-categories))]
     (apply merge
       (for [idx (range 1 (inc (apply max all-categories)))]
-        (hash-map (keyword (str idx)) (sort #(compare (:order %1) (:order %2)) (filter #(= (:column %) idx) new-topic-categories)))))))
+        (hash-map (keyword (str idx)) (sort-by :order (filter #(= (:column %) idx) new-topic-categories)))))))
 
 (rum/defcs custom-topic-input
   < (rum/local "" ::topic-title)
