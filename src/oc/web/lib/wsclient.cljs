@@ -9,7 +9,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.local-settings :as ls]))
 
-(def ws-port 3000)
+(def ws-port 3002)
 
 (def ws-server "localhost")
 
@@ -21,7 +21,8 @@
 
 (defn should-disconnect? [rep]
   (when-not (:valid rep)
-    (js/console.log "disconnecting client due to not valid JWT!")
+    (js/console.log "disconnecting client due to invalid JWT!")
+    (js/console.log rep)
     (s/chsk-disconnect! @channelsk)))
 
 (defn post-handshake-auth []
@@ -82,7 +83,7 @@
 (defn reconnect [uid]
   (js/console.log "wsclient/reconnect" uid)
   (let [{:keys [chsk ch-recv send-fn state] :as x}
-          (s/make-channel-socket! "/chsk" {:type :auto
+          (s/make-channel-socket! "/interaction-socket/boards/1234-abcd-1234" {:type :auto
                                            :host (encore/format "%s:%d" ws-server ws-port)
                                            :protocol (if ls/jwt-cookie-secure :https :http)
                                            :packer :edn
