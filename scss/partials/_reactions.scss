@@ -16,6 +16,10 @@ div.reactions {
     opacity: 0.6;
     position: relative;
 
+    &.has-reactions {
+      opacity: 1;
+    }
+
     span.count {
       color: rgba(78,90,107,0.7);
       margin-left: 5px;

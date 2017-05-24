@@ -34,7 +34,8 @@
                       reaction-data)]]
         [:button.reaction-btn.btn-reset
           {:key (str "topic-" topic-slug "-entry-" entry-uuid "-" idx)
-           :class (if (:reacted r) "reacted" "")
+           :class (utils/class-set {:reacted (:reacted r)
+                                    :has-reactions (pos? (:count r))})
            :on-click (fn [e]
                        (when-not (:loading reactions-data)
                          (when-not (:reacted r)
