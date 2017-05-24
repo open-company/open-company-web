@@ -49,14 +49,14 @@
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
-    [open-company/lib "0.8.2-87c79dc"] ; Library for OC projects https://github.com/open-company/open-company-lib
+    [open-company/lib "0.10.7-d128484"] ; Library for OC projects https://github.com/open-company/open-company-lib
     ; In addition to common functions, brings in the following common dependencies used by this project:
     ; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
     ; Timbre - Pure Clojure/Script logging library https://github.com/ptaoussanis/timbre
     ; environ - Get environment settings from different sources https://github.com/weavejester/environ
     ; hickory - HTML as data https://github.com/davidsantiago/hickory
-    ; com.taoensso/sente - Handle WebSocket client https://github.com/ptaoussanis/sente
+    ; com.taoensso/sente - WebSocket client https://github.com/ptaoussanis/sente
 
     ;; ------- Deps for project repl ------------------
     [adzerk/boot-cljs-repl   "0.3.3"] ;; latest release
