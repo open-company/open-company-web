@@ -8,7 +8,8 @@
     [tolitius/boot-check "0.1.4" :scope "test"]
 
     ;; Clojure/ClojureScript
-    [org.clojure/clojure "1.9.0-alpha16"] ; Lisp on the JVM http://clojure.org/documentation
+    ;; NB: Don't upgrade Clojure to 1.9 Alpha 15+ due to a Sente issue until it is resolved.
+    [org.clojure/clojure "1.9.0-alpha14"] ; Lisp on the JVM http://clojure.org/documentation
     ;; NB: do not update to 1.9.493+ since it's broken w/ advanced compilation
     [org.clojure/clojurescript "1.9.473"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
