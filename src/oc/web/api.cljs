@@ -14,7 +14,8 @@
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]))
+            [oc.web.lib.raven :as sentry]
+            [goog.Uri :as guri]))
 
 (def ^:private api-endpoint ls/api-server-domain)
 
@@ -25,9 +26,12 @@
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
 (defn- relative-href [href]
-  (if (and href (s/starts-with? href "http"))
-    (str "/" (s/join "/" (subvec (s/split href #"/") 3)))
-    href))
+  (let [parsed-uri (guri/parse href)]
+      (str (.getPath parsed-uri)
+           (when (.hasQuery parsed-uri)
+             (str "?" (.getEncodedQuery parsed-uri)))
+           (when (.hasFragment parsed-uri)
+             (str "#" (.getFragment parsed-uri))))))
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
