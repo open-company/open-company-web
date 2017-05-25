@@ -75,18 +75,13 @@
 
 ;;;; Sente event router (our `event-msg-handler` loop)
 
-(defonce router_ (atom nil))
-
 (defn  stop-router! []
-  (when-let [stop-f @router_]
-    (stop-f)
+  (when @channelsk
+    (s/chsk-disconnect! @channelsk)
     (timbre/info "Connection closed")))
 
 (defn start-router! []
-  (stop-router!)
-  (reset! router_
-    (s/start-client-chsk-router!
-      @ch-chsk event-msg-handler))
+  (s/start-client-chsk-router! @ch-chsk event-msg-handler)
   (timbre/info "Connection estabilished"))
 
 (defn reconnect [ws-link uid]
@@ -101,8 +96,7 @@
       (when (and @ch-state
                  (:open? @@ch-state))
         (timbre/info "Closing previous connection for" @current-board-path)
-        (stop-router!)
-        (reset! router_ nil))
+        (stop-router!))
       (timbre/info "Attempting connection to" ws-domain "for board" ws-board-path)
       (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-board-path
                                                         {:type :auto
