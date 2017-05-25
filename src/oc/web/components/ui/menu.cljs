@@ -14,8 +14,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.popover :as popover]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]
-            [om-bootstrap.button :as b]))
+            [goog.events.EventType :as EventType]))
 
 (defn prior-updates-click [e]
   (utils/event-stop e)

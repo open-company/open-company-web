@@ -9,7 +9,7 @@
 
     ;; Clojure/ClojureScript
     ;; NB: Don't upgrade Clojure to 1.9 Alpha 15+ due to a Sente issue until it is resolved.
-    [org.clojure/clojure "1.9.0-alpha14"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.9.0-alpha16"] ; Lisp on the JVM http://clojure.org/documentation
     ;; NB: do not update to 1.9.493+ since it's broken w/ advanced compilation
     [org.clojure/clojurescript "1.9.473"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
@@ -17,7 +17,6 @@
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [org.omcljs/om "1.0.0-alpha48" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [racehub/om-bootstrap "0.6.1"] ; Bootstrap for Om https://github.com/racehub/om-bootstrap
     [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
     [rum "0.10.8" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.2.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
