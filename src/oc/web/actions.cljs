@@ -149,6 +149,9 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
+      (when (jwt/jwt)
+        (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
+          (wsc/reconnect ws-link (jwt/get-key :user-id))))
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
     (let [fixed-board-data (utils/fix-board board-data)
           old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
@@ -395,9 +398,6 @@
 
 (defmethod dispatcher/action :jwt
   [db [_ jwt-data]]
-  (js/console.log "dispatcher/action :jwt" jwt-data)
-  (when (and jwt-data (:user-id jwt-data))
-    (wsc/reconnect (:user-id jwt-data)))
   (let [next-db (if (cook/get-cookie :show-login-overlay)
                   (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
                   db)]
