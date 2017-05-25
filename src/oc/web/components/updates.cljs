@@ -21,7 +21,7 @@
   (when (and (:updates-list-loaded data)
              (not (om/get-state owner :selected-su)))
     (let [updates-list (:items (dis/updates-list-data data))
-          last-su (first (vec (sort #(compare (:created-at %2) (:created-at %1)) updates-list)))]
+          last-su (first (vec (reverse (sort-by :created-at updates-list))))]
       (om/set-state! owner :selected-su (:slug last-su)))))
 
 (defn load-updates-list-if-needed [owner data]

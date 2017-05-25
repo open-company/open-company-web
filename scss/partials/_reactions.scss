@@ -1,0 +1,49 @@
+div.reactions {
+  height: 25px;
+  float: left;
+
+  button.reaction-btn {
+    border: 1px solid rgba(78,90,107,1);
+    color: rgba(78,90,107,1);
+    font-size: 14px;
+    font-weight: 300;
+    border-radius: 4px;
+    padding: .15em .9em .1em;
+    margin-right: 5px;
+    float: left;
+    outline: none;
+    background-color: transparent;
+    opacity: 0.6;
+    position: relative;
+
+    &.has-reactions {
+      opacity: 1;
+    }
+
+    span.count {
+      color: rgba(78,90,107,0.7);
+      margin-left: 5px;
+    }
+
+    &:hover {
+      opacity: 1;
+
+      span.count {
+        color: rgba(78,90,107,1);
+      }
+    }
+
+    &.reacted {
+      border: 1px solid rgba(77,103,255,1);
+      background-color: rgba(228,232,255,1);
+
+      &:hover {
+        opacity: 1;
+      }
+
+      span.count {
+        color: rgba(78,90,107,1);
+      }
+    }
+  }
+}

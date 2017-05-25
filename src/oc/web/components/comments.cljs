@@ -50,13 +50,8 @@
           [:div.add-comment-counter
             (str (- 300 (count @v)))]]]]))
 
-(defn get-dom-node [s]
-  (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
-    (let [component (:rum/react-component s)]
-      (js/ReactDOM.findDOMNode component))))
-
 (defn scroll-to-bottom [s]
-  (when-let* [dom-node (get-dom-node s)
+  (when-let* [dom-node (utils/rum-dom-node s)
               comments-internal (sel1 dom-node :div.comments-internal)]
     ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
     (when comments-internal
@@ -67,7 +62,7 @@
                       rum/static
                       (rum/local false ::needs-gradient)
                       {:after-render (fn [s]
-                                       (when-let* [dom-node (get-dom-node s)
+                                       (when-let* [dom-node (utils/rum-dom-node s)
                                                    comments-internal (sel1 dom-node :div.comments-internal)]
                                          (let [next-needs-gradient (> (.-scrollHeight comments-internal) 300)]
                                            ;; Show the gradient at the top only if there are at least 5 comments

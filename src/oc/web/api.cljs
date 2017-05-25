@@ -152,6 +152,8 @@
 
 (def ^:private interaction-get (partial req interaction-endpoint http/get))
 (def ^:private interaction-post (partial req interaction-endpoint http/post))
+(def ^:private interaction-put (partial req interaction-endpoint http/put))
+(def ^:private interaction-delete (partial req interaction-endpoint http/delete))
 
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -187,14 +189,14 @@
                (dispatcher/dispatch! [:subscription body])))))
 
 (defn get-org [org-data]
-  (when-let [org-link (or (utils/link-for (:links org-data) "item" "GET") (utils/link-for (:links org-data) "self" "GET"))]
+  (when-let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
     (api-get (relative-href (:href org-link))
       {:headers (headers-for-link org-link)}
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org (json->cljs body)])))))
 
 (defn get-board [board-data]
-  (when-let [board-link (or (utils/link-for (:links board-data) "item" "GET") (utils/link-for (:links board-data) "self" "GET"))]
+  (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
     (api-get (relative-href (:href board-link))
       {:headers (headers-for-link board-link)}
       (fn [{:keys [status body success]}]
@@ -825,3 +827,13 @@
                                                       :error (when-not success body)
                                                       :body (if (not (empty? body)) (json->cljs body) nil)
                                                       :entry-uuid entry-uuid}]))))))
+
+(defn toggle-reaction
+  [topic-slug entry-uuid reaction-data]
+  (when (and topic-slug entry-uuid)
+    (let [reaction-link (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"])
+          interaction-method (if (= (:method reaction-link) "PUT") interaction-put interaction-delete)]
+      (interaction-method (relative-href (:href reaction-link))
+        {:headers (headers-for-link reaction-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:reaction-toggle/finish topic-slug entry-uuid (:reaction reaction-data) (if success (json->cljs body) nil)]))))))

@@ -9,6 +9,7 @@
             [oc.web.lib.oc-colors :as oc-colors]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.chart :refer (chart)]
+            [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.topic-attachments :refer (topic-attachments)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
@@ -285,6 +286,10 @@
                           :ref "topic-body"
                           :dangerouslySetInnerHTML (utils/emojify truncated-body)})))
 
+        ;; Reactions
+        (when is-topic-view
+          (dom/div {:class "reactions-row group"}
+            (reactions (:topic-slug topic-data) (:uuid topic-data) topic-data)))
         ;; Attachments
         (topic-attachments attachments nil)))))
 
