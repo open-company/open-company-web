@@ -87,6 +87,6 @@
           [:th "STATUS"]
           [:th {:style {:text-align "center"}} "ACTIONS"]]]
       [:tbody
-        (for [user (sort #(compare (utils/name-or-email %1) (utils/name-or-email %2)) users)
+        (for [user (sort-by utils/name-or-email users)
               :let [author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)]]
           (rum/with-key (user-row team-id user author) (str "user-tr-" team-id "-" (:user-id user))))]]])

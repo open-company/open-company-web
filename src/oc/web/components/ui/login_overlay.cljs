@@ -61,7 +61,7 @@
                                      dont-scroll
   [state]
   (let [action-title (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) "Sign Up" "Sign In")
-        slack-error [:span.block.red "There is a temporary error validating with Slack. Please try again later."]]
+        slack-error [:span.block.red "There was an issue validating with Slack."]]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       (close-button)
@@ -73,7 +73,6 @@
           (if @(::sign-up-slack-clicked state)
             [:div
               [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
-              (when (:access (:query-params @router/path)) slack-error)
               [:button.btn-reset.btn-solid.login-button
                 {:on-click #(do
                               (.preventDefault %)
@@ -403,7 +402,7 @@
                                (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 5))
                  :on-click #(do
                               (utils/event-stop %)
-                              (dis/dispatch! [:collect-name-pswd]))}
+                              (dis/dispatch! [:name-pswd-collect]))}
                 "LET ME IN"]]]]]]])
 
 (rum/defcs collect-password < rum/reactive

@@ -174,7 +174,7 @@ div.topic {
 
     button.top-right-button {
       width: 30px;
-      height: 20px;
+      height: 25px;
       float: right;
       opacity: 0;
       transition: 230ms;
@@ -185,6 +185,15 @@ div.topic {
 
       &:hover {
         color: rgba(78,90,107,1);
+      }
+
+      &.topic-comments-button {
+        width: 67px;
+        margin-left: 5px;
+        opacity: 0.8;
+        span.counter {
+          margin-left: 5px;
+        }
       }
     }
 
@@ -321,6 +330,10 @@ div.topic {
         float: left;
         @include big_web(){
           width: 85%;
+
+          &.has-comments {
+            width: 75%;
+          }
         }
 
         @include mobile(){
@@ -398,6 +411,10 @@ div.topic {
         margin-bottom: 0px;
         padding-bottom: 0px;
       }
+    }
+
+    div.reactions-row {
+      margin-top: 15px;
     }
   }
 }

@@ -36,7 +36,7 @@
                                                 s)}
   [attachments remove-cb]
   (when (pos? (count attachments))
-    (let [sorted-attachments (sort #(compare (:created-at %2) (:created-at %1)) attachments)]
+    (let [sorted-attachments (vec (reverse (sort-by :created-at attachments)))]
       [:div.topic-attachments
         (for [atc sorted-attachments
               :let [remove-fn (when (fn? remove-cb)

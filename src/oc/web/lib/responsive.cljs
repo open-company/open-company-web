@@ -142,11 +142,9 @@
 (defn calc-update-width [columns-num]
   (let [card-width   (calc-card-width)
         total-width-int (total-layout-width-int card-width columns-num)
-        total-width  (str total-width-int "px")
         fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
                                 (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
                                 total-width-int)
-        total-width  (str fixed-total-width-int "px")
         fixed-card-width (if (>= (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin) updates-content-cards-max-width)
                             updates-content-cards-max-width
                             (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]

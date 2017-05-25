@@ -8,6 +8,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as oc-colors]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.chart :refer (chart)]
+            [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.topic-attachments :refer (topic-attachments)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
@@ -83,6 +85,11 @@
                                       column
                                       show-top-menu] :as data} owner options]
 
+  (did-mount [_]
+    (when (and is-topic-view
+               (not is-mobile?))
+      (dis/dispatch! [:comments-get (:uuid topic-data)])))
+
   (render [_]
     (let [topic-kw          (keyword topic)
           chart-opts          {:chart-size {:width 230}
@@ -101,7 +108,15 @@
                                  (.truncate js/$ topic-body (clj->js {:length utils/topic-body-limit :words true}))
                                  topic-body)
           showing-menu        (= show-top-menu topic)
-          attachments         (:attachments topic-data)]
+          attachments         (:attachments topic-data)
+          comments-link       (utils/link-for (:links topic-data) "comments")
+          should-show-comments-button (and comments-link
+                                           show-editing
+                                           (not is-stakeholder-update)
+                                           (not is-dashboard)
+                                           (not is-mobile?)
+                                           is-topic-view
+                                           (not foce-active))]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name topic))
                     :ref "topic-internal"}
@@ -127,8 +142,6 @@
                            :on-click #(dis/dispatch! [:foce-start topic-kw {:placeholder true
                                                                             :topic (name topic-kw)
                                                                             :title (:title topic-data)
-                                                                            :data (:data topic-data)
-                                                                            :metrics (:metrics topic-data)
                                                                             :links (:links topic-data)}])}
                 (dom/i {:class "fa fa-plus"})" New entry")
               (dom/button {:class "topic-top-menu-btn btn-reset"
@@ -138,8 +151,9 @@
               (dom/button {:class "topic-top-menu-btn btn-reset"
                            :on-click #(assign-topic-click)}
                 (dom/i {:class "fa fa-user"}) " Assign")))
-
-          (dom/div {:class "topic-title"}
+          (chart topic-data (- card-width (* 16 2)))
+          (dom/div {:class (utils/class-set {:topic-title true
+                                             :has-comments should-show-comments-button})}
 
             (when-not (and is-topic-view
                        is-mobile?)
@@ -172,6 +186,16 @@
                            :data-toggle "tooltip"
                            :title "This topic has prior history"}
                 (dom/i {:class "fa fa-history"}))))
+          (when should-show-comments-button
+            (dom/button {:class "top-right-button topic-comments-button btn-reset"
+                         :on-click #(dis/dispatch! [:comments-show topic-kw (:uuid topic-data)])
+                         :title "Comments"
+                         :data-toggle "tooltip"
+                         :data-container "body"
+                         :data-placement "top"}
+              (dom/i {:class "fa fa-comments-o"})
+              (when (pos? (:count comments-link))
+                (dom/span {:class "counter"} (str "(" (:count comments-link) ")")))))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (not is-dashboard)
@@ -262,6 +286,10 @@
                           :ref "topic-body"
                           :dangerouslySetInnerHTML (utils/emojify truncated-body)})))
 
+        ;; Reactions
+        (when is-topic-view
+          (dom/div {:class "reactions-row group"}
+            (reactions (:topic-slug topic-data) (:uuid topic-data) topic-data)))
         ;; Attachments
         (topic-attachments attachments nil)))))
 
@@ -396,6 +424,7 @@
                                     :is-topic-view is-topic-view
                                     :show-editing show-editing
                                     :column column
-                                    :show-top-menu (:show-top-menu data)}
+                                    :show-top-menu (:show-top-menu data)
+                                    :comments-open (:comments-open data)}
                                    {:opts options
                                     :key (str "topic-" topic)}))))))

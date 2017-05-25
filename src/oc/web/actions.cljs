@@ -37,7 +37,7 @@
 ;; Get the board to show counting the last accessed and the last created
 
 (defn newest-org [orgs]
-  (first (sort #(compare (:created-at %1) (:created-at %2)) orgs)))
+  (first (sort-by :created-at orgs)))
 
 (defn get-default-org [orgs]
   (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
@@ -52,7 +52,7 @@
 ;; Get the board to show counting the last accessed and the last created
 
 (defn newest-board [boards]
-  (first (sort #(compare (:name %1) (:name %2)) boards)))
+  (first (sort-by :name boards)))
 
 (defn get-default-board [org-data]
   (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
@@ -217,7 +217,7 @@
           new-entries (if (not (nil? entry-index))
                         (assoc old-entries entry-index fixed-topic)
                         (conj old-entries fixed-topic))
-          sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) new-entries))
+          sorted-entries (vec (reverse (sort-by :created-at new-entries)))
           board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
           old-board-data (get-in db board-key)
           new-board-data (assoc old-board-data (keyword topic) (first sorted-entries))]
@@ -376,7 +376,7 @@
         entries-data (or (get-in db topic-entries-key) []) ;(or (:entries-data (get (dispatcher/board-data db) topic)) [])
         without-current-entry (vec (filter #(not= (:created-at %) created-at) entries-data))
         with-new-entry (conj without-current-entry without-placeholder)
-        sorted-entries (vec (sort #(compare (:created-at %2) (:created-at %1)) with-new-entry))]
+        sorted-entries (vec (reverse (sort-by :created-at with-new-entry)))]
     (if (not (:placeholder topic-data))
       (api/partial-update-topic topic without-placeholder)
       (api/save-or-create-topic without-placeholder))
@@ -689,11 +689,17 @@
   ; Reset flag to reload su list when needed
   (dissoc db :updates-list-loaded))
 
+(defn sort-reactions [entry]
+  (let [reactions (:reactions entry)
+        sorted-reactions (vec (sort-by :reaction reactions))]
+    (assoc entry :reactions sorted-reactions)))
+
 (defmethod dispatcher/action :entries-loaded
   [db [_ {:keys [topic entries]}]]
   (let [fixed-entries (map #(utils/fix-topic % topic) (:items (:collection entries)))
+        with-sorted-reactions (vec (map #(sort-reactions %) fixed-entries))
         sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))
-        sorted-fixed-entries (vec (sort sort-pred fixed-entries))]
+        sorted-fixed-entries (vec (sort sort-pred with-sorted-reactions))]
     (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
 
 (defmethod dispatcher/action :add-topic-show
@@ -924,3 +930,79 @@
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
   (assoc db :edit-user-profile-failed true))
+
+(defmethod dispatcher/action :comments-show
+  [db [_ topic-slug entry-uuid]]
+  (if (and (= (:topic-slug (:comments-open db)) topic-slug)
+           (= (:entry-uuid (:comments-open db)) entry-uuid))
+    (dissoc db :comments-open)
+    (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
+
+(defn get-comments [db entry-uuid]
+  (api/get-comments entry-uuid)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (router/current-topic-slug)
+        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
+    (assoc-in db comments-key {:loading true})))
+
+(defmethod dispatcher/action :comments-get
+  [db [_ entry-uuid]]
+  (get-comments db entry-uuid))
+
+(defmethod dispatcher/action :comments-get/finish
+  [db [_ {:keys [success error body entry-uuid]}]]
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)
+        sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
+    (assoc-in db comments-key sorted-comments)))
+
+(defmethod dispatcher/action :comment-add
+  [db [_ comment-body]]
+  (api/add-comment (:entry-uuid (:comments-open db)) comment-body)
+  db)
+
+(defmethod dispatcher/action :comment-add/finish
+  [db [_ {:keys [entry-uuid]}]]
+  (let [next-db (get-comments db entry-uuid)
+        entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug))
+        entries-data (get-in next-db entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)
+        link-idx (utils/index-of (:links entry-data) #(= (:rel %) "comments"))
+        current-count-link (get (:links entry-data) link-idx)
+        next-entries-data (update-in entries-data [entry-idx :links link-idx :count] inc)]
+    (assoc-in next-db entries-key next-entries-data)))
+
+(defmethod dispatcher/action :reaction-toggle
+  [db [_ topic-slug entry-uuid reaction-data]]
+  (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
+        entries-data (get-in db topic-entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)
+        old-reactions-loading (or (:reactions-loading entry-data) [])
+        next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
+        updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
+        updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
+    (api/toggle-reaction topic-slug entry-uuid reaction-data)
+    (assoc-in db topic-entries-key updated-entries-data)))
+
+(defmethod dispatcher/action :reaction-toggle/finish
+  [db [_ topic-slug entry-uuid reaction reaction-data]]
+  (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
+        entries-data (get-in db topic-entries-key)
+        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+        entry-data (get entries-data entry-idx)
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)]
+    (if (nil? reaction-data)
+      (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
+            updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
+        (assoc-in db topic-entries-key updated-entries-data))
+      (let [reaction (first (keys reaction-data))
+            next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
+            reactions-data (:reactions entry-data)
+            reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
+            updated-entry-data (-> entry-data
+                                (assoc :reactions-loading next-reactions-loading)
+                                (assoc-in [:reactions reaction-idx] next-reaction-data))
+            updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
+        (assoc-in db topic-entries-key updated-entries-data)))))

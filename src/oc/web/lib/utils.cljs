@@ -18,7 +18,8 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
-            [cljsjs.emojione]) ; pulled in for cljsjs externs
+            [cljsjs.emojione] ; pulled in for cljsjs externs
+            [defun.core :refer (defun)])
   (:import  [goog.i18n NumberFormat]))
 
 (defn abs
@@ -185,7 +186,8 @@
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
-        hours-interval (.floor js/Math (/ seconds 3600))]
+        hours-interval (.floor js/Math (/ seconds 3600))
+        minutes-interval (.floor js/Math (/ seconds 60))]
     (cond
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
@@ -198,6 +200,9 @@
 
       (pos? hours-interval)
       (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+
+      (pos? minutes-interval)
+      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
       :else
       "just now")))
@@ -233,11 +238,23 @@
   "Get the topic names, as a vector of keywords."
   (vec (map keyword (:topics company-data))))
 
-(defn link-for
+(defun link-for
+
   ([links rel]
    (some #(when (= (:rel %) rel) %) links))
-  ([links rel method]
+
+  ([links rel :guard string? method :guard string?]
    (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links))
+
+  ([links rels :guard sequential? method :guard string?]
+   (some #(when (and (= (:method %) method) (in? rels (:rel %))) %) links))
+
+  ([links rel :guard string? methods :guard sequential?]
+   (some #(when (and (in? methods (:method %)) (= (:rel %) rel)) %) links))
+
+  ([links rels :guard sequential? methods :guard sequential?]
+   (some #(when (and (in? methods (:method %)) (in? rels (:rel %))) %) links))
+
   ([links rel method params]
    (some (fn [link]
           (when (and (= (:method link) method)
@@ -843,7 +860,7 @@
     :viewer))
 
 (defn index-of
-  "Given a collection and a function return the index that match make the function truely."
+  "Given a collection and a function return the index that make the function truely."
   [s f]
   (loop [idx 0 items s]
     (cond
@@ -907,3 +924,18 @@
     "fa-file"))
 
 (def generic-network-error "There may be a problem with your network, or with our servers. Please try again later.")
+
+(defn clean-google-chart-url [gchart-url]
+  (if (string? gchart-url)
+    (.replace gchart-url #"(?i)/u/\d+" "")
+    ""))
+
+(defn check-google-chart-url [url]
+  (when (string? url)
+    (let [cleaned-url (clean-google-chart-url url)]
+      (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))
+
+(defn rum-dom-node [s]
+  (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
+    (let [component (:rum/react-component s)]
+      (js/ReactDOM.findDOMNode component))))
