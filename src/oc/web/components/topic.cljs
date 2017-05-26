@@ -70,6 +70,7 @@
 
 (defcomponent topic-internal [{:keys [topic-data
                                       entries-data
+                                      comments-data
                                       topic
                                       currency
                                       card-width
@@ -116,7 +117,10 @@
                                            (not is-dashboard)
                                            (not is-mobile?)
                                            is-topic-view
-                                           (not foce-active))]
+                                           (not foce-active))
+          comments-count      (if (sequential? comments-data)
+                                (count comments-data)
+                                (:count comments-link))]
       (dom/div #js {:className "topic-internal group"
                     :key (str "topic-internal-" (name topic))
                     :ref "topic-internal"}
@@ -194,8 +198,8 @@
                          :data-container "body"
                          :data-placement "top"}
               (dom/i {:class "fa fa-comments-o"})
-              (when (pos? (:count comments-link))
-                (dom/span {:class "counter"} (str "(" (:count comments-link) ")")))))
+              (when (pos? comments-count)
+                (dom/span {:class "counter"} (str "(" comments-count ")")))))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (not is-dashboard)
@@ -315,6 +319,7 @@
 (defcomponent topic [{:keys [active-topics
                              topic-data
                              entries-data
+                             comments-data
                              topic
                              currency
                              column
@@ -425,6 +430,7 @@
                                     :show-editing show-editing
                                     :column column
                                     :show-top-menu (:show-top-menu data)
-                                    :comments-open (:comments-open data)}
+                                    :comments-open (:comments-open data)
+                                    :comments-data comments-data}
                                    {:opts options
                                     :key (str "topic-" topic)}))))))
