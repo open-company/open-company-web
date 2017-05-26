@@ -7,7 +7,9 @@
             [taoensso.timbre :as timbre]
             [cljs.core.async :as async :refer [<! >! chan]]
             [taoensso.encore :as encore :refer-macros (have)]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
 
@@ -65,6 +67,11 @@
   (post-handshake-auth)
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)))
+
+(defmethod -event-msg-handler :interaction-comment/add
+  [{:as ev-msg :keys [?data]}]
+  (when ?data
+    (dis/dispatch! [:ws-interaction/comment-add (json->cljs ?data)])))
 
 ;; Session test
 
