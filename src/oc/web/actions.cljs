@@ -1006,3 +1006,18 @@
                                 (assoc-in [:reactions reaction-idx] next-reaction-data))
             updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
         (assoc-in db topic-entries-key updated-entries-data)))))
+
+
+(defmethod dispatcher/action :ws-interaction/comment-add
+  [db [_ interaction-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (keyword (:topic interaction-data))
+        entry-uuid (:entry-uuid interaction-data)
+        comment-data (:interaction interaction-data)
+        created-at (:created-at comment-data)
+        old-comments-data (dispatcher/comments-data entry-uuid)
+        new-comments-data (vec (conj (vec (filter #(not= (:created-at %) created-at) old-comments-data)) comment-data))
+        sorted-comments-data (vec (sort-by :created-at new-comments-data))
+        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
+    (assoc-in db comments-key sorted-comments-data)))
