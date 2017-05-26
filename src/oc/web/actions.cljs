@@ -1014,10 +1014,17 @@
         board-slug (router/current-board-slug)
         topic-slug (keyword (:topic interaction-data))
         entry-uuid (:entry-uuid interaction-data)
-        comment-data (:interaction interaction-data)
-        created-at (:created-at comment-data)
-        old-comments-data (dispatcher/comments-data entry-uuid)
-        new-comments-data (vec (conj (vec (filter #(not= (:created-at %) created-at) old-comments-data)) comment-data))
-        sorted-comments-data (vec (sort-by :created-at new-comments-data))
-        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
-    (assoc-in db comments-key sorted-comments-data)))
+        entry-data (dispatcher/entry entry-uuid)]
+    (if entry-data
+      (let [comment-data (:interaction interaction-data)
+            created-at (:created-at comment-data)
+            old-comments-data (dispatcher/comments-data entry-uuid)
+            new-comments-data (vec (conj (vec (filter #(not= (:created-at %) created-at) old-comments-data)) comment-data))
+            sorted-comments-data (vec (sort-by :created-at new-comments-data))
+            comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
+        (assoc-in db comments-key sorted-comments-data))
+      ;; the entry is not present, refresh the full topic
+      (let [topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)]
+        ;; force refresh of topic
+        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        db))))
