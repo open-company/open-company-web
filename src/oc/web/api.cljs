@@ -4,8 +4,6 @@
   (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
             [taoensso.timbre :as timbre]
-            [cognitect.transit :as t]
-            [clojure.walk :refer (keywordize-keys stringify-keys)]
             [clojure.string :as s]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.cookies :as cook]
@@ -14,6 +12,7 @@
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.lib.raven :as sentry]
             [goog.Uri :as guri]))
 
@@ -35,14 +34,6 @@
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
-
-(defn- json->cljs [json]
-  (let [reader (t/reader :json)]
-    (keywordize-keys (t/read reader json))))
-
-(defn- cljs->json [coll]
-  (let [stringified-coll (stringify-keys coll)]
-    (clj->js stringified-coll)))
 
 (defn complete-params [params]
   (if-let [jwt (j/jwt)]
