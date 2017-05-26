@@ -9,7 +9,6 @@
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
-            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
 
@@ -34,7 +33,28 @@
   (timbre/debug "Trying post handshake jwt auth")
   (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
 
-;; Event handlers
+;; Event handler
+
+(defmulti event-handler
+  "Multimethod to handle our internal events"
+  (fn [event & _]
+    (timbre/debug "event-handler" event)
+    event))
+
+(defmethod event-handler :default
+  [_ & r]
+  (timbre/info "No event handler defined for" _))
+
+(defmethod event-handler :chsk/ws-ping
+  [_ & r]
+  )
+
+(defmethod event-handler :interaction-comment/add
+  [_ body]
+  (timbre/debug "Comment event" body)
+  (dis/dispatch! [:ws-interaction/comment-add body]))
+
+;; Sente events handlers
 
 (defmulti -event-msg-handler
   "Multimethod to handle Sente `event-msg`s"
@@ -60,18 +80,14 @@
 
 (defmethod -event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
-  (timbre/debug "Push event from server: " ?data))
+  (timbre/debug "Push event from server: " ?data)
+  (apply event-handler ?data))
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
   (post-handshake-auth)
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)))
-
-(defmethod -event-msg-handler :interaction-comment/add
-  [{:as ev-msg :keys [?data]}]
-  (when ?data
-    (dis/dispatch! [:ws-interaction/comment-add (json->cljs ?data)])))
 
 ;; Session test
 
