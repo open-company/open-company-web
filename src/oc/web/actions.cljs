@@ -1014,6 +1014,7 @@
         board-slug (router/current-board-slug)
         topic-slug (keyword (:topic interaction-data))
         entry-uuid (:entry-uuid interaction-data)
+        topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
         entry-data (dispatcher/entry entry-uuid)]
     (if entry-data
       (let [comment-data (:interaction interaction-data)
@@ -1021,37 +1022,59 @@
             old-comments-data (dispatcher/comments-data entry-uuid)
             new-comments-data (vec (conj (vec (filter #(not= (:created-at %) created-at) old-comments-data)) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
-            comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
+            comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
+            is-current-user (= (jwt/get-key :user-id) (:user-id (:author comment-data)))]
+        ;; Refresh the topic data if the action coming in is from the current user
+        ;; to get the new links to interact with
+        (when is-current-user
+          (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
         (assoc-in db comments-key sorted-comments-data))
       ;; the entry is not present, refresh the full topic
-      (let [topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)]
+      (do
+        ;; force refresh of topic
+        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        db))))
+
+(defn- update-reaction
+  "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
+   we need to refresh the entry since we don't have the links to delete/add the reaction."
+  [db interaction-data add-event?]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (keyword (:topic interaction-data))
+        entry-uuid (:entry-uuid interaction-data)
+        topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
+        entry-data (dispatcher/entry entry-uuid)]
+    (if (and entry-data (:reactions entry-data))
+      (let [reaction-data (:interaction interaction-data)
+            old-reactions-data (:reactions entry-data)
+            reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
+            new-reaction-data {:count (:count interaction-data)}
+            is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+            with-reacted (if is-current-user
+                            (assoc new-reaction-data :reacted add-event?)
+                            new-reaction-data)
+            new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+            updated-entry-data (assoc entry-data :reactions new-reactions-data)
+            topic-entries-key (dispatcher/topic-entries-key org-slug board-slug topic-slug)
+            entries-data (get-in db topic-entries-key)
+            entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+            entry-key (conj topic-entries-key entry-idx)]
+        ;; Refresh the topic data if the action coming in is from the current user
+        ;; to get the new links to interact with
+        (when is-current-user
+          (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+        (assoc-in db entry-key updated-entry-data))
+      ;; the entry is not present, refresh the full topic
+      (do
         ;; force refresh of topic
         (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
         db))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
   [db [_ interaction-data]]
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        topic-slug (keyword (:topic interaction-data))
-        entry-uuid (:entry-uuid interaction-data)
-        entry-data (dispatcher/entry entry-uuid)]
-    (if (and entry-data (:reactions entry-data))
-      (let [reaction-data (:interaction interaction-data)
-            old-reactions-data (:reactions entry-data)
-            reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
-            new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx)
-                                                                        {:count (:count reaction-data)
-                                                                         :reacted (not (utils/link-for (:links reaction-data) "react" "PUT"))
-                                                                         :links (:links reaction-data)}))
-            updated-entry-data (assoc entry-data :reactions new-reactions-data)
-            topic-entries-key (dispatcher/topic-entries-key org-slug board-slug topic-slug)
-            entries-data (get-in db topic-entries-key)
-            entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-            entry-key (conj topic-entries-key entry-idx)]
-        (assoc-in db entry-key updated-entry-data))
-      ;; the entry is not present, refresh the full topic
-      (let [topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)]
-        ;; force refresh of topic
-        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
-        db))))
+  (update-reaction db interaction-data true))
+
+(defmethod dispatcher/action :ws-interaction/reaction-delete
+  [db [_ interaction-data]]
+  (update-reaction db interaction-data false))
