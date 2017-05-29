@@ -1028,3 +1028,30 @@
         ;; force refresh of topic
         (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
         db))))
+
+(defmethod dispatcher/action :ws-interaction/reaction-add
+  [db [_ interaction-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (keyword (:topic interaction-data))
+        entry-uuid (:entry-uuid interaction-data)
+        entry-data (dispatcher/entry entry-uuid)]
+    (if (and entry-data (:reactions entry-data))
+      (let [reaction-data (:interaction interaction-data)
+            old-reactions-data (:reactions entry-data)
+            reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
+            new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx)
+                                                                        {:count (:count reaction-data)
+                                                                         :reacted (not (utils/link-for (:links reaction-data) "react" "PUT"))
+                                                                         :links (:links reaction-data)}))
+            updated-entry-data (assoc entry-data :reactions new-reactions-data)
+            topic-entries-key (dispatcher/topic-entries-key org-slug board-slug topic-slug)
+            entries-data (get-in db topic-entries-key)
+            entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+            entry-key (conj topic-entries-key entry-idx)]
+        (assoc-in db entry-key updated-entry-data))
+      ;; the entry is not present, refresh the full topic
+      (let [topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)]
+        ;; force refresh of topic
+        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        db))))
