@@ -54,6 +54,11 @@
   (timbre/debug "Comment event" body)
   (dis/dispatch! [:ws-interaction/comment-add body]))
 
+(defmethod event-handler :interaction-reaction/add
+  [_ body]
+  (timbre/debug "Reaction event" body)
+  (dis/dispatch! [:ws-interaction/reaction-add body]))
+
 ;; Sente events handlers
 
 (defmulti -event-msg-handler
