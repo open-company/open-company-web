@@ -56,8 +56,13 @@
 
 (defmethod event-handler :interaction-reaction/add
   [_ body]
-  (timbre/debug "Reaction event" body)
+  (timbre/debug "Reaction add event" body)
   (dis/dispatch! [:ws-interaction/reaction-add body]))
+
+(defmethod event-handler :interaction-reaction/delete
+  [_ body]
+  (timbre/debug "Reaction delete event" body)
+  (dis/dispatch! [:ws-interaction/reaction-delete body]))
 
 ;; Sente events handlers
 
