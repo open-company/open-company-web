@@ -44,4 +44,6 @@
                            (animate-reaction e s))
                          (dis/dispatch! [:reaction-toggle topic-slug entry-uuid r])))}
           [:span.reaction (:reaction r)]
-          [:span.count (:count r)]])]))
+          [:div.count
+            {:class (str (name topic-slug) "-" entry-uuid "-" (:reaction r))}
+            (:count r)]])]))

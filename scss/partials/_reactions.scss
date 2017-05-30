@@ -20,15 +20,16 @@ div.reactions {
       opacity: 1;
     }
 
-    span.count {
+    div.count {
       color: rgba(78,90,107,0.7);
       margin-left: 5px;
+      display: inline-block;
     }
 
     &:hover {
       opacity: 1;
 
-      span.count {
+      div.count {
         color: rgba(78,90,107,1);
       }
     }
@@ -41,7 +42,7 @@ div.reactions {
         opacity: 1;
       }
 
-      span.count {
+      div.count {
         color: rgba(78,90,107,1);
       }
     }
