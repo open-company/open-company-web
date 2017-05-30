@@ -199,7 +199,7 @@
                          :data-placement "top"}
               (dom/i {:class "fa fa-comments-o"})
               (when (pos? comments-count)
-                (dom/span {:class "counter"} (str "(" comments-count ")")))))
+                (dom/div {:class (str "counter " topic "-" (:uuid topic-data) "-comments-count")} (str "(" comments-count ")")))))
           (when (and show-editing
                      (not is-stakeholder-update)
                      (not is-dashboard)
