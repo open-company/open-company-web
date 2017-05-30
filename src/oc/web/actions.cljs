@@ -938,17 +938,14 @@
     (dissoc db :comments-open)
     (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
 
-(defn get-comments [db entry-uuid]
+(defmethod dispatcher/action :comments-get
+  [db [_ entry-uuid]]
   (api/get-comments entry-uuid)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         topic-slug (router/current-topic-slug)
         comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
     (assoc-in db comments-key {:loading true})))
-
-(defmethod dispatcher/action :comments-get
-  [db [_ entry-uuid]]
-  (get-comments db entry-uuid))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body entry-uuid]}]]
@@ -957,21 +954,24 @@
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ comment-body]]
-  (api/add-comment (:entry-uuid (:comments-open db)) comment-body)
-  db)
+  [db [_ entry-uuid comment-body]]
+  (api/add-comment entry-uuid comment-body)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (router/current-topic-slug)
+        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
+        comments-data (get-in db comments-key)
+        new-comments-data (conj comments-data {:body comment-body
+                                               :created-at (utils/as-of-now)
+                                               :author {:name (jwt/get-key :name)
+                                                        :avatar-url (jwt/get-key :avatar-url)
+                                                        :user-id (jwt/get-key :user-id)}})]
+    (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [entry-uuid]}]]
-  (let [next-db (get-comments db entry-uuid)
-        entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug))
-        entries-data (get-in next-db entries-key)
-        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-        entry-data (get entries-data entry-idx)
-        link-idx (utils/index-of (:links entry-data) #(= (:rel %) "comments"))
-        current-count-link (get (:links entry-data) link-idx)
-        next-entries-data (update-in entries-data [entry-idx :links link-idx :count] inc)]
-    (assoc-in next-db entries-key next-entries-data)))
+  (api/get-comments entry-uuid)
+  db)
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ topic-slug entry-uuid reaction-data]]
@@ -1019,7 +1019,8 @@
     (if entry-data
       (let [comment-data (:interaction interaction-data)
             created-at (:created-at comment-data)
-            old-comments-data (dispatcher/comments-data entry-uuid)
+            all-old-comments-data (dispatcher/comments-data entry-uuid)
+            old-comments-data (vec (filter :links all-old-comments-data))
             new-comments-data (vec (conj (vec (filter #(not= (:created-at %) created-at) old-comments-data)) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
             comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
@@ -1028,6 +1029,9 @@
         ;; to get the new links to interact with
         (when is-current-user
           (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+        ;; Animate the comments count if we don't have already the same number of comments locally
+        (when (not= (count all-old-comments-data) (count new-comments-data))
+          (utils/pulse-comments-count topic-slug entry-uuid))
         (assoc-in db comments-key sorted-comments-data))
       ;; the entry is not present, refresh the full topic
       (do
@@ -1064,6 +1068,8 @@
         ;; to get the new links to interact with
         (when is-current-user
           (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+        (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
+          (utils/pulse-reaction-count topic-slug entry-uuid (:reaction reaction-data)))
         (assoc-in db entry-key updated-entry-data))
       ;; the entry is not present, refresh the full topic
       (do
