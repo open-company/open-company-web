@@ -886,7 +886,13 @@
       (:email user))))
 
 (defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace original-url team-id (str team-id ":" user-id ":" redirect)))
+  (clojure.string/replace
+   original-url
+   team-id
+   (str
+    (when-not (empty? team-id) (str team-id ":"))
+    (when-not (empty? user-id) (str user-id ":"))
+    redirect)))
 
 (defn icon-for-mimetype
   "Thanks to https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922"
