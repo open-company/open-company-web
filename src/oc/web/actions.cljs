@@ -434,12 +434,13 @@
 (defmethod dispatcher/action :login-with-slack
   [db [_]]
   (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})]
+        auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})
+        auth-url-with-redirect (utils/slack-link-with-state (:href auth-url) nil "open-company-auth" oc-urls/login)]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
         (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    (router/redirect! (:href auth-url)))
+    (router/redirect! auth-url-with-redirect))
   db)
 
 (defmethod dispatcher/action :bot-auth
