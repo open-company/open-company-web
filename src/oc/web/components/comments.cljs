@@ -46,9 +46,7 @@
               {:on-click #(do
                             (dis/dispatch! [:comment-add entry-uuid @v])
                             (reset! v ""))}
-              "Post"]]
-          [:div.add-comment-counter
-            (str (- 300 (count @v)))]]]]))
+              "Post"]]]]]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
