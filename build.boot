@@ -2,21 +2,22 @@
 (def cljs-deps
   '[
     ;; Boot tasks
-    [adzerk/boot-cljs "1.7.228-2" :scope "test"]
+    [adzerk/boot-cljs "2.0.0" :scope "test"]
     [adzerk/boot-reload "0.5.1" :scope "test"]
-    [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
+    [crisptrutski/boot-cljs-test "0.3.1" :scope "test"]
     [tolitius/boot-check "0.1.4" :scope "test"]
 
     ;; Clojure/ClojureScript
-    ;; NB: Don't upgrade Clojure to 1.9 Alpha 15+ due to a Sente issue until it is resolved.
-    [org.clojure/clojure "1.9.0-alpha16"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.9.0-alpha17"] ; Lisp on the JVM http://clojure.org/documentation
     ;; NB: do not update to 1.9.493+ since it's broken w/ advanced compilation
-    [org.clojure/clojurescript "1.9.473"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Om and Rum React Frameworks
+    ;; Didn't update to 15.5.4 just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes acecss
+    ;; and some change sto omcljs/om to not use createClass anymore. See React docs for more info.
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [org.omcljs/om "1.0.0-alpha48" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
+    [org.omcljs/om "1.0.0-beta1" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
     [rum "0.10.8" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.2.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
@@ -24,13 +25,13 @@
     
     ;; ClojureScript libraries
     [cljs-http "0.1.43"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "1.1.5"] ; Dependency of om-tools https://github.com/Prismatic/schema
+    [prismatic/schema "1.1.6"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [prismatic/plumbing "0.5.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [com.cognitect/transit-cljs "0.8.239"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
-    [com.andrewmcveigh/cljs-time "0.5.0-alpha2"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
+    [com.andrewmcveigh/cljs-time "0.5.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "2.0.3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [clojure-humanize "0.2.2"] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
@@ -41,7 +42,7 @@
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     [cljsjs/rangy-selectionsaverestore "1.3.0-1"]
     [cljsjs/raven "3.14.2-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
-    [cljsjs/d3 "4.3.0-3"] ; d3 externs https://clojars.org/cljsjs/d3
+    [cljsjs/d3 "4.3.0-5"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
@@ -52,7 +53,7 @@
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
-    [open-company/lib "0.10.8-ed2f0f8"] ; Library for OC projects https://github.com/open-company/open-company-lib
+    [open-company/lib "0.11.2"] ; Library for OC projects https://github.com/open-company/open-company-lib
     ; In addition to common functions, brings in the following common dependencies used by this project:
     ; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
@@ -74,8 +75,8 @@
 (def static-site-deps
   '[[hiccup "2.0.0-alpha1" :scope "test"]
     [perun "0.3.0" :scope "test"]
-    [compojure "1.6.0-beta3" :scope "test"]
-    [pandeiro/boot-http "0.8.0" :scope "test"]
+    [compojure "1.6.0" :scope "test"]
+    [pandeiro/boot-http "0.8.3" :scope "test"]
     [deraen/boot-sass "0.3.1" :scope "test"]
     [org.slf4j/slf4j-nop "1.8.0-alpha2" :scope "test"]])
 
