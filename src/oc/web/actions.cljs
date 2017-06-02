@@ -1008,21 +1008,26 @@
             updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
         (assoc-in db topic-entries-key updated-entries-data)))))
 
-
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
-  (let [org-slug (router/current-org-slug)
+  (let [; Get the current router data
+        org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         topic-slug (keyword (:topic interaction-data))
         entry-uuid (:entry-uuid interaction-data)
+        ; Topic data
         topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
+        ; Entry data
         entry-data (dispatcher/entry entry-uuid)]
     (if entry-data
-      (let [comment-data (:interaction interaction-data)
+      ; If the entry is present in the local state
+      (let [; get the comment data from the ws message
+            comment-data (:interaction interaction-data)
             created-at (:created-at comment-data)
             all-old-comments-data (dispatcher/comments-data entry-uuid)
             old-comments-data (vec (filter :links all-old-comments-data))
-            new-comments-data (vec (conj (vec (filter #(not= (:created-at %) created-at) old-comments-data)) comment-data))
+            ; Add the new comment to the comments list, make sure it's not present already
+            new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
             comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
             is-current-user (= (jwt/get-key :user-id) (:user-id (:author comment-data)))]
@@ -1033,6 +1038,7 @@
         ;; Animate the comments count if we don't have already the same number of comments locally
         (when (not= (count all-old-comments-data) (count new-comments-data))
           (utils/pulse-comments-count topic-slug entry-uuid))
+        ; Update the local state with the new comments list
         (assoc-in db comments-key sorted-comments-data))
       ;; the entry is not present, refresh the full topic
       (do
@@ -1044,13 +1050,17 @@
   "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
    we need to refresh the entry since we don't have the links to delete/add the reaction."
   [db interaction-data add-event?]
-  (let [org-slug (router/current-org-slug)
+  (let [; Get the current router data
+        org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         topic-slug (keyword (:topic interaction-data))
         entry-uuid (:entry-uuid interaction-data)
+        ; Topic data
         topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
+        ; Entry data
         entry-data (dispatcher/entry entry-uuid)]
-    (if (and entry-data (:reactions entry-data))
+    (if (and entry-data (not (empty? (:reactions entry-data))))
+      ; If the entry is present in the local state and it has reactions
       (let [reaction-data (:interaction interaction-data)
             old-reactions-data (:reactions entry-data)
             reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
@@ -1059,8 +1069,11 @@
             with-reacted (if is-current-user
                             (assoc new-reaction-data :reacted add-event?)
                             new-reaction-data)
+            ; Update the reactions data with the new reaction
             new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+            ; Update the entry with the new reaction
             updated-entry-data (assoc entry-data :reactions new-reactions-data)
+            ; Update the topic entries with the updated entry
             topic-entries-key (dispatcher/topic-entries-key org-slug board-slug topic-slug)
             entries-data (get-in db topic-entries-key)
             entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
@@ -1071,6 +1084,7 @@
           (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
         (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
           (utils/pulse-reaction-count topic-slug entry-uuid (:reaction reaction-data)))
+        ; Update the entry in the local state with the new reaction
         (assoc-in db entry-key updated-entry-data))
       ;; the entry is not present, refresh the full topic
       (do
