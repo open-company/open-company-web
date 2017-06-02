@@ -204,6 +204,10 @@ provided in the table below:
 |  :bot-auth | UI | Start the bot add for a give slack team. |
 |  :channels-enumerate | UI | Start the request to load the Slack channels give a Slack team. |
 |  :channels-enumerate/success | API | Slack channels loaded, it saves them in the proper place of the app-state. |
+|  :comment-add | UI | Add a comment to an entry. |
+|  :comment-add/finish | API | Request to add a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
+|  :comments-get | UI | Starts the request to load the comments given an entry UUID. |
+|  :comments-get/finish | API | Request to load the comments for an entry finished, could be it failed though. |
 |  :dashboard-select-all | UI | Given a board select all the topics for the share. |
 |  :dashboard-select-topic | UI | When in sharing mode toggle a topic in the selected set. |
 |  :dashboard-share-mode | UI | Toggle the sharing mode. |
@@ -243,6 +247,7 @@ provided in the table below:
 |  :private-board-add | UI | Add a user to a private board with a specific role. |
 |  :pswd-collect | UI | Start the request to save the new user password on password request. |
 |  :pswd-collect/finish | API | Collect password request finished. |
+|  :reaction-toggle | UI | Toggle a reaction, temporarily change it in the local state then starts the request to save it server side. |
 |  :set-board-cache! | UI | Save some data of the current board, used for example by the growth topic to remember the last focused metric in the UI. |
 |  :signup-with-email | UI | Show the signup with email overlay. |
 |  :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
@@ -271,6 +276,9 @@ provided in the table below:
 |  :user-profile-save | UI | Save the edited user data. |
 |  :user-profile-update/failed | API | User profile update request failed. |
 |  :welcome-screen-hide | UI | Remove the welcome screen shown the first time the first org user open the dashboard. |
+|  :ws-interaction/comment-add | WS | Websocket message for an added comment. |
+|  :ws-interaction/reaction-add | WS | Websocket message for an added reaction. |
+|  :ws-interaction/reaction-delete | WS | Websocket message for a removed reaction. |
 
 ## Testing
 
