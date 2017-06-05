@@ -5,6 +5,43 @@
 
 // buttons
 
+.mlb-reset {
+  cursor: pointer;
+  outline: none;
+  border-width: 0;
+  background-color: transparent;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.2;
+  }
+}
+
+.mlb-default {
+  background-color: #D4F6E4;
+  color: #0E8749;
+  font-weight: 900;
+  border-radius: 4px;
+  height: 40px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: .2em .6em;
+
+  &:hover {
+    background-color: #3FBD7C;
+    color: #FFFFFF;
+
+  }
+
+  &:active, &:focus, &.active {
+    background-color: #0E8749;
+  }
+
+  &:disabled, &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
 .btn-reset {
   cursor: pointer;
   outline: none;
