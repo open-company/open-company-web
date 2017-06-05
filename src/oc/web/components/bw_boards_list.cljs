@@ -7,6 +7,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]))
@@ -43,8 +44,16 @@
   (render [_]
     (when-not (:dashboard-sharing data)
       (dom/div {:class "left-boards-list group" :style {:width (str responsive/left-boards-list-width "px")}}
+        ;; All activity
+        (dom/button {:class "all-activity group"}
+          (dom/div {:class "all-activity-icon"})
+          "All Activity")
+        ;; Boards list
         (dom/div {:class "left-boards-list-top group"}
-          (dom/h3 {:class "left-boards-list-top-title"} "BOARDS")
+          ;; Boards header
+          (dom/h3 {:class "left-boards-list-top-title"}
+            (dom/div {:class "boards-icon"})
+            "BOARDS")
           (when (and (not (responsive/is-tablet-or-mobile?))
                      (utils/link-for (:links org-data) "create"))
             (dom/button {:class "left-boards-list-top-title btn-reset right"
@@ -53,8 +62,7 @@
                          :title "Create a new board"
                          :data-placement "top"
                          :data-toggle "tooltip"
-                         :data-container "body"}
-              (dom/i {:class "fa fa-plus-circle"}))))
+                         :data-container "body"})))
         (dom/div {:class (str "left-boards-list-items group")}
           (for [board (sorted-boards (:boards org-data))]
             (dom/div {:class (utils/class-set {:left-boards-list-item true
@@ -66,7 +74,7 @@
                       :key (str "bw-board-list-" (name (:slug board)))
                       :on-click #(when (nil? (:foce-key data))
                                    (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
-              (dom/div {:class "internal"
+              (dom/div {:class "internal has-news"
                         :key (str "bw-board-list-" (name (:slug board)) "-internal")}
                 (or (:name board) (:slug board)))
               (when (utils/link-for (:links board) "delete")
@@ -93,4 +101,26 @@
                                             (= "Enter" (.-key e))
                                             (dis/dispatch! [:board-create])
                                             (= "Escape" (.-key e))
-                                            (dis/dispatch! [:input [:create-board] nil])))}))))))))
+                                            (dis/dispatch! [:input [:create-board] nil])))}))))
+        (dom/div {:class "left-boards-list-top group"}
+          ;; Boards header
+          (dom/h3 {:class "left-boards-list-top-title"}
+            (dom/div {:class "stories-icon"})
+            "STORIES")
+          (when (and (not (responsive/is-tablet-or-mobile?))
+                     true) ;; FIXME: replace with create storeis link check
+            (dom/button {:class "left-boards-list-top-title btn-reset right"
+                         :on-click #(identity %) ;; FIXME: Replace with story creation action
+                         :title "Create a new board"
+                         :data-placement "top"
+                         :data-toggle "tooltip"
+                         :data-container "body"})))
+        (dom/div {:class "left-boards-list-footer"}
+          (when (and (router/current-org-slug)
+                     (jwt/is-admin? (:team-id org-data)))
+            (dom/button {:class "mlb-reset invite-people-btn"
+                         :on-click #(router/nav! (oc-urls/org-team-settings))}
+              (dom/div {:class "invite-people-icon"}) "Invite People"))
+          (dom/button {:class "mlb-reset about-carrot-btn"
+                       :on-click #(router/nav! oc-urls/about)}
+            (dom/div {:class "about-carrot-icon"}) "About Carrot"))))))
