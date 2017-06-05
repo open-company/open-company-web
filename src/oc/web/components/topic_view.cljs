@@ -174,6 +174,7 @@
                   (om/build topic {:topic (router/current-topic-slug)
                                    :topic-data topic-data
                                    :entries-data entries
+                                   :comments-data []
                                    :card-width (- topic-card-width 60)
                                    :is-stakeholder-update false
                                    :read-only-board (:read-only board-data)
@@ -186,7 +187,8 @@
                                    :comments-open (:comments-open data)}
                                    {:opts {:topic-name (router/current-topic-slug)}})))
               (for [idx (range (count entries))
-                    :let [rev (get entries idx)]]
+                    :let [rev (get entries idx)
+                          comments-data (dis/comments-data (:uuid rev))]]
                 (when rev
                   (dom/div {:class "entry-container group"}
                     (when-not (= idx 0)
@@ -195,6 +197,7 @@
                     (om/build topic {:topic (router/current-topic-slug)
                                      :topic-data rev
                                      :entries-data entries
+                                     :comments-data comments-data
                                      :card-width (- topic-card-width 60)
                                      :is-stakeholder-update false
                                      :read-only-board (:read-only board-data)

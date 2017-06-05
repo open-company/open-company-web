@@ -24,24 +24,27 @@
 
 (rum/defcs reactions
   [s topic-slug entry-uuid entry-data]
-  (let [reactions-data (:reactions entry-data)
-        reactions-loading (:reactions-loading entry-data)]
-    [:div.reactions
-      (for [idx (range (count reactions-data))
-            :let [reaction-data (get reactions-data idx)
-                  is-loading (utils/in? reactions-loading (:reaction reaction-data))
-                  r (if is-loading
-                      (merge reaction-data {:count (if (:reacted reaction-data) (dec (:count reaction-data)) (inc (:count reaction-data)))
-                                            :reacted (not (:reacted reaction-data))})
-                      reaction-data)]]
-        [:button.reaction-btn.btn-reset
-          {:key (str "topic-" topic-slug "-entry-" entry-uuid "-" idx)
-           :class (utils/class-set {:reacted (:reacted r)
-                                    :has-reactions (pos? (:count r))})
-           :on-click (fn [e]
-                       (when-not is-loading
-                         (when-not (:reacted r)
-                           (animate-reaction e s))
-                         (dis/dispatch! [:reaction-toggle topic-slug entry-uuid r])))}
-          [:span.reaction (:reaction r)]
-          [:span.count (:count r)]])]))
+  (when-not (empty? (:reactions entry-data))
+    (let [reactions-data (:reactions entry-data)
+          reactions-loading (:reactions-loading entry-data)]
+      [:div.reactions
+        (for [idx (range (count reactions-data))
+              :let [reaction-data (get reactions-data idx)
+                    is-loading (utils/in? reactions-loading (:reaction reaction-data))
+                    r (if is-loading
+                        (merge reaction-data {:count (if (:reacted reaction-data) (dec (:count reaction-data)) (inc (:count reaction-data)))
+                                              :reacted (not (:reacted reaction-data))})
+                        reaction-data)]]
+          [:button.reaction-btn.btn-reset
+            {:key (str "topic-" topic-slug "-entry-" entry-uuid "-" idx)
+             :class (utils/class-set {:reacted (:reacted r)
+                                      :has-reactions (pos? (:count r))})
+             :on-click (fn [e]
+                         (when-not is-loading
+                           (when-not (:reacted r)
+                             (animate-reaction e s))
+                           (dis/dispatch! [:reaction-toggle topic-slug entry-uuid r])))}
+            [:span.reaction (:reaction r)]
+            [:div.count
+              {:class (str (name topic-slug) "-" entry-uuid "-" (:reaction r))}
+              (:count r)]])])))

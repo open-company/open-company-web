@@ -25,7 +25,7 @@
 (rum/defcs add-comment < (rum/local "" ::v)
                          (rum/local false ::show-footer)
                          rum/static
-  [s did-expand-cb]
+  [s entry-uuid did-expand-cb]
   (let [v (::v s)
         show-footer (::show-footer s)
         fixed-show-footer (or @show-footer (not (empty? @v)))]
@@ -44,11 +44,9 @@
           [:div.right
             [:button.btn-reset.btn-solid
               {:on-click #(do
-                            (dis/dispatch! [:comment-add @v])
+                            (dis/dispatch! [:comment-add entry-uuid @v])
                             (reset! v ""))}
-              "Post"]]
-          [:div.add-comment-counter
-            (str (- 300 (count @v)))]]]]))
+              "Post"]]]]]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
@@ -87,4 +85,4 @@
             (when (pos? (count entry-comments))
               (for [c entry-comments]
                 (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
-            (add-comment (fn [] (utils/after 200 #(scroll-to-bottom s))))]]))))
+            (add-comment (:entry-uuid (:show-comments comments-data)) (fn [] (utils/after 200 #(scroll-to-bottom s))))]]))))

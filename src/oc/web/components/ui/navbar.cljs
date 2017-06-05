@@ -22,9 +22,7 @@
             [oc.web.components.ui.small-loading :as loading]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [om-bootstrap.random :as r]
-            [om-bootstrap.button :as b]))
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (defn- share-new-tooltip [team-id]
   (if (jwt/team-has-bot? team-id)

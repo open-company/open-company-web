@@ -19,7 +19,8 @@
             [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
             [cljsjs.emojione] ; pulled in for cljsjs externs
-            [defun.core :refer (defun)])
+            [defun.core :refer (defun)]
+            [cljsjs.web-animations])
   (:import  [goog.i18n NumberFormat]))
 
 (defn abs
@@ -945,3 +946,22 @@
   (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
     (let [component (:rum/react-component s)]
       (js/ReactDOM.findDOMNode component))))
+
+(defn pulse-animation [el]
+  (.animate el
+    #js {:transform #js ["scale(1)" "scale(1.5)" "scale(2)" "scale(1.5)" "scale(1)"]}
+    #js {:fill "forwards"
+         :duration 500
+         :iterations 3}))
+
+(defn pulse-reaction-count
+  [topic-slug entry-uuid reaction]
+  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-" reaction)
+        el (sel1 [(keyword selector)])]
+    (pulse-animation el)))
+
+(defn pulse-comments-count
+  [topic-slug entry-uuid]
+  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-comments-count")
+        el (sel1 [(keyword selector)])]
+    (pulse-animation el)))

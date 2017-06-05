@@ -191,7 +191,8 @@ div.topic {
         width: 67px;
         margin-left: 5px;
         opacity: 0.8;
-        span.counter {
+        div.counter {
+          display: inline-block;
           margin-left: 5px;
         }
       }

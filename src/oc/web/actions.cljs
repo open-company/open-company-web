@@ -10,7 +10,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.lib.wsclient :as wsc]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -148,6 +149,9 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
+      (when (jwt/jwt)
+        (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
+          (wsc/reconnect ws-link (jwt/get-key :user-id))))
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
     (let [fixed-board-data (utils/fix-board board-data)
           old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
@@ -935,17 +939,14 @@
     (dissoc db :comments-open)
     (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
 
-(defn get-comments [db entry-uuid]
+(defmethod dispatcher/action :comments-get
+  [db [_ entry-uuid]]
   (api/get-comments entry-uuid)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         topic-slug (router/current-topic-slug)
         comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
     (assoc-in db comments-key {:loading true})))
-
-(defmethod dispatcher/action :comments-get
-  [db [_ entry-uuid]]
-  (get-comments db entry-uuid))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body entry-uuid]}]]
@@ -954,21 +955,24 @@
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ comment-body]]
-  (api/add-comment (:entry-uuid (:comments-open db)) comment-body)
-  db)
+  [db [_ entry-uuid comment-body]]
+  (api/add-comment entry-uuid comment-body)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (router/current-topic-slug)
+        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
+        comments-data (get-in db comments-key)
+        new-comments-data (conj comments-data {:body comment-body
+                                               :created-at (utils/as-of-now)
+                                               :author {:name (jwt/get-key :name)
+                                                        :avatar-url (jwt/get-key :avatar-url)
+                                                        :user-id (jwt/get-key :user-id)}})]
+    (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [entry-uuid]}]]
-  (let [next-db (get-comments db entry-uuid)
-        entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug))
-        entries-data (get-in next-db entries-key)
-        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-        entry-data (get entries-data entry-idx)
-        link-idx (utils/index-of (:links entry-data) #(= (:rel %) "comments"))
-        current-count-link (get (:links entry-data) link-idx)
-        next-entries-data (update-in entries-data [entry-idx :links link-idx :count] inc)]
-    (assoc-in next-db entries-key next-entries-data)))
+  (api/get-comments entry-uuid)
+  db)
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ topic-slug entry-uuid reaction-data]]
@@ -1003,3 +1007,95 @@
                                 (assoc-in [:reactions reaction-idx] next-reaction-data))
             updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
         (assoc-in db topic-entries-key updated-entries-data)))))
+
+(defmethod dispatcher/action :ws-interaction/comment-add
+  [db [_ interaction-data]]
+  (let [; Get the current router data
+        org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (keyword (:topic interaction-data))
+        entry-uuid (:entry-uuid interaction-data)
+        ; Topic data
+        topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
+        ; Entry data
+        entry-data (dispatcher/entry entry-uuid)]
+    (if entry-data
+      ; If the entry is present in the local state
+      (let [; get the comment data from the ws message
+            comment-data (:interaction interaction-data)
+            created-at (:created-at comment-data)
+            all-old-comments-data (dispatcher/comments-data entry-uuid)
+            old-comments-data (vec (filter :links all-old-comments-data))
+            ; Add the new comment to the comments list, make sure it's not present already
+            new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
+            sorted-comments-data (vec (sort-by :created-at new-comments-data))
+            comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
+            is-current-user (= (jwt/get-key :user-id) (:user-id (:author comment-data)))]
+        ;; Refresh the topic data if the action coming in is from the current user
+        ;; to get the new links to interact with
+        (when is-current-user
+          (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+        ;; Animate the comments count if we don't have already the same number of comments locally
+        (when (not= (count all-old-comments-data) (count new-comments-data))
+          (utils/pulse-comments-count topic-slug entry-uuid))
+        ; Update the local state with the new comments list
+        (assoc-in db comments-key sorted-comments-data))
+      ;; the entry is not present, refresh the full topic
+      (do
+        ;; force refresh of topic
+        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        db))))
+
+(defn- update-reaction
+  "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
+   we need to refresh the entry since we don't have the links to delete/add the reaction."
+  [db interaction-data add-event?]
+  (let [; Get the current router data
+        org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        topic-slug (keyword (:topic interaction-data))
+        entry-uuid (:entry-uuid interaction-data)
+        ; Topic data
+        topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
+        ; Entry data
+        entry-data (dispatcher/entry entry-uuid)]
+    (if (and entry-data (not (empty? (:reactions entry-data))))
+      ; If the entry is present in the local state and it has reactions
+      (let [reaction-data (:interaction interaction-data)
+            old-reactions-data (:reactions entry-data)
+            reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
+            new-reaction-data {:count (:count interaction-data)}
+            is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+            with-reacted (if is-current-user
+                            (assoc new-reaction-data :reacted add-event?)
+                            new-reaction-data)
+            ; Update the reactions data with the new reaction
+            new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+            ; Update the entry with the new reaction
+            updated-entry-data (assoc entry-data :reactions new-reactions-data)
+            ; Update the topic entries with the updated entry
+            topic-entries-key (dispatcher/topic-entries-key org-slug board-slug topic-slug)
+            entries-data (get-in db topic-entries-key)
+            entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
+            entry-key (conj topic-entries-key entry-idx)]
+        ;; Refresh the topic data if the action coming in is from the current user
+        ;; to get the new links to interact with
+        (when is-current-user
+          (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+        (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
+          (utils/pulse-reaction-count topic-slug entry-uuid (:reaction reaction-data)))
+        ; Update the entry in the local state with the new reaction
+        (assoc-in db entry-key updated-entry-data))
+      ;; the entry is not present, refresh the full topic
+      (do
+        ;; force refresh of topic
+        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        db))))
+
+(defmethod dispatcher/action :ws-interaction/reaction-add
+  [db [_ interaction-data]]
+  (update-reaction db interaction-data true))
+
+(defmethod dispatcher/action :ws-interaction/reaction-delete
+  [db [_ interaction-data]]
+  (update-reaction db interaction-data false))
