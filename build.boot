@@ -4,7 +4,7 @@
     ;; Boot tasks
     [adzerk/boot-cljs "2.0.0" :scope "test"]
     [adzerk/boot-reload "0.5.1" :scope "test"]
-    [crisptrutski/boot-cljs-test "0.3.1" :scope "test"]
+    [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
     [tolitius/boot-check "0.1.4" :scope "test"]
 
     ;; Clojure/ClojureScript
