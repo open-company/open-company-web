@@ -21,9 +21,8 @@ nav.oc-navbar {
   }
   z-index: $navbar_zindex;
   background-color: white;
-  border-top: 4px solid $oc_yellow;
   margin: 0px;
-  box-shadow: 0 2px 2px -2px rgba(78,90,107,0.2);
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.3);
 
   &.small-navbar:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
@@ -109,6 +108,21 @@ nav.oc-navbar {
     @media screen and (max-width: 683px){
       padding: 0px;
       margin-top: 10px;
+    }
+
+    div.navbar-center {
+      float: none;
+      text-align: center;
+      width: 42px;
+      height: 42px;
+      position: absolute;
+      left: 50%;
+      margin-left: -21px;
+
+      img.navbar-org-logo {
+        max-width: 42px;
+        max-height: 42px;
+      }
     }
 
     ul.navbar-right {

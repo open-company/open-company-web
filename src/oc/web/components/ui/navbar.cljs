@@ -91,6 +91,10 @@
                 (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))
                 ;; Show the orgs dropdown instead
                 (orgs-dropdown)))
+            (when-not (empty? (:logo-url org-data))
+              (dom/div {:class "nav navbar-nav navbar-center"}
+                (dom/img {:class "navbar-org-logo"
+                          :src (:logo-url org-data)})))
             (when-not (:hide-right-menu data)
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}
