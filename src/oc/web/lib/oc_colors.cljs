@@ -31,12 +31,15 @@
   :oc-gray-5 "#4E5A6B" ;rgb(78,90,107)
   :oc-gray-5-half "rgba(78,90,107,0.5)"
   :oc-gray-5-3-quarter "rgba(78,90,107,0.75)"
-  :oc-gray-7 "#0A0A0A"
+  :oc-gray-7 "#637282"
+  :oc-gray-8 "#FBFAF7"
   ;; Reds
   :oc-red-dark-1 "#d10022"
   :oc-red-dark "#9E001A"
   :oc-red-regular "#E04B53" ; :red
-  :oc-red-light "#EC7A8D"})
+  :oc-red-light "#EC7A8D"
+
+  :ml-text-blue "#4c67fc"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)
