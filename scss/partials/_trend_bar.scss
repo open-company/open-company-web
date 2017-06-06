@@ -1,0 +1,37 @@
+div.trend-bar {
+  height: #{$cr_trend_collapsed_height}px;
+  width: 100%;
+  background-color: $cr_orange;
+  padding: 7px 102px;
+
+  button {
+    opacity: 0.8;
+    font-family: $oc_main_font;
+    font-size: 16px;
+    font-weight: 900;
+    color: #ffffff;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  div.trending-org {
+    float: left;
+
+    button::before {
+      content: "";
+      background-image: url("/img/ML/trend_line.png");
+      background-size: 20px 12px;
+      width: 20px;
+      height: 12px;
+      margin-top: 3px;
+      margin-right: 16px;
+      float: left;
+    }
+  }
+
+  button.expand-bt {
+    float: right;
+  }
+}
