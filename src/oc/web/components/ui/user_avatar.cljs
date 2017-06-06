@@ -8,24 +8,17 @@
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
-(rum/defc avatar-with-initials < rum/static
-  [user-data]
-  [:div.user-avatar-name
-    (when (or (:first-name user-data)
-              (:last-name user-data))
-      (let [first-name-initial (or (first (:first-name user-data)) "")
-            last-name-initial (or (first (:last-name user-data)) "")
-            avatar-name (clojure.string/upper-case (str first-name-initial
-                                                        last-name-initial))]
-        [:span.user-avatar-name-span avatar-name]))])
+(def default-user-image "/img/ML/user_avatar_red.png")
 
-(rum/defc user-avatar-image < rum/static
-  [user-data]
-  (if-not (clojure.string/blank? (:avatar-url user-data))
+(rum/defcs user-avatar-image < rum/static
+                               (rum/local false ::use-default)
+  [s user-data]
+  (let [use-default @(::use-default s)
+        user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) default-user-image (:avatar-url user-data))]
     [:img.user-avatar-img
-      {:src (:avatar-url user-data)
-       :title (str (:first-name user-data) " " (:last-name user-data))}]
-    (avatar-with-initials user-data)))
+      {:src user-avatar-url
+       :on-error #(reset! true (::use-default s))
+       :title (str (:first-name user-data) " " (:last-name user-data))}]))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive
@@ -34,11 +27,10 @@
   (let [not-mobile? (not (responsive/is-mobile-size?))]
     [:button.user-avatar-button.group
       {:type "button"
-       :class (str classes (when (clojure.string/blank? (:avatar-url (drv/react s :current-user-data))) " no-image"))
+       :class (str classes)
        :id "dropdown-toggle-menu"
        :data-toggle (when not-mobile? "dropdown")
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image (drv/react s :current-user-data))
-      [:img {:src (str ls/cdn-url "/img/vert-ellipsis.svg") :width 5 :height 24}]]))
+      (user-avatar-image (drv/react s :current-user-data))]))

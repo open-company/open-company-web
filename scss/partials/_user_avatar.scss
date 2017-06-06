@@ -1,61 +1,20 @@
-$avatar_size: 35;
+$avatar_size: 32;
 
 button.user-avatar-button{
   margin: 0;
-  padding: 5px;
   border: 0px solid transparent;
   background-color: transparent;
-  width: auto;
-  color: rgba(78, 90, 107, 0.5);
-  height: #{$avatar_size + 10}px;
-  margin-top: 2px;
-
-  &:hover {
-    border-radius: 3px;
-    background-color: rgba(78,90,107,0.1);
-  }
-
-  &.no-image {
-    img {
-      margin-top: 5px;
-    }
-  }
+  width: #{$avatar_size}px;
+  height: #{$avatar_size}px;
+  border-radius: #{$avatar-size / 2}px;
 
   &:active, &:focus {
     outline: none;
     border: 0px solid tranparent;
   }
 
-  &:hover {
-    div.user-avatar-name {
-      background-color: rgba(78, 90, 107, 0.2);
-    }
-  }
-}
-
-img.user-avatar-img {
-  max-width: #{$avatar_size}px;
-  max-height: #{$avatar_size}px;
-  margin-right: 5px;
-}
-
-div.user-avatar-name {
-  min-width: #{$avatar_size}px;
-  height: #{$avatar_size}px;
-  font-size: 22px;
-  font-family: $oc_headers_font;
-  padding: 0px 7px 7px 5px;
-  color: rgba(78, 90, 107, 1);
-  font-weight: 400;
-  float: left;
-  margin-right: 5px;
-
-  background-color: $oc_gray_8;
-
-  &:empty {
-    width: 0px;
-    height: 0px;
-    margin: 0;
-    padding: 0;
+  img.user-avatar-img {
+    max-width: #{$avatar_size}px;
+    max-height: #{$avatar_size}px;
   }
 }
