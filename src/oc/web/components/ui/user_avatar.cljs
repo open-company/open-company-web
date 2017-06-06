@@ -8,7 +8,7 @@
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
-(def default-user-image "/img/ML/user_avatar_red.png")
+(def default-user-image "/img/ML/user_avatar_red.svg")
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
