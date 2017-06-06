@@ -178,7 +178,8 @@
                                             #js {:margin "0px 9px"
                                                  :width "auto"}
                                             #js {:width total-width}))
-          topic-view-width (responsive/topic-view-width card-width columns-num)]
+          topic-view-width (responsive/topic-view-width card-width columns-num)
+          total-width-int (js/parseInt total-width 10)]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -202,12 +203,21 @@
                              :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-boards-list data))
-            (dom/div {:class "board-container right"
-                      :style {:margin-right (str (- topic-view-width 660) "px")
-                              :width (str (- (int total-width) responsive/left-boards-list-width) "px")}}
-              (dom/div {:class "board-name"}
-                (:name board-data)
-                (dom/button {:class "mlb-reset board-settings-bt"}))
+            (dom/div {:class "board-container right"}
+              (dom/div {:class "group"}
+                (dom/div {:class "board-name"}
+                  (:name board-data)
+                  (dom/button {:class "mlb-reset board-settings-bt"}))
+                (when (and (not (:read-only (dis/org-data)))
+                           (not (:show-add-topic data))
+                           (not (router/current-topic-slug))
+                           (not (:foce-key data))
+                           (not (responsive/is-tablet-or-mobile?))
+                           (not (:dashboard-sharing data)))
+                  (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
+                               :on-click #(dis/dispatch! [:add-topic-show true])}
+                    (dom/div {:class "add-to-board-pencil"})
+                    "Start writing")))
               (cond
                 (and is-dashboard
                      (not (responsive/is-mobile-size?))
@@ -230,8 +240,8 @@
                                       :comments-open (:comments-open data)})
                 ; for each column key contained in best layout
                 :else
-                (dom/div {:class (str "" (when (:dashboard-sharing data) " mt2"))
-                          ; :style {:width (str (- (int total-width) responsive/left-boards-list-width) "px")}
+                (dom/div {:class (when (:dashboard-sharing data) " mt2")
+                          ; :style {:width (str (- total-width-int responsive/left-boards-list-width) "px")}
                         }
                   (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
                     (let [column (get topics-layout kw)]
