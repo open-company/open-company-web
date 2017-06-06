@@ -39,7 +39,9 @@
   :oc-red-regular "#E04B53" ; :red
   :oc-red-light "#EC7A8D"
 
-  :ml-text-blue "#4c67fc"})
+  :cr-gray "#333333"
+  :cr-text-blue "#4c67fc"
+  :cr_orange "#FA6452"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)
