@@ -9,12 +9,25 @@
             [oc.web.lib.responsive :as responsive]))
 
 (def default-user-image "/img/ML/user_avatar_red.svg")
+(def other-user-images
+ ["/img/ML/user_avatar_blue.svg"
+  "/img/ML/user_avatar_green.svg"
+  "/img/ML/user_avatar_purple.svg"
+  "/img/ML/user_avatar_yellow.svg"])
+
+(defn- user-icon [user-id]
+  (if (= user-id (jwt/get-key :user-id))
+    ;; If the user id is the same of the current JWT use the red icon
+    default-user-image
+    ;; if not get a random icon from the rest of the images vector
+    (first (shuffle other-user-images))))
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
   [s user-data]
   (let [use-default @(::use-default s)
-        user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) default-user-image (:avatar-url user-data))]
+        default-avatar (user-icon (:user-id user-data))
+        user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) default-avatar (:avatar-url user-data))]
     [:img.user-avatar-img
       {:src user-avatar-url
        :on-error #(reset! true (::use-default s))
