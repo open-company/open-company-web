@@ -69,7 +69,7 @@
                                                :highlight-on-hover (nil? (:foce-key data))
                                                :group true
                                                :selected (= (router/current-board-slug) (:slug board))})
-                      :style {:width (str (- responsive/left-boards-list-width 5) "px")}
+                      :style {:width (str (- responsive/left-boards-list-width 17) "px")}
                       :data-board (name (:slug board))
                       :key (str "bw-board-list-" (name (:slug board)))
                       :on-click #(when (nil? (:foce-key data))
