@@ -15,7 +15,6 @@
             [oc.web.components.topics-list :refer (topics-list)]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
             [oc.web.components.ui.login-required :refer (login-required)]
-            [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
@@ -171,9 +170,7 @@
             (login-overlays-handler))
           (if board-error
             (dom/div {:class "fullscreen-page with-small-footer"}
-              (login-required data)
-              ;;Footer
-               (footer total-width-int))
+              (login-required data))
             (dom/div {:class "page"}
               ;; Navbar
               (when-not (and (responsive/is-tablet-or-mobile?)
@@ -264,6 +261,4 @@
                              (not (:foce-key data))
                              (not (responsive/is-tablet-or-mobile?))
                              (not (:dashboard-sharing data)))
-                    (floating-add-topic))
-                  ;;Footer
-                  (footer total-width-int))))))))))
+                    (floating-add-topic)))))))))))
