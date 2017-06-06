@@ -12,9 +12,37 @@ div.topics-columns {
   }
 
   div.topics-column-container {
-    padding: 50px 20px;
+    padding: 40px 20px;
     margin: 0 auto;
     position: relative;
+
+    div.board-container {
+      div.board-name {
+        font-family: $oc_main_font;
+        font-size: 32px;
+        font-weight: 500;
+        color: $cr_gray;
+        margin-bottom: 30px;
+        float: left;
+        margin-left: 10px;
+
+        div.board-settings-bt {
+          content: "";
+          float: right;
+          background-image: url("/img/ML/board_settings.svg");
+          background-size: 12px 12px;
+          width: 12px;
+          height: 12px;
+          margin-top: 18px;
+          margin-left: 10px;
+          opacity: 0.8;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
 
     div.dashboard-sharing-select-all {
       position: absolute;

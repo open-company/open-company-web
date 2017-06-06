@@ -202,41 +202,47 @@
                              :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-boards-list data))
-            (cond
-              (and is-dashboard
-                   (not (responsive/is-mobile-size?))
-                   (not (router/current-topic-slug))
-                   show-add-topic)
-              (dom/div {:class "add-topic-container"
-                        :style {:margin-right (str (- topic-view-width 660) "px")}}
-                (add-topic (partial update-active-topics owner)))
-              (and is-dashboard
-                   (not (responsive/is-mobile-size?))
-                   (router/current-topic-slug))
-              (om/build topic-view {:card-width card-width
-                                    :columns-num columns-num
-                                    :board-data board-data
-                                    :entries-data (:entries-data data)
-                                    :foce-key (:foce-key data)
-                                    :foce-data (:foce-data data)
-                                    :foce-data-editing? (:foce-data-editing? data)
-                                    :new-topics (:new-topics data)
-                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                                    :comments-open (:comments-open data)})
-              ; for each column key contained in best layout
-              :else
-              (dom/div {:class (str "right" (when (:dashboard-sharing data) " mt2"))
-                        :style {:width (str (- (int total-width) responsive/left-boards-list-width) "px")}}
-                (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-                  (let [column (get topics-layout kw)]
-                    (dom/div {:class (str "topics-column col-" (name kw))
-                              :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
-                      ; render the topics
-                      (when (pos? (count column))
-                        (for [idx (range (count column))
-                              :let [topic-kw (get column idx)
-                                    topic-name (name topic-kw)]]
-                          (partial-render-topic topic-name (name kw))))))))))
+            (dom/div {:class "board-container right"
+                      :style {:margin-right (str (- topic-view-width 660) "px")
+                              :width (str (- (int total-width) responsive/left-boards-list-width) "px")}}
+              (dom/div {:class "board-name"}
+                (:name board-data)
+                (dom/button {:class "mlb-reset board-settings-bt"}))
+              (cond
+                (and is-dashboard
+                     (not (responsive/is-mobile-size?))
+                     (not (router/current-topic-slug))
+                     show-add-topic)
+                (dom/div {:class "add-topic-container group"}
+                  (add-topic (partial update-active-topics owner)))
+                (and is-dashboard
+                     (not (responsive/is-mobile-size?))
+                     (router/current-topic-slug))
+                (om/build topic-view {:card-width card-width
+                                      :columns-num columns-num
+                                      :board-data board-data
+                                      :entries-data (:entries-data data)
+                                      :foce-key (:foce-key data)
+                                      :foce-data (:foce-data data)
+                                      :foce-data-editing? (:foce-data-editing? data)
+                                      :new-topics (:new-topics data)
+                                      :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                                      :comments-open (:comments-open data)})
+                ; for each column key contained in best layout
+                :else
+                (dom/div {:class (str "" (when (:dashboard-sharing data) " mt2"))
+                          ; :style {:width (str (- (int total-width) responsive/left-boards-list-width) "px")}
+                        }
+                  (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
+                    (let [column (get topics-layout kw)]
+                      (dom/div {:class (str "topics-column col-" (name kw))
+                                :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
+                        ; render the topics
+                        (when (pos? (count column))
+                          (for [idx (range (count column))
+                                :let [topic-kw (get column idx)
+                                      topic-name (name topic-kw)]]
+                            (partial-render-topic topic-name (name kw)))))))))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
