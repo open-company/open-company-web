@@ -2,7 +2,7 @@
   body.small-footer{
     div.org-dashboard:not(.dashboard-sharing){
       div.topic-list {
-        min-height: calc(100vh - #{$footer_small_height}px);
+        min-height: 100vh;
       }
     }
   }
@@ -34,7 +34,7 @@ div.org-dashboard.selected-topic-view.mobile-or-tablet {
 
 div.org-dashboard:not(.dashboard-sharing) div.topic-list{
   @include big_web(){
-    min-height: calc(100vh - #{$footer_height}px);
+    min-height: 100vh;
   }
   @include mobile(){
     min-height: calc(100vh - #{$mobile_navbar_height + $footer_small_height + 22}px);
@@ -46,7 +46,7 @@ div.topic-list{
   background-color: $oc_gray_8;
 
   @include big_web(){
-    padding-top: #{$navbar_height}px;
+    padding-top: #{$navbar_height + $cr_trend_collapsed_height}px;
 
     &.not-first-board {
       padding-top: 0px;
