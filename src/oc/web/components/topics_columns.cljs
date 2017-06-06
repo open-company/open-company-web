@@ -203,11 +203,13 @@
                              :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build bw-boards-list data))
-            (dom/div {:class "board-container right"}
+            (dom/div {:class "board-container right"
+                      :style {:width (str (- total-width-int responsive/left-boards-list-width 40) "px")}}
               (dom/div {:class "group"}
                 (dom/div {:class "board-name"}
                   (:name board-data)
-                  (dom/button {:class "mlb-reset board-settings-bt"}))
+                  (dom/button {:class "mlb-reset board-settings-bt"
+                               :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))}))
                 (when (and (not (:read-only (dis/org-data)))
                            (not (:show-add-topic data))
                            (not (router/current-topic-slug))
