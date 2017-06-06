@@ -254,11 +254,4 @@
                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                    :is-dashboard true
                                    :show-top-menu (:show-top-menu data)
-                                   :comments-open (:comments-open data)})))
-                  (when (and (not (:read-only org-data))
-                             (not (:show-add-topic data))
-                             (not (router/current-topic-slug))
-                             (not (:foce-key data))
-                             (not (responsive/is-tablet-or-mobile?))
-                             (not (:dashboard-sharing data)))
-                    (floating-add-topic)))))))))))
+                                   :comments-open (:comments-open data)}))))))))))))
