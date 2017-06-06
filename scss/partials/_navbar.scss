@@ -12,7 +12,7 @@ nav.oc-navbar {
   }
 
   @include big_web(){
-    height: #{$navbar_height}px;
+    height: #{$navbar_height + $cr_trend_collapsed_height}px;
   }
 
   @include mobile(){
@@ -80,15 +80,15 @@ nav.oc-navbar {
 
   &.small-navbar {
     div.oc-navbar-header {
-      margin-top: 10px;
+      padding-top: 10px;
     }
   }
 
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 0 28px;
-    margin-top: 20px;
+    padding: 20px 28px 0;
+    height: #{$navbar_height}px;
 
     div.oc-navbar-header-container{
       height: 45px;
@@ -128,6 +128,10 @@ nav.oc-navbar {
     ul.navbar-right {
       float: right;
       margin-right: 0px;
+
+      div.alerts {
+        float: right;
+      }
 
       div.user-avatar {
         float: right;

@@ -15,6 +15,7 @@
             ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.trend-bar :refer (trend-bar)]
             [oc.web.components.ui.icon :as i]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar)]
@@ -106,8 +107,11 @@
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
                         (dom/div {:class "dropdown right"}
-                          (user-avatar {:classes "btn-reset dropdown-toggle"})
+                          (user-avatar {:classes "mlb-reset dropdown-toggle"})
                           (om/build menu {}))
+                        (dom/div {:class "right"
+                                  :style {:margin-right "0.5rem" :margin-top "5px"}}
+                          (dom/img {:width 14 :height 16 :src "/img/ML/alerts_bell.svg"}))
                         (when (and (not dashboard-sharing)
                                    (not is-update-preview)
                                    (router/current-board-slug)
@@ -158,6 +162,7 @@
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)
             (dom/div {:class "oc-navbar-separator"})))
+        (trend-bar (:name org-data))
         (when (responsive/is-mobile-size?)
           ;; Render the menu here only on mobile so it can expand the navbar
           (om/build menu {:mobile-menu-open mobile-menu-open}))))))
