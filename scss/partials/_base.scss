@@ -43,10 +43,6 @@ div.fullscreen-page {
   &.with-small-footer {
     min-height: calc(100vh - #{$footer_small_height}px);
   }
-
-  &.with-footer {
-    min-height: calc(100vh - #{$footer_height}px);
-  }
 }
 
 .no-scroll {
