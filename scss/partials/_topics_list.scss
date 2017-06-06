@@ -61,7 +61,7 @@ div.topic-list{
 div.org-dashboard.small-navbar {
   div.topic-list{
     @include big_web(){
-      padding-top: #{$mobile_navbar_height}px;
+      padding-top: #{$navbar_height + $cr_trend_collapsed_height}px;
     }
   }
 }
