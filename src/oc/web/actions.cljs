@@ -1099,3 +1099,7 @@
 (defmethod dispatcher/action :ws-interaction/reaction-delete
   [db [_ interaction-data]]
   (update-reaction db interaction-data false))
+
+(defmethod dispatcher/action :trend-bar-status
+  [db [_ status]]
+  (assoc db :trend-bar-status status))
