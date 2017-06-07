@@ -9,11 +9,13 @@
   (render [_]
     (dom/div {:class (utils/class-set {:oc-loading true
                                        :active (:loading data)})}
-      (dom/div {:class "oc-loading-inner"}))))
+      (dom/div {:class "oc-loading-inner"}
+        (dom/div {:class "oc-loading-heart"})
+        (dom/div {:class "oc-loading-body"})))))
 
 (rum/defc rloading < rum/static
   [data]
-  [:div.oc-loading
+  [:div.oc-loading.rloading
     {:class (if (:loading data) "active" "")}
     [:div.oc-loading-inner
       [:div.oc-loading-heart]
