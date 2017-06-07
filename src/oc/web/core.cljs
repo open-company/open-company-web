@@ -222,6 +222,9 @@
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
   (do
+    (defroute _loading_route "/__loading" {:as params}
+      (timbre/info "Routing _loading_route __loading")
+      (pre-routing (:query-params params)))
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
       (when-not (contains? (:query-params params) :jwt)
@@ -420,7 +423,7 @@
       (router/redirect-404!))
 
     (def route-dispatch!
-      (secretary/uri-dispatcher [
+      (secretary/uri-dispatcher [_loading_route
                                  login-route
                                  signup-route
                                  about-route
