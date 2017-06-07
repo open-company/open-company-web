@@ -70,7 +70,6 @@
                                             true))]
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
-                                         :small-navbar su-navbar
                                          :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
                                          :has-prior-updates (and (router/current-org-slug)

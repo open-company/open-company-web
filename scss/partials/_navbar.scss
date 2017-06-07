@@ -44,7 +44,7 @@ nav.oc-navbar {
   background-color: white;
   margin: 0px;
 
-  &.small-navbar:not(.mobile-menu-open) {
+  &:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
   }
 
@@ -98,10 +98,8 @@ nav.oc-navbar {
     }
   }
 
-  &.small-navbar {
-    div.oc-navbar-header {
-      padding-top: 10px;
-    }
+  div.oc-navbar-header {
+    padding-top: 10px;
   }
 
   div.oc-navbar-header {

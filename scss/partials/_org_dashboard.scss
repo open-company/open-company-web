@@ -85,7 +85,7 @@ div.org-dashboard {
   }
 }
 
-div.org-dashboard.small-navbar {
+div.org-dashboard {
   div.page {
     div.empty-dashboard {
       min-height: calc(100vh - #{$footer_small_height}px + 24px);
