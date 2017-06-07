@@ -262,7 +262,7 @@
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
    :body [:body.small-footer
-          [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
+          [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           
