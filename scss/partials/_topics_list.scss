@@ -58,10 +58,32 @@ div.topic-list{
   }
 }
 
-div.org-dashboard.small-navbar {
-  div.topic-list{
-    @include big_web(){
-      padding-top: #{$navbar_height + $cr_trend_collapsed_height}px;
+body.trend-bar-collapsed {
+  div.org-dashboard.small-navbar {
+    div.topic-list{
+      @include big_web(){
+        padding-top: #{$navbar_height + $cr_trend_collapsed_height}px;
+      }
+    }
+  }
+}
+
+body.trend-bar-expanded {
+  div.org-dashboard.small-navbar {
+    div.topic-list{
+      @include big_web(){
+        padding-top: #{$navbar_height + $cr_trend_expanded_height}px;
+      }
+    }
+  }
+}
+
+body.trend-bar-trending {
+  div.org-dashboard.small-navbar {
+    div.topic-list{
+      @include big_web(){
+        padding-top: #{$navbar_height + $cr_trend_trending_height}px;
+      }
     }
   }
 }
