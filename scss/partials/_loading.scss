@@ -42,12 +42,12 @@ div.oc-loading {
     }
   }
 
-  &.active div.oc-loading-inner div.oc-loading-heart {
-    -webkit-animation: -webkit-heart-frames 2s linear;
-    -webkit-animation-iteration-count: infinite;
-    animation: heart-frames 2s linear;
-    animation-iteration-count: infinite;
-  }
+  // &.active div.oc-loading-inner div.oc-loading-heart {
+  //   -webkit-animation: -webkit-heart-frames 2s linear;
+  //   -webkit-animation-iteration-count: infinite;
+  //   animation: heart-frames 2s linear;
+  //   animation-iteration-count: infinite;
+  // }
 
   // &.active div.oc-loading-inner div.oc-loading-body {
   //   -webkit-animation: -webkit-body-frames 2s linear;
