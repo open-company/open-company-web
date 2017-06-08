@@ -95,43 +95,50 @@
           org-data (dis/org-data)
           board-data (when (router/current-board-slug)
                         (dis/board-data))]
-      (dom/ul {:class menu-classes
+      (dom/div {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
+        (dom/div {:class "top-arrow"})
+        (dom/div {:class "menu-header"}
+          (dom/div {:class "user-name"} (str "Hi " (jwt/get-key :first-name) "!"))
+           (dom/div {:class "user-type"}
+              (cond
+                (jwt/is-admin? (:team-id org-data))
+                "You're an Admin"
+                (utils/link-for (:links org-data) "create")
+                "You're an Author")))
         (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
           (when (and (router/current-org-slug)
                      (pos? (:count su-link)))
-            (dom/li {:class "oc-menu-item menu-separator"}
+            (dom/div {:class "oc-menu-item"}
               (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
         (when (and (router/current-org-slug)
                    (not (utils/in? (:route @router/path) "boards-list"))
                    (responsive/is-tablet-or-mobile?))
-          (dom/li {:class "oc-menu-item"}
+          (dom/div {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org) :on-click list-boards-click} "Boards List")))
         (when (and (router/current-org-slug)
                    (jwt/is-admin? (:team-id org-data)))
-          (dom/li {:class "oc-menu-item"}
+          (dom/div {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Team")))
         (when (and (router/current-org-slug)
                    (not (:read-only org-data))
                    (not (responsive/is-mobile-size?)))
-          (dom/li {:class (utils/class-set {:oc-menu-item true
-                                            :menu-separator (or (not (router/current-board-slug))
-                                                                (:read-only board-data))})}
+          (dom/div {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/org-settings) :on-click org-settings-click} "Company Settings")))
         (when (and (router/current-board-slug)
                    (not (:read-only board-data))
                    (not (responsive/is-mobile-size?)))
-          (dom/li {:class "oc-menu-item menu-separator"}
+          (dom/div {:class "oc-menu-item"}
             (dom/a {:href (oc-urls/board-settings) :on-click board-settings-click} "Board Settings")))
         ;; Temp commenting this out since we need API support to know how many companies the user has
         ; (when (jwt/jwt)
-        ;   (dom/li {:class "oc-menu-item"}
+        ;   (dom/div {:class "oc-menu-item"}
         ;     (dom/a {:href (oc-urls/boards (router/current-org-slug)) :on-click companies-click} "Companies")))
         (when (jwt/jwt)
-          (dom/li {:class "oc-menu-item"}
+          (dom/div {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))
         (if (jwt/jwt)
-          (dom/li {:class "oc-menu-item"}
-            (dom/a {:href oc-urls/logout :on-click logout-click} "Sign Out"))
-          (dom/li {:class "oc-menu-item"}
+          (dom/div {:class "oc-menu-item"}
+            (dom/a {:class "sign-out" :href oc-urls/logout :on-click logout-click} "Sign Out"))
+          (dom/div {:class "oc-menu-item"}
             (dom/a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up")))))))

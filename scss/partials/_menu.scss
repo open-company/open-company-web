@@ -1,9 +1,44 @@
-ul.menu {
-  top: 55px;
-  padding: 10px 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
-  border: 1px solid rgba(78,90,107,0.1);
-  border-radius: 3px;
+div.menu {
+  top: 50px;
+  right: -10px;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2), 0 10px 25px 1px rgba(0, 0, 0, 0.1);
+  border: 0px;
+  border-radius: 5px;
+  width: 288px;
+  position: absolute;
+  overflow: visible;
+  padding-top: 0px;
+  text-transform: none;
+
+  div.top-arrow {
+    @include triangle(top, #F3F2EE, 10px);
+    top: -15px;
+    right: 10px;
+    position: absolute;
+  }
+
+  div.menu-header {
+    height: 40px;
+    width: 100%;
+    background-color: #F3F2EE;
+    padding-top: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 10px 20px;
+
+    div.user-name {
+      font-family: $oc_main_bold_font;
+      font-size: 14px;
+      color: $cr_dark_gray;
+      float: left;
+    }
+
+    div.user-type {
+      float: right;
+      color: $cr_light_gray;
+      font-weight: 400;
+    }
+  }
 
   @include mobile() {
     position: relative;
@@ -11,7 +46,6 @@ ul.menu {
     left: 0px;
     width: 100%;
     opacity: 0;
-    list-style-type: none;
     border: none;
     border-top: 1px solid rgba(78,90,107,0.1);
     border-bottom: 1px solid rgba(78,90,107,0.1);
@@ -25,9 +59,18 @@ ul.menu {
     }
   }
 
-  li.oc-menu-item {
+  div.oc-menu-item {
     opacity: 0.9;
-    padding: 0px 20px;
+    padding: 12px 20px;
+
+    &:last-child {
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    &:hover {
+      background-color: #F3F2EE;
+    }
 
     @include mobile(){
       padding: 4px;
@@ -41,29 +84,24 @@ ul.menu {
       }
     }
 
-    &:hover {
-      background-color: transparent;
-      opacity: 1;
-      a {
-        background-color: transparent;
-      }
-    }
-
     a {
       display: block;
-      letter-spacing: 1px;
-      color: $oc_gray_5;
       background-color: transparent;
-      font-size: 14px;
-      font-family: $oc_headers_font;
-      font-weight: 400;
-      text-transform: none;
       padding: 0px;
+      font-family: $oc_main_font;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.0;
+      color: $cr_dark_gray;
 
       @include mobile() {
         font-size: 21px;
         color: $oc_gray_7;
       }
+    }
+
+    a.sign-out {
+      color: $cr_orange;
     }
   }
 }
