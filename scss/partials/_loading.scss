@@ -43,9 +43,9 @@ div.oc-loading {
   }
 
   &.active div.oc-loading-inner div.oc-loading-heart {
-    -webkit-animation: -webkit-heart-frames 1s linear;
+    -webkit-animation: -webkit-heart-frames 2s linear;
     -webkit-animation-iteration-count: infinite;
-    animation: heart-frames 1s linear;
+    animation: heart-frames 2s linear;
     animation-iteration-count: infinite;
   }
 
@@ -184,19 +184,19 @@ div.oc-loading {
     transform: rotateY(0deg);
     opacity: 1;
   }
-  25%{
+  10%{
     transform: rotateY(45deg);
     opacity: 1;
   }
-  50%{
+  20%{
     transform: rotateY(90deg);
     opacity: 1;
   }
-  75%{
+  30%{
     transform: rotateY(45deg);
     opacity: 1;
   }
-  100%{
+  40%{
     transform: rotateY(0deg);
     opacity: 1;
   }
@@ -207,19 +207,19 @@ div.oc-loading {
     -webkit-transform: rotateY(0deg);
     opacity: 1;
   }
-  25%{
+  10%{
     -webkit-transform: rotateY(45deg);
     opacity: 1;
   }
-  50%{
+  20%{
     -webkit-transform: rotateY(90deg);
     opacity: 1;
   }
-  75%{
+  30%{
     -webkit-transform: rotateY(45deg);
     opacity: 1;
   }
-  100%{
+  40%{
     -webkit-transform: rotateY(0deg);
     opacity: 1;
   }
