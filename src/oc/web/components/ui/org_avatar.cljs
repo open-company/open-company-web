@@ -8,7 +8,7 @@
 
 (rum/defcs org-avatar < rum/static
                         (rum/local false ::img-load-failed)
-  [s org-data should-show-link]
+  [s org-data should-show-link & [show-avatar-and-name]]
   (let [org-slug (:slug org-data)
         has-name (not (empty? (:name org-data)))
         org-name (if has-name
@@ -46,6 +46,8 @@
                  ; :style {:margin-top (str (max 0 (/ (- 35 (:logo-height org-data)) 2)) "px")}
                  :title org-name
                  :on-error #(reset! (::img-load-failed s) true)}]])
-          [:span.org-name
-            {:class (when-not show-org-avatar? "no-logo")}
-            org-name]]]]))
+          (when (or (not show-org-avatar?)
+                    show-avatar-and-name)
+            [:span.org-name
+              {:class (when-not show-org-avatar? "no-logo")}
+              org-name])]]]))

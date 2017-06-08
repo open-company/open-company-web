@@ -8,7 +8,7 @@
   [current-slug org]
   [:li
     {:class (when (= (:slug org) current-slug) "active")}
-    (org-avatar org true)])
+    (org-avatar org true true)])
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive

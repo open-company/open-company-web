@@ -86,15 +86,11 @@
                     (not (router/current-org-slug)))
               (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
                 (dom/img {:src (str ls/cdn-url "/img/oc-wordmark.svg") :style {:height "25px" :margin-top "12px"}}))
-              (if (:su-navbar data)
+              (when (:su-navbar data)
                 ;; If it's showing an update link the org avatar only if there is a link to the company
-                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))
-                ;; Show the orgs dropdown instead
-                (orgs-dropdown)))
-            (when-not (empty? (:logo-url org-data))
-              (dom/div {:class "nav navbar-nav navbar-center"}
-                (dom/img {:class "navbar-org-logo"
-                          :src (:logo-url org-data)})))
+                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))))
+            (dom/div {:class "nav navbar-nav navbar-center"}
+              (orgs-dropdown))
             (when-not (:hide-right-menu data)
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}
