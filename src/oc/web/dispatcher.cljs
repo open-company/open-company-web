@@ -145,6 +145,10 @@
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
+   :edit-user-profile   [[:base]
+                          (fn [base]
+                            {:user-data (:edit-user-profile base)
+                             :error (:edit-user-profile-failed base)})]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
