@@ -26,7 +26,6 @@
             [oc.web.components.team-management :refer (team-management-wrapper)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
-            [oc.web.components.edit-user-profile :refer (edit-user-profile)]
             [oc.web.components.about :refer (about)]
             [oc.web.components.login :refer (login)]
             [oc.web.components.oc-wall :refer (oc-wall)]
@@ -323,9 +322,7 @@
       (router/set-route! ["user-profile"] {:query-params (:query-params params)})
       (post-routing)
       (if (jwt/jwt)
-        (if (jwt/is-slack-org?)
-          (drv-root #(om/component (user-profile)) target)
-          (drv-root edit-user-profile target))
+        (drv-root #(om/component (user-profile)) target)
         (oc-wall-handler "Please sign in to access this page." target params)))
 
     (defroute org-logo-setup-route (urls/org-logo-setup ":org") {:as params}
