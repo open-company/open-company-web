@@ -11,7 +11,7 @@ div.menu {
   text-transform: none;
 
   div.top-arrow {
-    @include triangle(top, #F3F2EE, 10px);
+    @include triangle(top, $cr_dark_bg_gray, 10px);
     top: -15px;
     right: 10px;
     position: absolute;
@@ -20,7 +20,7 @@ div.menu {
   div.menu-header {
     height: 40px;
     width: 100%;
-    background-color: #F3F2EE;
+    background-color: $cr_dark_bg_gray;
     padding-top: 10px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -69,7 +69,7 @@ div.menu {
     }
 
     &:hover {
-      background-color: #F3F2EE;
+      background-color: $cr_dark_bg_gray;
     }
 
     @include mobile(){
