@@ -105,7 +105,7 @@
                 (jwt/is-admin? (:team-id org-data))
                 "You're an Admin"
                 (utils/link-for (:links org-data) "create")
-                "You're an Author")))
+                "You're a Contributor")))
         (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
           (when (and (router/current-org-slug)
                      (pos? (:count su-link)))
