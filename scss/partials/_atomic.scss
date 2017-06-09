@@ -29,7 +29,6 @@
   &:hover {
     background-color: #3FBD7C;
     color: #FFFFFF;
-
   }
 
   &:active, &:focus, &.active {
@@ -39,6 +38,33 @@
   &:disabled, &.disabled {
     opacity: 0.3;
     cursor: not-allowed;
+
+    &:hover {
+      background-color: #D4F6E4;
+      color: #0E8749;
+    }
+  }
+}
+
+.mlb-link {
+  background-color: transparent;
+  color: $cr_text_blue;
+  font-family: $oc_main_font;
+  font-weight: 900;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.mlb-link-black {
+  background-color: transparent;
+  color: $cr_dark_gray;
+  font-family: $oc_main_font;
+  font-weight: 900;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 
