@@ -1,11 +1,53 @@
+$user_profile_header_height: 124px;
+$user_profile_footer_height: 90px;
+$user_profile_content_width: 709;
+
 div.user-profile {
+
+  &.fullscreen-page {
+    background-color: $cr_settings_background;
+  }
+
+  div.user-profile-header {
+    position: relative;
+    font-size: 32px;
+    font-weight: 500;
+    color: $cr_gray;
+    background-color: $cr_dark_bg_gray;
+    height: $user_profile_header_height;
+    padding: 40px 32px;
+    width: #{$user_profile_content_width}px;
+    margin: 0 auto;
+  }
+
+  div.user-profile-footer {
+    height: $user_profile_footer_height;
+    box-shadow: inset 0 1px 0 0 #f3f2ee;
+    background-color: white;
+    position: relative;
+    width: #{$user_profile_content_width}px;
+    margin: 0 auto;
+    padding: 32px 34px;
+
+    button {
+      float: right;
+      margin-left: 14px;
+    }
+
+    button.mlb-link-black {
+      margin-top: 7px;
+    }
+  }
 
   div.user-profile-internal {
     position: relative;
-    padding: 2rem;
+    background-color: white;
+    height: calc(100vh - $user_profile_header_height - $user_profile_footer_height);
+    padding: 40px 32px;
+    margin: 0 auto;
 
     @include big_web(){
-      width: 580px;
+      width: 709px;
     }
     /* 29px is the height below the user info */
     min-height: calc(100vh - 114px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
@@ -16,93 +58,114 @@ div.user-profile {
       min-height: calc(100vh - 9px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
     }
 
-    div.user-profile-title {
-      height: 74px;
-      font-size: 26px;
-      font-weight: 400;
-      line-height: 1.4;
-      color: $oc_gray_5;
-    }
-
-    div.user-profile-disclaimer {
-      @include big_web(){
-        width: 580px;
-      }
-      height: 64px;
-      font-size: 18px;
-      line-height: 1.8;
-      color: $oc_gray_5;
-      margin-top: 32px;
-      margin-bottom: 20px;
-      font-weight: 400;
-    }
-
-    button.user-profile-refresh.success {
-      color: $oc_green_regular;
-    }
-
     div.user-profile-content {
-      padding: 28px;
-      background-color: rgba(78, 90, 107, 0.05);
-      margin-bottom: 20px;
 
-      .data-title {
-        font-family: $oc_headers_font;
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
+      div.user-profile-avatar-box {
+        height: 72px;
+        margin-bottom: 40px;
+
+        div.user-profile-avatar {
+          width: 72px;
+          height: 72px;
+          float: left;
+          margin-right: 25px;
+
+          img.user-avatar-img {
+            min-width: 72px;
+            min-height: 72px;
+          }
+        }
+
+        div.user-profile-avatar-change {
+          button.upload-photo {
+            height: 67px;
+            margin: 0;
+            padding: 0;
+
+            &:hover {
+              span.user-avatar-upload-cta {
+                text-decoration: underline;
+              }
+            }
+
+            span.user-avatar-upload-cta {
+              float: left;
+              text-align: left;
+              height: 22px;
+            }
+
+            span.user-avatar-upload-description {
+              color: #a3a6ab;
+              font-family: $oc_main_font;
+              font-size: 14px;
+              line-height: 1.29;
+              letter-spacing: 0.2px;
+              width: 210px;
+              height: 36px;
+              margin-top: 31px;
+              float: left;
+              text-align: left;
+              font-weight: 300;
+              margin-left: -100px;
+            }
+          }
+        }
       }
 
-      div.left-column{
-        @include big_web(){
-          width: 70%;
-          float: left;
+      div.user-profile-field-box {
+        text-align: left;
+
+        div.user-profile-field-label {
+          font-family: $oc_main_font;
+          font-size: 12px;
+          font-weight: 900;
+          font-style: normal;
+          font-stretch: normal;
+          line-height: 1.33;
+          letter-spacing: 0.5px;
+          color: $oc_gray_7;
+          text-transform: uppercase;
         }
 
-        div.user-profile-name {
-          margin-top: 6px;
-          font-size: 18px;
-          line-height: 1.8;
-          color: $oc_gray_5;
-        }
+        div.user-profile-field {
+          font-family: $oc_main_font;
+          font-size: 16px;
+          color: $cr_dark_gray;
+          margin: 8px 0 24px 0;
+          padding: 0;
 
-        div.user-profile-org-title {
-          margin-top: 25px;
-        }
+          input {
+            border-radius: 4px;
+            background-color: #ffffff;
+            border: solid 1px rgba(177, 184, 192, 0.5);
+            padding: 17px 11px;
+            height: 40px;
+            width: 100%;
+            outline: none;
+          }
 
-        div.user-profile-org {
-          margin-top: 6px;
-          font-size: 18px;
-          line-height: 1.8;
-          color: $oc_gray_5;
-        }
-
-        div.user-profile-email-title {
-          margin-top: 25px;
-        }
-
-        div.user-profile-email {
-          margin-top: 6px;
-          font-size: 18px;
-          line-height: 1.8;
-          color: $oc_gray_5;
+          select {
+            border-radius: 4px;
+            background-color: #ffffff;
+            border: solid 1px rgba(177, 184, 192, 0.5);
+            padding: 17px 11px;
+            height: 40px;
+            width: 100%;
+            outline: none;
+          }
         }
       }
 
-      div.right-column {
-        @include big_web(){
-          float: left;
-          width: 30%;
-          padding-left: 25px;
-        }
+      div.user-profile-column-left {
+        float: left;
+        width: 307px;
+        min-height: 100px;
+      }
 
-        img.user-profile-avatar {
-          margin-top: 11px;
-          max-width: 100px;
-          max-height: 100px;
-        }
+      div.user-profile-column-right {
+        float: right;
+        width: 307px;
+        min-height: 100px;
       }
     }
   }
