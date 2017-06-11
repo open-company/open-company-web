@@ -25,6 +25,7 @@
   font-size: 16px;
   line-height: 1.5;
   padding: .2em 1em;
+  transition: opacity 230ms, color 230ms, background-color 230ms;
 
   &:hover {
     background-color: #3FBD7C;
