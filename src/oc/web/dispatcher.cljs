@@ -9,7 +9,7 @@
                           :show-login-overlay false
                           :show-add-topic false
                           :dashboard-sharing false
-                          :trend-bar-status :trending}))
+                          :trend-bar-status :hidden}))
 
 ;; Data key paths
 
