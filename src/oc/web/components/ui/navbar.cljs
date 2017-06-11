@@ -82,13 +82,9 @@
         (dom/div {:class "oc-navbar-header group"
                   :style {:width (if header-width (str header-width "px") "100%")}}
           (dom/div {:class "oc-navbar-header-container group"}
-            (if (or (utils/in? (:route @router/path) "orgs")
-                    (not (router/current-org-slug)))
-              (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
-                (dom/img {:src (str ls/cdn-url "/img/oc-wordmark.svg") :style {:height "25px" :margin-top "12px"}}))
-              (when (:su-navbar data)
+            (when (and org-data (:su-navbar data))
                 ;; If it's showing an update link the org avatar only if there is a link to the company
-                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))))
+                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET")))
             (dom/div {:class "nav navbar-nav navbar-center"}
               (orgs-dropdown))
             (when-not (:hide-right-menu data)
