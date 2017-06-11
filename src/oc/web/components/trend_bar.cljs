@@ -2,13 +2,15 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer (add-class! remove-class!) :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (def status-bar-values
-  [:collapsed
+  [:hidden
+   :collapsed
    :expanded
    :trending])
 
@@ -50,6 +52,7 @@
                        (rum/local nil ::scroll-listener)
                        {:did-mount (fn [s]
                                      ; start listenings for scrolling events
+                                     (utils/after 1000 #(when (router/current-org-slug) (dis/dispatch! [:trend-bar-status :trending])))
                                      (let [scroll-listener (events/listen js/window EventType/SCROLL #(scrolled % s))]
                                        (reset! (::scroll-listener s) scroll-listener))
                                      s)
@@ -62,27 +65,28 @@
                                         (update-body-class @(drv/get-ref s :trend-bar-status))
                                         s)}
   [s org-name]
-  (let [trend-bar-status (drv/react s :trend-bar-status)]
-    [:div.trend-bar.group
-      {:class (name trend-bar-status)
-       :on-mouse-over #(when (= trend-bar-status :collapsed)
-                         (reset! (::hovering s) true)
-                         (dis/dispatch! [:trend-bar-status :expanded]))
-       :on-mouse-leave #(when @(::hovering s)
-                        (reset! (::hovering s) false)
-                        (dis/dispatch! [:trend-bar-status :collapsed]))}
-      [:div.trend-bar-orange-box
-        [:button.mlb-reset.toggle-trend-bt
-          {:on-click #(do
-                        (reset! (::hovering s) false)
-                        (dis/dispatch! [:trend-bar-status (if (not= trend-bar-status :trending) :trending :expanded)]))}
-          (if (not= trend-bar-status :trending) "Expand" "Hide")]
-        [:div.trending-org
-          (str "Trending in " org-name)]
-        (let [card-number 5]
-          [:div.trend-bar-cards
-            [:div.trend-bar-cards-inner
-              {:style {:width (str (+ (* 278 card-number) (* 16 (dec card-number))) "px")}}
-              (for [c (range 5)]
-                [:div.card
-                  {:key (str "card-" (rand 5))}])]])]]))
+  (when (router/current-org-slug)
+    (let [trend-bar-status (drv/react s :trend-bar-status)]
+      [:div.trend-bar.group
+        {:class (name trend-bar-status)
+         :on-mouse-over #(when (= trend-bar-status :collapsed)
+                           (reset! (::hovering s) true)
+                           (dis/dispatch! [:trend-bar-status :expanded]))
+         :on-mouse-leave #(when @(::hovering s)
+                          (reset! (::hovering s) false)
+                          (dis/dispatch! [:trend-bar-status :collapsed]))}
+        [:div.trend-bar-orange-box
+          [:button.mlb-reset.toggle-trend-bt
+            {:on-click #(do
+                          (reset! (::hovering s) false)
+                          (dis/dispatch! [:trend-bar-status (if (not= trend-bar-status :trending) :trending :expanded)]))}
+            (if (not= trend-bar-status :trending) "Expand" "Hide")]
+          [:div.trending-org
+            (str "Trending in " org-name)]
+          (let [card-number 5]
+            [:div.trend-bar-cards
+              [:div.trend-bar-cards-inner
+                {:style {:width (str (+ (* 278 card-number) (* 16 (dec card-number))) "px")}}
+                (for [c (range 5)]
+                  [:div.card
+                    {:key (str "card-" (rand 5))}])]])]])))

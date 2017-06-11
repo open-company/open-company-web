@@ -58,6 +58,16 @@ div.topic-list{
   }
 }
 
+body.trend-bar-hidden {
+  div.org-dashboard {
+    div.topic-list{
+      @include big_web(){
+        padding-top: #{$navbar_height}px;
+      }
+    }
+  }
+}
+
 body.trend-bar-collapsed {
   div.org-dashboard {
     div.topic-list{
