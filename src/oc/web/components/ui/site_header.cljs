@@ -15,7 +15,7 @@
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
-          [:img {:alt "OpenCompany" :src (str ls/cdn-url "/img/oc-wordmark.svg")}]]
+          [:img {:alt "Carrot" :src (str ls/cdn-url "/img/oc-wordmark.svg")}]]
         [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]

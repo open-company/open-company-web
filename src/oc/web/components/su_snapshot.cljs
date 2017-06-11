@@ -88,4 +88,4 @@
                                          {:opts {:topic-name (name (:topic-slug entry))}
                                           :key (:slug update)}))))))
               (dom/div {:class "su-sp-footer"} "Updates by "
-                (dom/a {:href "https://opencompany.com"} "OpenCompany")))))))))
+                (dom/a {:href "https://carrot.io"} "Carrot")))))))))

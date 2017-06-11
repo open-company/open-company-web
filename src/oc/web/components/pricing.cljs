@@ -24,7 +24,7 @@
               [:hr]
               [:p
                 [:span.cost "$0"][:string " / month"]]
-              [:p "OpenCompany is free to use for dashboards that are open to the public."]]]
+              [:p "Carrot is free to use for dashboards that are open to the public."]]]
           [:div.col-sm-4.col-xs-12.right
             [:div.price-box
               [:h1 "Private"]
@@ -39,7 +39,7 @@
           [:div.col-sm-3.col-xs-0]
           [:div.col-sm-6.col-xs-12
             [:div.concierge-logo
-              [:img {:id "oc-logo-gold" :src (str ls/cdn-url "/img/oc-logo-gold.png") :alt "OpenCompany Logo"}]]
+              [:img {:id "oc-logo-gold" :src (str ls/cdn-url "/img/oc-logo-gold.png") :alt "Carrot Logo"}]]
             [:h1 "Concierge"]
             [:p "Want us to build and maintain your dashboards for you? Our team will make it
             beautiful, and we can prepare team and investor updates for you to approve and send."]

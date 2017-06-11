@@ -12,7 +12,7 @@
   [:div.bot-access-prompt.fullscreen-page.group
     [:div.org-editor-box.group.navbar-offset
       [:div
-        [:div.slack-disclaimer "OpenCompany has a " [:span.bold "Slack bot"] " to make your life easier."]
+        [:div.slack-disclaimer "Carrot has a " [:span.bold "Slack bot"] " to make your life easier."]
         [:div.slack-disclaimer "The bot makes it easy to " [:span.bold "share updates to Slack"] ", and " [:span.bold "invite Slack teammates"] "that haven’t signed up."]
         [:div.slack-disclaimer "The bot will " [:span.bold "never"] " do anything without your permission."]
         [:botton.btn-reset.btn-link

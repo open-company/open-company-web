@@ -11,7 +11,7 @@
 
       [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
         [:li [:a.navbar-logo {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
-          [:img {:alt "OpenCompany" :src (str ls/cdn-url "/img/oc-logo-grey.svg")}]]]
+          [:img {:alt "Carrot" :src (str ls/cdn-url "/img/oc-logo-grey.svg")}]]]
         [:li.web-only
             [:a {:href oc-urls/pricing} "Pricing"]]
         [:li.web-only

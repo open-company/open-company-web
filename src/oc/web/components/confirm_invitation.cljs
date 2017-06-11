@@ -50,7 +50,7 @@
         (dom/div {:class "mt5 center group"}
           (dom/img {:src (str ls/cdn-url "/img/oc-logo-gold.png")})
           (dom/div {:class "confirm-invitation-p group"}
-            (dom/p {:class ""} "OpenCompany makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
+            (dom/p {:class ""} "Carrot makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
       (let [columns-num (responsive/columns-num)
             card-width (responsive/calc-card-width)]
         (footer (responsive/total-layout-width-int card-width columns-num))))))

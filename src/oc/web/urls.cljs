@@ -14,7 +14,7 @@
 
 (def contact "/contact")
 
-(def contact-email "hello@opencompany.com")
+(def contact-email "hello@carrot.io")
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")

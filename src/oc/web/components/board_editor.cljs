@@ -37,7 +37,7 @@
     {:loading false})
 
   (did-mount [_]
-    (utils/update-page-title "OpenCompany - Setup A Board"))
+    (utils/update-page-title "Carrot - Setup A Board"))
 
   (render-state [_ {:keys [loading]}]
     (dom/div {:class "board-editor"}
