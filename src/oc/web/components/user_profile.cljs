@@ -23,6 +23,7 @@
       (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000])
       (do
         (set! (.-onload node) #(img-on-load url node))
+        (set! (.-className node) "hidden")
         (gdom/append (.-body js/document) node)
         (set! (.-src node) url)))))
 
