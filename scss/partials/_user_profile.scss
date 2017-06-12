@@ -64,11 +64,12 @@ div.user-profile {
         height: 72px;
         margin-bottom: 40px;
 
-        div.user-profile-avatar {
+        button.user-profile-avatar {
           width: 72px;
           height: 72px;
           float: left;
           margin-right: 25px;
+          cursor: pointer;
 
           img.user-avatar-img {
             max-width: 72px;

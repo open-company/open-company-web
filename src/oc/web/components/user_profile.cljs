@@ -3,9 +3,33 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [cljsjs.moment-timezone]))
+            [cljsjs.moment-timezone]
+            [goog.object :as googobj]
+            [goog.dom :as gdom]))
+
+(defn- img-on-load [url img]
+  (dis/dispatch! [:input [:edit-user-profile :avatar-url] url])
+  (dis/dispatch! [:input [:edit-user-profile :has-changes] true])
+  (gdom/removeNode img))
+
+(defn success-cb
+  [res]
+  (let [url    (googobj/get res "url")
+        node   (gdom/createDom "img")]
+    (if-not url
+      (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000])
+      (do
+        (set! (.-onload node) #(img-on-load url node))
+        (gdom/append (.-body js/document) node)
+        (set! (.-src node) url)))))
+
+(defn progress-cb [res progress])
+
+(defn error-cb [res error]
+  (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000]))
 
 (defn change! [k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
@@ -34,11 +58,12 @@
       [:div.user-profile-internal
         [:div.user-profile-content.group
           [:div.user-profile-avatar-box.group
-            [:div.user-profile-avatar
+            [:button.user-profile-avatar.mlb-reset
+              {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
               (user-avatar-image current-user-data)]
             [:div.user-profile-avatar-change
               [:button.mlb-reset.mlb-link.upload-photo
-                {:on-click #()}
+                {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
                 [:span.user-avatar-upload-cta "Upload Photo"]
                 [:span.user-avatar-upload-description
                   "A 160x160 transparent Gif or PNG works best"]]]]
