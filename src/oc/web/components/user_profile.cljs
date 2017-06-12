@@ -107,13 +107,54 @@
           [:div.user-profile-field-box
             [:div.user-profile-field-label
               "DIGEST FREQUENCY " [:i.fa.fa-info-circle]]
-            [:div.user-profile-field
+            [:div.user-profile-field.digest-frequency-field.digest-frequency
               [:select
-                {:value (:digest-period current-user-data)
-                 :on-change #(change! :digest-period (.. % -target -value))}
-                [:option "DAILY"]
-                [:option "WEEKLY"]
-                [:option "MONTHLY"]]]]]]
+                {:value (:digest-frequency current-user-data)
+                 :on-change #(change! :digest-frequency (.. % -target -value))}
+                [:option {:value "weekly"} "WEEKLY"]
+                [:option {:value "daily"} "DAILY"]
+                [:option {:value "never"} "NEVER"]]]
+            [:div.user-profile-field.digest-frequency-field.digest-day
+              [:select
+                {:value (:digest-day current-user-data)
+                 :disabled (not= (:digest-frequency current-user-data) "weekly")
+                 :on-change #(change! :digest-day (.. % -target -value))}
+                [:option {:value "monday"} "MONDAY"]
+                [:option {:value "tuesday"} "TUESDAY"]
+                [:option {:value "wednesday"} "WEDNESDAY"]
+                [:option {:value "thursday"} "THURSDAY"]
+                [:option {:value "friday"} "FRIDAY"]
+                [:option {:value "saturday"} "SATURDAY"]
+                [:option {:value "sunday"} "SUNDAY"]]]
+            [:div.user-profile-field.digest-frequency-field.digest-time
+              [:select
+                {:value (:digest-time current-user-data)
+                 :disabled (= (:digest-frequency current-user-data) "never")
+                 :on-change #(change! :digest-time (.. % -target -value))}
+                [:option {:value "7am"} "7AM"]
+                [:option {:value "8am"} "8AM"]
+                [:option {:value "9am"} "9AM"]
+                [:option {:value "10am"} "10AM"]
+                [:option {:value "11am"} "11AM"]
+                [:option {:value "12pm"} "12PM"]
+                [:option {:value "1pm"} "1PM"]
+                [:option {:value "2pm"} "2PM"]
+                [:option {:value "3pm"} "3PM"]
+                [:option {:value "4pm"} "4PM"]
+                [:option {:value "5pm"} "5PM"]
+                [:option {:value "6pm"} "6PM"]
+                [:option {:value "7pm"} "7PM"]
+                [:option {:value "8pm"} "8PM"]
+                [:option {:value "9pm"} "9PM"]
+                [:option {:value "10pm"} "10PM"]
+                [:option {:value "11pm"} "11PM"]
+                [:option {:value "12am"} "12AM"]
+                [:option {:value "1am"} "1AM"]
+                [:option {:value "2am"} "2AM"]
+                [:option {:value "3am"} "3AM"]
+                [:option {:value "4am"} "4AM"]
+                [:option {:value "5am"} "5AM"]
+                [:option {:value "6am"} "6AM"]]]]]]
         [:div.user-profile-footer
           [:button.mlb-reset.mlb-default
             {:on-click #(dis/dispatch! [:user-profile-save])

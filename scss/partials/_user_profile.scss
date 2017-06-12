@@ -152,6 +152,20 @@ div.user-profile {
             height: 40px;
             width: 100%;
             outline: none;
+
+            &:disabled {
+              opacity: 0.5;
+            }
+          }
+
+          &.digest-frequency-field {
+            float: left;
+            width: 208px;
+            margin-right: 10px;
+
+            &:last-child {
+              margin-right: 0px;
+            }
           }
         }
       }
