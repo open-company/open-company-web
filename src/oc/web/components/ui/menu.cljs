@@ -36,15 +36,10 @@
   (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
-(defn org-settings-click [e]
+(defn team-settings-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings))))
-
-(defn board-settings-click [e]
-  (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/board-settings))))
 
 (defn um-click [e]
   (utils/event-stop e)
@@ -94,7 +89,9 @@
                             " dropdown-menu"))
           org-data (dis/org-data)
           board-data (when (router/current-board-slug)
-                        (dis/board-data))]
+                        (dis/board-data))
+          is-admin? (jwt/is-admin? (:team-id org-data))
+          is-author? (utils/link-for (:links org-data) "create")]
       (dom/div {:class menu-classes
                :aria-labelledby "dropdown-toggle-menu"}
         (dom/div {:class "top-arrow"})
@@ -102,38 +99,43 @@
           (dom/div {:class "user-name"} (str "Hi " (jwt/get-key :first-name) "!"))
            (dom/div {:class "user-type"}
               (cond
-                (jwt/is-admin? (:team-id org-data))
+                is-admin?
                 "You're an Admin"
-                (utils/link-for (:links org-data) "create")
+                is-author?
                 "You're a Contributor")))
-        (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
-          (when (and (router/current-org-slug)
-                     (pos? (:count su-link)))
-            (dom/div {:class "oc-menu-item"}
-              (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
-        (when (and (router/current-org-slug)
-                   (not (utils/in? (:route @router/path) "boards-list"))
-                   (responsive/is-tablet-or-mobile?))
-          (dom/div {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/org) :on-click list-boards-click} "Boards List")))
-        (when (and (router/current-org-slug)
-                   (jwt/is-admin? (:team-id org-data)))
-          (dom/div {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Team")))
-        (when (and (router/current-org-slug)
-                   (not (:read-only org-data))
-                   (not (responsive/is-mobile-size?)))
-          (dom/div {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/org-settings) :on-click org-settings-click} "Company Settings")))
-        (when (and (router/current-board-slug)
-                   (not (:read-only board-data))
-                   (not (responsive/is-mobile-size?)))
-          (dom/div {:class "oc-menu-item"}
-            (dom/a {:href (oc-urls/board-settings) :on-click board-settings-click} "Board Settings")))
-        ;; Temp commenting this out since we need API support to know how many companies the user has
-        ; (when (jwt/jwt)
+        ; (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
+        ;   (when (and (router/current-org-slug)
+        ;              (pos? (:count su-link)))
+        ;     (dom/div {:class "oc-menu-item"}
+        ;       (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
+        ; (when (and (router/current-org-slug)
+        ;            (not (utils/in? (:route @router/path) "boards-list"))
+        ;            (responsive/is-tablet-or-mobile?))
         ;   (dom/div {:class "oc-menu-item"}
-        ;     (dom/a {:href (oc-urls/boards (router/current-org-slug)) :on-click companies-click} "Companies")))
+        ;     (dom/a {:href (oc-urls/org) :on-click list-boards-click} "Boards List")))
+        (when (and is-admin?
+                   (router/current-org-slug)
+                   (not (responsive/is-mobile-size?)))
+          (dom/div {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/org-settings) :on-click team-settings-click} "Team Settings")))
+        (when (and (router/current-org-slug)
+                   is-admin?)
+          (dom/div {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Members")))
+        (when (and (router/current-org-slug)
+                   is-admin?)
+          (dom/div {:class "oc-menu-item"}
+            (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Invite People")))
+        (when (and (router/current-org-slug)
+                   is-admin?)
+          (dom/div {:class "oc-menu-item"}
+            (dom/a {:href "#" :on-click #(js/alert "Coming soon")} "Billing")))
+        ;; Temp commenting this out since we need API support to know how many companies the user has
+        (when (and (jwt/jwt)
+                   (or is-admin?
+                       is-author?))
+          (dom/div {:class "oc-menu-item"}
+            (dom/a {:href "#" :on-click #(js/alert "Coming soon")} "Archive")))
         (when (jwt/jwt)
           (dom/div {:class "oc-menu-item"}
             (dom/a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile")))

@@ -68,10 +68,6 @@ div.menu {
       border-bottom-right-radius: 5px;
     }
 
-    &:hover {
-      background-color: $cr_dark_bg_gray;
-    }
-
     @include mobile(){
       padding: 4px;
     }
@@ -97,6 +93,10 @@ div.menu {
       @include mobile() {
         font-size: 21px;
         color: $oc_gray_7;
+      }
+
+      &:hover {
+        text-decoration: underline;
       }
     }
 
