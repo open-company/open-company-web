@@ -16,3 +16,16 @@ div.login-button{
     }
   }
 }
+
+div.get-started-button {
+  button.mlb-get-started {
+    width: 109px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: $cr_text_blue;
+    font-family: $oc_main_font;
+    font-size: 13px;
+    font-weight: 900;
+    color: white;
+  }
+}
