@@ -36,11 +36,13 @@
           (dis/dispatch! [:trend-bar-status :collapsed])
           ; avoid to expand when the mouse move out of the trendbar
           (reset! (::hovering s) false))
-        (and (= trend-bar-status :collapsed)
-             (= next-scroll-top 0))
-        ; if the scroll reaches the top of the page
-        ; expand the trending bar
-        (dis/dispatch! [:trend-bar-status :trending]))
+        ;; FIXME: do not expand the trend bar on scroll up for now
+        ; (and (= trend-bar-status :collapsed)
+        ;      (= next-scroll-top 0))
+        ; ; if the scroll reaches the top of the page
+        ; ; expand the trending bar
+        ; (dis/dispatch! [:trend-bar-status :trending])
+        )
     ; save the scroll top for the enxt scroll
     (reset! (::last-scroll-top s) next-scroll-top)))
 
@@ -52,7 +54,7 @@
                        (rum/local nil ::scroll-listener)
                        {:did-mount (fn [s]
                                      ; start listenings for scrolling events
-                                     (utils/after 1000 #(when (router/current-org-slug) (dis/dispatch! [:trend-bar-status :trending])))
+                                     (utils/after 1000 #(when (router/current-org-slug) (dis/dispatch! [:trend-bar-status :collapsed])))
                                      (let [scroll-listener (events/listen js/window EventType/SCROLL #(scrolled % s))]
                                        (reset! (::scroll-listener s) scroll-listener))
                                      s)
