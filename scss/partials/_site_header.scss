@@ -1,18 +1,19 @@
 /* Header */
 
 nav.navbar-static-top {
-  border-top: 4px solid #f9d748; /* gold */
   background-color: white !important;
   margin-bottom: 0px !important;
 }
 
 @media (min-width: 768px) { /* not mobile */
   nav.navbar-static-top {
-    height: 105px;
+    height: 72px;
   }
 
   a.navbar-brand img {
-    margin-top: 21px;
+    margin-top: 10px;
+    width: 82px;
+    height: 20px;
   }
 }
 
@@ -30,30 +31,28 @@ button.navbar-toggle {
 }
 
 ul.navbar-nav li {
-  font-family: $oc_headers_font;
+  opacity: 0.8;
+  font-family: $oc_main_font;
   font-size: 14px;
-  font-weight: bold;
-  line-height: 1.5;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-weight: 500;
+  text-align: center;
+  color: #6d645f;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
 }
 
 ul.navbar-top li {
-  margin-top: 19px;
-}
-
-ul.navbar-top li .navbar-item {
-  opacity: 0.4;
-  color: $oc_gray_5 !important; //override bootstrap
-  font-family: $oc_headers_font;
-
-  &:hover {
-    opacity: 0.6;
-  }
+  margin-top: 10px;
 }
 
 @media (min-width: 768px)  { /* not mobile */
   .navbar-nav>li>a {
-    padding-top: 16px;
+    padding-top: 18px;
+  }
+  .navbar-nav>li button.mlb-get-started{
+    margin-top: 12px; 
   }
 }

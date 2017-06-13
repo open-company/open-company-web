@@ -12,6 +12,8 @@
 
 (def about "/about")
 
+(def blog "/blog")
+
 (def contact "/contact")
 
 (def contact-email "hello@carrot.io")
