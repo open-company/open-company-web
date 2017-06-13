@@ -208,8 +208,9 @@
               (dom/div {:class "group"}
                 (dom/div {:class "board-name"}
                   (:name board-data)
-                  (dom/button {:class "mlb-reset board-settings-bt"
-                               :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))}))
+                  (when-not (:read-only board-data)
+                    (dom/button {:class "mlb-reset board-settings-bt"
+                                 :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))})))
                 (when (and (not (:read-only (dis/org-data)))
                            (not (:show-add-topic data))
                            (not (router/current-topic-slug))
