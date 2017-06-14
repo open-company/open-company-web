@@ -956,12 +956,12 @@
 
 (defn pulse-reaction-count
   [topic-slug entry-uuid reaction]
-  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-" reaction)
-        el (sel1 [(keyword selector)])]
-    (pulse-animation el)))
+  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-" reaction)]
+    (when-let [el (sel1 [(keyword selector)])]
+      (pulse-animation el))))
 
 (defn pulse-comments-count
   [topic-slug entry-uuid]
-  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-comments-count")
-        el (sel1 [(keyword selector)])]
-    (pulse-animation el)))
+  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-comments-count")]
+    (when-let [el (sel1 [(keyword selector)])]
+      (pulse-animation el))))
