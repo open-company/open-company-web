@@ -655,13 +655,21 @@
     (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
   db)
 
+(defn update-user-data [db user-data]
+  (-> db
+      (assoc :current-user-data user-data)
+      (assoc :edit-user-profile user-data)
+      (dissoc :edit-user-profile-failed)))
+
 (defmethod dispatcher/action :name-pswd-collect/finish
-  [db [_ status]]
-  (if (and (>= status 200)
+  [db [_ status user-data]]
+  (if (and status
+           (>= status 200)
            (<= status 299))
     (do
       (cook/remove-cookie! :show-login-overlay)
-      (dissoc db :show-login-overlay))
+      (-> (update-user-data db user-data)
+          (dissoc :show-login-overlay)))
     (assoc db :collect-name-password-error status)))
 
 (defmethod dispatcher/action :pswd-collect
@@ -790,10 +798,7 @@
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]
-  (-> db
-      (assoc :current-user-data user-data)
-      (assoc :edit-user-profile user-data)
-      (dissoc :edit-user-profile-failed)))
+  (update-user-data db user-data))
 
 (defmethod dispatcher/action :user-profile-save
   [db [_]]

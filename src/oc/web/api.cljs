@@ -503,21 +503,6 @@
            #(when success
              (update-jwt-cookie! body))))))))
 
-(defn collect-name-password [firstname lastname pswd]
-  (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
-    (when (and (or firstname lastname) pswd update-link)
-      (auth-patch (relative-href (:href update-link))
-        {:json-params {
-          :first-name firstname
-          :last-name lastname
-          :password pswd
-         }
-         :headers (headers-for-link update-link)}
-        (fn [{:keys [status body success]}]
-          (when success
-            (dispatcher/dispatch! [:user-data (json->cljs body)]))
-          (utils/after 100 #(dispatcher/dispatch! [:name-pswd-collect/finish status])))))))
-
 (defn collect-password [pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
     (when (and pswd update-link)
@@ -567,6 +552,30 @@
                             (update-jwt-cookie! (:body res))
                             (dispatcher/dispatch! [:logout])))))))
                 (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
+
+(defn collect-name-password [firstname lastname pswd]
+  (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
+    (when (and (or firstname lastname) pswd update-link)
+      (auth-patch (relative-href (:href update-link))
+        {:json-params {
+          :first-name firstname
+          :last-name lastname
+          :password pswd
+         }
+         :headers (headers-for-link update-link)}
+        (fn [{:keys [status body success]}]
+          (if-not success
+            (dispatcher/dispatch! [:name-pswd-collect/finish status nil])
+            (when success
+              (dispatcher/dispatch! [:name-pswd-collect/finish status (json->cljs body)])
+              (utils/after 1000
+                (fn []
+                  (go
+                    (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
+                      (let [res (<! (refresh-jwt refresh-url))]
+                        (if (:success res)
+                          (update-jwt-cookie! (:body res))
+                          (dispatcher/dispatch! [:logout]))))))))))))))
 
 (defn add-email-domain [domain]
   (when domain
