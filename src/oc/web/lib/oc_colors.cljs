@@ -43,7 +43,8 @@
   :cr-dark-bg-gray "#F3F2EE"
   :cr-text-blue "#4c67fc"
   :cr_orange "#FA6452"
-  :cr-settings-background "#FCFBF7"})
+  :cr-settings-background "#FCFBF7"
+  :cr-dark-blue "#2e405a"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)
