@@ -1,6 +1,8 @@
 .navbar-bottom {
-  background-color: #F6F7F8 !important;
+  background-color: $cr_dark_blue !important;
   margin-bottom: 0px !important;
+  border-radius: 0px;
+  border: none;
 }
 
 .navbar-logo img {
