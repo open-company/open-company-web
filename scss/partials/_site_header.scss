@@ -13,10 +13,19 @@ nav.navbar-static-top {
     height: 72px;
   }
 
-  a.navbar-brand img {
-    margin-top: 10px;
-    width: 82px;
-    height: 20px;
+  div.navbar-header {
+    margin-left: 30px !important;
+
+    a.navbar-brand{
+      outline: none;
+      height: 72px;
+
+      img {
+        margin-top: 10px;
+        width: 82px;
+        height: 20px;
+      }
+    }
   }
 }
 
