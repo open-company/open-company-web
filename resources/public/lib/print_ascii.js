@@ -14,7 +14,8 @@ OCWebPrintAsciiArt(): print beautiful ASCII art,
 OCWebConfigLogLevel("debug"): to change log level.
 OCWebPrintUpdatesListData(): to print the current loaded list of updates,
 OCWebPrintUpdateData(): to print the current update data,
-OCWebPrintRouterPath(): to print the current router setup.
+OCWebPrintRouterPath(): to print the current router setup,
+OCWebForceRefreshToken(): force a JWT token refresh with our auth server.
 `)}
 
 function printArt(){
