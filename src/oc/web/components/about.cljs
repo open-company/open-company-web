@@ -49,6 +49,41 @@
       [:div.about-alignment
         [:div.quote "“"]
         [:div.about-alignment-description "Company alignment requires real openness and transparency."]]
+
+      [:div.about-team.group
+        [:h1.team "Our team"]
+        [:div.divider-line]
+
+        [:div.group
+          [:div.column-left.group
+            [:div.team-card
+              [:div.team-avatar]
+              [:div.team-member
+                [:div.team-name "Stuart Levinson"]
+                [:div.team-description "Skydiver, ninja, guitarist, Swiss design-head and communicator, collector, connector, creator. "]
+                [:div.team-media-links
+                  [:a.linkedin]
+                  [:a.twitter]]]]]
+
+          [:div.column-right.group
+            [:div.team-card
+              [:div.team-avatar]
+              [:div.team-member
+                [:div.team-name "Sean Johnson"]
+                [:div.team-description "Skydiver, ninja, guitarist, Swiss design-head and communicator, collector, connector, creator. "]
+                [:div.team-media-links
+                  [:a.linkedin]
+                  [:a.twitter]]]]]]
+
+        [:div.team-card
+          [:div.team-avatar]
+          [:div.team-member
+            [:div.team-name "Iacopo Carraro"]
+            [:div.team-description "Skydiver, ninja, guitarist, Swiss design-head and communicator, collector, connector, creator. "]
+            [:div.team-media-links
+              [:a.linkedin]
+              [:a.twitter]]]]]
+      [:div.about-footer]
     ] ; <!-- wrap -->
 
     (site-footer)])

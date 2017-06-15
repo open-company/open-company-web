@@ -128,7 +128,7 @@ div.about-alignment {
   background-color: $cr_dark_blue;
   padding: 115px 0;
   position: relative;
-  margin: 177px 0;
+  margin: 177px 0 0;
   text-align: center;
   
   div.quote {
@@ -149,6 +149,116 @@ div.about-alignment {
     color: white;
     text-align: center;
   }
+}
+
+div.about-team {
+  width: 1146px;
+  margin: 114px auto 0;
+  text-align: center;
+
+  h1.team {
+    font-family: $oc_main_font;
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    color: $cr_dark_blue;
+    margin-top: 35px;
+  }
+
+  div.divider-line {
+    margin-bottom: 56px;
+  }
+
+  div.team-card {
+    margin: 26px auto 0;
+    width: 561px;
+    height: 230px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.03);
+    padding: 40px;
+
+    div.team-avatar {
+      background-image: url("/img/ML/user_avatar_red.svg");
+      background-size: 64px 64px;
+      background-repeat: no-repeat;
+      width: 64px;
+      height: 64px;
+      float: left;
+    }
+
+    div.team-member {
+      float: left;
+      margin-left: 26px;
+      text-align: left;
+      width: 390px;
+
+      div.team-name {
+        font-family: $oc_main_font;
+        font-weight: 700;
+        font-size: 24px;
+        font-weight: 900;
+        color: #383b41;
+      }
+
+      div.team-description {
+        font-family: $oc_main_font;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.75;
+        color: #6a707a;
+      }
+
+      div.team-media-links {
+        height: 20px;
+        margin-top: 20px;
+
+        a {
+          width: 20px;
+          height: 20px;
+          display: block;
+          float: left;
+          margin-right: 40px;
+
+          &.twitter {
+            background-image: url("/img/ML/about_twitter.svg");
+            background-size: 20px 17.5px;
+            background-repeat: no-repeat;
+          } 
+
+          &.linkedin {
+            background-image: url("/img/ML/about_linkedin.svg");
+            background-size: 20px 20px;
+            background-repeat: no-repeat;
+          }
+        }
+      }
+    }
+  }
+
+  div.column-left {
+    float: left;
+    width: 561px;
+    div.team-card {
+      float: left;
+      margin-right: 24px;
+    }
+  }
+
+  div.column-right {
+    float: right;
+    width: 561px;
+    div.team-card {
+      float: right;
+    }
+  }
+}
+
+div.about-footer {
+  width: 100%;
+  margin: 190px auto 0;
+  padding: 56px 0 86px;
+  background-image: linear-gradient(252deg, #f7c144, #f2558f);
 }
 
 
