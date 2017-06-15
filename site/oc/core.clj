@@ -65,7 +65,7 @@
 
 (defn tagline []
   [:div.tagline.text-center
-    [:h1 "Startup Transparency Made Simple"]
+    [:h1 "Everyone on the same page"]
     [:div.early-access
      [:form.form-inline
       [:div.form-group
@@ -77,7 +77,7 @@
   [:nav.navbar.navbar-default.navbar-bottom
     [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
       [:li [:a.navbar-logo {:href "/"}
-        [:img {:alt "OpenCompany" :src (str (env :oc_web_cdn_url) "/img/oc-logo-grey.svg")}]]]
+        [:img {:alt "Carrot" :src (str (env :oc_web_cdn_url) "/img/oc-logo-grey.svg")}]]]
       [:li.web-only
         [:a {:href "/pricing"} "Pricing"]]
       [:li.web-only

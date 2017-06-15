@@ -169,7 +169,7 @@
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "OpenCompany - Startup Transparency Made Simple"]
+          [:title "Carrot - Everyone on the same page"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -244,7 +244,7 @@
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "OpenCompany - Startup Transparency Made Simple"]
+          [:title "Carrot - Everyone on the same page"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
