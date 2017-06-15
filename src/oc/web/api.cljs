@@ -841,3 +841,14 @@
         {:headers (headers-for-link reaction-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:reaction-toggle/finish topic-slug entry-uuid (:reaction reaction-data) (if success (json->cljs body) nil)]))))))
+
+
+(defn force-jwt-refresh []
+  (if-let [refresh-url (j/get-key :refresh-url)]
+    (let [res (<! (refresh-jwt refresh-url))]
+      (if (:success res)
+        (update-jwt-cookie! (:body res))
+        (dispatcher/dispatch! [:logout])))
+    (dispatcher/dispatch! [:logout])))
+
+(set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)

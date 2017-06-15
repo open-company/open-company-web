@@ -1,4 +1,4 @@
-(ns oc.web.components.bw-boards-list
+(ns oc.web.components.boards-list
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -27,7 +27,7 @@
 (defn sorted-boards [boards]
   (into [] (sort-by :name boards)))
 
-(defcomponent bw-boards-list
+(defcomponent boards-list
   [{:keys [org-data board-data card-width show-add-topic] :as data} owner options]
 
   (did-mount [_]
@@ -71,11 +71,11 @@
                                                :selected (= (router/current-board-slug) (:slug board))})
                       :style {:width (str (- responsive/left-boards-list-width 17) "px")}
                       :data-board (name (:slug board))
-                      :key (str "bw-board-list-" (name (:slug board)))
+                      :key (str "board-list-" (name (:slug board)))
                       :on-click #(when (nil? (:foce-key data))
                                    (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
               (dom/div {:class "internal has-news"
-                        :key (str "bw-board-list-" (name (:slug board)) "-internal")}
+                        :key (str "board-list-" (name (:slug board)) "-internal")}
                 (or (:name board) (:slug board)))
               (when (utils/link-for (:links board) "delete")
                 (dom/button {:class "remove-board btn-reset"
