@@ -8,23 +8,38 @@
 (rum/defc site-footer []
   ;; <!-- footer -->
   [:nav.navbar.navbar-default.navbar-bottom
+    [:div.container-fluid.group
+      [:div.left-column
+        [:img.logo
+          {:src "/img/ML/carrot_wordmark_white.svg"}]
+        [:div.small-links
+          [:a "Get started"] "|" [:a "Login"]]
+        [:div.small-logos
+          [:a.twitter
+            [:img {:src "/img/ML/home_page_twitter.svg"}]]
+          [:a.medium
+            [:img {:src "/img/ML/home_page_medium.svg"}]]]
+        [:div.copyright "© Copyright 2017. All rights reserved"]]
+      [:div.right-column
 
-      [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
-        [:li [:a.navbar-logo {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
-          [:img {:alt "Carrot" :src (str ls/cdn-url "/img/oc-logo-grey.svg")}]]]
-        [:li.web-only
-            [:a {:href oc-urls/pricing} "Pricing"]]
-        [:li.web-only
-            [:a {:href oc-urls/about} "About"]]
-        [:li
-          [:a.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
-        [:li.mobile-only {:style {:float "right" :marginRight "15px"}}
-          [:a {:href "https://twitter.com/opencompanyhq"}
-            [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]]
-      [:ul.nav.navbar-nav.navbar-right
-        [:li
-          [:a {:href oc-urls/oc-twitter}
-            [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]
-        [:li
-          [:a {:href "https://github.com/open-company"}
-            [:i.fa.fa-2x.fa-github {:aria-hidden "true"}]]]]])
+        [:div.column
+          [:div.column-title "SUPPORT"]
+          [:div.column-item [:a "Help"]]
+          [:div.column-item [:a "Contact"]]]
+
+        [:div.column
+          [:div.column-title "INTEGRATIONS"]
+          [:div.column-item [:a "Slack"]]
+          [:div.column-item [:a "Developers"]]]
+
+        [:div.column
+          [:div.column-title "COMPANY"]
+          [:div.column-item [:a "About"]]
+          [:div.column-item [:a "Blog"]]
+          [:div.column-item [:a "Legal"]]]
+
+        [:div.column
+          [:div.column-title "TOUR"]
+          [:div.column-item [:a "Home"]]
+          [:div.column-item [:a "Features"]]
+          [:div.column-item [:a "Pricing"]]]]]])
