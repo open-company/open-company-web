@@ -7,8 +7,11 @@
 }
 
 div.container.about {
+  padding-left: 0px;
+  padding-right: 0px;
   margin-top: 50px;
   margin-bottom: 50px;
+  text-align: center;
 }
 
 @media (min-width: 768px) { 
@@ -18,14 +21,136 @@ div.container.about {
 }
 
 h1.about {
-  font-family: $oc_headers_font;
-  font-size: 24px;
-  line-height: 1.1;
-  color: #4e5a6b;
-  text-align: center;
-  margin-top: 50px;
-  margin-bottom: 20px;
+  font-family: $oc_main_font;
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  color: $cr_dark_blue;
+  margin-top: 35px;
 }
+
+div.divider-line {
+  margin-top: 32px;
+  width: 82px;
+  height: 6px;
+  background-color: $cr_orange;
+  left: 50%;
+  margin-left: -41px;
+  position: relative;
+}
+
+div.about-subline {
+  font-family: $oc_main_font;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  text-align: center;
+  color: $cr_dark_blue;
+  margin-top: 50px;
+  margin-bottom: 106px;
+}
+
+div.paragraph {
+  margin-top: 20px;
+  font-family: $oc_main_font;
+  font-size: 20px;
+  text-align: center;
+  color: #3B3D40;
+}
+
+div.principle {
+  margin-top: 126px;
+  position: relative;
+
+  div.principle-logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    backgorund-size: 80px 80px;
+  }
+
+  div.principle-title {
+    padding-top: 90px;
+    font-size: 36px;
+    font-family: $oc_main_font;
+    width: 564px;
+    text-align: left;
+    margin-left: 160px
+  }
+
+  div.principle-description {
+    color: #3B3D40;
+    font-family: $oc_main_font;
+    font-size: 20px;
+    width: 564px;
+    text-align: left;
+    margin-left: 160px;
+    margin-top: 23px;
+  }
+
+  &.principle-1 {
+
+    div.principle-logo {
+      background-image: url("/img/ML/about_principle_1.svg");
+    }
+
+    div.principle-title {
+      color: $cr_orange;
+    }
+  }
+
+  &.principle-2 {
+
+    div.principle-logo {
+      background-image: url("/img/ML/about_principle_2.svg");
+    }
+
+    div.principle-title {
+      color: #0F8E4C;
+    }
+  }
+
+  &.principle-3 {
+
+    div.principle-logo {
+      background-image: url("/img/ML/about_principle_3.svg");
+    }
+
+    div.principle-title {
+      color: $cr_text_blue;
+    }
+  }
+}
+
+div.about-alignment {
+  background-color: $cr_dark_blue;
+  padding: 115px 0;
+  position: relative;
+  margin: 177px 0;
+  text-align: center;
+  
+  div.quote {
+    position: absolute;
+    left: 50%;
+    margin-left: -480px;
+    top: 70px;
+    font-size: 200px;
+    font-family: $oc_main_font;
+    color: $cr_orange;
+  }
+
+  div.about-alignment-description {
+    width: 1024px;
+    padding: 0 117px;
+    margin: 0 auto;
+    font-size: 33px;
+    color: white;
+    text-align: center;
+  }
+}
+
 
 div.container p {
   font-family: $oc_main_font;
