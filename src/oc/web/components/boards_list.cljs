@@ -111,7 +111,7 @@
                      true) ;; FIXME: replace with create storeis link check
             (dom/button {:class "left-boards-list-top-title btn-reset right"
                          :on-click #(identity %) ;; FIXME: Replace with story creation action
-                         :title "Create a new board"
+                         :title "Create a new story"
                          :data-placement "top"
                          :data-toggle "tooltip"
                          :data-container "body"})))
