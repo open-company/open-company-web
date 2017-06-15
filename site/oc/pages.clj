@@ -167,6 +167,7 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "Carrot - Everyone on the same page"]
@@ -242,6 +243,7 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "Carrot - Everyone on the same page"]
