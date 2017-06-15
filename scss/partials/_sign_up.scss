@@ -11,7 +11,8 @@ div#wrap {
       font-family: $oc_main_font;
       color: $cr_dark_blue;
       padding: 0;
-      margin: 0;
+      max-width: 830px;
+      margin: 0 auto 20px;
     }
 
     div.description {
@@ -184,7 +185,7 @@ div#wrap {
 
     div.customers-cards {
       margin: 60px auto;
-      width: 1300px;
+      width: 1246px;
 
       div.left-arrow {
         height: 200px;
@@ -208,6 +209,7 @@ div#wrap {
           }
         }
       }
+
       div.customers-cards-scroll {
         width: 1110px;
         height: 200px;
@@ -231,6 +233,7 @@ div#wrap {
           }
         }
       }
+
       div.right-arrow {
         height: 200px;
         width: 48px;

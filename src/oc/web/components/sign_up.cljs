@@ -21,8 +21,6 @@
         ; Hope page header
         [:div.cta
           [:h1 "Company updates that keep everyone on the same page."]
-          [:div.description
-            "Company updates and stories that keep teams aligned over time."]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
             "Get started for free"]
@@ -96,7 +94,7 @@
           [:div.try-it-title
             "Try it today"]
           [:div.try-it-subtitle
-            "Easy set-up · Free for small team"]
+            "Easy set-up • Free for small teams"]
           [:div.try-it-combo-field
             [:input
               {:type "text"
