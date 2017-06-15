@@ -24,12 +24,16 @@
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
           [:li
-              [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
+            {:class (when (utils/in? (:route @router/path) "pricing") "active")}
+            [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
           [:li
-              [:a.navbar-item {:href oc-urls/about :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))} "About"]]
+            {:class (when (utils/in? (:route @router/path) "about") "active")}
+            [:a.navbar-item {:href oc-urls/about :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))} "About"]]
           [:li
-              [:a.navbar-item {:href oc-urls/blog :on-click #(do (.preventDefault %) (router/nav! oc-urls/blog))} "Blog"]]
+            {:class (when (utils/in? (:route @router/path) "blog") "active")}
+            [:a.navbar-item {:href oc-urls/blog :on-click #(do (.preventDefault %) (router/nav! oc-urls/blog))} "Blog"]]
           [:li.mobile-only
+            {:class (when (utils/in? (:route @router/path) "contact") "active")}
             [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
           [:li
             (if (jwt/jwt)

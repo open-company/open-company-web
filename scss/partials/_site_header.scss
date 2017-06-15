@@ -42,13 +42,14 @@ button.navbar-toggle {
   background-color: white;
 }
 
-ul.navbar-nav li {
+ul.navbar-nav li a {
   opacity: 0.8;
   font-family: $oc_main_font;
   font-size: 14px;
   font-weight: 500;
   text-align: center;
   color: #6d645f;
+  background-color: transparent !important;
 
   &:hover {
     opacity: 1;
@@ -56,8 +57,17 @@ ul.navbar-nav li {
   }
 }
 
-ul.navbar-top li {
-  margin-top: 10px;
+ul.navbar-top {
+  margin-right: 30px;
+
+  li {
+    padding-top: 10px;
+
+    &.active {
+      border-top: 4px solid $cr_orange;
+      padding-top: 6px;
+    }
+  }
 }
 
 @media (min-width: 768px)  { /* not mobile */
