@@ -14,7 +14,7 @@
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.topic-view :refer (topic-view)]
             [oc.web.components.add-topic :refer (add-topic)]
-            [oc.web.components.bw-boards-list :refer (bw-boards-list)]))
+            [oc.web.components.boards-list :refer (boards-list)]))
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
@@ -202,7 +202,7 @@
                 (dom/button {:class "btn-reset btn-link"
                              :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
-              (om/build bw-boards-list data))
+              (om/build boards-list data))
             (dom/div {:class "board-container right"
                       :style {:width (str (- total-width-int responsive/left-boards-list-width 40) "px")}}
               (dom/div {:class "group"}
