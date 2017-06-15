@@ -20,7 +20,7 @@
       [:div.main.sign-up
         ; Hope page header
         [:div.cta
-          [:h1 "Where companies find alignment"]
+          [:h1 "Company updates that keep everyone on the same page."]
           [:div.description
             "Company updates and stories that keep teams aligned over time."]
           [:button.get-started-centred-bt.mlb-reset
