@@ -74,7 +74,7 @@ nav.oc-navbar {
       div.preview-title {
         width: 150px;
         font-weight: 700;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
@@ -175,7 +175,7 @@ nav.oc-navbar {
           &.btn-link {
             font-size: 14px;
             color: $oc_blue_dark;
-            font-family: $oc_headers_font;
+            font-family: $oc_main_font;
             outline: none;
             font-weight: 400;
             text-transform: none;
@@ -228,7 +228,7 @@ nav.oc-navbar {
         height: 33px;
         font-size: 0.75rem;
         font-weight: 700;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
       }
 
       button.share-button {
@@ -241,7 +241,7 @@ nav.oc-navbar {
       font-size: 14px;
       color: rgba(78,90,107,0.6);
       margin-right: 20px;
-      font-family: $oc_headers_font;
+      font-family: $oc_main_font;
       margin-top: 2px;
       outline: none;
 

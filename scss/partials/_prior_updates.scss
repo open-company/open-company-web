@@ -8,7 +8,7 @@ div.prior-updates {
 
   h3.mobile-title {
     margin-left: 20px;
-    font-family: $oc_headers_font;
+    font-family: $oc_main_font;
     font-weight: 500;
     font-size: 24px;
     text-transform: none;
@@ -28,7 +28,7 @@ div.prior-updates {
       }
 
       h3.message {
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-size: 16px;
         font-weight: 700;
         line-height: 1.5;
@@ -80,7 +80,7 @@ div.prior-updates {
       div.update-title {
         margin-bottom: 0;
         font-size: 14px;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-weight: 400;
 
         a {

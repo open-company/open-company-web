@@ -24,7 +24,7 @@ div.su-snapshot {
     div.su-mobile-navigation-title {
       color: $oc_gray_7;
       font-weight: 400;
-      font-family: $oc_headers_font;
+      font-family: $oc_main_font;
       font-size: 25px;
       padding-top: 16px;
       overflow: hidden;
@@ -43,7 +43,7 @@ div.su-snapshot {
       width: 30px;
       height: 30px;
       font-weight: 400;
-      font-family: $oc_headers_font;
+      font-family: $oc_main_font;
       font-size: 28px;
       color: $oc_gray_7;
     }
@@ -109,7 +109,7 @@ div.su-snapshot {
         line-height: 1.2;
         color: $oc_gray_7;
         font-size: 24px;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-weight: 500;;
       }
     }

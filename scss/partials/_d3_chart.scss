@@ -86,7 +86,7 @@ div.composed-topic {
 
     div.chart-value, div.chart-label {
       font-weight: 700;
-      font-family: $oc_headers_font;
+      font-family: $oc_main_font;
       line-height: 1.5;
     }
 
@@ -110,7 +110,7 @@ div.composed-topic {
 
       div.chart-value, div.chart-label {
         font-weight: 400;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         line-height: 1.5;
         font-size: 13px;
         color: $oc_gray_5;

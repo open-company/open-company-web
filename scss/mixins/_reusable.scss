@@ -91,7 +91,7 @@
     color: rgba(78, 90, 107, 0.5);
     cursor: pointer;
     text-transform: uppercase;
-    font-family: $oc_headers_font;
+    font-family: $oc_main_font;
 
     &.active {
       background-color: #ffffff;
@@ -157,7 +157,7 @@
 
   h1, h2, h3, h4, h5 {
     font-weight: 700;
-    font-family: $oc_headers_font;
+    font-family: $oc_main_font;
     text-size: 19px;
   }
 

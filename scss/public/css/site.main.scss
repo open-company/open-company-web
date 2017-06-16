@@ -22,7 +22,7 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: $oc_headers_font;
+  font-family: $oc_main_font;
   color: #444;
 }
 
@@ -80,7 +80,7 @@ div.gradient {
 }
 
 nav.navbar {
-  font-family: $oc_headers_font;
+  font-family: $oc_main_font;
   font-weight: 300;
 }
 
@@ -142,7 +142,7 @@ div.early-access button {
   padding-right: 15px;
   margin-left: 5px;
   transition: all 0.3s ease 0s;
-  font-family: $oc_headers_font;
+  font-family: $oc_main_font;
 }
 
 div.early-access button:hover {
@@ -457,7 +457,7 @@ div.container.outer.footer nav.navbar {
 }
 
 .error-page p {
-  font-family: $oc_headers_font;
+  font-family: $oc_main_font;
 }
 
 .error-page p a {
@@ -466,7 +466,7 @@ div.container.outer.footer nav.navbar {
 
 .error-page .btn {
     margin-top: 2rem;
-    font-family: $oc_headers_font;
+    font-family: $oc_main_font;
     background-color: $oc_yellow;
     padding: .7rem 2rem;
     color: white;

@@ -27,7 +27,7 @@ div.topic-view-container{
       width: 100%;
       height: #{$mobile_navbar_height}px;
       font-size: 22px;
-      font-family: $oc_headers_font;
+      font-family: $oc_main_font;
       font-weight: 700;
       position: fixed;
       top: 0;
@@ -113,7 +113,7 @@ div.topic-view-container{
           color: $oc_gray_5;
           padding: 12px;
           font-size: 13px;
-          font-family: $oc_headers_font;
+          font-family: $oc_main_font;
           text-transform: uppercase;
           letter-spacing: 1px;
           line-height: 1.5;

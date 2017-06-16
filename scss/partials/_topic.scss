@@ -127,7 +127,7 @@ div.topic {
         font-size: 12px;
         color: $oc_gray_7;
         opacity: 0.6;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         padding-left: 10px;
         padding-right: 10px;
         margin-left: 0px;
@@ -135,7 +135,7 @@ div.topic {
       }
 
       div.topic-headline-inner {
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         padding-top: 5px;
         font-size: 13px;
         font-weight: 400;
@@ -326,7 +326,7 @@ div.topic {
         letter-spacing: 1px;
         color: rgba(78,90,107,0.5);
         text-transform: uppercase;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-weight: 700;
         float: left;
         @include big_web(){

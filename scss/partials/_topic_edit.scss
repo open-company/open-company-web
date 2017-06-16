@@ -115,7 +115,7 @@ div.topic.topic-edit {
     input.topic-title {
       padding-top: 12px;
       opacity: 0.5;
-      font-family: $oc_headers_font;
+      font-family: $oc_main_font;
       font-weight: 700;
       font-size: 13px;
       line-height: 1.5;
@@ -312,7 +312,7 @@ div.topic.topic-edit {
 
         label.char-counter {
           font-weight: 700;
-          font-family: $oc_headers_font;
+          font-family: $oc_main_font;
           font-size: 12px;
           line-height: 1.5;
           letter-spacing: 1px;

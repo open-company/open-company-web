@@ -22,7 +22,7 @@ div.create-update {
           border: none;
           outline: none;
           font-size: 24px;
-          font-family: $oc_headers_font;
+          font-family: $oc_main_font;
           font-weight: 500;
           color: $oc_gray_7;
           margin: 0 30px 23px;
@@ -39,7 +39,7 @@ div.create-update {
 
         div.create-update-content-cards-no-topics{
           font-size: 17px;
-          font-family: $oc_headers_font;
+          font-family: $oc_main_font;
           font-weight: 600;
           color: $oc_gray_5;
           opacity: 0.5;
@@ -118,7 +118,7 @@ div.create-update {
         }
 
         div.create-update-content-cta {
-          font-family: $oc_headers_font;
+          font-family: $oc_main_font;
           font-weight: 400;
           font-size: 14px;
           color: $oc_gray_5;
@@ -131,7 +131,7 @@ div.create-update {
           padding: 0;
 
           div.create-update-topics-list-item {
-            font-family: $oc_headers_font;
+            font-family: $oc_main_font;
             font-size: 14px;
             font-weight: 400;
             text-transform: capitalize;
