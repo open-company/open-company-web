@@ -277,12 +277,13 @@ div.about-team {
 div.about-footer {
   width: 100%;
   margin: 0 auto;
-  padding: 155px 128px;
+  padding: 155px 78px;
   background-image: linear-gradient(252deg, #f7c144, #f2558f);
 
   div.block {
     width: 50%;
     text-align: left;
+    padding-left: 50px;
 
     div.block-title {
       @include avenir_H();
