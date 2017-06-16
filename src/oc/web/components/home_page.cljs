@@ -1,4 +1,4 @@
-(ns oc.web.components.sign-up
+(ns oc.web.components.home-page
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -7,7 +7,7 @@
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defcs sign-up < rum/reactive [s]
+(rum/defcs home-page < rum/reactive [s]
 
   [:div
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
@@ -17,7 +17,7 @@
       [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
       (login-overlays-handler)
 
-      [:div.main.sign-up
+      [:div.main.home-page
         ; Hope page header
         [:div.cta
           [:h1 "Company updates that get\neveryone on the same page"]

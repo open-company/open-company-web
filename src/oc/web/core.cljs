@@ -29,7 +29,7 @@
             [oc.web.components.about :refer (about)]
             [oc.web.components.login :refer (login)]
             [oc.web.components.oc-wall :refer (oc-wall)]
-            [oc.web.components.sign-up :refer (sign-up)]
+            [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.board-editor :refer (board-editor)]
@@ -228,12 +228,12 @@
       (timbre/info "Routing login-route" urls/login)
       (when-not (contains? (:query-params params) :jwt)
         (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
-      (simple-handler sign-up "login" target params))
+      (simple-handler home-page "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
       (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
-      (simple-handler sign-up "sign-up" target params))
+      (simple-handler home-page "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
