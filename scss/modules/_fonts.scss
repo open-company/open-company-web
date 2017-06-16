@@ -1,3 +1,81 @@
-$oc_main_font: 'Muli', sans-serif;
-$oc_main_bold_font: 'Muli Black', sans-serif;
-$oc_main_font: 'Open Sans', Arial, sans-serif;
+$oc_main_font: AvenirLTStd-Medium, 'Muli', sans-serif;
+$oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
+
+.AvenirLTStd-MediumOblique {
+  font-family: AvenirLTStd-MediumOblique;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-Medium {
+  font-family: AvenirLTStd-Medium;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-BlackOblique {
+  font-family: AvenirLTStd-BlackOblique;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-Oblique {
+  font-family: AvenirLTStd-Oblique;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-Roman {
+  font-family: AvenirLTStd-Roman;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-Heavy {
+  font-family: AvenirLTStd-Heavy;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-HeavyOblique {
+  font-family: AvenirLTStd-HeavyOblique;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-Black {
+  font-family: AvenirLTStd-Black;
+  font-weight: normal;
+  font-style: normal;
+}
+
+@mixin avenir($avenir_variant: Black){
+  font-family: AvenirLTStd-#{$avenir_variant};
+  font-weight: normal;
+  font-style: normal;
+}
+
+@mixin avenir_MO(){
+  @include avenir(MediumOblique);
+}
+
+@mixin avenir_M(){
+  @include avenir(Medium);
+}
+
+@mixin avenir_BO(){
+  @include avenir(BlackOblique);
+}
+
+@mixin avenir_B(){
+  @include avenir(Black);
+}
+
+@mixin avenir_O(){
+  @include avenir(Oblique);
+}
+
+@mixin avenir_R(){
+  @include avenir(Roman);
+}
+
+@mixin avenir_H(){
+  @include avenir(Heavy);
+}
+
+@mixin avenir_HO(){
+  @include avenir(HeavyOblique);
+}

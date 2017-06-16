@@ -199,6 +199,8 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css?oc_deploy_key"}]
+          ;; CarrotKit Font
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css?oc_deploy_key"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
