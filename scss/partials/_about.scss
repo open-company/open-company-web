@@ -21,9 +21,8 @@ div.container.about {
 }
 
 h1.about {
-  font-family: $oc_main_font;
+  @include avenir_H();
   font-size: 40px;
-  font-weight: 900;
   letter-spacing: 0.3px;
   color: $cr_dark_blue;
   margin-top: 35px;
@@ -40,9 +39,8 @@ div.divider-line {
 }
 
 div.about-subline {
-  font-family: $oc_main_font;
+  @include avenir_H();
   font-size: 28px;
-  font-weight: 900;
   letter-spacing: 0.2px;
   text-align: center;
   color: $cr_dark_blue;
@@ -157,9 +155,8 @@ div.about-team {
   text-align: center;
 
   h1.team {
-    font-family: $oc_main_font;
+    @include avenir_H();
     font-size: 40px;
-    font-weight: 900;
     letter-spacing: 0.3px;
     color: $cr_dark_blue;
     margin-top: 35px;
@@ -194,10 +191,8 @@ div.about-team {
       width: 390px;
 
       div.team-name {
-        font-family: $oc_main_font;
-        font-weight: 700;
+        @include avenir_H();
         font-size: 24px;
-        font-weight: 900;
         color: #383b41;
       }
 
@@ -273,9 +268,8 @@ div.about-footer {
     text-align: left;
 
     div.block-title {
-      font-family: $oc_main_font;
+      @include avenir_H();
       font-size: 36px;
-      font-weight: 900;
       letter-spacing: 0.2px;
       color: white;
     }
@@ -293,9 +287,8 @@ div.about-footer {
     button {
       border-radius: 8px;
       background-color: white;
-      font-family: $oc_main_font;
+      @include avenir_H();
       font-size: 16px;
-      font-weight: 900;
       text-align: center;
       color: $cr_orange;
       margin-top: 39px;
