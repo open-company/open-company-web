@@ -19,15 +19,17 @@
 
         [:div.divider-line]
 
-        [:div.about-subline
-          "Transparency is a powerful motivator for teams. It creates a sense of ownership, and builds trust and clarity of purpose."]
-        [:div.paragraph
-          "Serial entrepreneurs ourselves, we’ve learned most of all that transparency is essential for company alignment."]
-        [:div.paragraph
-          "Still, we could never find easy solutions to help us keep growing and distributed teams on the same page."]
+        [:div.ovarls-container
 
-        [:div.paragraph
-          "Now we’ve built the solution we wanted ourselves, based on three principles:"]
+          [:div.about-subline
+            "Transparency is a powerful motivator for teams. It creates a sense of ownership, and builds trust and clarity of purpose."]
+          [:div.paragraph
+            "Serial entrepreneurs ourselves, we’ve learned most of all that transparency is essential for company alignment."]
+          [:div.paragraph
+            "Still, we could never find easy solutions to help us keep growing and distributed teams on the same page."]
+
+          [:div.paragraph
+            "Now we’ve built the solution we wanted ourselves, based on three principles:"]]
 
         [:div.principle.principle-1
           [:div.principle-logo]

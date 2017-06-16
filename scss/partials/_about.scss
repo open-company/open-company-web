@@ -16,7 +16,7 @@ div.container.about {
 
 @media (min-width: 768px) { 
   div.container.about {
-    max-width: 700px;
+    max-width: 1086px;
   }
 }
 
@@ -38,27 +38,39 @@ div.divider-line {
   position: relative;
 }
 
-div.about-subline {
-  @include avenir_H();
-  font-size: 28px;
-  letter-spacing: 0.2px;
-  text-align: center;
-  color: $cr_dark_blue;
-  margin-top: 50px;
-  margin-bottom: 106px;
-}
+div.ovarls-container {
+  width: 1086px;
+  height: 580px;
+  background-image: url("/img/ML/about_happy_faces.svg");
+  background-position: 0px 0px;
+  background-size: 1086px 565px;
+  background-repeat: no-repeat;
+  margin: 30px auto 0;
 
-div.paragraph {
-  margin-top: 20px;
-  font-family: $oc_main_font;
-  font-size: 20px;
-  text-align: center;
-  color: #3B3D40;
+  div.about-subline {
+    @include avenir_H();
+    font-size: 28px;
+    letter-spacing: 0.2px;
+    text-align: center;
+    color: $cr_dark_blue;
+    width: 757px;
+    margin: 20px auto 106px;
+  }
+
+  div.paragraph {
+    font-family: $oc_main_font;
+    font-size: 20px;
+    text-align: center;
+    color: #3B3D40;
+    width: 757px;
+    margin: 20px auto 50px;
+  }
 }
 
 div.principle {
-  margin-top: 126px;
   position: relative;
+  width: 746px;
+  margin: 76px auto 0;
 
   div.principle-logo {
     position: absolute;
