@@ -179,7 +179,7 @@ div.about-team {
     padding: 40px;
 
     div.team-avatar {
-      background-image: url("/img/ML/user_avatar_red.svg");
+      background-image: url("/img/ML/user_avatar_yellow.svg");
       background-size: 64px 64px;
       background-repeat: no-repeat;
       width: 64px;
@@ -242,6 +242,10 @@ div.about-team {
     div.team-card {
       float: left;
       margin-right: 24px;
+
+      div.team-avatar {
+        background-image: url("/img/ML/user_avatar_red.svg");
+      }
     }
   }
 
@@ -250,6 +254,10 @@ div.about-team {
     width: 561px;
     div.team-card {
       float: right;
+
+      div.team-avatar {
+        background-image: url("/img/ML/user_avatar_blue.svg");
+      }
     }
   }
 }
