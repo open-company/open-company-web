@@ -116,7 +116,7 @@
                   (when (is? :index) (tagline))]]
                 (case page
                   ; :index   (pages/index options)
-                  :about   (pages/about options)
+                  :about-old   (pages/about options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)
