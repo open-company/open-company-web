@@ -20,7 +20,7 @@
       [:div.main.sign-up
         ; Hope page header
         [:div.cta
-          [:h1 "Company updates that keep everyone on the same page."]
+          [:h1 "Company updates and stories\nthat get everyone on the same page"]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
             "Get started for free"]
