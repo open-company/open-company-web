@@ -1,6 +1,16 @@
 $oc_main_font: AvenirLTStd-Medium, 'Muli', sans-serif;
 $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 
+.AvenirLTStd-Book {
+  font-family: AvenirLTStd-Book;
+  font-weight: normal;
+  font-style: normal;
+}
+.AvenirLTStd-BookOblique {
+  font-family: AvenirLTStd-BookOblique;
+  font-weight: normal;
+  font-style: normal;
+}
 .AvenirLTStd-MediumOblique {
   font-family: AvenirLTStd-MediumOblique;
   font-weight: normal;
@@ -11,6 +21,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
   font-weight: normal;
   font-style: normal;
 }
+
 .AvenirLTStd-BlackOblique {
   font-family: AvenirLTStd-BlackOblique;
   font-weight: normal;
@@ -46,6 +57,14 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
   font-family: AvenirLTStd-#{$avenir_variant};
   font-weight: normal;
   font-style: normal;
+}
+
+@mixin avenir_BOOK() {
+  @include avenir(Book);
+}
+
+@mixin avenir_BOOKO() {
+  @include avenir(BookOblique);
 }
 
 @mixin avenir_MO(){

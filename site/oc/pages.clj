@@ -263,6 +263,8 @@
           [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/main.css"}]
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
+          ;; CarrotKit Font
+          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/fonts/CarrotKit.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
