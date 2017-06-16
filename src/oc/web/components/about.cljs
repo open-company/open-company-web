@@ -1,7 +1,7 @@
 (ns oc.web.components.about
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
-            [oc.web.dispatcher :as dis]
+            [oc.web.router :as router]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
@@ -83,7 +83,26 @@
             [:div.team-media-links
               [:a.linkedin]
               [:a.twitter]]]]]
-      [:div.about-footer]
+
+      [:div.about-footer.group
+
+        [:div.block.join-us
+          [:div.block-title
+            "Join Us"]
+          [:div.block-description
+            "Want to join us? We are always looking for amazing people no matter where they live."]
+          [:button.mlb-reset
+            {:on-click #(router/redirect! oc-urls/contact-mail-to)}
+            "Say hello"]]
+
+        [:div.block.open-source
+          [:div.block-title
+            "Open Source"]
+          [:div.block-description
+            "Have an idea you’d like to contribute? A new integration you’d like to see?"]
+          [:button.mlb-reset
+            {:on-click #(router/redirect! oc-urls/oc-github)}
+            "Build it with us on Github"]]]
     ] ; <!-- wrap -->
 
     (site-footer)])

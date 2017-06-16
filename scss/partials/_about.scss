@@ -257,8 +257,51 @@ div.about-team {
 div.about-footer {
   width: 100%;
   margin: 190px auto 0;
-  padding: 56px 0 86px;
+  padding: 155px 128px;
   background-image: linear-gradient(252deg, #f7c144, #f2558f);
+
+  div.block {
+    width: 50%;
+    text-align: left;
+
+    div.block-title {
+      font-family: $oc_main_font;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      color: white;
+    }
+
+    div.block-description {
+      opacity: 0.8;
+      font-family: $oc_main_font;
+      font-size: 20px;
+      line-height: 1.7;
+      color: #3a3d40;
+      margin-top: 39px;
+      max-width: 417px;
+    }
+
+    button {
+      border-radius: 8px;
+      background-color: white;
+      font-family: $oc_main_font;
+      font-size: 16px;
+      font-weight: 900;
+      text-align: center;
+      color: $cr_orange;
+      margin-top: 39px;
+      padding: 13px 20px;
+    }
+
+    &.join-us {
+      float: left;
+    }
+
+    &.open-source {
+      float: right
+    }
+  }
 }
 
 
