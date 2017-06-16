@@ -1,0 +1,77 @@
+/**
+ * @license
+ * MyFonts Webfont Build ID 3407672, 2017-06-16T10:42:47-0400
+ * 
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are 
+ * explicitly restricted from using the Licensed Webfonts(s).
+ * 
+ * You may obtain a valid license at the URLs below.
+ * 
+ * Webfont: AvenirLTStd-MediumOblique by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/65-mediumoblique/
+ * Copyright: Copyright &#x00A9; 1981 - 2006 Linotype GmbH, www.linotype.com. All rights reserved. Copyright &#x00A9; 1989 - 2002 Adobe Systems Incorporated.  All Rights Reserved.
+ * 
+ * Webfont: AvenirLTStd-Medium by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/65-medium/
+ * Copyright: Copyright &#x00A9; 1981 - 2006 Linotype GmbH, www.linotype.com. All rights reserved. Copyright &#x00A9; 1989 - 2002 Adobe Systems Incorporated.  All Rights Reserved.
+ * 
+ * Webfont: AvenirLTStd-BlackOblique by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/95-black-oblique/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * 
+ * Webfont: AvenirLTStd-Oblique by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/55-oblique/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * 
+ * Webfont: AvenirLTStd-Roman by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/55-roman/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * 
+ * Webfont: AvenirLTStd-Heavy by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/85-heavy/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * 
+ * Webfont: AvenirLTStd-HeavyOblique by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/85-heavy-oblique/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * 
+ * Webfont: AvenirLTStd-Black by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir/95-black/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * 
+ * 
+ * License: https://www.myfonts.com/viewlicense?type=web&buildid=3407672
+ * Licensed pageviews: 250,000
+ * 
+ * © 2017 MyFonts Inc
+*/
+
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/33ff38");
+
+  
+@font-face {font-family: 'AvenirLTStd-MediumOblique';src: url('webfonts/33FF38_0_0.eot');src: url('webfonts/33FF38_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_0_0.woff2') format('woff2'),url('webfonts/33FF38_0_0.woff') format('woff'),url('webfonts/33FF38_0_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-Medium';src: url('webfonts/33FF38_1_0.eot');src: url('webfonts/33FF38_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_1_0.woff2') format('woff2'),url('webfonts/33FF38_1_0.woff') format('woff'),url('webfonts/33FF38_1_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-BlackOblique';src: url('webfonts/33FF38_2_0.eot');src: url('webfonts/33FF38_2_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_2_0.woff2') format('woff2'),url('webfonts/33FF38_2_0.woff') format('woff'),url('webfonts/33FF38_2_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-Oblique';src: url('webfonts/33FF38_3_0.eot');src: url('webfonts/33FF38_3_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_3_0.woff2') format('woff2'),url('webfonts/33FF38_3_0.woff') format('woff'),url('webfonts/33FF38_3_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-Roman';src: url('webfonts/33FF38_4_0.eot');src: url('webfonts/33FF38_4_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_4_0.woff2') format('woff2'),url('webfonts/33FF38_4_0.woff') format('woff'),url('webfonts/33FF38_4_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-Heavy';src: url('webfonts/33FF38_5_0.eot');src: url('webfonts/33FF38_5_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_5_0.woff2') format('woff2'),url('webfonts/33FF38_5_0.woff') format('woff'),url('webfonts/33FF38_5_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-HeavyOblique';src: url('webfonts/33FF38_6_0.eot');src: url('webfonts/33FF38_6_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_6_0.woff2') format('woff2'),url('webfonts/33FF38_6_0.woff') format('woff'),url('webfonts/33FF38_6_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLTStd-Black';src: url('webfonts/33FF38_7_0.eot');src: url('webfonts/33FF38_7_0.eot?#iefix') format('embedded-opentype'),url('webfonts/33FF38_7_0.woff2') format('woff2'),url('webfonts/33FF38_7_0.woff') format('woff'),url('webfonts/33FF38_7_0.ttf') format('truetype');}
+ 
