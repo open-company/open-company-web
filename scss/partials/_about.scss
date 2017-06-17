@@ -81,6 +81,15 @@ div.principle {
     backgorund-size: 80px 80px;
   }
 
+  div.principle-oval-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 251px;
+    height: 251px;
+    backgorund-size: 251px 251px;
+  }
+
   div.principle-title {
     padding-top: 90px;
     font-size: 36px;
@@ -106,6 +115,10 @@ div.principle {
       background-image: url("/img/ML/about_principle_1.svg");
     }
 
+    div.principle-oval-bg {
+      background-image: url("/img/ML/about_principle_1_oval.svg");
+    }
+
     div.principle-title {
       color: $cr_orange;
     }
@@ -117,6 +130,10 @@ div.principle {
       background-image: url("/img/ML/about_principle_2.svg");
     }
 
+    div.principle-oval-bg {
+      background-image: url("/img/ML/about_principle_2_oval.svg");
+    }
+
     div.principle-title {
       color: #0F8E4C;
     }
@@ -126,6 +143,10 @@ div.principle {
 
     div.principle-logo {
       background-image: url("/img/ML/about_principle_3.svg");
+    }
+
+    div.principle-oval-bg {
+      background-image: url("/img/ML/about_principle_3_oval.svg");
     }
 
     div.principle-title {
