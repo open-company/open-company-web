@@ -44,7 +44,10 @@
    ;; Favicon
    [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]])
 
-(defn nav [active-page]
+(defn nav
+  "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header and every change here should be reflected there."
+  [active-page]
+  ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
   [:nav.navbar.navbar-default.navbar-static-top
     [:div.container-fluid
       [:div.navbar-header
@@ -74,7 +77,10 @@
                 ; {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
                 "Get Started"]]]]]]])
 
-(defn footer []
+(defn footer
+  "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer and every change here should be reflected there."
+  []
+  ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:nav.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
       [:div.left-column

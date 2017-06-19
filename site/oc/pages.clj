@@ -8,70 +8,9 @@
 (defn privacy [options]
   (privacy/privacy options))
 
-; (defn index [options]
-;   [:div
-;    [:div.container.outer.sector
-;     [:div.container.inner
-;      [:div.sector-box
-;       [:div.sector-text.team-text
-;        [:h2 "Make Employees Great"]
-;        [:p
-;         "Everyone is on the same page with open access to company information."]
-;        [:h2 "Easy to Update"]
-;        [:p
-;         "Our "
-;         [:i.fa.fa-slack]
-;         " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
-;       [:div.team-image]]]]
-;    [:hr]
-;    [:div.container.outer.sector
-;     [:div.container.inner
-;      [:div.sector-box.even
-;       [:div.sector-text.update-text
-;        [:h2 "Impress Investors and Advisors"]
-;        [:p
-;         "Send regular investor updates that follow best practices and increase engagement."]
-;        [:h2 "Updates are Automatic"]
-;        [:p
-;         "Stakeholder updates are generated from your company's content for your approval."]]
-;       [:div.update-image]]]]
-;    [:hr]
-;    [:div.container.outer.sector
-;     [:div.container.inner
-;      [:div.sector-box
-;       [:div.sector-text.public-text
-;        [:h2 "Go Public!"]
-;        [:p
-;         "Share publicly to build trust and attract new investors, employees, and customers."]
-;        [:h2 "Play to the Crowd"]
-;        [:p
-;         "Keep crowd supporters and investors informed of your progress."]]
-;       [:div.public-image]]]]
-;    [:hr]
-;    [:div.container.outer.sector
-;     [:div.row.features
-;      [:div.col-md-4
-;       [:div.col-sm-2.feature-icon
-;        [:img.feature-icon {:src "oc_web_cdn_url/img/archive@4x.png"}]]
-;       [:div.col-sm-10.col-xs-12
-;        [:h2 "All in One Place"]
-;        [:p
-;         "All your company information; organized and easy to find."]]]
-;      [:div.col-md-4
-;       [:div.col-sm-2.feature-icon
-;        [:img.feature-icon {:src "oc_web_cdn_url/img/best-practices@4x.png"}]]
-;       [:div.col-sm-10.col-xs-12
-;        [:h2 "Best Practices"]
-;        [:p
-;         "Core topics and guidelines help you decide what to share."]]]
-;      [:div.col-md-4
-;       [:div.col-sm-2.feature-icon
-;        [:img.feature-icon {:src "oc_web_cdn_url/img/concierge@4x.png"}]]
-;       [:div.col-sm-10.col-xs-12
-;        [:h2 "Concierge Service"]
-;        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
-
-(defn pricing [options]
+(defn pricing
+  "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
+  [options]
    [:div.container.outer.sector.content
     [:div.row
      [:div.col-md-12.pricing-header
@@ -119,7 +58,9 @@
      ;; "<!--         <div class=\"col-md-4 sm-12\">\n          <h2>Team</h2>\n          <p>Internal distribution with Slack.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Stakeholders</h2>\n          <p>Periodic stakeholder updates distributed automatically.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Concierge</h2>\n          <p>Beautiful stakeholder updates, hand-crafted by content creation professionals.</p>\n        </div>\n -->"
      ]])
 
-(defn about [options]
+(defn about
+  "About page. This is a copy of oc.web.components.about and every change here should be reflected there and vice versa."
+  [options]
   [:div
     [:div.container.main.about
 

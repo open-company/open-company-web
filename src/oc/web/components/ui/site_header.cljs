@@ -1,4 +1,5 @@
 (ns oc.web.components.ui.site-header
+  "Component for the site header. This is copied into oc.core/nav and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]

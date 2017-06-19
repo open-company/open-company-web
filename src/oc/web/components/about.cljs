@@ -1,4 +1,5 @@
 (ns oc.web.components.about
+  "About page component, this is copied into oc.pages/about and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
