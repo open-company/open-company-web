@@ -36,16 +36,20 @@
            :href "https://fonts.googleapis.com/css?family=Open+Sans:400,300"}]
    [:link {:type "text/css", :rel "stylesheet",
            :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
+   ;; CarrotKit Font
+   [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css?oc_deploy_key"}]
    ;; Font Awesome
    [:link {:href "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css",
-           :rel "stylesheet"}]])
+           :rel "stylesheet"}]
+   ;; Favicon
+   [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]])
 
-(defn nav [index?]
+(defn nav [active-page]
   [:nav.navbar.navbar-default.navbar-static-top
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href "/"}
-          [:img {:alt "OpenCompany" :src (str (env :oc_web_cdn_url) "/img/oc-wordmark.svg")}]]
+          [:img {:alt "Carrot" :src "/img/ML/carrot_wordmark.svg"}]]
         [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]
@@ -53,47 +57,60 @@
             [:span.icon-bar]]]
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
-          (when-not index?
-            [:li
-              [:a.navbar-item {:href "/"} "Home"]])
           [:li
-              [:a.navbar-item {:href "/pricing"} "Pricing"]]
+            {:class (when (= active-page "pricing") "active")}
+            [:a.navbar-item {:href "/pricing"} "Pricing"]]
           [:li
-              [:a.navbar-item {:href "/about"} "About"]]
+            {:class (when (= active-page "about") "active")}
+            [:a.navbar-item {:href "/about"} "About"]]
+          [:li
+            {:class (when (= active-page "blog") "active")}
+            [:a.navbar-item {:href "/blog"} "Blog"]]
           [:li.mobile-only
-            [:a.navbar-item.contact {:href "mailto:hello@carrot.io"} "Contact"]]]]]])
-
-(defn tagline []
-  [:div.tagline.text-center
-    [:h1 "Everyone on the same page"]
-    [:div.early-access
-     [:form.form-inline
-      [:div.form-group
-       [:input#email
-        {:size "40", :placeholder "email@work.com", :type "email"}]
-       [:button "Get early access"]]]]])
+            [:a.navbar-item.contact {:href "mailto:hello@carrot.io"} "Contact"]]
+          [:li
+            [:div.get-started-button.navbar-item
+              [:button.mlb-reset.mlb-get-started
+                ; {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
+                "Get Started"]]]]]]])
 
 (defn footer []
   [:nav.navbar.navbar-default.navbar-bottom
-    [:ul.nav.navbar-nav.navbar-left.navbar-bottom-left
-      [:li [:a.navbar-logo {:href "/"}
-        [:img {:alt "Carrot" :src (str (env :oc_web_cdn_url) "/img/oc-logo-grey.svg")}]]]
-      [:li.web-only
-        [:a {:href "/pricing"} "Pricing"]]
-      [:li.web-only
-        [:a {:href "/about"} "About"]]
-      [:li
-        [:a.contact {:href "mailto:hello@carrot.io"} "Contact"]]
-      [:li.mobile-only {:style {:float "right" :marginRight "15px"}}
-        [:a {:href "https://twitter.com/opencompanyhq"}
-          [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]]
-    [:ul.nav.navbar-nav.navbar-right
-      [:li
-        [:a {:href "https://twitter.com/opencompanyhq"}
-          [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]
-      [:li
-        [:a {:href "https://github.com/open-company"}
-          [:i.fa.fa-2x.fa-github {:aria-hidden "true"}]]]]])
+    [:div.container-fluid.group
+      [:div.left-column
+        [:img.logo
+          {:src "/img/ML/carrot_wordmark_white.svg"}]
+        [:div.small-links
+          [:a "Get started"] "|" [:a "Login"]]
+        [:div.small-logos
+          [:a.twitter
+            [:img {:src "/img/ML/home_page_twitter.svg"}]]
+          [:a.medium
+            [:img {:src "/img/ML/home_page_medium.svg"}]]]
+        [:div.copyright "© Copyright 2017. All rights reserved"]]
+      [:div.right-column
+
+        [:div.column
+          [:div.column-title "SUPPORT"]
+          [:div.column-item [:a "Help"]]
+          [:div.column-item [:a "Contact"]]]
+
+        [:div.column
+          [:div.column-title "INTEGRATIONS"]
+          [:div.column-item [:a "Slack"]]
+          [:div.column-item [:a "Developers"]]]
+
+        [:div.column
+          [:div.column-title "COMPANY"]
+          [:div.column-item [:a "About"]]
+          [:div.column-item [:a "Blog"]]
+          [:div.column-item [:a "Legal"]]]
+
+        [:div.column
+          [:div.column-title "TOUR"]
+          [:div.column-item [:a "Home"]]
+          [:div.column-item [:a "Features"]]
+          [:div.column-item [:a "Pricing"]]]]]])
 
 
 (defn read-edn [entry]
@@ -112,11 +129,10 @@
                  {:class (if (is? :index) "hero gradient" "gradient")}
                  [:div
                   {:class (if (is? :index) "container outer header hero" "outer header")}
-                  (nav (is? :index))
-                  (when (is? :index) (tagline))]]
+                  (nav (name page))]]
                 (case page
                   ; :index   (pages/index options)
-                  :about-old   (pages/about options)
+                  :about   (pages/about options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)
