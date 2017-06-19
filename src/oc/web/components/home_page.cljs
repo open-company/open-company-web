@@ -20,7 +20,7 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1 "Company updates that get\neveryone on the same page"]
+          [:h1 "Company updates that tell a better story"]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
             "Get started for free"]
