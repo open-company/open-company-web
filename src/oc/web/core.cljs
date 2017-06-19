@@ -27,6 +27,7 @@
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
+            [oc.web.components.blog :refer (blog)]
             [oc.web.components.login :refer (login)]
             [oc.web.components.oc-wall :refer (oc-wall)]
             [oc.web.components.home-page :refer (home-page)]
@@ -239,6 +240,10 @@
       (timbre/info "Routing about-route" urls/about)
       (simple-handler about "about" target params))
 
+    (defroute blog-route "/blog" {:as params}
+      (timbre/info "Routing blog-route /blog")
+      (simple-handler blog "blog" target params))    
+
     (defroute pricing-route urls/pricing {:as params}
       (timbre/info "Routing pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
@@ -424,6 +429,7 @@
                                  login-route
                                  signup-route
                                  about-route
+                                 blog-route
                                  pricing-route
                                  logout-route
                                  org-create-route

@@ -61,7 +61,7 @@ div.ovarls-container {
     font-family: $oc_main_font;
     font-size: 20px;
     text-align: center;
-    color: #3B3D40;
+    color: $cr_text_blue_2;
     width: 757px;
     margin: 20px auto 50px;
   }
@@ -100,7 +100,7 @@ div.principle {
   }
 
   div.principle-description {
-    color: #3B3D40;
+    color: $cr_text_blue_2;
     font-family: $oc_main_font;
     font-size: 20px;
     width: 564px;
@@ -135,7 +135,7 @@ div.principle {
     }
 
     div.principle-title {
-      color: #0F8E4C;
+      color: $cr_green;
     }
   }
 
