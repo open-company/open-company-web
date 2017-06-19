@@ -66,7 +66,7 @@
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
-                  [:div.team-description "Skydiver, ninja, guitarist, Swiss design-head and communicator, collector, connector, creator. "]
+                  [:div.team-description "Skydiver, future ninja skydiver, guitarist, Swiss design-head and communicator, collector, connector, creator."]
                   [:div.team-media-links
                     [:a.linkedin]
                     [:a.twitter]]]]]
@@ -76,7 +76,7 @@
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
-                  [:div.team-description "Skydiver, ninja, guitarist, Swiss design-head and communicator, collector, connector, creator. "]
+                  [:div.team-description "Skydiver, ninja skydiver spectator, guitarist, Swiss design-head and communicator."]
                   [:div.team-media-links
                     [:a.linkedin]
                     [:a.twitter]]]]]]
@@ -85,7 +85,7 @@
             [:div.team-avatar]
             [:div.team-member
               [:div.team-name "Iacopo Carraro"]
-              [:div.team-description "Skydiver, ninja, guitarist, Swiss design-head and communicator, collector, connector, creator. "]
+              [:div.team-description "Skydiver, ninja dev, guitarist, Swiss design-head and communicator, collector, connector, creator."]
               [:div.team-media-links
                 [:a.linkedin]
                 [:a.twitter]]]]]]
@@ -97,8 +97,8 @@
             "Join Us"]
           [:div.block-description
             "Want to join us? We are always looking for amazing people no matter where they live."]
-          [:button.mlb-reset
-            {:on-click #(router/redirect! oc-urls/contact-mail-to)}
+          [:a.link
+            {:a "mailto:hello@carrot.io"}
             "Say hello"]]
 
         [:div.block.open-source
@@ -106,8 +106,8 @@
             "Open Source"]
           [:div.block-description
             "Have an idea you’d like to contribute? A new integration you’d like to see?"]
-          [:button.mlb-reset
-            {:on-click #(router/redirect! oc-urls/oc-github)}
+          [:a.link
+            {:href "https://github.com/open-company"}
             "Build it with us on Github"]]]
     ] ; <!-- wrap -->
 

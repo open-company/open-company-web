@@ -166,6 +166,7 @@ div.about-alignment {
     position: absolute;
     left: 50%;
     margin-left: -480px;
+    margin-top: 27px;
     top: 70px;
     font-size: 200px;
     font-family: $oc_main_font;
@@ -234,16 +235,16 @@ div.about-team {
         }
 
         div.team-description {
-          font-family: $oc_main_font;
-          font-weight: 400;
+          @include avenir_BOOK();
           font-size: 16px;
           line-height: 1.75;
           color: #6a707a;
+          margin-top: 12px;
         }
 
         div.team-media-links {
           height: 20px;
-          margin-top: 20px;
+          margin-top: 19px;
 
           a {
             width: 20px;
@@ -323,7 +324,7 @@ div.about-footer {
       max-width: 417px;
     }
 
-    button {
+    a.link {
       border-radius: 8px;
       background-color: white;
       @include avenir_H();
@@ -332,6 +333,7 @@ div.about-footer {
       color: $cr_orange;
       margin-top: 39px;
       padding: 13px 20px;
+      display: inline-block;
     }
 
     &.join-us {
