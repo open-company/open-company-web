@@ -17,6 +17,7 @@
           [:a "Get started"] "|" [:a "Login"]]
         [:div.small-logos
           [:a.twitter
+            {:href oc-urls/oc-twitter}
             [:img {:src "/img/ML/home_page_twitter.svg"}]]
           [:a.medium
             [:img {:src "/img/ML/home_page_medium.svg"}]]]

@@ -29,7 +29,9 @@
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
-(def oc-twitter "https://twitter.com/opencompanyhq")
+(def oc-twitter "https://twitter.com/carrot_HQ")
+
+(def oc-facebook "https://www.facebook.com/Carrot-111981319388047/")
 
 (def oc-github "https://github.com/open-company")
 
