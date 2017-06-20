@@ -13,7 +13,7 @@ div#wrap {
     padding-bottom: 50px;
     text-align: center;
 
-    h1 {
+    h1.headline {
       font-size: 48px;
       // font-weight: 900;
       // font-family: $oc_main_font;
@@ -24,7 +24,7 @@ div#wrap {
       margin: 0 auto 20px;
     }
 
-    div.description {
+    div.subheadline {
       color: #4D4D4D;
       font-size: 20px;
       @include avenir_R();
