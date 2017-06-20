@@ -26,8 +26,8 @@ div#wrap {
 
     div.description {
       color: #4D4D4D;
-      font-size: 26px;
-      font-family: $oc_main_font;
+      font-size: 20px;
+      @include avenir_R();
       margin-top: 20px;
     }
 

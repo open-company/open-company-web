@@ -21,6 +21,7 @@
         ; Hope page header
         [:div.cta
           [:h1 "Company updates that tell a better story"]
+          [:div.description "Keep your team engaged and aligned. Keep investors up to date, too."]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
             "Get started for free"]
