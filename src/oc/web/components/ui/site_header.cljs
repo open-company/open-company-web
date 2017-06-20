@@ -31,8 +31,7 @@
             {:class (when (utils/in? (:route @router/path) "about") "active")}
             [:a.navbar-item {:href oc-urls/about :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))} "About"]]
           [:li
-            {:class (when (utils/in? (:route @router/path) "blog") "active")}
-            [:a.navbar-item {:href oc-urls/blog :on-click #(do (.preventDefault %) (router/nav! oc-urls/blog))} "Blog"]]
+            [:a.navbar-item {:href oc-urls/blog} "Blog"]]
           [:li.mobile-only
             {:class (when (utils/in? (:route @router/path) "contact") "active")}
             [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]

@@ -12,7 +12,7 @@
 
 (def about "/about")
 
-(def blog "/blog")
+(def blog "https://blog.carrot.io")
 
 (def contact "/contact")
 

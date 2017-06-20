@@ -68,7 +68,7 @@
             [:a.navbar-item {:href "/about"} "About"]]
           [:li
             {:class (when (= active-page "blog") "active")}
-            [:a.navbar-item {:href "/blog"} "Blog"]]
+            [:a.navbar-item {:href "https://blog.carrot.io"} "Blog"]]
           [:li.mobile-only
             [:a.navbar-item.contact {:href "mailto:hello@carrot.io"} "Contact"]]
           [:li
