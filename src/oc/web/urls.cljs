@@ -33,6 +33,8 @@
 
 (def oc-facebook "https://www.facebook.com/Carrot-111981319388047/")
 
+(def oc-medium "https://medium.com/@Carrot.io")
+
 (def oc-github "https://github.com/open-company")
 
 (def subscription-callback "/subscription-completed")

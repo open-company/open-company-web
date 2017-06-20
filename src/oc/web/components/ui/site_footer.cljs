@@ -20,6 +20,7 @@
             {:href oc-urls/oc-twitter}
             [:img {:src "/img/ML/home_page_twitter.svg"}]]
           [:a.medium
+            {:href oc-urls/oc-medium}
             [:img {:src "/img/ML/home_page_medium.svg"}]]]
         [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column
