@@ -11,25 +11,22 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.login-button :refer (get-started-button)]))
 
-(defn navbar-menu-toggle-event [s]
-  (doto (js/$ ".navbar-collapse")
-    (.on "shown.bs.collapse"
-      (fn [_]
-        (reset! (::expanded s) true)
-        (.css (js/$ (.-body js/document)) #js {:height "100vh"})))
-    (.on "hidden.bs.collapse"
-      (fn [_]
-        (reset! (::expanded s) false)
-        (.css (js/$ (.-body js/document)) #js {:height "auto"})))))
+(defn toggle-menu [_]
+  ; $('nav.navbar-static-top').toggleClass('mobile-expanded')
+  (.toggleClass (js/$ "nav.navbar-static-top") "mobile-expanded")
+  (.toggleClass (js/$ (.-body js/document)) "no-scroll"))
 
-(rum/defcs site-header < (rum/local false ::expanded)
-                         {:did-mount (fn [s]
-                                      (navbar-menu-toggle-event s)
+(defn navbar-menu-toggle-event []
+  (doto (js/$ ".navbar-collapse")
+    (.on "shown.bs.collapse" toggle-menu)
+    (.on "hidden.bs.collapse" toggle-menu)))
+
+(rum/defcs site-header < {:did-mount (fn [s]
+                                      (navbar-menu-toggle-event)
                                       s)}
   [s]
   ; <!-- Nav Bar -->
   [:nav.navbar.navbar-default.navbar-static-top
-    {:class (when @(::expanded s) "mobile-expanded")}
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}]
