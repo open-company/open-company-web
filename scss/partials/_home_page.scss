@@ -9,7 +9,7 @@ div#wrap {
   }
 
   div.cta {
-    padding-top: 104px;
+    padding-top: 116px;
     padding-bottom: 50px;
     text-align: center;
 
@@ -47,11 +47,11 @@ div#wrap {
       color: $cr_dark_blue;
       font-size: 12px;
       @include avenir_H();
-      margin-top: 10px;
+      margin-top: 16px;
     }
 
     img {
-      margin-top: 40px;
+      margin-top: 48px;
     }
   }
 
@@ -59,7 +59,7 @@ div#wrap {
     text-align: center;
 
     div.illustration {
-      margin: 50px auto;
+      margin: 60px auto;
 
       div.description {
         width: 475px;
