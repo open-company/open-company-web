@@ -45,7 +45,7 @@ div.fullscreen-page {
 }
 
 .no-scroll {
-  overflow: hidden;
+  overflow-y: hidden;
 }
 
 h1, h2, h3, h4, h5, h6, .oc-header {
@@ -161,4 +161,10 @@ button.slack-button {
 /* Remove the files counter from Filestack picker */
 div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span.fsp-nav__right span.fsp-badge {
   display: none;
+}
+
+.mobile-only {
+  @include big_web(){
+    display: none !important;
+  }
 }
