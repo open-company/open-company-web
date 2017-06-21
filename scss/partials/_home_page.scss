@@ -2,10 +2,13 @@ div#wrap {
 
   div.main.home-page {
     width: 100%;
-    background-image: url("/img/ML/home_page_swoosh.svg");
-    background-position: 0px -159px;
-    background-size: 100% auto;
-    background-repeat: no-repeat;
+
+    @include big_web(){
+      background-image: url("/img/ML/home_page_swoosh.svg");
+      background-position: 0px -159px;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+    }
   }
 
   div.cta {
@@ -15,11 +18,9 @@ div#wrap {
 
     h1.headline {
       font-size: 48px;
-      // font-weight: 900;
-      // font-family: $oc_main_font;
       @include avenir_B();
       color: $cr_dark_blue;
-      padding: 0;
+      padding: 0 16px;
       max-width: 940px;
       margin: 0 auto 20px;
     }
@@ -27,20 +28,21 @@ div#wrap {
     div.subheadline {
       color: #4D4D4D;
       font-size: 20px;
+      padding: 0 16px;
       @include avenir_R();
       margin-top: 20px;
     }
 
     button.get-started-centred-bt {
-      width: 320px;
+      max-width: 320px;
       height: 48px;
       border-radius: 8px;
       background-color: $cr_text_blue;
       color: white;
-      padding: 3px 6px;
+      padding: 3px 56px;
       @include avenir_H();
       font-size: 18px;
-      margin-top: 20px;
+      margin: 20px 16px 0;
     }
 
     div.small-teams {
@@ -52,6 +54,9 @@ div#wrap {
 
     img {
       margin-top: 48px;
+      padding: 0 16px;
+      max-width: 100%;
+      height: auto;
     }
   }
 
@@ -60,9 +65,17 @@ div#wrap {
 
     div.illustration {
       margin: 60px auto;
+      padding: 0 16px;
+
+      @include mobile(){
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      }
 
       div.description {
-        width: 475px;
+        max-width: 475px;
 
         div.title {
           color: $cr_dark_blue;
@@ -81,88 +94,109 @@ div#wrap {
 
       // 1st illustration
       &.illustration-1 {
-        width: 1127px;
+        max-width: 1127px;
 
         img {
-          float: left;
-          width: 506px;
-          margin-left: 70px;
+          @include big_web() {
+            float: left;
+            margin-left: 70px;
+            max-width: 506px;
+          }
         }
 
         div.description {
-          float: right;
-          text-align: left;
+          @include big_web() {
+            float: right;
+            text-align: left;
+          }
           margin-top: 70px;
         }
       }
 
       // 2nd illustration
       &.illustration-2 {
-        width: 1127px;
+        max-width: 1127px;
 
         img {
-          float: right;
-          width: 521px;
-          margin-right: 40px;
+          @include big_web(){
+            float: right;
+            margin-right: 40px;
+            max-width: 521px;
+          }
         }
 
         div.description {
-          float: left;
-          text-align: left;
+          @include big_web(){
+            float: left;
+            text-align: left;
+          }
           margin-top: 115px;
         }
       }
 
       // 3rd illustration
       &.illustration-3 {
-        width: 1127px;
+        max-width: 1127px;
 
         img {
-          float: left;
-          width: 424px;
-          margin-left: 30px;
+          @include big_web(){
+            float: left;
+            margin-left: 30px;
+            max-width: 424px;
+          }
         }
 
         div.description {
-          float: right;
-          text-align: left;
+          @include big_web(){
+            float: right;
+            text-align: left;
+            margin-right: 10px;
+          }
           margin-top: 75px;
-          margin-right: 10px;
         }
       }
 
       // 4th illustration
       &.illustration-4 {
-        width: 1127px;
+        max-width: 1127px;
 
         img {
-          float: right;
-          width: 346px;
-          margin-right: 160px;
+          @include big_web(){
+            float: right;
+            margin-right: 160px;
+            max-width: 346px;
+          }
         }
 
         div.description {
-          float: left;
-          text-align: left;
-          margin-top: 80px;
+          @include big_web(){
+            float: left;
+            text-align: left;
+            margin-top: 80px;
+          }
         }
       }
 
       // 5th illustration
       &.illustration-5 {
-        width: 1127px;
+        max-width: 1127px;
 
         img {
-          float: left;
-          width: 333px;
-          margin-left: 50px;
+          @include big_web(){
+            float: left;
+            margin-left: 50px;
+            max-width: 333px;
+          }
         }
 
         div.description {
-          float: right;
-          text-align: left;
+          @include big_web(){
+            float: right;
+            text-align: left;
+            margin-right: 20px;
+          }
           margin-top: 60px;
-          margin-right: 20px;
+          
         }
       }
     }
@@ -176,16 +210,25 @@ div#wrap {
     text-align: center;
 
     div.customers-title {
+      padding: 0 16px;
+      font-size: 36px;
+      @include avenir_H();
+      color: white;
+
+      @include mobile() {
+        font-size: 28px;
+      }
+
       img {
         width: 40px;
         height: 40px;
         margin-right: 20px;
         margin-top: -4px;
-      }
 
-      font-size: 36px;
-      @include avenir_H();
-      color: white;
+        @include mobile() {
+          display: none;
+        }
+      }
     }
 
     div.customers-cards {
@@ -196,6 +239,10 @@ div#wrap {
         height: 200px;
         width: 48px;
         float: left;
+
+        @include mobile(){
+          display: none;
+        }
 
         button {
           margin-top: 50px;
@@ -244,6 +291,10 @@ div#wrap {
         width: 48px;
         float: right;
 
+        @include mobile(){
+          display: none;
+        }
+
         button {
           margin-top: 50px;
           background-image: url("/img/ML/home_page_right_arrow.svg");
@@ -287,6 +338,7 @@ div#wrap {
 
     div.try-it-combo-field {
       margin-top: 12px;
+      padding: 0 16px;
 
       input {
         margin: 0;
@@ -300,6 +352,11 @@ div#wrap {
         padding: 10px 20px;
         outline: none;
         border: none;
+
+        @include mobile() {
+          width: 100%;
+          border-radius: 8px;
+        }
 
         @include placeholder() {
           opacity: 0.8;
@@ -316,6 +373,12 @@ div#wrap {
         @include avenir_H();
         font-size: 16px;
         padding: 10px 18px;
+
+        @include mobile(){
+          width: 100%;
+          border-radius: 8px;
+          margin-top: 20px;
+        }
       }
     }
   }
