@@ -17,12 +17,8 @@
    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
    [:title "OpenCompany - Startup Transparency Simplified"]
-   ;; Bootstrap
-   ;; Latest compiled and minified CSS
-   [:link {:crossorigin "anonymous",
-           :integrity "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7",
-           :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
-           :rel "stylesheet"}]
+   ;; Bootstrap - Latest compiled and minified CSS
+   [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
    [:link {:href "/css/app.main.css", :rel "stylesheet"}]
    [:link {:href "/css/site.main.css", :rel "stylesheet"}]
    ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
@@ -38,11 +34,14 @@
            :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
    ;; CarrotKit Font
    [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css?oc_deploy_key"}]
-   ;; Font Awesome
-   [:link {:href "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css",
-           :rel "stylesheet"}]
+   ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
+   [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
    ;; Favicon
-   [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]])
+   [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
+   ;; jQuery needed by Bootstrap JavaScript
+   [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+   ;; Bootstrap JavaScript //getf.com/
+   [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header and every change here should be reflected there."
@@ -51,27 +50,33 @@
   [:nav.navbar.navbar-default.navbar-static-top
     [:div.container-fluid
       [:div.navbar-header
-        [:a.navbar-brand {:href "/"}
-          [:img {:alt "Carrot" :src "/img/ML/carrot_wordmark.svg"}]]
-        [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
+        [:a.navbar-brand {:href "/"}]
+        [:button.navbar-toggle.collapsed
+          {:type "button"
+           :data-toggle "collapse"
+           :data-target "#oc-navbar-collapse"
+           :onClick "$('nav.navbar-static-top').toggleClass('mobile-expanded');$(document.body).toggleClass('no-scroll');"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]
             [:span.icon-bar]
             [:span.icon-bar]]]
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
+          [:li.mobile-only
+            {:class (if (= active-page "home") "active" "")}
+            [:a.navbar-item {:href "/"} "Home"]]
           [:li
-            {:class (when (= active-page "pricing") "active")}
+            {:class (if (= active-page "pricing") "active" "")}
             [:a.navbar-item {:href "/pricing"} "Pricing"]]
           [:li
-            {:class (when (= active-page "about") "active")}
+            {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]
           [:li
-            {:class (when (= active-page "blog") "active")}
+            {:class (if (= active-page "blog") "active" "")}
             [:a.navbar-item {:href "https://blog.carrot.io"} "Blog"]]
-          [:li.mobile-only
+          [:li.big-web-only
             [:a.navbar-item.contact {:href "mailto:hello@carrot.io"} "Contact"]]
-          [:li
+          [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
                 ; {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
