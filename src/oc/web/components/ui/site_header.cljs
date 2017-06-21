@@ -21,9 +21,7 @@
     (.on "shown.bs.collapse" toggle-menu)
     (.on "hidden.bs.collapse" toggle-menu)))
 
-(rum/defcs site-header < {:did-mount (fn [s]
-                                      (navbar-menu-toggle-event)
-                                      s)}
+(rum/defcs site-header < {:did-mount (fn [s] (navbar-menu-toggle-event) s)}
   [s]
   ; <!-- Nav Bar -->
   [:nav.navbar.navbar-default.navbar-static-top
