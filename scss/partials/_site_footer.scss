@@ -5,11 +5,20 @@
   border: none;
   padding: 20px 30px;
 
+  @include mobile(){
+    padding: 20px 0;
+  }
+
   div.container-fluid {
     div.left-column {
       margin-top: 30px;
       float: left;
       width: 211px;
+
+      @include mobile(){
+        width: 100%;
+        float: none;
+      }
 
       img.logo {
         width: 82px;
@@ -38,6 +47,10 @@
 
       div.small-logos {
         margin-top: 40px;
+
+        @include mobile(){
+          margin-bottom: 20px;
+        }
 
         a.twitter {
           img {
@@ -68,10 +81,34 @@
       float: right;
       margin-right: 100px;
 
+      @include mobile(){
+        width: 100%;
+        float: none;
+        margin-right: 0;
+      }
+
       div.column {
         float: right;
         margin-right: 30px;
         width: 100px;
+
+        @include mobile(){
+          float: none;
+          marign-right: 0px;
+          width: 100%;
+          margin-bottom: 20px;
+          height: 20px;
+          overflow: hidden;
+          transition: height 230ms;
+        }
+
+        &.expanded {
+          height: auto;
+
+          div.column-title:after {
+            content: "\f077"; 
+          }
+        }
 
         &:first-child {
           margin-right: 0px;
@@ -84,6 +121,21 @@
           font-size: 13px;
           opacity: 0.5;
           text-transform: uppercase;
+
+          @include mobile(){
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+          }
+
+          &:after {
+            @include mobile(){
+              font-family: FontAwesome;
+              content: "\f078";
+              font-size: 20px;
+              color: rgba(255,255,255,0.5);
+              float: right;
+              margin-top: -7px;
+            }
+          }
         }
 
         div.column-item {
