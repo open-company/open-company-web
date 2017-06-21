@@ -41,18 +41,21 @@
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
           [:li.mobile-only
-            {:class (when (utils/in? (:route @router/path) "home") "active")}
+            {:class (if (utils/in? (:route @router/path) "home") "active" "")}
             [:a.navbar-item {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))} "Home"]]
           [:li
-            {:class (when (utils/in? (:route @router/path) "pricing") "active")}
+            {:class (if (utils/in? (:route @router/path) "pricing") "active" "")}
             [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
           [:li
-            {:class (when (utils/in? (:route @router/path) "about") "active")}
-            [:a.navbar-item {:href oc-urls/about :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))} "About"]]
+            {:class (if (utils/in? (:route @router/path) "about") "active" "")}
+            [:a.navbar-item
+              {:href oc-urls/about
+               :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))}
+              "About"]]
           [:li
             [:a.navbar-item {:href oc-urls/blog} "Blog"]]
           [:li.big-web-only
-            {:class (when (utils/in? (:route @router/path) "contact") "active")}
+            {:class (if (utils/in? (:route @router/path) "contact") "active" "")}
             [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
           [:li.get-started-item
             (if (jwt/jwt)
