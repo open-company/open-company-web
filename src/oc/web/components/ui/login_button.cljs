@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.login-button
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
+            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]))
 
 (rum/defcs login-button < rum/static
@@ -34,4 +35,6 @@
     {:class (when button-classes button-classes)}
     [:button.mlb-reset.mlb-get-started
       {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
-      "Get Started"]])
+      "Get Started"]
+    [:div.mobile-already-account
+      [:a {:href oc-urls/login} "Already have an account? " [:span.login "Sign in"]]]])

@@ -28,4 +28,48 @@ div.get-started-button {
     font-weight: 900;
     color: white;
   }
+
+  @include big_web(){
+    div.mobile-already-account {
+      display: none;
+    }
+  }
+}
+
+@include mobile(){
+  div.get-started-button{
+    bottom: 40px;
+    left: 0px;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+
+    button.mlb-get-started {
+      background-color: white;
+      color: $cr_text_blue;
+      font-size: 16px;
+      @include avenir_H();
+      padding: 13px 80px;
+      width: auto;
+      height: auto;
+    }
+  }
+
+  ul.navbar-top li div.mobile-already-account {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+
+    a {
+      @include avenir_BOOK();
+      font-size: 14px;
+      color: white;
+
+      span.login {
+        @include avenir_M();
+        text-decoration: underline;
+      }
+    }
+  }
 }
