@@ -11,15 +11,17 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.login-button :refer (get-started-button)]))
 
-(defn toggle-menu [_]
+(defn toggle-menu [_ expanding]
   ; $('nav.navbar-static-top').toggleClass('mobile-expanded')
-  (.toggleClass (js/$ "nav.navbar-static-top") "mobile-expanded")
-  (.toggleClass (js/$ (.-body js/document)) "no-scroll"))
+  (if expanding
+    (.addClass (js/$ "nav.navbar-static-top") "mobile-expanded")
+    (.removeClass (js/$ "nav.navbar-static-top") "mobile-expanded"))
+  (.css (js/$ (.-body js/document)) #js {:height (if expanding "100vh" "auto")}))
 
 (defn navbar-menu-toggle-event []
   (doto (js/$ ".navbar-collapse")
-    (.on "shown.bs.collapse" toggle-menu)
-    (.on "hidden.bs.collapse" toggle-menu)))
+    (.on "shown.bs.collapse" toggle-menu true)
+    (.on "hidden.bs.collapse" toggle-menu false)))
 
 (rum/defcs site-header < {:did-mount (fn [s] (navbar-menu-toggle-event) s)}
   [s]
