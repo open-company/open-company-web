@@ -9,6 +9,16 @@
     padding: 20px 0;
   }
 
+  div.mobile-footer {
+    div.small-logos {
+      margin: 40px 0;
+
+      a {
+        margin-right: 20px;
+      }
+    }
+  }
+
   div.container-fluid {
     div.left-column {
       margin-top: 30px;
@@ -94,12 +104,14 @@
 
         @include mobile(){
           float: none;
-          marign-right: 0px;
+          margin-right: 0px;
           width: 100%;
           margin-bottom: 20px;
-          height: 20px;
+          height: 24px;
           overflow: hidden;
           transition: height 230ms;
+          width: calc(100% + 30px);
+          margin-left: -15px;
         }
 
         &.expanded {
@@ -124,13 +136,14 @@
 
           @include mobile(){
             border-bottom: 1px solid rgba(255,255,255,0.5);
+            padding: 2px 15px;
           }
 
           &:after {
             @include mobile(){
               font-family: FontAwesome;
               content: "\f078";
-              font-size: 20px;
+              font-size: 14px;
               color: rgba(255,255,255,0.5);
               float: right;
               margin-top: -7px;
@@ -140,6 +153,9 @@
 
         div.column-item {
           margin-top: 10px;
+          @include mobile(){
+            padding: 0 15px;
+          }
 
           a {
             font-family: $oc_main_font;
