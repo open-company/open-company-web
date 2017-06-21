@@ -168,3 +168,9 @@ div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span
     display: none !important;
   }
 }
+
+.big-web-only {
+  @include mobile(){
+    display: none !important;
+  }
+}
