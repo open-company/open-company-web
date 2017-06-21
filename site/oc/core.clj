@@ -79,8 +79,10 @@
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
-                ; {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
-                "Get Started"]]]]]]])
+                {:on-click #()}
+                "Get Started"]
+              [:div.mobile-already-account
+                [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]]]]]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer and every change here should be reflected there."
