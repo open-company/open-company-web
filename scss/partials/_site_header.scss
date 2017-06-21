@@ -1,5 +1,79 @@
 /* Header */
 
+@include mobile() {
+  .navbar-default .navbar-toggle:hover {
+    background-color: transparent;
+  }
+
+  div.collapse.navbar-collapse{
+    border: none;
+    box-shadow: none;border: none;
+    position: relative;
+    height: calc(100vh - 72px);
+  }
+
+  .navbar-toggle .icon-bar {
+    transition: 320ms;
+  }
+
+  div.navbar-header {
+    height: 72px;
+    transition: background-color 230ms;
+  }
+
+  nav.mobile-expanded {
+    background-color: $cr_text_blue;
+    box-shadow: none;
+    width: 100vw;
+
+    .navbar-toggle .icon-bar {
+      background-color: white;
+
+      &:nth-child(2){
+        transform: rotate(-45deg);
+        top: 8px;
+        position: relative;
+      }
+
+      &:nth-child(3){
+        transform: rotate(45deg);
+        top: 2px;
+        position: relative;
+      }
+
+      &:nth-child(4){
+        transform: rotate(-45deg);
+        top: -4px;
+        position: relative;
+      }
+    }
+
+    div.navbar-header {
+      border: none;
+      box-shadow: none;
+
+      // ------- Blue navbar ------
+      background-color: $cr_text_blue;
+      a.navbar-brand {
+        background-image: url("/img/ML/carrot_wordmark_white.svg");
+      }
+      // ------- Uncomment for blue navbar ------
+    }
+  }
+
+  div.collapse.navbar-collapse {
+    height: calc(100vh - 60px);
+    background-color: $cr_text_blue;
+    border: none;
+    box-shadow: none;
+
+    ul {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}
+
 nav.navbar-static-top {
   background-color: white !important;
   margin-bottom: 0px !important;
@@ -12,7 +86,7 @@ nav.navbar-static-top {
   height: 72px;
 }
 
-@media (min-width: 768px) { /* not mobile */
+@include big_web() { /* not mobile */
 
   div.navbar-header {
     margin-left: 30px !important;
@@ -30,9 +104,18 @@ nav.navbar-static-top {
   }
 }
 
-a.navbar-brand img {
-  width: 150px;
-  color: rgba(78, 90, 107, 0.5);
+div.navbar-header {
+  background-color: white;
+
+  a.navbar-brand {
+    width: 150px;
+    height: 36px;
+    background-image: url("/img/ML/carrot_wordmark.svg");
+    background-size: 150px 36px;
+    background-repeat: no-repeat;
+    margin-top: 18px;
+    margin-left: 15px;
+  }
 }
 
 button.navbar-toggle {
@@ -67,17 +150,43 @@ ul.navbar-nav li a {
 ul.navbar-top {
   margin-right: 30px;
 
+  @include mobile() {
+    margin: 7px auto;
+    width: 290px;
+  }
+
   li {
     padding-top: 10px;
 
-    &.active {
-      border-top: 4px solid $cr_orange;
-      padding-top: 6px;
+    @include mobile(){
+      color: white !important;
+      margin-top: 20px;
+
+      &.get-started-item {
+        position: initial;
+      }
+
+      a {
+        @include avenir_R();
+        font-size: 20px;
+        color: white !important;
+        opacity: 0.6;
+      }
+
+      &.active {
+        background-image: url("/img/ML/site_header_active_menu_item.svg");
+        background-position: 100px 0px;
+        background-size: 91px 56px;
+        background-repeat: no-repeat;
+        a {
+          opacity: 1;
+        }
+      }
     }
   }
 }
 
-@media (min-width: 768px)  { /* not mobile */
+@include big_web()  { /* not mobile */
   .navbar-nav>li>a {
     padding-top: 18px;
   }
