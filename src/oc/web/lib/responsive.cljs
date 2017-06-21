@@ -6,7 +6,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(def big-web-min-width 684)
+(def big-web-min-width 768)
 ; 2 columns 302 * 2 = 604 diff: 80 |30|col1|20|col2|30|
 ; 1 column 420 diff: 263: |131|420|131|
 
