@@ -8,10 +8,11 @@ nav.navbar-static-top {
   border-radius: 0px;
 }
 
+nav.navbar-static-top {
+  height: 72px;
+}
+
 @media (min-width: 768px) { /* not mobile */
-  nav.navbar-static-top {
-    height: 72px;
-  }
 
   div.navbar-header {
     margin-left: 30px !important;
@@ -36,6 +37,12 @@ a.navbar-brand img {
 
 button.navbar-toggle {
   border: 0;
+}
+
+@include mobile(){
+  button.navbar-toggle {
+    margin-top: 20px;
+  }
 }
 
 .navbar-collapse {
