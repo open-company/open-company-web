@@ -11,30 +11,45 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.login-button :refer (get-started-button)]))
 
-(defn toggle-menu [_ expanding]
-  ; $('nav.navbar-static-top').toggleClass('mobile-expanded')
-  (if expanding
-    (.addClass (js/$ "nav.navbar-static-top") "mobile-expanded")
-    (.removeClass (js/$ "nav.navbar-static-top") "mobile-expanded"))
-  (.css (js/$ (.-body js/document)) #js {:height (if expanding "100vh" "auto")}))
+(defn toggle-menu
+  "Helper function called every time this component is mounted, remounted or the menu button is clicked"
+  [force-collapse]
+  (let [nav (js/$ "nav.navbar-static-top")
+        body (js/$ (.-body js/document))]
+    ;; If it's forcing the collapse or the menu is already open
+    (if (or force-collapse (.hasClass nav "mobile-expanded"))
+      (do
+        ;; Remove class for expanded menu
+        (.removeClass nav "mobile-expanded")
+        ;; Remove the overflow hidden for the body
+        (.removeClass body "no-scroll")
+        ;; Reset the body height to show the full content
+        (.css body #js {:height "auto"}))
+      (do
+        ;; Add the mobile menu expanded class
+        (.addClass nav "mobile-expanded")
+        ;; Hide the body overflow
+        (.addClass body "no-scroll")
+        ;; Limit the body height to the screen height
+        (.css body #js {:height "100vh"})))))
 
-(defn navbar-menu-toggle-event []
-  (doto (js/$ ".navbar-collapse")
-    (.on "shown.bs.collapse" toggle-menu true)
-    (.on "hidden.bs.collapse" toggle-menu false)))
-
-(rum/defcs site-header < {:did-mount (fn [s] (navbar-menu-toggle-event) s)}
+(rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)
+                          :did-remount (fn [_ s] (toggle-menu true) s)}
   [s]
   ; <!-- Nav Bar -->
   [:nav.navbar.navbar-default.navbar-static-top
     [:div.container-fluid
       [:div.navbar-header
         [:a.navbar-brand {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}]
-        [:button.navbar-toggle.collapsed {:type "button" :data-toggle "collapse" :data-target "#oc-navbar-collapse"}
-            [:span.sr-only "Toggle navigation"]
-            [:span.icon-bar]
-            [:span.icon-bar]
-            [:span.icon-bar]]]
+        [:button.navbar-toggle.collapsed
+          {:type "button"
+           :data-toggle "collapse"
+           :data-target "#oc-navbar-collapse"
+           :on-click #(toggle-menu false)}
+          [:span.sr-only "Toggle navigation"]
+          [:span.icon-bar]
+          [:span.icon-bar]
+          [:span.icon-bar]]]
       [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
         [:ul.nav.navbar-nav.navbar-right.navbar-top
           [:li.mobile-only
