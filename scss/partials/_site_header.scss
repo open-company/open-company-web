@@ -21,14 +21,16 @@
     transition: background-color 230ms;
   }
 
+  .navbar-toggle .icon-bar {
+    background-color: #333333;
+  }
+
   body.mobile-menu-expanded {
     nav.navbar-static-top {
-      background-color: $cr_text_blue;
       box-shadow: none;
       width: 100vw;
 
       .navbar-toggle .icon-bar {
-        background-color: white;
 
         &:nth-child(2){
           transform: rotate(-45deg);
@@ -52,20 +54,12 @@
       div.navbar-header {
         border: none;
         box-shadow: none;
-
-        // ------- Blue navbar ------
-        background-color: $cr_text_blue;
-        a.navbar-brand {
-          background-image: url("/img/ML/carrot_wordmark_white.svg");
-        }
-        // ------- Uncomment for blue navbar ------
       }
     }
   }
 
   div.collapse.navbar-collapse {
     height: calc(100vh - 60px);
-    background-color: $cr_text_blue;
     border: none;
     box-shadow: none;
 
@@ -161,7 +155,7 @@ ul.navbar-top {
     padding-top: 10px;
 
     @include mobile(){
-      color: white !important;
+      color: #333333 !important;
       margin-top: 20px;
 
       &.get-started-item {
@@ -171,7 +165,7 @@ ul.navbar-top {
       a {
         @include avenir_R();
         font-size: 20px;
-        color: white !important;
+        color: #333333 !important;
         opacity: 0.6;
       }
 

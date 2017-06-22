@@ -54,9 +54,6 @@
               "About"]]
           [:li
             [:a.navbar-item {:href oc-urls/blog} "Blog"]]
-          [:li.big-web-only
-            {:class (if (utils/in? (:route @router/path) "contact") "active" "")}
-            [:a.navbar-item.contact {:href (str "mailto:" oc-urls/contact-email)} "Contact"]]
           [:li.get-started-item
             (if (jwt/jwt)
               [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
