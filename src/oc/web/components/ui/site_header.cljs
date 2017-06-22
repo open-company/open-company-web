@@ -22,8 +22,7 @@
       (.removeClass body body-class)
       (.addClass body body-class))))
 
-(rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)
-                          :did-remount (fn [_ s] (toggle-menu true) s)}
+(rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)}
   [s]
   ; <!-- Nav Bar -->
   [:nav.navbar.navbar-default.navbar-static-top
