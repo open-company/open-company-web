@@ -40,7 +40,7 @@ div.divider-line {
 }
 
 div.ovarls-container {
-  width: 1086px;
+  max-width: 1086px;
   height: 580px;
   background-image: url("/img/ML/about_happy_faces.svg");
   background-position: 0px 0px;
@@ -61,7 +61,7 @@ div.ovarls-container {
     letter-spacing: 0.2px;
     text-align: center;
     color: $cr_dark_blue;
-    width: 757px;
+    max-width: 757px;
     margin: 20px auto 106px;
 
     @include mobile(){
@@ -142,7 +142,7 @@ div.ovarls-container {
     font-size: 20px;
     text-align: center;
     color: $cr_text_blue_2;
-    width: 757px;
+    max-width: 757px;
     margin: 20px auto 50px;
 
     &:last-child {
@@ -161,7 +161,7 @@ div.principles {
 
   div.principle {
     position: relative;
-    width: 746px;
+    max-width: 746px;
     margin: 76px auto 0;
 
     @include mobile(){
@@ -206,7 +206,7 @@ div.principles {
       padding-top: 90px;
       font-size: 36px;
       @include avenir_H();
-      width: 564px;
+      max-width: 564px;
       text-align: left;
       margin-left: 160px;
 
@@ -223,7 +223,7 @@ div.principles {
       color: $cr_text_blue_2;
       @include avenir_BOOK();
       font-size: 20px;
-      width: 564px;
+      max-width: 564px;
       text-align: left;
       margin-left: 160px;
       margin-top: 23px;
@@ -315,7 +315,7 @@ div.about-alignment {
   }
 
   div.about-alignment-description {
-    width: 1024px;
+    max-width: 1024px;
     padding: 0 117px;
     margin: 0 auto;
     font-size: 33px;
@@ -342,7 +342,7 @@ div.about-team {
   }
 
   div.about-team-inner {
-    width: 1146px;
+    max-width: 1146px;
     margin: 0 auto 0;
     text-align: center;
 
@@ -364,7 +364,7 @@ div.about-team {
 
     div.team-card {
       margin: 26px auto 0;
-      width: 561px;
+      max-width: 561px;
       height: 230px;
       border-radius: 10px;
       background-color: #ffffff;
@@ -466,7 +466,7 @@ div.about-team {
 
     div.column-left {
       float: left;
-      width: 561px;
+      max-width: 561px;
 
       @include mobile(){
         float: initial;
@@ -489,7 +489,7 @@ div.about-team {
 
     div.column-right {
       float: right;
-      width: 561px;
+      max-width: 561px;
 
       @include mobile(){
         float: initial;
