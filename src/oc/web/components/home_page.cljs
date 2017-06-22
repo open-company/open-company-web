@@ -20,8 +20,8 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates that tell a better story"]
-          [:div.subheadline "Keep everyone - inside and outside the company - engaged and aligned."]
+          [:h1.headline "Company updates tell the story"]
+          [:div.subheadline "It's never been easier to get everyone aligned - inside and outside the company."]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
             "Get started for free"]
