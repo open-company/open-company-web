@@ -55,7 +55,7 @@
           {:type "button"
            :data-toggle "collapse"
            :data-target "#oc-navbar-collapse"
-           :onClick "$('nav.navbar-static-top').toggleClass('mobile-expanded');$(document.body).toggleClass('no-scroll');"}
+           :onClick "$(document.body).toggleClass('mobile-menu-expanded');"}
             [:span.sr-only "Toggle navigation"]
             [:span.icon-bar]
             [:span.icon-bar]
