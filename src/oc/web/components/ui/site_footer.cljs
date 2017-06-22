@@ -29,7 +29,7 @@
         [:img.logo
           {:src "/img/ML/carrot_wordmark_white.svg"}]
         [:div.small-links
-          [:a "Get started"] "|" [:a "Login"]]
+          [:a "Request Free Early Access"]]
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 
