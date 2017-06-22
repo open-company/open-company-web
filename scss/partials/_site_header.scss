@@ -21,43 +21,45 @@
     transition: background-color 230ms;
   }
 
-  nav.mobile-expanded {
-    background-color: $cr_text_blue;
-    box-shadow: none;
-    width: 100vw;
-
-    .navbar-toggle .icon-bar {
-      background-color: white;
-
-      &:nth-child(2){
-        transform: rotate(-45deg);
-        top: 8px;
-        position: relative;
-      }
-
-      &:nth-child(3){
-        transform: rotate(45deg);
-        top: 2px;
-        position: relative;
-      }
-
-      &:nth-child(4){
-        transform: rotate(-45deg);
-        top: -4px;
-        position: relative;
-      }
-    }
-
-    div.navbar-header {
-      border: none;
-      box-shadow: none;
-
-      // ------- Blue navbar ------
+  body.mobile-menu-expanded {
+    nav.navbar-static-top {
       background-color: $cr_text_blue;
-      a.navbar-brand {
-        background-image: url("/img/ML/carrot_wordmark_white.svg");
+      box-shadow: none;
+      width: 100vw;
+
+      .navbar-toggle .icon-bar {
+        background-color: white;
+
+        &:nth-child(2){
+          transform: rotate(-45deg);
+          top: 8px;
+          position: relative;
+        }
+
+        &:nth-child(3){
+          transform: rotate(45deg);
+          top: 2px;
+          position: relative;
+        }
+
+        &:nth-child(4){
+          transform: rotate(-45deg);
+          top: -4px;
+          position: relative;
+        }
       }
-      // ------- Uncomment for blue navbar ------
+
+      div.navbar-header {
+        border: none;
+        box-shadow: none;
+
+        // ------- Blue navbar ------
+        background-color: $cr_text_blue;
+        a.navbar-brand {
+          background-image: url("/img/ML/carrot_wordmark_white.svg");
+        }
+        // ------- Uncomment for blue navbar ------
+      }
     }
   }
 
