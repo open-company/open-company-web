@@ -17,7 +17,6 @@
   "Helper function called every time this component is mounted, remounted or the menu button is clicked"
   [force-collapse]
   (let [body (js/$ (.-body js/document))]
-    (js/console.log "toggle-menu force?" force-collapse "$(body):" body "hasClass:" (.hasClass body body-class))
     ;; If it's forcing the collapse or the menu is already open
     (if (or force-collapse (.hasClass body body-class))
       (.removeClass body body-class)
