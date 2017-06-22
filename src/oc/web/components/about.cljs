@@ -80,33 +80,35 @@
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
-                  [:div.team-description "Skydiver, future ninja skydiver, guitarist, Swiss design-head and communicator, collector, connector, creator."]
+                  [:div.team-description "Prior to founding OpenCompany, Stuart started and sold two venture-backed startups. Venetica (acquired by IBM) pioneered a new type of enterprise integration software, and TalkTo (acquired by Path) launched the first messaging app to local businesses powered by a human + AI backend."]
                   [:div.team-media-links
-                    [:a.linkedin]
-                    [:a.twitter]]]]
-              [:div.team-card
+                    [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
+                    [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
+              [:div.team-card.new-member
                 [:div.team-avatar]
-                [:div.team-member
-                  [:div.team-name "Iacopo Carraro"]
-                  [:div.team-description "Skydiver, ninja dev, guitarist, Swiss design-head and communicator, collector, connector, creator."]
-                  [:div.team-media-links
-                    [:a.linkedin]
-                    [:a.twitter]]]]]
+                  [:div.team-member
+                    [:div.team-name "You?"]
+                    [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]
 
             [:div.column-right.group
               [:div.team-card
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
-                  [:div.team-description "Skydiver, ninja skydiver spectator, guitarist, Swiss design-head and communicator."]
+                  [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
                   [:div.team-media-links
-                    [:a.linkedin]
-                    [:a.twitter]]]]
+                    [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
+                    [:a.twitter {:href "http://twitter.com/belucid"}]
+                    [:a.github {:href "http://github.com/belucid"} [:i.fa.fa-github]]]]]
               [:div.team-card
-            [:div.team-avatar]
-              [:div.team-member
-                [:div.team-name "You?"]
-                [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]]
+                [:div.team-avatar]
+                [:div.team-member
+                  [:div.team-name "Iacopo Carraro"]
+                  [:div.team-description "Iacopo is a full-stack engineer with lots of remote team and startup experience."]
+                  [:div.team-media-links
+                    [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
+                    [:a.twitter {:href "http://twitter.com/bago2k4"}]
+                    [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]]]]
 
       [:div.about-footer.group
 

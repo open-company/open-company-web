@@ -365,7 +365,7 @@ div.about-team {
     div.team-card {
       margin: 26px auto 0;
       max-width: 561px;
-      height: 230px;
+      min-height: 230px;
       border-radius: 10px;
       background-color: #ffffff;
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.03);
@@ -377,8 +377,14 @@ div.about-team {
         text-align: center;
       }
 
+      &.new-member {
+        div.team-avatar {
+          background-image: url("/img/ML/user_avatar_yellow.svg");
+        }        
+      }
+
       div.team-avatar {
-        background-image: url("/img/ML/user_avatar_yellow.svg");
+        background-image: url("/img/ML/user_avatar_red.svg");
         background-size: 64px 64px;
         background-repeat: no-repeat;
         width: 64px;
@@ -397,7 +403,7 @@ div.about-team {
         float: left;
         margin-left: 26px;
         text-align: left;
-        width: 390px;
+        width: 360px;
 
         @include mobile(){
           float: initial;
@@ -446,7 +452,12 @@ div.about-team {
             height: 20px;
             display: block;
             float: left;
-            margin-right: 40px;
+            margin-right: 20px;
+            font-size: 20px;
+
+            &.github {
+              margin-top: -3px;
+            }
 
             &.twitter {
               background-image: url("/img/ML/about_twitter.svg");
@@ -480,10 +491,6 @@ div.about-team {
         @include mobile(){
           float: initial;
         }
-
-        div.team-avatar {
-          background-image: url("/img/ML/user_avatar_red.svg");
-        }
       }
     }
 
@@ -501,10 +508,6 @@ div.about-team {
 
         @include mobile(){
           float: initial;
-        }
-
-        div.team-avatar {
-          background-image: url("/img/ML/user_avatar_blue.svg");
         }
       }
     }
