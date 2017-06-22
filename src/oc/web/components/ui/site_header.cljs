@@ -11,27 +11,17 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.login-button :refer (get-started-button)]))
 
+(def body-class "mobile-menu-expanded")
+
 (defn toggle-menu
   "Helper function called every time this component is mounted, remounted or the menu button is clicked"
   [force-collapse]
-  (let [nav (js/$ "nav.navbar-static-top")
-        body (js/$ (.-body js/document))]
+  (let [body (js/$ (.-body js/document))]
+    (js/console.log "toggle-menu force?" force-collapse "$(body):" body "hasClass:" (.hasClass body body-class))
     ;; If it's forcing the collapse or the menu is already open
-    (if (or force-collapse (.hasClass nav "mobile-expanded"))
-      (do
-        ;; Remove class for expanded menu
-        (.removeClass nav "mobile-expanded")
-        ;; Remove the overflow hidden for the body
-        (.removeClass body "no-scroll")
-        ;; Reset the body height to show the full content
-        (.css body #js {:height "auto"}))
-      (do
-        ;; Add the mobile menu expanded class
-        (.addClass nav "mobile-expanded")
-        ;; Hide the body overflow
-        (.addClass body "no-scroll")
-        ;; Limit the body height to the screen height
-        (.css body #js {:height "100vh"})))))
+    (if (or force-collapse (.hasClass body body-class))
+      (.removeClass body body-class)
+      (.addClass body body-class))))
 
 (rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)
                           :did-remount (fn [_ s] (toggle-menu true) s)}
