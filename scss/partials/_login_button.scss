@@ -19,7 +19,6 @@ div.login-button{
 
 div.get-started-button {
   button.mlb-get-started {
-    width: 109px;
     height: 32px;
     border-radius: 6px;
     background-color: $cr_text_blue;
@@ -27,6 +26,12 @@ div.get-started-button {
     font-size: 13px;
     font-weight: 900;
     color: white;
+    padding: 8px 20px;
+    opacity: 0.9;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
   @include big_web(){
@@ -38,6 +43,7 @@ div.get-started-button {
 
 @include mobile(){
   div.get-started-button{
+    display: none;
     bottom: 40px;
     left: 0px;
     position: absolute;
@@ -45,8 +51,8 @@ div.get-started-button {
     text-align: center;
 
     button.mlb-get-started {
-      background-color: white;
-      color: $cr_text_blue;
+      background-color: $cr_text_blue;
+      color: white;
       font-size: 16px;
       @include avenir_H();
       padding: 13px 80px;

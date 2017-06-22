@@ -35,6 +35,6 @@
     {:class (when button-classes button-classes)}
     [:button.mlb-reset.mlb-get-started
       {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
-      "Get Started"]
+      "Get Early Access"]
     [:div.mobile-already-account
       [:a {:href oc-urls/login} "Already have an account? " [:span.login "Sign in"]]]])
