@@ -23,6 +23,7 @@ div#wrap {
       padding: 0 16px;
       max-width: 1200px;
       margin: 0 auto 20px;
+      line-height: 60px;
     }
 
     div.subheadline {
@@ -31,6 +32,7 @@ div#wrap {
       padding: 0 16px;
       @include avenir_R();
       margin-top: 20px;
+      line-height: 32px;
     }
 
     button.get-started-centred-bt {
@@ -43,6 +45,11 @@ div#wrap {
       @include avenir_H();
       font-size: 18px;
       margin: 20px 16px 0;
+      opacity: 0.9;
+
+      &:hover {
+        opacity: 1;
+      }
     }
 
     div.small-teams {

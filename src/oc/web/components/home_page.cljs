@@ -20,11 +20,11 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates tell the story"]
+          [:h1.headline "Company updates that tell the story"]
           [:div.subheadline "It's never been easier to get everyone aligned - inside and outside the company."]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
-            "Get started for free"]
+            "Get Early Access"]
           [:div.small-teams
             "Easy set-up • Free for small teams"]
           [:img
@@ -75,21 +75,22 @@
               [:div.subtitle
                 "Share updates and stories with anyone outside the company, too, such as recruits, investors and customers."]]]]
 
-        [:div.customers
-          [:div.customers-title
-            [:img {:src "/img/ML/user_avatar_yellow.svg"}]
-            "Our happy clients"]
-          [:div.customers-cards.group
-            [:div.left-arrow
-              [:button.mlb-reset.left-arrow-bt
-                {:disabled true}]]
-            [:div.customers-cards-scroll
-              [:div.customers-card]
-              [:div.customers-card]
-              [:div.customers-card]]
-            [:div.right-arrow
-              [:button.mlb-reset.right-arrow-bt
-                {:disabled true}]]]]
+        (comment
+          [:div.customers
+            [:div.customers-title
+              [:img {:src "/img/ML/user_avatar_yellow.svg"}]
+              "Our happy clients"]
+            [:div.customers-cards.group
+              [:div.left-arrow
+                [:button.mlb-reset.left-arrow-bt
+                  {:disabled true}]]
+              [:div.customers-cards-scroll
+                [:div.customers-card]
+                [:div.customers-card]
+                [:div.customers-card]]
+              [:div.right-arrow
+                [:button.mlb-reset.right-arrow-bt
+                  {:disabled true}]]]])
 
         [:div.try-it
           [:div.try-it-title
