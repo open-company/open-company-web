@@ -20,7 +20,7 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates that make an impact"]
+          [:h1.headline "Company updates that get alignment"]
           [:div.subheadline "It's never been easier to get everyone aligned - inside and outside the company."]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
