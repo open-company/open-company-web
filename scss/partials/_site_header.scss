@@ -1,7 +1,7 @@
 /* Header */
 
 @include mobile() {
-  .navbar-default .navbar-toggle:hover {
+  .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:active{
     background-color: transparent;
   }
 
@@ -153,6 +153,10 @@ ul.navbar-top {
 
   li {
     padding-top: 10px;
+
+    &.get-started-item {
+      margin-left: 20px;
+    }
 
     @include mobile(){
       color: #333333 !important;

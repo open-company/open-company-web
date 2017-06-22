@@ -22,9 +22,8 @@ div.get-started-button {
     height: 32px;
     border-radius: 6px;
     background-color: $cr_text_blue;
-    font-family: $oc_main_font;
+    @include avenir_H();
     font-size: 13px;
-    font-weight: 900;
     color: white;
     padding: 8px 20px;
     opacity: 0.9;
