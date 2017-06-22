@@ -32,6 +32,7 @@ $.click = function(){};
 $.addClass = function(){};
 $.removeClass = function(){};
 $.toggleClass = function(){};
+$.hasClass = function(){};
 $.width = function(){};
 $.height = function(){};
 $.last = function(){};
