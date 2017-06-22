@@ -74,13 +74,11 @@
           [:li
             {:class (if (= active-page "blog") "active" "")}
             [:a.navbar-item {:href "https://blog.carrot.io"} "Blog"]]
-          [:li.big-web-only
-            [:a.navbar-item.contact {:href "mailto:hello@carrot.io"} "Contact"]]
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
                 {:on-click #()}
-                "Get Started"]
+                "Get Early Access"]
               [:div.mobile-already-account
                 [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]]]]]]])
 
