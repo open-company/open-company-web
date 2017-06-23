@@ -10,9 +10,15 @@
   outline: none;
   border-width: 0;
   background-color: transparent;
+  opacity: 0.8;
+
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.2;
+    opacity: 0.2 !important;
+  }
+
+  &:hover {
+    opacity: 1;
   }
 }
 
