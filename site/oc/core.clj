@@ -101,24 +101,32 @@
         [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column
 
-        [:div.column
-          [:div.column-title "SUPPORT"]
+        [:div.column.support
+          [:div.column-title
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.support').addClass('expanded');"}
+            "SUPPORT"]
           [:div.column-item [:a "Help"]]
           [:div.column-item [:a "Contact"]]]
 
-        [:div.column
-          [:div.column-title "INTEGRATIONS"]
+        [:div.column.integration
+          [:div.column-title
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.integration').addClass('expanded');"}
+            "INTEGRATIONS"]
           [:div.column-item [:a "Slack"]]
           [:div.column-item [:a "Developers"]]]
 
-        [:div.column
-          [:div.column-title "COMPANY"]
+        [:div.column.company
+          [:div.column-title
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.company').addClass('expanded');"}
+            "COMPANY"]
           [:div.column-item [:a "About"]]
           [:div.column-item [:a "Blog"]]
           [:div.column-item [:a "Legal"]]]
 
-        [:div.column
-          [:div.column-title "TOUR"]
+        [:div.column.tour
+          [:div.column-title
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.tour').addClass('expanded');"}
+            "TOUR"]
           [:div.column-item [:a "Home"]]
           [:div.column-item [:a "Features"]]
           [:div.column-item [:a "Pricing"]]]]]])
