@@ -93,6 +93,7 @@
                   {:disabled true}]]]])
 
         [:div.try-it
+          {:id "mc_embed_signup"}
           [:div.try-it-title
             "Try it today"]
           [:div.try-it-subtitle
@@ -110,14 +111,15 @@
               [:div.clear {:id "mce-responses"}
                 [:div.response.hidden {:id "mce-error-response"}]
                 [:div.response.hidden {:id "mce-success-response"}]]
-              [:input.mail.required
-                {:type "text"
-                 :id "mce-EMAIL"
-                 :name "EMAIL"
-                 :placeholder "Email address"}]
+              [:div.mc-field-group
+                [:input.mail.required
+                  {:type "text"
+                   :id "mce-EMAIL"
+                   :name "EMAIL"
+                   :placeholder "Email address"}]]
               [:div {:style #js {:position "absolute" :left "-5000px"}
                      :aria-hidden true}
-                [:input {:type "text" :name "b_16bbc69a5b39531f20233bd5f_2ee535bf29" :tabindex "-1" :value ""}]]
+                [:input {:type "text" :name "b_16bbc69a5b39531f20233bd5f_2ee535bf29" :tab-index "-1" :value ""}]]
               [:button.mlb-reset.try-it-get-started
                 {:type "submit"
                  :id "mc-embedded-subscribe"}
