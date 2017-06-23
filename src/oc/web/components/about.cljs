@@ -26,10 +26,8 @@
           [:div.about-subline
             "Transparency is a powerful motivator for teams. It creates a sense of ownership, and builds trust and clarity of purpose."]
           [:div.paragraphs-container.group
-            (when (responsive/is-mobile-size?)
-              [:div.mobile-only.happy-face.yellow-happy-face])
-            (when (responsive/is-mobile-size?)
-              [:div.mobile-only.happy-face.red-happy-face])
+            [:div.mobile-only.happy-face.yellow-happy-face]
+            [:div.mobile-only.happy-face.red-happy-face]
             [:div.mobile-paragraphs-container.group
               [:div.paragraph
                 "Serial entrepreneurs ourselves, we’ve learned most of all that transparency is essential for company alignment."]
@@ -37,12 +35,9 @@
                 "Still, we could never find easy solutions to help us keep growing and distributed teams on the same page."]
               [:div.paragraph
                 "Now we’ve built the solution we wanted ourselves, based on three principles:"]]
-            (when (responsive/is-mobile-size?)
-              [:div.mobile-only.happy-face.blue-happy-face])
-            (when (responsive/is-mobile-size?)
-              [:div.mobile-only.happy-face.purple-happy-face])
-            (when (responsive/is-mobile-size?)
-              [:div.mobile-only.happy-face.green-happy-face])]]
+            [:div.mobile-only.happy-face.blue-happy-face]
+            [:div.mobile-only.happy-face.purple-happy-face]
+            [:div.mobile-only.happy-face.green-happy-face]]]
 
         [:div.principles.group
           [:div.principle.principle-1
