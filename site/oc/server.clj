@@ -16,6 +16,9 @@
 (defn about []
   (res/resource-response "/about.html" {:root "public"}))
 
+(defn features []
+  (res/resource-response "/features.html" {:root "public"}))
+
 ; (defn index []
 ;   (res/resource-response "/index.html" {:root "public"}))
 
@@ -35,6 +38,7 @@
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/about" [] (about))
+  (GET "/features" [] (features))
   (GET "/" [] (app-shell))
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))

@@ -1,0 +1,167 @@
+div.main.features {
+  width: 100%;
+  text-align: center;
+  padding-bottom: 60px;
+  margin-top: 50px;
+
+  h1.features {
+    @include avenir_H();
+    font-size: 40px;
+    letter-spacing: 0.3px;
+    color: $cr_dark_blue;
+    margin-top: 47px;
+    padding: 0 16px;
+  }
+
+  div.divider-line {
+    margin-top: 32px;
+    width: 82px;
+    height: 6px;
+    background-color: $cr_orange;
+    left: 50%;
+    margin-left: -41px;
+    position: relative;
+  }
+
+  div.illustrations {
+    text-align: center;
+
+    div.illustration {
+      margin: 60px auto;
+      padding: 0 16px;
+
+      @include mobile(){
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      }
+
+      div.description {
+        max-width: 475px;
+
+        div.title {
+          color: $cr_dark_blue;
+          @include avenir_H();
+          font-size: 36px;
+          letter-spacing: 0.1px;
+        }
+
+        div.subtitle {
+          color: $cr_dark_blue;
+          @include avenir_M();
+          font-size: 20px;
+          line-height: 1.7;
+        }
+      }
+
+      // 1st illustration
+      &.illustration-1 {
+        max-width: 1127px;
+
+        img {
+          @include big_web() {
+            float: left;
+            margin-left: 20px;
+            max-width: 506px;
+          }
+        }
+
+        div.description {
+          @include big_web() {
+            float: right;
+            text-align: left;
+          }
+          margin-top: 70px;
+        }
+      }
+
+      // 2nd illustration
+      &.illustration-2 {
+        max-width: 1127px;
+
+        img {
+          @include big_web(){
+            float: right;
+            margin-right: 40px;
+            max-width: 521px;
+          }
+        }
+
+        div.description {
+          @include big_web(){
+            float: left;
+            text-align: left;
+          }
+          margin-top: 115px;
+        }
+      }
+
+      // 3rd illustration
+      &.illustration-3 {
+        max-width: 1127px;
+
+        img {
+          @include big_web(){
+            float: left;
+            margin-left: 30px;
+            max-width: 424px;
+          }
+        }
+
+        div.description {
+          @include big_web(){
+            float: right;
+            text-align: left;
+            margin-right: 10px;
+          }
+          margin-top: 75px;
+        }
+      }
+
+      // 4th illustration
+      &.illustration-4 {
+        max-width: 1127px;
+
+        img {
+          @include big_web(){
+            float: right;
+            margin-right: 160px;
+            max-width: 346px;
+          }
+        }
+
+        div.description {
+          @include big_web(){
+            float: left;
+            text-align: left;
+            margin-top: 80px;
+          }
+        }
+      }
+
+      // 5th illustration
+      &.illustration-5 {
+        max-width: 1127px;
+
+        img {
+          @include big_web(){
+            float: left;
+            margin-left: 50px;
+            max-width: 333px;
+          }
+        }
+
+        div.description {
+          @include big_web(){
+            float: right;
+            text-align: left;
+            margin-right: 20px;
+          }
+          margin-top: 60px;
+          
+        }
+      }
+    }
+  }
+}

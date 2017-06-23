@@ -70,6 +70,9 @@
           ;   {:class (if (= active-page "pricing") "active" "")}
           ;   [:a.navbar-item {:href "/pricing"} "Pricing"]]
           [:li
+            {:class (if (= active-page "features") "active" "")}
+            [:a.navbar-item {:href "/features"} "Features"]]
+          [:li
             {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]
           [:li
@@ -107,7 +110,7 @@
             {:onClick "$('nav.navbar-bottom div.column:not(.support)').removeClass('expanded');$('nav.navbar-bottom div.column.support').toggleClass('expanded');"}
             "SUPPORT"]
           [:div.column-item [:a "Help"]]
-          [:div.column-item [:a "Contact"]]]
+          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.integration
           [:div.column-title
@@ -120,8 +123,8 @@
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.company)').removeClass('expanded');$('nav.navbar-bottom div.column.company').toggleClass('expanded');"}
             "COMPANY"]
-          [:div.column-item [:a "About"]]
-          [:div.column-item [:a "Blog"]]
+          [:div.column-item [:a {:href "/about"} "About"]]
+          [:div.column-item [:a {:href "https://blog.carrot.io"} "Blog"]]
           [:div.column-item [:a "Legal"]]]
 
         [:div.column.tour
@@ -129,8 +132,9 @@
             {:onClick "$('nav.navbar-bottom div.column:not(.tour)').removeClass('expanded');$('nav.navbar-bottom div.column.tour').toggleClass('expanded');"}
             "TOUR"]
           [:div.column-item [:a "Home"]]
-          [:div.column-item [:a "Features"]]
-          [:div.column-item [:a "Pricing"]]]]]])
+          [:div.column-item [:a {:href "/features"} "Features"]]
+          ; [:div.column-item [:a "Pricing"]]
+          ]]]])
 
 
 (defn read-edn [entry]
@@ -153,6 +157,7 @@
                 (case page
                   ; :index   (pages/index options)
                   :about   (pages/about options)
+                  :features (pages/features options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

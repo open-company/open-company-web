@@ -31,6 +31,7 @@
             [oc.web.components.oc-wall :refer (oc-wall)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
+            [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
@@ -239,6 +240,10 @@
       (timbre/info "Routing about-route" urls/about)
       (simple-handler about "about" target params))
 
+    (defroute features-route urls/features {:as params}
+      (timbre/info "Routing features-route" urls/features)
+      (simple-handler features "features" target params))
+
     (defroute pricing-route urls/pricing {:as params}
       (timbre/info "Routing pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
@@ -424,6 +429,7 @@
                                  login-route
                                  signup-route
                                  about-route
+                                 features-route
                                  pricing-route
                                  logout-route
                                  org-create-route
