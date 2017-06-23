@@ -44,7 +44,7 @@
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
           [:div.column-item [:a "Help"]]
-          [:div.column-item [:a "Contact"]]]
+          [:div.column-item [:a {:href oc-urls/contact-mail-to}"Contact"]]]
 
         [:div.column
           {:class (when (= @(::expanded s) :integration) "expanded")}
@@ -65,8 +65,8 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
-          [:div.column-item [:a "About"]]
-          [:div.column-item [:a "Blog"]]
+          [:div.column-item [:a {:href oc-urls/about} "About"]]
+          [:div.column-item [:a {:href oc-urls/blog} "Blog"]]
           [:div.column-item [:a "Legal"]]]
 
         [:div.column
@@ -77,8 +77,8 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :tour)))}
             "TOUR"]
-          [:div.column-item [:a "Home"]]
-          [:div.column-item [:a "Features"]]
+          [:div.column-item [:a {:href oc-urls/home} "Home"]]
+          [:div.column-item [:a {:href oc-urls/features} "Features"]]
           [:div.column-item [:a "Pricing"]]]]
 
         (when (responsive/is-mobile-size?)
