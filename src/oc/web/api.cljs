@@ -844,11 +844,13 @@
 
 
 (defn force-jwt-refresh []
-  (if-let [refresh-url (j/get-key :refresh-url)]
-    (let [res (<! (refresh-jwt refresh-url))]
-      (if (:success res)
-        (update-jwt-cookie! (:body res))
-        (dispatcher/dispatch! [:logout])))
-    (dispatcher/dispatch! [:logout])))
+  (when (j/jwt)
+    (go
+      (if-let [refresh-url (j/get-key :refresh-url)]
+        (let [res (<! (refresh-jwt refresh-url))]
+          (if (:success res)
+            (update-jwt-cookie! (:body res))
+            (dispatcher/dispatch! [:logout])))
+        (dispatcher/dispatch! [:logout])))))
 
 (set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)
