@@ -21,7 +21,7 @@ div#wrap {
       @include avenir_B();
       color: $cr_dark_blue;
       padding: 0 16px;
-      max-width: 1200px;
+      max-width: 800px;
       margin: 0 auto 20px;
       line-height: 60px;
     }
@@ -31,8 +31,9 @@ div#wrap {
       font-size: 22px;
       padding: 0 16px;
       @include avenir_R();
-      margin-top: 20px;
       line-height: 32px;
+      max-width: 490px;
+      margin: 20px auto 0;
     }
 
     button.get-started-centred-bt {
@@ -69,6 +70,7 @@ div#wrap {
 
   div.illustrations {
     text-align: center;
+    padding-bottom: 80px;
 
     div.illustration {
       margin: 60px auto;
@@ -106,8 +108,8 @@ div#wrap {
         img {
           @include big_web() {
             float: left;
-            margin-left: 70px;
-            max-width: 506px;
+            margin-left: 0px;
+            max-width: 416px;
           }
         }
 
@@ -127,8 +129,8 @@ div#wrap {
         img {
           @include big_web(){
             float: right;
-            margin-right: 40px;
-            max-width: 521px;
+            margin-right: 140px;
+            max-width: 320px;
           }
         }
 
@@ -148,8 +150,8 @@ div#wrap {
         img {
           @include big_web(){
             float: left;
-            margin-left: 30px;
-            max-width: 424px;
+            margin-left: 80px;
+            max-width: 320px;
           }
         }
 
@@ -160,50 +162,6 @@ div#wrap {
             margin-right: 10px;
           }
           margin-top: 75px;
-        }
-      }
-
-      // 4th illustration
-      &.illustration-4 {
-        max-width: 1127px;
-
-        img {
-          @include big_web(){
-            float: right;
-            margin-right: 160px;
-            max-width: 346px;
-          }
-        }
-
-        div.description {
-          @include big_web(){
-            float: left;
-            text-align: left;
-            margin-top: 80px;
-          }
-        }
-      }
-
-      // 5th illustration
-      &.illustration-5 {
-        max-width: 1127px;
-
-        img {
-          @include big_web(){
-            float: left;
-            margin-left: 50px;
-            max-width: 333px;
-          }
-        }
-
-        div.description {
-          @include big_web(){
-            float: right;
-            text-align: left;
-            margin-right: 20px;
-          }
-          margin-top: 60px;
-          
         }
       }
     }
@@ -347,26 +305,30 @@ div#wrap {
       margin-top: 12px;
       padding: 0 16px;
 
-      input {
-        margin: 0;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-        width: 322px;
-        height: 61px;
-        @include avenir_M();
-        font-size: 16px;
-        color: $cr_dark_blue;
-        padding: 10px 20px;
-        outline: none;
-        border: none;
+      div.mc-field-group {
+        display: inline;
 
-        @include mobile() {
-          width: 100%;
-          border-radius: 8px;
-        }
+        input {
+          margin: 0;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+          width: 322px;
+          height: 61px;
+          @include avenir_M();
+          font-size: 16px;
+          color: $cr_dark_blue;
+          padding: 10px 20px;
+          outline: none;
+          border: none;
 
-        @include placeholder() {
-          opacity: 0.8;
+          @include mobile() {
+            width: 100%;
+            border-radius: 8px;
+          }
+
+          @include placeholder() {
+            opacity: 0.8;
+          }
         }
       }
 

@@ -20,7 +20,7 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates that get alignment"]
+          [:h1.headline "Company updates that build transparency and alignment"]
           [:div.subheadline "It's never been easier to get everyone aligned - inside and outside the company."]
           [:button.get-started-centred-bt.mlb-reset
             {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
@@ -36,44 +36,28 @@
         [:div.illustrations.group
 
           [:div.illustration.illustration-1.group
-            [:img {:src "/img/ML/home_page_illustration_1.png"}]
+            [:img {:src "/img/ML/home_page_il_1_416_424.svg"}]
             [:div.description.group
               [:div.title
                 "Get aligned fast"]
               [:div.subtitle
-                "Whether you’re adding a quick update about one topic, or writing a monthly update that covers many, getting started is fast and simple."]]]
+                "Check out what’s new this week, or get new employees up to speed in a flash. Updates are in one place and easy to find."]]]
 
           [:div.illustration.illustration-2.group
-            [:img {:src "/img/ML/home_page_illustration_2.png"}]
+            [:img {:src "/img/ML/home_page_il_2_320_408.svg"}]
             [:div.description.group
               [:div.title
-                "See the big picture"]
+                "Keep investors up to date"]
               [:div.subtitle
-                "Check out what’s new this past week, or get new employees up to speed in a flash - it’s never been easier to get caught up."]]]
+                "Investors and advisors are happier - and more helpful - when they’re in the loop!"]]]
 
           [:div.illustration.illustration-3.group
-            [:img {:src "/img/ML/home_page_illustration_3.png"}]
+            [:img {:src "/img/ML/home_page_il_3_320_312.svg"}]
             [:div.description.group
               [:div.title
-                "Spark better conversations"]
+                "Grow your business"]
               [:div.subtitle
-                "Share updates that encourage reactions and comments to keep the team in sync - great for distributed teams."]]]
-
-          [:div.illustration.illustration-4.group
-            [:img {:src "/img/ML/home_page_illustration_4.png"}]
-            [:div.description.group
-              [:div.title
-                "Integrate with Slack"]
-              [:div.subtitle
-                "Onboard your Slack team with single sign-on to make team management easy. Sharing to a channel or individual is seamless."]]]
-
-          [:div.illustration.illustration-5.group
-            [:img {:src "/img/ML/home_page_illustration_5.png"}]
-            [:div.description.group
-              [:div.title
-                "Build a bigger audience"]
-              [:div.subtitle
-                "Share updates and stories with anyone outside the company, too, such as recruits, investors and customers."]]]]
+                "Share the latest news with recruits, potential investors, and customers. Build trust with a bigger audience and they’ll reward you for it."]]]]
 
         (comment
           [:div.customers
