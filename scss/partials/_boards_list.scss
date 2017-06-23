@@ -53,14 +53,25 @@ div.left-boards-list {
       }
     }
 
-    button.left-boards-list-top-title {
+    button.left-boards-list-top-title-button {
       width: 20px;
       height: 20px;
       margin-right: 5px;
       margin-top: -6px;
       padding: 0;
       cursor: pointer;
-      background-image: url("/img/ML/add.svg");
+      transition: 230ms;
+      background-color: rgba(82,222,149,0.25);
+      background-image: url("/img/ML/plus_button_icon.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 8px 8px;
+      border-radius: 2px;
+
+      &:hover {
+        background-color: #3FBD7C;
+        background-image: url("/img/ML/plus_button_icon_white.svg");
+      }
     }
   }
 
