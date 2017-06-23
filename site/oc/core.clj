@@ -103,21 +103,21 @@
 
         [:div.column.support
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.support').addClass('expanded');"}
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.support').toggleClass('expanded');"}
             "SUPPORT"]
           [:div.column-item [:a "Help"]]
           [:div.column-item [:a "Contact"]]]
 
         [:div.column.integration
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.integration').addClass('expanded');"}
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.integration').toggleClass('expanded');"}
             "INTEGRATIONS"]
           [:div.column-item [:a "Slack"]]
           [:div.column-item [:a "Developers"]]]
 
         [:div.column.company
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.company').addClass('expanded');"}
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.company').toggleClass('expanded');"}
             "COMPANY"]
           [:div.column-item [:a "About"]]
           [:div.column-item [:a "Blog"]]
@@ -125,7 +125,7 @@
 
         [:div.column.tour
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.tour').addClass('expanded');"}
+            {:onClick "$('nav.navbar-bottom div.column').removeClass('expanded');$('nav.navbar-bottom div.column.tour').toggleClass('expanded');"}
             "TOUR"]
           [:div.column-item [:a "Home"]]
           [:div.column-item [:a "Features"]]
