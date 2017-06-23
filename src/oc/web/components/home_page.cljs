@@ -97,13 +97,31 @@
             "Try it today"]
           [:div.try-it-subtitle
             "Easy set-up • Free for small teams"]
-          [:div.try-it-combo-field
-            [:input
-              {:type "text"
-               :placeholder "Email address"}]
-            [:button.mlb-reset.try-it-get-started
-              {:on-click #()}
-              "Get Started"]]]
+          [:form.validate
+            {:action "//opencompany.us11.list-manage.com/subscribe/post?u=16bbc69a5b39531f20233bd5f&amp;id=2ee535bf29"
+             :method "post"
+             :id "mc-embedded-subscribe-form"
+             :name "mc-embedded-subscribe-form"
+             :target "_blank"
+             :no-validate true}
+            [:div.try-it-combo-field
+              {:id "mc_embed_signup_scroll"}
+              [:div.hidden "real people should not fill this in and expect good things - do not remove this or risk form bot signups"]
+              [:div.clear {:id "mce-responses"}
+                [:div.response.hidden {:id "mce-error-response"}]
+                [:div.response.hidden {:id "mce-success-response"}]]
+              [:input.mail.required
+                {:type "text"
+                 :id "mce-EMAIL"
+                 :name "EMAIL"
+                 :placeholder "Email address"}]
+              [:div {:style #js {:position "absolute" :left "-5000px"}
+                     :aria-hidden true}
+                [:input {:type "text" :name "b_16bbc69a5b39531f20233bd5f_2ee535bf29" :tabindex "-1" :value ""}]]
+              [:button.mlb-reset.try-it-get-started
+                {:type "submit"
+                 :id "mc-embedded-subscribe"}
+                "Get Started"]]]]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
