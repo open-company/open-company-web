@@ -128,13 +128,13 @@
             (dom/a {:href (oc-urls/org-team-settings) :on-click um-click} "Invite People")))
         (when (and (router/current-org-slug)
                    is-admin?)
-          (dom/div {:class "oc-menu-item"}
+          (dom/div {:class "oc-menu-item divider-item"}
             (dom/a {:href "#" :on-click #(js/alert "Coming soon")} "Billing")))
         ;; Temp commenting this out since we need API support to know how many companies the user has
         (when (and (jwt/jwt)
                    (or is-admin?
                        is-author?))
-          (dom/div {:class "oc-menu-item"}
+          (dom/div {:class "oc-menu-item divider-item"}
             (dom/a {:href "#" :on-click #(js/alert "Coming soon")} "Archive")))
         (when (jwt/jwt)
           (dom/div {:class "oc-menu-item"}

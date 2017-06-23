@@ -3,8 +3,9 @@
             [boot.util :as util]
             [hiccup.page :as hp]
             [environ.core :refer (env)]))
-
-(def contact-email "hello@carrot.io")
+;; FIXME: Using hellp@opencompany.com until we have hello@carrot.io setup
+;; (def contact-email "hello@carrot.io")
+(def contact-email "hello@opencompany.com")
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def options {:contact-email contact-email

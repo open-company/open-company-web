@@ -8,10 +8,6 @@
   :gray "#D8D8D8" ;"#ADADAD"
   :black "#000000"
   :white "#FCFCFC"
-  ;; Charts
-  :oc-chart-blue "#4EE4D6"
-  :oc-chart-green "#4de148"
-  :oc-chart-red "#D72A46"
   ;; Greens
   :oc-green-dark-1 "#51d34a"
   :oc-green-dark "#35bc2e"

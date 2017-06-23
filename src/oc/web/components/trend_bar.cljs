@@ -71,12 +71,14 @@
     (let [trend-bar-status (drv/react s :trend-bar-status)]
       [:div.trend-bar.group
         {:class (name trend-bar-status)
-         :on-mouse-over #(when (= trend-bar-status :collapsed)
-                           (reset! (::hovering s) true)
-                           (dis/dispatch! [:trend-bar-status :expanded]))
-         :on-mouse-leave #(when @(::hovering s)
-                          (reset! (::hovering s) false)
-                          (dis/dispatch! [:trend-bar-status :collapsed]))}
+         ;; FIXME: Disable the trending hover state for now since we have no data to show
+         ; :on-mouse-over #(when (= trend-bar-status :collapsed)
+         ;                   (reset! (::hovering s) true)
+         ;                   (dis/dispatch! [:trend-bar-status :expanded]))
+         ; :on-mouse-leave #(when @(::hovering s)
+         ;                  (reset! (::hovering s) false)
+         ;                  (dis/dispatch! [:trend-bar-status :collapsed]))
+       }
         [:div.trend-bar-orange-box
           [:button.mlb-reset.toggle-trend-bt
             {:on-click #(do

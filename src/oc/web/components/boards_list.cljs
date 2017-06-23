@@ -56,7 +56,7 @@
             "BOARDS")
           (when (and (not (responsive/is-tablet-or-mobile?))
                      (utils/link-for (:links org-data) "create"))
-            (dom/button {:class "left-boards-list-top-title btn-reset right"
+            (dom/button {:class "left-boards-list-top-title-button btn-reset right"
                          :on-click #(when (nil? (:foce-key data))
                                       (dis/dispatch! [:input [:create-board] ""]))
                          :title "Create a new board"
@@ -109,9 +109,9 @@
             "STORIES")
           (when (and (not (responsive/is-tablet-or-mobile?))
                      true) ;; FIXME: replace with create storeis link check
-            (dom/button {:class "left-boards-list-top-title btn-reset right"
+            (dom/button {:class "left-boards-list-top-title-button btn-reset right"
                          :on-click #(identity %) ;; FIXME: Replace with story creation action
-                         :title "Create a new board"
+                         :title "Create a new story"
                          :data-placement "top"
                          :data-toggle "tooltip"
                          :data-container "body"})))

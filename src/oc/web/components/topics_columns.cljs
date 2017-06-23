@@ -220,7 +220,7 @@
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:add-topic-show true])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "Start writing")))
+                    "Say something")))
               (cond
                 (and is-dashboard
                      (not (responsive/is-mobile-size?))
