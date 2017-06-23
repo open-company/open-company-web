@@ -92,7 +92,7 @@
         [:img.logo
           {:src "/img/ML/carrot_wordmark_white.svg"}]
         [:div.small-links
-          [:a "Get started"] "|" [:a "Login"]]
+          [:a "Request Free Early Access"]]
         [:div.small-logos
           [:a.twitter
             [:img {:src "/img/ML/home_page_twitter.svg"}]]
