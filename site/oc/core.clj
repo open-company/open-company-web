@@ -65,9 +65,9 @@
           [:li.mobile-only
             {:class (if (= active-page "home") "active" "")}
             [:a.navbar-item {:href "/"} "Home"]]
-          [:li
-            {:class (if (= active-page "pricing") "active" "")}
-            [:a.navbar-item {:href "/pricing"} "Pricing"]]
+          ; [:li
+          ;   {:class (if (= active-page "pricing") "active" "")}
+          ;   [:a.navbar-item {:href "/pricing"} "Pricing"]]
           [:li
             {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]

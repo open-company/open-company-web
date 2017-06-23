@@ -43,9 +43,9 @@
           [:li.mobile-only
             {:class (if (utils/in? (:route @router/path) "home") "active" "")}
             [:a.navbar-item {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))} "Home"]]
-          [:li
-            {:class (if (utils/in? (:route @router/path) "pricing") "active" "")}
-            [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
+          ; [:li
+          ;   {:class (if (utils/in? (:route @router/path) "pricing") "active" "")}
+          ;   [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
           [:li
             {:class (if (utils/in? (:route @router/path) "about") "active" "")}
             [:a.navbar-item
