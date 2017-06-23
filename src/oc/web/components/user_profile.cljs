@@ -43,6 +43,10 @@
                           {:init (fn [s _]
                                    (dis/dispatch! [:user-profile-reset])
                                    s)
+                           :after-render (fn [s]
+                                           (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
+                                              (change! :timezone (.. js/moment -tz guess)))
+                                           s)
                            :did-remount (fn [old-state new-state]
                                           (when @(::loading new-state)
                                             (reset! (::show-success new-state) true)
@@ -125,9 +129,21 @@
                 [:select
                   {:value (:timezone current-user-data)
                    :on-change #(change! :timezone (.. % -target -value))}
+                  ;; Promoted timezones
+                  (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+                    [:option
+                      {:key (str "timezone-" t "-promoted")
+                       :value t} t])
+                  ;; Divider line option
+                  [:option
+                    {:disabled true
+                     :value ""}
+                    "------------"]
+                  ;; All the timezones, repeating the promoted
                   (for [t timezones]
                     [:option
-                      {:key (str "timezone-" t)}
+                      {:key (str "timezone-" t)
+                       :value t}
                       t])]]]]
           ; Digest frequency
           [:div.user-profile-field-box
