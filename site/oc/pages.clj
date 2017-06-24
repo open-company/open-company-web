@@ -127,11 +127,11 @@
           [:div.mobile-only.happy-face.red-happy-face]
           [:div.mobile-paragraphs-container.group
             [:div.paragraph
-              "Serial entrepreneurs ourselves, we’ve learned most of all that transparency is essential for company alignment."]
+              "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
             [:div.paragraph
-              "Still, we could never find easy solutions to help us keep growing and distributed teams on the same page."]
+              "The solution is surprisingly simple and effective - great company updates build transparency and alignment.  Updates need to be fun and engaging to trigger the conversations that keep everyone in sync. They need to be kept in one place so they’re easy to find, and don’t disappear as the chats scroll by."]
             [:div.paragraph
-              "Now we’ve built the solution we wanted ourselves, based on three principles:"]]
+              "With that in mind we designed Carrot based on three principles:"]]
           [:div.mobile-only.happy-face.blue-happy-face]
           [:div.mobile-only.happy-face.purple-happy-face]
           [:div.mobile-only.happy-face.green-happy-face]]]
