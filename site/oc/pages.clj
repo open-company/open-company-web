@@ -121,13 +121,11 @@
       [:div.ovarls-container
 
         [:div.about-subline
-          "Transparency is a powerful motivator for teams. It creates a sense of ownership, and builds trust and clarity of purpose."]
+          "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
         [:div.paragraphs-container.group
           [:div.mobile-only.happy-face.yellow-happy-face]
           [:div.mobile-only.happy-face.red-happy-face]
           [:div.mobile-paragraphs-container.group
-            [:div.paragraph
-              "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
             [:div.paragraph
               "The solution is surprisingly simple and effective - great company updates build transparency and alignment.  Updates need to be fun and engaging to trigger the conversations that keep everyone in sync. They need to be kept in one place so they’re easy to find, and don’t disappear as the chats scroll by."]
             [:div.paragraph
