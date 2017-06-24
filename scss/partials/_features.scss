@@ -38,7 +38,13 @@ div.main.features {
       }
 
       div.description {
-        max-width: 475px;
+        @include mobile(){
+          margin-top: 60px;
+        }
+
+        @include big_web(){
+          max-width: 475px;
+        }
 
         div.title {
           color: $cr_dark_blue;
@@ -55,112 +61,95 @@ div.main.features {
         }
       }
 
-      // 1st illustration
-      &.illustration-1 {
-        max-width: 1127px;
+      @include big_web() {
 
-        img {
-          @include big_web() {
+        // 1st illustration
+        &.illustration-1 {
+          max-width: 1127px;
+
+          img {
             float: right;
             margin-right: 20px;
             max-width: 506px;
           }
-        }
 
-        div.description {
-          @include big_web() {
+          div.description {
             float: left;
             text-align: left;
             margin-left: 40px;
+            margin-top: 100px;
           }
-          margin-top: 110px;
         }
-      }
 
-      // 2nd illustration
-      &.illustration-2 {
-        max-width: 1127px;
+        // 2nd illustration
+        &.illustration-2 {
+          max-width: 1127px;
 
-        img {
-          @include big_web(){
+          img {
             float: left;
             margin-left: 80px;
             max-width: 521px;
           }
-        }
 
-        div.description {
-          @include big_web(){
+          div.description {
             float: right;
             text-align: left;
             margin-right: 0px;
+            margin-top: 100px;
           }
-          margin-top: 115px;
         }
-      }
 
-      // 3rd illustration
-      &.illustration-3 {
-        max-width: 1127px;
-        margin-top: 80px;
+        // 3rd illustration
+        &.illustration-3 {
+          max-width: 1127px;
+          margin-top: 80px;
 
-        img {
-          @include big_web(){
+          img {
             float: right;
             margin-right: 40px;
             max-width: 424px;
-            margin-top: 40px;
+            margin-top: 50px;
           }
-        }
 
-        div.description {
-          @include big_web(){
+          div.description {
             float: left;
             text-align: left;
             margin-left: 70px;
+            margin-top: 25px;
           }
-          margin-top: 25px;
         }
-      }
 
-      // 4th illustration
-      &.illustration-4 {
-        max-width: 1127px;
+        // 4th illustration
+        &.illustration-4 {
+          max-width: 1127px;
 
-        img {
-          @include big_web(){
+          img {
             float: left;
             margin-left: 120px;
             max-width: 346px;
             margin-top: 55px;
           }
-        }
 
-        div.description {
-          @include big_web(){
+          div.description {
             float: right;
             text-align: left;
             margin-top: 80px;
             margin-right: 0px;
           }
         }
-      }
 
-      // 5th illustration
-      &.illustration-5 {
-        max-width: 1127px;
+        // 5th illustration
+        &.illustration-5 {
+          max-width: 1127px;
 
-        img {
-          @include big_web(){
+          img {
             float: right;
             margin-right: 100px;
             max-width: 333px;
           }
-        }
 
-        div.description {
-          margin-top: 60px;
-          @include big_web(){
+          div.description {
+            margin-top: 60px;
             float: left;
             text-align: left;
             margin-left: 60px;
