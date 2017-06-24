@@ -9,344 +9,343 @@ div#wrap {
       background-size: 100% auto;
       background-repeat: no-repeat;
     }
-  }
+  
 
-  div.cta {
-    padding-top: 116px;
-    padding-bottom: 50px;
-    text-align: center;
+    div.cta {
+      padding-top: 116px;
+      padding-bottom: 50px;
+      text-align: center;
 
-    h1.headline {
-      font-size: 48px;
-      @include avenir_B();
-      color: $cr_dark_blue;
-      padding: 0 16px;
-      max-width: 800px;
-      margin: 0 auto 20px;
-      line-height: 60px;
-    }
-
-    div.subheadline {
-      color: #4D4D4D;
-      font-size: 22px;
-      padding: 0 16px;
-      @include avenir_R();
-      line-height: 32px;
-      max-width: 490px;
-      margin: 20px auto 0;
-    }
-
-    button.get-started-centred-bt {
-      max-width: 320px;
-      height: 48px;
-      border-radius: 8px;
-      background-color: $cr_text_blue;
-      color: white;
-      padding: 3px 56px;
-      @include avenir_H();
-      font-size: 18px;
-      margin: 20px 16px 0;
-      opacity: 0.9;
-
-      &:hover {
-        opacity: 1;
+      h1.headline {
+        font-size: 48px;
+        @include avenir_B();
+        color: $cr_dark_blue;
+        padding: 0 16px;
+        max-width: 800px;
+        margin: 0 auto 20px;
+        line-height: 60px;
       }
-    }
 
-    div.small-teams {
-      color: $cr_dark_blue;
-      font-size: 12px;
-      @include avenir_H();
-      margin-top: 16px;
-    }
+      div.subheadline {
+        color: #4D4D4D;
+        font-size: 22px;
+        padding: 0 16px;
+        @include avenir_R();
+        line-height: 32px;
+        max-width: 490px;
+        margin: 20px auto 0;
+      }
 
-    img {
-      margin-top: 48px;
-      padding: 0 16px;
-      max-width: 100%;
-      height: auto;
-    }
-  }
+      button.get-started-centred-bt {
+        max-width: 320px;
+        height: 48px;
+        border-radius: 8px;
+        background-color: $cr_text_blue;
+        color: white;
+        padding: 3px 56px;
+        @include avenir_H();
+        font-size: 18px;
+        margin: 20px 16px 0;
+        opacity: 0.9;
 
-  div.illustrations {
-    text-align: center;
-    padding-bottom: 80px;
-
-    div.illustration {
-      margin: 60px auto;
-      padding: 0 16px;
-
-      @include mobile(){
-        img {
-          max-width: 100%;
-          height: auto;
+        &:hover {
+          opacity: 1;
         }
       }
 
-      div.description {
-        max-width: 475px;
-
-        div.title {
-          color: $cr_dark_blue;
-          @include avenir_H();
-          font-size: 36px;
-          letter-spacing: 0.1px;
-        }
-
-        div.subtitle {
-          color: $cr_dark_blue;
-          @include avenir_M();
-          font-size: 20px;
-          line-height: 1.7;
-        }
-      }
-
-      // 1st illustration
-      &.illustration-1 {
-        max-width: 1127px;
-
-        img {
-          @include big_web() {
-            float: left;
-            margin-left: 0px;
-            max-width: 416px;
-          }
-        }
-
-        div.description {
-          @include big_web() {
-            float: right;
-            text-align: left;
-          }
-          margin-top: 70px;
-        }
-      }
-
-      // 2nd illustration
-      &.illustration-2 {
-        max-width: 1127px;
-
-        img {
-          @include big_web(){
-            float: right;
-            margin-right: 140px;
-            max-width: 320px;
-          }
-        }
-
-        div.description {
-          @include big_web(){
-            float: left;
-            text-align: left;
-          }
-          margin-top: 115px;
-        }
-      }
-
-      // 3rd illustration
-      &.illustration-3 {
-        max-width: 1127px;
-
-        img {
-          @include big_web(){
-            float: left;
-            margin-left: 80px;
-            max-width: 320px;
-          }
-        }
-
-        div.description {
-          @include big_web(){
-            float: right;
-            text-align: left;
-            margin-right: 10px;
-          }
-          margin-top: 75px;
-        }
-      }
-    }
-  }
-
-  div.customers {
-    width: 100%;
-    margin: 50px auto 0;
-    background-color: $cr_dark_blue;
-    padding: 60px 0;
-    text-align: center;
-
-    div.customers-title {
-      padding: 0 16px;
-      font-size: 36px;
-      @include avenir_H();
-      color: white;
-
-      @include mobile() {
-        font-size: 28px;
+      div.small-teams {
+        color: $cr_dark_blue;
+        font-size: 12px;
+        @include avenir_H();
+        margin-top: 16px;
       }
 
       img {
-        width: 40px;
-        height: 40px;
-        margin-right: 20px;
-        margin-top: -4px;
+        margin-top: 48px;
+        padding: 0 16px;
+        max-width: 100%;
+        height: auto;
+      }
+    }
+
+    div.illustrations {
+      text-align: center;
+      padding-bottom: 80px;
+
+      div.illustration {
+        margin: 60px auto;
+        padding: 0 16px;
+
+        @include mobile(){
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+        }
+
+        div.description {
+          @include mobile(){
+            margin-top: 60px;
+          }
+
+          @include big_web(){
+            max-width: 475px;
+          }
+
+          div.title {
+            color: $cr_dark_blue;
+            @include avenir_H();
+            font-size: 36px;
+            letter-spacing: 0.1px;
+          }
+
+          div.subtitle {
+            color: $cr_dark_blue;
+            @include avenir_M();
+            font-size: 20px;
+            line-height: 1.7;
+          }
+        }
+
+        // 1st illustration
+        @include big_web() {
+          &.illustration-1 {
+            max-width: 1127px;
+
+            img {
+              float: right;
+              margin-right: 80px;
+              max-width: 416px;
+            }
+
+            div.description {
+              float: left;
+              text-align: left;
+              margin-top: 120px;
+              margin-left: 50px
+            }
+          }
+
+          // 2nd illustration
+          &.illustration-2 {
+            max-width: 1127px;
+
+            img {
+              float: left;
+              margin-left: 80px;
+              max-width: 320px;
+            }
+
+            div.description {
+              float: right;
+              text-align: right;
+              margin-top: 150px;
+              margin-right: 90px;
+            }
+          }
+
+          // 3rd illustration
+          &.illustration-3 {
+            max-width: 1127px;
+
+            img {
+              float: right;
+              margin-right: 130px;
+              max-width: 320px;
+            }
+
+            div.description {
+              float: left;
+              text-align: left;
+              margin-left: 60px;
+              margin-top: 75px;
+            }
+          }
+        }
+      }
+    }
+
+    div.customers {
+      width: 100%;
+      margin: 50px auto 0;
+      background-color: $cr_dark_blue;
+      padding: 60px 0;
+      text-align: center;
+
+      div.customers-title {
+        padding: 0 16px;
+        font-size: 36px;
+        @include avenir_H();
+        color: white;
 
         @include mobile() {
-          display: none;
-        }
-      }
-    }
-
-    div.customers-cards {
-      margin: 60px auto;
-      width: 1246px;
-
-      div.left-arrow {
-        height: 200px;
-        width: 48px;
-        float: left;
-
-        @include mobile(){
-          display: none;
+          font-size: 28px;
         }
 
-        button {
-          margin-top: 50px;
-          background-image: url("/img/ML/home_page_left_arrow.svg");
-          background-size: 48px 96px;
-          width: 48px;
-          height: 96px;
-          opacity: 0.9;
-
-          &:hover {
-            opacity: 1;
-          }
-
-          &:disabled {
-            opacity: 0.4;
-          }
-        }
-      }
-
-      div.customers-cards-scroll {
-        width: 1110px;
-        height: 200px;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        margin: 0 20px;
-        float: left;
-        display: inline-block;
-
-        div.customers-card {
-          margin-right: 15px;
-          width: 360px;
-          height: 200px;
-          border-radius: 10px;
-          background-color: white;
-          box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
-          float: left;
-
-          &:last-child {
-            margin-right: 0px;
-          }
-        }
-      }
-
-      div.right-arrow {
-        height: 200px;
-        width: 48px;
-        float: right;
-
-        @include mobile(){
-          display: none;
-        }
-
-        button {
-          margin-top: 50px;
-          background-image: url("/img/ML/home_page_right_arrow.svg");
-          background-size: 48px 96px;
-          width: 48px;
-          height: 96px;
-          opacity: 0.9;
-
-          &:hover {
-            opacity: 1;
-          }
-
-          &:disabled {
-            opacity: 0.4;
-          }
-        }
-      }
-    }
-  }
-
-  div.try-it {
-    width: 100%;
-    margin: 0 auto;
-    padding: 56px 0 86px;
-    background-image: linear-gradient(252deg, #f7c144, #f2558f);
-    text-align: center;
-
-    div.try-it-title {
-      @include avenir_H();
-      font-size: 36px;
-      letter-spacing: 0.1px;
-      color: white;
-    }
-
-    div.try-it-subtitle {
-      color: #592121;
-      @include avenir_H();
-      font-size: 16px;
-      line-height: 1.75;
-    }
-
-    div.try-it-combo-field {
-      margin-top: 12px;
-      padding: 0 16px;
-
-      div.mc-field-group {
-        display: inline;
-
-        input {
-          margin: 0;
-          border-top-left-radius: 8px;
-          border-bottom-left-radius: 8px;
-          width: 322px;
-          height: 61px;
-          @include avenir_M();
-          font-size: 16px;
-          color: $cr_dark_blue;
-          padding: 10px 20px;
-          outline: none;
-          border: none;
+        img {
+          width: 40px;
+          height: 40px;
+          margin-right: 20px;
+          margin-top: -4px;
 
           @include mobile() {
-            width: 100%;
-            border-radius: 8px;
-          }
-
-          @include placeholder() {
-            opacity: 0.8;
+            display: none;
           }
         }
       }
 
-      button.try-it-get-started {
-        height: 61px;
-        margin: 0;
-        background-color: $cr_dark_blue;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
+      div.customers-cards {
+        margin: 60px auto;
+        width: 1246px;
+
+        div.left-arrow {
+          height: 200px;
+          width: 48px;
+          float: left;
+
+          @include mobile(){
+            display: none;
+          }
+
+          button {
+            margin-top: 50px;
+            background-image: url("/img/ML/home_page_left_arrow.svg");
+            background-size: 48px 96px;
+            width: 48px;
+            height: 96px;
+            opacity: 0.9;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            &:disabled {
+              opacity: 0.4;
+            }
+          }
+        }
+
+        div.customers-cards-scroll {
+          width: 1110px;
+          height: 200px;
+          overflow-x: hidden;
+          overflow-y: hidden;
+          margin: 0 20px;
+          float: left;
+          display: inline-block;
+
+          div.customers-card {
+            margin-right: 15px;
+            width: 360px;
+            height: 200px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
+            float: left;
+
+            &:last-child {
+              margin-right: 0px;
+            }
+          }
+        }
+
+        div.right-arrow {
+          height: 200px;
+          width: 48px;
+          float: right;
+
+          @include mobile(){
+            display: none;
+          }
+
+          button {
+            margin-top: 50px;
+            background-image: url("/img/ML/home_page_right_arrow.svg");
+            background-size: 48px 96px;
+            width: 48px;
+            height: 96px;
+            opacity: 0.9;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            &:disabled {
+              opacity: 0.4;
+            }
+          }
+        }
+      }
+    }
+
+    div.try-it {
+      width: 100%;
+      margin: 0 auto;
+      padding: 56px 0 86px;
+      background-image: linear-gradient(252deg, #f7c144, #f2558f);
+      text-align: center;
+
+      div.try-it-title {
+        @include avenir_H();
+        font-size: 36px;
+        letter-spacing: 0.1px;
         color: white;
+      }
+
+      div.try-it-subtitle {
+        color: #592121;
         @include avenir_H();
         font-size: 16px;
-        padding: 10px 18px;
+        line-height: 1.75;
+      }
 
-        @include mobile(){
-          width: 100%;
-          border-radius: 8px;
-          margin-top: 20px;
+      div.try-it-combo-field {
+        margin-top: 12px;
+        padding: 0 16px;
+
+        div.mc-field-group {
+          display: inline;
+
+          input {
+            margin: 0;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            width: 322px;
+            height: 61px;
+            @include avenir_M();
+            font-size: 16px;
+            color: $cr_dark_blue;
+            padding: 10px 20px;
+            outline: none;
+            border: none;
+
+            @include mobile() {
+              width: 100%;
+              border-radius: 8px;
+            }
+
+            @include placeholder() {
+              opacity: 0.8;
+            }
+          }
+        }
+
+        button.try-it-get-started {
+          height: 61px;
+          margin: 0;
+          background-color: $cr_dark_blue;
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+          color: white;
+          @include avenir_H();
+          font-size: 16px;
+          padding: 10px 18px;
+
+          @include mobile(){
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+          }
         }
       }
     }

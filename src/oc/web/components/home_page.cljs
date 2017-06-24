@@ -27,10 +27,12 @@
             "Get Early Access"]
           [:div.small-teams
             "Easy set-up • Free for small teams"]
-          [:img
-            {:src "/img/ML/home_page_screenshot.png"
-             :width 756
-             :height 511}]]
+          ;; FIXME: Remove the carrot screenshot for the initial onboarding period
+          (comment
+            [:img
+              {:src "/img/ML/home_page_screenshot.png"
+               :width 756
+               :height 511}])]
 
 
         [:div.illustrations.group
