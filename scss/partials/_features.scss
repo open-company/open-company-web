@@ -61,18 +61,19 @@ div.main.features {
 
         img {
           @include big_web() {
-            float: left;
-            margin-left: 20px;
+            float: right;
+            margin-right: 20px;
             max-width: 506px;
           }
         }
 
         div.description {
           @include big_web() {
-            float: right;
+            float: left;
             text-align: left;
+            margin-left: 40px;
           }
-          margin-top: 70px;
+          margin-top: 110px;
         }
       }
 
@@ -82,16 +83,17 @@ div.main.features {
 
         img {
           @include big_web(){
-            float: right;
-            margin-right: 40px;
+            float: left;
+            margin-left: 80px;
             max-width: 521px;
           }
         }
 
         div.description {
           @include big_web(){
-            float: left;
+            float: right;
             text-align: left;
+            margin-right: 0px;
           }
           margin-top: 115px;
         }
@@ -100,22 +102,24 @@ div.main.features {
       // 3rd illustration
       &.illustration-3 {
         max-width: 1127px;
+        margin-top: 80px;
 
         img {
           @include big_web(){
-            float: left;
-            margin-left: 30px;
+            float: right;
+            margin-right: 40px;
             max-width: 424px;
+            margin-top: 40px;
           }
         }
 
         div.description {
           @include big_web(){
-            float: right;
+            float: left;
             text-align: left;
-            margin-right: 10px;
+            margin-left: 70px;
           }
-          margin-top: 75px;
+          margin-top: 25px;
         }
       }
 
@@ -125,17 +129,19 @@ div.main.features {
 
         img {
           @include big_web(){
-            float: right;
-            margin-right: 160px;
+            float: left;
+            margin-left: 120px;
             max-width: 346px;
+            margin-top: 55px;
           }
         }
 
         div.description {
           @include big_web(){
-            float: left;
+            float: right;
             text-align: left;
             margin-top: 80px;
+            margin-right: 0px;
           }
         }
       }
@@ -146,20 +152,19 @@ div.main.features {
 
         img {
           @include big_web(){
-            float: left;
-            margin-left: 50px;
+            float: right;
+            margin-right: 100px;
             max-width: 333px;
           }
         }
 
         div.description {
-          @include big_web(){
-            float: right;
-            text-align: left;
-            margin-right: 20px;
-          }
           margin-top: 60px;
-          
+          @include big_web(){
+            float: left;
+            text-align: left;
+            margin-left: 60px;
+          }
         }
       }
     }
