@@ -27,7 +27,7 @@ div.menu {
     padding: 10px 20px;
 
     div.user-name {
-      font-family: $oc_main_bold_font;
+      @include avenir_H();
       font-size: 14px;
       color: $cr_dark_gray;
       float: left;
@@ -36,7 +36,8 @@ div.menu {
     div.user-type {
       float: right;
       color: $cr_light_gray;
-      font-weight: 400;
+      @include avenir_R();
+      font-size: 14px;
     }
   }
 
@@ -88,8 +89,7 @@ div.menu {
       display: block;
       background-color: transparent;
       padding: 0px;
-      font-family: $oc_main_font;
-      font-weight: 400;
+      @include avenir_R();
       font-size: 16px;
       line-height: 1.0;
       color: $cr_dark_gray;

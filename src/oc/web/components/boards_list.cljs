@@ -47,13 +47,13 @@
         ;; All activity
         (dom/button {:class "all-activity group"}
           (dom/div {:class "all-activity-icon"})
-          "All Activity")
+          (dom/span "All Activity"))
         ;; Boards list
         (dom/div {:class "left-boards-list-top group"}
           ;; Boards header
           (dom/h3 {:class "left-boards-list-top-title"}
             (dom/div {:class "boards-icon"})
-            "BOARDS")
+            (dom/span "BOARDS"))
           (when (and (not (responsive/is-tablet-or-mobile?))
                      (utils/link-for (:links org-data) "create"))
             (dom/button {:class "left-boards-list-top-title-button btn-reset right"
@@ -106,7 +106,7 @@
           ;; Boards header
           (dom/h3 {:class "left-boards-list-top-title"}
             (dom/div {:class "stories-icon"})
-            "STORIES")
+            (dom/span "STORIES"))
           (when (and (not (responsive/is-tablet-or-mobile?))
                      true) ;; FIXME: replace with create storeis link check
             (dom/button {:class "left-boards-list-top-title-button btn-reset right"
@@ -120,7 +120,7 @@
                      (jwt/is-admin? (:team-id org-data)))
             (dom/button {:class "mlb-reset invite-people-btn"
                          :on-click #(router/nav! (oc-urls/org-team-settings))}
-              (dom/div {:class "invite-people-icon"}) "Invite People"))
+              (dom/div {:class "invite-people-icon"}) (dom/span "Invite People")))
           (dom/button {:class "mlb-reset about-carrot-btn"
                        :on-click #(router/nav! oc-urls/about)}
-            (dom/div {:class "about-carrot-icon"}) "About Carrot"))))))
+            (dom/div {:class "about-carrot-icon"}) (dom/span "About Carrot")))))))

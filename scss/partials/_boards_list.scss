@@ -4,11 +4,16 @@ div.left-boards-list {
   position: fixed;
 
   button.all-activity {
-    font-size: 16px;
-    color: $oc_gray_7;
     background-color: transparent;
     border: none;
     outline: none;
+    
+
+    span {
+      font-size: 16px;
+      color: $oc_gray_7;
+      @include avenir_H();
+    }
 
     div.all-activity-icon {
       background-image: url("/img/ML/activity_hamburger.svg");
@@ -17,7 +22,7 @@ div.left-boards-list {
       height: 16px;
       float: left;
       margin-right: 5px;
-      margin-top: 3px;
+      margin-top: 1px;
     }
   }
 
@@ -26,15 +31,18 @@ div.left-boards-list {
     margin-top: 34px; 
 
     .left-boards-list-top-title {
-      font-family: $oc_main_font;
-      font-size: 13px;
-      font-weight: 800;
-      color: $oc_gray_7;
       padding: 0 0 0 5px;
       margin: 0;
       float: left;
       width: 130px;
       margin-bottom: 12px;
+
+      span {
+        @include avenir_B();
+        font-size: 13px;
+        color: $oc_gray_7;
+        float: left;
+      }
 
       div.boards-icon, div.stories-icon {
         background-size: 16px 16px;
@@ -42,7 +50,7 @@ div.left-boards-list {
         height: 16px;
         float: left;
         margin-right: 5px;
-        margin-top: -2px;
+        margin-top: -3px;
       }
 
       div.boards-icon {
@@ -98,6 +106,9 @@ div.left-boards-list {
         overflow: hidden;
         width: 120px;
         float: left;
+        font-size: 14px;
+        color: $oc_gray_7;
+        @include avenir_M();
       }
 
       button.remove-board {
@@ -120,22 +131,17 @@ div.left-boards-list {
 
       &.selected {
         background-color: #dee8ff;
-        color: $cr_text_blue;
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1.71;
+        color: #3E4547;
+
+        div.internal {
+          @include avenir_H();
+          font-size: 14px;
+          line-height: 1.71;
+        }
       }
 
       &.highlight-on-hover {
         cursor: pointer;
-
-        &:hover {
-          background-color: #dee8ff;
-          color: $cr_text_blue;
-          font-size: 14px;
-          font-weight: 600;
-          line-height: 1.71;
-        }
       }
 
       input.board-name {
@@ -160,12 +166,14 @@ div.left-boards-list {
         height: 16px;
         margin-right: 5px;
         float: left;
-        margin-top: 2px;
+        margin-top: 1px;
       }
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.71;
-      color: $oc_gray_7;
+      
+      span {
+        font-size: 14px;
+        line-height: 1.71;
+        color: $oc_gray_7;
+      }
     }
 
     button.invite-people-btn {
@@ -176,12 +184,14 @@ div.left-boards-list {
         height: 16px;
         margin-right: 5px;
         float: left;
-        margin-top: 2px;
+        margin-top: 1px;
       }
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.71;
-      color: $oc_gray_7;
+
+      span {
+        font-size: 14px;
+        line-height: 1.71;
+        color: $oc_gray_7;
+      }
     }
   }
 }
