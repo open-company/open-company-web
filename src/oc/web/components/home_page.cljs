@@ -5,10 +5,14 @@
             [oc.web.local-settings :as ls]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
+            [oc.web.components.ui.try-it-form :refer (try-it-form)]
+            [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defcs home-page < rum/reactive [s]
-
+(rum/defcs home-page < rum/static
+                       (rum/local "" ::thanks-box-email)
+                       (rum/local "" ::thanks-box-email-bottom)
+  [s]
   [:div
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
         
@@ -22,14 +26,15 @@
         [:div.cta
           [:h1.headline "Company updates that build transparency and alignment"]
           [:div.subheadline "It's never been easier to get everyone aligned - inside and outside the company."]
-          [:button.get-started-centred-bt.mlb-reset
-            {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
-            "Get Early Access"]
+          (try-it-form "try-it-input-central" #(reset! (::thanks-box-email s) %))
           [:div.small-teams
             "Easy set-up • Free for small teams"]
+          (when-not (empty? @(::thanks-box-email s))
+            (carrot-box-thanks @(::thanks-box-email s)))
+
           ;; FIXME: Remove the carrot screenshot for the initial onboarding period
           (comment
-            [:img
+            [:img.homepage-screenshot
               {:src "/img/ML/home_page_screenshot.png"
                :width 756
                :height 511}])]
@@ -81,35 +86,12 @@
         [:div.try-it
           {:id "mc_embed_signup"}
           [:div.try-it-title
-            "Try it today"]
+            "Request early access"]
           [:div.try-it-subtitle
             "Easy set-up • Free for small teams"]
-          [:form.validate
-            {:action "//opencompany.us11.list-manage.com/subscribe/post?u=16bbc69a5b39531f20233bd5f&amp;id=2ee535bf29"
-             :method "post"
-             :id "mc-embedded-subscribe-form"
-             :name "mc-embedded-subscribe-form"
-             :target "_blank"
-             :no-validate true}
-            [:div.try-it-combo-field
-              {:id "mc_embed_signup_scroll"}
-              [:div.hidden "real people should not fill this in and expect good things - do not remove this or risk form bot signups"]
-              [:div.clear {:id "mce-responses"}
-                [:div.response.hidden {:id "mce-error-response"}]
-                [:div.response.hidden {:id "mce-success-response"}]]
-              [:div.mc-field-group
-                [:input.mail.required
-                  {:type "text"
-                   :id "mce-EMAIL"
-                   :name "EMAIL"
-                   :placeholder "Email address"}]]
-              [:div {:style #js {:position "absolute" :left "-5000px"}
-                     :aria-hidden true}
-                [:input {:type "text" :name "b_16bbc69a5b39531f20233bd5f_2ee535bf29" :tab-index "-1" :value ""}]]
-              [:button.mlb-reset.try-it-get-started
-                {:type "submit"
-                 :id "mc-embedded-subscribe"}
-                "Get Started"]]]]
+          (try-it-form "try-it-input-bottom" #(reset! (::thanks-box-email-bottom s) %))
+          (when-not (empty? @(::thanks-box-email-bottom s))
+            (carrot-box-thanks @(::thanks-box-email-bottom s)))]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
