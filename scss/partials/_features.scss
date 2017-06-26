@@ -30,11 +30,11 @@ div.main.features {
       margin: 60px auto;
       padding: 0 16px;
 
-      @include big_web(){
+      @media screen and (min-width: 1127px){
         width: 1127px;
       }
 
-      @include mobile(){
+      @media screen and (max-width: 1126px){
         img {
           max-width: 100%;
           height: auto;
@@ -42,11 +42,11 @@ div.main.features {
       }
 
       div.description {
-        @include mobile(){
+        @media screen and (max-width: 1126px){
           margin-top: 60px;
         }
 
-        @include big_web(){
+        @media screen and (min-width: 1127px){
           max-width: 475px;
         }
 
@@ -65,7 +65,7 @@ div.main.features {
         }
       }
 
-      @include big_web() {
+      @media screen and (min-width: 1127px) {
 
         // 1st illustration
         &.illustration-1 {
