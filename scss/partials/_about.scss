@@ -17,6 +17,7 @@ div.container.about {
 @media (min-width: 768px) { 
   div.container.about {
     max-width: 1086px;
+    text-align: center;
   }
 }
 
@@ -25,8 +26,10 @@ h1.about {
   font-size: 40px;
   letter-spacing: 0.3px;
   color: $cr_dark_blue;
-  margin-top: 47px;
+  margin: 47px auto 0;
   padding: 0 16px;
+  max-width: 575px;
+  text-align: center;
 }
 
 div.divider-line {
@@ -39,9 +42,9 @@ div.divider-line {
   position: relative;
 }
 
-div.ovarls-container {
+div.ovals-container {
   max-width: 1086px;
-  height: 580px;
+  height: 660px;
   background-image: url("/img/ML/about_happy_faces.svg");
   background-position: 0px 0px;
   background-size: 1086px 565px;
@@ -61,8 +64,8 @@ div.ovarls-container {
     letter-spacing: 0.2px;
     text-align: center;
     color: $cr_dark_blue;
-    max-width: 757px;
-    margin: 20px auto 106px;
+    max-width: 767px;
+    margin: 20px auto 40px;
 
     @include mobile(){
       width: 100%;
@@ -78,15 +81,6 @@ div.ovarls-container {
 
       div.happy-face {
         position: absolute;
-      }
-
-      div.yellow-happy-face {
-        background-image: url("/img/ML/user_avatar_yellow.svg");
-        background-size: 43px 43px;
-        width: 43px;
-        height: 43px;
-        left: 0px;
-        top: 0px;
       }
 
       div.red-happy-face {
@@ -128,7 +122,7 @@ div.ovarls-container {
   }
 
   @include mobile(){
-    div.mobile-paragraphs-container {
+    div.paragraphs-bg-container {
       background-image: url("/img/ML/about_mobile_oval_bg.svg");
       background-repeat: no-repeat;
       width: 100%;
@@ -138,12 +132,22 @@ div.ovarls-container {
     }
   }
 
+  @include big_web(){
+    div.paragraphs-bg-container {
+      background-image: url("/img/ML/about_oval_bg.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      padding: 40px 0;
+    }
+  }
+
   div.paragraph {
     @include avenir_BOOK();
     font-size: 20px;
     text-align: center;
     color: $cr_text_blue_2;
-    max-width: 757px;
+    max-width: 547px;
     margin: 20px auto 50px;
 
     &:last-child {
@@ -381,11 +385,28 @@ div.about-team {
       &.new-member {
         div.team-avatar {
           background-image: url("/img/ML/user_avatar_yellow.svg");
-        }        
+        }
+      }
+
+      &.stuart-levinson {
+        div.team-avatar {
+          background-image: url("/img/ML/user_avatar_red.svg");
+        }
+      }
+
+      &.sean-johnson {
+        div.team-avatar {
+          background-image: url("/img/ML/user_avatar_blue.svg");
+        }
+      }
+
+      &.iacopo-carraro {
+        div.team-avatar {
+          background-image: url("/img/ML/user_avatar_purple.svg");
+        }
       }
 
       div.team-avatar {
-        background-image: url("/img/ML/user_avatar_red.svg");
         background-size: 64px 64px;
         background-repeat: no-repeat;
         width: 64px;

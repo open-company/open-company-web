@@ -21,18 +21,18 @@
 
         [:div.divider-line]
 
-        [:div.ovarls-container.group
+        [:div.ovals-container.group
 
           [:div.about-subline
-            "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company"]
+            "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
           [:div.paragraphs-container.group
             [:div.mobile-only.happy-face.yellow-happy-face]
             [:div.mobile-only.happy-face.red-happy-face]
-            [:div.mobile-paragraphs-container.group
+            [:div.paragraphs-bg-container.group
               [:div.paragraph
-                "The solution is surprisingly simple and effective - great company updates build transparency and alignment.  Updates need to be fun and engaging to trigger the conversations that keep everyone in sync. They need to be kept in one place so they’re easy to find, and don’t disappear as the chats scroll by."]
+                "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
               [:div.paragraph
-                "With that in mind we designed Carrot based on three principles:"]]
+                "With that in mind we designed Carrot based" [:br] "on three principles:"]]
             [:div.mobile-only.happy-face.blue-happy-face]
             [:div.mobile-only.happy-face.purple-happy-face]
             [:div.mobile-only.happy-face.green-happy-face]]]
@@ -47,14 +47,14 @@
           [:div.principle.principle-2
             [:div.principle-oval-bg]
             [:div.principle-logo]
-            [:div.principle-title "The “big picture” should always be visible. "]
-            [:div.principle-description "No one wants to drill into folders or documents to understand what’s going on, or search through corporate chat archives to find something. It should be easier to get an instant view of what’s happening across the company anytime."]]
+            [:div.principle-title "The “big picture” should always be visible."]
+            [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
 
           [:div.principle.principle-3
             [:div.principle-oval-bg]
             [:div.principle-logo]
             [:div.principle-title "Alignment is valuable beyond the team, too."]
-            [:div.principle-description "Once you’ve created the big picture, you should be able to share it with anyone, inside and outside the company. Sharing beautiful updates with recruits, investors and customers is the surest way to keep them engaged and supportive."]]]
+            [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
 
       ] ;<!-- main -->
 
@@ -69,7 +69,7 @@
 
           [:div.group
             [:div.column-left.group
-              [:div.team-card
+              [:div.team-card.stuart-levinson
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
@@ -77,14 +77,14 @@
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                     [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
-              [:div.team-card.new-member
+              [:div.team-card.new-member.big-web-only
                 [:div.team-avatar]
                   [:div.team-member
                     [:div.team-name "You?"]
                     [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]
 
             [:div.column-right.group
-              [:div.team-card
+              [:div.team-card.sean-johnson
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
@@ -93,7 +93,7 @@
                     [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
                     [:a.twitter {:href "http://twitter.com/belucid"}]
                     [:a.github {:href "http://github.com/belucid"} [:i.fa.fa-github]]]]]
-              [:div.team-card
+              [:div.team-card.iacopo-carraro
                 [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "Iacopo Carraro"]
@@ -101,7 +101,13 @@
                   [:div.team-media-links
                     [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
                     [:a.twitter {:href "http://twitter.com/bago2k4"}]
-                    [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]]]]
+                    [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]
+
+            [:div.team-card.new-member.mobile-only
+              [:div.team-avatar]
+                [:div.team-member
+                  [:div.team-name "You?"]
+                  [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]
 
       [:div.about-footer.group
 
