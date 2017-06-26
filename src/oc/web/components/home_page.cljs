@@ -38,7 +38,7 @@
         [:div.illustrations.group
 
           [:div.illustration.illustration-1.group
-            [:img {:src "/img/ML/home_page_il_1_416_424.svg"}]
+            [:img {:src "/img/ML/home_page_il_1_412_385.svg"}]
             [:div.description.group
               [:div.title
                 "Get aligned fast"]
@@ -46,7 +46,7 @@
                 "Check out what’s new this week, or get new employees up to speed in a flash. Updates are in one place and easy to find."]]]
 
           [:div.illustration.illustration-2.group
-            [:img {:src "/img/ML/home_page_il_2_320_408.svg"}]
+            [:img {:src "/img/ML/home_page_il_2_444_414.svg"}]
             [:div.description.group
               [:div.title
                 "Keep investors up to date"]
@@ -54,7 +54,7 @@
                 "Investors and advisors are happier - and more helpful - when they’re in the loop!"]]]
 
           [:div.illustration.illustration-3.group
-            [:img {:src "/img/ML/home_page_il_3_320_312.svg"}]
+            [:img {:src "/img/ML/home_page_il_3_355_350.svg"}]
             [:div.description.group
               [:div.title
                 "Grow your business"]
