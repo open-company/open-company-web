@@ -97,7 +97,7 @@
 
 ;; home
 (defn home-handler [target params]
-  (pre-routing (:query-params params))
+  (pre-routing (:query-params params) true)
   ;; save route
   (router/set-route! ["home"] {:query-params (:query-params params)})
   (when (jwt/jwt)

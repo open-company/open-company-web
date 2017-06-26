@@ -4,7 +4,7 @@
 
 (rum/defcs try-it-form < (rum/local (int (rand 100)) ::input-class)
                          (rum/local "" ::email-value)
-  [s try-it-input-class get-started-cb]
+  [s try-it-input-class & [get-started-cb]]
   (let [try-it-final-class (or try-it-input-class (str "try-it-class-" @(::input-class s)))]
     [:form.validate
       {:action "//opencompany.us11.list-manage.com/subscribe/post?u=16bbc69a5b39531f20233bd5f&amp;id=2ee535bf29"

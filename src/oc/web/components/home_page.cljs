@@ -2,7 +2,9 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.router :as router]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.prevent-route-dispatch :as prd]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.try-it-form :refer (try-it-form)]
@@ -10,8 +12,22 @@
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs home-page < rum/static
-                       (rum/local "" ::thanks-box-email)
-                       (rum/local "" ::thanks-box-email-bottom)
+                       (rum/local false ::thanks-box-top)
+                       (rum/local false ::thanks-box-bottom)
+                       {:did-mount (fn [s]
+                                    (when (:tyt (:query-params @router/path))
+                                      (utils/after 1000 #(do
+                                                          (reset! prd/prevent-route-dispatch true)
+                                                          (reset! (::thanks-box-top s) true)
+                                                          (router/redirect! (str (.-location js/window) "#thank-you-top"))
+                                                          (reset! prd/prevent-route-dispatch false))))
+                                    (when (:tyb (:query-params @router/path))
+                                      (utils/after 1000 #(do
+                                                          (reset! prd/prevent-route-dispatch true)
+                                                          (reset! (::thanks-box-bottom s) true)
+                                                          (router/redirect! (str (.-location js/window) "#thank-you-bottom"))
+                                                          (reset! prd/prevent-route-dispatch false))))
+                                    s)}
   [s]
   [:div
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
@@ -25,12 +41,12 @@
         ; Hope page header
         [:div.cta
           [:h1.headline "Company updates that build transparency and alignment"]
-          [:div.subheadline "It's never been easier to get everyone aligned - inside and outside the company."]
-          (try-it-form "try-it-input-central" #(reset! (::thanks-box-email s) %))
+          [:div.subheadline#thank-you-top "It's never been easier to get everyone aligned - inside and outside the company."]
+          (try-it-form "try-it-input-central")
           [:div.small-teams
             "Easy set-up • Free for small teams"]
-          (when-not (empty? @(::thanks-box-email s))
-            (carrot-box-thanks @(::thanks-box-email s)))
+          (when @(::thanks-box-top s)
+            (carrot-box-thanks))
 
           ;; FIXME: Remove the carrot screenshot for the initial onboarding period
           (comment
@@ -86,12 +102,14 @@
         [:div.try-it
           {:id "mc_embed_signup"}
           [:div.try-it-title
+            {:id "thank-you-bottom"}
             "Request early access"]
           [:div.try-it-subtitle
             "Easy set-up • Free for small teams"]
-          (try-it-form "try-it-input-bottom" #(reset! (::thanks-box-email-bottom s) %))
-          (when-not (empty? @(::thanks-box-email-bottom s))
-            (carrot-box-thanks @(::thanks-box-email-bottom s)))]
+          [:div
+            (try-it-form "try-it-input-bottom" nil)]
+          (when @(::thanks-box-bottom s)
+            (carrot-box-thanks))]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
