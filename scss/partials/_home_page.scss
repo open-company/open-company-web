@@ -16,6 +16,10 @@ div#wrap {
       padding-bottom: 50px;
       text-align: center;
 
+      @include mobile(){
+        padding-top: 46px;
+      }
+
       h1.headline {
         font-size: 48px;
         @include avenir_B();
@@ -76,11 +80,11 @@ div#wrap {
         margin: 60px auto;
         padding: 0 16px;
 
-        @include big_web(){
+        @media screen and (min-width: 1127px){
           width: 1127px;
         }
 
-        @include mobile(){
+        @media screen and (max-width: 1126px){
           img {
             max-width: 100%;
             height: auto;
@@ -88,11 +92,11 @@ div#wrap {
         }
 
         div.description {
-          @include mobile(){
+          @media screen and (max-width: 1126px){
             margin-top: 60px;
           }
 
-          @include big_web(){
+          @media screen and (min-width: 1127px){
             max-width: 475px;
           }
 
@@ -112,7 +116,7 @@ div#wrap {
         }
 
         // 1st illustration
-        @include big_web() {
+        @media screen and (min-width: 1127px){
           &.illustration-1 {
 
             img {
