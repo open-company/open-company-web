@@ -109,32 +109,28 @@
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.support)').removeClass('expanded');$('nav.navbar-bottom div.column.support').toggleClass('expanded');"}
             "SUPPORT"]
-          [:div.column-item [:a "Help"]]
+          [:div.column-item [:a {:href contact-mail-to} "Help"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.integration
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.integration)').removeClass('expanded');$('nav.navbar-bottom div.column.integration').toggleClass('expanded');"}
             "INTEGRATIONS"]
-          [:div.column-item [:a "Slack"]]
-          [:div.column-item [:a "Developers"]]]
+          [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
 
         [:div.column.company
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.company)').removeClass('expanded');$('nav.navbar-bottom div.column.company').toggleClass('expanded');"}
             "COMPANY"]
           [:div.column-item [:a {:href "/about"} "About"]]
-          [:div.column-item [:a {:href "http://blog.carrot.io"} "Blog"]]
-          [:div.column-item [:a "Legal"]]]
+          [:div.column-item [:a {:href "http://blog.carrot.io"} "Blog"]]]
 
         [:div.column.tour
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.tour)').removeClass('expanded');$('nav.navbar-bottom div.column.tour').toggleClass('expanded');"}
             "TOUR"]
           [:div.column-item [:a {:href "/"} "Home"]]
-          [:div.column-item [:a {:href "/features"} "Features"]]
-          ; [:div.column-item [:a "Pricing"]]
-          ]]]])
+          [:div.column-item [:a {:href "/features"} "Features"]]]]]])
 
 
 (defn read-edn [entry]
