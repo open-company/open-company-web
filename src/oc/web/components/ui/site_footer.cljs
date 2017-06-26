@@ -43,8 +43,8 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
-          [:div.column-item [:a "Help"]]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to}"Contact"]]]
+          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Help"]]
+          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column
           {:class (when (= @(::expanded s) :integration) "expanded")}
@@ -54,8 +54,7 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :integration)))}
             "INTEGRATIONS"]
-          [:div.column-item [:a "Slack"]]
-          [:div.column-item [:a "Developers"]]]
+          [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
 
         [:div.column
           {:class (when (= @(::expanded s) :company) "expanded")}
@@ -66,8 +65,7 @@
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
-          [:div.column-item [:a {:href oc-urls/blog} "Blog"]]
-          [:div.column-item [:a "Legal"]]]
+          [:div.column-item [:a {:href oc-urls/blog} "Blog"]]]
 
         [:div.column
           {:class (when (= @(::expanded s) :tour) "expanded")}
@@ -78,8 +76,7 @@
                             (reset! (::expanded s) :tour)))}
             "TOUR"]
           [:div.column-item [:a {:href oc-urls/home} "Home"]]
-          [:div.column-item [:a {:href oc-urls/features} "Features"]]
-          [:div.column-item [:a "Pricing"]]]]
+          [:div.column-item [:a {:href oc-urls/features} "Features"]]]]
 
         (when (responsive/is-mobile-size?)
           (bottom-footer "mobile-footer"))]])
