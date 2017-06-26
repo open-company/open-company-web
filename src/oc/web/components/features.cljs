@@ -57,7 +57,7 @@
             [:img {:src "/img/ML/features_il_5_333_274.svg"}]
             [:div.description.group
               [:div.title
-                "Share the news more broadly"]
+                "Share your news more broadly"]
               [:div.subtitle
                 "Share something beautiful via email or on the Web. Updates and stories are accessible by teams, but can also be made public or private."]]]]
 
