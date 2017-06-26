@@ -221,6 +221,7 @@ div.principles {
         text-align: center;
         padding-top: 30px;
         font-size: 28px;
+        max-width: initial;
       }
     }
 
@@ -238,6 +239,7 @@ div.principles {
         margin-left: 0px;
         text-align: left;
         font-size: 16px;
+        max-width: initial;
       }
     }
 
@@ -351,7 +353,7 @@ div.about-team {
     margin: 0 auto 0;
     text-align: center;
 
-    @include mobile(){
+    @media screen and (max-width: 1121px){
       width: 100%;
     }
 
@@ -376,7 +378,7 @@ div.about-team {
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.03);
       padding: 40px;
 
-      @include mobile(){
+      @media screen and (max-width: 1121px){
         width: 100%;
         height: auto;
         text-align: center;
@@ -413,11 +415,17 @@ div.about-team {
         height: 64px;
         float: left;
 
-        @include mobile(){
-          float: initial;
+        @media screen and (max-width: 1121px){
+          float: none;
           position: relative;
           left: 50%;
           margin-left: -32px;
+        }
+      }
+
+      & > div.team-member.new-member {
+        @media screen and (min-width: 1122px) {
+          display: none;
         }
       }
 
@@ -427,8 +435,8 @@ div.about-team {
         text-align: left;
         width: 360px;
 
-        @include mobile(){
-          float: initial;
+        @media screen and (max-width: 1121px){
+          float: none;
           margin-left: 0px;
           width: 100%;
         }
@@ -438,7 +446,7 @@ div.about-team {
           font-size: 24px;
           color: #383b41;
 
-          @include mobile(){
+          @media screen and (max-width: 1121px){
             text-align: center;
             margin-top: 22px;
           }
@@ -451,7 +459,7 @@ div.about-team {
           color: #6a707a;
           margin-top: 12px;
 
-          @include mobile(){
+          @media screen and (max-width: 1121px){
             text-align: center;
             margin-top: 0px;
           }
@@ -461,7 +469,7 @@ div.about-team {
           height: 20px;
           margin-top: 19px;
 
-          @include mobile(){
+          @media screen and (max-width: 1121px){
             widtH: auto;
             text-align: center;
             margin-left: -40px;
@@ -501,17 +509,25 @@ div.about-team {
       float: left;
       max-width: 561px;
 
-      @include mobile(){
-        float: initial;
+      @media screen and (max-width: 1121px){
+        float: none;
         width: 100%;
+        max-width: initial;
       }
 
       div.team-card {
         float: left;
         margin-right: 24px;
 
-        @include mobile(){
-          float: initial;
+        &.new-member {
+          @media screen and (max-width: 1121px){
+            display: none;
+          }
+        }
+
+        @media screen and (max-width: 1121px){
+          float: none;
+          margin-right: auto;
         }
       }
     }
@@ -520,16 +536,17 @@ div.about-team {
       float: right;
       max-width: 561px;
 
-      @include mobile(){
-        float: initial;
+      @media screen and (max-width: 1121px){
+        float: none;
         width: 100%;
+        max-width: initial;
       }
 
       div.team-card {
         float: right;
 
-        @include mobile(){
-          float: initial;
+        @media screen and (max-width: 1121px){
+          float: none;
         }
       }
     }

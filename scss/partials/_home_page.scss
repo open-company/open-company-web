@@ -76,6 +76,10 @@ div#wrap {
         margin: 60px auto;
         padding: 0 16px;
 
+        @include big_web(){
+          width: 1127px;
+        }
+
         @include mobile(){
           img {
             max-width: 100%;
@@ -110,7 +114,6 @@ div#wrap {
         // 1st illustration
         @include big_web() {
           &.illustration-1 {
-            max-width: 1127px;
 
             img {
               float: right;
@@ -128,7 +131,6 @@ div#wrap {
 
           // 2nd illustration
           &.illustration-2 {
-            max-width: 1127px;
 
             img {
               float: left;
@@ -146,7 +148,6 @@ div#wrap {
 
           // 3rd illustration
           &.illustration-3 {
-            max-width: 1127px;
 
             img {
               float: right;

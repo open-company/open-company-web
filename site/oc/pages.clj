@@ -174,7 +174,7 @@
                 [:div.team-media-links
                   [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                   [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
-            [:div.team-card.new-member.big-web-only
+            [:div.team-card.new-member
               [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "You?"]
@@ -199,7 +199,7 @@
                   [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
                   [:a.twitter {:href "http://twitter.com/bago2k4"}]
                   [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]
-          [:div.team-card.new-member.mobile-only
+          [:div.team-card.new-member
             [:div.team-avatar]
               [:div.team-member
                 [:div.team-name "You?"]

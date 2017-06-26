@@ -30,6 +30,10 @@ div.main.features {
       margin: 60px auto;
       padding: 0 16px;
 
+      @include big_web(){
+        width: 1127px;
+      }
+
       @include mobile(){
         img {
           max-width: 100%;
@@ -65,7 +69,6 @@ div.main.features {
 
         // 1st illustration
         &.illustration-1 {
-          max-width: 1127px;
 
           img {
             float: right;
@@ -83,7 +86,6 @@ div.main.features {
 
         // 2nd illustration
         &.illustration-2 {
-          max-width: 1127px;
 
           img {
             float: left;
@@ -101,7 +103,6 @@ div.main.features {
 
         // 3rd illustration
         &.illustration-3 {
-          max-width: 1127px;
           margin-top: 80px;
 
           img {
@@ -120,7 +121,6 @@ div.main.features {
 
         // 4th illustration
         &.illustration-4 {
-          max-width: 1127px;
 
           img {
             float: left;
@@ -138,7 +138,6 @@ div.main.features {
 
         // 5th illustration
         &.illustration-5 {
-          max-width: 1127px;
 
           img {
             float: right;

@@ -11,12 +11,23 @@ div.carrot-box-container {
     height: 114px;
     float: left;
     margin: 0 50px;
+
+    @include mobile(){
+      float: none;
+      margin: 0 auto;
+    }
   }
 
   div.carrot-box-thanks {
     float: left;
     text-align: center;
     width: calc(100% - 211px);
+
+    @include mobile(){
+      float: none;
+      width: 100%;
+      padding: 0 16px;
+    }
 
     div{
       text-align: center;
@@ -26,6 +37,10 @@ div.carrot-box-container {
       @include avenir_M();
       font-size: 32px;
       color: $cr_gray;
+
+      @include mobile(){
+        margin-top: 40px;
+      }
     }
 
     div.thanks-subheadline {
