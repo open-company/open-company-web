@@ -1,4 +1,5 @@
 (ns oc.web.components.ui.login-button
+  (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.urls :as oc-urls]
@@ -34,7 +35,9 @@
   [:div.get-started-button
     {:class (when button-classes button-classes)}
     [:button.mlb-reset.mlb-get-started
-      {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
+      {:on-click #(if (sel1 [:input.try-it-input-central])
+                    (.focus (sel1 [:input.try-it-input-central]))
+                    (dis/dispatch! [:login-overlay-show :login-with-slack]))}
       "Get Early Access"]
     [:div.mobile-already-account
       [:a {:href oc-urls/login} "Already have an account? " [:span.login "Sign in"]]]])
