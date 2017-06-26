@@ -22,7 +22,7 @@
         [:div.illustrations.group
 
           [:div.illustration.illustration-1.group
-            [:img {:src "/img/ML/features_il_1_608_504.svg"}]
+            [:img {:src "/img/ML/features_il_1_608_544.svg"}]
             [:div.description.group
               [:div.title
                 "Simplicity"]
@@ -30,7 +30,7 @@
                 "Whether you’re adding a quick update about one topic, or writing a story that covers many, getting started is fast and simple."]]]
 
           [:div.illustration.illustration-2.group
-            [:img {:src "/img/ML/features_il_2_395_424.svg"}]
+            [:img {:src "/img/ML/features_il_2_465_408.svg"}]
             [:div.description.group
               [:div.title
                 "Company timeline"]
@@ -38,7 +38,7 @@
                 "It’s easy to catch up if you missed something or want more context. Great for getting new employees up to speed, too."]]]
 
           [:div.illustration.illustration-3.group
-            [:img {:src "/img/ML/features_il_3_443_179.svg"}]
+            [:img {:src "/img/ML/features_il_3_443_269.svg"}]
             [:div.description.group
               [:div.title
                 "Feedback loops"]
@@ -46,7 +46,7 @@
                 "Company updates are best when they trigger conversation. Comments and reactions keep everyone engaged and in sync - great for distributed teams."]]]
 
           [:div.illustration.illustration-4.group
-            [:img {:src "/img/ML/features_il_4_288_233.svg"}]
+            [:img {:src "/img/ML/features_il_4_346_321.svg"}]
             [:div.description.group
               [:div.title
                 "Integrate with Slack"]
@@ -54,7 +54,7 @@
                 "With Slack single sign-on and our Slack bot, updates are automatically shared to the right channels. Discussions about updates can happen within Slack or Carrot - everything is kept in sync."]]]
 
           [:div.illustration.illustration-5.group
-            [:img {:src "/img/ML/features_il_5_320_312.svg"}]
+            [:img {:src "/img/ML/features_il_5_333_274.svg"}]
             [:div.description.group
               [:div.title
                 "Share the news more broadly"]
