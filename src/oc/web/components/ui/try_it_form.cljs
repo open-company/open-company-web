@@ -39,4 +39,4 @@
                         (when (and (fn? get-started-cb)
                                    (utils/valid-email? email-value))
                           (get-started-cb email-value)))}
-          "Get Started"]]]))
+          "Get Early Access"]]]))
