@@ -93,6 +93,7 @@ div.menu {
       font-size: 16px;
       line-height: 1.0;
       color: $cr_dark_gray;
+      text-align: left;
 
       @include mobile() {
         font-size: 21px;
