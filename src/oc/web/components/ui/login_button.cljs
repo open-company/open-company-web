@@ -2,7 +2,6 @@
   (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
-            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]))
 
 (rum/defcs login-button < rum/static
@@ -22,22 +21,3 @@
       {:class (str "btn-reset signup-signin " (when button-classes button-classes))
        :on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
       "Sign Up"]])
-
-
-
-(rum/defcs get-started-button < rum/static
-                                rum/reactive
-                                {:will-mount (fn [s]
-                                              (when-not (utils/is-test-env?)
-                                                (dis/dispatch! [:auth-settings-get]))
-                                              s)}
-  [s {:keys [button-classes]}]
-  [:div.get-started-button
-    {:class (when button-classes button-classes)}
-    [:button.mlb-reset.mlb-get-started
-      {:on-click #(if (sel1 [:input.try-it-input-central])
-                    (.focus (sel1 [:input.try-it-input-central]))
-                    (dis/dispatch! [:login-overlay-show :login-with-slack]))}
-      "Get Early Access"]
-    [:div.mobile-already-account
-      [:a {:href oc-urls/login} "Already have an account? " [:span.login "Sign in"]]]])
