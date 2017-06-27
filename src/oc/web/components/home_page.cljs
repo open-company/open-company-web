@@ -1,4 +1,5 @@
 (ns oc.web.components.home-page
+  (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -27,6 +28,8 @@
                                                           (reset! (::thanks-box-bottom s) true)
                                                           (router/redirect! (str (.-location js/window) "#thank-you-bottom"))
                                                           (reset! prd/prevent-route-dispatch false))))
+                                    (when (:tif (:query-params @router/path))
+                                      (utils/after 1500 #(.focus (sel1 [:input.try-it-input-central]))))
                                     s)}
   [s]
   [:div
