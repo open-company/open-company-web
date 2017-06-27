@@ -16,13 +16,13 @@
                        (rum/local false ::thanks-box-bottom)
                        {:did-mount (fn [s]
                                     (when (:tyt (:query-params @router/path))
-                                      (utils/after 1000 #(do
+                                      (utils/after 2500 #(do
                                                           (reset! prd/prevent-route-dispatch true)
                                                           (reset! (::thanks-box-top s) true)
                                                           (router/redirect! (str (.-location js/window) "#thank-you-top"))
                                                           (reset! prd/prevent-route-dispatch false))))
                                     (when (:tyb (:query-params @router/path))
-                                      (utils/after 1000 #(do
+                                      (utils/after 2500 #(do
                                                           (reset! prd/prevent-route-dispatch true)
                                                           (reset! (::thanks-box-bottom s) true)
                                                           (router/redirect! (str (.-location js/window) "#thank-you-bottom"))
