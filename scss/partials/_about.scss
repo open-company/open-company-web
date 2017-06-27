@@ -386,7 +386,7 @@ div.about-team {
   background-color: $cr_settings_background;
 
   @include mobile(){
-    padding: 114px 16px 190px;
+    padding: 50px 16px
   }
 
   div.about-team-inner {
@@ -425,7 +425,7 @@ div.about-team {
         text-align: center;
       }
 
-      &.new-member, &.new-member-mobile {
+      &.new-member {
         div.team-avatar {
           background-image: url("/img/ML/user_avatar_yellow.svg");
         }
@@ -461,12 +461,6 @@ div.about-team {
           position: relative;
           left: 50%;
           margin-left: -32px;
-        }
-      }
-
-      &.new-member-mobile {
-        @media screen and (min-width: 1122px) {
-          display: none;
         }
       }
 
@@ -559,12 +553,6 @@ div.about-team {
       div.team-card {
         float: left;
         margin-right: 24px;
-
-        &.new-member {
-          @media screen and (max-width: 1121px){
-            display: none;
-          }
-        }
 
         @media screen and (max-width: 1121px){
           float: none;

@@ -172,6 +172,7 @@
 
         [:div.group
           [:div.column-left.group
+            ;; Member: Stuart Levinson
             [:div.team-card.stuart-levinson
               [:div.team-avatar]
               [:div.team-member
@@ -180,22 +181,7 @@
                 [:div.team-media-links
                   [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                   [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
-            [:div.team-card.new-member
-              [:div.team-avatar]
-                [:div.team-member
-                  [:div.team-name "You?"]
-                  [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]
-
-          [:div.column-right.group
-            [:div.team-card.sean-johnson
-              [:div.team-avatar]
-              [:div.team-member
-                [:div.team-name "Sean Johnson"]
-                [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
-                [:div.team-media-links
-                  [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
-                  [:a.twitter {:href "http://twitter.com/belucid"}]
-                  [:a.github {:href "http://github.com/belucid"} [:i.fa.fa-github]]]]]
+            ;; Member: Iacopo Carraro
             [:div.team-card.iacopo-carraro
               [:div.team-avatar]
               [:div.team-member
@@ -205,11 +191,24 @@
                   [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
                   [:a.twitter {:href "http://twitter.com/bago2k4"}]
                   [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]
-          [:div.team-card.new-member-mobile
-            [:div.team-avatar]
+
+          [:div.column-right.group
+            ;; Member: Sean Johnson
+            [:div.team-card.sean-johnson
+              [:div.team-avatar]
               [:div.team-member
-                [:div.team-name "You?"]
-                [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]
+                [:div.team-name "Sean Johnson"]
+                [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
+                [:div.team-media-links
+                  [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
+                  [:a.twitter {:href "http://twitter.com/belucid"}]
+                  [:a.github {:href "http://github.com/belucid"} [:i.fa.fa-github]]]]]
+            ;; Member: new member
+            [:div.team-card.new-member
+              [:div.team-avatar]
+                [:div.team-member
+                  [:div.team-name "You?"]
+                  [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]]
 
     [:div.about-footer.group
 
@@ -219,7 +218,7 @@
         [:div.block-description
           "Want to join us? We are always looking for amazing people no matter where they live."]
         [:a.link
-          {:a "mailto:hello@carrot.io"}
+          {:href (:contact-mail-to options)}
           "Say hello"]]
 
       [:div.block.open-source
