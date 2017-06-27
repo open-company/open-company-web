@@ -76,12 +76,11 @@
             {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]
           [:li
-            {:class (if (= active-page "blog") "active" "")}
             [:a.navbar-item {:href "http://blog.carrot.io"} "Blog"]]
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
-                {:on-click #()}
+                {:onClick (str "window.location=\"/?tif=1\"")}
                 "Get Early Access"]
               [:div.mobile-already-account
                 [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]]]]]]])
