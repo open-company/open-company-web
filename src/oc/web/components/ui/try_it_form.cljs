@@ -1,5 +1,9 @@
 (ns oc.web.components.ui.try-it-form
+  (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
 (rum/defcs try-it-form < (rum/local (int (rand 100)) ::input-class)
@@ -40,3 +44,24 @@
                                    (utils/valid-email? email-value))
                           (get-started-cb email-value)))}
           "Get Early Access"]]]))
+
+(defn get-started-click
+  []
+  (if (sel1 [:input.try-it-input-central])
+    (.focus (sel1 [:input.try-it-input-central]))
+    (router/nav! (str oc-urls/home "?tif"))))
+
+(rum/defcs get-started-button < rum/static
+                                rum/reactive
+                                {:will-mount (fn [s]
+                                              (when-not (utils/is-test-env?)
+                                                (dis/dispatch! [:auth-settings-get]))
+                                              s)}
+  [s {:keys [button-classes]}]
+  [:div.get-started-button
+    {:class (when button-classes button-classes)}
+    [:button.mlb-reset.mlb-get-started
+      {:on-click get-started-click}
+      "Get Early Access"]
+    [:div.mobile-already-account
+      [:a {:href oc-urls/login} "Already have an account? " [:span.login "Sign in"]]]])

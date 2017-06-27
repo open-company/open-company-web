@@ -16,7 +16,7 @@ div.try-it-combo-field {
       color: $cr_dark_blue;
       padding: 10px 20px;
       outline: none;
-      border: none;
+      border: 1px solid transparent;
 
       @include mobile() {
         width: 100%;
@@ -25,7 +25,23 @@ div.try-it-combo-field {
       }
 
       @include placeholder() {
-        opacity: 0.8;
+        opacity: 0.5;
+      }
+
+      &:focus {
+        @include big_web(){
+          border-top: 1px solid rgba(51,51,51,0.3);
+          border-bottom: 1px solid rgba(51,51,51,0.3);
+          border-left: 1px solid rgba(51,51,51,0.3);
+        }
+
+        @include mobile() {
+          border: 1px solid rgba(51,51,51,0.5);
+        }
+
+        @include placeholder(){
+          opacity: 0.8;
+        }
       }
     }
   }
@@ -45,6 +61,68 @@ div.try-it-combo-field {
       width: 100%;
       border-radius: 8px;
       margin-top: 20px;
+    }
+  }
+}
+
+div.get-started-button {
+  button.mlb-get-started {
+    height: 32px;
+    border-radius: 6px;
+    background-color: $cr_text_blue;
+    @include avenir_H();
+    font-size: 13px;
+    color: white;
+    padding: 8px 20px;
+    opacity: 0.9;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @include big_web(){
+    div.mobile-already-account {
+      display: none;
+    }
+  }
+}
+
+@include mobile(){
+  div.get-started-button{
+    display: none;
+    bottom: 40px;
+    left: 0px;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+
+    button.mlb-get-started {
+      background-color: $cr_text_blue;
+      color: white;
+      font-size: 16px;
+      @include avenir_H();
+      padding: 13px 80px;
+      width: auto;
+      height: auto;
+    }
+  }
+
+  ul.navbar-top li div.mobile-already-account {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+
+    a {
+      @include avenir_BOOK();
+      font-size: 14px;
+      color: white;
+
+      span.login {
+        @include avenir_M();
+        text-decoration: underline;
+      }
     }
   }
 }
