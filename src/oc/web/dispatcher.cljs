@@ -8,7 +8,8 @@
                           :mobile-menu-open false
                           :show-login-overlay false
                           :show-add-topic false
-                          :dashboard-sharing false}))
+                          :dashboard-sharing false
+                          :trend-bar-status :hidden}))
 
 ;; Data key paths
 
@@ -141,6 +142,13 @@
                                                               (= (:entry-uuid comments-open) entry-uuid))]
                                 {:comments comments-data
                                  :show-comments comments-open})))]
+   :trend-bar-status    [[:base]
+                          (fn [base]
+                            (:trend-bar-status base))]
+   :edit-user-profile   [[:base]
+                          (fn [base]
+                            {:user-data (:edit-user-profile base)
+                             :error (:edit-user-profile-failed base)})]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)

@@ -51,7 +51,7 @@
         (router/nav! (oc-urls/org)))))
 
   (did-mount [_]
-    (utils/update-page-title "OpenCompany - Setup Your Company Logo"))
+    (utils/update-page-title "Carrot - Setup Your Company Logo"))
 
   (render-state [_ {:keys [loading logo-url]}]
     (dom/div {:class "org-editor org-logo-setup"}

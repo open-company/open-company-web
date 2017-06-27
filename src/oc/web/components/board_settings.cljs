@@ -200,7 +200,7 @@
   (render-state [_ {:keys [board-slug board-name access loading has-changes show-save-successful]}]
     (let [org-data (dis/org-data data)
           board-data (dis/board-data data)]
-      (utils/update-page-title (str "OpenCompany - " (:name org-data) " " board-name " settings"))
+      (utils/update-page-title (str "Carrot - " (:name org-data) " " board-name " settings"))
 
       (dom/div {:class "mx-auto my4 settings-container group"}
         (dom/div {:class "my1 group"}

@@ -16,6 +16,52 @@ div.topics-columns {
     margin: 0 auto;
     position: relative;
 
+    div.board-container {
+      div.board-name {
+        font-family: $oc_main_font;
+        font-size: 32px;
+        font-weight: 500;
+        color: $cr_gray;
+        margin-bottom: 30px;
+        float: left;
+        margin-left: 10px;
+
+        button.board-settings-bt {
+          float: right;
+          background-image: url("/img/ML/board_settings.svg");
+          background-size: 12px 12px;
+          width: 12px;
+          height: 12px;
+          margin-top: 18px;
+          margin-left: 10px;
+          opacity: 0.8;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      button.add-to-board-btn {
+        float: right;
+        margin-right: 5px;
+
+        div.add-to-board-pencil {
+          background-image: url("/img/ML/add_to_board_pencil.svg");
+          background-size: 16px 16px;
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+          margin-top: 5px;
+          float: left;
+        }
+
+        &:hover div.add-to-board-pencil {
+          background-image: url("/img/ML/add_to_board_pencil_white.svg"); 
+        }
+      }
+    }
+
     div.dashboard-sharing-select-all {
       position: absolute;
       right: 2px;

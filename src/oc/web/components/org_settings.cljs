@@ -49,7 +49,7 @@
    [:div.small-caps.bold.mb1 "Subscription Plan"]
    (if (drv/react s :subscription)
      [:div
-      [:p.mb2 "You are on the OpenCompany Beta Plan."]
+      [:p.mb2 "You are on the Carrot Beta Plan."]
       [:p.mb2 "To cancel your plan, "
         [:a {:href oc-urls/contact-mail-to} "contact us"]
         "."]]
@@ -238,7 +238,7 @@
                     has-changes :has-changes}]
     (let [slug (keyword (router/current-org-slug))]
 
-      (utils/update-page-title (str "OpenCompany - " org-name))
+      (utils/update-page-title (str "Carrot - " org-name))
 
       (dom/div {:class "mx-auto my4 settings-container group"}
         

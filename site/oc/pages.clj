@@ -187,6 +187,8 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
+          ;; Google fonts Muli
+          [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css?oc_deploy_key"}]
@@ -200,7 +202,7 @@
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body.small-footer
-          [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
+          [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Custom Tooltips
@@ -255,12 +257,14 @@
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/main.css"}]
+          ;; Google fonts Muli
+          [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
    :body [:body.small-footer
-          [:div#app [:div.oc-loading.active [:i.fa.fa-circle-o-notch.fa-spin]]]
+          [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           

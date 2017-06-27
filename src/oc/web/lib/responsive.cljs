@@ -84,7 +84,7 @@
 
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 20)
-(def left-boards-list-width 160)
+(def left-boards-list-width 178)
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies

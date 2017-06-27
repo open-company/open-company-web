@@ -266,6 +266,7 @@ provided in the table below:
 |  :topic-archive | UI | Start the archive topic action. Call the API function to archive. |
 |  :topic-archive/success | API | Archive succesfully done, navigate to the board to reload the data without the topic. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
+|  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
 |  :udpates-list-get | UI | Start the request to load the list of the prior updates for a certain org. |
 |  :update-loaded | API | Read and save the data of certain update in the app-state |
 |  :updates-list | API | Read and save the list of the prior updates in the app-state given an org. |

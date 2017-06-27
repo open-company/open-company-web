@@ -1,9 +1,30 @@
+@include big_web(){
+  body.trend-bar-collapsed {
+    nav.oc-navbar {
+      height: #{$navbar_height + $cr_trend_collapsed_height}px;
+    }
+  }
+
+  body.trend-bar-expanded {
+    nav.oc-navbar {
+      height: #{$navbar_height + $cr_trend_expanded_height}px;
+    }
+  }
+
+  body.trend-bar-trending {
+    nav.oc-navbar {
+      height: #{$navbar_height + $cr_trend_trending_height}px;
+    }
+  }
+}
+
 nav.oc-navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   background-color: white;
+  transition: height 230ms;
 
   @include mobile(){
     &.show-login-overlay {
@@ -12,7 +33,7 @@ nav.oc-navbar {
   }
 
   @include big_web(){
-    height: #{$navbar_height}px;
+    height: #{$navbar_height + $cr_trend_collapsed_height}px;
   }
 
   @include mobile(){
@@ -21,11 +42,9 @@ nav.oc-navbar {
   }
   z-index: $navbar_zindex;
   background-color: white;
-  border-top: 4px solid $oc_yellow;
   margin: 0px;
-  box-shadow: 0 2px 2px -2px rgba(78,90,107,0.2);
 
-  &.small-navbar:not(.mobile-menu-open) {
+  &:not(.mobile-menu-open) {
     height: #{$mobile_navbar_height}px;
   }
 
@@ -79,17 +98,15 @@ nav.oc-navbar {
     }
   }
 
-  &.small-navbar {
-    div.oc-navbar-header {
-      margin-top: 10px;
-    }
+  div.oc-navbar-header {
+    padding-top: 10px;
   }
 
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 0 28px;
-    margin-top: 20px;
+    padding: 20px 28px 0;
+    height: #{$navbar_height}px;
 
     div.oc-navbar-header-container{
       height: 45px;
@@ -111,9 +128,28 @@ nav.oc-navbar {
       margin-top: 10px;
     }
 
+    div.navbar-center {
+      float: none;
+      text-align: center;
+      width: 42px;
+      height: 42px;
+      position: absolute;
+      left: 50%;
+      margin-left: -21px;
+
+      img.navbar-org-logo {
+        max-width: 42px;
+        max-height: 42px;
+      }
+    }
+
     ul.navbar-right {
       float: right;
       margin-right: 0px;
+
+      div.alerts {
+        float: right;
+      }
 
       div.user-avatar {
         float: right;

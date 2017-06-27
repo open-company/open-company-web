@@ -204,11 +204,11 @@
                               (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
                                 [:button.btn-reset.btn-link
                                   {:on-click #(router/redirect! fixed-add-bot-link)
-                                   :title "The OpenCompany Slack bot enables Slack invites, assignments and sharing."
+                                   :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
                                    :data-toggle "tooltip"
                                    :data-placement "top"
                                    :data-container "body"}
-                                  "Add OpenCompany Slack bot"])))
+                                  "Add Carrot Slack bot"])))
                           [:button.btn-reset
                             {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                              :title (str "Remove " (:name team) " Slack team")

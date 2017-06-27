@@ -14,7 +14,7 @@
   [{:keys [welcome] :as data}]
   [:div.login-required
     (when-not welcome
-      (btd/back-to-dashboard-btn {:button-cta "OPENCOMPANY.COM" :click-cb #(router/redirect! oc-urls/home)}))
+      (btd/back-to-dashboard-btn {:button-cta "CARROT.IO" :click-cb #(router/redirect! oc-urls/home)}))
     [:div.welcome.center.mx-auto.max-width-3
       [:div
         [:div.login-required-cta
@@ -24,7 +24,7 @@
             [:br]
             "Please sign in with a different account."]
           welcome
-          "OpenCompany, See the Big Picture"
+          "Carrot, See the Big Picture"
           :else
           "Please sign in to access this company dashboard.")]
         (if (jwt/jwt)
@@ -38,4 +38,4 @@
             (login-button))]
      [:div.logo-container
        [:img.logo-gold {:src (str ls/cdn-url "/img/oc-logo-gold.svg")}]
-       [:div.logo-cta "OpenCompany makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."]]]])
+       [:div.logo-cta "Carrot makes it easy to see the big picture. Companies are strongest when everyone knows what matters most."]]]])

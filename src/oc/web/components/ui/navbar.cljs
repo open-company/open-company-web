@@ -15,6 +15,7 @@
             ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.trend-bar :refer (trend-bar)]
             [oc.web.components.ui.icon :as i]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar)]
@@ -69,7 +70,6 @@
                                             true))]
       (dom/nav {:class (utils/class-set {:oc-navbar true
                                          :group true
-                                         :small-navbar su-navbar
                                          :show-login-overlay (:show-login-overlay data)
                                          :mobile-menu-open mobile-menu-open
                                          :has-prior-updates (and (router/current-org-slug)
@@ -82,15 +82,11 @@
         (dom/div {:class "oc-navbar-header group"
                   :style {:width (if header-width (str header-width "px") "100%")}}
           (dom/div {:class "oc-navbar-header-container group"}
-            (if (or (utils/in? (:route @router/path) "orgs")
-                    (not (router/current-org-slug)))
-              (dom/a {:href "https://opencompany.com/" :title "OpenCompany.com"}
-                (dom/img {:src (str ls/cdn-url "/img/oc-wordmark.svg") :style {:height "25px" :margin-top "12px"}}))
-              (if (:su-navbar data)
+            (when (and org-data (:su-navbar data))
                 ;; If it's showing an update link the org avatar only if there is a link to the company
-                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET"))
-                ;; Show the orgs dropdown instead
-                (orgs-dropdown)))
+                (org-avatar org-data (utils/link-for (:links (dis/update-data)) "company" "GET")))
+            (dom/div {:class "nav navbar-nav navbar-center"}
+              (orgs-dropdown))
             (when-not (:hide-right-menu data)
               (dom/ul {:class "nav navbar-nav navbar-right"}
                 (dom/li {}
@@ -102,22 +98,11 @@
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
                         (dom/div {:class "dropdown right"}
-                          (user-avatar {:classes "btn-reset dropdown-toggle"})
+                          (user-avatar {:classes "mlb-reset dropdown-toggle"})
                           (om/build menu {}))
-                        (when (and (not dashboard-sharing)
-                                   (not is-update-preview)
-                                   (router/current-board-slug)
-                                   (jwt/is-admin? (:team-id (dis/org-data)))
-                                   (pos? (count (:topics (dis/board-data)))))
-                          (dom/button {:class "btn-reset invite-others right"
-                                       :title "Invite others"
-                                       :data-toggle "tooltip"
-                                       :data-container "body"
-                                       :data-placement "bottom"
-                                       :on-click #(let [share-work-tip (str "share-work-" (:slug (dis/org-data)))]
-                                                   ; (t/hide share-work-tip)
-                                                   (router/nav! (oc-urls/org-team-settings)))}
-                            (dom/i {:class "fa fa-user-plus"})))
+                        (dom/div {:class "right"
+                                  :style {:margin-right "0.5rem" :margin-top "5px"}}
+                          (dom/img {:width 14 :height 16 :src "/img/ML/alerts_bell.svg"}))
                         (when fixed-show-share-su-button
                           (if dashboard-sharing
                             (dom/div {:class "sharing-button-container"}
@@ -137,23 +122,26 @@
                                            :on-click (fn []
                                                        (dis/dispatch! [:dashboard-share-mode false]))}
                                 "Cancel"))
-                            (dom/div {:class "sharing-button-container"}
-                              (dom/button {:class "btn-reset sharing-button right"
-                                           :title (share-new-tooltip (:team-id org-data))
-                                           :data-toggle "tooltip"
-                                           :data-container "body"
-                                           :data-placement "left"
-                                           :disabled (not (nil? foce-key))
-                                           :on-click (fn []
-                                                       (when (nil? foce-key)
-                                                         (when is-topic-view
-                                                            (router/nav! (oc-urls/board)))
-                                                         (dis/dispatch! [:dashboard-share-mode true])))}
-                                (dom/i {:class "fa fa-share"}))))))
+                            ; Comment out but not remove until we replace this with something.
+                            ; (dom/div {:class "sharing-button-container"}
+                            ;   (dom/button {:class "btn-reset sharing-button right"
+                            ;                :title (share-new-tooltip (:team-id org-data))
+                            ;                :data-toggle "tooltip"
+                            ;                :data-container "body"
+                            ;                :data-placement "left"
+                            ;                :disabled (not (nil? foce-key))
+                            ;                :on-click (fn []
+                            ;                            (when (nil? foce-key)
+                            ;                              (when is-topic-view
+                            ;                                 (router/nav! (oc-urls/board)))
+                            ;                              (dis/dispatch! [:dashboard-share-mode true])))}
+                            ;     (dom/i {:class "fa fa-share"})))
+                            )))
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))
                      create-update-share-button-cb)
             (dom/div {:class "oc-navbar-separator"})))
+        (trend-bar (:name org-data))
         (when (responsive/is-mobile-size?)
           ;; Render the menu here only on mobile so it can expand the navbar
           (om/build menu {:mobile-menu-open mobile-menu-open}))))))

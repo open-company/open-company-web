@@ -48,7 +48,7 @@
      :name-did-change false})
 
   (did-mount [_]
-    (utils/update-page-title "OpenCompany - Setup Your Organization")
+    (utils/update-page-title "Carrot - Setup Your Organization")
     (when-not (:create-org data)
       (setup-org-name owner data)))
 
@@ -59,7 +59,7 @@
   (render-state [_ {:keys [loading message]}]
     (dom/div {:class "org-editor"}
       (dom/div {:class "fullscreen-page group"}
-        (om/build navbar {:hide-right-menu true :show-navigation-bar true})
+        (om/build navbar {:show-navigation-bar true})
         (dom/div {:class "org-editor-box group navbar-offset"}
           (dom/form {:on-submit (partial create-org-clicked owner)}
             (dom/div {:class "form-group"}

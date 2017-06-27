@@ -14,15 +14,15 @@
           [:img {:src (str ls/cdn-url "/img/oc-wordmark.svg")}]]
         [:div.footer-bottom-right
           [:a.contact {:href oc-urls/contact-mail-to
-                       :title "Contact OpenCompany"
-                       :alt "Contact OpenCompany"} "CONTACT"]
+                       :title "Contact Carrot"
+                       :alt "Contact Carrot"} "CONTACT"]
           [:a.twitter {:target "_blank"
                        :href oc-urls/oc-twitter
-                       :title "OpenCompany on Twitter"
+                       :title "Carrot on Twitter"
                        :alt "twitter"}
             [:img {:src (str ls/cdn-url "/img/twitter.svg")}]]
             [:a.github {:target "_blank"
                         :href oc-urls/oc-github
-                        :title "OpenCompany on GitHub"
+                        :title "Carrot on GitHub"
                         :alt "github"}
               [:img {:src (str ls/cdn-url "/img/github.svg")}]]]]]])

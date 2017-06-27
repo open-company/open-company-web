@@ -813,9 +813,10 @@
         with-email (if (and email-did-change
                             (utils/valid-email? new-email))
                      (assoc with-pswd :email new-email)
-                     (assoc with-pswd :email (:email (:current-user-data db))))]
-    (api/patch-user-profile (:current-user-data db) with-email))
-  db)
+                     (assoc with-pswd :email (:email (:current-user-data db))))
+        without-has-changes (dissoc with-email :has-changes :loading)]
+    (api/patch-user-profile (:current-user-data db) without-has-changes))
+  (assoc-in db [:edit-user-profile :loading] true))
 
 (defmethod dispatcher/action :email-domain-team-add
   [db [_]]
@@ -1104,3 +1105,7 @@
 (defmethod dispatcher/action :ws-interaction/reaction-delete
   [db [_ interaction-data]]
   (update-reaction db interaction-data false))
+
+(defmethod dispatcher/action :trend-bar-status
+  [db [_ status]]
+  (assoc db :trend-bar-status status))

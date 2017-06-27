@@ -5,6 +5,76 @@
 
 // buttons
 
+.mlb-reset {
+  cursor: pointer;
+  outline: none;
+  border-width: 0;
+  background-color: transparent;
+  opacity: 0.8;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.2 !important;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.mlb-default {
+  background-color: #D4F6E4;
+  color: #0E8749;
+  font-weight: 900;
+  border-radius: 4px;
+  height: 40px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: .2em 1em;
+  transition: opacity 230ms, color 230ms, background-color 230ms;
+
+  &:hover {
+    background-color: #3FBD7C;
+    color: #FFFFFF;
+  }
+
+  &:active, &:focus, &.active {
+    background-color: #0E8749;
+  }
+
+  &:disabled, &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: #D4F6E4;
+      color: #0E8749;
+    }
+  }
+}
+
+.mlb-link {
+  background-color: transparent;
+  color: $cr_text_blue;
+  font-family: $oc_main_font;
+  font-weight: 900;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.mlb-link-black {
+  background-color: transparent;
+  color: $cr_dark_gray;
+  font-family: $oc_main_font;
+  font-weight: 900;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .btn-reset {
   cursor: pointer;
   outline: none;

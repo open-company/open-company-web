@@ -3,7 +3,8 @@
             [boot.util :as util]
             [hiccup.page :as hp]
             [environ.core :refer (env)]))
-
+;; FIXME: Using hellp@opencompany.com until we have hello@carrot.io setup
+;; (def contact-email "hello@carrot.io")
 (def contact-email "hello@opencompany.com")
 (def contact-mail-to (str "mailto:" contact-email))
 
@@ -61,7 +62,7 @@
           [:li
               [:a.navbar-item {:href "/about"} "About"]]
           [:li.mobile-only
-            [:a.navbar-item.contact {:href "mailto:hello@opencompany.com"} "Contact"]]]]]])
+            [:a.navbar-item.contact {:href contact-mail-to} "Contact"]]]]]])
 
 (defn tagline []
   [:div.tagline.text-center
@@ -83,7 +84,7 @@
       [:li.web-only
         [:a {:href "/about"} "About"]]
       [:li
-        [:a.contact {:href "mailto:hello@opencompany.com"} "Contact"]]
+        [:a.contact {:href contact-mail-to} "Contact"]]
       [:li.mobile-only {:style {:float "right" :marginRight "15px"}}
         [:a {:href "https://twitter.com/opencompanyhq"}
           [:i.fa.fa-2x.fa-twitter {:aria-hidden "true"}]]]]

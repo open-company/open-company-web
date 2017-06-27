@@ -51,6 +51,7 @@
     [cljsjs/clipboard "1.6.1-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [cljsjs/web-animations "2.1.4-0"] ; JavaScript implementation of the Web Animations API https://github.com/web-animations/web-animations-js
+    [cljsjs/moment-timezone "0.5.11-0"] ; Timezone support for moment.js https://github.com/moment/moment-timezone/
 
     [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools

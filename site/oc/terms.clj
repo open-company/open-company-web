@@ -41,7 +41,7 @@
           "The “"
           [:strong "Service"]
           "” means (a) OpenCompany’s dashboard and shared updates and related systems and technologies, as well as the website "
-          [:a {:href "https://opencompany.com"} "opencompany.com"]
+          [:a {:href "https://carrot.io"} "carrot.io"]
           ", and (b) all software (including the Software, as defined below), applications, data, reports, text, images, and other content made available by or on behalf of OpenCompany through any of the foregoing. The “Service” does not include Your Data (as defined below) or any software application or service that is provided by you or a third party, which you use in connection with the Service, whether or not OpenCompany designates them as “official integrations” (each a “"
           [:strong "Non-OpenCompany Product"]
           "”). Any modifications and new features added to the Service are also subject to this TOS. OpenCompany reserves the right to modify or discontinue the Service (or any Service plan) or any feature or functionality thereof at any time without notice to you. All rights, title and interest in and to the Service and its components (including all intellectual property rights) will remain with and belong exclusively to OpenCompany."]
@@ -71,7 +71,7 @@
         [:li [:strong "Payment."]
           [:ol
             [:li "To the extent you use a Service plan that is made available for a fee, you will be required to select a payment plan and provide accurate information regarding your credit card or other payment instrument. You will promptly update your account information with any changes in your payment information. You agree to pay OpenCompany in accordance with the terms set forth on the Site (currently, "
-              [:a {:href "https://opencompany.com/pricing"} "opencompany.com/pricing"] 
+              [:a {:href "https://carrot.io/pricing"} "carrot.io/pricing"] 
               " and related pages) and this TOS, and you authorize OpenCompany or its third-party payment processors to bill your payment instrument in advance on a periodic basis in accordance with such terms."]
             [:li "If you dispute any charges you must let OpenCompany know within sixty (60) days after the date that OpenCompany invoices you. All amounts paid are non-refundable and we reserve the right to change our prices in the future. If we increase our prices for your Service plan, we will provide notice of the change on the Site and in email to you at least 30 days before the change is to take effect. Your continued use of the Service after the price change goes into effect constitutes your agreement to pay the changed amount. OpenCompany may choose to bill you through an invoice, in which case, full payment for invoices issued must be received by the date specified in the invoice. Past due fees are subject to a finance charge of 1.5% per month on any outstanding balance, or the maximum permitted by law, whichever is lower, plus all expenses of collection. You shall be responsible for all taxes associated with Services other than U.S. taxes based on OpenCompany’s net income."]]]
 
@@ -107,7 +107,7 @@
             [:li "This TOS will continue in full effect unless and until your account or this TOS is terminated as described herein. Service plans that are paid monthly will automatically renew for additional months, and Service plans that are paid annually will automatically renew for additional years. You have the right to deactivate your account at any time by using the account deactivation interface in company Settings."]
             [:li "We reserve the right to deactivate and delete your account (or the access privileges of any Member) and terminate this TOS at any time for any reason, or no reason, with or without notice. Without limiting the foregoing, OpenCompany may, in its sole discretion, publish policies whereby we delete your account for prolonged inactivity. Upon any termination of this TOS, we will have no obligation to maintain or provide Your Data. If your team’s account is deleted, we will delete or destroy all copies of Your Data in our possession or control, in a reasonably expedient way, unless legally prohibited."]
             [:li "Please see our Privacy Policy at "
-              [:a {:href "https://opencompany.com/privacy"} "opencompany.com/privacy"]
+              [:a {:href "https://carrot.io/privacy"} "carrot.io/privacy"]
               " for more information about the choices you have regarding Your Data."]
             [:li "All accrued rights to payment and the terms of topic 5 and topics 8 through 20 shall survive termination of this TOS."]]]
 

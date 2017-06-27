@@ -14,6 +14,8 @@
 
 (def contact "/contact")
 
+;; FIXME: Using hellp@opencompany.com until we have hello@carrot.io setup
+;; (def contact-email "hello@carrot.io")
 (def contact-email "hello@opencompany.com")
 (def contact-mail-to (str "mailto:" contact-email))
 

@@ -9,13 +9,13 @@
       [:p "If you read nothing else, please read this:"]
       [:ul
         [:li "By default, anything you post to OpenCompany is private to your team. That is, viewing your information requires authentication as a member of that team unless the information has been actively shared with someone outside the team, such as investors, advisors, and customers."]
-        [:li "Companies can choose to use OpenCompany for free, but the free version does not maintain a private dashboard. The free version is for a public dashboard, which means your information can be viewed by anyone that comes to your URL, for example, https://opencompany.com/your-company-name."]
+        [:li "Companies can choose to use OpenCompany for free, but the free version does not maintain a private dashboard. The free version is for a public dashboard, which means your information can be viewed by anyone that comes to your URL, for example, https://carrot.io/your-company-name."]
         [:li "We try to make our product easy to use, with settings and options that are easy to find and understand. This is good for privacy, good for the product, and good for OpenCompany customers and users."]]
 
       [:h1 "OpenCompany Privacy Policy"]
       [:p "Updated: August 1, 2016"]
       [:p "This privacy policy is here to help you understand what information we collect at OpenCompany, how we use it, and what choices you have. When we talk about OpenCompany in this policy, we are talking about OpenCompany, LLC, the company and the OpenCompany application and website at "
-        [:a {:href "https://opencompany.com"} "https://opencompany.com"]
+        [:a {:href "https://carrot.io"} "https://carrot.io"]
         ". OpenCompany is available for use via a web browser on your desktop or mobile device."]
       [:p "This policy describes how OpenCompany treats your information, not how other organizations treat your information. If you are using OpenCompany in a workplace or on a device or account issued to you by your employer or another organization, that company or organization likely has its own policies regarding storage, access, modification, deletion, and retention of communications and content which may apply to your use of OpenCompany. Please check with your employer about the policies it has in place regarding your communications and related content on OpenCompany."]
 
@@ -24,7 +24,7 @@
       [:ul
         [:li 
           [:strong "Team information. "]
-          "When you create a team on OpenCompany, we collect your email address, your company name, OpenCompany domain (ex: opencompany.com/your-team-name), your Slack user name, team name, and personal and team avatars. "]
+          "When you create a team on OpenCompany, we collect your email address, your company name, OpenCompany domain (ex: carrot.io/your-team-name), your Slack user name, team name, and personal and team avatars. "]
         [:li
           [:strong "Account and profile information. "]
           "The only information we require to create your OpenCompany account is a Slack authentication and company name."]

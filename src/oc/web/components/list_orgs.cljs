@@ -28,7 +28,7 @@
     {:columns-num (responsive/columns-num)})
 
   (render-state [_ {:keys [columns-num]}]
-    (utils/update-page-title "OpenCompany - Startup Transparency Made Simple")
+    (utils/update-page-title "Carrot - Startup Transparency Made Simple")
     (when (:orgs data)
       (let [orgs-list (:orgs data)
             card-width (responsive/calc-card-width)]
