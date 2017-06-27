@@ -9,7 +9,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.login-button :refer (get-started-button)]))
+            [oc.web.components.ui.try-it-form :refer (get-started-button)]))
 
 (def body-class "mobile-menu-expanded")
 
