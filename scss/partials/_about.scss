@@ -384,7 +384,7 @@ div.about-team {
         text-align: center;
       }
 
-      &.new-member {
+      &.new-member, &.new-member-mobile {
         div.team-avatar {
           background-image: url("/img/ML/user_avatar_yellow.svg");
         }
@@ -423,7 +423,7 @@ div.about-team {
         }
       }
 
-      & > div.team-member.new-member {
+      &.new-member-mobile {
         @media screen and (min-width: 1122px) {
           display: none;
         }

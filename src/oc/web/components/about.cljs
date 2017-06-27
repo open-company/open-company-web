@@ -103,7 +103,7 @@
                     [:a.twitter {:href "http://twitter.com/bago2k4"}]
                     [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]
 
-            [:div.team-card.new-member
+            [:div.team-card.new-member-mobile
               [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "You?"]
