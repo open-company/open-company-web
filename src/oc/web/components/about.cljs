@@ -23,6 +23,12 @@
 
         [:div.ovals-container.group
 
+          [:div.ovals-container-face.face-red]
+          [:div.ovals-container-face.face-yellow]
+          [:div.ovals-container-face.face-blue]
+          [:div.ovals-container-face.face-green]
+          [:div.ovals-container-face.face-purple]
+
           [:div.about-subline
             "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
           [:div.paragraphs-container.group

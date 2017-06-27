@@ -44,13 +44,56 @@ div.divider-line {
 
 div.ovals-container {
   max-width: 1086px;
-  height: 660px;
-  background-image: url("/img/ML/about_happy_faces.svg");
-  background-position: 0px 0px;
-  background-size: 1086px 565px;
-  background-repeat: no-repeat;
   margin: 30px auto 0;
   padding: 0 16px;
+  position: relative;
+
+  @include mobile(){
+    div.ovals-container-face {
+      display: none;
+    }
+  }
+
+  @include big_web(){
+    div.ovals-container-face {
+      position: absolute;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 48px;
+      height: 48px;
+      background-size: 48px 48px;
+
+      &.face-red {
+        background-image: url("/img/ML/user_avatar_red.svg");
+        top: 0px;
+        left: 83px;
+      }
+
+      &.face-yellow {
+        background-image: url("/img/ML/user_avatar_yellow.svg");
+        top: 156px;
+        left: 0px;
+      }
+
+      &.face-blue {
+        background-image: url("/img/ML/user_avatar_blue.svg");
+        top: 247px;
+        left: 89px;
+      }
+
+      &.face-green {
+        background-image: url("/img/ML/user_avatar_green.svg");
+        bottom: 171px;
+        right: 21px;
+      }
+
+      &.face-purple {
+        background-image: url("/img/ML/user_avatar_purple.svg");
+        bottom: 0px;
+        right: 85px;
+      }
+    }
+  }
 
   @include mobile(){
     width: 100%;
@@ -65,7 +108,8 @@ div.ovals-container {
     text-align: center;
     color: $cr_dark_blue;
     max-width: 767px;
-    margin: 20px auto 40px;
+    margin: 0px auto 40px;
+    padding-top: 50px;
 
     @include mobile(){
       width: 100%;
@@ -81,40 +125,37 @@ div.ovals-container {
 
       div.happy-face {
         position: absolute;
+        background-size: 43px 43px;
+        width: 43px;
+        height: 43px;
       }
 
       div.red-happy-face {
         background-image: url("/img/ML/user_avatar_red.svg");
-        background-size: 43px 43px;
-        width: 43px;
-        height: 43px;
         left: 43px;
         top: 43px;
       }
 
+      div.yellow-happy-face {
+        background-image: url("/img/ML/user_avatar_yellow.svg");
+        left: 0px;
+        top: 0px;
+      }
+
       div.blue-happy-face {
         background-image: url("/img/ML/user_avatar_blue.svg");
-        background-size: 43px 43px;
-        width: 43px;
-        height: 43px;
         left: 33px;
         bottom: 43px;
       }
 
       div.green-happy-face {
         background-image: url("/img/ML/user_avatar_green.svg");
-        background-size: 43px 43px;
-        width: 43px;
-        height: 43px;
         right: 53px;
         bottom: 43px;
       }
 
       div.purple-happy-face {
         background-image: url("/img/ML/user_avatar_purple.svg");
-        background-size: 43px 43px;
-        width: 43px;
-        height: 43px;
         right: 0px;
         bottom: 0px;
       }
