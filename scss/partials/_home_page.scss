@@ -28,6 +28,10 @@ div#wrap {
         max-width: 800px;
         margin: 0 auto 20px;
         line-height: 60px;
+
+        @include mobile() {
+          font-size: 32px;
+        }
       }
 
       div.subheadline {
