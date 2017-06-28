@@ -29,7 +29,7 @@
         [:img.logo
           {:src "/img/ML/carrot_wordmark_white.svg"}]
         [:div.small-links
-          [:a "Request Free Early Access"]]
+          [:a {:href oc-urls/home-try-it-focus} "Request Free Early Access"]]
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 

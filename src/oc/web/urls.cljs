@@ -18,6 +18,8 @@
 
 (def contact "/contact")
 
+(def home-try-it-focus (str home "?tif"))
+
 ;; FIXME: Using hellp@opencompany.com until we have hello@carrot.io setup
 ;; (def contact-email "hello@carrot.io")
 (def contact-email "hello@opencompany.com")

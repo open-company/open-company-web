@@ -49,7 +49,7 @@
   []
   (if (sel1 [:input.try-it-input-central])
     (.focus (sel1 [:input.try-it-input-central]))
-    (router/nav! (str oc-urls/home "?tif"))))
+    (router/nav! oc-urls/home-try-it-focus)))
 
 (rum/defcs get-started-button < rum/static
                                 rum/reactive
