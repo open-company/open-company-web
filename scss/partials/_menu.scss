@@ -65,7 +65,7 @@ div.menu {
     padding: 12px 20px;
 
     &.divider-item {
-      box-shadow: inset 0 -1px 0 0 #f3f2ee;
+      box-shadow: inset 0 -1px 0 0 $cr_dark_bg_gray;
     }
 
     &:last-child {

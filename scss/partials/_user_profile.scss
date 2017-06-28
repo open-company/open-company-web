@@ -22,7 +22,7 @@ div.user-profile {
 
   div.user-profile-footer {
     height: $user_profile_footer_height;
-    box-shadow: inset 0 1px 0 0 #f3f2ee;
+    box-shadow: inset 0 1px 0 0 $cr_dark_bg_gray;
     background-color: white;
     position: relative;
     width: #{$user_profile_content_width}px;
