@@ -1109,3 +1109,7 @@
 (defmethod dispatcher/action :trend-bar-status
   [db [_ status]]
   (assoc db :trend-bar-status status))
+
+(defmethod dispatcher/action :board-filters-set
+  [db [_ new-board-filters]]
+  (assoc db :board-filters new-board-filters))

@@ -9,7 +9,8 @@
                           :show-login-overlay false
                           :show-add-topic false
                           :dashboard-sharing false
-                          :trend-bar-status :hidden}))
+                          :trend-bar-status :hidden
+                          :board-filters :latest}))
 
 ;; Data key paths
 
@@ -76,6 +77,7 @@
    :topic-slug          [[:route] (fn [route] (:topic route))]
    :entry-uuid          [[:route] (fn [route] (:entry route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
+   :board-filters       [[:base] (fn [base] (:board-filters base))]
    :updates-list        [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
