@@ -1,7 +1,7 @@
 div.left-boards-list {
   float: left;
-  padding-left: 5px;
   position: fixed;
+  margin-right: 20px;
 
   button.all-activity {
     background-color: transparent;
@@ -34,7 +34,7 @@ div.left-boards-list {
       padding: 0 0 0 5px;
       margin: 0;
       float: left;
-      width: 130px;
+      width: #{$left_boards_list_width - 20 - 48}px;
       margin-bottom: 12px;
 
       span {
@@ -64,7 +64,7 @@ div.left-boards-list {
     button.left-boards-list-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 5px;
+      margin-right: 0px;
       margin-top: -6px;
       padding: 0;
       cursor: pointer;
@@ -85,7 +85,7 @@ div.left-boards-list {
 
   div.left-boards-list-items{
     cursor: pointer;
-    padding-left: 17px;
+    padding-left: 20px;
 
     div.left-boards-list-item {
       height: 21px;
@@ -145,7 +145,7 @@ div.left-boards-list {
       }
 
       input.board-name {
-        width: 130px;
+        width: #{$left_boards_list_width - 20 - 48}px;
         height: 20px;
         margin: 2px 0;
 
