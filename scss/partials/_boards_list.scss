@@ -16,7 +16,7 @@ div.left-boards-list {
     }
 
     div.all-activity-icon {
-      background-image: url("/img/ML/activity_hamburger.svg");
+      background-image: cdnUrl($cdn_url, "/img/ML/activity_hamburger.svg");
       background-size: 16px 16px;
       width: 16px;
       height: 16px;
@@ -54,10 +54,10 @@ div.left-boards-list {
       }
 
       div.boards-icon {
-        background-image: url("/img/ML/boards_icon.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/boards_icon.svg");
       }
       div.stories-icon {
-        background-image: url("/img/ML/stories_icon.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/stories_icon.svg");
       }
     }
 
@@ -70,7 +70,7 @@ div.left-boards-list {
       cursor: pointer;
       transition: 230ms;
       background-color: rgba(82,222,149,0.25);
-      background-image: url("/img/ML/plus_button_icon.svg");
+      background-image: cdnUrl($cdn_url, "/img/ML/plus_button_icon.svg");
       background-repeat: no-repeat;
       background-position: center;
       background-size: 8px 8px;
@@ -78,7 +78,7 @@ div.left-boards-list {
 
       &:hover {
         background-color: #3FBD7C;
-        background-image: url("/img/ML/plus_button_icon_white.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/plus_button_icon_white.svg");
       }
     }
   }
@@ -88,7 +88,6 @@ div.left-boards-list {
     padding-left: 17px;
 
     div.left-boards-list-item {
-      height: 21px;
       padding: 0 5px 0 5px;
       border-radius: 3px;
       font-family: $oc_main_font;
@@ -160,7 +159,7 @@ div.left-boards-list {
     margin-top: 34px;
     button.about-carrot-btn {
       div.about-carrot-icon {
-        background-image: url("/img/ML/carrot_grey.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/carrot_grey.svg");
         background-size: 16px 16px;
         width: 16px;
         height: 16px;
@@ -178,7 +177,7 @@ div.left-boards-list {
 
     button.invite-people-btn {
       div.invite-people-icon {
-        background-image: url("/img/ML/invite_people.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/invite_people.svg");
         background-size: 16px 16px;
         width: 16px;
         height: 16px;

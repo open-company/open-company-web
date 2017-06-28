@@ -94,7 +94,7 @@ div.trend-bar {
 
       &:before {
         content: "";
-        background-image: url("/img/ML/trend_line.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/trend_line.svg");
         background-size: 20px 12px;
         width: 20px;
         height: 12px;
