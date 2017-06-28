@@ -14,7 +14,8 @@
             [oc.web.components.topic :refer (topic)]
             [oc.web.components.topic-view :refer (topic-view)]
             [oc.web.components.add-topic :refer (add-topic)]
-            [oc.web.components.boards-list :refer (boards-list)]))
+            [oc.web.components.boards-list :refer (boards-list)]
+            [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]))
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
@@ -221,6 +222,7 @@
                                :on-click #(dis/dispatch! [:add-topic-show true])}
                     (dom/div {:class "add-to-board-pencil"})
                     "Say something")))
+              (filters-dropdown)
               (cond
                 (and is-dashboard
                      (not (responsive/is-mobile-size?))
