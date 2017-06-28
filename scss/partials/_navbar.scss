@@ -108,10 +108,6 @@ nav.oc-navbar {
     padding: 20px 28px 0;
     height: #{$navbar_height}px;
 
-    div.oc-navbar-header-container{
-      height: 45px;
-    }
-
     div.oc-navbar-separator {
       border-bottom: 1px solid rgba(78,90,107,0.1);
       padding-top: 10px;
@@ -128,18 +124,23 @@ nav.oc-navbar {
       margin-top: 10px;
     }
 
-    div.navbar-center {
-      float: none;
-      text-align: center;
-      width: 42px;
-      height: 42px;
-      position: absolute;
-      left: 50%;
-      margin-left: -21px;
+    div.oc-navbar-header-container{
+      height: 45px;
 
-      img.navbar-org-logo {
-        max-width: 42px;
-        max-height: 42px;
+      div.navbar-center {
+        text-align: center;
+        width: 320px;
+        position: absolute;
+        left: calc(50% - 160px);
+
+        @include avenir_H();
+        font-size: 26px;
+
+        img.org-avatar-img {
+          max-width: 35px;
+          max-height: 35px;
+          margin-left: 142px;
+        }
       }
     }
 
