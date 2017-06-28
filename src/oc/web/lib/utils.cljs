@@ -965,3 +965,6 @@
   (let [selector (str "div." (name topic-slug) "-" entry-uuid "-comments-count")]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
+
+(defn cdn [img-src]
+  (str (or ls/cdn-url "") img-src))

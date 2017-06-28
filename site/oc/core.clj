@@ -1,8 +1,7 @@
 (ns oc.core
   (:require [oc.pages :as pages]
             [boot.util :as util]
-            [hiccup.page :as hp]
-            [environ.core :refer (env)]))
+            [hiccup.page :as hp]))
 ;; FIXME: Using hellp@opencompany.com until we have hello@carrot.io setup
 ;; (def contact-email "hello@carrot.io")
 (def contact-email "hello@opencompany.com")
@@ -38,7 +37,7 @@
    ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
    [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
    ;; Favicon
-   [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
+   [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
    ;; jQuery needed by Bootstrap JavaScript
    [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
    ;; Bootstrap JavaScript //getf.com/
@@ -93,14 +92,14 @@
     [:div.container-fluid.group
       [:div.left-column
         [:img.logo
-          {:src "/img/ML/carrot_wordmark_white.svg"}]
+          {:src (pages/cdn "/img/ML/carrot_wordmark_white.svg")}]
         [:div.small-links
           [:a {:href "/?tif"} "Request Free Early Access"]]
         [:div.small-logos
           [:a.twitter
-            [:img {:src "/img/ML/home_page_twitter.svg"}]]
+            [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
           [:a.medium
-            [:img {:src "/img/ML/home_page_medium.svg"}]]]
+            [:img {:src (pages/cdn "/img/ML/home_page_medium.svg")}]]]
         [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column
 
