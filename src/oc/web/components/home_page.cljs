@@ -4,7 +4,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.router :as router]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.prevent-route-dispatch :as prd]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
@@ -54,7 +53,7 @@
           ;; FIXME: Remove the carrot screenshot for the initial onboarding period
           (comment
             [:img.homepage-screenshot
-              {:src "/img/ML/home_page_screenshot.png"
+              {:src (utils/cdn "/img/ML/home_page_screenshot.png")
                :width 756
                :height 511}])]
 
@@ -62,7 +61,7 @@
         [:div.illustrations.group
 
           [:div.illustration.illustration-1.group
-            [:img {:src "/img/ML/home_page_il_1_412_385.svg"}]
+            [:img {:src (utils/cdn "/img/ML/home_page_il_1_412_385.svg")}]
             [:div.description.group
               [:div.title
                 "Get aligned fast"]
@@ -70,7 +69,7 @@
                 "Check out what’s new this week, or get new employees up to speed in a flash. Updates are in one place and easy to find."]]]
 
           [:div.illustration.illustration-2.group
-            [:img {:src "/img/ML/home_page_il_2_444_414.svg"}]
+            [:img {:src (utils/cdn "/img/ML/home_page_il_2_444_414.svg")}]
             [:div.description.group
               [:div.title
                 "Keep investors up to date"]
@@ -78,7 +77,7 @@
                 "Investors and advisors are happier - and more helpful - when they’re in the loop!"]]]
 
           [:div.illustration.illustration-3.group
-            [:img {:src "/img/ML/home_page_il_3_355_350.svg"}]
+            [:img {:src (utils/cdn "/img/ML/home_page_il_3_355_350.svg")}]
             [:div.description.group
               [:div.title
                 "Grow your business"]
@@ -88,7 +87,7 @@
         (comment
           [:div.customers
             [:div.customers-title
-              [:img {:src "/img/ML/user_avatar_yellow.svg"}]
+              [:img {:src (utils/cdn "/img/ML/user_avatar_yellow.svg")}]
               "Our happy clients"]
             [:div.customers-cards.group
               [:div.left-arrow

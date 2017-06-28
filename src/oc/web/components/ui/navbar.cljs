@@ -10,7 +10,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.utils :as utils]
@@ -93,7 +92,7 @@
                   (if (responsive/is-mobile-size?)
                     (dom/button {:class "btn-reset mobile-menu group"
                                  :on-click #(dis/dispatch! [:mobile-menu-toggle])}
-                      ; (dom/img {:src (str ls/cdn-url "/img/vert-ellipsis.svg") :width 8})
+                      ; (dom/img {:src (utils/cdn "/img/vert-ellipsis.svg") :width 8})
                       (dom/div {:class "vertical-ellipses"}))
                     (if (jwt/jwt)
                       (dom/div {:class "group"}
@@ -102,7 +101,7 @@
                           (om/build menu {}))
                         (dom/div {:class "right"
                                   :style {:margin-right "0.5rem" :margin-top "5px"}}
-                          (dom/img {:width 14 :height 16 :src "/img/ML/alerts_bell.svg"}))
+                          (dom/img {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}))
                         (when fixed-show-share-su-button
                           (if dashboard-sharing
                             (dom/div {:class "sharing-button-container"}

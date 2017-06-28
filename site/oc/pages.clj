@@ -1,6 +1,10 @@
 (ns oc.pages
   (:require [oc.terms :as terms]
-            [oc.privacy :as privacy]))
+            [oc.privacy :as privacy]
+            [environ.core :refer (env)]))
+
+(defn cdn [img-src]
+  (str (or (env :oc_web_cdn_url) "") img-src))
 
 (defn terms [options]
   (terms/terms options))
@@ -19,7 +23,7 @@
     [:div.illustrations.group
 
       [:div.illustration.illustration-1.group
-        [:img {:src "/img/ML/features_il_1_608_544.svg"}]
+        [:img {:src (cdn "/img/ML/features_il_1_608_544.svg")}]
         [:div.description.group
           [:div.title
             "Simplicity"]
@@ -27,7 +31,7 @@
             "Whether you’re adding a quick update about one topic, or writing a story that covers many, getting started is fast and simple."]]]
 
       [:div.illustration.illustration-2.group
-        [:img {:src "/img/ML/features_il_2_465_408.svg"}]
+        [:img {:src (cdn "/img/ML/features_il_2_465_408.svg")}]
         [:div.description.group
           [:div.title
             "Company timeline"]
@@ -35,7 +39,7 @@
             "It’s easy to catch up if you missed something or want more context. Great for getting new employees up to speed, too."]]]
 
       [:div.illustration.illustration-3.group
-        [:img {:src "/img/ML/features_il_3_443_269.svg"}]
+        [:img {:src (cdn "/img/ML/features_il_3_443_269.svg")}]
         [:div.description.group
           [:div.title
             "Feedback loops"]
@@ -43,7 +47,7 @@
             "Company updates are best when they trigger conversation. Comments and reactions keep everyone engaged and in sync - great for distributed teams."]]]
 
       [:div.illustration.illustration-4.group
-        [:img {:src "/img/ML/features_il_4_346_321.svg"}]
+        [:img {:src (cdn "/img/ML/features_il_4_346_321.svg")}]
         [:div.description.group
           [:div.title
             "Integrate with Slack"]
@@ -51,7 +55,7 @@
             "With Slack single sign-on and our Slack bot, updates are automatically shared to the right channels. Discussions about updates can happen within Slack or Carrot - everything is kept in sync."]]]
 
       [:div.illustration.illustration-5.group
-        [:img {:src "/img/ML/features_il_5_333_274.svg"}]
+        [:img {:src (cdn "/img/ML/features_il_5_333_274.svg")}]
         [:div.description.group
           [:div.title
             "Share your news more broadly"]
@@ -266,7 +270,7 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
-          [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
+          [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "Carrot - Company updates and stories"]
@@ -336,7 +340,7 @@
           [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
-          [:div.hidden [:img {:src "/img/emojione.sprites.png"}]]]})
+          [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
 
 (def prod-app-shell
   {:head [:head
@@ -344,7 +348,7 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
-          [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
+          [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
           [:title "Carrot - Company updates and stories"]

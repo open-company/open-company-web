@@ -7,7 +7,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
@@ -48,7 +47,7 @@
                 (small-loading)
                 "OK! LET’S GET STARTED →"))))
         (dom/div {:class "mt5 center group"}
-          (dom/img {:src (str ls/cdn-url "/img/oc-logo-gold.png")})
+          (dom/img {:src (utils/cdn "/img/oc-logo-gold.png")})
           (dom/div {:class "confirm-invitation-p group"}
             (dom/p {:class ""} "Carrot makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
       (let [columns-num (responsive/columns-num)

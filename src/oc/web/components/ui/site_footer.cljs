@@ -3,7 +3,6 @@
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]))
 
@@ -14,10 +13,10 @@
     [:div.small-logos
       [:a.twitter
         {:href oc-urls/oc-twitter}
-        [:img {:src "/img/ML/home_page_twitter.svg"}]]
+        [:img {:src (utils/cdn "/img/ML/home_page_twitter.svg")}]]
       [:a.medium
         {:href oc-urls/oc-medium}
-        [:img {:src "/img/ML/home_page_medium.svg"}]]]
+        [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
 (rum/defcs site-footer  < (rum/local nil ::expanded)
@@ -27,7 +26,7 @@
     [:div.container-fluid.group
       [:div.left-column
         [:img.logo
-          {:src "/img/ML/carrot_wordmark_white.svg"}]
+          {:src (utils/cdn "/img/ML/carrot_wordmark_white.svg")}]
         [:div.small-links
           [:a {:href oc-urls/home-try-it-focus} "Request Free Early Access"]]
         (when-not (responsive/is-mobile-size?)

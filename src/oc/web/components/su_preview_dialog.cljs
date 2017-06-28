@@ -9,9 +9,7 @@
             [goog.style :as gstyle]
             [oc.web.api :as api]
             [oc.web.dispatcher :as dis]
-            [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]
@@ -324,7 +322,7 @@
     (when (jwt/team-has-bot? (:team-id (drv/react s :org-data)))
       [:div.group
        [:button.btn-reset {:on-click #(prompt-cb :slack)}
-        [:div.circle50.left [:img {:src (str ls/cdn-url "/img/Slack_Icon.png") :style {:width "20px" :height "20px"}}]]
+        [:div.circle50.left [:img {:src (utils/cdn "/img/Slack_Icon.png") :style {:width "20px" :height "20px"}}]]
         [:span.left.ml1.gray5.h6 {} "SHARE TO SLACK"]]])
     [:div.group
      [:button.btn-reset {:on-click #(prompt-cb :email)}

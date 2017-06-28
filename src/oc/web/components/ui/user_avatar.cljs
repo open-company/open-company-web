@@ -4,7 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
-            [oc.web.local-settings :as ls]
+            [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
@@ -29,7 +29,7 @@
         default-avatar (user-icon (:user-id user-data))
         user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) default-avatar (:avatar-url user-data))]
     [:img.user-avatar-img
-      {:src user-avatar-url
+      {:src (utils/cdn user-avatar-url)
        :on-error #(reset! true (::use-default s))
        :title (str (:first-name user-data) " " (:last-name user-data))}]))
 
