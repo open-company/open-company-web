@@ -15,7 +15,8 @@
             [oc.web.components.topic-view :refer (topic-view)]
             [oc.web.components.add-topic :refer (add-topic)]
             [oc.web.components.boards-list :refer (boards-list)]
-            [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]))
+            [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
+            [oc.web.components.ui.empty-board :refer (empty-board)]))
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
@@ -167,20 +168,23 @@
 
   (render-state [_ {:keys [topics-layout filtered-topics]}]
     (let [partial-render-topic  (partial render-topic owner options)
-          columns-container-key (if (router/current-topic-slug)
-                                  (str "topics-columns-selected-topic-" (router/current-topic-slug))
+          current-topic-slug (router/current-topic-slug)
+          is-mobile-size? (responsive/is-mobile-size?)
+          columns-container-key (if current-topic-slug
+                                  (str "topics-columns-selected-topic-" current-topic-slug)
                                   (apply str filtered-topics))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
                                             #js {:width total-width}
                                             #js {:margin "0px 9px"
                                                  :width "auto"})
-                                          (if (responsive/is-mobile-size?)
+                                          (if is-mobile-size?
                                             #js {:margin "0px 9px"
                                                  :width "auto"}
                                             #js {:width total-width}))
           topic-view-width (responsive/topic-view-width card-width columns-num)
-          total-width-int (js/parseInt total-width 10)]
+          total-width-int (js/parseInt total-width 10)
+          empty-board? (zero? (count (:topics board-data)))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -206,15 +210,19 @@
               (om/build boards-list data))
             (dom/div {:class "board-container right"
                       :style {:width (str (- total-width-int responsive/left-boards-list-width 40) "px")}}
+              ;; Board name row: board name, settings button and say something button
               (dom/div {:class "group"}
+                ;; Board name and settings button
                 (dom/div {:class "board-name"}
                   (:name board-data)
+                  ;; Settings button
                   (when-not (:read-only board-data)
                     (dom/button {:class "mlb-reset board-settings-bt"
                                  :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))})))
+                ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
-                           (not (:show-add-topic data))
-                           (not (router/current-topic-slug))
+                           (not show-add-topic)
+                           (not current-topic-slug)
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?))
                            (not (:dashboard-sharing data)))
@@ -222,17 +230,29 @@
                                :on-click #(dis/dispatch! [:add-topic-show true])}
                     (dom/div {:class "add-to-board-pencil"})
                     "Say something")))
-              (filters-dropdown)
+              ;; Board filters dropdown
+              (when (and is-dashboard
+                         (not is-mobile-size?)
+                         (not current-topic-slug)
+                         (not empty-board?))
+                (filters-dropdown))
+              ;; Board content: empty board, add topic, topic view or topic cards
               (cond
                 (and is-dashboard
-                     (not (responsive/is-mobile-size?))
-                     (not (router/current-topic-slug))
+                     (not is-mobile-size?)
+                     (not current-topic-slug)
+                     (not show-add-topic)
+                     empty-board?)
+                (empty-board)
+                (and is-dashboard
+                     (not is-mobile-size?)
+                     (not current-topic-slug)
                      show-add-topic)
                 (dom/div {:class "add-topic-container group"}
                   (add-topic (partial update-active-topics owner)))
                 (and is-dashboard
-                     (not (responsive/is-mobile-size?))
-                     (router/current-topic-slug))
+                     (not is-mobile-size?)
+                     current-topic-slug)
                 (om/build topic-view {:card-width card-width
                                       :columns-num columns-num
                                       :board-data board-data
@@ -251,7 +271,7 @@
                   (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
                     (let [column (get topics-layout kw)]
                       (dom/div {:class (str "topics-column col-" (name kw))
-                                :style #js {:width (str (+ card-width (if (responsive/is-mobile-size?) mobile-topic-margins topic-margins)) "px")}}
+                                :style #js {:width (str (+ card-width (if is-mobile-size? mobile-topic-margins topic-margins)) "px")}}
                         ; render the topics
                         (when (pos? (count column))
                           (for [idx (range (count column))
