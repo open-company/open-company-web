@@ -106,7 +106,7 @@ div.navbar-header {
   a.navbar-brand {
     width: 150px;
     height: 36px;
-    background-image: url("/img/ML/carrot_wordmark.svg");
+    background-image: cdnUrl($cdn_url, "/img/ML/carrot_wordmark.svg");
     background-size: 150px 36px;
     background-repeat: no-repeat;
     margin-top: 18px;
@@ -179,7 +179,7 @@ ul.navbar-top {
       }
 
       &.active {
-        background-image: url("/img/ML/site_header_active_menu_item.svg");
+        background-image: cdnUrl($cdn_url, "/img/ML/site_header_active_menu_item.svg");
         background-position: 100px 0px;
         background-size: 91px 56px;
         background-repeat: no-repeat;
