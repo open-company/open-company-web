@@ -18,6 +18,9 @@
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)]
     [:div.filters-dropdown-name
+      (when (string? board-filters)
+        [:button.mlb-reset.board-remove-filter
+          {:on-click #(dis/dispatch! [:board-filters-set :latest])}])
       (board-filters-label board-filters)
       [:div.filters-dropdown-container
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle

@@ -4,6 +4,24 @@ div.filters-dropdown-name {
   font-size: 16px;
   margin: 0 0 16px 20px;
 
+  button.board-remove-filter {
+    width: 24px;
+    height: 24px;
+    background-color: $cr_light_blue;
+    border-radius: 4px;
+    background-image: cdnUrl($cdn_url, "/img/ML/board_remove_filter.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    margin-right: 10px;
+    transition: 230ms;
+
+    &:hover {
+      background-image: cdnUrl($cdn_url, "/img/ML/board_remove_filter_white.svg");
+      background-color: $cr_text_blue;
+    }
+  }
+
   div.filters-dropdown-container{
     position: relative;
     display: inline-block;
