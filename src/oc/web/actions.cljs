@@ -1104,9 +1104,3 @@
 (defmethod dispatcher/action :trend-bar-status
   [db [_ status]]
   (assoc db :trend-bar-status status))
-
-(defmethod dispatcher/action :board-filters-set
-  [db [_ new-board-filters]]
-  (when (keyword? new-board-filters)
-    (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name new-board-filters) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-  (assoc db :board-filters new-board-filters))
