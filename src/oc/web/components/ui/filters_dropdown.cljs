@@ -2,8 +2,10 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]))
 
 (defn board-filters-label [board-filters]
   (case board-filters
@@ -20,7 +22,7 @@
     [:div.filters-dropdown-name
       (when (string? board-filters)
         [:button.mlb-reset.board-remove-filter
-          {:on-click #(dis/dispatch! [:board-filters-set :latest])}])
+          {:on-click #(dis/dispatch! [:board-filters-set (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug))))])}])
       (board-filters-label board-filters)
       [:div.filters-dropdown-container
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle

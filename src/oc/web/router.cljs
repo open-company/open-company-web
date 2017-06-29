@@ -131,6 +131,11 @@
   [org-slug]
   (str "last-board-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
 
+(defn last-board-filter-cookie
+  "Cookie to save the last order the user visualized a board."
+  [org-slug board-slug]
+  (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
+
 (defn print-router-path []
   (js/console.log @path))
 

@@ -169,7 +169,8 @@
         board (:board (:params params))
         topic (:topic (:params params))
         update-slug (:update-slug (:params params))
-        query-params (:query-params params)]
+        query-params (:query-params params)
+        last-board-filter (or (keyword (cook/get-cookie (router/last-board-filter-cookie org board))) :latest)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
@@ -178,6 +179,7 @@
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :update-slug update-slug :query-params query-params})
     (swap! dis/app-state dissoc :show-add-topic)
+    (swap! dis/app-state assoc :board-filters last-board-filter)
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
