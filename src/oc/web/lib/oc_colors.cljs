@@ -43,7 +43,8 @@
   :cr-dark-blue "#2e405a"
   :cr-green "#0F8E4C"
   :cr-green-1 "#0E8749"
-  :cr-text-blue-2 "#3B3D40"})
+  :cr-text-blue-2 "#3B3D40"
+  :cr-light-blue "#DEE8FF"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)
