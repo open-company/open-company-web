@@ -6,7 +6,6 @@
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
