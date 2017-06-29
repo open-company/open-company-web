@@ -42,6 +42,7 @@
   :cr-settings-background "#FCFBF7"
   :cr-dark-blue "#2e405a"
   :cr-green "#0F8E4C"
+  :cr-green-1 "#0E8749"
   :cr-text-blue-2 "#3B3D40"})
 
 (defn get-color-by-kw [kw]
