@@ -5,6 +5,11 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
+(defn get-max-count-reaction [reactions]
+  (if-let [max-reaction (first (sort-by :count reactions))]
+    (:reaction max-reaction)
+    "👏"))
+
 (def comments-authors-data [
   {:avatar-url "" :first-name "Stuart" :last-name "Levinson" :user-id "1234-1234-1234"}
   {:avatar-url "" :first-name "Sean" :last-name "Johnson" :user-id "4321-4321-4321"}
@@ -18,19 +23,16 @@
         comments-count (min (:count comments-link) 4)]
     [:div.topic-interactions-summary
       ;; Reactions
-      [:div.tis-reactions
-        [:div.tis-reactions-reactions
-          (for [r (:reactions entry-data)]
-            [:div.tis-reactions-reaction
-              {:key (str "entry-reaction-" (:uuid entry-data) "-" (:reaction r))}
-              (:reaction r)])]
+      [:div.tis-reactions.group
+        [:div.tis-reactions-reaction
+          (get-max-count-reaction (:reactions entry-data))]
         ; Reactions count
         [:div.tis-reactions-summary
-          (str reactions-count " reactions")]]
+          (str reactions-count)]]
       ; Comments
       [:div.tis-comments
         ; Comments authors heads
-        [:div.tis-comments-authors
+        [:div.tis-comments-authors.group
           {:style {:width (str (+ 9 (* 15 comments-count)) "px")}}
           (for [c (range comments-count)
                 :let [user-data (get comments-authors-data (mod c 3))]]

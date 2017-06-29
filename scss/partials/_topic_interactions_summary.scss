@@ -5,32 +5,28 @@ div.topic-interactions-summary {
 
   div.tis-reactions{
     float: left;
-    width: 50%;
 
-    div.tis-reactions-reactions {
-      div.tis-reactions-reaction {
-        font-size: 12px;
-        margin-right: 7px;
-        width: 16px;
-        height: 16px;
-        float: left;
-      }
+    div.tis-reactions-reaction {
+      float: left;
+      font-size: 16px;
+    }
 
-      div.tis-reactions-summary {
-        margin-left: 7px;
-        font-size: 14px;
-        color: $oc_gray_7;
-        font-family: $oc_main_font;
-      }
+    div.tis-reactions-summary {
+      float: left;
+      margin-left: 7px;
+      font-size: 14px;
+      color: $oc_gray_7;
+      @include avenir_R();
     }
   }
 
   div.tis-comments {
-    float: right;
+    float: left;
     text-align: right;
-    width: 50%;
+    margin-left: 24px;
 
     div.tis-comments-authors {
+      float: left;
 
       div.tis-comments-author {
         float: left;
@@ -53,11 +49,12 @@ div.topic-interactions-summary {
       }
     }
 
-    div.tis-reactions-summary {
+    div.tis-comments-summary {
+      float: left;
       margin-left: 16px;
       font-size: 14px;
       color: $oc_gray_7;
-      font-family: $oc_main_font;
+      @include avenir_R();
     }
   }
 }
