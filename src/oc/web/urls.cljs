@@ -111,6 +111,27 @@
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
 
+(defn board-sort-latest
+  "Board filtered by latest topic"
+  ([]
+    (board-sort-latest (router/current-org-slug) (router/current-board-slug)))
+  ([org-slug board-slug]
+    (str (board org-slug board-slug) "/latest")))
+
+(defn board-sort-by-topic
+  "Board filtered by latest topic"
+  ([]
+    (board-sort-by-topic (router/current-org-slug) (router/current-board-slug)))
+  ([org-slug board-slug]
+   (str (board org-slug board-slug) "/by-topic")))
+
+(defn board-filter-by-topic
+  "Board url filtered by topic"
+  ([topic-slug]
+    (board-filter-by-topic (router/current-org-slug) (router/current-board-slug) topic-slug))
+  ([org-slug board-slug topic-slug]
+    (str (board org-slug board-slug) "/filter/" (name topic-slug))))
+
 (defn board-settings
   "Board settings url"
   ([]

@@ -164,13 +164,12 @@
     (drv-root #(om/component (component)) target)))
 
 ;; Component specific to a company
-(defn board-handler [route target component params]
+(defn board-handler [route target component params & [board-sort-or-filter]]
   (let [org (:org (:params params))
         board (:board (:params params))
         topic (:topic (:params params))
         update-slug (:update-slug (:params params))
-        query-params (:query-params params)
-        last-board-filter (or (keyword (cook/get-cookie (router/last-board-filter-cookie org board))) :latest)]
+        query-params (:query-params params)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
@@ -179,7 +178,10 @@
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :update-slug update-slug :query-params query-params})
     (swap! dis/app-state dissoc :show-add-topic)
-    (swap! dis/app-state assoc :board-filters last-board-filter)
+    (when board-sort-or-filter
+      (swap! dis/app-state assoc :board-filters board-sort-or-filter)
+      (when (keyword? board-sort-or-filter)
+        (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
@@ -227,6 +229,7 @@
     (defroute _loading_route "/__loading" {:as params}
       (timbre/info "Routing _loading_route __loading")
       (pre-routing (:query-params params)))
+
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
       (when-not (contains? (:query-params params) :jwt)
@@ -379,11 +382,11 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (board-handler "dashboard" target org-dashboard params))
+      (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params))
+      (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
@@ -392,6 +395,30 @@
       (if (jwt/jwt)
         (board-handler "board-settings" target board-settings params)
         (oc-wall-handler "Please sign in to access this board." target params)))
+
+    (defroute board-sort-latest-route (urls/board-sort-latest ":org" ":board") {:as params}
+      (timbre/info "Routing board-sort-latest-route" "/:org/:board/latest")
+      (board-handler "dashboard" target org-dashboard params :latest))
+
+    (defroute board-sort-latest-slash-route (str (urls/board-sort-latest ":org" ":board") "/") {:as params}
+      (timbre/info "Routing board-sort-latest-slash-route" (str (urls/board-sort-latest ":org" ":board") "/"))
+      (board-handler "dashboard" target org-dashboard params :latest))
+
+    (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
+      (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
+      (board-handler "dashboard" target org-dashboard params :by-topic))
+
+    (defroute board-sort-by-topic-slash-route (str (urls/board-sort-by-topic ":org" ":board") "/") {:as params}
+      (timbre/info "Routing board-sort-by-topic-slash-route" (str (urls/board-sort-by-topic ":org" ":board") "/"))
+      (board-handler "dashboard" target org-dashboard params :by-topic))
+
+    (defroute board-filter-by-topic-route (urls/board-filter-by-topic ":org" ":board" ":topic-filter") {:as params}
+      (timbre/info "Routing board-filter-by-topic-route" (urls/board-filter-by-topic ":org" ":board" ":topic-filter"))
+      (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
+
+    (defroute board-filter-by-topic-slash-route (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/") {:as params}
+      (timbre/info "Routing board-filter-by-topic-slash-route" (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/"))
+      (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
 
     (defroute create-update-route (urls/update-preview ":org") {:as params}
       (timbre/info "Routing create-update-route" (urls/update-preview ":org"))
@@ -457,8 +484,17 @@
                                  boards-list-route
                                  board-route
                                  board-route-slash
+                                 ; Board sorting
+                                 board-sort-latest-route
+                                 board-sort-latest-slash-route
+                                 board-sort-by-topic-route
+                                 board-sort-by-topic-slash-route
+                                 ; Board settings
                                  board-settings-route
-                                 ;; Topics
+                                 ; Board filter
+                                 board-filter-by-topic-route
+                                 board-filter-by-topic-slash-route
+                                 ; Entry route
                                  topic-route
                                  ;; Not found
                                  not-found-route
