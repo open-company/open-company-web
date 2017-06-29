@@ -1,0 +1,93 @@
+div.entry-card {
+  width: 432px;
+  max-height: 265px;
+  float: left;
+  background-color: white;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+  border-radius: 4px;
+  padding: 32px 24px;
+  margin: 10px 16px;
+
+  div.entry-card-head {
+    width: 100%;
+
+    div.entry-card-head-author {
+      float: left;
+      width: 80%;
+      padding-right: 20px;
+      overflow: hidden;
+
+      img.user-avatar-img {
+        max-width: 32px;
+        max-height: 32px;
+        margin-right: 16px;
+        float: left;
+      }
+
+      div.name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 220px;
+        @include avenir_H();
+        color: $cr_dark_gray;
+        font-size: 15px;
+      }
+
+      div.time-since {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 220px;
+        @include avenir_R();
+        color: $oc_gray_7;
+        font-size: 14px;
+      }
+    }
+
+    div.entry-card-head-right {
+      float: right;
+      width: 20%;
+
+      div.new {
+        float: right;
+        margin-top: 0;
+        width: 50px;
+        height: 26px;
+        border: 1px solid rgba(63,189,124,0.40);
+        border-radius: 3px;
+        @include avenir_B();
+        font-size: 12px;
+        color: $cr_green_1;
+        line-height: 14px;
+        text-align: center;
+        padding-top: 6px;
+      }
+    }
+  }
+
+  div.entry-card-content {
+    margin-top: 24px;
+    width: 100%;
+
+    div.entry-card-headline {
+      @include avenir_H();
+      font-size: 20px;
+      color: $cr_dark_gray;
+    }
+
+    div.entry-card-body {
+      @include avenir_R();
+      font-size: 16px;
+      color: $cr_dark_gray;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-height: 24px;
+      max-height: #{24*3}px;
+    }
+  }
+
+  div.entry-card-footer {
+  }
+}
