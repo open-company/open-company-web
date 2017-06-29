@@ -16,7 +16,8 @@
             [oc.web.components.add-topic :refer (add-topic)]
             [oc.web.components.boards-list :refer (boards-list)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
-            [oc.web.components.ui.empty-board :refer (empty-board)]))
+            [oc.web.components.ui.empty-board :refer (empty-board)]
+            [oc.web.components.entry-card :refer (entry-card)]))
 
 (def topic-margins 20)
 (def mobile-topic-margins 3)
@@ -265,19 +266,23 @@
                                       :comments-open (:comments-open data)})
                 ; for each column key contained in best layout
                 :else
-                (dom/div {:class (when (:dashboard-sharing data) " mt2")
-                          ; :style {:width (str (- total-width-int responsive/left-boards-list-width) "px")}
-                        }
-                  (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
-                    (let [column (get topics-layout kw)]
-                      (dom/div {:class (str "topics-column col-" (name kw))
-                                :style #js {:width (str (+ card-width (if is-mobile-size? mobile-topic-margins topic-margins)) "px")}}
-                        ; render the topics
-                        (when (pos? (count column))
-                          (for [idx (range (count column))
-                                :let [topic-kw (get column idx)
-                                      topic-name (name topic-kw)]]
-                            (partial-render-topic topic-name (name kw)))))))))))
+                (for [t (:topics board-data)
+                      :let [topic-data (get board-data (keyword t))]]
+                  (entry-card topic-data))
+                ; (dom/div {:class (when (:dashboard-sharing data) " mt2")
+                ;           ; :style {:width (str (- total-width-int responsive/left-boards-list-width) "px")}
+                ;         }
+                ;   (for [kw (if (= columns-num 3) [:1 :2 :3] [:1 :2])]
+                ;     (let [column (get topics-layout kw)]
+                ;       (dom/div {:class (str "topics-column col-" (name kw))
+                ;                 :style #js {:width (str (+ card-width (if is-mobile-size? mobile-topic-margins topic-margins)) "px")}}
+                ;         ; render the topics
+                ;         (when (pos? (count column))
+                ;           (for [idx (range (count column))
+                ;                 :let [topic-kw (get column idx)
+                ;                       topic-name (name topic-kw)]]
+                ;             (partial-render-topic topic-name (name kw))))))))
+                )))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
