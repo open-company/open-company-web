@@ -111,13 +111,6 @@
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
 
-(defn board-sort-latest
-  "Board sorted by latest topic"
-  ([]
-    (board-sort-latest (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug board-slug]
-    (str (board org-slug board-slug) "/latest")))
-
 (defn board-sort-by-topic
   "Board sorted by latest topic"
   ([]
@@ -130,7 +123,7 @@
   ([topic-slug]
     (board-filter-by-topic (router/current-org-slug) (router/current-board-slug) topic-slug))
   ([org-slug board-slug topic-slug]
-    (str (board org-slug board-slug) "/filter/" (name topic-slug))))
+    (str (board org-slug board-slug) "/" (name topic-slug))))
 
 (defn board-settings
   "Board settings url"
