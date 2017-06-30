@@ -131,7 +131,9 @@
         (if (responsive/is-tablet-or-mobile?)
           (router/nav! (oc-urls/boards))
           (let [board-to (get-default-board org-data)]
-            (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))
+            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
+              (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
+              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))))
         ;; Redirect to create board if no board are present
         :else
         (router/nav! (oc-urls/create-board (:slug org-data))))))
