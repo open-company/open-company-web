@@ -31,4 +31,10 @@
       [:div.entry-card-body
         {:dangerouslySetInnerHTML #js {:__html (cut-body (:body entry-data))}}]]
     [:div.entry-card-footer.group
-      (topic-interactions-summary entry-data)]])
+      (topic-interactions-summary entry-data)
+      [:div.more-button
+        [:button.mlb-reset.more-ellipsis
+          {:title "More"
+           :data-toggle "tooltip"
+           :data-placement "top"
+           :data-container "body"}]]]])
