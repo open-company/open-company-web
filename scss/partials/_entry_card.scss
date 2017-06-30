@@ -8,6 +8,37 @@ div.entry-card {
   padding: 32px 24px;
   margin: 10px 16px;
 
+  &.empty-state {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: cdnUrl($cdn_url, "/img/ML/entry_empty_state.svg");
+    background-size: 168px 120px;
+    background-position: center top;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+
+    div.entry-card-title {
+      font-size: 14px;
+      color: $cr_light_gray;
+      @include avenir_H();
+      margin-top: 110px;
+      text-align: center;
+
+      button {
+        color: $cr_text_blue;
+        padding: 0;
+        margin: 0;
+
+        &:hover, &:avtive, &:focus {
+          border: none;
+          outline: none;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
   div.entry-card-head {
     width: 100%;
 

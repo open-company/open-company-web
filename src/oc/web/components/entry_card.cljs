@@ -1,12 +1,21 @@
 (ns oc.web.components.entry-card
   (:require [rum.core :as rum]
-            [clojure.string :as s]
+            [cuerdas.core :as s]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
 
 (defn cut-body [entry-body]
   (.truncate js/$ entry-body (clj->js {:length utils/topic-body-limit :words true})))
+
+(rum/defc entry-card-empty
+  []
+  [:div.entry-card.empty-state.group
+    [:div.entry-card-title
+      "This topic’s a little sparse. "
+      [:button.mlb-reset
+        {:on-click #(js/alert "Coming soon")}
+        "Add an update?"]]])
 
 (rum/defcs entry-card < rum/static
   [s entry-data]
@@ -20,7 +29,9 @@
         [:div.time-since
           [:time
             {:date-time (:updated-at entry-data)}
-            (utils/time-since (:updated-at entry-data))]]]
+            (utils/time-since (:updated-at entry-data))]
+          (when (or (:topic-name entry-data) (:topic-slug entry-data))
+            (str " · " (or (:topic-name entry-data) (s/capital (:topic-slug entry-data)))))]]
       ; Card labels
       [:div.entry-card-head-right
         (when true
