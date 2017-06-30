@@ -18,7 +18,7 @@
         "Add an update?"]]])
 
 (rum/defcs entry-card < rum/static
-  [s entry-data]
+  [s entry-data show-topic?]
   [:div.entry-card
     ; Card header
     [:div.entry-card-head.group
@@ -28,9 +28,13 @@
         [:div.name (:name (first (:author entry-data)))]
         [:div.time-since
           [:time
-            {:date-time (:updated-at entry-data)}
+            {:date-time (:updated-at entry-data)
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
             (utils/time-since (:updated-at entry-data))]
-          (when (or (:topic-name entry-data) (:topic-slug entry-data))
+          (when (and show-topic? (or (:topic-name entry-data) (:topic-slug entry-data)))
             (str " · " (or (:topic-name entry-data) (s/capital (:topic-slug entry-data)))))]]
       ; Card labels
       [:div.entry-card-head-right
