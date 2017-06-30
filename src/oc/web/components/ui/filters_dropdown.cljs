@@ -6,7 +6,8 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]))
+            [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]))
 
 (defn board-filters-label [board-filters]
   (case board-filters
@@ -28,7 +29,7 @@
                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
                         (if (= last-filter :by-topic)
                           (router/nav! (oc-urls/board-sort-by-topic))
-                          (router/nav! (oc-urls/board-sort-latest))))}])
+                          (router/nav! (oc-urls/board))))}])
       (board-filters-label board-filters)
       [:div.filters-dropdown-container
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle
@@ -44,11 +45,15 @@
           [:div.filters-dropdown-list-content
             [:ul
               [:li.category
-                {:on-click #(router/nav! (oc-urls/board-sort-latest))
+                {:on-click (fn []
+                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (router/nav! (oc-urls/board)))
                  :class (if (= board-filters :latest) "select" "")}
                 "Latest Updates"]
               [:li.category
-                {:on-click #(router/nav! (oc-urls/board-sort-by-topic))
+                {:on-click (fn [_]
+                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (router/nav! (oc-urls/board-sort-by-topic)))
                  :class (if (= board-filters :by-topic) "select" "")}
                 "Latest by Topic"]
               [:li.divider]
