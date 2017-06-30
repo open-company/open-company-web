@@ -182,7 +182,7 @@
     (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :update-slug update-slug :query-params query-params})
     (swap! dis/app-state dissoc :show-add-topic)
     (when board-sort-or-filter
-      (swap! dis/app-state assoc :board-filters board-sort-or-filter)
+      (swap! dis/app-state merge {:board-filters board-sort-or-filter :reset-default "asd"})
       (when (keyword? board-sort-or-filter)
         (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
     ;; do we have the company data already?
@@ -385,10 +385,14 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
+      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :by-topic)
+        (router/redirect! (urls/board-sort-by-topic (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
+      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :by-topic)
+        (router/redirect! (urls/board-sort-by-topic (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
@@ -399,20 +403,16 @@
         (board-handler "board-settings" target board-settings params)
         (oc-wall-handler "Please sign in to access this board." target params)))
 
-    (defroute board-sort-latest-route (urls/board-sort-latest ":org" ":board") {:as params}
-      (timbre/info "Routing board-sort-latest-route" "/:org/:board/latest")
-      (board-handler "dashboard" target org-dashboard params :latest))
-
-    (defroute board-sort-latest-slash-route (str (urls/board-sort-latest ":org" ":board") "/") {:as params}
-      (timbre/info "Routing board-sort-latest-slash-route" (str (urls/board-sort-latest ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params :latest))
-
     (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
       (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
+      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
+        (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params :by-topic))
 
     (defroute board-sort-by-topic-slash-route (str (urls/board-sort-by-topic ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-sort-by-topic-slash-route" (str (urls/board-sort-by-topic ":org" ":board") "/"))
+      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
+        (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params :by-topic))
 
     (defroute board-filter-by-topic-route (urls/board-filter-by-topic ":org" ":board" ":topic-filter") {:as params}
@@ -487,14 +487,12 @@
                                  boards-list-route
                                  board-route
                                  board-route-slash
-                                 ; Board sorting
-                                 board-sort-latest-route
-                                 board-sort-latest-slash-route
-                                 board-sort-by-topic-route
-                                 board-sort-by-topic-slash-route
                                  ; Board settings
                                  board-settings-route
-                                 ; Board filter
+                                 ; ;; Board sorting
+                                 board-sort-by-topic-route
+                                 board-sort-by-topic-slash-route
+                                 ; ;; Board filter
                                  board-filter-by-topic-route
                                  board-filter-by-topic-slash-route
                                  ; Entry route
