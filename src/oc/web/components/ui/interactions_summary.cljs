@@ -23,22 +23,22 @@
         comments-count (min (:count comments-link) 4)]
     [:div.interactions-summary
       ;; Reactions
-      [:div.tis-reactions.group
-        [:div.tis-reactions-reaction
+      [:div.is-reactions.group
+        [:div.is-reactions-reaction
           (get-max-count-reaction (:reactions entry-data))]
         ; Reactions count
-        [:div.tis-reactions-summary
+        [:div.is-reactions-summary
           (str reactions-count)]]
       ; Comments
-      [:div.tis-comments
+      [:div.is-comments
         ; Comments authors heads
-        [:div.tis-comments-authors.group
+        [:div.is-comments-authors.group
           {:style {:width (str (+ 9 (* 15 comments-count)) "px")}}
           (for [c (range comments-count)
                 :let [user-data (get comments-authors-data (mod c 3))]]
-            [:div.tis-comments-author
+            [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (rand 7))}
               (user-avatar-image user-data)])]
         ; Comments count
-        [:div.tis-comments-summary
+        [:div.is-comments-summary
           (str (:count comments-link) " comments")]]]))
