@@ -299,7 +299,7 @@
         (topic-attachments attachments nil)
         (when (and is-dashboard
                    (not is-mobile?))
-          (topic-interactions-summary topic-data))))))
+          (interactions-summary topic-data))))))
 
 (defn anchor-clicked? [e]
   (loop [element (.-target e)]
