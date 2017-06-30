@@ -1,0 +1,15 @@
+div.entry-cards-container {
+  max-width: 928px;
+
+  &.by-topic {
+    width: 100%;
+    margin-top: 30px;
+  }
+
+  div.by-topic-title {
+    @include avenir_H();
+    font-size: 24px;
+    color: $oc_gray_7;
+    margin-left: 16px;
+  }
+}
