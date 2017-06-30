@@ -93,6 +93,7 @@
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
                          :show-top-menu (:show-top-menu data)
-                         :comments-open (:comments-open data)}
+                         :comments-open (:comments-open data)
+                         :board-filters (:board-filters data)}
               sub-component (if (responsive/is-mobile-size?) mobile-topics-list topics-columns)]
           (om/build sub-component comp-data))))))

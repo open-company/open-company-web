@@ -230,7 +230,8 @@
                                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                          :is-dashboard true
                                          :show-top-menu (:show-top-menu data)
-                                         :comments-open (:comments-open data)}))))
+                                         :comments-open (:comments-open data)
+                                         :board-filters (:board-filters data)}))))
                       (om/build topics-list
                                   {:loading (:loading data)
                                    :content-loaded (or (:loading board-data) (:loading data))
@@ -253,4 +254,5 @@
                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                                    :is-dashboard true
                                    :show-top-menu (:show-top-menu data)
-                                   :comments-open (:comments-open data)}))))))))))))
+                                   :comments-open (:comments-open data)
+                                   :board-filters (:board-filters data)}))))))))))))
