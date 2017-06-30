@@ -1,4 +1,4 @@
-(ns oc.web.components.ui.topic-interactions-summary
+(ns oc.web.components.ui.interactions-summary
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
@@ -15,13 +15,13 @@
   {:avatar-url "" :first-name "Sean" :last-name "Johnson" :user-id "4321-4321-4321"}
   {:avatar-url "" :first-name "Iacopo" :last-name "Carraro" :user-id (jwt/get-key :user-id)}])
 
-(rum/defcs topic-interactions-summary < rum/static
+(rum/defcs interactions-summary < rum/static
   [s entry-data]
   (let [comments-link (or (utils/link-for (:links entry-data) "comments") {:count (int (rand 10))})
         reactions (:reactions entry-data)
         reactions-count (if reactions (apply + (map :count reactions)) (int (rand 20)))
         comments-count (min (:count comments-link) 4)]
-    [:div.topic-interactions-summary
+    [:div.interactions-summary
       ;; Reactions
       [:div.tis-reactions.group
         [:div.tis-reactions-reaction

@@ -3,7 +3,7 @@
             [clojure.string :as s]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.topic-interactions-summary :refer (topic-interactions-summary)]))
+            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
 
 (defn cut-body [entry-body]
   (.truncate js/$ entry-body (clj->js {:length utils/topic-body-limit :words true})))
@@ -31,7 +31,7 @@
       [:div.entry-card-body
         {:dangerouslySetInnerHTML #js {:__html (cut-body (:body entry-data))}}]]
     [:div.entry-card-footer.group
-      (topic-interactions-summary entry-data)
+      (interactions-summary entry-data)
       [:div.more-button
         [:button.mlb-reset.more-ellipsis
           {:title "More"
