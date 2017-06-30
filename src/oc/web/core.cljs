@@ -58,6 +58,9 @@
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
 
+;; Avoid warnings
+(declare route-dispatch!)
+
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
     ; if :browser-type is "mobile" the mobile site is forced
@@ -472,7 +475,7 @@
                                  org-list-route
                                  org-page-route
                                  org-logo-setup-route
-                                 org-settings-route
+                                  org-settings-route
                                  org-team-settings-route
                                  board-create-route
                                  ;; Updates
@@ -497,8 +500,7 @@
                                  ; Entry route
                                  topic-route
                                  ;; Not found
-                                 not-found-route
-                                 ]))
+                                 not-found-route]))
 
     (defn handle-url-change [e]
       (when-not @prevent-route-dispatch
