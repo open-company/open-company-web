@@ -13,7 +13,7 @@
             [oc.web.components.topic-edit :refer (topic-edit)]
             [oc.web.components.topic-attachments :refer (topic-attachments)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
-            [oc.web.components.ui.topic-interactions-summary :refer (topic-interactions-summary)]
+            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [oc.web.components.growth.topic-growth :refer (topic-growth)]
             [oc.web.components.finances.topic-finances :refer (topic-finances)]
             [goog.events.EventType :as EventType]
