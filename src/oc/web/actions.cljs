@@ -710,11 +710,7 @@
 
 (defmethod dispatcher/action :add-topic-show
   [db [_ active]]
-  (if active
-    (do
-      (utils/after 100 #(router/nav! (oc-urls/board)))
-      (assoc db :show-add-topic true))
-    (assoc db :show-add-topic false)))
+  (assoc db :show-add-topic active))
 
 (defmethod dispatcher/action :dashboard-select-topic
   [db [_ board-slug topic-slug]]
