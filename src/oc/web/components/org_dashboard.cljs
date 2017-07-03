@@ -14,6 +14,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.components.topics-list :refer (topics-list)]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
+            [oc.web.components.entry-modal :refer (entry-modal)]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -162,11 +163,14 @@
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :editing-topic (or (not (nil? (:foce-key data)))
                                                               (not (nil? (:show-top-menu data))))
-                                           :main-scroll true})}
+                                           :main-scroll true
+                                           :no-scroll (router/current-topic-slug)})}
           (when (and (not (utils/is-test-env?))
                      board-error)
             ;show login overlays if needed
             (login-overlays-handler))
+          (when (router/current-topic-slug)
+            (entry-modal (get board-data (keyword (router/current-topic-slug)))))
           (if board-error
             (dom/div {:class "fullscreen-page with-small-footer"}
               (login-required data))
