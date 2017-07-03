@@ -1,9 +1,24 @@
 @mixin entry-author(){
-  img.user-avatar-img {
-    max-width: 32px;
-    max-height: 32px;
-    margin-right: 16px;
+  div.user-avatar-img-container {
+    height: 32px;
     float: left;
+    white-space: nowrap;
+    width: 32px;
+    text-align: center;
+    margin-right: 16px;
+
+    div.user-avatar-img-helper {
+      display: inline-block;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+    img.user-avatar-img {
+      max-width: 32px;
+      max-height: 32px;
+      border-radius: 16px;
+      vertical-align: middle;
+    }
   }
 
   div.name {

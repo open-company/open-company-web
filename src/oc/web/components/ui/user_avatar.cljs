@@ -28,10 +28,12 @@
   (let [use-default @(::use-default s)
         default-avatar (user-icon (:user-id user-data))
         user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) (utils/cdn default-avatar) (:avatar-url user-data))]
-    [:img.user-avatar-img
-      {:src user-avatar-url
-       :on-error #(reset! (::use-default s) true)
-       :title (str (:first-name user-data) " " (:last-name user-data))}]))
+    [:div.user-avatar-img-container
+      [:div.user-avatar-img-helper]
+      [:img.user-avatar-img
+        {:src user-avatar-url
+         :on-error #(reset! (::use-default s) true)
+         :title (:name user-data)}]]))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive
