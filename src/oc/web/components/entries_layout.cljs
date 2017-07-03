@@ -29,7 +29,7 @@
                   {:on-click #(router/nav! (oc-urls/board-filter-by-topic topic-slug))}
                   "VIEW " (count entries-group) " UPDATES"])]
             (for [entry (take 4 entries-group)]
-              (rum/with-key (entry-card entry false) (str "entry-by-topic-" topic "-" (:created-at entry))))
+              (rum/with-key (entry-card entry false) (str "entry-by-topic-" topic "-" (:uuid entry))))
             (when (or (= (count entries-group) 1)
                       (= (count entries-group) 3))
               (entry-card-empty))]))
@@ -39,7 +39,7 @@
             sorted-entries (vec (reverse (sort-by :updated-at filtered-entries)))]
         [:div.entry-cards-container.by-specific-topic.group
           (for [entry sorted-entries]
-            (rum/with-key (entry-card entry false) (str "entry-topic-" (:topic-slug entry) "-" (:created-at entry))))
+            (rum/with-key (entry-card entry false) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
           (when (= (count sorted-entries) 1)
               (entry-card-empty))])
       ;; :latest layout
@@ -47,4 +47,4 @@
       (let [sorted-entries (vec (reverse (sort-by :updated-at entries)))]
         [:div.entry-cards-container.group
           (for [entry sorted-entries]
-            (rum/with-key (entry-card entry true) (str "entry-latest-" (:created-at entry))))]))])
+            (rum/with-key (entry-card entry true) (str "entry-latest-" (:uuid entry))))]))])
