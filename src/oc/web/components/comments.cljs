@@ -41,12 +41,12 @@
         [:div.add-comment-footer.group
           ; {:style {:opacity (if fixed-show-footer 1 0)}}
           {:style {:display (if fixed-show-footer "block" "none")}}
-          [:div.right
-            [:button.btn-reset.btn-solid
+          [:div.reply-button-container
+            [:button.btn-reset.reply-btn
               {:on-click #(do
                             (dis/dispatch! [:comment-add entry-uuid @v])
                             (reset! v ""))}
-              "Post"]]]]]))
+              "Reply"]]]]]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
@@ -77,12 +77,11 @@
     (if (:loading comments-data)
       [:div.comments
         (small-loading)]
-      (when (:show-comments comments-data)
-        [:div.comments
-          (when needs-gradient
-            [:div.top-gradient])
-          [:div.comments-internal
-            (when (pos? (count entry-comments))
-              (for [c entry-comments]
-                (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
-            (add-comment (:entry-uuid (:show-comments comments-data)) (fn [] (utils/after 200 #(scroll-to-bottom s))))]]))))
+      [:div.comments
+        (when needs-gradient
+          [:div.top-gradient])
+        [:div.comments-internal
+          (when (pos? (count entry-comments))
+            (for [c entry-comments]
+              (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
+          (add-comment (:entry-uuid (:show-comments comments-data)) (fn [] (utils/after 200 #(scroll-to-bottom s))))]])))

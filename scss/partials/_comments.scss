@@ -1,11 +1,7 @@
 $comment_avatar_size: 23;
 
 div.comments {
-  width: 300px;
-  margin-left: 20px;
-  margin-top: 20px;
-  float: right;
-  max-height: 300px;
+  width: 100%;
   overflow: hidden;
   position: relative;
 
@@ -28,7 +24,6 @@ div.comments {
   div.comments-internal {
     overflow-x: hidden;
     overflow-y: auto;
-    max-height: 300px;
     padding: 10px;
     transition: 230ms;
 
@@ -74,14 +69,14 @@ div.comments {
     div.add-comment-box {
       background-color: white;
       border-radius: 4px;
-      border: 1px solid rgba(78,90,107,0.3);
+      border: 1px solid rgba(177, 184, 192, 0.5);
       padding: 0.5rem;
       transition: 230ms;
 
       &.expanded{
         div.add-comment-internal {
           textarea.add-comment {
-            height: 80px;
+            height: 70px;
           }
         }
       }
@@ -105,6 +100,19 @@ div.comments {
 
         div.add-comment-footer {
           transition: 230ms;
+
+          div.reply-button-container {
+            button.reply-btn {
+              float: left;
+              color: $cr_text_blue;
+              @include avenir_R();
+              font-size: 14px;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
         }
       }
     }
