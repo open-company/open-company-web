@@ -7,7 +7,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.topic-view :refer (topic-view)]
             [oc.web.components.add-topic :refer (add-topic)]
             [oc.web.components.boards-list :refer (boards-list)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
@@ -121,19 +120,6 @@
                      show-add-topic)
                 (dom/div {:class "add-topic-container group"}
                   (add-topic (partial update-active-topics owner)))
-                (and is-dashboard
-                     (not is-mobile-size?)
-                     current-topic-slug)
-                (om/build topic-view {:card-width card-width
-                                      :columns-num columns-num
-                                      :board-data board-data
-                                      :entries-data (:entries-data data)
-                                      :foce-key (:foce-key data)
-                                      :foce-data (:foce-data data)
-                                      :foce-data-editing? (:foce-data-editing? data)
-                                      :new-topics (:new-topics data)
-                                      :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                                      :comments-open (:comments-open data)})
                 ; for each column key contained in best layout
                 :else
                 (let [all-entries (vec (map #(get board-data (keyword %)) (:topics board-data)))]
