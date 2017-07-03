@@ -55,6 +55,11 @@ div.entry-card {
       float: right;
       width: 20%;
 
+      div.new {
+        margin-top: 0;
+        float: right;
+      }
+
       @include entry-new();
     }
   }
