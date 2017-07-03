@@ -137,7 +137,8 @@
         ;; Redirect to create board if no board are present
         :else
         (router/nav! (oc-urls/create-board (:slug org-data))))))
-  (utils/after 100 #(api/get-updates))
+  ;; FIXME: temporarily remove stories loading
+  ; (utils/after 100 #(api/get-updates))
   (-> db
     (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
     (assoc :updates-list-loading (utils/in? (:route @router/path) "updates-list"))))
