@@ -122,7 +122,7 @@
                   (add-topic (partial update-active-topics owner)))
                 ; for each column key contained in best layout
                 :else
-                (let [all-entries (vec (map #(get board-data (keyword %)) (:topics board-data)))]
+                (let [all-entries (:entries board-data)]
                   (entries-layout all-entries board-filters)))))
           ;; 1 column or default
           :else
