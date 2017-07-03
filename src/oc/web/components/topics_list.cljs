@@ -9,7 +9,6 @@
             [om-tools.core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros (sel sel1)]
-            [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.raven :as sentry]
