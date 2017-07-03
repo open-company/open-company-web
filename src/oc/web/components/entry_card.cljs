@@ -1,12 +1,14 @@
 (ns oc.web.components.entry-card
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
 
 (defn cut-body [entry-body]
-  (.truncate js/$ entry-body (clj->js {:length utils/topic-body-limit :words true})))
+  (.truncate js/$ entry-body (clj->js {:length 130 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"})))
 
 (rum/defc entry-card-empty
   []
@@ -20,6 +22,7 @@
 (rum/defcs entry-card < rum/static
   [s entry-data show-topic?]
   [:div.entry-card
+    {:on-click #(router/nav! (oc-urls/topic (:topic-slug entry-data)))}
     ; Card header
     [:div.entry-card-head.group
       ; Card author

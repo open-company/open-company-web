@@ -48,50 +48,14 @@ div.entry-card {
       padding-right: 20px;
       overflow: hidden;
 
-      img.user-avatar-img {
-        max-width: 32px;
-        max-height: 32px;
-        margin-right: 16px;
-        float: left;
-      }
-
-      div.name {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 220px;
-        @include avenir_H();
-        color: $cr_dark_gray;
-        font-size: 15px;
-      }
-
-      div.time-since {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 220px;
-        @include avenir_R();
-        color: $oc_gray_7;
-        font-size: 14px;
-      }
+      @include entry-author();
     }
 
     div.entry-card-head-right {
       float: right;
       width: 20%;
 
-      div.new {
-        float: right;
-        margin-top: 0;
-        width: 50px;
-        height: 26px;
-        border: 1px solid rgba(63,189,124,0.40);
-        border-radius: 3px;
-        @include avenir_B();
-        font-size: 12px;
-        color: $cr_green_1;
-        line-height: 14px;
-        text-align: center;
-        padding-top: 6px;
-      }
+      @include entry-new();
     }
   }
 
@@ -100,15 +64,12 @@ div.entry-card {
     width: 100%;
 
     div.entry-card-headline {
-      @include avenir_H();
-      font-size: 20px;
-      color: $cr_dark_gray;
+      @include entry-headline();
     }
 
     div.entry-card-body {
-      @include avenir_R();
-      font-size: 16px;
-      color: $cr_dark_gray;
+      @include entry-body();
+
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
@@ -116,6 +77,32 @@ div.entry-card {
       -webkit-line-clamp: 3;
       line-height: 24px;
       max-height: #{24*3}px;
+
+      span.full-update {
+        color: $cr_text_blue;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+
+      // // Uncomment this to programmatically add the read full update at the end of the last body tag
+      // div:last-child, p:last-child {
+      //   &:after {
+      //     content: "Read Full Update";
+      //     @include entry-body;
+      //     color: $cr_text_blue;
+      //     cursor: pointer;
+      //     margin-left: 5px;
+      //   }
+      // }
+
+      // &:empty {
+      //   &:after {
+      //     content: "Read Full Update";
+      //     @include entry-body;
+      //     color: $cr_text_blue;
+      //     cursor: pointer;
+      //   } 
+      // }
     }
   }
 
