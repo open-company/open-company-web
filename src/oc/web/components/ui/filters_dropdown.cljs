@@ -59,7 +59,7 @@
               [:li.divider]
               (for [t (:topics board-data)]
                 [:li
-                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic t))
-                   :class (if (= board-filters t) "select" "")
-                   :key (str "board-filters-topic-" t)}
-                  (s/capital t)])]]]]]))
+                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:slug t)))
+                   :class (if (= board-filters (:slug t)) "select" "")
+                   :key (str "board-filters-topic-" (:slug t))}
+                  (s/capital (:name t))])]]]]]))
