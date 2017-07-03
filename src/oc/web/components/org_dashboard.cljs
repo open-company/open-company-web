@@ -170,7 +170,8 @@
             ;show login overlays if needed
             (login-overlays-handler))
           (when (router/current-topic-slug)
-            (entry-modal (get board-data (keyword (router/current-topic-slug)))))
+            (let [entry-data (some #(when (= (:uuid %) (router/current-topic-slug)) %) (:entries board-data))]
+              (entry-modal entry-data (:topics board-data))))
           (if board-error
             (dom/div {:class "fullscreen-page with-small-footer"}
               (login-required data))
