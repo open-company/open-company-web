@@ -51,6 +51,8 @@
                   (when (or (:topic-name entry-data) (:topic-slug entry-data))
                     (str " · " (or (:topic-name entry-data) (s/capital (:topic-slug entry-data)))))]]
               [:div.entry-card-head-right
+                [:button.mlb-reset.entry-modal-more
+                  {:on-click #()}]
                 [:div.new "NEW"]]]
             [:div.entry-card-content
               [:div.entry-card-content-headline (:headline entry-data)]

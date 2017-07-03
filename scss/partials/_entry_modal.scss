@@ -66,9 +66,27 @@ div.entry-modal-container {
               float: right;
               div.new {
                 float: right;
+                margin-top: 7px;
               }
 
               @include entry-new();
+
+              button.entry-modal-more {
+                float: right;
+                margin-top: 7px;
+                margin-left: 10px;
+                width: 24px;
+                height: 24px;
+                background-image: cdnUrl($cdn_url, "/img/ML/entry_modal_more.svg");
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: 24px 24px;
+                opacity: 0.6;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
             }
           }
 
@@ -112,6 +130,7 @@ div.entry-modal-container {
           position: absolute;
           bottom: 0px;
           width: 100%;
+          height: 100%;
         }
       }
     }
