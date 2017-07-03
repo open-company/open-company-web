@@ -26,12 +26,13 @@ div.entry-modal-container {
       background-image: cdnUrl($cdn_url, "/img/ML/board_remove_filter.svg");
       background-position: center;
       background-repeat: no-repeat;
-      background-size: 16px 16px;
       transition: 230ms;
+      opacity: 1;
 
       &:hover {
         background-image: cdnUrl($cdn_url, "/img/ML/board_remove_filter_white.svg");
         background-color: $cr_text_blue;
+        opacity: 1;
       }
     }
 

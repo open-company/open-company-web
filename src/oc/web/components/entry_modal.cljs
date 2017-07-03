@@ -38,7 +38,7 @@
           [:div.entry-left-column-content
             [:div.entry-card-head.group
               [:div.entry-card-head-left
-                (user-avatar-image (:author entry-data))
+                (user-avatar-image (first (:author entry-data)))
                 [:div.name (:name (first (:author entry-data)))]
                 [:div.time-since
                   [:time
