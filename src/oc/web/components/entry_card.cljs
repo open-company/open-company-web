@@ -8,7 +8,7 @@
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
 
 (defn cut-body [entry-body]
-  (.truncate js/$ entry-body (clj->js {:length 130 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"})))
+  (.truncate js/$ entry-body (clj->js {:length 86 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"})))
 
 (rum/defc entry-card-empty
   []
@@ -22,12 +22,12 @@
 (rum/defcs entry-card < rum/static
   [s entry-data show-topic?]
   [:div.entry-card
-    {:on-click #(router/nav! (oc-urls/topic (:topic-slug entry-data)))}
+    {:on-click #(router/nav! (oc-urls/topic (:uuid entry-data)))}
     ; Card header
     [:div.entry-card-head.group
       ; Card author
       [:div.entry-card-head-author
-        (user-avatar-image)
+        (user-avatar-image (first (:author entry-data)))
         [:div.name (:name (first (:author entry-data)))]
         [:div.time-since
           [:time

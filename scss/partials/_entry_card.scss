@@ -65,23 +65,29 @@ div.entry-card {
   }
 
   div.entry-card-content {
-    margin-top: 24px;
     width: 100%;
 
     div.entry-card-headline {
       @include entry-headline();
+      margin-top: 24px;
+      text-overflow: ellipsis;
+      width: 100%;
+      overflow: hidden;
+      max-height: 28px;
+      white-space: nowrap;
     }
 
     div.entry-card-body {
       @include entry-body();
 
+      margin-top: 24px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       line-height: 24px;
-      max-height: #{24*3}px;
+      max-height: #{24*2}px;
 
       span.full-update {
         color: $cr_text_blue;
