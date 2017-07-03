@@ -139,7 +139,7 @@
   ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
   ([topic-slug] (topic (router/current-org-slug) (router/current-board-slug) topic-slug))
   ([board-slug topic-slug] (topic (router/current-org-slug) board-slug topic-slug))
-  ([org-slug board-slug topic-slug] (str (board org-slug board-slug) "/" (name topic-slug))))
+  ([org-slug board-slug topic-slug] (str (board org-slug board-slug) "/update/" (name topic-slug))))
 
 (defn topic-entry
   ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
