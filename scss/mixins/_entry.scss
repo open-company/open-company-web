@@ -1,0 +1,55 @@
+@mixin entry-author(){
+  img.user-avatar-img {
+    max-width: 32px;
+    max-height: 32px;
+    margin-right: 16px;
+    float: left;
+  }
+
+  div.name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 52px);
+    @include avenir_H();
+    color: $cr_dark_gray;
+    font-size: 15px;
+  }
+
+  div.time-since {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 52px);
+    @include avenir_R();
+    color: $oc_gray_7;
+    font-size: 14px;
+  }
+}
+
+@mixin entry-new(){
+  div.new {
+    float: right;
+    margin-top: 0;
+    width: 50px;
+    height: 26px;
+    border: 1px solid rgba(63,189,124,0.40);
+    border-radius: 3px;
+    @include avenir_B();
+    font-size: 12px;
+    color: $cr_green_1;
+    line-height: 14px;
+    text-align: center;
+    padding-top: 6px;
+  }
+}
+
+@mixin entry-headline(){
+  @include avenir_H();
+  font-size: 20px;
+  color: $cr_dark_gray;
+}
+
+@mixin entry-body(){
+  @include avenir_R();
+  font-size: 16px;
+  color: $cr_dark_gray;
+}
