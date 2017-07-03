@@ -4,6 +4,7 @@ div.comments {
   width: 100%;
   overflow: hidden;
   position: relative;
+  height: 100%;
 
   div.top-gradient {
     position: absolute;
@@ -12,12 +13,12 @@ div.comments {
     width: 90%;
     height: 40px;
     pointer-events: none;
-    background: -moz-linear-gradient(top,  rgba(248, 248, 248, 1) 0%, rgba(255, 255, 255,0) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255, 255, 255,0)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(248, 248, 248, 1) 0%,rgba(255, 255, 255,0) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(248, 248, 248, 1) 0%,rgba(255, 255, 255,0) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(248, 248, 248, 1) 0%,rgba(255, 255, 255,0) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(248, 248, 248, 1) 0%,rgba(255, 255, 255,0) 100%); /* W3C */
+    background: -moz-linear-gradient(top,  rgba(241, 242, 237, 1) 0%, rgba(241, 242, 237,0) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(241, 242, 237,0)), color-stop(100%,rgba(241, 242, 237,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8f8f8f1', endColorstr='#FFFFFF',GradientType=0 ); /* IE6-9 */
   }
 
@@ -26,6 +27,24 @@ div.comments {
     overflow-y: auto;
     padding: 10px;
     transition: 230ms;
+    height: 100%;
+    margin-top: 50px;
+
+    div.comments-internal-empty {
+      text-align: center;
+      @include avenir_M();
+      font-size: 16px;
+      color: $cr_light_gray;
+
+      img {
+        width: 23px;
+        height: 23px;
+      }
+
+      div {
+        margin-top: 24px;
+      }
+    }
 
     div.comment {
       margin: 10px 0;
@@ -72,6 +91,9 @@ div.comments {
       border: 1px solid rgba(177, 184, 192, 0.5);
       padding: 0.5rem;
       transition: 230ms;
+      width: 100%;
+      position: absolute;
+      bottom: 0px;
 
       &.expanded{
         div.add-comment-internal {

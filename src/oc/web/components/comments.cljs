@@ -5,6 +5,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (rum/defc comment-row
@@ -81,7 +82,11 @@
         (when needs-gradient
           [:div.top-gradient])
         [:div.comments-internal
-          (when (pos? (count entry-comments))
+          (if (pos? (count entry-comments))
             (for [c entry-comments]
-              (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c)))))
+              (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c))))
+            [:div.comments-internal-empty
+              [:img {:src (str ls/cdn-url "/img/ML/comments_empty.png")}]
+              [:div "No comments yet"]
+              [:div (str "Jump in and let everybody know what you think!")]])
           (add-comment (:entry-uuid (:show-comments comments-data)) (fn [] (utils/after 200 #(scroll-to-bottom s))))]])))
