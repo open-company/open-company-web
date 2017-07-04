@@ -23,14 +23,14 @@ div.entry-modal-container {
       height: 32px;
       background-color: $cr_light_blue;
       border-radius: 4px;
-      background-image: cdnUrl($cdn_url, "/img/ML/board_remove_filter.svg");
+      background-image: cdnUrl("/img/ML/board_remove_filter.svg");
       background-position: center;
       background-repeat: no-repeat;
       transition: 230ms;
       opacity: 1;
 
       &:hover {
-        background-image: cdnUrl($cdn_url, "/img/ML/board_remove_filter_white.svg");
+        background-image: cdnUrl("/img/ML/board_remove_filter_white.svg");
         background-color: $cr_text_blue;
         opacity: 1;
       }
@@ -78,7 +78,7 @@ div.entry-modal-container {
                 margin-left: 10px;
                 width: 24px;
                 height: 24px;
-                background-image: cdnUrl($cdn_url, "/img/ML/entry_modal_more.svg");
+                background-image: cdnUrl("/img/ML/entry_modal_more.svg");
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: 24px 24px;

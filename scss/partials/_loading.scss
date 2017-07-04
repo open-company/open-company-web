@@ -22,7 +22,7 @@ div.oc-loading {
     margin-top: -48px;
 
     div.oc-loading-body {
-      background-image: cdnUrl($cdn_url, "/img/ML/carrot_loading_body.svg");
+      background-image: cdnUrl("/img/ML/carrot_loading_body.svg");
       background-position: 52px 74px;
       width: 52px;
       height: 74px;
@@ -32,7 +32,7 @@ div.oc-loading {
     }
 
     div.oc-loading-heart {
-      background-image: cdnUrl($cdn_url, "/img/ML/carrot_loading_heart.svg");
+      background-image: cdnUrl("/img/ML/carrot_loading_heart.svg");
       background-position: 23px 23px;
       width: 23px;
       height: 23px;

@@ -12,7 +12,7 @@ div.entry-card {
     border: none;
     box-shadow: none;
     background-color: transparent;
-    background-image: cdnUrl($cdn_url, "/img/ML/entry_empty_state.svg");
+    background-image: cdnUrl("/img/ML/entry_empty_state.svg");
     background-size: 168px 120px;
     background-position: center top;
     background-repeat: no-repeat;
@@ -128,7 +128,7 @@ div.entry-card {
         height: 22px;
         padding: 4px 9px;
         display: block;
-        background-image: cdnUrl($cdn_url, "/img/ML/vertical_ellipsis.svg");
+        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
         background-position: center;
         background-size: 3px 13px;
         background-repeat: no-repeat;

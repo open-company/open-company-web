@@ -28,7 +28,7 @@ div.topics-columns {
 
         button.board-settings-bt {
           float: right;
-          background-image: cdnUrl($cdn_url, "/img/ML/board_settings.svg");
+          background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 12px 12px;
           width: 12px;
           height: 12px;
@@ -47,7 +47,7 @@ div.topics-columns {
         margin-right: 5px;
 
         div.add-to-board-pencil {
-          background-image: cdnUrl($cdn_url, "/img/ML/add_to_board_pencil.svg");
+          background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");
           background-size: 16px 16px;
           width: 16px;
           height: 16px;
@@ -57,7 +57,7 @@ div.topics-columns {
         }
 
         &:hover div.add-to-board-pencil {
-          background-image: cdnUrl($cdn_url, "/img/ML/add_to_board_pencil_white.svg");
+          background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
         }
       }
     }

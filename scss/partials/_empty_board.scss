@@ -21,7 +21,7 @@ div.empty-board {
   div.empty-board-image {
     width: 416px;
     height: 424px;
-    background-image: cdnUrl($cdn_url, "/img/ML/empty_board.svg");
+    background-image: cdnUrl("/img/ML/empty_board.svg");
     background-size: 416px 424px;
     background-position: center;
     background-repeat: no-repeat;

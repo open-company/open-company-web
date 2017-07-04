@@ -210,7 +210,7 @@ nav.oc-navbar {
           background: $oc_gray_5;
           width: 8px;
           height: 24px;
-          -webkit-mask: cdnUrl( $cdn_url, "/img/vert-ellipsis.svg") center / contain no-repeat;
+          -webkit-mask: cdnUrl("/img/vert-ellipsis.svg") center / contain no-repeat;
         }
       }
     }
