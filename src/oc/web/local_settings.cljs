@@ -28,7 +28,7 @@
 (def recurly-plan "local")
 
 ;; Deploy key (cache buster)
-(def deploy-key "asd")
+(def deploy-key "")
 
 ;; Filestack key
 (def filestack-key "Aoay0qXUSOyVIcDvls4Egz")

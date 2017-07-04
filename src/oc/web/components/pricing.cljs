@@ -1,7 +1,7 @@
 (ns oc.web.components.pricing
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
-            [oc.web.local-settings :as ls]
+            [oc.web.lib.utils :as utils]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.urls :as oc-urls]
@@ -39,7 +39,7 @@
           [:div.col-sm-3.col-xs-0]
           [:div.col-sm-6.col-xs-12
             [:div.concierge-logo
-              [:img {:id "oc-logo-gold" :src (str ls/cdn-url "/img/oc-logo-gold.png") :alt "Carrot Logo"}]]
+              [:img {:id "oc-logo-gold" :src (utils/cdn "/img/oc-logo-gold.png") :alt "Carrot Logo"}]]
             [:h1 "Concierge"]
             [:p "Want us to build and maintain your dashboards for you? Our team will make it
             beautiful, and we can prepare team and investor updates for you to approve and send."]

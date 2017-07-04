@@ -86,7 +86,7 @@
             (for [c entry-comments]
               (rum/with-key (comment-row c) (str "entry-" (:entry-uuid (:show-comments comments-data)) "-comment-" (:created-at c))))
             [:div.comments-internal-empty
-              [:img {:src (str ls/cdn-url "/img/ML/comments_empty.png")}]
+              [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
               [:div "No comments yet"]
               [:div (str "Jump in and let everybody know what you think!")]])
           (add-comment (:entry-uuid (:show-comments comments-data)) (fn [] (utils/after 200 #(scroll-to-bottom s))))]])))

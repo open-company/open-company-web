@@ -3,7 +3,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.local-settings :as ls]
+            [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.cookies :as cook]
             [oc.web.urls :as oc-urls]
@@ -36,6 +36,6 @@
             ;; else
             "SIGN IN")]]
       [:div.logo-container
-        [:img.logo-gold {:src (str ls/cdn-url "/img/oc-logo-gold.svg")}]
+        [:img.logo-gold {:src (utils/cdn "/img/oc-logo-gold.svg")}]
         [:div.logo-cta "Build team alignment together."]]]
     (footer)])

@@ -981,4 +981,4 @@
       (pulse-animation el))))
 
 (defn cdn [img-src]
-  (str (or ls/cdn-url "") img-src))
+  (str (when-not (empty? ls/cdn-url) (str ls/cdn-url "/" ls/deploy-key)) img-src))
