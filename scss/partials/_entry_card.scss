@@ -89,6 +89,10 @@ div.entry-card {
       line-height: 24px;
       max-height: #{24*2}px;
 
+      img:not(.emojione){
+        display: none;
+      }
+
       span.full-update {
         color: $cr_text_blue;
         cursor: pointer;
