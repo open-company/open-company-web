@@ -4,7 +4,7 @@
             [environ.core :refer (env)]))
 
 (defn cdn [img-src]
-  (str (or (env :oc_web_cdn_url) "") img-src))
+  (str (when (env :oc_web_cdn_url) (str (env :oc_web_cdn_url) "/" (env :oc_deploy_key))) img-src))
 
 (defn terms [options]
   (terms/terms options))
@@ -367,7 +367,7 @@
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;; CarrotKit Font
-          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/fonts/CarrotKit.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/fonts/CarrotKit.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
