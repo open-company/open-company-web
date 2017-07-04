@@ -9,11 +9,14 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]))
 
-(defn board-filters-label [board-filters]
-  (case board-filters
-    :latest "Latest Updates"
-    :by-topic "Latest by Topic"
-    (s/capital board-filters)))
+(defn board-filters-label [board-filters topics]
+  (cond
+    ;; by topic order
+    (= board-filters :by-topic) "Latest by Topic"
+    ;; if the filter is a string it means we are filtering by a topic slug, get the topic name from the board data
+    (string? board-filters) (or (utils/topic-name topics board-filters) (s/capital board-filters))
+    ;; in any other case we are showing by latest updates
+    :else "Latest Updates"))
 
 (rum/defcs filters-dropdown < rum/reactive
                               (drv/drv :board-filters)
@@ -30,7 +33,7 @@
                         (if (= last-filter :by-topic)
                           (router/nav! (oc-urls/board-sort-by-topic))
                           (router/nav! (oc-urls/board))))}])
-      (board-filters-label board-filters)
+      (board-filters-label board-filters (:topics board-data))
       [:div.filters-dropdown-container
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle
           {:type "button"
