@@ -391,4 +391,4 @@
           [:script {:src "oc_web_cdn_url/oc_deploy_key/oc.js"}]
           ;; Compiled assents
           [:script {:src "oc_web_cdn_url/oc_deploy_key/oc_assets.js"}]
-          [:div.hidden [:img {:src "oc_web_cdn_url/img/emojione.sprites.png"}]]]})
+          [:div.hidden [:img {:src "oc_web_cdn_url/oc_deploy_key/img/emojione.sprites.png"}]]]})
