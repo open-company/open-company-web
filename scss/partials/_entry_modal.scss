@@ -23,14 +23,14 @@ div.entry-modal-container {
       height: 32px;
       background-color: $cr_light_blue;
       border-radius: 4px;
-      background-image: cdnUrl("/img/ML/board_remove_filter.svg");
+      background-image: cdnUrl("/img/ML/board_remove_filter.png");
       background-position: center;
       background-repeat: no-repeat;
       transition: 230ms;
       opacity: 1;
 
       &:hover {
-        background-image: cdnUrl("/img/ML/board_remove_filter_white.svg");
+        background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
         background-color: $cr_text_blue;
         opacity: 1;
       }
