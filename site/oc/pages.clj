@@ -60,7 +60,8 @@
       ; Hope page header
       [:div.cta
         [:h1.headline "Company updates that build transparency and alignment"]
-        [:div.subheadline#thank-you-top "It's never been easier to get everyone aligned - inside and outside the company."]
+        [:div.subheadline
+          "It's never been easier to get everyone aligned - inside and outside the company."]
         (try-it-form "try-it-input-central")
         [:div.small-teams
           "Easy set-up • Free for small teams"]

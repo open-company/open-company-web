@@ -1,7 +1,6 @@
 $(document).ready(function(){
   var topThankyou = getParameterByName("tyt");
   var bottomThankyou = getParameterByName("tyb");
-  var rewriteUrl = window.location.pathname + window.location.hash;
   window.history.pushState({}, document.title, rewriteUrl);
   if (topThankyou) {
     $(".carrot-box-thanks-top").show();
@@ -9,6 +8,7 @@ $(document).ready(function(){
   if (bottomThankyou) {
     $(".carrot-box-thanks-bottom").show();
   }
+  var rewriteUrl = window.location.pathname + window.location.hash;
 });
 
 function getParameterByName(name, url) {
