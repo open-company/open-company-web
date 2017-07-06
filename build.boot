@@ -43,7 +43,7 @@
     ;; CLJSJS packages http://cljsjs.github.io/
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     [cljsjs/rangy-selectionsaverestore "1.3.0-1"]
-    [cljsjs/raven "3.14.2-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
+    [cljsjs/raven "3.16.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/d3 "4.3.0-5"] ; d3 externs https://clojars.org/cljsjs/d3
     [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/

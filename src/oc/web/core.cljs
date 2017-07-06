@@ -447,9 +447,12 @@
       (timbre/info "Routing update-unique-route" (urls/update-link ":org" ":update-data" ":update-slug"))
       (update-handler target su-snapshot params))
 
-    (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
-      (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
-      (board-handler "topic" target org-dashboard params))
+    (defroute topic-route urls/topic-route-regex {:as params}
+      (let [new-params (assoc params :params {:org (first (:params params))
+                                              :board (second (:params params))
+                                              :topic (nth (:params params) 2)})]
+        (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
+        (board-handler "topic" target org-dashboard new-params)))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
@@ -492,11 +495,11 @@
                                  ; ;; Board sorting
                                  board-sort-by-topic-route
                                  board-sort-by-topic-slash-route
+                                 ; Entry route
+                                 topic-route
                                  ; ;; Board filter
                                  board-filter-by-topic-route
                                  board-filter-by-topic-slash-route
-                                 ; Entry route
-                                 topic-route
                                  ;; Not found
                                  not-found-route]))
 
