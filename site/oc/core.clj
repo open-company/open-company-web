@@ -19,8 +19,10 @@
    [:title "OpenCompany - Startup Transparency Simplified"]
    ;; Bootstrap - Latest compiled and minified CSS
    [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
-   [:link {:href "/css/app.main.css", :rel "stylesheet"}]
-   [:link {:href "/css/site.main.css", :rel "stylesheet"}]
+   ;; Local css
+   [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
+   ;; Fallback for the CDN compacted css
+   [:link {:href (pages/cdn "/main.css") :rel "stylesheet"}]
    ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
    ;; WARNING: Respond.js doesn't work if you view the page via file://
    "<!--[if lt IE 9]>
@@ -33,7 +35,7 @@
    [:link {:type "text/css", :rel "stylesheet",
            :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
    ;; CarrotKit Font
-   [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css?oc_deploy_key"}]
+   [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
    ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
    [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
    ;; Favicon
@@ -41,7 +43,7 @@
    ;; jQuery needed by Bootstrap JavaScript
    [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
    ;; Static js files
-   [:script {:src "/js/static-js.js?oc_deploy_key"}]
+   [:script {:src (pages/cdn "/js/static-js.js")}]
    ;; Bootstrap JavaScript //getf.com/
    [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]])
 
