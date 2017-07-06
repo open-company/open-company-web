@@ -140,3 +140,25 @@ div.entry-card {
     }
   }
 }
+/* linkAnimation for card and modal links */
+@include keyframe(linkAnimation){
+  0% {
+    background-position: right bottom;
+    background-size: 100% .1rem;
+  }
+
+  50% {
+    background-position: right bottom;
+    background-size: 0 .1rem;
+  }
+
+  51% {
+    background-position: left bottom;
+    background-size: 0 .1rem;
+  }
+
+  100% {
+    background-position: left bottom;
+    background-size: 100% .1rem;
+  }
+}
