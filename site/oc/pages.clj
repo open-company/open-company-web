@@ -4,7 +4,7 @@
             [environ.core :refer (env)]))
 
 (defn cdn [img-src]
-  (str (when (env :oc_web_cdn_url) (str (env :oc_web_cdn_url) "/" (env :oc_deploy_key))) img-src))
+  (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
 (defn terms [options]
   (terms/terms options))
@@ -396,30 +396,30 @@
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
-          [:link {:rel "stylesheet" :href "/css/normalize.css?oc_deploy_key"}]
+          [:link {:rel "stylesheet" :href "/css/normalize.css"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
           ;; OpenCompany CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;;  Medium Editor css
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css"}]
           ;; Emojione CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css"}]
           ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css"}]
           ;; Emojone Sprites CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css"}]
           ;; CarrotKit Font
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
@@ -438,7 +438,7 @@
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; jQuery scrollTo plugin
-          [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/lib/scrollTo/scrollTo.min.js" :type "text/javascript"}]
           ;; jQuery UI
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
@@ -446,14 +446,14 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
-          [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
-          [:script {:src "/oc.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/oc.js" :type "text/javascript"}]
           ;; Utilities
-          [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
-          [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
+          [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js"}]
+          [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
-          [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
           [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
@@ -479,11 +479,11 @@
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; App single CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/main.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;; CarrotKit Font
-          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/fonts/CarrotKit.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href (cdn "/fonts/CarrotKit.css")}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -504,7 +504,7 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
-          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc.js"}]
+          [:script {:src (cdn "/oc.js")}]
           ;; Compiled assents
-          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc_assets.js"}]
-          [:div.hidden [:img {:src "oc_web_cdn_url/oc_deploy_key/img/emojione.sprites.png"}]]]})
+          [:script {:src (cdn "/oc_assets.js")}]
+          [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
