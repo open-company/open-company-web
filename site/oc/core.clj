@@ -40,6 +40,8 @@
    [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
    ;; jQuery needed by Bootstrap JavaScript
    [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+   ;; Static js files
+   [:script {:src "/js/static-js.js?oc_deploy_key"}]
    ;; Bootstrap JavaScript //getf.com/
    [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]])
 
@@ -144,12 +146,12 @@
                (head)
                [:body
                 [:div
-                 {:class (if (is? :index) "hero gradient" "gradient")}
+                 {:class "gradient"}
                  [:div
-                  {:class (if (is? :index) "container outer header hero" "outer header")}
+                  {:class "outer header"}
                   (nav (name page))]]
                 (case page
-                  ; :index   (pages/index options)
+                  :index   (pages/index options)
                   :about   (pages/about options)
                   :features (pages/features options)
                   :pricing (pages/pricing options)
