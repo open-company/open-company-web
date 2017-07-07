@@ -77,3 +77,5 @@ var filestack = {};
 filestack.init = function(){};
 filestack.pick = function(){};
 filestack.then = function(){};
+
+var mailchipApiSubmit = function(){};

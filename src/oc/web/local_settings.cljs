@@ -44,3 +44,6 @@
 
 ;; Attachments bucket
 (def attachments-bucket "open-company-attachments-non-prod")
+
+;; Mailchimp api endpoing
+(def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
