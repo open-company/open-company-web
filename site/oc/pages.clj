@@ -59,12 +59,10 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "Company updates that build transparency and alignment"]
+        [:h1.headline "Company updates that tell a better story"]
         [:div.subheadline
-          "It's never been easier to get everyone aligned - inside and outside the company."]
+          "The easy way to build transparency and alignment - inside and outside the company."]
         (try-it-form "try-it-input-central")
-        [:div.small-teams
-          "Easy set-up • Free for small teams"]
         (carrot-box-thanks "carrot-box-thanks-top")
 
         ;; FIXME: Remove the carrot screenshot for the initial onboarding period
