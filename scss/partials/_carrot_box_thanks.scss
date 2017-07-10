@@ -6,22 +6,22 @@ div.carrot-box-container {
   background-color: transparent;
   border-radius: 8px;
 
-  img.carrot-box {
-    width: 111px;
-    height: 114px;
-    float: left;
-    margin: 0 50px;
+  // img.carrot-box {
+  //   width: 111px;
+  //   height: 114px;
+  //   float: left;
+  //   margin: 0 50px;
 
-    @include mobile(){
-      float: none;
-      margin: 0 auto;
-    }
-  }
+  //   @include mobile(){
+  //     float: none;
+  //     margin: 0 auto;
+  //   }
+  // }
 
   div.carrot-box-thanks {
     float: left;
     text-align: center;
-    width: calc(100% - 211px);
+    width: 100%;
     margin-top: 25px;
 
     @include mobile(){

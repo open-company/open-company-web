@@ -16,7 +16,7 @@
   [:div.carrot-box-container.group
     {:class carrot-box-class
      :style #js {:display "none"}}
-    [:img.carrot-box {:src (cdn "/img/ML/carrot_box.svg")}]
+    ; [:img.carrot-box {:src (cdn "/img/ML/carrot_box.svg")}]
     [:div.carrot-box-thanks
       [:div.thanks-headline "Thanks!"]
       "we've sent you an email with a link."
