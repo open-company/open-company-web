@@ -347,11 +347,10 @@
     [:div.row
      [:div.col-md-12
       [:div.error-page
-       [:h1 "404"]
-       [:h2 "Hmm, this does not look right!!!"]
-       [:p {:id "oc-404-disclaimer"} "You are accessing a page that doesn’t exist or requires authentication."]
-       [:a.btn {:href "/"} "RETURN TO HOME"]
-       [:a.btn.ml2 {:id "oc-signin-logout-btn" :href "/login"} "SIGN IN / SIGN UP"]
+       [:img {:src (cdn "/img/ML/carrot_404.svg") :width 338 :height 189}]
+       [:h2 "Page Not Found"]
+       [:p "It seems we can't find what you're looking for."]
+       [:p " The page may have been moved or removed."]
        [:script {:src "/js/set-path.js"}]]]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]

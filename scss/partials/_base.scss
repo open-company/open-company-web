@@ -181,3 +181,21 @@ div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span
     display: none !important;
   }
 }
+
+div.error-page {
+  text-align: center;
+  min-height: calc(100vh - 336px);
+  padding-top: 100px;
+
+  h2 {
+    margin: 50px auto;
+    color: $cr_orange;
+    font-size: 40px;
+    text-align: center;
+    @include avenir_H();
+  }
+
+  p {
+
+  }
+}
