@@ -19,7 +19,7 @@
     ; [:img.carrot-box {:src (cdn "/img/ML/carrot_box.svg")}]
     [:div.carrot-box-thanks
       [:div.thanks-headline "Thanks!"]
-      "We've sent you an email with a link."
+      "We’ve sent you an email to confirm."
       [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
       [:a.carrot-early-access-link.hidden {:href "/"} "/"]]])
 
