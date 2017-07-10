@@ -19,16 +19,12 @@ function mailchipApiSubmit(e, form, success, fail){
 }
 
 $(document).ready(function(){
-  var topThankyou = getParameterByName("tyt");
-  var bottomThankyou = getParameterByName("tyb");
-  window.history.pushState({}, document.title, rewriteUrl);
-  if (topThankyou) {
-    $(".carrot-box-thanks-top").show();
-  }
-  if (bottomThankyou) {
-    $(".carrot-box-thanks-bottom").show();
-  }
+  var tif = getParameterByName("tif");
   var rewriteUrl = window.location.pathname + window.location.hash;
+  window.history.pushState({}, document.title, rewriteUrl);
+  if (tif) {
+    $(".try-it-form-central-input").focus();
+  }
 
   $(".mailchimp-api-subscribe-form").submit( function(e){
     mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show();}, function(){});
