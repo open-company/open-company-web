@@ -27,7 +27,7 @@ $(document).ready(function(){
   }
 
   $(".mailchimp-api-subscribe-form").submit( function(e){
-    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show();}, function(){});
+    mailchipApiSubmit(e, this, function(){$() $(".carrot-box-thanks-top").show(); $(".try-it-combo-field").hide();}, function(){});
     return false;
   });
 });
