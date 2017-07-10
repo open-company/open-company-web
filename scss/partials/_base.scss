@@ -182,20 +182,40 @@ div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span
   }
 }
 
-div.error-page {
-  text-align: center;
-  min-height: calc(100vh - 336px);
-  padding-top: 100px;
-
-  h2 {
-    margin: 50px auto;
-    color: $cr_orange;
-    font-size: 40px;
+div.not-found, div.server-error{
+  div.error-page {
     text-align: center;
-    @include avenir_H();
-  }
+    min-height: calc(100vh - 336px);
+    padding: 100px 0;
 
-  p {
+    h1 {
+      color: $oc_gray_6;
+      font-size: 100px;
+      @include avenir_B();
+    }
 
+    @media screen and (max-width: 768px) {
+      padding: 50px 16px;
+      img {
+        max-width: 100%;
+      }
+
+      h2 {
+        font-size: 32px;
+      }
+    }
+
+    @media screen and (min-width: 769px){
+      h2{
+        font-size: 40px;
+      }
+    }
+
+    h2 {
+      margin: 50px auto;
+      color: $cr_orange;
+      text-align: center;
+      @include avenir_H();
+    }
   }
 }

@@ -342,32 +342,24 @@
     ])
 
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.sector.not-found
-   [:div.container.inner
-    [:div.row
-     [:div.col-md-12
+  [:div.not-found
+    [:div
       [:div.error-page
-       [:img {:src (cdn "/img/ML/carrot_404.svg") :width 338 :height 189}]
-       [:h2 "Page Not Found"]
-       [:p "It seems we can't find what you're looking for."]
-       [:p " The page may have been moved or removed."]
-       [:script {:src "/js/set-path.js"}]]]]]])
+        [:img {:src (cdn "/img/ML/carrot_404.svg") :width 338 :height 189}]
+        [:h2 "Page Not Found"]
+        [:p "It seems we can't find what you're looking for."]
+        [:p.last "The page may have been moved or removed."]
+        [:script {:src "/js/set-path.js"}]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.sector.server-error
-   [:div.container.inner
-    [:div.row
-     [:div.col-md-12
+  [:div.server-error
+    [:div
       [:div.error-page
-       [:h1 "500"]
-       [:h2 "Hmm, this does not look right."]
-       [:p
-        "You seem to have come across an error."
-        [:br]
-        "Please try again or contact support: "
-        [:a {:href contact-mail-to} contact-email]]
-       [:a.btn {:href "/"} "Return To Home"]
-       [:script {:src "/js/set-path.js"}]]]]]])
+        [:h1 "500"]
+        [:h2 "Internal Server Error"]
+        [:p "We are sorry for the inconvenience."]
+        [:p.last "Please try again later."]
+        [:script {:src "/js/set-path.js"}]]]])
 
 (def app-shell
   {:head [:head
