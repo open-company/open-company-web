@@ -17,5 +17,5 @@
       [:div.carrot-box-thanks
         [:div.thanks-headline "Thanks!"]
         thanks-message
-        [:div.carrot-early-access-top "Get earlier access when your friends sign up with this link:"]
-        [:a.carrot-early-access-link {:href carrot-link} carrot-link]]]))
+        [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
+        [:a.carrot-early-access-link.hidden {:href carrot-link} carrot-link]]]))
