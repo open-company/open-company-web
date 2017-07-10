@@ -313,8 +313,12 @@ div#wrap {
       }
 
       div.carrot-box-container {
-        background-color: white !important;
-        margin-top: 60px;
+        color: #592121 !important;
+        padding: 0;
+
+        div.thanks-headline {
+          color: white !important;
+        }
       }
     }
   }

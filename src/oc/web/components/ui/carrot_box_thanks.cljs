@@ -10,7 +10,7 @@
   [& [email]]
   (let [thanks-message (if-not (empty? email)
                           [:div.thanks-subheadline "We've sent you a link to " [:span email] "."]
-                          [:div.thanks-subheadline "we've sent you an email with a link."])
+                          [:div.thanks-subheadline "We've sent you an email with a link."])
         carrot-link (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (get-link))]
     [:div.carrot-box-container.group
       ; [:img.carrot-box {:src (utils/cdn "/img/ML/carrot_box.svg")}]
