@@ -438,6 +438,9 @@ div.about-team {
       }
 
       &.sean-johnson {
+        @media screen and (min-width: 1122px){
+          height: 361px;
+        }
         div.team-avatar {
           background-image: cdnUrl("/img/ML/user_avatar_blue.svg");
         }
