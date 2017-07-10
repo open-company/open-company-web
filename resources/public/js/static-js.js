@@ -26,8 +26,13 @@ $(document).ready(function(){
     $(".try-it-form-central-input").focus();
   }
 
-  $(".mailchimp-api-subscribe-form").submit( function(e){
+  $("#try-it-form-central").submit( function(e){
     mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show(); $(".try-it-combo-field").hide();}, function(){});
+    return false;
+  });
+
+  $("#try-it-form-bottom").submit( function(e){
+    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-bottom").show(); $(".try-it-combo-field").hide();}, function(){});
     return false;
   });
 });
