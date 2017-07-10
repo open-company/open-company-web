@@ -30,7 +30,8 @@
         [:div.cta
           [:h1.headline "Company updates that build transparency and alignment"]
           [:div.subheadline#thank-you-top "It's never been easier to get everyone aligned - inside and outside the company."]
-          (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true))
+          (when-not @(::thanks-box-top s)
+            (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
           [:div.small-teams
             "Easy set-up • Free for small teams"]
           (when @(::thanks-box-top s)
@@ -94,8 +95,9 @@
             "Request early access"]
           [:div.try-it-subtitle
             "Easy set-up • Free for small teams"]
-          [:div
-            (try-it-form "try-it-form-bottom" #(reset! (::thanks-box-bottom s) true))]
+          (when-not @(::thanks-box-bottom s)
+            [:div
+              (try-it-form "try-it-form-bottom" #(reset! (::thanks-box-bottom s) true))])
           (when @(::thanks-box-bottom s)
             (carrot-box-thanks))]
 
