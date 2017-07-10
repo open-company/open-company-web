@@ -1,17 +1,16 @@
-function mailchipApiSubmit(e, emailValue, success, fail){
+function mailchipApiSubmit(e, form, success, fail){
   e.preventDefault();
-  $.POST(form.action,)
   $.ajax({
     type: "POST",
-    data: {email: emailValue},
+    url: form.action,
+    contentType: "text/plain",
+    data: $("input." + form.id + "-input").val(),
     success: function(a, b){
-      console.log("SUCCESS", a, b);
       if (typeof success === "function") {
         success();
       }
     },
     error: function(a, b){
-      console.log("ERROR", a, b);
       if (typeof fail === "function") {
         fail();
       }
@@ -31,10 +30,10 @@ $(document).ready(function(){
   }
   var rewriteUrl = window.location.pathname + window.location.hash;
 
-  var form = $("#mailchimp-api-subscribe-form");
-  form.onSubmit = function(e){
-    
-  };
+  $(".mailchimp-api-subscribe-form").submit( function(e){
+    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show();}, function(){});
+    return false;
+  });
 });
 
 function getParameterByName(name, url) {
