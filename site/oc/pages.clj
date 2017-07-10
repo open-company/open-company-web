@@ -20,22 +20,23 @@
     [:div.carrot-box-thanks
       [:div.thanks-headline "Thanks!"]
       "we've sent you an email with a link."
-      [:div.carrot-early-access-top "Get earlier access when your friends sign up with this link:"]
-      [:a.carrot-early-access-link {:href "/"} "/"]]])
+      [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
+      [:a.carrot-early-access-link.hidden {:href "/"} "/"]]])
 
-(defn try-it-form [try-it-class]
+(defn try-it-form [form-id]
   [:form.validate
     {:action (or (env :oc-mailchimp-api-endpoint) "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
      :method "post"
-     :id "mailchimp-api-subscribe-form"
+     :id form-id
+     :class "mailchimp-api-subscribe-form"
      :no-validate true}
     [:div.try-it-combo-field
       [:div.mc-field-group
         [:input.mail.required
           {:type "text"
            :value ""
-           :class try-it-class
            :id "mce-EMAIL"
+           :class (str form-id "-input")
            :name "email"
            :placeholder "Email address"}]]
       [:button.mlb-reset.try-it-get-started
@@ -52,7 +53,7 @@
         [:h1.headline "Company updates that tell a better story"]
         [:div.subheadline
           "The easy way to build transparency and alignment - inside and outside the company."]
-        (try-it-form "try-it-input-central")
+        (try-it-form "try-it-form-central")
         (carrot-box-thanks "carrot-box-thanks-top")
 
         ;; FIXME: Remove the carrot screenshot for the initial onboarding period
@@ -114,7 +115,7 @@
         [:div.try-it-subtitle
           "Easy set-up • Free for small teams"]
         [:div
-          (try-it-form "try-it-input-bottom")]
+          (try-it-form "try-it-form-bottom")]
         (carrot-box-thanks "carrot-box-thanks-bottom")]]])
 
 (defn features [options]
@@ -445,6 +446,8 @@
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
+          ;; Static js files
+          [:script {:src (cdn "/js/static-js.js")}]
           [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
 
 (def prod-app-shell
@@ -496,4 +499,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assents
           [:script {:src (cdn "/oc_assets.js")}]
+          ;; Static js files
+          [:script {:src (cdn "/js/static-js.js")}]
           [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
