@@ -144,6 +144,9 @@
 (def topic-route-regex
   #"/([0-9a-z-]+)/([0-9a-z-]+)/([0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4})")
 
+(def topic-route-regex-slash
+  #"/([0-9a-z-]+)/([0-9a-z-]+)/([0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4})/")
+
 (defn topic-entry
   ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
   ([entry] (str (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)) "?as-of=" entry))
