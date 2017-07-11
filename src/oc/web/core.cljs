@@ -329,6 +329,10 @@
       (timbre/info "Routing org-page-route" (urls/org ":org"))
       (org-handler "org" target #(om/component) params))
 
+    (defroute org-page-slash-route (str (urls/org ":org") "/") {:as params}
+      (timbre/info "Routing org-page-route" (str (urls/org ":org") "/"))
+      (org-handler "org" target #(om/component) params))
+
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
@@ -389,7 +393,7 @@
         (router/redirect! (urls/board-sort-by-topic (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
-    (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
+    (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :by-topic)
         (router/redirect! (urls/board-sort-by-topic (:org (:params params)) (:board (:params params)))))
@@ -454,6 +458,13 @@
         (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
         (board-handler "topic" target org-dashboard new-params)))
 
+    (defroute topic-slash-route urls/topic-route-regex-slash {:as params}
+      (let [new-params (assoc params :params {:org (first (:params params))
+                                              :board (second (:params params))
+                                              :topic (nth (:params params) 2)})]
+        (timbre/info "Routing topic-route" (str (urls/topic ":org" ":board" ":topic") "/"))
+        (board-handler "topic" target org-dashboard new-params)))
+
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
       ;; render component
@@ -477,8 +488,9 @@
                                  ;; Org routes
                                  org-list-route
                                  org-page-route
+                                 org-page-slash-route
                                  org-logo-setup-route
-                                  org-settings-route
+                                 org-settings-route
                                  org-team-settings-route
                                  board-create-route
                                  ;; Updates
@@ -489,7 +501,7 @@
                                  ;; Boards
                                  boards-list-route
                                  board-route
-                                 board-route-slash
+                                 board-slash-route
                                  ; Board settings
                                  board-settings-route
                                  ; ;; Board sorting
@@ -497,6 +509,7 @@
                                  board-sort-by-topic-slash-route
                                  ; Entry route
                                  topic-route
+                                 topic-slash-route
                                  ; ;; Board filter
                                  board-filter-by-topic-route
                                  board-filter-by-topic-slash-route
