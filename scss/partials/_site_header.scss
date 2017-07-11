@@ -158,9 +158,11 @@ ul.navbar-top {
       margin-left: 20px;
     }
 
-    &.active {
-      padding-top: 6px;
-      border-top: 4px solid $cr_orange;
+    @include big_web(){
+      &.active {
+        padding-top: 6px;
+        border-top: 4px solid $cr_orange;
+      }
     }
 
     @include mobile(){
