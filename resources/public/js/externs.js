@@ -67,10 +67,7 @@ var OCWebPrintJWTContents = function(){};
 var OCWebHelp = function(){};
 var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
-var OCWebPrintUpdatesListData = function(){};
-var OCWebPrintUpdateData = function(){};
 var OCWebPrintRouterPath = function(){};
-var OCWebPrintTopicEntriesData = function(){};
 var OCWebForceRefreshToken = function(){};
 // Filestack
 var filestack = {};

@@ -33,9 +33,6 @@
 (defn board-new-categories-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :new-categories])
 
-(defn board-topic-key [org-slug board-slug topic-slug]
-  (conj (board-data-key org-slug board-slug) (keyword topic-slug)))
-
 (defn updates-list-key [org-slug]
   [(keyword org-slug) :updates-list])
 
@@ -48,11 +45,8 @@
 (defn entries-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :entries-data])
 
-(defn topic-entries-key [org-slug board-slug topic-slug]
-  (vec (conj (entries-key org-slug board-slug) (keyword topic-slug) :entries)))
-
-(defn comments-key [org-slug board-slug topic-slug entry-uuid]
- (vec (conj (entries-key org-slug board-slug) (keyword topic-slug) entry-uuid :comments-data)))
+(defn comments-key [org-slug board-slug entry-uuid]
+ (vec (conj (entries-key org-slug board-slug) entry-uuid :comments-data)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -124,25 +118,16 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :topic-data          [[:base :org-slug :board-slug :topic-slug]
-                          (fn [base org-slug board-slug topic-slug]
-                            (when (and org-slug board-slug topic-slug)
-                              (get-in base (board-topic-key org-slug board-slug topic-slug))))]
-   :entry-data          [[:base :org-slug :board-slug :topic-slug :entry-uuid]
-                          (fn [base org-slug board-slug topic-slug entry-uuid]
-                            (when (and org-slug board-slug topic-slug)
-                              (let [entry-data (get-in base (board-topic-key org-slug board-slug topic-slug))
-                                    comments-open (:comments-open base)]
-                                (assoc entry-data :show-comments (= (:topic-slug comments-open) (keyword topic-slug))))))]
-   :comments-data       [[:base :org-slug :board-slug :topic-slug :entry-uuid]
-                          (fn [base org-slug board-slug topic-slug entry-uuid]
-                            (when (and org-slug board-slug topic-slug)
-                              (let [comments-open (:comments-open base)
-                                    comments-data (get-in base (comments-key org-slug board-slug topic-slug (:entry-uuid comments-open)))
-                                    should-show-comments (and (= (:topic-slug comments-open) (keyword topic-slug))
-                                                              (= (:entry-uuid comments-open) entry-uuid))]
-                                {:comments comments-data
-                                 :show-comments comments-open})))]
+   :entry-data          [[:base :org-slug :board-slug :entry-uuid]
+                          (fn [base org-slug board-slug entry-uuid]
+                            (when (and org-slug board-slug entry-uuid)
+                              (let [board-data (get-in base (board-data-key org-slug board-slug))]
+                                (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))]
+   :comments-data       [[:base :org-slug :board-slug :entry-uuid]
+                          (fn [base org-slug board-slug entry-uuid]
+                            (when (and org-slug board-slug entry-uuid)
+                              (let [comments-data (get-in base (comments-key org-slug board-slug entry-uuid))]
+                                comments-data)))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
@@ -214,74 +199,32 @@
   ([data org-slug board-slug k]
     (get-in data (conj (board-cache-key org-slug board-slug) k))))
 
-(defn topic-data
-  "Get topic data."
+(defn entry-data
+  "Get entry data."
   ([]
-    (topic-data @app-state))
+    (entry-data @app-state))
   ([data]
-    (topic-data data (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
-  ([data topic-slug]
-    (topic-data data (router/current-org-slug) (router/current-board-slug) topic-slug))
-  ([data org-slug board-slug topic-slug]
-    (get-in data (board-topic-key org-slug board-slug topic-slug))))
-
-(defn latest-stakeholder-update
-  ([]
-    (latest-stakeholder-update @app-state))
-  ([data]
-    (latest-stakeholder-update data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (latest-update-key org-slug))))
-
-(defn updates-list-data
-  ([]
-    (updates-list-data @app-state))
-  ([data]
-    (updates-list-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (updates-list-key org-slug))))
-
-(defn update-data
-  ([]
-    (update-data @app-state))
-  ([data]
-    (update-data data (router/current-org-slug) (router/current-update-slug)))
-  ([data org-slug update-slug]
-    (get-in data (update-key org-slug update-slug))))
-
-(defn force-edit-topic []
-  (:force-edit-topic @app-state))
-
-(defn entry
-  ([entry-uuid]
-    (entry (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid @app-state))
-  ([topic-slug entry-uuid]
-    (entry (router/current-org-slug) (router/current-board-slug) topic-slug entry-uuid @app-state))
-  ([org-slug board-slug topic-slug entry-uuid]
-    (entry org-slug board-slug topic-slug entry-uuid @app-state))
-  ([org-slug board-slug topic-slug entry-uuid data]
-    (let [entries-data (get-in data (topic-entries-key org-slug board-slug topic-slug))]
-      (first (filter #(= (:uuid %) entry-uuid) entries-data)))))
+    (entry-data data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid)))
+  ([data entry-uuid]
+    (entry-data data (router/current-org-slug) (router/current-board-slug) entry-uuid))
+  ([data org-slug board-slug entry-uuid]
+    (let [board-data (get-in data (board-data-key org-slug board-slug))]
+      (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))
 
 (defn comments-data
+  ([]
+    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid) @app-state))
   ([entry-uuid]
-    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid @app-state))
-  ([topic-slug entry-uuid]
-    (comments-data (router/current-org-slug) (router/current-board-slug) topic-slug entry-uuid @app-state))
-  ([org-slug board-slug topic-slug entry-uuid]
-    (comments-data org-slug board-slug topic-slug entry-uuid @app-state))
-  ([org-slug board-slug topic-slug entry-uuid data]
-    (get-in data (comments-key org-slug board-slug topic-slug entry-uuid))))
+    (comments-data (router/current-org-slug) (router/current-board-slug) entry-uuid @app-state))
+  ([org-slug board-slug entry-uuid]
+    (comments-data org-slug board-slug entry-uuid @app-state))
+  ([org-slug board-slug entry-uuid data]
+    (get-in data (comments-key org-slug board-slug entry-uuid))))
 
 (defn entries-data
   ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))
   ([data] (entries-data data (router/current-org-slug) (router/current-board-slug)))
   ([data org-slug board-slug] (get-in data (entries-key org-slug board-slug))))
-
-(defn topic-entries-data
-  ([topic-slug] (topic-entries-data (router/current-org-slug) (router/current-board-slug) topic-slug))
-  ([org-slug board-slug topic-slug] (topic-entries-data org-slug board-slug topic-slug @app-state))
-  ([org-slug board-slug topic-slug data] (get-in data (topic-entries-key org-slug board-slug topic-slug))))
 
 (defn teams-data
   ([] (teams-data @app-state))
@@ -302,15 +245,6 @@
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
 
-(defn foce-topic-key []
-  (:foce-key @app-state))
-
-(defn foce-topic-data []
-  (:foce-data @app-state))
-
-(defn foce-topic-data-editing? []
-  (:foce-data-editing? @app-state))
-
 ;; Debug functions
 
 (defn print-app-state []
@@ -325,27 +259,15 @@
 (defn print-team-roster []
   (js/console.log (get-in @app-state (team-roster-key (:team-id (org-data))))))
 
-(defn print-updates-list-data []
-  (js/console.log (get-in @app-state (updates-list-key (router/current-org-slug)))))
-
-(defn print-update-data []
-  (js/console.log (get-in @app-state (update-key (router/current-org-slug) (router/current-update-slug)))))
-
 (defn print-board-data []
   (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-entries-data []
   (js/console.log (get-in @app-state (entries-key (router/current-org-slug) (router/current-board-slug)))))
 
-(defn print-topic-entries-data []
-  (js/console.log (get-in @app-state (topic-entries-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))))
-
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
-(set! (.-OCWebPrintUpdatesListData js/window) print-updates-list-data)
-(set! (.-OCWebPrintUpdateData js/window) print-update-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintEntriesData js/window) print-entries-data)
-(set! (.-OCWebPrintTopicEntriesData js/window) print-topic-entries-data)

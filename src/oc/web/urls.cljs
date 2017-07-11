@@ -132,40 +132,35 @@
   ([org-slug board-slug]
     (str (board org-slug board-slug) "/settings")))
 
-;; Topics
+;; Entries
 
-(defn topic
-  "Topic url"
-  ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
-  ([topic-slug] (topic (router/current-org-slug) (router/current-board-slug) topic-slug))
-  ([board-slug topic-slug] (topic (router/current-org-slug) board-slug topic-slug))
-  ([org-slug board-slug topic-slug] (str (board org-slug board-slug) "/update/" (name topic-slug))))
-
-(defn topic-entry
-  ([] (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)))
-  ([entry] (str (topic (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug)) "?as-of=" entry))
-  ([org-slug board-slug topic-slug entry] (str (topic org-slug board-slug topic-slug) "?as-of=" entry)))
+(defn entry
+  "Entry url"
+  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid)))
+  ([entry-uuid] (entry (router/current-org-slug) (router/current-board-slug) entry-uuid))
+  ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
+  ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/update/" (name entry-uuid))))
 
 ;; Stakeholder update
 
-(defn updates-list
-  ([]
-    (updates-list (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/updates"))
-  ([org-slug update-slug]
-    (str (updates-list org-slug) "/" (name update-slug))))
+; (defn updates-list
+;   ([]
+;     (updates-list (router/current-org-slug)))
+;   ([org-slug]
+;     (str (org org-slug) "/updates"))
+;   ([org-slug update-slug]
+;     (str (updates-list org-slug) "/" (name update-slug))))
 
-(defn update-preview
-  ([]
-    (update-preview (router/current-org-slug)))
-  ([org-slug]
-    (str (updates-list org-slug) "/preview")))
+; (defn update-preview
+;   ([]
+;     (update-preview (router/current-org-slug)))
+;   ([org-slug]
+;     (str (updates-list org-slug) "/preview")))
 
-(defn update-link
-  ([]
-    (update (router/current-org-slug) (router/current-update-date) (router/current-update-slug)))
-  ([update-date update-slug]
-    (update (router/current-org-slug) update-date update-slug))
-  ([org-slug update-date update-slug]
-    (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))
+; (defn update-link
+;   ([]
+;     (update (router/current-org-slug) (router/current-update-date) (router/current-update-slug)))
+;   ([update-date update-slug]
+;     (update (router/current-org-slug) update-date update-slug))
+;   ([org-slug update-date update-slug]
+;     (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))

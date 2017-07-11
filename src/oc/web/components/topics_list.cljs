@@ -16,9 +16,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.topics-columns :refer (topics-columns)]
-            [oc.web.components.mobile-topics-list :refer (mobile-topics-list)]
-            [cljsjs.hammer]))
+            [oc.web.components.topics-columns :refer (topics-columns)]))
 
 ;; ===== Topic List Component =====
 
@@ -44,8 +42,6 @@
     (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
                 new-topic-data (-> next-props :board-data new-topic-foce)]
       (dispatcher/dispatch! [:foce-start new-topic-foce new-topic-data]))
-    (when (om/get-state owner :redirect-to-preview)
-      (utils/after 100 #(router/nav! (oc-urls/update-preview))))
     (when-not (= (:board-data next-props) (:board-data data))
       (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
@@ -92,7 +88,5 @@
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
                          :show-top-menu (:show-top-menu data)
-                         :comments-open (:comments-open data)
-                         :board-filters (:board-filters data)}
-              sub-component (if (responsive/is-mobile-size?) mobile-topics-list topics-columns)]
-          (om/build sub-component comp-data))))))
+                         :board-filters (:board-filters data)}]
+          (om/build topics-columns comp-data))))))

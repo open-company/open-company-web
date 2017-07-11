@@ -24,7 +24,7 @@
     (dis/dispatch! [:topic-add new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
     (when (:was-archived topic-data)
-      (router/nav! (oc-urls/topic (router/current-org-slug) (:slug board-data) new-topic)))))
+      (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data) new-topic)))))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
@@ -39,10 +39,10 @@
                                       board-filters] :as data} owner options]
 
   (render [_]
-    (let [current-topic-slug (router/current-topic-slug)
+    (let [current-entry-uuid (router/current-entry-uuid)
           is-mobile-size? (responsive/is-mobile-size?)
-          columns-container-key (if current-topic-slug
-                                  (str "topics-columns-selected-topic-" current-topic-slug)
+          columns-container-key (if current-entry-uuid
+                                  (str "topics-columns-selected-topic-" current-entry-uuid)
                                   (apply str (:topics board-data)))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
@@ -92,7 +92,7 @@
                 ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
                            (not show-add-topic)
-                           (not current-topic-slug)
+                           (not current-entry-uuid)
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?))
                            (not (:dashboard-sharing data)))
@@ -103,20 +103,20 @@
               ;; Board filters dropdown
               (when (and is-dashboard
                          (not is-mobile-size?)
-                         (not current-topic-slug)
+                         (not current-entry-uuid)
                          (not empty-board?))
                 (filters-dropdown))
               ;; Board content: empty board, add topic, topic view or topic cards
               (cond
                 (and is-dashboard
                      (not is-mobile-size?)
-                     (not current-topic-slug)
+                     (not current-entry-uuid)
                      (not show-add-topic)
                      empty-board?)
                 (empty-board)
                 (and is-dashboard
                      (not is-mobile-size?)
-                     (not current-topic-slug)
+                     (not current-entry-uuid)
                      show-add-topic)
                 (dom/div {:class "add-topic-container group"}
                   (add-topic (partial update-active-topics owner)))

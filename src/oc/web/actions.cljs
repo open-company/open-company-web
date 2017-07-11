@@ -154,8 +154,8 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
-      (when (and (router/current-topic-slug)
-                 (zero? (count (filter #(= (:uuid %) (router/current-topic-slug)) (:entries board-data)))))
+      (when (and (router/current-entry-uuid)
+                 (zero? (count (filter #(= (:uuid %) (router/current-entry-uuid)) (:entries board-data)))))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
                  (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
@@ -207,33 +207,9 @@
       (utils/after auth-settings-retry #(api/get-auth-settings))
       (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
-(defmethod dispatcher/action :topic [db [_ {:keys [topic body]}]]
-  ;; Refresh topic entries
-  (api/load-entries topic (utils/link-for (:links body) "up"))
-  (if body
-    (let [fixed-topic (utils/fix-topic body topic)]
-      (assoc-in db (dispatcher/board-topic-key (router/current-org-slug) (router/current-board-slug) topic) fixed-topic))
-    db))
-
-(defmethod dispatcher/action :topic-entry [db [_ {:keys [topic body created-at]}]]
-  ;; Refresh topic entries
-  (api/load-entries topic (utils/link-for (:links body) "up"))
-  (if body
-    (let [entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic)
-          old-entries (get-in db entries-key)
-          fixed-topic (utils/fix-topic body topic)
-          entry-index (utils/index-of old-entries #(= (:created-at %) created-at))
-          new-entries (if (not (nil? entry-index))
-                        (assoc old-entries entry-index fixed-topic)
-                        (conj old-entries fixed-topic))
-          sorted-entries (vec (reverse (sort-by :created-at new-entries)))
-          board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-          old-board-data (get-in db board-key)
-          new-board-data (assoc old-board-data (keyword topic) (first sorted-entries))]
-      (-> db
-        (assoc-in entries-key sorted-entries)
-        (assoc-in board-key new-board-data)))
-    db))
+(defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
+  ;; FIXME: Disable this until we have editing back working
+  db)
 
 (defn- get-updates [db]
   (api/get-updates)
@@ -248,24 +224,6 @@
     (dissoc :updates-list-loading)
     (assoc :updates-list-loaded true)
     (assoc-in (dispatcher/updates-list-key (router/current-org-slug)) (:collection response))))
-
-(defmethod dispatcher/action :su-edit [db [_ {:keys [su-date su-slug medium] :as update-data}]]
-  (let [latest-su-key (dispatcher/latest-update-key (router/current-org-slug))]
-    (if (nil? update-data)
-      (-> db
-        (dissoc :loading)
-        (assoc-in latest-su-key ""))
-      (let [su-url   (oc-urls/update-link (router/current-org-slug) (utils/su-date-from-created-at su-date) su-slug)
-            org-data-links (:links (dispatcher/org-data))
-            updates-list-link (utils/link-for org-data-links "collection" "GET" {:accept "application/vnd.collection+vnd.open-company.update+json;version=1"})
-            updated-link (assoc updates-list-link :count (inc (:count updates-list-link)))
-            new-links (conj (utils/vec-dissoc org-data-links updates-list-link) updated-link)]
-        (-> db
-          (assoc-in latest-su-key su-url)
-          (dissoc :loading)
-          (assoc-in (conj (dispatcher/org-data-key (router/current-org-slug)) :links) new-links)
-          ; refresh the su list
-          (get-updates))))))
 
 (defmethod dispatcher/action :update-loaded [db [_ {:keys [org-slug update-slug response load-org-data]}]]
   (let [org-data-keys [:logo-url :logo-width :logo-height :currency]
@@ -341,64 +299,6 @@
   [db [_]]
   (router/nav! (oc-urls/board))
   (dissoc db :prevent-topic-not-found-navigation))
-
-(defmethod dispatcher/action :entry-delete [db [_ topic as-of]]
-  (let [board-data (dispatcher/board-data)
-        old-topic-data ((keyword topic) board-data)
-        entries (dispatcher/topic-entries-data (router/current-org-slug) (router/current-board-slug) topic db)
-        entry-data (first (filter #(= (:created-at %) as-of) entries))
-        new-entries (vec (filter #(not= (:created-at %) as-of) entries))
-        should-remove-topic? (zero? (count new-entries))
-        should-update-topic? (= (:created-at old-topic-data) as-of)
-        new-topics (if should-remove-topic? (utils/vec-dissoc (:topics board-data) (name topic)) (:topics board-data))
-        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        new-topic-data (if should-update-topic?
-                          (merge old-topic-data (first new-entries))
-                          old-topic-data)
-        with-topics (assoc board-data :topics new-topics)
-        with-fixed-topics (if should-remove-topic?
-                            (dissoc with-topics (keyword topic))
-                            (assoc with-topics (keyword topic) new-topic-data))]
-    (api/delete-entry topic entry-data should-remove-topic?)
-    (-> db
-      (stop-foce)
-      (assoc :prevent-topic-not-found-navigation true)
-      (assoc-in board-data-key with-fixed-topics)
-      (assoc-in (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) new-entries))))
-
-(defmethod dispatcher/action :entry-delete/success
-  [db [_ should-redirect-to-board]]
-  (when should-redirect-to-board
-    (router/nav! (oc-urls/board)))
-  (dissoc db :prevent-topic-not-found-navigation))
-
-(defmethod dispatcher/action :foce-save [db [_ & [new-topics topic-data]]]
-  (let [topic (:foce-key db)
-        topic-data (merge (:foce-data db) (if (map? topic-data) topic-data {}))
-        body (:body topic-data)
-        with-fixed-headline (assoc topic-data :headline (utils/emoji-images-to-unicode (:headline topic-data)))
-        with-fixed-body (assoc with-fixed-headline :body (utils/emoji-images-to-unicode body))
-        with-created-at (if (contains? with-fixed-body :created-at) with-fixed-body (assoc with-fixed-body :created-at (utils/as-of-now)))
-        without-placeholder (dissoc with-created-at :placeholder)
-        created-at (:created-at without-placeholder)
-        topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic)
-        entries-data (or (get-in db topic-entries-key) []) ;(or (:entries-data (get (dispatcher/board-data db) topic)) [])
-        without-current-entry (vec (filter #(not= (:created-at %) created-at) entries-data))
-        with-new-entry (conj without-current-entry without-placeholder)
-        sorted-entries (vec (reverse (sort-by :created-at with-new-entry)))]
-    (if (not (:placeholder topic-data))
-      (api/partial-update-topic topic without-placeholder)
-      (api/save-or-create-topic without-placeholder))
-    (-> db
-      (assoc-in (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) without-placeholder)
-      (assoc-in topic-entries-key sorted-entries)
-      (stop-foce))))
-
-(defn- save-topic [db topic topic-data]
-  (let [old-topic-data (get (dispatcher/board-data db) (keyword topic))
-        new-data (dissoc (merge old-topic-data topic-data) :placeholder)]
-    (api/partial-update-topic topic (dissoc topic-data :placeholder))
-    (assoc-in db (conj (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)) (keyword topic)) new-data)))
 
 ;; Store JWT in App DB so it can be easily accessed in actions etc.
 
@@ -709,14 +609,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :entries-loaded
-  [db [_ {:keys [topic entries]}]]
-  (let [fixed-entries (map #(utils/fix-topic % topic) (:items (:collection entries)))
-        with-sorted-reactions (vec (map #(sort-reactions %) fixed-entries))
-        sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))
-        sorted-fixed-entries (vec (sort sort-pred with-sorted-reactions))]
-    (assoc-in db (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic) sorted-fixed-entries)))
-
 (defmethod dispatcher/action :add-topic-show
   [db [_ active]]
   (assoc db :show-add-topic active))
@@ -940,35 +832,28 @@
   [db [_]]
   (assoc db :edit-user-profile-failed true))
 
-(defmethod dispatcher/action :comments-show
-  [db [_ topic-slug entry-uuid]]
-  (if (and (= (:topic-slug (:comments-open db)) topic-slug)
-           (= (:entry-uuid (:comments-open db)) entry-uuid))
-    (dissoc db :comments-open)
-    (assoc db :comments-open {:topic-slug topic-slug :entry-uuid entry-uuid})))
-
 (defmethod dispatcher/action :comments-get
   [db [_ entry-uuid]]
   (api/get-comments entry-uuid)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        topic-slug (router/current-topic-slug)
-        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)]
+        entry-uuid (router/current-entry-uuid)
+        comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)]
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
-  [db [_ {:keys [success error body entry-uuid]}]]
-  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-topic-slug) entry-uuid)
+  [db [_ {:keys [success error body]}]]
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid))
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ entry-uuid comment-body]]
-  (api/add-comment entry-uuid comment-body)
+  [db [_ comment-body]]
+  (api/add-comment (router/current-entry-uuid) comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        topic-slug (router/current-topic-slug)
-        comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
+        entry-uuid (router/current-entry-uuid)
+        comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
                                                :created-at (utils/as-of-now)
@@ -983,50 +868,46 @@
   db)
 
 (defmethod dispatcher/action :reaction-toggle
-  [db [_ topic-slug entry-uuid reaction-data]]
-  (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
-        entries-data (get-in db topic-entries-key)
-        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-        entry-data (get entries-data entry-idx)
+  [db [_ entry-uuid reaction-data]]
+  (let [board-key (dispatcher/board-data (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-data (get (:entries board-data) entry-idx)
         old-reactions-loading (or (:reactions-loading entry-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
-        updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
-    (api/toggle-reaction topic-slug entry-uuid reaction-data)
-    (assoc-in db topic-entries-key updated-entries-data)))
+        entry-key (concat board-key [:entries entry-idx])]
+    (api/toggle-reaction entry-uuid reaction-data)
+    (assoc-in db entry-key updated-entry-data)))
 
 (defmethod dispatcher/action :reaction-toggle/finish
-  [db [_ topic-slug entry-uuid reaction reaction-data]]
-  (let [topic-entries-key (dispatcher/topic-entries-key (router/current-org-slug) (router/current-board-slug) topic-slug)
-        entries-data (get-in db topic-entries-key)
-        entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-        entry-data (get entries-data entry-idx)
-        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)]
+  [db [_ entry-uuid reaction reaction-data]]
+  (let [board-key (dispatcher/board-data (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-data (get-in board-data [:entries entry-idx])
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
+        entry-key (concat board-key [:entries entry-idx])]
     (if (nil? reaction-data)
-      (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
-            updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
-        (assoc-in db topic-entries-key updated-entries-data))
+      (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)]
+        (assoc-in db entry-key updated-entry-data))
       (let [reaction (first (keys reaction-data))
             next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
             reactions-data (:reactions entry-data)
             reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
             updated-entry-data (-> entry-data
                                 (assoc :reactions-loading next-reactions-loading)
-                                (assoc-in [:reactions reaction-idx] next-reaction-data))
-            updated-entries-data (assoc entries-data entry-idx updated-entry-data)]
-        (assoc-in db topic-entries-key updated-entries-data)))))
+                                (assoc-in [:reactions reaction-idx] next-reaction-data))]
+        (assoc-in db entry-key updated-entry-data)))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
-        topic-slug (keyword (:topic interaction-data))
         entry-uuid (:entry-uuid interaction-data)
-        ; Topic data
-        topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
         ; Entry data
-        entry-data (dispatcher/entry entry-uuid)]
+        entry-data (dispatcher/entry-data db org-slug board-slug entry-uuid)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
@@ -1037,21 +918,21 @@
             ; Add the new comment to the comments list, make sure it's not present already
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
-            comments-key (dispatcher/comments-key org-slug board-slug topic-slug entry-uuid)
+            comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
             is-current-user (= (jwt/get-key :user-id) (:user-id (:author comment-data)))]
         ;; Refresh the topic data if the action coming in is from the current user
         ;; to get the new links to interact with
         (when is-current-user
-          (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+          (api/get-board (dispatcher/board-data)))
         ;; Animate the comments count if we don't have already the same number of comments locally
         (when (not= (count all-old-comments-data) (count new-comments-data))
-          (utils/pulse-comments-count topic-slug entry-uuid))
+          (utils/pulse-comments-count entry-uuid))
         ; Update the local state with the new comments list
         (assoc-in db comments-key sorted-comments-data))
       ;; the entry is not present, refresh the full topic
       (do
         ;; force refresh of topic
-        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        (api/get-board (dispatcher/board-data))
         db))))
 
 (defn- update-reaction
@@ -1061,12 +942,15 @@
   (let [; Get the current router data
         org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        topic-slug (keyword (:topic interaction-data))
         entry-uuid (:entry-uuid interaction-data)
-        ; Topic data
-        topic-data (dispatcher/topic-data db org-slug board-slug topic-slug)
         ; Entry data
-        entry-data (dispatcher/entry entry-uuid)]
+        entry-data (dispatcher/entry-data entry-uuid)
+        ; Board data
+        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-data (dispatcher/board-data)
+        ; Entry idx
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-key (concat board-key [:entries entry-idx])]
     (if (and entry-data (not (empty? (:reactions entry-data))))
       ; If the entry is present in the local state and it has reactions
       (let [reaction-data (:interaction interaction-data)
@@ -1080,24 +964,19 @@
             ; Update the reactions data with the new reaction
             new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
             ; Update the entry with the new reaction
-            updated-entry-data (assoc entry-data :reactions new-reactions-data)
-            ; Update the topic entries with the updated entry
-            topic-entries-key (dispatcher/topic-entries-key org-slug board-slug topic-slug)
-            entries-data (get-in db topic-entries-key)
-            entry-idx (utils/index-of entries-data #(= (:uuid %) entry-uuid))
-            entry-key (conj topic-entries-key entry-idx)]
+            updated-entry-data (assoc entry-data :reactions new-reactions-data)]
         ;; Refresh the topic data if the action coming in is from the current user
         ;; to get the new links to interact with
         (when is-current-user
-          (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection")))
+          (api/get-board (dispatcher/board-data)))
         (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
-          (utils/pulse-reaction-count topic-slug entry-uuid (:reaction reaction-data)))
+          (utils/pulse-reaction-count entry-uuid (:reaction reaction-data)))
         ; Update the entry in the local state with the new reaction
         (assoc-in db entry-key updated-entry-data))
       ;; the entry is not present, refresh the full topic
       (do
         ;; force refresh of topic
-        (api/load-entries topic-slug (utils/link-for (:links topic-data) "collection"))
+        (api/get-board (dispatcher/board-data))
         db))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add

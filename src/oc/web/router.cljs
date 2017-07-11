@@ -103,23 +103,11 @@
 (defn current-board-slug []
   (:board @path))
 
-(defn current-topic-slug []
-  (:topic @path))
-
-(defn current-update-date []
-  (:update-date @path))
-
-(defn current-update-slug []
-  (:update-slug @path))
+(defn current-entry-uuid []
+  (:entry @path))
 
 (defn query-params []
   (:query-params @path))
-
-(defn topic-editing? []
-  (some #(= "edit" %) (:route @path)))
-
-(defn current-as-of []
-  (:as-of (:query-params @path)))
 
 (defn last-org-cookie
   "Cookie to save the last accessed org"

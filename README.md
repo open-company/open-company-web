@@ -215,8 +215,6 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
-|  :entry-delete | UI | Start the delete entry action. Call the proper API function. It also takes care of removing the topic from the board if it's the last entry or to replace it with the previous entry if it was the latest. |
-|  :entry-delete/success | API | Entry succesfully deleted, navigate to the board to reload the data without the entry. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :foce-data-editing-start | UI | Start the data edit for growth and finances topics. |
@@ -254,7 +252,6 @@ provided in the table below:
 |  :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |
 |  :slack-team-add | UI | Start the request to add a Slack team to the current team. |
 |  :slack-token-refresh | UI | Refresh the data of the user signed in with Slack. |
-|  :su-edit | API | When a new update is created it saves the link and the data of the update in the app-state. |
 |  :subscription | API | Save the new subscription data in the app-state. |
 |  :team-loaded | API | Save the team loaded data in the app-state. |
 |  :team-roster-loaded | API | Save the roster in the team data. |

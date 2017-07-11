@@ -969,14 +969,14 @@
          :iterations 3}))
 
 (defn pulse-reaction-count
-  [topic-slug entry-uuid reaction]
-  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-" reaction)]
+  [entry-uuid reaction]
+  (let [selector (str "div." entry-uuid "-" reaction)]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn pulse-comments-count
-  [topic-slug entry-uuid]
-  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-comments-count")]
+  [entry-uuid]
+  (let [selector (str "div." entry-uuid "-comments-count")]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
