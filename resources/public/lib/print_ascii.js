@@ -28,7 +28,7 @@ function printArt(){
 ╚██████╔╝██║     ███████╗██║ ╚████║╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║  ██║██║ ╚████║   ██║
  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝
 `, "font-family:monospace; color:#f9d748;");
-  console.log("We are hiring: hello@opencompany.com");
+  console.log("Say hi! hello@carrot.io");
   OCWebHelp();
   console.groupEnd();
 }
