@@ -848,11 +848,10 @@
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ comment-body]]
-  (api/add-comment (router/current-entry-uuid) comment-body)
+  [db [_ entry-uuid comment-body]]
+  (api/add-comment entry-uuid comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        entry-uuid (router/current-entry-uuid)
         comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
@@ -907,7 +906,7 @@
         board-slug (router/current-board-slug)
         entry-uuid (:entry-uuid interaction-data)
         ; Entry data
-        entry-data (dispatcher/entry-data db org-slug board-slug entry-uuid)]
+        entry-data (dispatcher/entry-data org-slug board-slug entry-uuid db)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
