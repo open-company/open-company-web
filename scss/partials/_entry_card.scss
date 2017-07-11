@@ -16,13 +16,13 @@ div.entry-card {
     background-size: 168px 120px;
     background-position: 50% 40%;
     background-repeat: no-repeat;
-    margin-top: 40px;
+    margin-top: 20px;
 
     div.entry-card-title {
       font-size: 14px;
       color: $cr_light_gray;
       @include avenir_H();
-      margin-top: 110px;
+      margin-top: 140px;
       text-align: center;
 
       button {
