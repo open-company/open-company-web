@@ -126,7 +126,8 @@
    :comments-data       [[:base :org-slug :board-slug :entry-uuid]
                           (fn [base org-slug board-slug entry-uuid]
                             (when (and org-slug board-slug entry-uuid)
-                              (let [comments-data (get-in base (comments-key org-slug board-slug entry-uuid))]
+                              (let [comments-key (comments-key org-slug board-slug entry-uuid)
+                                    comments-data (get-in base comments-key)]
                                 comments-data)))]
    :trend-bar-status    [[:base]
                           (fn [base]
@@ -202,12 +203,14 @@
 (defn entry-data
   "Get entry data."
   ([]
-    (entry-data @app-state))
-  ([data]
-    (entry-data data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid)))
-  ([data entry-uuid]
-    (entry-data data (router/current-org-slug) (router/current-board-slug) entry-uuid))
-  ([data org-slug board-slug entry-uuid]
+    (entry-data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid) @app-state))
+  ([entry-uuid]
+    (entry-data (router/current-org-slug) (router/current-board-slug) entry-uuid @app-state))
+  ([board-slug entry-uuid]
+    (entry-data (router/current-org-slug) board-slug entry-uuid @app-state))
+  ([org-slug board-slug entry-uuid]
+    (entry-data org-slug board-slug entry-uuid @app-state))
+  ([org-slug board-slug entry-uuid data]
     (let [board-data (get-in data (board-data-key org-slug board-slug))]
       (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))
 
