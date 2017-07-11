@@ -152,6 +152,12 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
+      (when (and (router/current-topic-slug)
+                 (zero? (count (filter #(= (:uuid %) (router/current-topic-slug)) (:entries board-data)))))
+        (router/redirect-404!))
+      (when (and (string? (:board-filters db))
+                 (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
+        (router/redirect-404!))
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
           (wsc/reconnect ws-link (jwt/get-key :user-id))))
