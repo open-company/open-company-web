@@ -19,7 +19,6 @@
   (let [comments-link (or (utils/link-for (:links entry-data) "comments") {:count (int (rand 10))})
         comments-count (min (:count comments-link) 4)
         max-reaction (get-max-count-reaction (:reactions entry-data))]
-    (js/console.log "max-reaction" max-reaction)
     [:div.interactions-summary
       ;; Reactions
       (when-not (zero? (:count max-reaction))
