@@ -103,19 +103,20 @@
                                               (dis/dispatch! [:board-create])
                                               (= "Escape" (.-key e))
                                               (dis/dispatch! [:input [:create-board] nil])))}))))
-          (dom/div {:class "left-boards-list-top group"}
-            ;; Boards header
-            (dom/h3 {:class "left-boards-list-top-title"}
-              (dom/div {:class "stories-icon"})
-              (dom/span "STORIES"))
-            (when (and (not (responsive/is-tablet-or-mobile?))
-                       true) ;; FIXME: replace with create storeis link check
-              (dom/button {:class "left-boards-list-top-title-button btn-reset right"
-                           :on-click #(identity %) ;; FIXME: Replace with story creation action
-                           :title "Create a new story"
-                           :data-placement "top"
-                           :data-toggle "tooltip"
-                           :data-container "body"})))
+          (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
+            (dom/div {:class "left-boards-list-top group"}
+                      ;; Boards header
+                      (dom/h3 {:class "left-boards-list-top-title"}
+                        (dom/div {:class "stories-icon"})
+                        (dom/span "STORIES"))
+                      (when (and (not (responsive/is-tablet-or-mobile?))
+                                 true) ;; FIXME: replace with create storeis link check
+                        (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+                                     :on-click #(identity %) ;; FIXME: Replace with story creation action
+                                     :title "Create a new story"
+                                     :data-placement "top"
+                                     :data-toggle "tooltip"
+                                     :data-container "body"}))))
           (dom/div {:class "left-boards-list-footer"}
             (when (and (router/current-org-slug)
                        (jwt/is-admin? (:team-id org-data)))
