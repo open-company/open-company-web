@@ -61,7 +61,10 @@
                       rum/reactive
                       rum/static
                       (rum/local false ::needs-gradient)
-                      {:after-render (fn [s]
+                      {:init (fn [s p]
+                              (dis/dispatch! [:comments-get (first (:rum/args s))])
+                              s)
+                       :after-render (fn [s]
                                        (when-let* [dom-node (utils/rum-dom-node s)
                                                    comments-internal (sel1 dom-node :div.comments-internal)]
                                          (let [next-needs-gradient (> (.-scrollHeight comments-internal) 300)]
@@ -72,7 +75,7 @@
                                        ;; recall scroll to bottom if needed
                                        (scroll-to-bottom s)
                                        s)}
-  [s]
+  [s entry-uuid]
   (let [comments-data (drv/react s :comments-data)
         entry-comments (:comments comments-data)
         needs-gradient @(::needs-gradient s)]
@@ -91,4 +94,4 @@
               [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
               [:div "No comments yet"]
               [:div (str "Jump in and let everybody know what you think!")]])
-          (add-comment (:entry-uuid (:show-comments comments-data)) (fn [] (utils/after 200 #(scroll-to-bottom s))))]])))
+          (add-comment entry-uuid (fn [] (utils/after 200 #(scroll-to-bottom s))))]])))
