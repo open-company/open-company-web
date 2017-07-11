@@ -88,7 +88,9 @@
              (not (utils/in? (:route @router/path) "create-org"))
              (not (utils/in? (:route @router/path) "user-profile"))
              (not (utils/in? (:route @router/path) "create-board"))
-             (not (utils/in? (:route @router/path) "email-verification")))
+             (not (utils/in? (:route @router/path) "email-verification"))
+             (not (utils/in? (:route @router/path) "about"))
+             (not (utils/in? (:route @router/path) "features")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
