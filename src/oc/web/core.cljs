@@ -389,14 +389,10 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :by-topic)
-        (router/redirect! (urls/board-sort-by-topic (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :by-topic)
-        (router/redirect! (urls/board-sort-by-topic (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
@@ -451,19 +447,13 @@
       (timbre/info "Routing update-unique-route" (urls/update-link ":org" ":update-data" ":update-slug"))
       (update-handler target su-snapshot params))
 
-    (defroute topic-route urls/topic-route-regex {:as params}
-      (let [new-params (assoc params :params {:org (first (:params params))
-                                              :board (second (:params params))
-                                              :topic (nth (:params params) 2)})]
-        (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
-        (board-handler "topic" target org-dashboard new-params)))
+    (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
+      (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
+        (board-handler "topic" target org-dashboard params))
 
-    (defroute topic-slash-route urls/topic-route-regex-slash {:as params}
-      (let [new-params (assoc params :params {:org (first (:params params))
-                                              :board (second (:params params))
-                                              :topic (nth (:params params) 2)})]
-        (timbre/info "Routing topic-route" (str (urls/topic ":org" ":board" ":topic") "/"))
-        (board-handler "topic" target org-dashboard new-params)))
+    (defroute topic-slash-route (str (urls/topic ":org" ":board" ":topic") "/") {:as params}
+      (timbre/info "Routing topic-route" (str (urls/topic ":org" ":board" ":topic") "/"))
+        (board-handler "topic" target org-dashboard params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
