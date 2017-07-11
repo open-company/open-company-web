@@ -60,4 +60,4 @@
               (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)]]]
         [:div.entry-right-column
           [:div.entry-right-column-content
-            (comments)]]]]])
+            (comments (:uuid entry-data))]]]]])
