@@ -5,7 +5,6 @@
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
             [cuerdas.core :as s]
-            [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]

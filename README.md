@@ -76,7 +76,7 @@ boot -V
 
 Prospective users of [Carrot](https://carrot.io/) should get started by going to [Carrot.io](https://carrot.io/). The following usage is **for developers** wanting to work on the Web application.
 
-Local usage of the web application requires you to run 2 services, the [API service](https://github.com/open-company/open-company-api), the [Auth service](https://github.com/open-company/open-company-auth). Both can be started in their respective repositiories with:
+Local usage of the web application requires you to run 3 services, the [Storage service](https://github.com/open-company/open-company-storage), the [Auth service](https://github.com/open-company/open-company-auth), and the [Interaction service](https://github.com/open-company/open-company-interaction). All can be started in their respective repositiories with:
 
 ```console
 lein start
@@ -88,7 +88,7 @@ To get an interactive web **development** environment, start the iterative compi
 boot dev
 ```
 
-If you've done it right, you'll now have 3 terminal sessions running: API, Auth, Web.
+If you've done it right, you'll now have 4 terminal sessions running: Storage, Auth, Interaction and Web.
 
 Open your browser to [http://localhost:3559/](http://localhost:3559/).
 
