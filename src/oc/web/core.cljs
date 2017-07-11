@@ -169,7 +169,6 @@
         board (:board (:params params))
         entry (:entry (:params params))
         query-params (:query-params params)]
-    (js/console.log "board-handler:" params org board entry "keyword entry?" (keyword? entry))
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
