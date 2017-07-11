@@ -41,7 +41,7 @@
             (str " · " (or (:topic-name entry-data) (s/capital (:topic-slug entry-data)))))]]
       ; Card labels
       [:div.entry-card-head-right
-        (when true
+        (when false
           [:div.new "NEW"])]]
     [:div.entry-card-content.group
       [:div.entry-card-headline

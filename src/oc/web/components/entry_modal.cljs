@@ -51,7 +51,8 @@
               [:div.entry-card-head-right
                 [:button.mlb-reset.entry-modal-more
                   {:on-click #()}]
-                [:div.new "NEW"]]]
+                (when false
+                  [:div.new "NEW"])]]
             [:div.entry-card-content
               [:div.entry-card-content-headline (:headline entry-data)]
               [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
