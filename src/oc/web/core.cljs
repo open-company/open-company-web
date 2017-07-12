@@ -73,7 +73,9 @@
 (defn rewrite-url []
   (let [l (.-location js/window)
         rewrite-to (str (.-pathname l) (.-hash l))]
-    (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to)))
+    ;; Push state only if the query string has parameters or the history will have duplicates.
+    (when-not (empty? (.-search l))
+      (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to))))
 
 (defn pre-routing [query-params & [should-rewrite-url]]
   ; make sure the menu is closed
