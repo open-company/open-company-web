@@ -6,6 +6,15 @@ div.entry-modal-container {
   left: 0px;
   background-color: rgba(250,250,257,0.95);
   z-index: #{$navbar_zindex + 100};
+  transition: opacity 180ms ease-in;
+
+  &.will-appear {
+    opacity: 0;
+  }
+
+  &.appear {
+    opacity: 1;
+  }
 
   div.entry-modal {
     width: 950px;
