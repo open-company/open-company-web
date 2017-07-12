@@ -3,6 +3,7 @@
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
@@ -22,7 +23,7 @@
 (rum/defcs entry-card < rum/static
   [s entry-data show-topic?]
   [:div.entry-card
-    {:on-click #(router/nav! (oc-urls/entry (:uuid entry-data)))}
+    {:on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])}
     ; Card header
     [:div.entry-card-head.group
       ; Card author
