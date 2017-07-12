@@ -989,3 +989,8 @@
 (defmethod dispatcher/action :trend-bar-status
   [db [_ status]]
   (assoc db :trend-bar-status status))
+
+(defmethod dispatcher/action :entry-modal-fade-in
+  [db [_ entry-uuid]]
+  (utils/after 10 #(router/nav! (oc-urls/entry entry-uuid)))
+  (assoc db :entry-modal-fade-in entry-uuid))
