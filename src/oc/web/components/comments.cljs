@@ -45,7 +45,6 @@
           [:div.reply-button-container
             [:button.btn-reset.reply-btn
               {:on-click (fn [_]
-                            (js/console.log ":comment-add" entry-uuid @v)
                             (dis/dispatch! [:comment-add entry-uuid @v])
                             (reset! v ""))}
               "Reply"]]]]]))
@@ -79,7 +78,6 @@
   (let [comments-data (drv/react s :comments-data)
         entry-comments (:comments comments-data)
         needs-gradient @(::needs-gradient s)]
-    (js/console.log "comments:" comments-data)
     (if (:loading comments-data)
       [:div.comments
         (small-loading)]
