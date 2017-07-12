@@ -59,5 +59,6 @@
             [:div.entry-card-footer
               (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)]]]
         [:div.entry-right-column
+          {:style #js {:min-height (str (.height (js/$ ".entry-left-column")) "px")}}
           [:div.entry-right-column-content
             (comments (:uuid entry-data))]]]]])
