@@ -12,7 +12,7 @@
 (defn board-filters-label [board-filters topics]
   (cond
     ;; by topic order
-    (= board-filters :by-topic) "Latest by Topic"
+    (= board-filters :by-topic) "By Topic"
     ;; if the filter is a string it means we are filtering by a topic slug, get the topic name from the board data
     (string? board-filters) (or (utils/topic-name topics board-filters) (s/capital board-filters))
     ;; in any other case we are showing by latest updates
@@ -58,7 +58,7 @@
                               (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board-sort-by-topic)))
                  :class (if (= board-filters :by-topic) "select" "")}
-                "Latest by Topic"]
+                "By Topic"]
               [:li.divider]
               (for [t (:topics board-data)]
                 [:li
