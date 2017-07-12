@@ -136,6 +136,9 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
+   :entry-modal-fade-in  [[:base]
+                          (fn [base]
+                            (:entry-modal-fade-in base))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
