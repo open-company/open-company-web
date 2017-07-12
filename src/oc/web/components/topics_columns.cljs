@@ -92,7 +92,6 @@
                 ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
                            (not show-add-topic)
-                           (not current-entry-uuid)
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?))
                            (not (:dashboard-sharing data)))
@@ -101,9 +100,7 @@
                     (dom/div {:class "add-to-board-pencil"})
                     "Say something")))
               ;; Board filters dropdown
-              (when (and is-dashboard
-                         (not is-mobile-size?)
-                         (not current-entry-uuid)
+              (when (and (not is-mobile-size?)
                          (not empty-board?))
                 (filters-dropdown))
               ;; Board content: empty board, add topic, topic view or topic cards
