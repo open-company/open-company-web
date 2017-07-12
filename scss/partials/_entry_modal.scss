@@ -113,15 +113,13 @@ div.entry-modal-container {
       }
 
       div.entry-right-column {
-        // display:table-cell;
         float: right;
         width: 301px;
-        // padding: 24px 0;
-        // float: right;
         border-top-right-radius: 8px;
         border-bottom-right-radius: 8px;
         background-color: #F2F1ED;
-        height: calc(100vh - 150px - 48px);
+        max-height: calc(100vh - 150px - 48px);
+        min-height: 200px;
         position: relative;
 
         div.entry-right-column-content {
