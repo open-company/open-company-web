@@ -10,7 +10,6 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
-            ; [oc.web.lib.tooltip :as t]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.trend-bar :refer (trend-bar)]
