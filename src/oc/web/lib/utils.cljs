@@ -316,10 +316,10 @@
 
 (defn fix-entry
   "Add `:read-only` and `:topic-name` keys to the entry map"
-  [topic-body topics-data]
-  (-> topic-body
-    (assoc :read-only (readonly-entry? (:links topic-body)))
-    (assoc :topic-name (topic-name topics-data (:topic-slug topic-body)))))
+  [entry-body topics-data]
+  (-> entry-body
+    (assoc :read-only (readonly-entry? (:links entry-body)))
+    (assoc :topic-name (topic-name topics-data (:topic-slug entry-body)))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
