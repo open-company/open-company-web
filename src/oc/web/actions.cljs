@@ -209,7 +209,13 @@
 
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
   ;; FIXME: Disable this until we have editing back working
-  db)
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get db board-key)
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (:topics board-data)))
+        sorted-entries (vec (sort-by :updated-at new-entries))
+        new-board-data (assoc board-data :entries sorted-entries)]
+  (assoc db board-key new-board-data)))
 
 (defn- get-updates [db]
   (api/get-updates)
@@ -881,7 +887,7 @@
 
 (defmethod dispatcher/action :reaction-toggle/finish
   [db [_ entry-uuid reaction reaction-data]]
-  (let [board-key (dispatcher/board-data (router/current-org-slug) (router/current-board-slug))
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
         entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
         entry-data (get-in board-data [:entries entry-idx])
@@ -922,7 +928,7 @@
         ;; Refresh the topic data if the action coming in is from the current user
         ;; to get the new links to interact with
         (when is-current-user
-          (api/get-board (dispatcher/board-data)))
+          (api/get-entry entry-data))
         ;; Animate the comments count if we don't have already the same number of comments locally
         (when (not= (count all-old-comments-data) (count new-comments-data))
           (utils/pulse-comments-count entry-uuid))
@@ -967,7 +973,7 @@
         ;; Refresh the topic data if the action coming in is from the current user
         ;; to get the new links to interact with
         (when is-current-user
-          (api/get-board (dispatcher/board-data)))
+          (api/get-entry entry-data))
         (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
           (utils/pulse-reaction-count entry-uuid (:reaction reaction-data)))
         ; Update the entry in the local state with the new reaction

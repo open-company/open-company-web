@@ -775,7 +775,7 @@
 
 (defn toggle-reaction
   [entry-uuid reaction-data]
-  (when entry-uuid
+  (when (and entry-uuid reaction-data)
     (let [reaction-link (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"])
           interaction-method (if (= (:method reaction-link) "PUT") interaction-put interaction-delete)]
       (interaction-method (relative-href (:href reaction-link))
@@ -783,6 +783,15 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:reaction-toggle/finish entry-uuid (:reaction reaction-data) (if success (json->cljs body) nil)]))))))
 
+(defn get-entry
+  [entry-data]
+  (when entry-data
+    (let [entry-self-link (utils/link-for (:links entry-data) "self" "GET")]
+      (storage-get (:href entry-self-link)
+        {:headers (headers-for-link entry-self-link)}
+        (fn [{:keys [status success body]}]
+          (if success
+            (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
