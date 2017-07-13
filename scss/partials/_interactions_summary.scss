@@ -3,6 +3,7 @@ div.interactions-summary {
 
   div.is-reactions{
     float: left;
+    margin-right: 24px;
 
     div.is-reactions-reaction {
       float: left;
@@ -21,10 +22,13 @@ div.interactions-summary {
   div.is-comments {
     float: left;
     text-align: right;
-    margin-left: 24px;
 
     div.is-comments-authors {
       float: left;
+
+      &:not(:empty){
+        margin-right: 16px;
+      }
 
       div.is-comments-author {
         float: left;
@@ -49,7 +53,6 @@ div.interactions-summary {
 
     div.is-comments-summary {
       float: left;
-      margin-left: 16px;
       font-size: 14px;
       color: $oc_gray_7;
       @include avenir_R();
