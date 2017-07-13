@@ -12,14 +12,16 @@
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive
-                           (drv/drv :org-slug)
                            (drv/drv :orgs)
+                           (drv/drv :org-data)
   [s]
   (let [orgs (drv/react s :orgs)
-        current-org-slug (drv/react s :org-slug)
+        org-data (drv/react s :org-data)
+        current-org-slug (:slug org-data)
         should-show-dropdown? (> (count orgs) 1)]
     [:div.orgs-dropdown
-      {:class (when should-show-dropdown? "dropdown")}
+      {:class (utils/class-set {:dropdown should-show-dropdown?
+                                :org-has-logo (not (empty? (:logo-url org-data)))})}
       [:button.orgs-dropdown-btn
         {:id "orgs-dropdown"
          :class (when should-show-dropdown? "dropdown-toggle")
