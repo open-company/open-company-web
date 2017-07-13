@@ -131,15 +131,15 @@ nav.oc-navbar {
         text-align: center;
         width: 320px;
         position: absolute;
-        left: calc(50% - 160px);
-
+        left: 50%;
+        margin-left: -160px;
         @include avenir_H();
         font-size: 26px;
 
         img.org-avatar-img {
           max-width: 35px;
           max-height: 35px;
-          margin-left: 142px;
+          margin-left: 132px;
         }
       }
     }
