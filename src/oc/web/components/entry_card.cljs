@@ -17,7 +17,7 @@
     [:div.entry-card-title
       "This topic’s a little sparse. "
       [:button.mlb-reset
-        {:on-click #(js/alert "Coming soon")}
+        {:on-click #(dis/dispatch! [:new-entry-toggle true])}
         "Add an update?"]]])
 
 (rum/defcs entry-card < rum/static
