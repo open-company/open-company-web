@@ -6,7 +6,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-max-count-reaction [reactions]
-  (let [max-reaction (first (sort-by :count reactions))]
+  (let [max-reaction (first (vec (reverse (sort-by :count (reverse reactions)))))]
     max-reaction))
 
 (def comments-authors-data [
