@@ -1,0 +1,81 @@
+div.entry-create-modal-container {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background-color: rgba(250,250,257,0.95);
+  z-index: #{$navbar_zindex + 100};
+  transition: opacity 180ms ease-in;
+
+  &.will-appear {
+    opacity: 0;
+  }
+
+  &.appear {
+    opacity: 1;
+  }
+
+  div.entry-create-modal {
+    width: 648px;
+    min-height: 330px;
+    margin: 100px auto 50px;
+    position: relative;
+    overflow: hidden;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+    
+
+    div.user-avatar-img-container{
+      margin-right: 16px;
+      float: left;
+
+      img {
+        max-width: 32px;
+        max-height: 32px;
+        border-radius: 16px;
+      }
+    }
+
+    div.posting-in {
+      @include avenir_M();
+      font-size: 16px;
+      color: #B1B8C0;
+      float: left;
+      margin-top: 5px;
+
+      span {
+        @include avenir_H();
+        color: $cr_dark_gray;
+      }
+    }
+
+    div.arrow{
+      margin-left: 15px;
+      margin-right: 15px;
+      margin-top: 3px;
+      float: left;
+
+      i.fa.fa-angle-right {
+        color: #B1B8C0;
+        font-size: 24px;
+      }
+    }
+
+    div.select-topic {
+      color: #637282;
+      font-size: 16px;
+      @include avenir_M();
+      float: left;
+      margin-top: 5px;
+
+      i.fa.fa-caret-down {
+        margin-left: 5px;
+        font-size: 16px;
+        color: #637282;
+      }
+    }
+  }
+}
