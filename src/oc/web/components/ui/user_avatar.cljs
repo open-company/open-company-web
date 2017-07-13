@@ -24,7 +24,7 @@
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
-  [s user-data]
+  [s user-data tooltip?]
   (let [use-default @(::use-default s)
         default-avatar (user-icon (:user-id user-data))
         user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) (utils/cdn default-avatar) (:avatar-url user-data))]
@@ -33,6 +33,9 @@
       [:img.user-avatar-img
         {:src user-avatar-url
          :on-error #(reset! (::use-default s) true)
+         :data-toggle (if tooltip? "tooltip" "")
+         :data-placement "top"
+         :data-container "body"
          :title (:name user-data)}]]))
 
 (rum/defcs user-avatar < rum/static
