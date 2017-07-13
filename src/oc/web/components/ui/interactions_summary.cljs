@@ -17,7 +17,7 @@
 (rum/defcs interactions-summary < rum/static
   [s entry-data]
   (let [comments-link (or (utils/link-for (:links entry-data) "comments") {:count (int (rand 10))})
-        comments-authors (vec (reverse (sort-by :created-at (:authors comments-link))))
+        comments-authors (vec (sort-by :created-at (:authors comments-link)))
         comments-count (min (:count comments-link) 4)
         max-reaction (get-max-count-reaction (:reactions entry-data))]
     [:div.interactions-summary
