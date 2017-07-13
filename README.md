@@ -197,7 +197,6 @@ provided in the table below:
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
 |  :add-topic-rollback | UI | Rollback the add topic to the board. User canceled action. |
-|  :add-topic-show | UI | Show the add topic view in the dashboard. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -242,6 +241,7 @@ provided in the table below:
 |  :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
 |  :name-pswd-collect | UI | Start the request to save the user name and password. |
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
+|  :new-entry-toggle | UI | Show the new create new entry UI. |
 |  :new-topics-load/finish | API | Read the available new topics and save them in the app-state for later use. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
