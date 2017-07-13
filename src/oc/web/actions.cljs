@@ -171,9 +171,7 @@
                               old-board-data
                               fixed-board-data)]
       (-> db
-        (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
-        ;; show add topic if the board loaded is the one currently shown and it has no topics
-        (assoc :show-add-topic (:show-add-topic db))))))
+        (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)))))
 
 (defmethod dispatcher/action :new-topics-load/finish [db [_ body]]
   (if body
@@ -252,9 +250,8 @@
   (-> db
     (assoc :foce-key (keyword topic)) ; which topic is being FoCE
     (assoc :foce-data topic-data)     ; map of the in progress edits of the topic data
-    (assoc :foce-data-editing? false)   ; is the data portion of the topic (e.g. finance, growth) being edited
-    (assoc :show-top-menu nil)          ; dismiss top menu
-    (dissoc :show-add-topic)))          ; remove the add topic view)
+    (assoc :foce-data-editing? false) ; is the data portion of the topic (e.g. finance, growth) being edited
+    (assoc :show-top-menu nil)))      ; dismiss top menu
 
 (defn stop-foce [db]
   (let [board-data (dispatcher/board-data db (router/current-org-slug) (router/current-board-slug))
@@ -262,7 +259,6 @@
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
-      (assoc :show-add-topic show-add-topic)
       (dissoc :foce-data-editing?))))
 
 ;; Front of Card Edit topic
@@ -297,7 +293,6 @@
     (-> db
       (stop-foce)
       (assoc :prevent-topic-not-found-navigation true)
-      (assoc :show-add-topic (zero? (count new-topics)))
       (assoc-in (conj board-key :topics) new-topics)
       (assoc-in (conj board-key :archived) new-archived))))
 
@@ -615,10 +610,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :add-topic-show
-  [db [_ active]]
-  (assoc db :show-add-topic active))
-
 (defmethod dispatcher/action :dashboard-select-topic
   [db [_ board-slug topic-slug]]
   (if (pos? (count (filter #(and (= board-slug (:board-slug %)) (= topic-slug (:topic-slug %))) (:dashboard-selected-topics db))))
@@ -641,7 +632,6 @@
   [db [_ activate]]
   (-> db
     (assoc :dashboard-sharing activate)
-    (dissoc :show-add-topic)
     (assoc :dashboard-selected-topics [])))
 
 (defmethod dispatcher/action :topic-add
@@ -1000,3 +990,9 @@
   [db [_ entry-uuid]]
   (utils/after 10 #(router/nav! (oc-urls/entry entry-uuid)))
   (assoc db :entry-modal-fade-in entry-uuid))
+
+(defmethod dispatcher/action :new-entry-toggle
+  [db [_ show?]]
+  (if show?
+    (assoc db :new-entry true)
+    (dissoc db :new-entry)))
