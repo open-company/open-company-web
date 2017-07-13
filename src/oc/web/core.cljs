@@ -178,7 +178,6 @@
     (pre-routing query-params)
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :entry entry :query-params query-params})
-    (swap! dis/app-state dissoc :show-add-topic)
     (when board-sort-or-filter
       (swap! dis/app-state merge {:board-filters board-sort-or-filter :reset-default "asd"})
       (when (keyword? board-sort-or-filter)
