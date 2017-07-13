@@ -11,6 +11,6 @@
       [:div.empty-board-headline
         (str "You don’t have any updates in " board-name " yet. ")
         [:button.mlb-reset
-          {:on-click #(dis/dispatch! [:add-topic-show true])}
+          {:on-click #(dis/dispatch! [:new-entry-toggle true])}
           "Add one?"]]
       [:div.empty-board-image]]))
