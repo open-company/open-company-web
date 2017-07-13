@@ -7,7 +7,6 @@
 (defonce app-state (atom {:loading false
                           :mobile-menu-open false
                           :show-login-overlay false
-                          :show-add-topic false
                           :dashboard-sharing false
                           :trend-bar-status :hidden}))
 
@@ -142,7 +141,15 @@
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
-                             :error-banner-time (:error-banner-time base)})]})
+                             :error-banner-time (:error-banner-time base)})]
+   :board-topics        [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (let [board-data (get-in base (board-data-key org-slug board-slug))]
+                                (:topics board-data))))]
+   :new-entry-edit      [[:base]
+                          (fn [base]
+                            (:new-entry-edit base))]})
 
 ;; Action Loop =================================================================
 
