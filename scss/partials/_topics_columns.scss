@@ -56,7 +56,7 @@ div.topics-columns {
           float: left;
         }
 
-        &:hover div.add-to-board-pencil {
+        &:hover div.add-to-board-pencil, &:focus div.add-to-board-pencil, &:active div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
         }
       }
