@@ -17,7 +17,7 @@
 (rum/defcs interactions-summary < rum/static
   [s entry-data]
   (let [comments-link (or (utils/link-for (:links entry-data) "comments") {:count (int (rand 10))})
-        comments-authors (vec (reverse (sort-by :updated-at (:authors comments-link))))
+        comments-authors (vec (reverse (sort-by :created-at (:authors comments-link))))
         comments-count (min (:count comments-link) 4)
         max-reaction (get-max-count-reaction (:reactions entry-data))]
     [:div.interactions-summary
@@ -37,7 +37,7 @@
             {:style {:width (str (if (pos? (count comments-authors)) (+ 9 (* 15 (count comments-authors))) 0) "px")}}
             (for [user-data comments-authors]
               [:div.is-comments-author
-                {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:updated-at user-data))}
+                {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:created-at user-data))}
                 (user-avatar-image user-data true)])]
           ; Comments count
           [:div.is-comments-summary
