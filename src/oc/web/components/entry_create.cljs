@@ -21,6 +21,7 @@
                           (drv/drv :board-filters)
                           (rum/local false ::first-render-done)
                           (rum/local false ::dismiss)
+                          (rum/local "" ::new-topic)
                           {:will-mount (fn [s]
                                          (when (nil? (:topic-slug @(drv/get-ref s :new-entry-edit)))
                                             (let [board-filters @(drv/get-ref s :board-filters)
@@ -54,6 +55,35 @@
         (user-avatar-image current-user-data)
         [:div.posting-in "Posting in " [:span (:name topic)]]
         [:div.arrow [:i.fa.fa-angle-right]]
-        [:div.select-topic "Select a topic" [:i.fa.fa-caret-down]]]]))
-
+        [:div.select-topic "Select a topic"]
+        [:div.entry-card-dd-container
+          [:button.mlb-reset.dropdown-toggle
+            {:type "button"
+             :id "entry-create-dd-btn"
+             :data-toggle "dropdown"
+             :aria-haspopup true
+             :aria-expanded false}
+            [:i.fa.fa-caret-down]]
+          [:div.entry-create-topics-dd.dropdown-menu
+            {:aria-labelledby "entry-create-dd-btn"}
+            [:div.triangle]
+            [:div.entry-dropdown-list-content
+              [:ul
+                (for [t topics]
+                  [:li
+                    {:data-topic-slug (:slug t)
+                     :key (str "entry-create-dd-" (:slug t))
+                     :on-click #(dis/dispatch! [:input [:new-entry-edit :topic-slug] (:slug t)])
+                     :class (when (= (:topic-slug new-entry-edit) (:slug t)) "select")}
+                    (:name t)])
+                [:li.divider]
+                [:li.entry-create-new-topic
+                  [:button.mlb-reset.entry-create-new-topic-plus
+                    {:on-click #()
+                     :title "Create a new topic"}]
+                  [:input.entry-create-new-topic-field
+                    {:type "text"
+                     :value @(::new-topic s)
+                     :on-change #(reset! (::new-topic s) (.. % -target -value))
+                     :placeholder "Create New Topic"}]]]]]]]]))
 
