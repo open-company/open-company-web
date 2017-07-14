@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [cuerdas.core :as s]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -13,6 +14,26 @@
   (dis/dispatch! [:input [:new-entry-edit] nil])
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
+
+(defn unique-slug [topics topic-name]
+  (let [slug (atom (s/slug topic-name))]
+    (while (seq (filter #(= (:slug %) @slug) topics))
+      (reset! slug (str (s/slug topic-name) "-" (int (rand 1000)))))
+    @slug))
+
+(defn toggle-topics-dd []
+  (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
+
+(defn add-topic [state]
+  (let [topics @(drv/get-ref state :board-topics)
+        topic-name @(::new-topic state)]
+    (if (seq (filter #(= (s/lower (:name %)) (s/lower topic-name)) topics))
+      (js/alert "Please choose another topic name.")
+      (let [topic-slug (unique-slug topics topic-name)]
+        (dis/dispatch! [:topic-add {:slug topic-slug :name topic-name} true])
+        (reset! (::new-topic state) "")
+        ;; Dismiss the dropdown:
+        (toggle-topics-dd)))))
 
 (rum/defcs entry-create < rum/reactive
                           (drv/drv :board-topics)
@@ -78,12 +99,23 @@
                     (:name t)])
                 [:li.divider]
                 [:li.entry-create-new-topic
+                  {:on-click #(utils/event-stop %)}
                   [:button.mlb-reset.entry-create-new-topic-plus
-                    {:on-click #()
+                    {:on-click (fn [e]
+                                 (if (empty? @(::new-topic s))
+                                   (do
+                                     (toggle-topics-dd)
+                                     (.focus (sel1 [:input.entry-create-new-topic-field])))
+                                   (add-topic s)))
                      :title "Create a new topic"}]
                   [:input.entry-create-new-topic-field
                     {:type "text"
                      :value @(::new-topic s)
+                     :on-key-up (fn [e]
+                                  (cond
+                                    (= "Enter" (.-key e))
+                                    (when-not (empty? @(::new-topic s))
+                                      (add-topic s))))
                      :on-change #(reset! (::new-topic s) (.. % -target -value))
                      :placeholder "Create New Topic"}]]]]]]]]))
 

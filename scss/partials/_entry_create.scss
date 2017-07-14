@@ -138,6 +138,8 @@ div.entry-create-modal-container {
 
               &.select {
                 color: $cr_light_gray;
+                text-decoration: underline;
+                background-color: transparent;
               }
 
               &:hover {
@@ -151,9 +153,12 @@ div.entry-create-modal-container {
                 width: calc(100% + 32px);
                 cursor: default;
                 margin: 12px 0 12px -16px;
+                cursor: pointer;
               }
 
               &.entry-create-new-topic {
+                cursor: pointer;
+
                 button.entry-create-new-topic-plus {
                   width: 20px;
                   height: 20px;
