@@ -40,6 +40,7 @@ $.text = function(){};
 $.remove = function(){};
 $.animate = function(){};
 $.prop = function(){};
+$.dropdown = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
