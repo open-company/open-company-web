@@ -196,7 +196,6 @@ provided in the table below:
 
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
-|  :add-topic-rollback | UI | Rollback the add topic to the board. User canceled action. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -265,7 +264,7 @@ provided in the table below:
 |  :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
 |  :top-menu-show | UI | Toggle the dropdown menu of the topic in the dashboard. |
 |  :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
-|  :topic-add | UI | Give a topic and its data add the topic to the current board. |
+|  :topic-add | UI | Add a new topic to the topics list of the current board. |
 |  :topic-archive | UI | Start the archive topic action. Call the API function to archive. |
 |  :topic-archive/success | API | Archive succesfully done, navigate to the board to reload the data without the topic. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |

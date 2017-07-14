@@ -634,45 +634,6 @@
     (assoc :dashboard-sharing activate)
     (assoc :dashboard-selected-topics [])))
 
-(defmethod dispatcher/action :topic-add
-  [db [_ topic topic-data]]
-  (let [board-data (dispatcher/board-data)
-        archived-topics (:archived board-data)
-        updated-archived (if (:was-archived topic-data)
-                            (vec (filter #(not= (:topic %) (name topic)) archived-topics))
-                            archived-topics)
-        updated-topics (conj (:topics board-data) (name topic))
-        updated-board-data (-> board-data
-                                (assoc :topics updated-topics)
-                                (assoc :archived updated-archived)
-                                (assoc (keyword topic) topic-data))
-        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        next-db (assoc-in db board-data-key updated-board-data)]
-    (when (:was-archived topic-data)
-      (api/patch-topics updated-topics))
-    (if (:was-archived topic-data)
-     next-db
-     (start-foce next-db topic topic-data))))
-
-(defmethod dispatcher/action :add-topic-rollback
-  [db [_ topic-kw]]
-  (let [board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        board-data (get-in db board-data-key)
-        topic-data (get board-data topic-kw)
-        archived-topics (:archived board-data)
-        updated-archived (if (:was-archived topic-data)
-                            (conj archived-topics {:topic (name topic-kw)
-                                                   :title (:title topic-data)})
-                            archived-topics)
-        updated-topics (utils/vec-dissoc (:topics board-data) (name topic-kw))
-        updated-board-data (-> board-data
-                                (dissoc topic-kw)
-                                (assoc :topics updated-topics)
-                                (assoc :archived updated-archived))]
-    (-> db
-      (assoc-in board-data-key updated-board-data)
-      (stop-foce))))
-
 (defmethod dispatcher/action :top-menu-show [db [_ topic]]
   (assoc db :show-top-menu topic))
 
@@ -996,3 +957,14 @@
   (if show?
     (assoc db :new-entry true)
     (dissoc db :new-entry)))
+
+(defmethod dispatcher/action :topic-add
+  [db [_ topic-map use-in-new-entry?]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        next-topics (conj (:topics board-data) topic-map)
+        next-board-data (assoc board-data :topics next-topics)
+        next-db (assoc-in db board-key next-board-data)]
+    (if use-in-new-entry?
+      (assoc-in next-db [:new-entry-edit :topic-slug] (:slug topic-map))
+      next-db)))
