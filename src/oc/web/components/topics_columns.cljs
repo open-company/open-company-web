@@ -112,8 +112,7 @@
                 (empty-board)
                 ; for each column key contained in best layout
                 :else
-                (let [all-entries (:entries board-data)]
-                  (entries-layout all-entries board-filters)))))
+                (entries-layout board-data board-filters))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"

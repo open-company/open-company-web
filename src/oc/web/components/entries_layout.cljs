@@ -6,12 +6,12 @@
             [oc.web.components.entry-card :refer (entry-card entry-card-empty)]))
 
 (rum/defc entries-layout
-  [entries layout-type]
+  [board-data layout-type]
   [:div.entries-layout
     (cond
       ;; :by-topic
       (= layout-type :by-topic)
-      (let [grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :updated-at v))))) (group-by :topic-slug entries)))
+      (let [grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :updated-at v))))) (group-by :topic-slug (:entries board-data))))
             sorted-topics (vec (reverse (sort #(compare (:updated-at (first (get grouped-entries %1))) (:updated-at (first (get grouped-entries %2)))) (keys grouped-entries))))]
         (for [topic sorted-topics
               :let [entries-group (get grouped-entries topic)
@@ -32,19 +32,19 @@
               (rum/with-key (entry-card entry false) (str "entry-by-topic-" topic "-" (:uuid entry))))
             (when (or (= (count entries-group) 1)
                       (= (count entries-group) 3))
-              (entry-card-empty))]))
+              (entry-card-empty (:read-only board-data)))]))
       ;; by specific topic
       (string? layout-type)
-      (let [filtered-entries (vec (filter #(= (:topic-slug %) layout-type) entries))
+      (let [filtered-entries (vec (filter #(= (:topic-slug %) layout-type) (:entries board-data)))
             sorted-entries (vec (reverse (sort-by :updated-at filtered-entries)))]
         [:div.entry-cards-container.by-specific-topic.group
           (for [entry sorted-entries]
             (rum/with-key (entry-card entry false) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
           (when (= (count sorted-entries) 1)
-              (entry-card-empty))])
+              (entry-card-empty (:read-only board-data)))])
       ;; :latest layout
       :else
-      (let [sorted-entries (vec (reverse (sort-by :updated-at entries)))]
+      (let [sorted-entries (vec (reverse (sort-by :updated-at (:entries board-data))))]
         [:div.entry-cards-container.group
           (for [entry sorted-entries]
             (rum/with-key (entry-card entry true) (str "entry-latest-" (:uuid entry))))]))])

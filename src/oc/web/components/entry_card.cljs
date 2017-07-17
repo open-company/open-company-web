@@ -12,13 +12,14 @@
   (.truncate js/$ entry-body (clj->js {:length 86 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"})))
 
 (rum/defc entry-card-empty
-  []
+  [read-only?]
   [:div.entry-card.empty-state.group
     [:div.entry-card-title
       "This topic’s a little sparse. "
-      [:button.mlb-reset
-        {:on-click #(dis/dispatch! [:new-entry-toggle true])}
-        "Add an update?"]]])
+      (when-not read-only?
+        [:button.mlb-reset
+          {:on-click #(dis/dispatch! [:new-entry-toggle true])}
+          "Add an update?"])]])
 
 (rum/defcs entry-card < rum/static
   [s entry-data show-topic?]
