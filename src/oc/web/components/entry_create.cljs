@@ -172,19 +172,19 @@
                                       (= "Enter" (.-key e))
                                       (when-not (empty? @(::new-topic s))
                                         (add-topic s))))
-                       ; :on-change #(reset! (::new-topic s) (.. % -target -value))
-                       :on-paste    #(headline-on-paste s %)
-                       :on-key-Up   #(headline-on-change s)
-                       :on-key-down #(headline-on-change s)
-                       :on-focus    #(headline-on-change s)
-                       :on-blur     #(headline-on-change s)
+                       :on-change #(reset! (::new-topic s) (.. % -target -value))
                        :placeholder "Create New Topic"}]]]]]]]
       [:div.entry-create-modal-divider]
       [:div.entry-create-modal-body
         [:div.entry-create-headline.emoji-autocomplete.emojiable
           {:content-editable true
            :placeholder "Title this (if you like)"
-           :on-change #(dis/dispatch! [:input [:new-entry-edit :headline] (.. % -target -value)])
+           ; :on-change #(dis/dispatch! [:input [:new-entry-edit :headline] (.. % -target -value)])
+           :on-paste    #(headline-on-paste s %)
+           :on-key-Up   #(headline-on-change s)
+           :on-key-down #(headline-on-change s)
+           :on-focus    #(headline-on-change s)
+           :on-blur     #(headline-on-change s)
            :dangerouslySetInnerHTML #js {"__html" ""}}]
         [:div.entry-create-body.emoji-autocomplete.emojiable
           {:placeholder "What's new?"
