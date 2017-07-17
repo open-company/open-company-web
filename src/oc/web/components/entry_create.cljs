@@ -31,7 +31,7 @@
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
 (defn add-topic [state]
-  (let [topics @(drv/get-ref state :board-topics)
+  (let [topics (:topics @(drv/get-ref state :board-data))
         topic-name @(::new-topic state)]
     (if (seq (filter #(= (s/lower (:name %)) (s/lower topic-name)) topics))
       (js/alert "Please choose another topic name.")
@@ -83,7 +83,7 @@
     (utils/to-end-of-content-editable headline-el)))
 
 (rum/defcs entry-create < rum/reactive
-                          (drv/drv :board-topics)
+                          (drv/drv :board-data)
                           (drv/drv :current-user-data)
                           (drv/drv :new-entry-edit)
                           (drv/drv :board-filters)
@@ -92,11 +92,14 @@
                           (rum/local nil ::body-editor)
                           (rum/local "" ::new-topic)
                           {:will-mount (fn [s]
-                                         (when (nil? (:topic-slug @(drv/get-ref s :new-entry-edit)))
-                                            (let [board-filters @(drv/get-ref s :board-filters)
-                                                  topics @(drv/get-ref s :board-topics)
-                                                  topic (if (string? board-filters) (first (filter #(= (:slug %) board-filters) topics)) (first topics))]
-                                              (dis/dispatch! [:input [:new-entry-edit :topic-slug] (:slug topic)])))
+                                         (let [new-entry-edit @(drv/get-ref s :new-entry-edit)
+                                               board-filters @(drv/get-ref s :board-filters)]
+                                           (when (and (string? board-filters)
+                                                      (nil? (:topic-slug new-entry-edit)))
+                                              (let [topics (:topics @(drv/get-ref s :board-data))
+                                                    topic (first (filter #(= (:slug %) board-filters) topics))]
+                                                (when topic
+                                                  (dis/dispatch! [:input [:new-entry-edit :topic-slug] (:slug topic)])))))
                                          s)
                            :did-mount (fn [s]
                                         ;; Add no-scroll to the body to avoid scrolling while showing this modal
@@ -112,7 +115,8 @@
                                            (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                            s)}
   [s]
-  (let [topics (drv/react s :board-topics)
+  (let [board-data (drv/react s :board-data)
+        topics (:topics board-data)
         current-user-data (drv/react s :current-user-data)
         new-entry-edit (drv/react s :new-entry-edit)
         topic (first (filter #(= (:slug %) (:topic-slug new-entry-edit)) topics))]
@@ -124,9 +128,9 @@
         {:on-click #(utils/event-stop %)}
         [:div.entry-create-modal-header.group
           (user-avatar-image current-user-data)
-          [:div.posting-in "Posting in " [:span (:name topic)]]
+          [:div.posting-in "Posting in " [:span (:name board-data)]]
           [:div.arrow [:i.fa.fa-angle-right]]
-          [:div.select-topic "Select a topic"]
+          [:div.select-topic (if topic (:name topic) "Select a topic")]
           [:div.entry-card-dd-container
             [:button.mlb-reset.dropdown-toggle
               {:type "button"
@@ -193,9 +197,8 @@
           {:on-click #(do
                         (dis/dispatch! [:new-entry-add])
                         (close-clicked %))
-           :disabled (or (empty? (:topic-slug new-entry-edit))
-                         (and (empty? (:body new-entry-edit))
-                              (empty? (:headline new-entry-edit))))}
+           :disabled (and (empty? (:body new-entry-edit))
+                          (empty? (:headline new-entry-edit)))}
           "Post"]
         [:button.mlb-reset.mlb-link-black
           {:on-click #(close-clicked s)}
