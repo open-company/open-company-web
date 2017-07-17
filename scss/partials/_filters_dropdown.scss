@@ -7,7 +7,7 @@ div.filters-dropdown-name {
   button.board-remove-filter {
     width: 24px;
     height: 24px;
-    background-color: $cr_light_blue;
+    background-color: $carrot_light_blue;
     border-radius: 4px;
     background-image: cdnUrl("/img/ML/board_remove_filter.png");
     background-position: center;
@@ -17,7 +17,7 @@ div.filters-dropdown-name {
 
     &:hover {
       background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
-      background-color: $cr_text_blue;
+      background-color: $carrot_text_blue;
     }
   }
 
@@ -83,12 +83,12 @@ div.filters-dropdown-name {
           li {
             @include avenir_M();
             font-size: 12px;
-            color: $cr_dark_gray;
+            color: $carrot_dark_gray;
             cursor: pointer;
             margin: 6px 0;
 
             &.select {
-              color: $cr_light_gray;
+              color: $carrot_light_gray;
             }
 
             &.category {
@@ -97,14 +97,14 @@ div.filters-dropdown-name {
 
             &:hover {
               background-color: transparent;
-              color: $cr_dark_gray;
+              color: $carrot_dark_gray;
               &.select {
-                color: $cr_light_gray;
+                color: $carrot_light_gray;
               }
             }
 
             &.divider {
-              border-top: $cr_dark_bg_gray;
+              border-top: $carrot_dark_bg_gray;
               width: calc(100% + 32px);
               cursor: default;
               margin: 12px 0 12px -17px;

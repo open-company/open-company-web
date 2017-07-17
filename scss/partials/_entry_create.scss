@@ -51,7 +51,7 @@ div.entry-create-modal-container {
 
         span {
           @include avenir_H();
-          color: $cr_dark_gray;
+          color: $carrot_dark_gray;
         }
       }
 
@@ -140,7 +140,7 @@ div.entry-create-modal-container {
                 text-overflow: ellipsis;
 
                 &.select {
-                  color: $cr_light_gray;
+                  color: $carrot_light_gray;
                   text-decoration: underline;
                   background-color: transparent;
                 }
@@ -151,7 +151,7 @@ div.entry-create-modal-container {
                 }
 
                 &.divider {
-                  border-top: $cr_light_gray;
+                  border-top: $carrot_light_gray;
                   opacity: 0.8;
                   width: calc(100% + 32px);
                   cursor: default;
@@ -193,7 +193,7 @@ div.entry-create-modal-container {
                     padding: 0 0.5rem;
 
                     @include placeholder(){
-                      color: $cr_light_gray;
+                      color: $carrot_light_gray;
                     }
                   }
                 }
@@ -219,7 +219,7 @@ div.entry-create-modal-container {
         border: none;
         outline: none;
         font-size: 18px;
-        color: $cr_dark_gray;
+        color: $carrot_dark_gray;
         @include avenir_H();
         cursor: text;
 
@@ -233,7 +233,7 @@ div.entry-create-modal-container {
       div.entry-create-body {
         border: none;
         outline: none;
-        color: $cr_dark_gray;
+        color: $carrot_dark_gray;
         @include avenir_R();
         font-size: 16px;
         margin: 24px 0 0;

@@ -30,7 +30,7 @@ div.entry-modal-container {
       left: 0px;
       width: 32px;
       height: 32px;
-      background-color: $cr_light_blue;
+      background-color: $carrot_light_blue;
       border-radius: 4px;
       background-image: cdnUrl("/img/ML/board_remove_filter.png");
       background-position: center;
@@ -40,7 +40,7 @@ div.entry-modal-container {
 
       &:hover {
         background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
-        background-color: $cr_text_blue;
+        background-color: $carrot_text_blue;
         opacity: 1;
       }
     }

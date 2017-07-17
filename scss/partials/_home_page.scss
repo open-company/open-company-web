@@ -23,7 +23,7 @@ div#wrap {
       h1.headline {
         font-size: 48px;
         @include avenir_B();
-        color: $cr_dark_blue;
+        color: $carrot_dark_blue;
         padding: 0 16px;
         max-width: 970px;
         margin: 0 auto 20px;
@@ -48,7 +48,7 @@ div#wrap {
         max-width: 320px;
         height: 48px;
         border-radius: 8px;
-        background-color: $cr_text_blue;
+        background-color: $carrot_text_blue;
         color: white;
         padding: 3px 56px;
         @include avenir_H();
@@ -62,7 +62,7 @@ div#wrap {
       }
 
       div.small-teams {
-        color: $cr_dark_blue;
+        color: $carrot_dark_blue;
         font-size: 12px;
         @include avenir_H();
         margin-top: 16px;
@@ -105,14 +105,14 @@ div#wrap {
           }
 
           div.title {
-            color: $cr_dark_blue;
+            color: $carrot_dark_blue;
             @include avenir_H();
             font-size: 36px;
             letter-spacing: 0.1px;
           }
 
           div.subtitle {
-            color: $cr_dark_blue;
+            color: $carrot_dark_blue;
             @include avenir_M();
             font-size: 20px;
             line-height: 1.7;
@@ -177,7 +177,7 @@ div#wrap {
     div.customers {
       width: 100%;
       margin: 50px auto 0;
-      background-color: $cr_dark_blue;
+      background-color: $carrot_dark_blue;
       padding: 60px 0;
       text-align: center;
 
@@ -309,7 +309,7 @@ div#wrap {
       }
 
       div.try-it-combo-field button.try-it-get-started {
-        background-color: $cr_dark_blue;
+        background-color: $carrot_dark_blue;
       }
 
       div.carrot-box-container {

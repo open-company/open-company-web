@@ -1,4 +1,4 @@
-function mailchipApiSubmit(e, form, success, fail){
+function mailchimpApiSubmit(e, form, success, fail){
   e.preventDefault();
   $.ajax({
     type: "POST",
@@ -27,12 +27,12 @@ $(document).ready(function(){
   }
 
   $("#try-it-form-central").submit( function(e){
-    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show(); $(".try-it-combo-field").hide();}, function(){});
+    mailchimpApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show(); $(".try-it-combo-field").hide();}, function(){});
     return false;
   });
 
   $("#try-it-form-bottom").submit( function(e){
-    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-bottom").show(); $(".try-it-combo-field").hide();}, function(){});
+    mailchimpApiSubmit(e, this, function(){$(".carrot-box-thanks-bottom").show(); $(".try-it-combo-field").hide();}, function(){});
     return false;
   });
 });

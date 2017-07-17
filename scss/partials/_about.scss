@@ -25,7 +25,7 @@ h1.about {
   @include avenir_H();
   font-size: 40px;
   letter-spacing: 0.3px;
-  color: $cr_dark_blue;
+  color: $carrot_dark_blue;
   margin: 47px auto 0;
   padding: 0 16px;
   max-width: 575px;
@@ -36,7 +36,7 @@ div.divider-line {
   margin-top: 32px;
   width: 82px;
   height: 6px;
-  background-color: $cr_orange;
+  background-color: $carrot_orange;
   left: 50%;
   margin-left: -41px;
   position: relative;
@@ -106,7 +106,7 @@ div.ovals-container {
     font-size: 28px;
     letter-spacing: 0.2px;
     text-align: center;
-    color: $cr_dark_blue;
+    color: $carrot_dark_blue;
     max-width: 767px;
     margin: 0px auto 40px;
     padding-top: 50px;
@@ -187,7 +187,7 @@ div.ovals-container {
     @include avenir_BOOK();
     font-size: 20px;
     text-align: center;
-    color: $cr_text_blue_2;
+    color: $carrot_text_blue_2;
     max-width: 547px;
     margin: 20px auto 50px;
 
@@ -267,7 +267,7 @@ div.principles {
     }
 
     div.principle-description {
-      color: $cr_text_blue_2;
+      color: $carrot_text_blue_2;
       @include avenir_BOOK();
       font-size: 20px;
       max-width: 564px;
@@ -295,7 +295,7 @@ div.principles {
       }
 
       div.principle-title {
-        color: $cr_orange;
+        color: $carrot_orange;
       }
     }
 
@@ -310,7 +310,7 @@ div.principles {
       }
 
       div.principle-title {
-        color: $cr_green;
+        color: $carrot_green;
       }
     }
 
@@ -325,14 +325,14 @@ div.principles {
       }
 
       div.principle-title {
-        color: $cr_text_blue;
+        color: $carrot_text_blue;
       }
     }
   }
 }
 
 div.about-alignment {
-  background-color: $cr_dark_blue;
+  background-color: $carrot_dark_blue;
   padding: 115px 0;
   position: relative;
   margin: 177px 0 0;
@@ -383,7 +383,7 @@ div.about-alignment {
 
 div.about-team {
   padding: 114px 0 190px;
-  background-color: $cr_settings_background;
+  background-color: $carrot_settings_background;
 
   @include mobile(){
     padding: 50px 16px
@@ -402,7 +402,7 @@ div.about-team {
       @include avenir_H();
       font-size: 40px;
       letter-spacing: 0.3px;
-      color: $cr_dark_blue;
+      color: $carrot_dark_blue;
       margin-top: 35px;
     }
 
@@ -633,7 +633,7 @@ div.about-footer {
       @include avenir_H();
       font-size: 16px;
       text-align: center;
-      color: $cr_orange;
+      color: $carrot_orange;
       margin-top: 39px;
       padding: 13px 20px;
       display: inline-block;

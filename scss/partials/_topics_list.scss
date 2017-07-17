@@ -46,7 +46,7 @@ div.topic-list{
   background-color: $oc_gray_8;
 
   @include big_web(){
-    padding-top: #{$navbar_height + $cr_trend_collapsed_height}px;
+    padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
 
     &.not-first-board {
       padding-top: 0px;
@@ -72,7 +72,7 @@ body.trend-bar-collapsed {
   div.org-dashboard {
     div.topic-list{
       @include big_web(){
-        padding-top: #{$navbar_height + $cr_trend_collapsed_height}px;
+        padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
       }
     }
   }
@@ -82,7 +82,7 @@ body.trend-bar-expanded {
   div.org-dashboard {
     div.topic-list{
       @include big_web(){
-        padding-top: #{$navbar_height + $cr_trend_expanded_height}px;
+        padding-top: #{$navbar_height + $carrot_trend_expanded_height}px;
       }
     }
   }
@@ -92,7 +92,7 @@ body.trend-bar-trending {
   div.org-dashboard {
     div.topic-list{
       @include big_web(){
-        padding-top: #{$navbar_height + $cr_trend_trending_height}px;
+        padding-top: #{$navbar_height + $carrot_trend_trending_height}px;
       }
     }
   }

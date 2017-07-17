@@ -3,7 +3,7 @@ $animation_duration: 120ms;
 body.trend-bar-collapsed {
   div.trend-bar {
     margin-bottom: 0px;
-    height: #{$cr_trend_collapsed_height}px;
+    height: #{$carrot_trend_collapsed_height}px;
 
     div.trend-bar-orange-box {
 
@@ -21,7 +21,7 @@ body.trend-bar-collapsed {
 body.trend-bar-expanded {
   div.trend-bar {
     margin-bottom: 0px;
-    height: #{$cr_trend_expanded_height}px;
+    height: #{$carrot_trend_expanded_height}px;
 
     div.trend-bar-orange-box {
 
@@ -38,7 +38,7 @@ body.trend-bar-expanded {
 
 body.trend-bar-trending {
   div.trend-bar {
-    height: #{$cr_trend_trending_height}px;
+    height: #{$carrot_trend_trending_height}px;
 
     div.trend-bar-orange-box {
 
@@ -62,7 +62,7 @@ div.trend-bar {
 
   div.trend-bar-orange-box {
     width: 100%;
-    background-color: $cr_orange;
+    background-color: $carrot_orange;
     padding: 7px 102px 0px;
     height: 188px;
 

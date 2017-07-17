@@ -35,16 +35,16 @@
   :oc-red-regular "#E04B53" ; :red
   :oc-red-light "#EC7A8D"
 
-  :cr-gray "#333333"
-  :cr-dark-bg-gray "#F3F2EE"
-  :cr-text-blue "#4c67fc"
+  :carrot-gray "#333333"
+  :carrot-dark-bg-gray "#F3F2EE"
+  :carrot-text-blue "#4c67fc"
   :cr_orange "#FA6452"
-  :cr-settings-background "#FCFBF7"
-  :cr-dark-blue "#2e405a"
-  :cr-green "#0F8E4C"
-  :cr-green-1 "#0E8749"
-  :cr-text-blue-2 "#3B3D40"
-  :cr-light-blue "#DEE8FF"})
+  :carrot-settings-background "#FCFBF7"
+  :carrot-dark-blue "#2e405a"
+  :carrot-green "#0F8E4C"
+  :carrot-green-1 "#0E8749"
+  :carrot-text-blue-2 "#3B3D40"
+  :carrot-light-blue "#DEE8FF"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)

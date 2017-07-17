@@ -37,7 +37,7 @@ div.carrot-box-container {
     div.thanks-headline {
       @include avenir_M();
       font-size: 32px;
-      color: $cr_gray;
+      color: $carrot_gray;
 
       @include mobile(){
         margin-top: 40px;
@@ -63,7 +63,7 @@ div.carrot-box-container {
     a.carrot-early-access-link {
       @include avenir_H();
       font-size: 16px;
-      color: $cr_text_blue;
+      color: $carrot_text_blue;
 
       &:hover {
         text-decoration: underline;
