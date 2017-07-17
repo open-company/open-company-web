@@ -1,0 +1,164 @@
+div.entry-card {
+  width: 432px;
+  max-height: 265px;
+  float: left;
+  background-color: white;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+  border-radius: 4px;
+  padding: 32px 24px;
+  margin: 10px 16px;
+
+  &.empty-state {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: cdnUrl("/img/ML/entry_empty_state.svg");
+    background-size: 168px 120px;
+    background-position: 50% 40%;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+
+    div.entry-card-title {
+      font-size: 14px;
+      color: $cr_light_gray;
+      @include avenir_H();
+      margin-top: 140px;
+      text-align: center;
+
+      button {
+        color: $cr_text_blue;
+        padding: 0;
+        margin: 0;
+
+        &:hover, &:avtive, &:focus {
+          border: none;
+          outline: none;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  div.entry-card-head {
+    width: 100%;
+
+    div.entry-card-head-author {
+      float: left;
+      width: 80%;
+      padding-right: 20px;
+      overflow: hidden;
+
+      @include entry-author();
+    }
+
+    div.entry-card-head-right {
+      float: right;
+      width: 20%;
+
+      div.new {
+        margin-top: 0;
+        float: right;
+      }
+
+      @include entry-new();
+    }
+  }
+
+  div.entry-card-content {
+    width: 100%;
+
+    div.entry-card-headline {
+      @include entry-headline();
+      margin-top: 24px;
+      text-overflow: ellipsis;
+      width: 100%;
+      overflow: hidden;
+      max-height: 28px;
+      white-space: nowrap;
+    }
+
+    div.entry-card-body {
+      @include entry-body();
+
+      margin-top: 24px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-height: 24px;
+      max-height: #{24*2}px;
+
+      img:not(.emojione){
+        display: none;
+      }
+
+      span.full-update {
+        color: $cr_text_blue;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+
+      // // Uncomment this to programmatically add the read full update at the end of the last body tag
+      // div:last-child, p:last-child {
+      //   &:after {
+      //     content: "Read Full Update";
+      //     @include entry-body;
+      //     color: $cr_text_blue;
+      //     cursor: pointer;
+      //     margin-left: 5px;
+      //   }
+      // }
+
+      // &:empty {
+      //   &:after {
+      //     content: "Read Full Update";
+      //     @include entry-body;
+      //     color: $cr_text_blue;
+      //     cursor: pointer;
+      //   } 
+      // }
+    }
+  }
+
+  div.entry-card-footer {
+    margin-top: 15px;
+
+    div.more-button {
+      float: right;
+
+      button.more-ellipsis {
+        width: 22px;
+        height: 22px;
+        padding: 4px 9px;
+        display: block;
+        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+        background-position: center;
+        background-size: 3px 13px;
+        background-repeat: no-repeat;
+      }
+    }
+  }
+}
+/* linkAnimation for card and modal links */
+@include keyframe(linkAnimation){
+  0% {
+    background-position: right bottom;
+    background-size: 100% .1rem;
+  }
+
+  50% {
+    background-position: right bottom;
+    background-size: 0 .1rem;
+  }
+
+  51% {
+    background-position: left bottom;
+    background-size: 0 .1rem;
+  }
+
+  100% {
+    background-position: left bottom;
+    background-size: 100% .1rem;
+  }
+}

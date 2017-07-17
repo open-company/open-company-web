@@ -4,8 +4,8 @@
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
 (def local-whitelist-array ["localhost" "127.0.0.1"])
 
-;; API location
-(def api-server-domain "http://localhost:3000")
+;; Storage location
+(def storage-server-domain "http://localhost:3001")
 
 ;; Auth location
 (def auth-server-domain "http://localhost:3003")
@@ -28,7 +28,7 @@
 (def recurly-plan "local")
 
 ;; Deploy key (cache buster)
-(def deploy-key "asd")
+(def deploy-key "")
 
 ;; Filestack key
 (def filestack-key "Aoay0qXUSOyVIcDvls4Egz")
@@ -44,3 +44,6 @@
 
 ;; Attachments bucket
 (def attachments-bucket "open-company-attachments-non-prod")
+
+;; Mailchimp api endpoing
+(def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")

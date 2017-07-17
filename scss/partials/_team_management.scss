@@ -70,7 +70,7 @@ div.company-settings-container {
         line-height: 1.5;
         letter-spacing: 1px;
         color: $oc_gray_5;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         margin: 0px 0px 10px;
         padding: 0px;
       }
@@ -96,7 +96,7 @@ div.company-settings-container {
             float: left;
           }
           span {
-            font-family: $oc_headers_font;
+            font-family: $oc_main_font;
             font-size: 14px;
             font-weight: normal;
             letter-spacing: 1.2px;
@@ -222,7 +222,7 @@ div.company-settings-container {
       }
 
       span.um-byemail-anyone-span {
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-weight: 400;
         font-size: 14px;
         line-height: 1.5;

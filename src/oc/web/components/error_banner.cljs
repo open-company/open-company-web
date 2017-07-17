@@ -30,5 +30,5 @@
   [s]
   (let [banner-message (:error-banner-message (drv/react s :error-banner))]
     [:div.error-banner
-      {:class (if @(::showing s) "showing" "")}
+      {:class (if @(::showing s) "showing" "hidden")}
       [:h3.error-message banner-message]]))

@@ -27,7 +27,7 @@ div.menu {
     padding: 10px 20px;
 
     div.user-name {
-      font-family: $oc_main_bold_font;
+      @include avenir_H();
       font-size: 14px;
       color: $cr_dark_gray;
       float: left;
@@ -36,7 +36,8 @@ div.menu {
     div.user-type {
       float: right;
       color: $cr_light_gray;
-      font-weight: 400;
+      @include avenir_R();
+      font-size: 14px;
     }
   }
 
@@ -64,7 +65,7 @@ div.menu {
     padding: 12px 20px;
 
     &.divider-item {
-      box-shadow: inset 0 -1px 0 0 #f3f2ee;
+      box-shadow: inset 0 -1px 0 0 $cr_dark_bg_gray;
     }
 
     &:last-child {
@@ -88,11 +89,11 @@ div.menu {
       display: block;
       background-color: transparent;
       padding: 0px;
-      font-family: $oc_main_font;
-      font-weight: 400;
+      @include avenir_R();
       font-size: 16px;
       line-height: 1.0;
       color: $cr_dark_gray;
+      text-align: left;
 
       @include mobile() {
         font-size: 21px;

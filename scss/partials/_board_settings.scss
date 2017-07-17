@@ -21,7 +21,7 @@ div.main-board-settings {
       }
 
       div.settings-form-input-label {
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-weight: 700;
         font-size: 14px;
         line-height: 1.5;
@@ -55,7 +55,7 @@ div.main-board-settings {
           h3 {
             font-size: 14px;
             font-weight: 800;
-            font-family: $oc_headers_font;
+            font-family: $oc_main_font;
             color: rgba(78,90,107,1);
             margin-bottom: 0px;
             margin-top: 0px;
@@ -68,7 +68,7 @@ div.main-board-settings {
           p {
             font-size: 14px;
             font-weight: 400;
-            font-family: $oc_headers_font;
+            font-family: $oc_main_font;
             color: rgba(78,90,107,1);
             margin-bottom: 0px;
 
@@ -113,7 +113,7 @@ div.main-board-settings {
 
                 th {
                   font-size: 14px;
-                  font-family: $oc_headers_font;
+                  font-family: $oc_main_font;
                   color: rgba(78, 90, 107, 0.5);
                   font-weight: 700;
                 }
@@ -205,7 +205,7 @@ div.main-board-settings {
       div.dashboard-slug {
         font-size: 14px;
         font-weight: 400;
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         color: rgba(78,90,107,1);
         margin-bottom: 2rem;
       }

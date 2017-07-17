@@ -17,22 +17,22 @@ div.topics-columns {
     position: relative;
 
     div.board-container {
+
       div.board-name {
-        font-family: $oc_main_font;
+        @include avenir_M();
         font-size: 32px;
-        font-weight: 500;
         color: $cr_gray;
         margin-bottom: 30px;
         float: left;
-        margin-left: 10px;
+        margin-left: 15px;
 
         button.board-settings-bt {
           float: right;
-          background-image: url("/img/ML/board_settings.svg");
+          background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 12px 12px;
           width: 12px;
           height: 12px;
-          margin-top: 18px;
+          margin-top: 15px;
           margin-left: 10px;
           opacity: 0.8;
 
@@ -47,7 +47,7 @@ div.topics-columns {
         margin-right: 5px;
 
         div.add-to-board-pencil {
-          background-image: url("/img/ML/add_to_board_pencil.svg");
+          background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");
           background-size: 16px 16px;
           width: 16px;
           height: 16px;
@@ -57,7 +57,7 @@ div.topics-columns {
         }
 
         &:hover div.add-to-board-pencil {
-          background-image: url("/img/ML/add_to_board_pencil_white.svg"); 
+          background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
         }
       }
     }
@@ -69,7 +69,7 @@ div.topics-columns {
       padding-top: 5px;
       
       span {
-        font-family: $oc_headers_font;
+        font-family: $oc_main_font;
         font-size: 12px;
         font-weight: bold;
         color:  $oc_gray_5;

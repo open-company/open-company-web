@@ -1,39 +1,50 @@
+/*
+  Example usage:
+  @include keyframe(animationName){
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+*/
 @mixin keyframe($animation_name) {
-    @-webkit-keyframes $animation_name {
-        @content;
-    }
+  @-webkit-keyframes #{$animation_name} {
+    @content;
+  }
 
-    @-moz-keyframes $animation_name {
-        @content;
-    }
+  @-moz-keyframes #{$animation_name} {
+    @content;
+  }
 
-    @-o-keyframes $animation_name {
-        @content;
-    }
+  @-o-keyframes #{$animation_name} {
+    @content;
+  }
 
-    @keyframes $animation_name {
-        @content;
-    }
+  @keyframes #{$animation_name} {
+    @content;
+  }
 }
 
 @include keyframe(fadeout) {
-    0% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 1;
+  }
 
-    100% {
-        opacity: 0;
-    }
+  100% {
+    opacity: 0;
+  }
 }
 
 @include keyframe(changecolour) {
-    0% {
-        color: #000;
-    }
+  0% {
+    color: #000;
+  }
 
-    100% {
-        color: #FFF;
-    }
+  100% {
+    color: #FFF;
+  }
 }
 
 /*

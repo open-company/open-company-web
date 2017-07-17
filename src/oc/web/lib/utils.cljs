@@ -281,6 +281,12 @@
         delete (link-for links "delete")]
     (and (nil? create) (nil? partial-update) (nil? delete))))
 
+(defn readonly-entry? [links]
+  (let [create (link-for links "create")
+        partial-update (link-for links "partial-update")
+        delete (link-for links "delete")]
+    (and (nil? create) (nil? partial-update) (nil? delete))))
+
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
@@ -304,16 +310,24 @@
       (fix-finances with-keys)
       with-keys)))
 
+(defn topic-name [topics-data topic-slug]
+  (when-let [topic-data (some #(when (= (:slug %) topic-slug) %) topics-data)]
+    (:name topic-data)))
+
+(defn fix-entry
+  "Add `:read-only` and `:topic-name` keys to the entry map"
+  [entry-body topics-data]
+  (-> entry-body
+    (assoc :read-only (readonly-entry? (:links entry-body)))
+    (assoc :topic-name (topic-name topics-data (:topic-slug entry-body)))))
+
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
   [board-data]
   (let [links (:links board-data)
-        topic-keys (get-topic-keys board-data)
         read-only (readonly-board? links)
-        without-topics (apply dissoc board-data topic-keys)
-        with-read-only (assoc without-topics :read-only read-only)
-        topics (apply merge (map (fn [sn] (hash-map sn (fix-topic (get board-data sn) sn))) topic-keys))
-        with-fixed-topics (merge with-read-only topics)]
+        with-read-only (assoc board-data :read-only read-only)
+        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:topics board-data)) (:entries board-data))))]
     with-fixed-topics))
 
 (defn fix-org
@@ -955,13 +969,16 @@
          :iterations 3}))
 
 (defn pulse-reaction-count
-  [topic-slug entry-uuid reaction]
-  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-" reaction)]
+  [entry-uuid reaction]
+  (let [selector (str "div." entry-uuid "-" reaction)]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn pulse-comments-count
-  [topic-slug entry-uuid]
-  (let [selector (str "div." (name topic-slug) "-" entry-uuid "-comments-count")]
+  [entry-uuid]
+  (let [selector (str "div." entry-uuid "-comments-count")]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
+
+(defn cdn [img-src]
+  (str (when-not (empty? ls/cdn-url) (str ls/cdn-url "/" ls/deploy-key)) img-src))

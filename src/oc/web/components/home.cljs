@@ -6,7 +6,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.ui.login-required :refer (login-required)]
-            [oc.web.components.sign-up :refer (sign-up)]
+            [oc.web.components.home-page :refer (home-page)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -21,7 +21,7 @@
   (render-state [_ {:keys [columns-num]}]
     (let [card-width  (responsive/calc-card-width)]
       (if-not (jwt/jwt)
-        (sign-up)
+        (home-page)
         (dom/div {:class "home fullscreen-page"}
           (when-not (:loading data)
             (dom/div {:class "home-internal"})

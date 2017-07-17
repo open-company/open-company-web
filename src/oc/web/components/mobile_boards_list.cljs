@@ -34,7 +34,7 @@
                               :mobile-menu-open (:mobile-menu-open data)
                               :auth-settings (:auth-settings data)
                               :active :dashboard
-                              :is-dashboard (not (router/current-topic-slug))})
+                              :is-dashboard (not (router/current-entry-uuid))})
             (dom/div {:class "mobile-boards-inner"}
               (dom/div {:class "mobile-boards-list"}
                 (for [idx (range (count boards-list))

@@ -16,11 +16,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn prior-updates-click [e]
-  (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/updates-list))))
-
 (defn logout-click [e]
   (utils/event-stop e)
   (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
@@ -45,11 +40,6 @@
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-team-settings))))
-
-(defn updates-click [e]
-  (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
-  (router/nav! (oc-urls/updates-list)))
 
 (defn sign-in-sign-up-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
@@ -103,11 +93,6 @@
                 "You're an Admin"
                 is-author?
                 "You're a Contributor")))
-        ; (when-let [su-link (utils/link-for (:links org-data) "collection" "GET")]
-        ;   (when (and (router/current-org-slug)
-        ;              (pos? (:count su-link)))
-        ;     (dom/div {:class "oc-menu-item"}
-        ;       (dom/a {:href (oc-urls/updates-list) :on-click prior-updates-click} "View Shared Updates"))))
         ; (when (and (router/current-org-slug)
         ;            (not (utils/in? (:route @router/path) "boards-list"))
         ;            (responsive/is-tablet-or-mobile?))

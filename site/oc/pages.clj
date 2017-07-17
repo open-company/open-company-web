@@ -1,6 +1,10 @@
 (ns oc.pages
   (:require [oc.terms :as terms]
-            [oc.privacy :as privacy]))
+            [oc.privacy :as privacy]
+            [environ.core :refer (env)]))
+
+(defn cdn [img-src]
+  (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
 (defn terms [options]
   (terms/terms options))
@@ -8,70 +12,165 @@
 (defn privacy [options]
   (privacy/privacy options))
 
-; (defn index [options]
-;   [:div
-;    [:div.container.outer.sector
-;     [:div.container.inner
-;      [:div.sector-box
-;       [:div.sector-text.team-text
-;        [:h2 "Make Employees Great"]
-;        [:p
-;         "Everyone is on the same page with open access to company information."]
-;        [:h2 "Easy to Update"]
-;        [:p
-;         "Our "
-;         [:i.fa.fa-slack]
-;         " Slackbot works 24/7 with you and your team to keep everyone and everything up to date."]]
-;       [:div.team-image]]]]
-;    [:hr]
-;    [:div.container.outer.sector
-;     [:div.container.inner
-;      [:div.sector-box.even
-;       [:div.sector-text.update-text
-;        [:h2 "Impress Investors and Advisors"]
-;        [:p
-;         "Send regular investor updates that follow best practices and increase engagement."]
-;        [:h2 "Updates are Automatic"]
-;        [:p
-;         "Stakeholder updates are generated from your company's content for your approval."]]
-;       [:div.update-image]]]]
-;    [:hr]
-;    [:div.container.outer.sector
-;     [:div.container.inner
-;      [:div.sector-box
-;       [:div.sector-text.public-text
-;        [:h2 "Go Public!"]
-;        [:p
-;         "Share publicly to build trust and attract new investors, employees, and customers."]
-;        [:h2 "Play to the Crowd"]
-;        [:p
-;         "Keep crowd supporters and investors informed of your progress."]]
-;       [:div.public-image]]]]
-;    [:hr]
-;    [:div.container.outer.sector
-;     [:div.row.features
-;      [:div.col-md-4
-;       [:div.col-sm-2.feature-icon
-;        [:img.feature-icon {:src "oc_web_cdn_url/img/archive@4x.png"}]]
-;       [:div.col-sm-10.col-xs-12
-;        [:h2 "All in One Place"]
-;        [:p
-;         "All your company information; organized and easy to find."]]]
-;      [:div.col-md-4
-;       [:div.col-sm-2.feature-icon
-;        [:img.feature-icon {:src "oc_web_cdn_url/img/best-practices@4x.png"}]]
-;       [:div.col-sm-10.col-xs-12
-;        [:h2 "Best Practices"]
-;        [:p
-;         "Core topics and guidelines help you decide what to share."]]]
-;      [:div.col-md-4
-;       [:div.col-sm-2.feature-icon
-;        [:img.feature-icon {:src "oc_web_cdn_url/img/concierge@4x.png"}]]
-;       [:div.col-sm-10.col-xs-12
-;        [:h2 "Concierge Service"]
-;        [:p "Support to create beautiful, concise and meaningful updates."]]]]]])
+(defn carrot-box-thanks [carrot-box-class]
+  [:div.carrot-box-container.group
+    {:class carrot-box-class
+     :style #js {:display "none"}}
+    ; [:img.carrot-box {:src (cdn "/img/ML/carrot_box.svg")}]
+    [:div.carrot-box-thanks
+      [:div.thanks-headline "Thanks!"]
+      "We’ve sent you an email to confirm."
+      [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
+      [:a.carrot-early-access-link.hidden {:href "/"} "/"]]])
 
-(defn pricing [options]
+(defn try-it-form [form-id]
+  [:form.validate
+    {:action (or (env :oc-mailchimp-api-endpoint) "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
+     :method "post"
+     :id form-id
+     :class "mailchimp-api-subscribe-form"
+     :no-validate true}
+    [:div.try-it-combo-field
+      [:div.mc-field-group
+        [:input.mail.required
+          {:type "text"
+           :value ""
+           :id "mce-EMAIL"
+           :class (str form-id "-input")
+           :name "email"
+           :placeholder "Email address"}]]
+      [:button.mlb-reset.try-it-get-started
+        {:type "submit"
+         :id "mc-embedded-subscribe"}
+        "Get Early Access"]]])
+
+(defn index [options]
+  [:div
+    {:id "wrap"}
+    [:div.main.home-page
+      ; Hope page header
+      [:div.cta
+        [:h1.headline "Company updates that tell a better story"]
+        [:div.subheadline
+          "The easy way to build transparency and alignment - inside and outside the company."]
+        (try-it-form "try-it-form-central")
+        (carrot-box-thanks "carrot-box-thanks-top")
+
+        ;; FIXME: Remove the carrot screenshot for the initial onboarding period
+        (comment
+          [:img.homepage-screenshot
+            {:src (cdn "/img/ML/home_page_screenshot.png")
+             :width 756
+             :height 511}])]
+
+
+      [:div.illustrations.group
+
+        [:div.illustration.illustration-1.group
+          [:img {:src (cdn "/img/ML/home_page_il_1_412_385.svg")}]
+          [:div.description.group
+            [:div.title
+              "Get aligned fast"]
+            [:div.subtitle
+              "Check out what’s new this week, or get new employees up to speed in a flash. Updates are in one place and easy to find."]]]
+
+        [:div.illustration.illustration-2.group
+          [:img {:src (cdn "/img/ML/home_page_il_2_444_414.svg")}]
+          [:div.description.group
+            [:div.title
+              "Keep investors up to date"]
+            [:div.subtitle
+              "Investors and advisors are happier - and more helpful - when they’re in the loop!"]]]
+
+        [:div.illustration.illustration-3.group
+          [:img {:src (cdn "/img/ML/home_page_il_3_355_350.svg")}]
+          [:div.description.group
+            [:div.title
+              "Grow your business"]
+            [:div.subtitle
+              "Share the latest news with recruits, potential investors, and customers. Build trust with a bigger audience and they’ll reward you for it."]]]]
+
+      (comment
+        [:div.customers
+          [:div.customers-title
+            [:img {:src (cdn "/img/ML/user_avatar_yellow.svg")}]
+            "Our happy clients"]
+          [:div.customers-cards.group
+            [:div.left-arrow
+              [:button.mlb-reset.left-arrow-bt
+                {:disabled true}]]
+            [:div.customers-cards-scroll
+              [:div.customers-card]
+              [:div.customers-card]
+              [:div.customers-card]]
+            [:div.right-arrow
+              [:button.mlb-reset.right-arrow-bt
+                {:disabled true}]]]])
+
+      [:div.try-it
+        {:id "mc_embed_signup"}
+        [:div.try-it-title
+          {:id "thank-you-bottom"}
+          "Request early access"]
+        [:div.try-it-subtitle
+          "Easy set-up • Free for small teams"]
+        [:div
+          (try-it-form "try-it-form-bottom")]
+        (carrot-box-thanks "carrot-box-thanks-bottom")]]])
+
+(defn features [options]
+  [:div.container.main.features
+    ; Hope page header
+    [:h1.features "Features"]
+
+    [:div.divider-line]
+
+
+    [:div.illustrations.group
+
+      [:div.illustration.illustration-1.group
+        [:img {:src (cdn "/img/ML/features_il_1_608_544.svg")}]
+        [:div.description.group
+          [:div.title
+            "Simplicity"]
+          [:div.subtitle
+            "Whether you’re adding a quick update about one topic, or writing a story that covers many, getting started is fast and simple."]]]
+
+      [:div.illustration.illustration-2.group
+        [:img {:src (cdn "/img/ML/features_il_2_465_408.svg")}]
+        [:div.description.group
+          [:div.title
+            "Company timeline"]
+          [:div.subtitle
+            "It’s easy to catch up if you missed something or want more context. Great for getting new employees up to speed, too."]]]
+
+      [:div.illustration.illustration-3.group
+        [:img {:src (cdn "/img/ML/features_il_3_443_269.svg")}]
+        [:div.description.group
+          [:div.title
+            "Feedback loops"]
+          [:div.subtitle
+            "Company updates are best when they trigger conversation. Comments and reactions keep everyone engaged and in sync - great for distributed teams."]]]
+
+      [:div.illustration.illustration-4.group
+        [:img {:src (cdn "/img/ML/features_il_4_346_321.svg")}]
+        [:div.description.group
+          [:div.title
+            "Integrate with Slack"]
+          [:div.subtitle
+            "With Slack single sign-on and our Slack bot, updates are automatically shared to the right channels. Discussions about updates can happen within Slack or Carrot - everything is kept in sync."]]]
+
+      [:div.illustration.illustration-5.group
+        [:img {:src (cdn "/img/ML/features_il_5_333_274.svg")}]
+        [:div.description.group
+          [:div.title
+            "Share your news more broadly"]
+          [:div.subtitle
+            "Share something beautiful via email or on the Web. Updates and stories are accessible by teams, but can also be made public or private."]]]]])
+
+(defn pricing
+  "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
+  [options]
    [:div.container.outer.sector.content
     [:div.row
      [:div.col-md-12.pricing-header
@@ -119,47 +218,148 @@
      ;; "<!--         <div class=\"col-md-4 sm-12\">\n          <h2>Team</h2>\n          <p>Internal distribution with Slack.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Stakeholders</h2>\n          <p>Periodic stakeholder updates distributed automatically.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Concierge</h2>\n          <p>Beautiful stakeholder updates, hand-crafted by content creation professionals.</p>\n        </div>\n -->"
      ]])
 
-(defn about [options]
-  [:div.container.outer.sector.content.about
-   [:div.container.inner
-    [:div.row
-     [:div.col-md-12
-      [:h2 "Transparency Simplified."]
-      [:p "We help founders turn startup transparency into a competitive advantage."]
-      [:p "OpenCompany makes it easy to keep employees, investors, advisors, and customers updated and on the same page. We provide a guide based on best practices and automate distribution of the information to save you time."]
-      [:p "As an Open Source Software project, you can follow our progress or contribute code on "
-       [:a {:href "https://github.com/open-company"} "GitHub"] "."]
-      [:p "We can't build this open platform in a vacuum. Our goal is to work with everyone in the startup community: founders, employees and investors. Together we can define how the next generation of great startups will be created. We hope you'll join our community and contribute your experience and opinions."]
-      [:p "We’re also looking for awesome people that are interested in startup transparency. We are a fully distributed team working from our home offices around the world. Join us."]]]]])
+(defn about
+  "About page. This is a copy of oc.web.components.about and every change here should be reflected there and vice versa."
+  [options]
+  [:div
+    [:div.container.main.about
+
+      [:h1.about "About"]
+
+      [:div.divider-line]
+
+      [:div.ovals-container
+
+        [:div.ovals-container-face.face-red]
+        [:div.ovals-container-face.face-yellow]
+        [:div.ovals-container-face.face-blue]
+        [:div.ovals-container-face.face-green]
+        [:div.ovals-container-face.face-purple]
+
+        [:div.about-subline
+          "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
+        [:div.paragraphs-container.group
+          [:div.mobile-only.happy-face.yellow-happy-face]
+          [:div.mobile-only.happy-face.red-happy-face]
+          [:div.paragraphs-bg-container.group
+            [:div.paragraph
+              "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
+            [:div.paragraph
+              "With that in mind we designed Carrot based" [:br] "on three principles:"]]
+          [:div.mobile-only.happy-face.blue-happy-face]
+          [:div.mobile-only.happy-face.purple-happy-face]
+          [:div.mobile-only.happy-face.green-happy-face]]]
+
+      [:div.principles.group
+        [:div.principle.principle-1
+          [:div.principle-oval-bg]
+          [:div.principle-logo]
+          [:div.principle-title "It has to be easy or no one will play."]
+          [:div.principle-description "Alignment might be essential for success, but achieving it has never been easy or fun. We’re changing that. With a simple structure and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
+
+        [:div.principle.principle-2
+          [:div.principle-oval-bg]
+          [:div.principle-logo]
+          [:div.principle-title "The “big picture” should always be visible."]
+          [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
+
+        [:div.principle.principle-3
+          [:div.principle-oval-bg]
+          [:div.principle-logo]
+          [:div.principle-title "Alignment is valuable beyond the team, too."]
+          [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
+
+    ] ;<!-- main -->
+
+    [:div.about-alignment
+      [:div.quote]
+      [:div.about-alignment-description "Company alignment requires real openness and transparency."]]
+
+    [:div.about-team.group
+      [:div.about-team-inner.group
+        [:h1.team "Our team"]
+        [:div.divider-line]
+
+        [:div.group
+          [:div.column-left.group
+            ;; Member: Stuart Levinson
+            [:div.team-card.stuart-levinson
+              [:div.team-avatar]
+              [:div.team-member
+                [:div.team-name "Stuart Levinson"]
+                [:div.team-description "Prior to founding OpenCompany, Stuart started and sold two venture-backed startups. Venetica (acquired by IBM) pioneered a new type of enterprise integration software, and TalkTo (acquired by Path) launched the first messaging app to local businesses powered by a human + AI backend."]
+                [:div.team-media-links
+                  [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
+                  [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
+            ;; Member: Iacopo Carraro
+            [:div.team-card.iacopo-carraro
+              [:div.team-avatar]
+              [:div.team-member
+                [:div.team-name "Iacopo Carraro"]
+                [:div.team-description "Iacopo is a full-stack engineer with lots of remote team and startup experience."]
+                [:div.team-media-links
+                  [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
+                  [:a.twitter {:href "http://twitter.com/bago2k4"}]
+                  [:a.github {:href "http://github.com/bago2k4"} [:i.fa.fa-github]]]]]]
+
+          [:div.column-right.group
+            ;; Member: Sean Johnson
+            [:div.team-card.sean-johnson
+              [:div.team-avatar]
+              [:div.team-member
+                [:div.team-name "Sean Johnson"]
+                [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
+                [:div.team-media-links
+                  [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
+                  [:a.twitter {:href "http://twitter.com/belucid"}]
+                  [:a.github {:href "http://github.com/belucid"} [:i.fa.fa-github]]]]]
+            ;; Member: new member
+            [:div.team-card.new-member
+              [:div.team-avatar]
+                [:div.team-member
+                  [:div.team-name "You?"]
+                  [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]]
+
+    [:div.about-footer.group
+
+      [:div.block.join-us
+        [:div.block-title
+          "Join Us"]
+        [:div.block-description
+          "Want to join us? We are always looking for amazing people no matter where they live."]
+        [:a.link
+          {:href (:contact-mail-to options)}
+          "Say hello"]]
+
+      [:div.block.open-source
+        [:div.block-title
+          "Open Source"]
+        [:div.block-description
+          "Have an idea you’d like to contribute? A new integration you’d like to see?"]
+        [:a.link
+          {:href "https://github.com/open-company"}
+          "Build it with us on Github"]]]
+    ])
 
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.sector.not-found
-   [:div.container.inner
-    [:div.row
-     [:div.col-md-12
+  [:div.not-found
+    [:div
       [:div.error-page
-       [:h1 "404"]
-       [:h2 "Hmm, this does not look right!!!"]
-       [:p {:id "oc-404-disclaimer"} "You are accessing a page that doesn’t exist or requires authentication."]
-       [:a.btn {:href "/"} "RETURN TO HOME"]
-       [:a.btn.ml2 {:id "oc-signin-logout-btn" :href "/login"} "SIGN IN / SIGN UP"]
-       [:script {:src "/js/set-path.js"}]]]]]])
+        [:img {:src (cdn "/img/ML/carrot_404.svg") :width 338 :height 189}]
+        [:h2 "Page Not Found"]
+        [:p "It seems we can't find what you're looking for."]
+        [:p.last "The page may have been moved or removed."]
+        [:script {:src "/js/set-path.js"}]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.sector.server-error
-   [:div.container.inner
-    [:div.row
-     [:div.col-md-12
+  [:div.server-error
+    [:div
       [:div.error-page
-       [:h1 "500"]
-       [:h2 "Hmm, this does not look right."]
-       [:p
-        "You seem to have come across an error."
-        [:br]
-        "Please try again or contact support: "
-        [:a {:href contact-mail-to} contact-email]]
-       [:a.btn {:href "/"} "Return To Home"]
-       [:script {:src "/js/set-path.js"}]]]]]])
+        [:h1 "500"]
+        [:h2 "Internal Server Error"]
+        [:p "We are sorry for the inconvenience."]
+        [:p.last "Please try again later."]
+        [:script {:src "/js/set-path.js"}]]]])
 
 (def app-shell
   {:head [:head
@@ -167,37 +367,40 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "OpenCompany - Startup Transparency Made Simple"]
+          [:title "Carrot - Company updates and stories"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
-          [:link {:rel "stylesheet" :href "/css/normalize.css?oc_deploy_key"}]
+          [:link {:rel "stylesheet" :href "/css/normalize.css"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
           ;; OpenCompany CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;;  Medium Editor css
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css?oc_deploy_key"}]
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css"}]
           ;; Emojione CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css"}]
           ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css"}]
           ;; Emojone Sprites CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css?oc_deploy_key"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css"}]
+          ;; CarrotKit Font
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
@@ -216,7 +419,7 @@
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; jQuery scrollTo plugin
-          [:script {:src "/lib/scrollTo/scrollTo.min.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/lib/scrollTo/scrollTo.min.js" :type "text/javascript"}]
           ;; jQuery UI
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
@@ -224,17 +427,19 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
-          [:script {:src "/js/emojione/autocomplete.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
-          [:script {:src "/oc.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/oc.js" :type "text/javascript"}]
           ;; Utilities
-          [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js?oc_deploy_key"}]
-          [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js?oc_deploy_key"}]
+          [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js"}]
+          [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
-          [:script {:src "/lib/cleanHTML/cleanHTML.js?oc_deploy_key" :type "text/javascript"}]
+          [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
-          [:div.hidden [:img {:src "/img/emojione.sprites.png"}]]]})
+          ;; Static js files
+          [:script {:src (cdn "/js/static-js.js")}]
+          [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
 
 (def prod-app-shell
   {:head [:head
@@ -242,9 +447,10 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "OpenCompany - Startup Transparency Made Simple"]
+          [:title "Carrot - Company updates and stories"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -256,9 +462,11 @@
           ;; Google fonts Domine and OpenSans
           [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; App single CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "oc_web_cdn_url/oc_deploy_key/main.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
+          ;; CarrotKit Font
+          [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; Filestack
           [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -279,7 +487,9 @@
           ;; Bootstrap JavaScript //getf.com/
           [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
-          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc.js"}]
+          [:script {:src (cdn "/oc.js")}]
           ;; Compiled assents
-          [:script {:src "oc_web_cdn_url/oc_deploy_key/oc_assets.js"}]
-          [:div.hidden [:img {:src "oc_web_cdn_url/img/emojione.sprites.png"}]]]})
+          [:script {:src (cdn "/oc_assets.js")}]
+          ;; Static js files
+          [:script {:src (cdn "/js/static-js.js")}]
+          [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})

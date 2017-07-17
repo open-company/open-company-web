@@ -103,23 +103,11 @@
 (defn current-board-slug []
   (:board @path))
 
-(defn current-topic-slug []
-  (:topic @path))
-
-(defn current-update-date []
-  (:update-date @path))
-
-(defn current-update-slug []
-  (:update-slug @path))
+(defn current-entry-uuid []
+  (:entry @path))
 
 (defn query-params []
   (:query-params @path))
-
-(defn topic-editing? []
-  (some #(= "edit" %) (:route @path)))
-
-(defn current-as-of []
-  (:as-of (:query-params @path)))
 
 (defn last-org-cookie
   "Cookie to save the last accessed org"
@@ -130,6 +118,11 @@
   "Cookie to save the last accessed board"
   [org-slug]
   (str "last-board-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
+
+(defn last-board-filter-cookie
+  "Cookie to save the last order the user visualized a board."
+  [org-slug board-slug]
+  (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
 
 (defn print-router-path []
   (js/console.log @path))

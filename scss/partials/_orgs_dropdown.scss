@@ -1,6 +1,9 @@
 div.orgs-dropdown {
-  float: left;
   margin-top: -8px;
+
+  &.org-has-logo {
+    float: left;
+  }
 
   button#orgs-dropdown {
     border: none;

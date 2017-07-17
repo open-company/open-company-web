@@ -28,32 +28,25 @@
     ;; ClojureScript libraries
     [cljs-http "0.1.43"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [prismatic/schema "1.1.6"] ; Dependency of om-tools https://github.com/Prismatic/schema
-    [prismatic/plumbing "0.5.4"] ; Dependency of om-tools https://github.com/Prismatic/plumbing
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [com.cognitect/transit-cljs "0.8.239"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
-    [org.clojure.bago/cljs-dynamic-resources "0.0.3"] ; Dynamically load JavaScript and CSS https://github.com/bago2k4/cljs-dynamic-resources
     [com.andrewmcveigh/cljs-time "0.5.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "2.0.3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
-    [clojure-humanize "0.2.2"] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
-    [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
 
     ;; CLJSJS packages http://cljsjs.github.io/
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     [cljsjs/rangy-selectionsaverestore "1.3.0-1"]
-    [cljsjs/raven "3.14.2-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
-    [cljsjs/d3 "4.3.0-5"] ; d3 externs https://clojars.org/cljsjs/d3
+    [cljsjs/raven "3.16.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
-    [cljsjs/hammer "2.0.4-5"] ; Touch handler http://hammerjs.github.io/
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.6.1-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [cljsjs/web-animations "2.1.4-0"] ; JavaScript implementation of the Web Animations API https://github.com/web-animations/web-animations-js
     [cljsjs/moment-timezone "0.5.11-0"] ; Timezone support for moment.js https://github.com/moment/moment-timezone/
 
-    [lockedon/if-let "0.1.0"] ; More than one binding for if/when macros https://github.com/LockedOn/if-let
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
     [open-company/lib "0.11.2"] ; Library for OC projects https://github.com/open-company/open-company-lib

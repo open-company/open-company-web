@@ -4,7 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
-            [oc.web.local-settings :as ls]
+            [oc.web.lib.utils :as utils]
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
@@ -24,14 +24,19 @@
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
-  [s user-data]
+  [s user-data tooltip?]
   (let [use-default @(::use-default s)
         default-avatar (user-icon (:user-id user-data))
-        user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) default-avatar (:avatar-url user-data))]
-    [:img.user-avatar-img
-      {:src user-avatar-url
-       :on-error #(reset! true (::use-default s))
-       :title (str (:first-name user-data) " " (:last-name user-data))}]))
+        user-avatar-url (if (or use-default (empty? (:avatar-url user-data))) (utils/cdn default-avatar) (:avatar-url user-data))]
+    [:div.user-avatar-img-container
+      [:div.user-avatar-img-helper]
+      [:img.user-avatar-img
+        {:src user-avatar-url
+         :on-error #(reset! (::use-default s) true)
+         :data-toggle (if tooltip? "tooltip" "")
+         :data-placement "top"
+         :data-container "body"
+         :title (:name user-data)}]]))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive

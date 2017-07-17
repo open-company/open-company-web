@@ -45,11 +45,20 @@ div.fullscreen-page {
 }
 
 .no-scroll {
-  overflow: hidden;
+  overflow-y: hidden;
+}
+
+@include mobile(){
+  body.mobile-menu-expanded {
+    overflow-y: hidden;
+    height: 100vh;
+  }
 }
 
 h1, h2, h3, h4, h5, h6, .oc-header {
-  font-family: $oc_headers_font;
+  font-family: $oc_main_font;
+  font-weight: normal;
+  font-style: normal;
 }
 
 a {
@@ -104,11 +113,11 @@ span.num.red {
 }
 
 *::selection {
-  background: rgba(249,215,72, 0.5);
+  background: rgba(250,100,82, 0.5);
 }
 
 *::-moz-selection {
-  background: rgba(249,215,72, 0.5);
+  background: rgba(250,100,82, 0.5);
 }
 
 .navbar-offset {
@@ -122,13 +131,14 @@ span.num.red {
 
 div#wrap {
   min-height: 100vh;
+  background-color: white;
 }
 
 button.slack-button {
   height: 40px;
   font-size: 15px;
   font-weight: 400;
-  font-family: $oc_headers_font;
+  font-family: $oc_main_font;
   padding: 5px;
   border-radius: 5px;
   border: 1px solid rgba(78,90,107,0.4);
@@ -140,7 +150,7 @@ button.slack-button {
 
   &:before {
     content: "";
-    background-image: cdnUrl( $cdn_url, "/img/slack.png");
+    background-image: cdnUrl("/img/slack.png");
     background-position: 0px 0px;
     background-size: 20px 20px;
     width: 20px;
@@ -158,4 +168,54 @@ button.slack-button {
 /* Remove the files counter from Filestack picker */
 div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span.fsp-nav__right span.fsp-badge {
   display: none;
+}
+
+.mobile-only {
+  @include big_web(){
+    display: none !important;
+  }
+}
+
+.big-web-only {
+  @include mobile(){
+    display: none !important;
+  }
+}
+
+div.not-found, div.server-error{
+  div.error-page {
+    text-align: center;
+    min-height: calc(100vh - 336px);
+    padding: 100px 0;
+
+    h1 {
+      color: $oc_gray_6;
+      font-size: 150px;
+      @include avenir_B();
+    }
+
+    @media screen and (max-width: 768px) {
+      padding: 50px 16px;
+      img {
+        max-width: 100%;
+      }
+
+      h2 {
+        font-size: 32px;
+      }
+    }
+
+    @media screen and (min-width: 769px){
+      h2{
+        font-size: 40px;
+      }
+    }
+
+    h2 {
+      margin: 50px auto;
+      color: $cr_orange;
+      text-align: center;
+      @include avenir_H();
+    }
+  }
 }

@@ -16,29 +16,20 @@ div.org-avatar {
   div.org-avatar-container {
 
     div.org-avatar-border {
-      width: 45px;
       height: 45px;
       padding: 5px;
       text-align: center;
       white-space: nowrap;
-      text-align: center;
 
       img.org-avatar-img{
-        max-width: 35px;
-        max-height: 35px;
+        max-width: 42px;
+        max-height: 42px;
         vertical-align: middle;
       }
 
       .helper {
         display: inline-block;
         height: 100%;
-        vertical-align: middle;
-      }
-
-      span.org-avatar-initial {
-        font-size: 19px;
-        color: $oc_gray_5;
-        line-height: 1.1;
         vertical-align: middle;
       }
     }

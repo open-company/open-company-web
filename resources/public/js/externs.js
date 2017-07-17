@@ -31,12 +31,15 @@ $.on = function(){};
 $.click = function(){};
 $.addClass = function(){};
 $.removeClass = function(){};
+$.toggleClass = function(){};
+$.hasClass = function(){};
 $.width = function(){};
 $.height = function(){};
 $.last = function(){};
 $.text = function(){};
 $.remove = function(){};
 $.animate = function(){};
+$.prop = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -65,13 +68,12 @@ var OCWebPrintJWTContents = function(){};
 var OCWebHelp = function(){};
 var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
-var OCWebPrintUpdatesListData = function(){};
-var OCWebPrintUpdateData = function(){};
 var OCWebPrintRouterPath = function(){};
-var OCWebPrintTopicEntriesData = function(){};
 var OCWebForceRefreshToken = function(){};
 // Filestack
 var filestack = {};
 filestack.init = function(){};
 filestack.pick = function(){};
 filestack.then = function(){};
+
+var mailchipApiSubmit = function(){};

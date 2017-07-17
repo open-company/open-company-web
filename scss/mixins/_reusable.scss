@@ -1,3 +1,5 @@
+@import "../modules/_deploy";
+
 /// Triangle helper mixin
 /// @param {Direction} $direction - Triangle direction, either `top`, `right`, `bottom` or `left`
 /// @param {Color} $color [currentcolor] - Triangle color
@@ -91,7 +93,7 @@
     color: rgba(78, 90, 107, 0.5);
     cursor: pointer;
     text-transform: uppercase;
-    font-family: $oc_headers_font;
+    font-family: $oc_main_font;
 
     &.active {
       background-color: #ffffff;
@@ -157,7 +159,7 @@
 
   h1, h2, h3, h4, h5 {
     font-weight: 700;
-    font-family: $oc_headers_font;
+    font-family: $oc_main_font;
     text-size: 19px;
   }
 
@@ -171,11 +173,11 @@
   }
 
   *::selection {
-    background: rgba(249,215,72, 0.5);
+    background: rgba(250,100,82, 0.5);
   }
 
   *::-moz-selection {
-    background: rgba(249,215,72, 0.5);
+    background: rgba(250,100,82, 0.5);
   }
 
   &::after{ //placeholder
@@ -192,18 +194,18 @@
   }
 }
 
-@function cdnUrl($cdn, $path) {
-  @if $cdn == 'oc_web_cdn_url' {
+@function cdnUrl($path) {
+  @if $cdn_url == 'oc_web_cdn_url' {
     @return url( $path );
   } @else {
-    @return url( $cdn + $path );
+    @return url( $cdn_url + "/" + $deploy_key +  $path );
   }
 }
 
-@mixin cdn-url($cdn, $path) {
-  @if $cdn == 'oc_web_cdn_url' {
+@mixin cdn-url($path) {
+  @if $cdn_url == 'oc_web_cdn_url' {
     background-image: url( #{ $path } );
   } @else {
-    background-image: url( #{ $cdn + $path } );
+    background-image: url( #{ $cdn_url + "/" + $deploy_key + $path } );
   }
 }

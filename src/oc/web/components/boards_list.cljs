@@ -3,7 +3,6 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [dommy.core :refer-macros (sel1 sel)]
-            [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -43,84 +42,87 @@
 
   (render [_]
     (when-not (:dashboard-sharing data)
-      (dom/div {:class "left-boards-list group" :style {:width (str responsive/left-boards-list-width "px")}}
-        ;; All activity
-        (dom/button {:class "all-activity group"}
-          (dom/div {:class "all-activity-icon"})
-          "All Activity")
-        ;; Boards list
-        (dom/div {:class "left-boards-list-top group"}
-          ;; Boards header
-          (dom/h3 {:class "left-boards-list-top-title"}
-            (dom/div {:class "boards-icon"})
-            "BOARDS")
-          (when (and (not (responsive/is-tablet-or-mobile?))
-                     (utils/link-for (:links org-data) "create"))
-            (dom/button {:class "left-boards-list-top-title-button btn-reset right"
-                         :on-click #(when (nil? (:foce-key data))
-                                      (dis/dispatch! [:input [:create-board] ""]))
-                         :title "Create a new board"
-                         :data-placement "top"
-                         :data-toggle "tooltip"
-                         :data-container "body"})))
-        (dom/div {:class (str "left-boards-list-items group")}
-          (for [board (sorted-boards (:boards org-data))]
-            (dom/div {:class (utils/class-set {:left-boards-list-item true
-                                               :highlight-on-hover (nil? (:foce-key data))
-                                               :group true
-                                               :selected (= (router/current-board-slug) (:slug board))})
-                      :style {:width (str (- responsive/left-boards-list-width 17) "px")}
-                      :data-board (name (:slug board))
-                      :key (str "board-list-" (name (:slug board)))
-                      :on-click #(when (nil? (:foce-key data))
-                                   (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
-              (dom/div {:class "internal has-news"
-                        :key (str "board-list-" (name (:slug board)) "-internal")}
-                (or (:name board) (:slug board)))
-              (when (utils/link-for (:links board) "delete")
-                (dom/button {:class "remove-board btn-reset"
-                             :title "Delete this board"
-                             :data-toggle "tooltip"
-                             :data-placement "top"
-                             :data-container "body"
-                             :on-click #(delete-board-alert % (:slug board))}
-                  (dom/i {:class "fa fa-times"})))))
-          (when-not (nil? (:create-board data))
-            (dom/div {:class "left-boards-list-item group"}
-              (dom/input {:class "board-name left"
-                          :value (:create-board data)
-                          :data-toggle "tooltip"
-                          :data-placement "right"
-                          :data-container "body"
-                          :title "Press Enter to submit or Escape to cancel."
-                          :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
-                          :on-blur #(when (empty? (:create-board data))
-                                      (dis/dispatch! [:input [:create-board] nil]))
-                          :on-key-up (fn [e]
-                                          (cond
-                                            (= "Enter" (.-key e))
-                                            (dis/dispatch! [:board-create])
-                                            (= "Escape" (.-key e))
-                                            (dis/dispatch! [:input [:create-board] nil])))}))))
-        (dom/div {:class "left-boards-list-top group"}
-          ;; Boards header
-          (dom/h3 {:class "left-boards-list-top-title"}
-            (dom/div {:class "stories-icon"})
-            "STORIES")
-          (when (and (not (responsive/is-tablet-or-mobile?))
-                     true) ;; FIXME: replace with create storeis link check
-            (dom/button {:class "left-boards-list-top-title-button btn-reset right"
-                         :on-click #(identity %) ;; FIXME: Replace with story creation action
-                         :title "Create a new story"
-                         :data-placement "top"
-                         :data-toggle "tooltip"
-                         :data-container "body"})))
-        (dom/div {:class "left-boards-list-footer"}
-          (when (and (router/current-org-slug)
-                     (jwt/is-admin? (:team-id org-data)))
-            (dom/button {:class "mlb-reset invite-people-btn"
-                         :on-click #(router/nav! (oc-urls/org-team-settings))}
-              (dom/div {:class "invite-people-icon"}) "Invite People"))
-          (dom/button {:class "mlb-reset about-carrot-btn"
-                       :on-click #(router/nav! oc-urls/about)}
-            (dom/div {:class "about-carrot-icon"}) "About Carrot"))))))
+      (let [left-boards-list-width (- responsive/left-boards-list-width 20)]
+        (dom/div {:class "left-boards-list group"
+                  :style {:width (str (- left-boards-list-width 20) "px")}}
+          ;; All activity
+          (dom/button {:class "all-activity group"}
+            (dom/div {:class "all-activity-icon"})
+            (dom/span "All Activity"))
+          ;; Boards list
+          (dom/div {:class "left-boards-list-top group"}
+            ;; Boards header
+            (dom/h3 {:class "left-boards-list-top-title"}
+              (dom/div {:class "boards-icon"})
+              (dom/span "BOARDS"))
+            (when (and (not (responsive/is-tablet-or-mobile?))
+                       (utils/link-for (:links org-data) "create"))
+              (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+                           :on-click #(when (nil? (:foce-key data))
+                                        (dis/dispatch! [:input [:create-board] ""]))
+                           :title "Create a new board"
+                           :data-placement "top"
+                           :data-toggle "tooltip"
+                           :data-container "body"})))
+          (dom/div {:class (str "left-boards-list-items group")}
+            (for [board (sorted-boards (:boards org-data))]
+              (dom/div {:class (utils/class-set {:left-boards-list-item true
+                                                 :highlight-on-hover (nil? (:foce-key data))
+                                                 :group true
+                                                 :selected (= (router/current-board-slug) (:slug board))})
+                        :style {:width (str (- left-boards-list-width 20 5) "px")}
+                        :data-board (name (:slug board))
+                        :key (str "board-list-" (name (:slug board)))
+                        :on-click #(when (nil? (:foce-key data))
+                                     (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
+                (dom/div {:class "internal has-news"
+                          :key (str "board-list-" (name (:slug board)) "-internal")}
+                  (or (:name board) (:slug board)))
+                (when (utils/link-for (:links board) "delete")
+                  (dom/button {:class "remove-board btn-reset"
+                               :title "Delete this board"
+                               :data-toggle "tooltip"
+                               :data-placement "top"
+                               :data-container "body"
+                               :on-click #(delete-board-alert % (:slug board))}
+                    (dom/i {:class "fa fa-times"})))))
+            (when-not (nil? (:create-board data))
+              (dom/div {:class "left-boards-list-item group"}
+                (dom/input {:class "board-name left"
+                            :value (:create-board data)
+                            :data-toggle "tooltip"
+                            :data-placement "right"
+                            :data-container "body"
+                            :title "Press Enter to submit or Escape to cancel."
+                            :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
+                            :on-blur #(when (empty? (:create-board data))
+                                        (dis/dispatch! [:input [:create-board] nil]))
+                            :on-key-up (fn [e]
+                                            (cond
+                                              (= "Enter" (.-key e))
+                                              (dis/dispatch! [:board-create])
+                                              (= "Escape" (.-key e))
+                                              (dis/dispatch! [:input [:create-board] nil])))}))))
+          (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
+            (dom/div {:class "left-boards-list-top group"}
+                      ;; Boards header
+                      (dom/h3 {:class "left-boards-list-top-title"}
+                        (dom/div {:class "stories-icon"})
+                        (dom/span "STORIES"))
+                      (when (and (not (responsive/is-tablet-or-mobile?))
+                                 true) ;; FIXME: replace with create storeis link check
+                        (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+                                     :on-click #(identity %) ;; FIXME: Replace with story creation action
+                                     :title "Create a new story"
+                                     :data-placement "top"
+                                     :data-toggle "tooltip"
+                                     :data-container "body"}))))
+          (dom/div {:class "left-boards-list-footer"}
+            (when (and (router/current-org-slug)
+                       (jwt/is-admin? (:team-id org-data)))
+              (dom/button {:class "mlb-reset invite-people-btn"
+                           :on-click #(router/nav! (oc-urls/org-team-settings))}
+                (dom/div {:class "invite-people-icon"}) (dom/span "Invite People")))
+            (dom/button {:class "mlb-reset about-carrot-btn"
+                         :on-click #(router/nav! oc-urls/about)}
+              (dom/div {:class "about-carrot-icon"}) (dom/span "About Carrot"))))))))

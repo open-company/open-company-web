@@ -1,0 +1,117 @@
+div.filters-dropdown-name {
+  @include avenir_M();
+  color: $oc_gray_7;
+  font-size: 16px;
+  margin: 0 0 16px 20px;
+
+  button.board-remove-filter {
+    width: 24px;
+    height: 24px;
+    background-color: $cr_light_blue;
+    border-radius: 4px;
+    background-image: cdnUrl("/img/ML/board_remove_filter.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+    transition: 230ms;
+
+    &:hover {
+      background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
+      background-color: $cr_text_blue;
+    }
+  }
+
+  div.filters-dropdown-container{
+    position: relative;
+    display: inline-block;
+
+    button.filters-dropdown-caret {
+      width: 20px;
+      height: 20px;
+      margin-left: 10px;
+      display: inline-block;
+
+      i.fa-caret-down {
+        font-size: 12px;
+        margin-top: 5px;
+        transition: 230ms;
+      }
+
+      &.open {
+        i.fa-caret-down {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    div.filters-dropdown-list {
+      position: absolute;
+      top: 20px;
+      left: -60px;
+      width: 140px;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      background-color: transparent;
+
+      div.triangle {
+        position: absolute;
+        top: 3px;
+        left: 70px;
+        background-color: white;
+        border-top: 1px solid rgba(177,184,192,0.50);
+        border-left: 1px solid rgba(177,184,192,0.50);
+        transform: rotate(45deg);
+        width: 20px;
+        height: 20px;
+      }
+
+      div.filters-dropdown-list-content {
+        background-color: white;
+        border: 1px solid rgba(177,184,192,0.50);
+        box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+        border-radius: 5px;
+        margin: 8px 0;
+        padding: 10px 16px 6px;
+        min-height: 50px;
+
+        ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+
+          li {
+            @include avenir_M();
+            font-size: 12px;
+            color: $cr_dark_gray;
+            cursor: pointer;
+            margin: 6px 0;
+
+            &.select {
+              color: $cr_light_gray;
+            }
+
+            &.category {
+              font-size: 14px;
+            }
+
+            &:hover {
+              background-color: transparent;
+              color: $cr_dark_gray;
+              &.select {
+                color: $cr_light_gray;
+              }
+            }
+
+            &.divider {
+              border-top: $cr_dark_bg_gray;
+              width: calc(100% + 32px);
+              cursor: default;
+              margin: 12px 0 12px -17px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

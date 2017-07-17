@@ -29,17 +29,15 @@
             [oc.web.components.about :refer (about)]
             [oc.web.components.login :refer (login)]
             [oc.web.components.oc-wall :refer (oc-wall)]
-            [oc.web.components.sign-up :refer (sign-up)]
+            [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
+            [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.org-logo-setup :refer (org-logo-setup)]
-            [oc.web.components.updates :refer (updates-responsive-switcher)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
-            [oc.web.components.create-update :refer (create-update)]
-            [oc.web.components.su-snapshot :refer (su-snapshot)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]
@@ -57,6 +55,9 @@
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
 
+;; Avoid warnings
+(declare route-dispatch!)
+
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
     ; if :browser-type is "mobile" the mobile site is forced
@@ -72,7 +73,9 @@
 (defn rewrite-url []
   (let [l (.-location js/window)
         rewrite-to (str (.-pathname l) (.-hash l))]
-    (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to)))
+    ;; Push state only if the query string has parameters or the history will have duplicates.
+    (when-not (empty? (.-search l))
+      (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to))))
 
 (defn pre-routing [query-params & [should-rewrite-url]]
   ; make sure the menu is closed
@@ -96,7 +99,7 @@
 
 ;; home
 (defn home-handler [target params]
-  (pre-routing (:query-params params))
+  (pre-routing (:query-params params) true)
   ;; save route
   (router/set-route! ["home"] {:query-params (:query-params params)})
   (when (jwt/jwt)
@@ -163,11 +166,10 @@
     (drv-root #(om/component (component)) target)))
 
 ;; Component specific to a company
-(defn board-handler [route target component params]
+(defn board-handler [route target component params & [board-sort-or-filter]]
   (let [org (:org (:params params))
         board (:board (:params params))
-        topic (:topic (:params params))
-        update-slug (:update-slug (:params params))
+        entry (:entry (:params params))
         query-params (:query-params params)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
@@ -175,11 +177,15 @@
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org board (when topic topic) route])) {:org org :board board :topic topic :update-slug update-slug :query-params query-params})
+    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :entry entry :query-params query-params})
     (swap! dis/app-state dissoc :show-add-topic)
+    (when board-sort-or-filter
+      (swap! dis/app-state merge {:board-filters board-sort-or-filter :reset-default "asd"})
+      (when (keyword? board-sort-or-filter)
+        (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:topics (dis/board-data)))) ;; or the topic key is missing that means we have only
+              (not (:entries (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
     (post-routing)
@@ -197,26 +203,6 @@
     ;; render component
     (drv-root component target)))
 
-; ;; Component specific to an update
-(defn update-handler [target component params]
-  (let [org (:org (:params params))
-        update-slug (:update-slug (:params params))
-        update-date (:update-date (:params params))
-        query-params (:query-params params)
-        su-key (dis/update-key org update-slug)]
-    (pre-routing query-params)
-    ;; save the route
-    (router/set-route! [org "su-snapshot" "updates" update-date update-slug] {:org org :update-slug update-slug :update-date update-date :query-params query-params})
-    ;; do we have the company data already?
-    (when (not (get-in @dis/app-state su-key))
-      ;; load the Update data from the API
-      (api/get-update-with-slug org update-slug true)
-      (let [su-loading-key (conj su-key :loading)]
-        (swap! dis/app-state assoc-in su-loading-key true)))
-    (post-routing)
-    ;; render component
-    (drv-root component target)))
-
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
@@ -224,20 +210,25 @@
     (defroute _loading_route "/__loading" {:as params}
       (timbre/info "Routing _loading_route __loading")
       (pre-routing (:query-params params)))
+
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
       (when-not (contains? (:query-params params) :jwt)
         (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
-      (simple-handler sign-up "login" target params))
+      (simple-handler home-page "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
       (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
-      (simple-handler sign-up "sign-up" target params))
+      (simple-handler home-page "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
       (simple-handler about "about" target params))
+
+    (defroute features-route urls/features {:as params}
+      (timbre/info "Routing features-route" urls/features)
+      (simple-handler features "features" target params))
 
     (defroute pricing-route urls/pricing {:as params}
       (timbre/info "Routing pricing-route" urls/pricing)
@@ -316,6 +307,10 @@
       (timbre/info "Routing org-page-route" (urls/org ":org"))
       (org-handler "org" target #(om/component) params))
 
+    (defroute org-page-slash-route (str (urls/org ":org") "/") {:as params}
+      (timbre/info "Routing org-page-route" (str (urls/org ":org") "/"))
+      (org-handler "org" target #(om/component) params))
+
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
@@ -344,7 +339,7 @@
     (defroute org-settings-route (urls/org-settings ":org") {:as params}
       (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
       ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no topics and the user is looking at company profile
+      ; has no entries and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
       (if (jwt/jwt)
         (org-handler "org-settings" target org-settings params)
@@ -353,7 +348,7 @@
     (defroute org-team-settings-route (urls/org-team-settings ":org") {:as params}
       (timbre/info "Routing org-team-settings-route" (urls/org-team-settings ":org"))
       ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no topics and the user is looking at company profile
+      ; has no entries and the user is looking at company profile
       (swap! dis/app-state assoc :force-remove-loading true)
       (if (jwt/jwt)
         (team-handler "org-team-settings" target team-management-wrapper params)
@@ -372,11 +367,11 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (board-handler "dashboard" target org-dashboard params))
+      (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
-    (defroute board-route-slash (str (urls/board ":org" ":board") "/") {:as params}
+    (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params))
+      (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
@@ -386,33 +381,33 @@
         (board-handler "board-settings" target board-settings params)
         (oc-wall-handler "Please sign in to access this board." target params)))
 
-    (defroute create-update-route (urls/update-preview ":org") {:as params}
-      (timbre/info "Routing create-update-route" (urls/update-preview ":org"))
-      (if (jwt/jwt)
-        (board-handler "su-snapshot-preview" target create-update params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+    (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
+      (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
+      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
+        (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
+      (board-handler "dashboard" target org-dashboard params :by-topic))
 
-    (defroute updates-list-route (urls/updates-list ":org") {:as params}
-      (timbre/info "Routing updates-list-route" (urls/updates-list ":org"))
-      (if (jwt/jwt)
-        (board-handler "updates-list" target updates-responsive-switcher params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+    (defroute board-sort-by-topic-slash-route (str (urls/board-sort-by-topic ":org" ":board") "/") {:as params}
+      (timbre/info "Routing board-sort-by-topic-slash-route" (str (urls/board-sort-by-topic ":org" ":board") "/"))
+      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
+        (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
+      (board-handler "dashboard" target org-dashboard params :by-topic))
 
-    (defroute update-route (urls/updates-list ":org" ":update-slug") {:as params}
-      (timbre/info "Routing update-route" (urls/updates-list ":org" ":update-slug"))
-      (if (jwt/jwt)
-        (if (responsive/is-mobile-size?)
-          (update-handler target su-snapshot params)
-          (board-handler "updates-list" target updates-responsive-switcher params))
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+    (defroute board-filter-by-topic-route (urls/board-filter-by-topic ":org" ":board" ":topic-filter") {:as params}
+      (timbre/info "Routing board-filter-by-topic-route" (urls/board-filter-by-topic ":org" ":board" ":topic-filter"))
+      (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
 
-    (defroute update-unique-route (urls/update-link ":org" ":update-date" ":update-slug") {:as params}
-      (timbre/info "Routing update-unique-route" (urls/update-link ":org" ":update-data" ":update-slug"))
-      (update-handler target su-snapshot params))
+    (defroute board-filter-by-topic-slash-route (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/") {:as params}
+      (timbre/info "Routing board-filter-by-topic-slash-route" (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/"))
+      (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
 
-    (defroute topic-route (urls/topic ":org" ":board" ":topic") {:as params}
-      (timbre/info "Routing topic-route" (urls/topic ":org" ":board" ":topic"))
-      (board-handler "topic" target org-dashboard params))
+    (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
+      (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
+      (board-handler "entry" target org-dashboard params))
+
+    (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
+      (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
+      (board-handler "entry" target org-dashboard params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
@@ -424,6 +419,7 @@
                                  login-route
                                  signup-route
                                  about-route
+                                 features-route
                                  pricing-route
                                  logout-route
                                  org-create-route
@@ -436,25 +432,28 @@
                                  ;; Org routes
                                  org-list-route
                                  org-page-route
+                                 org-page-slash-route
                                  org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
                                  board-create-route
-                                 ;; Updates
-                                 create-update-route
-                                 updates-list-route
-                                 update-route
-                                 update-unique-route
                                  ;; Boards
                                  boards-list-route
                                  board-route
-                                 board-route-slash
+                                 board-slash-route
+                                 ; Board settings
                                  board-settings-route
-                                 ;; Topics
-                                 topic-route
+                                 ; ;; Board sorting
+                                 board-sort-by-topic-route
+                                 board-sort-by-topic-slash-route
+                                 ; Entry route
+                                 entry-route
+                                 entry-slash-route
+                                 ; ;; Board filter
+                                 board-filter-by-topic-route
+                                 board-filter-by-topic-slash-route
                                  ;; Not found
-                                 not-found-route
-                                 ]))
+                                 not-found-route]))
 
     (defn handle-url-change [e]
       (when-not @prevent-route-dispatch
