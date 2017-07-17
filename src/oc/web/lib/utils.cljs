@@ -698,6 +698,11 @@
   []
   (str (my-uuid) (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) (my-uuid) (my-uuid)))
 
+(defn entry-uuid
+  "Generate a UUID for an entry"
+ []
+ (str (my-uuid) "-" (my-uuid) "-" (my-uuid)))
+
 (defn event-stop [e]
   (.preventDefault e)
   (.stopPropagation e))

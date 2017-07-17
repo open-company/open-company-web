@@ -41,7 +41,9 @@
 
 (defn refresh-board-data []
   (when (not (router/current-entry-uuid))
-    (api/get-board (dis/board-data))))
+    ; FIXME: re-enable the auto board refresh once the add entry has server support
+    ; (api/get-board (dis/board-data))
+    ))
 
 (defcomponent org-dashboard [data owner]
 

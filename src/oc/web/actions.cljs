@@ -968,3 +968,24 @@
     (if use-in-new-entry?
       (assoc-in next-db [:new-entry-edit :topic-slug] (:slug topic-map))
       next-db)))
+
+(defmethod dispatcher/action :new-entry-add
+  [db [_]]
+  (let [new-entry (:new-entry-edit db)
+        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        current-user-data (:current-user-data db)
+        as-of (utils/as-of-now)
+        fixed-entry (utils/fix-entry (merge new-entry {:author [{:avatar-url (:avatar-url current-user-data)
+                                                                 :name (str (:first-name current-user-data) " " (:last-name current-user-data))
+                                                                 :user-id (:user-id current-user-data)
+                                                                 :updated-at as-of}]
+                                                       :created-at as-of
+                                                       :updated-at as-of
+                                                       :reactions []
+                                                       :uuid (utils/entry-uuid)})
+                                     (:topics board-data))
+        next-board-data (assoc board-data :entries (conj (:entries board-data) fixed-entry))]
+    (-> db
+        (assoc-in board-key next-board-data)
+        (assoc :board-filters :latest))))

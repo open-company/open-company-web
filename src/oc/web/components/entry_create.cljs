@@ -15,8 +15,9 @@
 (defn dismiss-modal []
   (dis/dispatch! [:new-entry-toggle false]))
 
-(defn close-clicked [s]
-  (dis/dispatch! [:input [:new-entry-edit] nil])
+(defn close-clicked [s & [saving?]]
+  (when-not saving?
+    (dis/dispatch! [:input [:new-entry-edit] nil]))
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
@@ -41,18 +42,14 @@
         (toggle-topics-dd)))))
 
 (defn body-on-change [state]
-  (js/console.log "body-on-change")
   (when-let [body-el (sel1 [:div.entry-create-body])]
-    (js/console.log "   " body-el)
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
     (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:input [:new-entry-edit :body] emojied-body]))))
 
 (defn- headline-on-change [state]
-  (js/console.log "headline-on-change")
   (when-let [headline (sel1 [:div.entry-create-headline])]
-    (js/console.log "   " headline)
     (let [emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:new-entry-edit :headline] emojied-headline]))))
 
@@ -119,9 +116,6 @@
         current-user-data (drv/react s :current-user-data)
         new-entry-edit (drv/react s :new-entry-edit)
         topic (first (filter #(= (:slug %) (:topic-slug new-entry-edit)) topics))]
-    (js/console.log "entry-create/render" new-entry-edit "disabled?" (or (empty? (:topic-slug new-entry-edit))
-                          (and (empty? (:body new-entry-edit))
-                               (empty? (:headline new-entry-edit)))))
     [:div.entry-create-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
@@ -196,7 +190,9 @@
       [:div.entry-create-modal-divider]
       [:div.entry-create-modal-footer.group
         [:button.mlb-reset.mlb-default
-          {:on-click #()
+          {:on-click #(do
+                        (dis/dispatch! [:new-entry-add])
+                        (close-clicked %))
            :disabled (or (empty? (:topic-slug new-entry-edit))
                          (and (empty? (:body new-entry-edit))
                               (empty? (:headline new-entry-edit))))}

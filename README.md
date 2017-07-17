@@ -240,6 +240,7 @@ provided in the table below:
 |  :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
 |  :name-pswd-collect | UI | Start the request to save the user name and password. |
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
+|  :new-entry-add | UI | Save the new edited entry in the modal view. |
 |  :new-entry-toggle | UI | Show the new create new entry UI. |
 |  :new-topics-load/finish | API | Read the available new topics and save them in the app-state for later use. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
