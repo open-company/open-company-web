@@ -38,13 +38,10 @@
              :data-placement "top"
              :data-container "body"
              :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
-            (utils/time-since (:updated-at entry-data))]
-          (when (and show-topic? (or (:topic-name entry-data) (:topic-slug entry-data)))
-            (str " · " (or (:topic-name entry-data) (s/capital (:topic-slug entry-data)))))]]
+            (utils/time-since (:updated-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
-        (when false
-          [:div.new "NEW"])]]
+        [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))]]]
     [:div.entry-card-content.group
       [:div.entry-card-headline
         (:headline entry-data)]
