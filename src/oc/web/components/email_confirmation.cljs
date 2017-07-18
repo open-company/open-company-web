@@ -43,5 +43,5 @@
           (dom/div {:class "email-confirmation-p group"}
             (dom/p {:class ""} "Carrot makes it easy to see the big picture. Companies are stronger when everyone knows what matters most."))))
       (let [columns-num (responsive/columns-num)
-            card-width (responsive/calc-card-width)]
+            card-width responsive/card-width]
         (footer (responsive/total-layout-width-int card-width columns-num))))))

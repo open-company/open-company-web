@@ -55,7 +55,7 @@
      :new-topics-requested false
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
-                   (responsive/calc-card-width))
+                   responsive/card-width)
      :columns-num (responsive/dashboard-columns-num)})
 
   (did-mount [_]
@@ -66,7 +66,7 @@
       (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
                                                                                            :card-width (if (responsive/is-mobile-size?)
                                                                                                          (responsive/mobile-dashboard-card-width)
-                                                                                                         (responsive/calc-card-width))})))))
+                                                                                                         responsive/card-width)})))))
     (om/set-state! owner :window-click-listener
       (events/listen js/window EventType/CLICK (fn[e]
                                                  (when (and (:show-top-menu @dis/app-state)

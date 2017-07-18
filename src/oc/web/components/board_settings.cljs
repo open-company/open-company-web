@@ -306,6 +306,6 @@
               (om/build board-settings-form data))))
 
         (let [columns-num (responsive/columns-num)
-              card-width (responsive/calc-card-width)
+              card-width responsive/card-width
               footer-width (responsive/total-layout-width-int card-width columns-num)]
           (footer/footer footer-width))))))

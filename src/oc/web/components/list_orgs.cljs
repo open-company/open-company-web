@@ -31,7 +31,7 @@
     (utils/update-page-title "Carrot - Company updates and stories")
     (when (:orgs data)
       (let [orgs-list (:orgs data)
-            card-width (responsive/calc-card-width)]
+            card-width responsive/card-width]
         (dom/div {:class "list-orgs"}
           ;show login overlays if needed
           (when-not (utils/is-test-env?)

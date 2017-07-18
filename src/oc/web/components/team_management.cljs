@@ -304,5 +304,5 @@
               (team-management))))
 
         (let [columns-num (responsive/columns-num)
-              card-width (responsive/calc-card-width)]
+              card-width responsive/card-width]
          (footer/footer (responsive/total-layout-width-int card-width columns-num)))))))

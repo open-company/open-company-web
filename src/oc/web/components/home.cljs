@@ -19,7 +19,7 @@
     (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
 
   (render-state [_ {:keys [columns-num]}]
-    (let [card-width  (responsive/calc-card-width)]
+    (let [card-width  responsive/card-width]
       (if-not (jwt/jwt)
         (home-page)
         (dom/div {:class "home fullscreen-page"}
