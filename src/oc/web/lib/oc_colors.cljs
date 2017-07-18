@@ -38,7 +38,7 @@
   :carrot-gray "#333333"
   :carrot-dark-bg-gray "#F3F2EE"
   :carrot-text-blue "#4c67fc"
-  :cr_orange "#FA6452"
+  :carrot-orange "#FA6452"
   :carrot-settings-background "#FCFBF7"
   :carrot-dark-blue "#2e405a"
   :carrot-green "#0F8E4C"
