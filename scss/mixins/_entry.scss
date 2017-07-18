@@ -76,6 +76,10 @@
     color: $carrot_dark_gray;
   }
 
+  p, img, h1, h2, h3, h4, h5 {
+    margin: 0 0 10px;
+  }
+
   b {
     @include avenir_M();
   }
@@ -87,13 +91,11 @@
 
   a {
     text-decoration: none;
-    // box-shadow: inset 0 -1px 0 $carrot_orange;
     color: $carrot_text_blue;
-    background-image: -webkit-linear-gradient($carrot_text_blue,$carrot_text_blue);
-    background-image: linear-gradient($carrot_text_blue,$carrot_text_blue);
-    background-size: 100% .1rem;
-    background-repeat: no-repeat;
-    background-position: left bottom;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 
   img {
@@ -107,10 +109,5 @@
   p:last-child, & > div:last-child {
     margin-bottom: 0px;
     padding-bottom: 0px;
-  }
-
-  a:hover {
-    -webkit-animation: linkAnimation .5s ease;
-    animation: linkAnimation .5s ease;
   }
 }
