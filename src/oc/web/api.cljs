@@ -793,6 +793,20 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
+(def entry-keys [:headline :body :topic-name])
+
+(defn create-entry
+  [entry-data]
+  (when entry-data
+    (let [board-data (dispatcher/board-data)
+          create-entry-link (utils/link-for (:links board-data) "create" "POST")
+          cleaned-entry-data (select-keys entry-data entry-keys)]
+      (storage-post (:href create-entry-link)
+        {:headers (headers-for-link create-entry-link)
+         :json-params (cljs->json cleaned-entry-data)}
+        (fn [{:keys [status success body]}]
+          (get-board board-data))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go

@@ -986,6 +986,7 @@
                                                        :uuid (utils/entry-uuid)})
                                      (:topics board-data))
         next-board-data (assoc board-data :entries (conj (:entries board-data) fixed-entry))]
+    (api/create-entry new-entry)
     (-> db
         (assoc-in board-key next-board-data)
         (assoc :board-filters :latest))))
