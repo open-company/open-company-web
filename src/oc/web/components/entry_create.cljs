@@ -123,7 +123,9 @@
     [:div.entry-create-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
-       :on-click #(close-clicked s)}
+       :on-click #(when (and (empty? (:body new-entry-edit))
+                             (empty? (:headline new-entry-edit)))
+                    (close-clicked s))}
       [:div.entry-create-modal.group
         {:on-click #(utils/event-stop %)}
         [:div.entry-create-modal-header.group

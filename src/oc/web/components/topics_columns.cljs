@@ -97,7 +97,7 @@
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:new-entry-toggle true])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "Say something")))
+                    "New Update")))
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?))

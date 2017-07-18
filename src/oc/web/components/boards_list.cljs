@@ -46,9 +46,10 @@
         (dom/div {:class "left-boards-list group"
                   :style {:width (str (- left-boards-list-width 20) "px")}}
           ;; All activity
-          (dom/button {:class "all-activity group"}
-            (dom/div {:class "all-activity-icon"})
-            (dom/span "All Activity"))
+          (when (jwt/user-is-part-of-the-team (:team-id org-data))
+            (dom/button {:class "all-activity group"}
+              (dom/div {:class "all-activity-icon"})
+              (dom/span "All Activity")))
           ;; Boards list
           (dom/div {:class "left-boards-list-top group"}
             ;; Boards header

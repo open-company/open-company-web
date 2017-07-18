@@ -42,6 +42,10 @@
   [team-id]
   (keyword (str "\"" team-id "\"")))
 
+(defn user-is-part-of-the-team [team-id]
+  (let [teams (get-key :teams)]
+    (some #{team-id} teams)))
+
 (defn team-has-bot? [team-id]
   (let [slack-bots (get-key :slack-bots)]
     ;; Since the team-id is a string on clj side the key in slakc-bots has quotes around that are
