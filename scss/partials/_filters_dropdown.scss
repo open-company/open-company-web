@@ -83,24 +83,19 @@ div.filters-dropdown-name {
           li {
             @include avenir_M();
             font-size: 12px;
-            color: $carrot_dark_gray;
+            color: $oc_gray_7;
             cursor: pointer;
             margin: 6px 0;
 
             &.select {
-              color: $carrot_light_gray;
-            }
-
-            &.category {
-              font-size: 14px;
+              @include avenir_H();
+              color: $carrot_dark_gray;
             }
 
             &:hover {
               background-color: transparent;
+              text-decoration: underline;
               color: $carrot_dark_gray;
-              &.select {
-                color: $carrot_light_gray;
-              }
             }
 
             &.divider {
