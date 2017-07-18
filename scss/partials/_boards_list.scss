@@ -80,42 +80,6 @@ div.left-boards-list {
         background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
       }
     }
-
-    button.about-carrot-btn {
-      div.about-carrot-icon {
-        background-image: cdnUrl("/img/ML/carrot_grey.svg");
-        background-size: 16px 16px;
-        width: 16px;
-        height: 16px;
-        margin-right: 5px;
-        float: left;
-        margin-top: 1px;
-      }
-
-      span {
-        font-size: 14px;
-        line-height: 1.71;
-        color: $oc_gray_7;
-      }
-    }
-
-    button.invite-people-btn {
-      div.invite-people-icon {
-        background-image: cdnUrl("/img/ML/invite_people.svg");
-        background-size: 16px 16px;
-        width: 16px;
-        height: 16px;
-        margin-right: 5px;
-        float: left;
-        margin-top: 1px;
-      }
-
-      span {
-        font-size: 14px;
-        line-height: 1.71;
-        color: $oc_gray_7;
-      }
-    }
   }
 
   div.left-boards-list-items{
@@ -186,6 +150,46 @@ div.left-boards-list {
         &:active, &:focus {
           outline: none;
         }
+      }
+    }
+  }
+
+  div.left-boards-list-footer {
+    margin-top: 34px;
+
+    button.about-carrot-btn {
+      div.about-carrot-icon {
+        background-image: cdnUrl("/img/ML/carrot_grey.svg");
+        background-size: 16px 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        float: left;
+        margin-top: 1px;
+      }
+
+      span {
+        font-size: 14px;
+        line-height: 1.71;
+        color: $oc_gray_7;
+      }
+    }
+
+    button.invite-people-btn {
+      div.invite-people-icon {
+        background-image: cdnUrl("/img/ML/invite_people.svg");
+        background-size: 16px 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        float: left;
+        margin-top: 1px;
+      }
+
+      span {
+        font-size: 14px;
+        line-height: 1.71;
+        color: $oc_gray_7;
       }
     }
   }
