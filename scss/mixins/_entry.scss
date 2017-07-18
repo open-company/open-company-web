@@ -1,3 +1,5 @@
+@import "../modules/_colors";
+
 @mixin entry-author(){
   div.user-avatar-img-container {
     height: 32px;
@@ -40,18 +42,24 @@
   }
 }
 
+// $entry_new_color: $carrot_orange;
+// $entry_new_color: $carrot_text_blue;
+$entry_new_color: $oc_gray_7;
+// $entry_new_color: $carrot_green_1;
+
 @mixin entry-new(){
   div.new {
-    width: 50px;
+    // width: 50px;
     height: 26px;
-    border: 1px solid rgba(63,189,124,0.40);
+    border: 1px solid rgba($entry_new_color, 0.40);
     border-radius: 3px;
     @include avenir_B();
     font-size: 12px;
-    color: $carrot_green_1;
+    color: $entry_new_color;
     line-height: 14px;
     text-align: center;
-    padding-top: 6px;
+    padding: .5em .9em;
+    text-transform: uppercase !important;
   }
 }
 
@@ -71,8 +79,6 @@
   color: $carrot_dark_gray;
 
   * {
-    @include avenir_R();
-    font-size: 16px;
     color: $carrot_dark_gray;
   }
 
@@ -80,13 +86,18 @@
     margin: 0 0 10px;
   }
 
-  b {
-    @include avenir_M();
+  b, strong{
+    @include avenir_H();
+    color: $carrot_dark_gray;
+    font-weight: normal;
   }
 
   h1, h2, h3, h4, h5 {
-    @include avenir_M();
-    text-size: 19px;
+    font-family: AvenirLTStd-Medium !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 19px;
   }
 
   a {
