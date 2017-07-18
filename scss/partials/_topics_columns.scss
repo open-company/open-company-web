@@ -17,6 +17,7 @@ div.topics-columns {
     position: relative;
 
     div.board-container {
+      margin-right: 36px;
 
       div.board-name {
         @include avenir_M();
@@ -44,7 +45,7 @@ div.topics-columns {
 
       button.add-to-board-btn {
         float: right;
-        margin-right: 5px;
+        margin-right: 16px;
 
         div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");

@@ -84,6 +84,7 @@
 
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 32)
+(def topic-list-right-margin 36)
 (def left-boards-list-width 178)
 
 (defn is-tablet-or-mobile? []
@@ -106,6 +107,7 @@
       (- win-width 8 8))
     (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
        (* topic-list-x-padding 2)
+       topic-list-right-margin
        (if (is-tablet-or-mobile?) 0 left-boards-list-width)))) ; the left side panel with the topics list
 
 (when (not (.-_phantom js/window))

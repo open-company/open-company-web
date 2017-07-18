@@ -78,7 +78,7 @@
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build boards-list data))
             (dom/div {:class "board-container right"
-                      :style {:width (str (- total-width-int responsive/left-boards-list-width 40) "px")}}
+                      :style {:width (str (- total-width-int responsive/left-boards-list-width responsive/topic-list-right-margin (* 2 responsive/topic-list-x-padding)) "px")}}
               ;; Board name row: board name, settings button and say something button
               (dom/div {:class "group"}
                 ;; Board name and settings button
