@@ -30,17 +30,6 @@
 (defn toggle-topics-dd []
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
-(defn add-topic [state]
-  (let [topics (:topics @(drv/get-ref state :board-data))
-        topic-name @(::new-topic state)]
-    (if (seq (filter #(= (s/lower (:name %)) (s/lower topic-name)) topics))
-      (js/alert "Please choose another topic name.")
-      (let [topic-slug (unique-slug topics topic-name)]
-        (dis/dispatch! [:topic-add {:slug topic-slug :name topic-name} true])
-        (reset! (::new-topic state) "")
-        ;; Dismiss the dropdown:
-        (toggle-topics-dd)))))
-
 (defn body-on-change [state]
   (when-let [body-el (sel1 [:div.entry-create-body])]
     ; Attach paste listener to the body and all its children
@@ -99,7 +88,8 @@
                                               (let [topics (:topics @(drv/get-ref s :board-data))
                                                     topic (first (filter #(= (:slug %) board-filters) topics))]
                                                 (when topic
-                                                  (dis/dispatch! [:input [:new-entry-edit :topic-slug] (:slug topic)])))))
+                                                  (dis/dispatch! [:input [:new-entry-edit :topic-slug] (:slug topic)])
+                                                  (dis/dispatch! [:input [:new-entry-edit :topic-name] (:name topic)])))))
                                          s)
                            :did-mount (fn [s]
                                         ;; Add no-scroll to the body to avoid scrolling while showing this modal
@@ -118,8 +108,7 @@
   (let [board-data (drv/react s :board-data)
         topics (:topics board-data)
         current-user-data (drv/react s :current-user-data)
-        new-entry-edit (drv/react s :new-entry-edit)
-        topic (first (filter #(= (:slug %) (:topic-slug new-entry-edit)) topics))]
+        new-entry-edit (drv/react s :new-entry-edit)]
     [:div.entry-create-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
@@ -131,8 +120,10 @@
         [:div.entry-create-modal-header.group
           (user-avatar-image current-user-data)
           [:div.posting-in "Posting in " [:span (:name board-data)]]
-          [:div.arrow [:i.fa.fa-angle-right]]
-          [:div.select-topic (if topic (:name topic) "Select a topic")]
+          [:div.arrow " · "]
+          [:div.select-topic
+            {:class (when-not (:topic-name new-entry-edit) "select-a-topic")}
+            (if (:topic-name new-entry-edit) (:topic-name new-entry-edit) "Select a topic")]
           [:div.entry-card-dd-container
             [:button.mlb-reset.dropdown-toggle
               {:type "button"
@@ -150,20 +141,19 @@
                     [:li
                       {:data-topic-slug (:slug t)
                        :key (str "entry-create-dd-" (:slug t))
-                       :on-click #(dis/dispatch! [:input [:new-entry-edit :topic-slug] (:slug t)])
-                       :class (when (= (:topic-slug new-entry-edit) (:slug t)) "select")}
+                       :on-click #(dis/dispatch! [:input [:new-entry-edit :topic-name] (:name t)])
+                       :class (when (= (:topic-name new-entry-edit) (:name t)) "select")}
                       (:name t)])
                   [:li.divider]
                   [:li.entry-create-new-topic
-                    {:on-click #(utils/event-stop %)}
-                    [:button.mlb-reset.entry-create-new-topic-plus
-                      {:on-click (fn [e]
-                                   (if (empty? @(::new-topic s))
-                                     (do
-                                       (toggle-topics-dd)
-                                       (.focus (sel1 [:input.entry-create-new-topic-field])))
-                                     (add-topic s)))
-                       :title "Create a new topic"}]
+                    (comment
+                      {:on-click #(utils/event-stop %)}
+                      [:button.mlb-reset.entry-create-new-topic-plus
+                        {:on-click (fn [e]
+                                     (when-not (empty? @(::new-topic s))
+                                       (dis/dispatch! [:input [:new-entry-edit :topic-name] @(::new-topic s)])
+                                       (toggle-topics-dd)))
+                         :title "Create a new topic"}])
                     [:input.entry-create-new-topic-field
                       {:type "text"
                        :value @(::new-topic s)
@@ -171,7 +161,8 @@
                                     (cond
                                       (= "Enter" (.-key e))
                                       (when-not (empty? @(::new-topic s))
-                                        (add-topic s))))
+                                       (dis/dispatch! [:input [:new-entry-edit :topic-name] @(::new-topic s)])
+                                       (toggle-topics-dd))))
                        :on-change #(reset! (::new-topic s) (.. % -target -value))
                        :placeholder "Create New Topic"}]]]]]]]
       [:div.entry-create-modal-divider]
@@ -198,7 +189,7 @@
         [:button.mlb-reset.mlb-default
           {:on-click #(do
                         (dis/dispatch! [:new-entry-add])
-                        (close-clicked %))
+                        (close-clicked s))
            :disabled (and (empty? (:body new-entry-edit))
                           (empty? (:headline new-entry-edit)))}
           "Post"]
