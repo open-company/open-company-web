@@ -795,12 +795,18 @@
 
 (def entry-keys [:headline :body :topic-name])
 
+(defn clean-entry [entry-data]
+  (let [fixed-entry-data (if (empty? (:topic-slug entry-data))
+                            (dissoc entry-data :topic-slug :topic-name)
+                            entry-data)]
+    (select-keys fixed-entry-data entry-keys)))
+
 (defn create-entry
   [entry-data]
   (when entry-data
     (let [board-data (dispatcher/board-data)
           create-entry-link (utils/link-for (:links board-data) "create" "POST")
-          cleaned-entry-data (select-keys entry-data entry-keys)]
+          cleaned-entry-data (clean-entry entry-data)]
       (storage-post (:href create-entry-link)
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
