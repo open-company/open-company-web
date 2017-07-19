@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
 
@@ -42,7 +43,13 @@
       ; Card labels
       [:div.entry-card-head-right
         (when (and (:topic-slug entry-data) show-topic?)
-          [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))])]]
+          (let [topic-name (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))
+                topic-color (utils/rgb-with-opacity (:topic-color entry-data) "1")
+                topic-border (utils/rgb-with-opacity (:topic-color entry-data) "0.4")]
+            [:div.new
+              {:style {:color topic-color
+                       :border (str "1px solid " topic-border)}}
+              topic-name]))]]
     [:div.entry-card-content.group
       [:div.entry-card-headline
         (:headline entry-data)]
