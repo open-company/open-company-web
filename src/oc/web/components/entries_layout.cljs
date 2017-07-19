@@ -23,7 +23,7 @@
               [:div.by-topic-header-title
                 (or topic-name
                     (s/capital topic-slug)
-                    "Uncategorized")]
+                    "")]
               (when (> (count entries-group) 4)
                 [:button.view-all-updates.mlb-reset
                   {:on-click #(router/nav! (oc-urls/board-filter-by-topic topic-slug))}
