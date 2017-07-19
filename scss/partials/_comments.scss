@@ -150,14 +150,15 @@ div.comments {
           width: 100%;
           border: none;
           outline: none;
+          @include avenir_R();
           background-color: transparent;
           color: $oc_gray_5;
-          height: 15px;
+          height: 18px;
           font-size: 14px;
           transition: 230ms;
 
           @include placeholder {
-            color: rgba(78,90,107,0.6);
+            color: $carrot_light_gray_1;
           }
         }
 
