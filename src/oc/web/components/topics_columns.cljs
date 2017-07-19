@@ -53,7 +53,7 @@
                                                  :width "auto"}
                                             #js {:width total-width}))
           total-width-int (js/parseInt total-width 10)
-          empty-board? (zero? (count (:topics board-data)))]
+          empty-board? (zero? (count (:entries board-data)))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
