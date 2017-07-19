@@ -966,7 +966,9 @@
         next-board-data (assoc board-data :topics next-topics)
         next-db (assoc-in db board-key next-board-data)]
     (if use-in-new-entry?
-      (assoc-in next-db [:new-entry-edit :topic-slug] (:slug topic-map))
+      (-> next-db
+        (assoc-in [:new-entry-edit :topic-slug] (:slug topic-map))
+        (assoc-in [:new-entry-edit :topic-name] (:name topic-map)))
       next-db)))
 
 (defmethod dispatcher/action :new-entry-add
