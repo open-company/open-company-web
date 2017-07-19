@@ -74,6 +74,14 @@ $entry_new_color: $oc_gray_7;
 }
 
 @mixin entry-body(){
+
+  &.medium-editor-placeholder:after {
+    @include avenir_R();
+    font-size: 16px;
+    color: $carrot_light_gray_1;
+    font-style: none !important;
+  }
+
   @include avenir_R();
   font-size: 16px;
   color: $carrot_dark_gray;
