@@ -41,7 +41,8 @@
             (utils/time-since (:updated-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
-        [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))]]]
+        (when (:topic-slug entry-data)
+          [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))])]]
     [:div.entry-card-content.group
       [:div.entry-card-headline
         (:headline entry-data)]
