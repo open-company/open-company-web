@@ -66,13 +66,11 @@ div.entry-modal-container {
 
           div.entry-card-head{
             div.entry-card-head-left {
-              width: 80%;
               float: left;
               @include entry-author();
             }
 
             div.entry-card-head-right {
-              width: 20%;
               float: right;
               div.new {
                 float: right;

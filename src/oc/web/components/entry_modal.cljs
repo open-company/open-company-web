@@ -45,37 +45,41 @@
                                           (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                           s)}
   [s entry-data]
-  [:div.entry-modal-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
-                              :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
-    [:div.entry-modal.group
-      [:button.close-entry-modal.mlb-reset
-        {:on-click #(close-clicked s)}]
-      [:div.entry-modal-inner.group
-        [:div.entry-left-column
-          [:div.entry-left-column-content
-            [:div.entry-card-head.group
-              [:div.entry-card-head-left
-                (user-avatar-image (first (:author entry-data)))
-                [:div.name (:name (first (:author entry-data)))]
-                [:div.time-since
-                  [:time
-                    {:date-time (:updated-at entry-data)
-                     :data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
-                    (utils/time-since (:updated-at entry-data))]]]
-              [:div.entry-card-head-right
-                [:button.mlb-reset.entry-modal-more
-                  {:on-click #()}]
-                [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))]]]
-            [:div.entry-card-content
-              [:div.entry-card-content-headline (:headline entry-data)]
-              [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
-            [:div.entry-card-footer
-              (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)]]]
-        [:div.entry-right-column
-          {:style #js {:minHeight (str (.height (js/$ ".entry-left-column")) "px")}}
-          [:div.entry-right-column-content
-            (comments (:uuid entry-data))]]]]])
+  (let [column-height (str (max 284 (.height (js/$ ".entry-left-column"))) "px")]
+    [:div.entry-modal-container
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
+                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+      [:div.entry-modal.group
+        [:button.close-entry-modal.mlb-reset
+          {:on-click #(close-clicked s)}]
+        [:div.entry-modal-inner.group
+          [:div.entry-left-column
+            {:style #js {:minHeight column-height}}
+            [:div.entry-left-column-content
+              {:style #js {:minHeight column-height}}
+              [:div.entry-card-head.group
+                [:div.entry-card-head-left
+                  (user-avatar-image (first (:author entry-data)))
+                  [:div.name (:name (first (:author entry-data)))]
+                  [:div.time-since
+                    [:time
+                      {:date-time (:updated-at entry-data)
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
+                      (utils/time-since (:updated-at entry-data))]]]
+                [:div.entry-card-head-right
+                  [:button.mlb-reset.entry-modal-more
+                    {:on-click #()}]
+                  (when (:topic-slug entry-data)
+                    [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))])]]
+              [:div.entry-card-content
+                [:div.entry-card-content-headline (:headline entry-data)]
+                [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
+              [:div.entry-card-footer
+                (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)]]]
+          [:div.entry-right-column
+            {:style #js {:minHeight column-height}}
+            [:div.entry-right-column-content
+              (comments (:uuid entry-data))]]]]]))
