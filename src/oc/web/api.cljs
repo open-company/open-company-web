@@ -796,7 +796,7 @@
 (def entry-keys [:headline :body :topic-name])
 
 (defn clean-entry [entry-data]
-  (let [fixed-entry-data (if (empty? (:topic-slug entry-data))
+  (let [fixed-entry-data (if (empty? (:topic-name entry-data))
                             (dissoc entry-data :topic-slug :topic-name)
                             entry-data)]
     (select-keys fixed-entry-data entry-keys)))
