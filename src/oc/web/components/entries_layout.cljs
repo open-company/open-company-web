@@ -30,7 +30,8 @@
                   "VIEW " (count entries-group) " UPDATES"])]
             (for [entry (take 4 entries-group)]
               (rum/with-key (entry-card entry false) (str "entry-by-topic-" topic "-" (:uuid entry))))
-            (when (= (count entries-group) 1)
+            (when (and (not (empty? topic-slug))
+                       (= (count entries-group) 1))
               (entry-card-empty (:read-only board-data)))]))
       ;; by specific topic
       (string? layout-type)
