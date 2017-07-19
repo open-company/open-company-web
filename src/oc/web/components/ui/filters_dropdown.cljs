@@ -37,11 +37,11 @@
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle
           {:type "button"
            :id "filters-dropdown-btn"
-           :data-toggle "dropdown"
+           :data-toggle (if (pos? (count (:topics board-data))) "dropdown" "")
            :aria-haspopup true
            :aria-expanded false}
           (board-filters-label board-filters (:topics board-data))
-          [:i.fa.fa-caret-down]]
+          (when (pos? (count (:topics board-data))) [:i.fa.fa-caret-down])]
         [:div.filters-dropdown-list.dropdown-menu
           {:aria-labelledby "filters-dropdown-btn"}
           [:div.triangle]
