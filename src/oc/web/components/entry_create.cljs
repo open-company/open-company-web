@@ -143,6 +143,12 @@
               [:div.triangle]
               [:div.entry-dropdown-list-content
                 [:ul
+                  (when-not (empty? (:topic-slug new-entry-edit))
+                    [:li
+                      {:on-click #(do
+                                    (dis/dispatch! [:input [:new-entry-edit :topic-slug] nil])
+                                    (dis/dispatch! [:input [:new-entry-edit :topic-name] nil]))}
+                      "Uncategorized"])
                   (for [t topics]
                     [:li
                       {:data-topic-slug (:slug t)
