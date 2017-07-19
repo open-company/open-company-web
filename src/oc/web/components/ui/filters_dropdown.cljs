@@ -23,7 +23,8 @@
                               (drv/drv :board-data)
   [s]
   (let [board-data (drv/react s :board-data)
-        board-filters (drv/react s :board-filters)]
+        board-filters (drv/react s :board-filters)
+        topic-groups (group-by :topic-slug (:entries board-data))]
     [:div.filters-dropdown-name.group
       (when (string? board-filters)
         [:button.mlb-reset.board-remove-filter
@@ -37,11 +38,11 @@
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle
           {:type "button"
            :id "filters-dropdown-btn"
-           :data-toggle (if (pos? (count (:topics board-data))) "dropdown" "")
+           :data-toggle (if (pos? (count topic-groups)) "dropdown" "")
            :aria-haspopup true
            :aria-expanded false}
           (board-filters-label board-filters (:topics board-data))
-          (when (pos? (count (:topics board-data))) [:i.fa.fa-caret-down])]
+          (when (pos? (count topic-groups)) [:i.fa.fa-caret-down])]
         [:div.filters-dropdown-list.dropdown-menu
           {:aria-labelledby "filters-dropdown-btn"}
           [:div.triangle]
