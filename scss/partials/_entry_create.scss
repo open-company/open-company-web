@@ -237,7 +237,7 @@ div.entry-create-modal-container {
         @include entry-body();
 
         &.medium-editor-placeholder:after {
-          color: $carrot_dark_gray !important;
+          color: $carrot_light_gray_1 !important;
         }
 
         &:after {
