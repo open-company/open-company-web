@@ -204,6 +204,7 @@ provided in the table below:
 |  :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
 |  :board-create | UI | Start the request to create a new board for the current org. |
 |  :board-delete | UI | Delete a board of the current org. |
+|  :board-nav | UI | Navigate to another board: it needs an action because it reset the board filters before navigating away. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |
 |  :channels-enumerate | UI | Start the request to load the Slack channels give a Slack team. |

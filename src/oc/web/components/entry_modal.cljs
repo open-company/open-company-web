@@ -12,9 +12,7 @@
             [oc.web.components.comments :refer (comments)]))
 
 (defn dismiss-modal []
-  (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)))) :by-topic)
-    (router/nav! (oc-urls/board-sort-by-topic))
-    (router/nav! (oc-urls/board))))
+  (dis/dispatch! [:board-nav (router/current-board-slug)]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)

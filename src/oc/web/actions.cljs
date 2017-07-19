@@ -990,3 +990,12 @@
     (-> db
         (assoc-in board-key next-board-data)
         (assoc :board-filters :latest))))
+
+(defmethod dispatcher/action :board-nav
+  [db [_ board-slug]]
+  (let [next-board-filter (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest)
+        next-board-url (if (= next-board-filter :by-topic)
+                         (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
+                         (oc-urls/board (router/current-org-slug) board-slug))]
+    (utils/after 10 #(router/nav! next-board-url))
+    (assoc db :board-filters next-board-filter)))

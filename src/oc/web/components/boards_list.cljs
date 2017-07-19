@@ -74,8 +74,7 @@
                         :style {:width (str (- left-boards-list-width 20 5) "px")}
                         :data-board (name (:slug board))
                         :key (str "board-list-" (name (:slug board)))
-                        :on-click #(when (nil? (:foce-key data))
-                                     (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
+                        :on-click #(dis/dispatch! [:board-nav (:slug board)])}
                 (dom/div {:class "internal has-news"
                           :key (str "board-list-" (name (:slug board)) "-internal")}
                   (or (:name board) (:slug board)))
