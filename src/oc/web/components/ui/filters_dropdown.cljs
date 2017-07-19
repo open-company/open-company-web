@@ -14,7 +14,7 @@
     ;; by topic order
     (= board-filters :by-topic) "By Topic"
     ;; if the filter is a string it means we are filtering by a topic slug, get the topic name from the board data
-    (string? board-filters) (or (utils/topic-name topics board-filters) (s/capital board-filters))
+    (string? board-filters) (or (:name (utils/get-topic topics board-filters)) (s/capital board-filters))
     ;; in any other case we are showing by latest updates
     :else "Latest Updates"))
 
