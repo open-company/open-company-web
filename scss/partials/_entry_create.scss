@@ -63,40 +63,32 @@ div.entry-create-modal-container {
         font-size: 26px;
       }
 
-      div.select-topic {
-        color: $carrot_dark_gray;
-        font-size: 16px;
-        @include avenir_M();
-        float: left;
-        margin-top: 5px;
-
-        &.select-a-topic {
-          color: #B1B8C0;
-        }
-
-        i.fa.fa-caret-down {
-          margin-left: 5px;
-          font-size: 16px;
-          color: $oc_gray_7;
-        }
-      }
-
       div.entry-card-dd-container {
         position: relative;
         float: left;
         display: inline-block;
 
         button.dropdown-toggle {
-          color: $oc_gray_7;
-          font-size: 20px;
-          margin-left: 5px;
-          margin-top: 2px;
+          color: $carrot_dark_gray;
+          font-size: 16px;
+          @include avenir_H();
+          float: left;
+
+          i.fa.fa-caret-down {
+            margin-left: 10px;
+            margin-top: 5px;
+          }
+
+          &.select-a-topic {
+            @include avenir_M();
+            color: #B1B8C0;
+          }
         }
 
         div.entry-create-topics-dd {
           position: absolute;
           top: 25px;
-          left: -113px;
+          left: -73px;
           width: 260px;
           border: none;
           outline: none;

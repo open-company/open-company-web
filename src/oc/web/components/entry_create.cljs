@@ -121,16 +121,15 @@
           (user-avatar-image current-user-data)
           [:div.posting-in "Posting in " [:span (:name board-data)]]
           [:div.arrow " · "]
-          [:div.select-topic
-            {:class (when-not (:topic-name new-entry-edit) "select-a-topic")}
-            (if (:topic-name new-entry-edit) (:topic-name new-entry-edit) "Select a topic")]
           [:div.entry-card-dd-container
             [:button.mlb-reset.dropdown-toggle
-              {:type "button"
+              {:class (when-not (:topic-name new-entry-edit) "select-a-topic")
+               :type "button"
                :id "entry-create-dd-btn"
                :data-toggle "dropdown"
                :aria-haspopup true
                :aria-expanded false}
+              (if (:topic-name new-entry-edit) (:topic-name new-entry-edit) "Add a topic")
               [:i.fa.fa-caret-down]]
             [:div.entry-create-topics-dd.dropdown-menu
               {:aria-labelledby "entry-create-dd-btn"}
