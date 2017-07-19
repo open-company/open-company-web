@@ -987,11 +987,19 @@
                                                        :reactions []
                                                        :uuid (utils/entry-uuid)})
                                      (:topics board-data))
-        next-board-data (assoc board-data :entries (conj (:entries board-data) fixed-entry))]
+        next-board-data (assoc board-data :entries (conj (:entries board-data) fixed-entry))
+        next-board-filters (if (= (:board-filters db) (:topic-slug new-entry))
+                              ; if it's filtering by the same topic of the new entry leave it be
+                              (:board-filters db)
+                              (if (keyword? (:board-filters db))
+                                ; if it's different but it's a keyword it means it's sorting (by latest or topic)
+                                (:board-filters db)
+                                ; else sort by latest because it's filtering by a different topic
+                                :latest))]
     (api/create-entry new-entry)
     (-> db
         (assoc-in board-key next-board-data)
-        (assoc :board-filters :latest))))
+        (assoc :board-filters next-board-filters))))
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug]]
