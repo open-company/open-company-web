@@ -143,21 +143,24 @@
               [:div.triangle]
               [:div.entry-dropdown-list-content
                 [:ul
-                  (when-not (empty? (:topic-slug new-entry-edit))
-                    [:li
-                      {:on-click #(do
-                                    (dis/dispatch! [:input [:new-entry-edit :topic-slug] nil])
-                                    (dis/dispatch! [:input [:new-entry-edit :topic-name] nil]))}
-                      "Uncategorized"])
-                  (for [t topics]
-                    [:li
-                      {:data-topic-slug (:slug t)
-                       :key (str "entry-create-dd-" (:slug t))
-                       :on-click #(dis/dispatch! [:input [:new-entry-edit :topic-name] (:name t)])
-                       :class (when (= (:topic-name new-entry-edit) (:name t)) "select")}
-                      (:name t)])
+                  (for [t topics
+                        :let [selected (= (:topic-name new-entry-edit) (:name t))]]
+                    [:li.group
+                      [:button.mlb-reset.selectable
+                        {:data-topic-slug (:slug t)
+                         :key (str "entry-create-dd-" (:slug t))
+                         :on-click #(dis/dispatch! [:input [:new-entry-edit :topic-name] (:name t)])
+                         :class (when selected "select")}
+                        (:name t)]
+                      (when selected
+                        [:button.mlb-reset.mlb-link.remove
+                          {:on-click (fn [e]
+                                       (utils/event-stop e)
+                                       (dis/dispatch! [:input [:new-entry-edit :topic-slug] nil])
+                                       (dis/dispatch! [:input [:new-entry-edit :topic-name] nil]))}
+                          "Remove"])])
                   [:li.divider]
-                  [:li.entry-create-new-topic
+                  [:li.entry-create-new-topic.group
                     (comment
                       {:on-click #(utils/event-stop %)}
                       [:button.mlb-reset.entry-create-new-topic-plus
