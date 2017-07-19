@@ -3,9 +3,10 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as s]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [cljsjs.medium-editor]
             [goog.object :as googobj]
@@ -42,10 +43,16 @@
     (let [emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:new-entry-edit :headline] emojied-headline]))))
 
+(defn body-placeholder []
+  (let [first-name (jwt/get-key :first-name)]
+    (if-not (empty? first-name)
+      (str "What's new, " first-name "?")
+      "What's new?")))
+
 (defn- setup-body-editor [state]
   (let [headline-el  (sel1 [:div.entry-create-headline])
         body-el      (sel1 [:div.entry-create-body])
-        body-editor  (new js/MediumEditor body-el (clj->js (utils/medium-editor-options "What's new?" false)))]
+        body-editor  (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (body-placeholder) false)))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
@@ -160,8 +167,11 @@
                                     (cond
                                       (= "Enter" (.-key e))
                                       (when-not (empty? @(::new-topic s))
-                                       (dis/dispatch! [:input [:new-entry-edit :topic-name] @(::new-topic s)])
-                                       (toggle-topics-dd))))
+                                        (let [topic-name @(::new-topic s)
+                                              topic-slug (unique-slug topics topic-name)]
+                                        (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
+                                        (toggle-topics-dd)
+                                        (reset! (::new-topic s) "")))))
                        :on-change #(reset! (::new-topic s) (.. % -target -value))
                        :placeholder "Create New Topic"}]]]]]]]
       [:div.entry-create-modal-divider]
@@ -177,8 +187,8 @@
            :on-blur     #(headline-on-change s)
            :dangerouslySetInnerHTML #js {"__html" ""}}]
         [:div.entry-create-body.emoji-autocomplete.emojiable
-          {:placeholder "What's new?"
-           :data-placeholder "What's new?"
+          {;:placeholder (body-placeholder)
+           ;:data-placeholder (body-placeholder)
            :role "textbox"
            :aria-multiline true
            :contentEditable true

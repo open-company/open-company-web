@@ -45,7 +45,7 @@ div.entry-create-modal-container {
       div.posting-in {
         @include avenir_M();
         font-size: 16px;
-        color: #B1B8C0;
+        color: $carrot_light_gray_1;
         float: left;
         margin-top: 5px;
 
@@ -59,7 +59,7 @@ div.entry-create-modal-container {
         margin-left: 15px;
         margin-right: 15px;
         float: left;
-        color: #B1B8C0;
+        color: $carrot_light_gray_1;
         font-size: 26px;
       }
 
@@ -81,7 +81,7 @@ div.entry-create-modal-container {
 
           &.select-a-topic {
             @include avenir_M();
-            color: #B1B8C0;
+            color: $carrot_light_gray_1;
           }
         }
 
@@ -201,7 +201,7 @@ div.entry-create-modal-container {
       width: calc(100% + 48px);
       margin-left: -24px;
       height: 1px;
-      background-color: #b1b8c0;
+      background-color: $carrot_light_gray_1;
       opacity: 0.3;
     }
 
@@ -211,15 +211,17 @@ div.entry-create-modal-container {
       div.entry-create-headline {
         border: none;
         outline: none;
+        cursor: text;
+        @include entry-headline();
+        @include avenir_H();
         font-size: 18px;
         color: $carrot_dark_gray;
-        @include avenir_H();
-        cursor: text;
 
         &:empty:before {
           content: attr(placeholder);
           display: block;
-          color: #B1B8C0;
+          color: $carrot_light_gray_1 !important;
+          font-style: none;
         }
       }
 
@@ -232,10 +234,10 @@ div.entry-create-modal-container {
         margin: 24px 0 0;
         cursor: text;
         min-height: 95px;
+        @include entry-body();
 
-        @include placeholder(){
-          color: #B1B8C0;
-          margin-top: 0px;
+        &.medium-editor-placeholder:after {
+          color: $carrot_dark_gray !important;
         }
 
         &:after {
