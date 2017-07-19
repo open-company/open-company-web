@@ -26,7 +26,6 @@
   div.name {
     overflow: hidden;
     text-overflow: ellipsis;
-    width: calc(100% - 52px);
     @include avenir_H();
     color: $carrot_dark_gray;
     font-size: 15px;
