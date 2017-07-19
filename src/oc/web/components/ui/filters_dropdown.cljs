@@ -59,7 +59,8 @@
                               (router/nav! (oc-urls/board-sort-by-topic)))
                  :class (if (= board-filters :by-topic) "select" "")}
                 "By Topic"]
-              [:li.divider]
+              (when (pos? (count (:topics board-data)))
+                [:li.divider])
               (for [t (:topics board-data)]
                 [:li
                   {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:slug t)))
