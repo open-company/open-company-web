@@ -57,9 +57,20 @@
         {:dangerouslySetInnerHTML #js {:__html (cut-body (:body entry-data))}}]]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
-      [:div.more-button
-        [:button.mlb-reset.more-ellipsis
-          {:title "More"
-           :data-toggle "tooltip"
-           :data-placement "top"
-           :data-container "body"}]]]])
+      [:div.more-button.dropdown
+        [:button.mlb-reset.more-ellipsis.dropdown-toggle
+          {:type "button"
+           :id (str "more-ellipsis-toggle-" (router/current-board-slug) "-" (:uuid entry-data))
+           :on-click #(utils/event-stop %)
+           :title "More"
+           :data-toggle "dropdown"
+           :aria-haspopup true
+           :aria-expanded false
+           ; :data-placement "top"
+           ; :data-container "body"
+           }]
+        [:div.dropdown-menu
+          [:div.triangle]
+          [:ul.entry-card-more-menu
+            [:li "Edit"]
+            [:li "Delete"]]]]]])

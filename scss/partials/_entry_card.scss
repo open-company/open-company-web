@@ -133,6 +133,7 @@ div.entry-card {
 
     div.more-button {
       float: right;
+      position: relative;
 
       button.more-ellipsis {
         width: 22px;
@@ -143,6 +144,54 @@ div.entry-card {
         background-position: center;
         background-size: 16px 16px;
         background-repeat: no-repeat;
+      }
+
+      div.dropdown-menu {
+        position: absolute;
+        top: 25px;
+        left: -63px;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        background-color: transparent;
+
+        div.triangle {
+          position: absolute;
+          top: 3px;
+          left: 64px;
+          background-color: white;
+          border-top: 1px solid rgba(177,184,192,0.50);
+          border-left: 1px solid rgba(177,184,192,0.50);
+          transform: rotate(45deg);
+          width: 20px;
+          height: 20px;
+        }
+
+        ul.entry-card-more-menu {
+          background-color: white;
+          border: 1px solid rgba(177,184,192,0.50);
+          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+          border-radius: 5px;
+          margin: 8px 0;
+          padding: 10px 16px 6px;
+          min-height: 50px;
+          list-style-type: none;
+          width: 100px;
+
+          li {
+            margin: 6px 0;
+            @include avenir_M();
+            font-size: 14px;
+            color: $oc_gray_7;
+            cursor: pointer;
+            background-color: transparent;
+
+            &:hover {
+              text-decoration: underline;
+              background-color: transparent;
+            }
+          }
+        }
       }
     }
   }
