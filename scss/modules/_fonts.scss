@@ -5,58 +5,85 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
   font-family: AvenirLTStd-Book;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .AvenirLTStd-BookOblique {
   font-family: AvenirLTStd-BookOblique;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .AvenirLTStd-MediumOblique {
   font-family: AvenirLTStd-MediumOblique;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .AvenirLTStd-Medium {
   font-family: AvenirLTStd-Medium;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .AvenirLTStd-BlackOblique {
   font-family: AvenirLTStd-BlackOblique;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 .AvenirLTStd-Oblique {
   font-family: AvenirLTStd-Oblique;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 .AvenirLTStd-Roman {
   font-family: AvenirLTStd-Roman;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 .AvenirLTStd-Heavy {
   font-family: AvenirLTStd-Heavy;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 .AvenirLTStd-HeavyOblique {
   font-family: AvenirLTStd-HeavyOblique;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 .AvenirLTStd-Black {
   font-family: AvenirLTStd-Black;
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @mixin avenir($avenir_variant: Black){
   font-family: AvenirLTStd-#{$avenir_variant};
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @mixin avenir_BOOK() {
