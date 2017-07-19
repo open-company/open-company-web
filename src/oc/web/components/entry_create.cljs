@@ -146,9 +146,9 @@
                   (for [t topics
                         :let [selected (= (:topic-name new-entry-edit) (:name t))]]
                     [:li.group
+                      {:key (str "entry-create-dd-" (:slug t))}
                       [:button.mlb-reset.selectable
                         {:data-topic-slug (:slug t)
-                         :key (str "entry-create-dd-" (:slug t))
                          :on-click #(dis/dispatch! [:input [:new-entry-edit :topic-name] (:name t)])
                          :class (when selected "select")}
                         (:name t)]

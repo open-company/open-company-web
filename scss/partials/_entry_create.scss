@@ -45,7 +45,7 @@ div.entry-create-modal-container {
       div.posting-in {
         @include avenir_M();
         font-size: 16px;
-        color: $carrot_light_gray_1;
+        color: $oc_gray_7;
         float: left;
         margin-top: 5px;
 
@@ -59,7 +59,7 @@ div.entry-create-modal-container {
         margin-left: 15px;
         margin-right: 15px;
         float: left;
-        color: $carrot_light_gray_1;
+        color: $oc_gray_7;
         font-size: 26px;
       }
 
@@ -81,7 +81,7 @@ div.entry-create-modal-container {
 
           &.select-a-topic {
             @include avenir_M();
-            color: $carrot_light_gray_1;
+            color: $oc_gray_7;
           }
         }
 
