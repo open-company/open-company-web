@@ -3,8 +3,9 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
-            [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -64,14 +65,11 @@
                      :data-placement "top"
                      :data-container "body"
                      :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
-                    (utils/time-since (:updated-at entry-data))]
-                  (when (or (:topic-name entry-data) (:topic-slug entry-data))
-                    (str " · " (or (:topic-name entry-data) (s/capital (:topic-slug entry-data)))))]]
+                    (utils/time-since (:updated-at entry-data))]]]
               [:div.entry-card-head-right
                 [:button.mlb-reset.entry-modal-more
                   {:on-click #()}]
-                (when false
-                  [:div.new "NEW"])]]
+                [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))]]]
             [:div.entry-card-content
               [:div.entry-card-content-headline (:headline entry-data)]
               [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
