@@ -6,7 +6,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
-            [oc.web.components.ui.small-loading :refer (small-loading)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defc comment-row
   [c]
@@ -25,13 +26,17 @@
 
 (rum/defcs add-comment < (rum/local "" ::v)
                          (rum/local false ::show-footer)
+                         rum/reactive
+                         (drv/drv :current-user-data)
                          rum/static
   [s entry-uuid did-expand-cb]
   (let [v (::v s)
         show-footer (::show-footer s)
-        fixed-show-footer (or @show-footer (not (empty? @v)))]
+        fixed-show-footer (or @show-footer (not (empty? @v)))
+        current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box
       {:class (if fixed-show-footer "expanded" "")}
+      (user-avatar-image current-user-data)
       [:div.add-comment-internal
         [:textarea.add-comment
           {:value @v

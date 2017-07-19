@@ -130,7 +130,21 @@ div.comments {
         }
       }
 
+      div.user-avatar-img-container {
+        width: 20px;
+        height: 20px;
+        float: left;
+
+        img.user-avatar-img {
+          max-width: 20px;
+          max-height: 20px;
+          border-radius: 10px;
+        }
+      }
+
       div.add-comment-internal{
+        margin-left: 35px;
+
         textarea.add-comment {
           resize: none;
           width: 100%;
@@ -138,7 +152,7 @@ div.comments {
           outline: none;
           background-color: transparent;
           color: $oc_gray_5;
-          height: 30px;
+          height: 15px;
           font-size: 14px;
           transition: 230ms;
 
