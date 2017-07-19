@@ -24,7 +24,7 @@
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)]
-    [:div.filters-dropdown-name
+    [:div.filters-dropdown-name.group
       (when (string? board-filters)
         [:button.mlb-reset.board-remove-filter
           {:on-click #(let [org-slug (router/current-org-slug)
@@ -33,7 +33,6 @@
                         (if (= last-filter :by-topic)
                           (router/nav! (oc-urls/board-sort-by-topic))
                           (router/nav! (oc-urls/board))))}])
-      (board-filters-label board-filters (:topics board-data))
       [:div.filters-dropdown-container
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle
           {:type "button"
@@ -41,6 +40,7 @@
            :data-toggle "dropdown"
            :aria-haspopup true
            :aria-expanded false}
+          (board-filters-label board-filters (:topics board-data))
           [:i.fa.fa-caret-down]]
         [:div.filters-dropdown-list.dropdown-menu
           {:aria-labelledby "filters-dropdown-btn"}

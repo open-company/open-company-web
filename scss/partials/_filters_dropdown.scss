@@ -14,6 +14,7 @@ div.filters-dropdown-name {
     background-repeat: no-repeat;
     margin-right: 10px;
     transition: 230ms;
+    float: left;
 
     &:hover {
       background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
@@ -24,17 +25,17 @@ div.filters-dropdown-name {
   div.filters-dropdown-container{
     position: relative;
     display: inline-block;
+    float: left;
 
     button.filters-dropdown-caret {
-      width: 20px;
       height: 20px;
-      margin-left: 10px;
       display: inline-block;
 
       i.fa-caret-down {
         font-size: 12px;
         margin-top: 5px;
         transition: 230ms;
+        margin-left: 10px;
       }
 
       &.open {
@@ -46,8 +47,8 @@ div.filters-dropdown-name {
 
     div.filters-dropdown-list {
       position: absolute;
-      top: 20px;
-      left: -60px;
+      top: 30px;
+      left: calc(50% - 70px);
       width: 140px;
       border: none;
       outline: none;
