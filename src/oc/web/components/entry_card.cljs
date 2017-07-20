@@ -19,7 +19,7 @@
       "This topic’s a little sparse. "
       (when-not read-only?
         [:button.mlb-reset
-          {:on-click #(dis/dispatch! [:new-entry-toggle true])}
+          {:on-click #(dis/dispatch! [:entry-edit {}])}
           "Add an update?"])]])
 
 (rum/defcs entry-card < rum/static
@@ -72,5 +72,13 @@
         [:div.dropdown-menu
           [:div.triangle]
           [:ul.entry-card-more-menu
-            [:li "Edit"]
-            [:li "Delete"]]]]]])
+            [:li
+              {:on-click (fn [e]
+                           (utils/event-stop e)
+                           (dis/dispatch! [:entry-edit entry-data]))}
+              "Edit"]
+            [:li
+              {:on-click (fn [e]
+                           (utils/event-stop e)
+                           (dis/dispatch! [:entry-delete entry-data]))}
+              "Delete"]]]]]])
