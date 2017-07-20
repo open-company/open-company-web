@@ -952,11 +952,13 @@
   (utils/after 10 #(router/nav! (oc-urls/entry entry-uuid)))
   (assoc db :entry-modal-fade-in entry-uuid))
 
-(defmethod dispatcher/action :new-entry-toggle
+(defmethod dispatcher/action :entry-edit
+  [db [_ initial-entry-data]]
+  (assoc db :entry-editing initial-entry-data))
+
+(defmethod dispatcher/action :entry-edit/dismiss
   [db [_ show?]]
-  (if show?
-    (assoc db :new-entry true)
-    (dissoc db :new-entry)))
+  (dissoc db :entry-editing))
 
 (defmethod dispatcher/action :topic-add
   [db [_ topic-map use-in-new-entry?]]
@@ -967,28 +969,47 @@
         next-db (assoc-in db board-key next-board-data)]
     (if use-in-new-entry?
       (-> next-db
-        (assoc-in [:new-entry-edit :topic-slug] (:slug topic-map))
-        (assoc-in [:new-entry-edit :topic-name] (:name topic-map)))
+        (assoc-in [:entry-editing :topic-slug] (:slug topic-map))
+        (assoc-in [:entry-editing :topic-name] (:name topic-map)))
       next-db)))
 
-(defmethod dispatcher/action :new-entry-add
+(defn author-data [current-user-data as-of]
+  {:avatar-url (:avatar-url current-user-data)
+   :name (str (:first-name current-user-data) " " (:last-name current-user-data))
+   :user-id (:user-id current-user-data)
+   :updated-at as-of})
+
+(defn new-entry-fixed-data [entry-data board-data current-user-data as-of]
+  (utils/fix-entry (merge entry-data {:author [(author-data current-user-data as-of)]
+                                      :created-at as-of
+                                      :updated-at as-of
+                                      :reactions []
+                                      :uuid (utils/entry-uuid)})
+                   (:topics board-data)))
+
+(defn entry-fixed-data [entry-data current-user-data as-of]
+  (let [new-author (author-data current-user-data as-of)]
+    (merge entry-data {:updated-at as-of
+                       :author (if (sequential? (:author entry-data))
+                                 (conj (:author entry-data) new-author)
+                                 [(:author entry-data) new-author])})))
+
+(defmethod dispatcher/action :entry-save
   [db [_]]
-  (let [new-entry (:new-entry-edit db)
+  (let [entry-data (:entry-editing db)
         board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
-        current-user-data (:current-user-data db)
         as-of (utils/as-of-now)
-        fixed-entry (utils/fix-entry (merge new-entry {:author [{:avatar-url (:avatar-url current-user-data)
-                                                                 :name (str (:first-name current-user-data) " " (:last-name current-user-data))
-                                                                 :user-id (:user-id current-user-data)
-                                                                 :updated-at as-of}]
-                                                       :created-at as-of
-                                                       :updated-at as-of
-                                                       :reactions []
-                                                       :uuid (utils/entry-uuid)})
-                                     (:topics board-data))
-        next-board-data (assoc board-data :entries (conj (:entries board-data) fixed-entry))
-        next-board-filters (if (= (:board-filters db) (:topic-slug new-entry))
+        new-entry? (empty? (:uuid entry-data))
+        current-user-data (:current-user-data db)
+        fixed-entry (if new-entry?
+                      (new-entry-fixed-data entry-data board-data current-user-data as-of)
+                      (entry-fixed-data entry-data current-user-data as-of))
+        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (:entries board-data))
+        new-entries (conj filtered-entries fixed-entry)
+        sorted-entries (vec (sort-by :updated-at new-entries))
+        next-board-data (assoc board-data :entries sorted-entries)
+        next-board-filters (if (= (:board-filters db) (:topic-slug entry-data))
                               ; if it's filtering by the same topic of the new entry leave it be
                               (:board-filters db)
                               (if (keyword? (:board-filters db))
@@ -996,10 +1017,17 @@
                                 (:board-filters db)
                                 ; else sort by latest because it's filtering by a different topic
                                 :latest))]
-    (api/create-entry new-entry)
+    (if new-entry?
+      (api/create-entry entry-data)
+      (api/update-entry entry-data))
     (-> db
         (assoc-in board-key next-board-data)
         (assoc :board-filters next-board-filters))))
+
+(defmethod dispatcher/action :entry-save/finish
+  [db [_]]
+  (api/get-board (dispatcher/board-data))
+  db)
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug]]
@@ -1009,3 +1037,18 @@
                          (oc-urls/board (router/current-org-slug) board-slug))]
     (utils/after 10 #(router/nav! next-board-url))
     (assoc db :board-filters next-board-filter)))
+
+(defmethod dispatcher/action :entry-delete
+  [db [_ entry-data]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        filtered-entries (filter #(not= (:uudi %) (:uuid entry-data)) (:entries board-data))
+        sorted-entries (vec (sort-by :updated-at filtered-entries))
+        next-board-data (assoc board-data :entries sorted-entries)]
+    (api/delete-entry entry-data)
+    (assoc-in db board-key next-board-data)))
+
+(defmethod dispatcher/action :entry-delete/finish
+  [db [_]]
+  (api/get-board (dispatcher/board-data))
+  db)
