@@ -1052,3 +1052,15 @@
   [db [_]]
   (api/get-board (dispatcher/board-data))
   db)
+
+(defmethod dispatcher/action :alert-modal-show
+  [db [_ modal-data]]
+  (assoc db :alert-modal modal-data))
+
+(defmethod dispatcher/action :alert-modal-hide
+  [db [_]]
+  (assoc-in db [:alert-modal :dismiss] true))
+
+(defmethod dispatcher/action :alert-modal-hide-done
+  [db [_]]
+  (dissoc db :alert-modal))
