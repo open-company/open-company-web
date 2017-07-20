@@ -10,7 +10,8 @@
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
 
 (defn cut-body [entry-body]
-  (.truncate js/$ entry-body (clj->js {:length 86 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"})))
+  (let [dom (.html (.not (js/$ (str "<div>" entry-body "</div>")) "img"))]
+    (.truncate js/$ dom (clj->js {:length 63 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"}))))
 
 (rum/defc entry-card-empty
   [read-only?]
@@ -60,16 +61,14 @@
       [:div.more-button.dropdown
         [:button.mlb-reset.more-ellipsis.dropdown-toggle
           {:type "button"
-           :id (str "more-ellipsis-toggle-" (router/current-board-slug) "-" (:uuid entry-data))
+           :id (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))
            :on-click #(utils/event-stop %)
            :title "More"
            :data-toggle "dropdown"
            :aria-haspopup true
-           :aria-expanded false
-           ; :data-placement "top"
-           ; :data-container "body"
-           }]
+           :aria-expanded false}]
         [:div.dropdown-menu
+          {:aria-labelledby (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))}
           [:div.triangle]
           [:ul.entry-card-more-menu
             [:li
