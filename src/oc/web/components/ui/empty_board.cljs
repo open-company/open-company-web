@@ -14,6 +14,6 @@
         [:div.empty-board-headline
           (str "You don’t have any updates in " (:name board-data) " yet. ")
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:new-entry-toggle true])}
+            {:on-click #(dis/dispatch! [:entry-edit {}])}
             "Add one?"]])
       [:div.empty-board-image]]))
