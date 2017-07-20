@@ -25,6 +25,7 @@
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
         topic-groups (group-by :topic-slug (:entries board-data))]
+    (js/console.log "topic-groups" topic-groups)
     [:div.filters-dropdown-name.group
       (when (string? board-filters)
         [:button.mlb-reset.board-remove-filter
@@ -62,9 +63,14 @@
                 "By Topic"]
               (when (pos? (count (:topics board-data)))
                 [:li.divider])
-              (for [t (:topics board-data)]
+              (for [topic-slug (keys topic-groups)
+                    :let [t (some #(when (= (:slug %) topic-slug) %) (:topics board-data))]]
                 [:li
-                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:slug t)))
-                   :class (if (= board-filters (:slug t)) "select" "")
-                   :key (str "board-filters-topic-" (:slug t))}
-                  (s/capital (:name t))])]]]]]))
+                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or (:slug t) "uncategorized")))
+                   :class (if (or (= board-filters (:slug t))
+                                  (and (= board-filters "uncategorized")
+                                       (nil? t))) "select" "")
+                   :key (str "board-filters-topic-" (or (:slug t) "uncategorized"))}
+                  (if t
+                    (s/capital (:name t))
+                    "Uncategorized")])]]]]]))
