@@ -144,7 +144,10 @@
                              :error-banner-time (:error-banner-time base)})]
    :entry-editing       [[:base]
                           (fn [base]
-                            (:entry-editing base))]})
+                            (:entry-editing base))]
+   :alert-modal         [[:base]
+                          (fn [base]
+                            (:alert-modal base))]})
 
 ;; Action Loop =================================================================
 
