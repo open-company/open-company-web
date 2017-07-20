@@ -70,8 +70,28 @@
                        :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
                       (utils/time-since (:updated-at entry-data))]]]
                 [:div.entry-card-head-right
-                  [:button.mlb-reset.entry-modal-more
-                    {:on-click #()}]
+                  [:div.more-dropdown.dropdown
+                    [:button.mlb-reset.entry-modal-more.dropdown-toggle
+                      {:type "button"
+                       :id (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))
+                       :data-toggle "dropdown"
+                       :aria-haspopup true
+                       :aria-expanded false
+                       :title "More"}]
+                    [:div.dropdown-menu
+                      {:aria-labelledby (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))}
+                      [:div.triangle]
+                      [:ul.entry-card-more-menu
+                        [:li
+                          {:on-click (fn [e]
+                                       (utils/event-stop e)
+                                       (dis/dispatch! [:entry-edit entry-data]))}
+                          "Edit"]
+                        [:li
+                          {:on-click (fn [e]
+                                       (utils/event-stop e)
+                                       (dis/dispatch! [:entry-delete entry-data]))}
+                          "Delete"]]]]
                   (when (:topic-slug entry-data)
                     [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))])]]
               [:div.entry-card-content
