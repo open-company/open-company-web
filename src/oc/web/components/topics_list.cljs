@@ -82,7 +82,7 @@
                          :topics-data board-data
                          :foce-key (:foce-key data)
                          :foce-data (:foce-data data)
-                         :new-entry-edit (:new-entry-edit data)
+                         :entry-editing (:entry-editing data)
                          :dashboard-selected-topics (:dashboard-selected-topics data)
                          :dashboard-sharing (:dashboard-sharing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)

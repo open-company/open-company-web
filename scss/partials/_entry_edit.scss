@@ -1,4 +1,4 @@
-div.entry-create-modal-container {
+div.entry-edit-modal-container {
   width: 100%;
   height: 100vh;
   position: fixed;
@@ -17,7 +17,7 @@ div.entry-create-modal-container {
     opacity: 1;
   }
 
-  div.entry-create-modal {
+  div.entry-edit-modal {
     width: 648px;
     min-height: 330px;
     margin: 100px auto 50px;
@@ -28,7 +28,7 @@ div.entry-create-modal-container {
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     padding: 20px 24px 16px;
     
-    div.entry-create-modal-header{
+    div.entry-edit-modal-header{
       height: 44px;
 
       div.user-avatar-img-container{
@@ -85,7 +85,7 @@ div.entry-create-modal-container {
           }
         }
 
-        div.entry-create-topics-dd {
+        div.entry-edit-topics-dd {
           position: absolute;
           top: 25px;
           left: -73px;
@@ -175,10 +175,10 @@ div.entry-create-modal-container {
                   min-height: initial;
                 }
 
-                &.entry-create-new-topic {
+                &.entry-edit-new-topic {
                   cursor: pointer;
 
-                  button.entry-create-new-topic-plus {
+                  button.entry-edit-new-topic-plus {
                     width: 20px;
                     height: 20px;
                     padding: 0;
@@ -198,7 +198,7 @@ div.entry-create-modal-container {
                     }
                   }
 
-                  input.entry-create-new-topic-field {
+                  input.entry-edit-new-topic-field {
                     float: left;
                     border: none;
                     outline: none;
@@ -221,7 +221,7 @@ div.entry-create-modal-container {
       }
     }
 
-    div.entry-create-modal-divider {
+    div.entry-edit-modal-divider {
       width: calc(100% + 48px);
       margin-left: -24px;
       height: 1px;
@@ -229,10 +229,10 @@ div.entry-create-modal-container {
       opacity: 0.3;
     }
 
-    div.entry-create-modal-body {
+    div.entry-edit-modal-body {
       margin: 24px 0;
 
-      div.entry-create-headline {
+      div.entry-edit-headline {
         border: none;
         outline: none;
         cursor: text;
@@ -249,7 +249,7 @@ div.entry-create-modal-container {
         }
       }
 
-      div.entry-create-body {
+      div.entry-edit-body {
         border: none;
         outline: none;
         color: $carrot_dark_gray;
@@ -270,7 +270,7 @@ div.entry-create-modal-container {
       }
     }
 
-    div.entry-create-modal-footer {
+    div.entry-edit-modal-footer {
       height: 40px;
       margin-top: 16px;
 

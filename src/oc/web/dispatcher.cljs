@@ -142,9 +142,9 @@
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
                              :error-banner-time (:error-banner-time base)})]
-   :new-entry-edit      [[:base]
+   :entry-editing       [[:base]
                           (fn [base]
-                            (:new-entry-edit base))]})
+                            (:entry-editing base))]})
 
 ;; Action Loop =================================================================
 

@@ -95,7 +95,7 @@
                            (not (responsive/is-tablet-or-mobile?))
                            (not (:dashboard-sharing data)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
-                               :on-click #(dis/dispatch! [:new-entry-toggle true])}
+                               :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
                     "New Update")))
               ;; Board filters dropdown
