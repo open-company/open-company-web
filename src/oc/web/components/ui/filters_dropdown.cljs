@@ -25,7 +25,6 @@
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
         topic-groups (group-by :topic-slug (:entries board-data))]
-    (js/console.log "topic-groups" topic-groups)
     [:div.filters-dropdown-name.group
       (when (string? board-filters)
         [:button.mlb-reset.board-remove-filter
