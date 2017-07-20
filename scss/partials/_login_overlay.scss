@@ -4,7 +4,7 @@ div.login-overlay-container {
   left: 0px;
   width: 100%;
   height: 100%;
-  z-index: #{$navbar_zindex + 150};
+  z-index: #{$navbar_zindex + 50};
   padding: 0px;
   opacity: 1;
   transition: 230ms;
