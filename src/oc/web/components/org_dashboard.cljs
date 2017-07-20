@@ -20,6 +20,7 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -117,6 +118,8 @@
             (entry-modal (dis/entry-data)))
           (when (:entry-editing data)
             (entry-edit))
+          (when (:alert-modal data)
+            (alert-modal))
           (if board-error
             (dom/div {:class "fullscreen-page with-small-footer"}
               (login-required data))
