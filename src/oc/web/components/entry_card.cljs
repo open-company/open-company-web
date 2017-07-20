@@ -23,6 +23,19 @@
           {:on-click #(dis/dispatch! [:entry-edit {}])}
           "Add an update?"])]])
 
+(defn delete-clicked [e entry-data]
+  (utils/event-stop e)
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :message "Delete this entry?"
+                    :first-button-title "No"
+                    :first-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :second-button-title "Yes"
+                    :second-button-cb #(do
+                                        (dis/dispatch! [:entry-delete entry-data])
+                                        (dis/dispatch! [:alert-modal-hide]))
+                    }]
+    (dis/dispatch! [:alert-modal-show alert-data])))
+
 (rum/defcs entry-card < rum/static
   [s entry-data show-topic?]
   [:div.entry-card
@@ -77,7 +90,5 @@
                            (dis/dispatch! [:entry-edit entry-data]))}
               "Edit"]
             [:li
-              {:on-click (fn [e]
-                           (utils/event-stop e)
-                           (dis/dispatch! [:entry-delete entry-data]))}
+              {:on-click #(delete-clicked % entry-data)}
               "Delete"]]]]]])

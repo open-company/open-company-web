@@ -19,6 +19,19 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
+(defn delete-clicked [e entry-data]
+  (utils/event-stop e)
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :message "Delete this entry?"
+                    :first-button-title "No"
+                    :first-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :second-button-title "Yes"
+                    :second-button-cb #(do
+                                        (dis/dispatch! [:entry-delete entry-data])
+                                        (dis/dispatch! [:alert-modal-hide]))
+                    }]
+    (dis/dispatch! [:alert-modal-show alert-data])))
+
 (rum/defcs entry-modal < (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
                          (rum/local false ::animate)
@@ -88,9 +101,7 @@
                                        (dis/dispatch! [:entry-edit entry-data]))}
                           "Edit"]
                         [:li
-                          {:on-click (fn [e]
-                                       (utils/event-stop e)
-                                       (dis/dispatch! [:entry-delete entry-data]))}
+                          {:on-click #(delete-clicked % entry-data)}
                           "Delete"]]]]
                   (when (:topic-slug entry-data)
                     [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))])]]
