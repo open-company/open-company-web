@@ -220,7 +220,13 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entry-delete | UI | Delete the selected entry. |
+|  :entry-delete/finish | API | Entry delete request finished, refresh the board data. |
+|  :entry-edit | UI | Start editing of an existing or a new entry. |
+|  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
+|  :entry-save | UI | Save the edited entry. |
+|  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :foce-data-editing-start | UI | Start the data edit for growth and finances topics. |
 |  :foce-input | UI | Save a new data for the current edited entry. |
@@ -241,8 +247,6 @@ provided in the table below:
 |  :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
 |  :name-pswd-collect | UI | Start the request to save the user name and password. |
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
-|  :new-entry-add | UI | Save the new edited entry in the modal view. |
-|  :new-entry-toggle | UI | Show the new create new entry UI. |
 |  :new-topics-load/finish | API | Read the available new topics and save them in the app-state for later use. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
