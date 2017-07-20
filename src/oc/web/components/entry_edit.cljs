@@ -13,14 +13,14 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn dismiss-modal []
-  (dis/dispatch! [:entry-edit/dismiss]))
+(defn dismiss-modal [saving?]
+  (dis/dispatch! [:entry-edit/dismiss])
+  (when-not saving?
+    (dis/dispatch! [:input [:entry-editing] nil])))
 
 (defn close-clicked [s & [saving?]]
-  (when-not saving?
-    (dis/dispatch! [:input [:entry-editing] nil]))
   (reset! (::dismiss s) true)
-  (utils/after 180 dismiss-modal))
+  (utils/after 180 #(dismiss-modal saving?)))
 
 (defn unique-slug [topics topic-name]
   (let [slug (atom (s/slug topic-name))]
@@ -220,4 +220,3 @@
         [:button.mlb-reset.mlb-link-black
           {:on-click #(close-clicked s)}
           "Cancel"]]]]))
-
