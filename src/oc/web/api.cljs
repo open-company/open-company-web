@@ -793,7 +793,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-name])
+(def entry-keys [:headline :body :topic-name :attachments])
 
 (defn clean-entry [entry-data]
   (let [fixed-entry-data (if (empty? (:topic-name entry-data))
@@ -811,7 +811,26 @@
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
-          (get-board board-data))))))
+          (dispatcher/dispatch! [:entry-save/finish]))))))
+
+(defn update-entry
+  [entry-data]
+  (when entry-data
+    (let [update-entry-link (utils/link-for (:links entry-data) "partial-update" "PATCH")
+          cleaned-entry-data (clean-entry entry-data)]
+      (storage-patch (:href update-entry-link)
+        {:headers (headers-for-link update-entry-link)
+         :json-params (cljs->json cleaned-entry-data)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:entry-save/finish]))))))
+
+(defn delete-entry [entry-data]
+  (when entry-data
+    (when-let [entry-delete-link (utils/link-for (:links entry-data) "delete")]
+      (storage-delete (:href entry-delete-link)
+        {:headers (headers-for-link entry-delete-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:entry-delete/finish]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
