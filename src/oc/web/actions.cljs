@@ -158,6 +158,7 @@
                  (zero? (count (filter #(= (:uuid %) (router/current-entry-uuid)) (:entries board-data)))))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
+                 (not= (:board-filters db) "uncategorized")
                  (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
         (router/redirect-404!))
       (when (jwt/jwt)
