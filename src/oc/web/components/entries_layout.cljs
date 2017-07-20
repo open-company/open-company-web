@@ -35,7 +35,9 @@
               (entry-card-empty (:read-only board-data)))]))
       ;; by specific topic
       (string? layout-type)
-      (let [filtered-entries (vec (filter #(= (:topic-slug %) layout-type) (:entries board-data)))
+      (let [filtered-entries (if (= layout-type "uncategorized")
+                                (vec (filter #(empty? (:topic-slug %)) (:entries board-data)))
+                                (vec (filter #(= (:topic-slug %) layout-type) (:entries board-data))))
             sorted-entries (vec (reverse (sort-by :updated-at filtered-entries)))]
         [:div.entry-cards-container.by-specific-topic.group
           (for [entry sorted-entries]
