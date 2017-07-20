@@ -104,7 +104,13 @@
                           {:on-click #(delete-clicked % entry-data)}
                           "Delete"]]]]
                   (when (:topic-slug entry-data)
-                    [:div.new (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))])]]
+                    (let [topic-name (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))
+                          topic-color (utils/rgb-with-opacity (:topic-color entry-data) "1")
+                          topic-border (utils/rgb-with-opacity (:topic-color entry-data) "0.4")]
+                      [:div.new
+                        {:style {:color topic-color
+                                 :border (str "1px solid " topic-border)}}
+                        topic-name]))]]
               [:div.entry-card-content
                 [:div.entry-card-content-headline (:headline entry-data)]
                 [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
