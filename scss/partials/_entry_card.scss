@@ -140,7 +140,7 @@ div.entry-card {
 
   div.entry-card-footer {
     position: absolute;
-    width: calc(100% - 64px);
+    width: calc(100% - 48px);
     bottom: 0px;
     left: 0px;
     margin: 15px 24px 32px;
@@ -148,14 +148,15 @@ div.entry-card {
     div.more-button {
       float: right;
       position: relative;
+      margin-right: -6px;
 
       button.more-ellipsis {
         width: 32px;
         height: 32px;
-        padding: 8px;
+        padding: 8px 0px 8px 16px;
         display: block;
         background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-        background-position: center;
+        background-position: right center;
         background-size: 16px 16px;
         background-repeat: no-repeat;
       }
@@ -163,7 +164,7 @@ div.entry-card {
       div.dropdown-menu {
         position: absolute;
         top: 27px;
-        left: -58px;
+        left: -52px;
         border: none;
         outline: none;
         box-shadow: none;
