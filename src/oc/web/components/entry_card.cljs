@@ -11,7 +11,7 @@
 
 (defn cut-body [entry-body]
   (let [dom (.html (.not (js/$ (str "<div>" entry-body "</div>")) "img"))]
-    (.truncate js/$ dom (clj->js {:length 63 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"}))))
+    (.truncate js/$ dom (clj->js {:length 103 :words true :ellipsis "... <span class=\"full-update\">Read Full Update</span>"}))))
 
 (rum/defc entry-card-empty
   [read-only?]
