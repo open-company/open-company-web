@@ -37,12 +37,28 @@
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (rum/defcs entry-card < rum/static
+                        (rum/local false ::hovering-card)
+                        (rum/local false ::showing-dropdown)
                         {:after-render (fn [s]
                                          (.click (js/$ "div.entry-card div.entry-card-body a") #(.preventDefault %))
-                                         s)}
+                                         s)
+                         :did-mount (fn [s]
+                                      (let [entry-data (first (:rum/args s))]
+                                        (.on (js/$ (str "div.entry-card-" (:uuid entry-data)))
+                                         "show.bs.dropdown"
+                                         (fn [e]
+                                           (reset! (::showing-dropdown s) true)))
+                                        (.on (js/$ (str "div.entry-card-" (:uuid entry-data)))
+                                         "hidden.bs.dropdown"
+                                         (fn [e]
+                                           (reset! (::showing-dropdown s) false))))
+                                      s)}
   [s entry-data show-topic?]
   [:div.entry-card
-    {:on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])}
+    {:class (str "entry-card-" (:uuid entry-data))
+     :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
+     :on-mouse-over #(reset! (::hovering-card s) true)
+     :on-mouse-leave #(reset! (::hovering-card s) false)}
     ; Card header
     [:div.entry-card-head.group
       ; Card author
@@ -77,6 +93,7 @@
       [:div.more-button.dropdown
         [:button.mlb-reset.more-ellipsis.dropdown-toggle
           {:type "button"
+           :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
            :id (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))
            :on-click #(utils/event-stop %)
            :title "More"

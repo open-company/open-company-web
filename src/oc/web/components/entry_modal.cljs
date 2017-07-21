@@ -35,6 +35,8 @@
 (rum/defcs entry-modal < (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
                          (rum/local false ::animate)
+                         (rum/local false ::hovering-card)
+                         (rum/local false ::showing-dropdown)
                          rum/reactive
                          (drv/drv :entry-modal-fade-in)
                          {:before-render (fn [s]
@@ -48,6 +50,15 @@
                                        ;; Scroll to the bottom of the comments box
                                        (let [el (sel1 [:div.entry-right-column-content])]
                                           (set! (.-scrollTop el) (.-scrollHeight el)))
+                                       (let [entry-data (first (:rum/args s))]
+                                        (.on (js/$ (str "div.entry-modal-" (:uuid entry-data)))
+                                         "show.bs.dropdown"
+                                         (fn [e]
+                                           (reset! (::showing-dropdown s) true)))
+                                        (.on (js/$ (str "div.entry-modal-" (:uuid entry-data)))
+                                         "hidden.bs.dropdown"
+                                         (fn [e]
+                                           (reset! (::showing-dropdown s) false))))
                                        s)
                           :after-render (fn [s]
                                           (when (not @(::first-render-done s))
@@ -63,6 +74,9 @@
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       [:div.entry-modal.group
+        {:class (str "entry-modal-" (:uuid entry-data))
+         :on-mouse-over #(reset! (::hovering-card s) true)
+         :on-mouse-leave #(reset! (::hovering-card s) false)}
         [:button.close-entry-modal.mlb-reset
           {:on-click #(close-clicked s)}]
         [:div.entry-modal-inner.group
@@ -100,6 +114,7 @@
                   [:div.more-dropdown.dropdown
                     [:button.mlb-reset.entry-modal-more.dropdown-toggle
                       {:type "button"
+                       :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
                        :id (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))
                        :data-toggle "dropdown"
                        :aria-haspopup true
