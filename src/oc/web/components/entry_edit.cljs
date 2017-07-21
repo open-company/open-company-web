@@ -71,12 +71,19 @@
         pasted-data (.getData clipboardData "text/plain")
         headline-el     (.querySelector js/document "div.entry-edit-headline")]
     ; replace the selected text of headline with the text/plain data of the clipboard
-    ; (set! (.-innerText headline-el) pasted-data)
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
     ; move cursor at the end
     (utils/to-end-of-content-editable headline-el)))
+
+(defn create-new-topic [s]
+  (when-not (empty? @(::new-topic s))
+    (let [topics (:topics @(drv/get-ref s :board-data))
+          topic-name (s/trim @(::new-topic s))
+          topic-slug (unique-slug topics topic-name)]
+      (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
+      (reset! (::new-topic s) ""))))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :board-data)
@@ -89,6 +96,7 @@
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
                         (rum/local "" ::new-topic)
+                        (rum/local false ::focusing-create-topic)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -168,28 +176,32 @@
                           "Remove"])])
                   [:li.divider]
                   [:li.entry-edit-new-topic.group
-                    (comment
-                      {:on-click #(utils/event-stop %)}
+                    ; {:on-click #(do (utils/event-stop %) (toggle-topics-dd))}
+                    (when-not @(::focusing-create-topic s)
                       [:button.mlb-reset.entry-edit-new-topic-plus
                         {:on-click (fn [e]
-                                     (when-not (empty? @(::new-topic s))
-                                       (dis/dispatch! [:input [:entry-editing :topic-name] @(::new-topic s)])
-                                       (toggle-topics-dd)))
+                                     (utils/event-stop e)
+                                     (toggle-topics-dd)
+                                     (.focus (js/$ "input.entry-edit-new-topic-field")))
                          :title "Create a new topic"}])
                     [:input.entry-edit-new-topic-field
                       {:type "text"
                        :value @(::new-topic s)
+                       :on-focus #(reset! (::focusing-create-topic s) true)
+                       :on-blur (fn [e] (utils/after 100 #(reset! (::focusing-create-topic s) false)))
                        :on-key-up (fn [e]
                                     (cond
                                       (= "Enter" (.-key e))
-                                      (when-not (empty? @(::new-topic s))
-                                        (let [topic-name @(::new-topic s)
-                                              topic-slug (unique-slug topics topic-name)]
-                                        (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
-                                        (toggle-topics-dd)
-                                        (reset! (::new-topic s) "")))))
+                                      (create-new-topic s)))
                        :on-change #(reset! (::new-topic s) (.. % -target -value))
-                       :placeholder "Create New Topic"}]]]]]]]
+                       :placeholder "Create New Topic"}]
+                    (when @(::focusing-create-topic s)
+                      [:button.mlb-reset.mlb-default.entry-edit-new-topic-create
+                        {:on-click (fn [e]
+                                     (utils/event-stop e)
+                                     (create-new-topic s))
+                         :disabled (empty? (s/trim @(::new-topic s)))}
+                        "Create"])]]]]]]
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-body
         [:div.entry-edit-headline.emoji-autocomplete.emojiable
