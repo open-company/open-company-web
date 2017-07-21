@@ -63,7 +63,8 @@ div.entry-modal-container {
         div.entry-left-column-content {
           padding: 24px 16px 24px 32px;
           max-height: calc(100vh - 150px - 48px);
-          overflow: scroll;
+          overflow-x: hidden;
+          overflow-y: scroll;
 
           div.entry-card-head{
             div.entry-card-head-left {
@@ -79,45 +80,67 @@ div.entry-modal-container {
               }
 
               @include entry-new();
+            }
+          }
+
+          div.entry-card-content {
+            float: none;
+            width: 100%;
+
+            div.entry-card-content-headline {
+              margin-top: 24px;
+              @include entry-headline();
+            }
+
+            div.entry-card-content-body {
+              margin-top: 24px;
+              @include entry-body();
+            }
+          }
+
+          div.entry-card-footer {
+            margin-top: 24px;
+
+            div.entry-card-footer-right {
+              float: right;
 
               div.more-dropdown {
                 float: right;
                 margin-top: 7px;
                 margin-left: 10px;
-                width: 24px;
-                height: 24px;
+                width: 32px;
+                height: 32px;
 
                 button.entry-modal-more {
-                  width: 24px;
-                  height: 24px;
-                  background-image: cdnUrl("/img/ML/entry_modal_more.svg");
-                  background-position: center;
+                  width: 32px;
+                  height: 32px;
+                  padding: 8px 0px 8px 16px;
+                  display: block;
+                  background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+                  background-position: right center;
+                  background-size: 16px 16px;
                   background-repeat: no-repeat;
-                  background-size: 24px 24px;
-                  opacity: 0.6;
-
-                  &:hover {
-                    opacity: 1;
-                  }
+                  margin-left: 6px;
                 }
 
                 div.dropdown-menu {
                   position: absolute;
-                  top: 25px;
-                  left: -63px;
+                  top: -44px;
+                  left: -91px;
                   border: none;
                   outline: none;
                   box-shadow: none;
                   background-color: transparent;
+                  padding: 0 0 .3em;
 
                   div.triangle {
                     position: absolute;
-                    top: 3px;
-                    left: 64px;
+                    top: 50px;
+                    left: 90px;
                     background-color: white;
                     border-top: 1px solid rgba(177,184,192,0.50);
                     border-left: 1px solid rgba(177,184,192,0.50);
-                    transform: rotate(45deg);
+                    transform: rotate(135deg);
                     width: 20px;
                     height: 20px;
                   }
@@ -150,25 +173,6 @@ div.entry-modal-container {
                 }
               }
             }
-          }
-
-          div.entry-card-content {
-            float: none;
-            width: 100%;
-
-            div.entry-card-content-headline {
-              margin-top: 24px;
-              @include entry-headline();
-            }
-
-            div.entry-card-content-body {
-              margin-top: 24px;
-              @include entry-body();
-            }
-          }
-
-          div.entry-card-footer {
-            margin-top: 24px;
           }
         }
       }

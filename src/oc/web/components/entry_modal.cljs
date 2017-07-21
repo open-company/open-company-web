@@ -83,6 +83,20 @@
                        :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
                       (utils/time-since (:updated-at entry-data))]]]
                 [:div.entry-card-head-right
+                  (when (:topic-slug entry-data)
+                    (let [topic-name (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))
+                          topic-color (utils/rgb-with-opacity (:topic-color entry-data) "1")
+                          topic-border (utils/rgb-with-opacity (:topic-color entry-data) "0.4")]
+                      [:div.new
+                        {:style {:color topic-color
+                                 :border (str "1px solid " topic-border)}}
+                        topic-name]))]]
+              [:div.entry-card-content
+                [:div.entry-card-content-headline (:headline entry-data)]
+                [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
+              [:div.entry-card-footer
+                (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)
+                [:div.entry-card-footer-right
                   [:div.more-dropdown.dropdown
                     [:button.mlb-reset.entry-modal-more.dropdown-toggle
                       {:type "button"
@@ -102,20 +116,7 @@
                           "Edit"]
                         [:li
                           {:on-click #(delete-clicked % entry-data)}
-                          "Delete"]]]]
-                  (when (:topic-slug entry-data)
-                    (let [topic-name (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))
-                          topic-color (utils/rgb-with-opacity (:topic-color entry-data) "1")
-                          topic-border (utils/rgb-with-opacity (:topic-color entry-data) "0.4")]
-                      [:div.new
-                        {:style {:color topic-color
-                                 :border (str "1px solid " topic-border)}}
-                        topic-name]))]]
-              [:div.entry-card-content
-                [:div.entry-card-content-headline (:headline entry-data)]
-                [:div.entry-card-content-body {:dangerouslySetInnerHTML #js {:__html (:body entry-data)}}]]
-              [:div.entry-card-footer
-                (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)]]]
+                          "Delete"]]]]]]]]
           [:div.entry-right-column
             {:style #js {:minHeight column-height}}
             [:div.entry-right-column-content
