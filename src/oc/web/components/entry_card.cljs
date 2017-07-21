@@ -17,12 +17,14 @@
 (rum/defc entry-card-empty
   [read-only?]
   [:div.entry-card.empty-state.group
-    [:div.entry-card-title
-      "This topic’s a little sparse. "
-      (when-not read-only?
-        [:button.mlb-reset
-          {:on-click #(dis/dispatch! [:entry-edit {}])}
-          "Add an update?"])]])
+    [:div.empty-state-content
+      [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
+      [:div.entry-card-title
+        "This topic’s a little sparse. "
+        (when-not read-only?
+          [:button.mlb-reset
+            {:on-click #(dis/dispatch! [:entry-edit {}])}
+            "Add an update?"])]]])
 
 (defn delete-clicked [e entry-data]
   (utils/event-stop e)
@@ -77,12 +79,8 @@
       ; Card labels
       [:div.entry-card-head-right
         (when (and (:topic-slug entry-data) show-topic?)
-          (let [topic-name (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))
-                topic-color (utils/rgb-with-opacity (:topic-color entry-data) "1")
-                topic-border (utils/rgb-with-opacity (:topic-color entry-data) "0.4")]
-            [:div.new
-              {:style {:color topic-color
-                       :border (str "1px solid " topic-border)}}
+          (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
+            [:div.topic-tag
               topic-name]))]]
     [:div.entry-card-content.group
       [:div.entry-card-headline
