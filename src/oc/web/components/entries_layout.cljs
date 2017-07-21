@@ -20,7 +20,7 @@
                     first-line-entries (take 2 entries-group)
                     first-has-headline (some #(not (empty? (:headline %))) first-line-entries)
                     first-has-body (some #(not (empty? (:body %))) first-line-entries)
-                    second-line-entries (subvec entries-group 2 (min 4 (count entries-group)))
+                    second-line-entries (if (> (count entries-group) 2) (subvec entries-group 2 (min 4 (count entries-group))) [])
                     second-has-headline (some #(not (empty? (:headline %))) second-line-entries)
                     second-has-body (some #(not (empty? (:body %))) second-line-entries)]]
           [:div.entry-cards-container.by-topic.group
