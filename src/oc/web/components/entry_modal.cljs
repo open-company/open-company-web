@@ -98,12 +98,8 @@
                       (utils/time-since (:updated-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
-                    (let [topic-name (s/upper (or (:topic-name entry-data) (:topic-slug entry-data)))
-                          topic-color (utils/rgb-with-opacity (:topic-color entry-data) "1")
-                          topic-border (utils/rgb-with-opacity (:topic-color entry-data) "0.4")]
+                    (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
                       [:div.new
-                        {:style {:color topic-color
-                                 :border (str "1px solid " topic-border)}}
                         topic-name]))]]
               [:div.entry-modal-content
                 [:div.entry-modal-content-headline
