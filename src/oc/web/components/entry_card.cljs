@@ -37,6 +37,9 @@
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (rum/defcs entry-card < rum/static
+                        {:after-render (fn [s]
+                                         (.click (js/$ "div.entry-card div.entry-card-body a") #(.preventDefault %))
+                                         s)}
   [s entry-data show-topic?]
   [:div.entry-card
     {:on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])}
