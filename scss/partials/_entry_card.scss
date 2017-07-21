@@ -5,8 +5,15 @@ div.entry-card {
   background-color: white;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
   border-radius: 8px;
-  padding: 32px 24px;
+  padding: 32px 24px 79px;
   margin: 10px 16px;
+  position: relative;
+
+  &.entry-card-placeholder {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+  }
 
   &.empty-state {
     border: none;
@@ -97,10 +104,14 @@ div.entry-card {
         display: none;
       }
 
-      span.full-update {
+      span.read-full-update {
         color: $carrot_text_blue;
         cursor: pointer;
         margin-left: 5px;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
 
       // // Uncomment this to programmatically add the read full update at the end of the last body tag
@@ -126,7 +137,11 @@ div.entry-card {
   }
 
   div.entry-card-footer {
-    margin-top: 15px;
+    position: absolute;
+    width: calc(100% - 64px);
+    bottom: 0px;
+    left: 0px;
+    margin: 15px 24px 32px;
 
     div.more-button {
       float: right;
