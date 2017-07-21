@@ -16,7 +16,13 @@
         (for [topic sorted-topics
               :let [entries-group (get grouped-entries topic)
                     topic-name (:topic-name (first entries-group))
-                    topic-slug (:topic-slug (first entries-group))]]
+                    topic-slug (:topic-slug (first entries-group))
+                    first-line-entries (take 2 entries-group)
+                    first-has-headline (some #(not (empty? (:headline %))) first-line-entries)
+                    first-has-body (some #(not (empty? (:body %))) first-line-entries)
+                    second-line-entries (subvec entries-group 2 (min 4 (count entries-group)))
+                    second-has-headline (some #(not (empty? (:headline %))) second-line-entries)
+                    second-has-body (some #(not (empty? (:body %))) second-line-entries)]]
           [:div.entry-cards-container.by-topic.group
             {:key (str "entries-topic-group-" (or topic "uncategorized"))}
             ; Title of the topic group
@@ -33,8 +39,8 @@
             ;; First row:
             [:div.entries-cards-container-row.group
               ; Render the first 2 entries
-              (for [entry (take 2 entries-group)]
-                (rum/with-key (entry-card entry false) (str "entry-by-topic-" topic "-" (:uuid entry))))
+              (for [entry first-line-entries]
+                (rum/with-key (entry-card entry false first-has-headline first-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
               ; If there is only 1 add the empty placeholder
               (when (and (not (empty? topic-slug))
                          (= (count entries-group) 1))
@@ -44,7 +50,7 @@
               [:div.entries-cards-container-row.group
                 ; Render the second 2 entries
                 (for [entry (subvec entries-group 2 (min 4 (count entries-group)))]
-                  (rum/with-key (entry-card entry false) (str "entry-by-topic-" topic "-" (:uuid entry))))
+                  (rum/with-key (entry-card entry false second-has-headline second-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
                 ; If the total entries are 3 add a placeholder to avoid taking the full width
                 (when (= (count entries-group) 3)
                   [:div.entry-card.entry-card-placeholder])])]))
@@ -62,12 +68,14 @@
                   ; Calc the entries in the row
                   :let [start (* idx 2)
                         end (min (+ start 2) (count sorted-entries))
-                        entries (subvec sorted-entries start end)]]
+                        entries (subvec sorted-entries start end)
+                        has-headline (some #(not (empty? (:headline %))) entries)
+                        has-body (some #(not (empty? (:body %))) entries)]]
               [:div.entries-cards-container-row.group
                 {:key (str "entries-row-" idx)}
                 ; Render the entries in the row
                 (for [entry entries]
-                  (rum/with-key (entry-card entry false) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
+                  (rum/with-key (entry-card entry false has-headline has-body) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
                 ; If there is only one entry add the empty card placeholder
                 (if (= (count sorted-entries) 1)
                   (entry-card-empty (:read-only board-data))
@@ -85,12 +93,14 @@
                   ; calc the entries that needs to render in this row
                   :let [start (* idx 2)
                         end (min (+ start 2) (count sorted-entries))
-                        entries (subvec sorted-entries start end)]]
+                        entries (subvec sorted-entries start end)
+                        has-headline (some #(not (empty? (:headline %))) entries)
+                        has-body (some #(not (empty? (:body %))) entries)]]
               ; Renteder the entries in thisnrow
               [:div.entries-cards-container-row.group
                 {:key (str "entries-row-" idx)}
                 (for [entry entries]
-                  (rum/with-key (entry-card entry true) (str "entry-latest-" (:uuid entry))))
+                  (rum/with-key (entry-card entry true has-headline has-body) (str "entry-latest-" (:uuid entry))))
                 ; If the row contains less than 2, add a placeholder div to avoid having the first cover the full width
                 (when (= (count entries) 1)
                   [:div.entry-card.entry-card-placeholder])]))]))])

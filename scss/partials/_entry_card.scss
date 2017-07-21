@@ -75,18 +75,20 @@ div.entry-card {
 
     div.entry-card-headline {
       @include entry-headline();
-      margin-top: 24px;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
       max-height: 28px;
       white-space: nowrap;
+
+      &.has-headline {
+        margin-top: 24px;
+        height: 28px;
+      }
     }
 
     div.entry-card-body {
       @include entry-body();
-
-      margin-top: 24px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
@@ -94,6 +96,11 @@ div.entry-card {
       -webkit-line-clamp: 3;
       line-height: 24px;
       max-height: #{24*3}px;
+
+      &.has-body {
+        margin-top: 24px;
+        height: #{24*3}px;
+      }
 
       p {
         margin-top: 0px;

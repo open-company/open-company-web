@@ -7,10 +7,11 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]))
+            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
+            [goog.object :as gobj]))
 
 (defn cut-body [entry-body]
-  (let [dom (.html (.not (js/$ (str "<div>" entry-body "</div>")) "img"))]
+  (let [dom (.html (.not (js/$ (str "<div>" (gobj/get (utils/emojify entry-body) "__html") "</div>")) "img:not(.emojione)"))]
     (.truncate js/$ dom (clj->js {:length 90 :words true :ellipsis "... <span class=\"read-full-update\">Read Full Update</span>"}))))
 
 (rum/defc entry-card-empty
@@ -53,7 +54,7 @@
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
                                       s)}
-  [s entry-data show-topic?]
+  [s entry-data show-topic? has-headline has-body]
   [:div.entry-card
     {:class (str "entry-card-" (:uuid entry-data))
      :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
@@ -85,9 +86,11 @@
               topic-name]))]]
     [:div.entry-card-content.group
       [:div.entry-card-headline
-        (:headline entry-data)]
+        {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
+         :class (when has-headline "has-headline")}]
       [:div.entry-card-body
-        {:dangerouslySetInnerHTML #js {:__html (cut-body (:body entry-data))}}]]
+        {:dangerouslySetInnerHTML #js {"__html" (cut-body (:body entry-data))}
+         :class (when has-body "has-body")}]]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
