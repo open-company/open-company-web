@@ -97,9 +97,10 @@
                         (dom/div {:class "dropdown right"}
                           (user-avatar {:classes "mlb-reset dropdown-toggle"})
                           (om/build menu {}))
-                        (dom/div {:class "right"
-                                  :style {:margin-right "0.5rem" :margin-top "5px"}}
-                          (dom/img {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}))
+                        ; FIXME: Remove the notification bell until we enable it.
+                        ; (dom/div {:class "right"
+                        ;           :style {:margin-right "0.5rem" :margin-top "5px"}}
+                        ;   (dom/img {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}))
                         ; ;; FIXME: Comment out but not remove until we replace this with something.
                         ; (when fixed-show-share-su-button
                         ;   (if dashboard-sharing
