@@ -19,28 +19,39 @@ div.entry-card {
     border: none;
     box-shadow: none;
     background-color: transparent;
-    background-image: cdnUrl("/img/ML/entry_empty_state.svg");
-    background-size: 168px 120px;
-    background-position: 50% 40%;
-    background-repeat: no-repeat;
     margin-top: 20px;
+    flex: 1;
+    text-align: center;
+    width: 100%;
 
-    div.entry-card-title {
-      font-size: 14px;
-      color: $carrot_light_gray;
-      @include avenir_H();
-      margin-top: 140px;
-      text-align: center;
+    div.empty-state-content {
+      height: 160px;
+      position: relative;
+      top: 50%;
+      margin-top: -80px;
 
-      button {
-        color: $carrot_text_blue;
-        padding: 0;
-        margin: 0;
+      img {
+        width: 168px;
+        height: 120px;
+      }
 
-        &:hover, &:avtive, &:focus {
-          border: none;
-          outline: none;
-          text-decoration: underline;
+      div.entry-card-title {
+        font-size: 14px;
+        color: $carrot_light_gray;
+        @include avenir_H();
+        margin-top: 20px;
+        text-align: center;
+
+        button {
+          color: $carrot_text_blue;
+          padding: 0;
+          margin: 0;
+
+          &:hover, &:avtive, &:focus {
+            border: none;
+            outline: none;
+            text-decoration: underline;
+          }
         }
       }
     }
@@ -61,12 +72,12 @@ div.entry-card {
     div.entry-card-head-right {
       float: right;
 
-      div.new {
+      div.topic-tag {
         margin-top: 0;
         float: right;
       }
 
-      @include entry-new();
+      @include entry-topic-tag();
     }
   }
 
@@ -100,6 +111,10 @@ div.entry-card {
       &.has-body {
         margin-top: 24px;
         height: #{24*3}px;
+      }
+
+      a:hover {
+        text-decoration: none !important;
       }
 
       p {
@@ -152,6 +167,10 @@ div.entry-card {
     left: 0px;
     margin: 15px 24px 16px;
 
+    div.interactions-summary {
+      margin-top: 8px;
+    }
+
     div.more-button {
       float: right;
       position: relative;
@@ -170,8 +189,8 @@ div.entry-card {
 
       div.dropdown-menu {
         position: absolute;
-        top: 27px;
-        left: -52px;
+        top: -49px;
+        left: -91px;
         border: none;
         outline: none;
         box-shadow: none;
@@ -179,12 +198,12 @@ div.entry-card {
 
         div.triangle {
           position: absolute;
-          top: 3px;
-          left: 64px;
+          top: 55px;
+          left: 90px;
           background-color: white;
           border-top: 1px solid rgba(177,184,192,0.50);
           border-left: 1px solid rgba(177,184,192,0.50);
-          transform: rotate(45deg);
+          transform: rotate(135deg);
           width: 20px;
           height: 20px;
         }
