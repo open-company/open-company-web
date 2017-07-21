@@ -328,8 +328,7 @@
   (let [topic (get-topic topics-data (:topic-slug entry-body))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :topic-name (:name topic))
-      (assoc :topic-color (or (:color topic) (get-color-by-kw :oc-gray-7))))))
+      (assoc :topic-name (:name topic)))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
