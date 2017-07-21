@@ -49,8 +49,9 @@
             (when (> (count entries-group) 2)
               [:div.entries-cards-container-row.group
                 ; Render the second 2 entries
-                (for [entry (subvec entries-group 2 (min 4 (count entries-group)))]
-                  (rum/with-key (entry-card entry false second-has-headline second-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
+                (when (> (count entries-group) 2)
+                  (for [entry (subvec entries-group 2 (min 4 (count entries-group)))]
+                    (rum/with-key (entry-card entry false second-has-headline second-has-body) (str "entry-by-topic-" topic "-" (:uuid entry)))))
                 ; If the total entries are 3 add a placeholder to avoid taking the full width
                 (when (= (count entries-group) 3)
                   [:div.entry-card.entry-card-placeholder])])]))
