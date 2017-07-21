@@ -64,7 +64,7 @@
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
-          [:div.column-item [:a {:href oc-urls/blog} "Blog"]]]
+          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
         [:div.column
           {:class (when (= @(::expanded s) :tour) "expanded")}

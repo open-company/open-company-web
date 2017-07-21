@@ -59,7 +59,7 @@
                :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))}
               "About"]]
           [:li
-            [:a.navbar-item {:href oc-urls/blog} "Blog"]]
+            [:a.navbar-item {:href oc-urls/blog :target "_blank"} "Blog"]]
           [:li.get-started-item
             (if (jwt/jwt)
               [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]

@@ -78,7 +78,7 @@
             {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]
           [:li
-            [:a.navbar-item {:href "http://blog.carrot.io"} "Blog"]]
+            [:a.navbar-item {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
@@ -124,7 +124,7 @@
             {:onClick "$('nav.navbar-bottom div.column:not(.company)').removeClass('expanded');$('nav.navbar-bottom div.column.company').toggleClass('expanded');"}
             "COMPANY"]
           [:div.column-item [:a {:href "/about"} "About"]]
-          [:div.column-item [:a {:href "http://blog.carrot.io"} "Blog"]]]
+          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
         [:div.column.tour
           [:div.column-title
