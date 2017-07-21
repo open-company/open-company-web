@@ -74,12 +74,12 @@ div.entry-modal-container {
 
             div.entry-modal-head-right {
               float: right;
-              div.new {
+              div.topic-tag {
                 float: right;
                 margin-top: 7px;
               }
 
-              @include entry-new();
+              @include entry-topic-tag();
             }
           }
 

@@ -99,7 +99,7 @@
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
                     (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
-                      [:div.new
+                      [:div.topic-tag
                         topic-name]))]]
               [:div.entry-modal-content
                 [:div.entry-modal-content-headline
