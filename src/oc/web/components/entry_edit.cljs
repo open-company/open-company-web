@@ -158,7 +158,7 @@
               [:div.triangle]
               [:div.entry-dropdown-list-content
                 [:ul
-                  (for [t topics
+                  (for [t (sort #(compare (:name %1) (:name %2)) topics)
                         :let [selected (= (:topic-name entry-editing) (:name t))]]
                     [:li.group
                       {:key (str "entry-edit-dd-" (:slug t))}

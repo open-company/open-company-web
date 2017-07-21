@@ -18,6 +18,11 @@
     ;; in any other case we are showing by latest updates
     :else "Latest Updates"))
 
+(defn compare-topic-names [topics topic-slug-1 topic-slug-2]
+  (let [topic-name-1 (some #(when (= (:slug %) topic-slug-1) (:name %)) topics)
+        topic-name-2 (some #(when (= (:slug %) topic-slug-2) (:name %)) topics)]
+    (compare topic-name-1 topic-name-2)))
+
 (rum/defcs filters-dropdown < rum/reactive
                               (drv/drv :board-filters)
                               (drv/drv :board-data)
@@ -62,7 +67,7 @@
                 "By Topic"]
               (when (pos? (count (:topics board-data)))
                 [:li.divider])
-              (for [topic-slug (keys topic-groups)
+              (for [topic-slug (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
                     :let [t (some #(when (= (:slug %) topic-slug) %) (:topics board-data))]]
                 [:li
                   {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or (:slug t) "uncategorized")))
