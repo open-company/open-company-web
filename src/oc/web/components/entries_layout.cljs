@@ -66,7 +66,7 @@
               [:div.entries-cards-container-row.group
                 {:key (str "entries-row-" idx)}
                 ; Render the entries in the row
-                (for [entry sorted-entries]
+                (for [entry entries]
                   (rum/with-key (entry-card entry false) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
                 ; If there is only one entry add the empty card placeholder
                 (if (= (count sorted-entries) 1)
