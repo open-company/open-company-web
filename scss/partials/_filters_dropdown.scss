@@ -22,10 +22,14 @@ div.filters-dropdown-name {
     }
   }
 
-  button.filters-dropdown-latest {
+  button.filters-dropdown-button {
     float: left;
     margin-right: 20px;
     margin-top: 1px;
+
+    &.filters-dropdown-by-topic {
+      margin-right: 0px;
+    }
   }
 
   .choice {
@@ -49,7 +53,7 @@ div.filters-dropdown-name {
   div.filters-dropdown-container{
     position: relative;
     display: inline-block;
-    float: left;
+    float: right;
 
     button.filters-dropdown-caret {
       height: 20px;
@@ -60,7 +64,6 @@ div.filters-dropdown-name {
         font-size: 12px;
         margin-top: 5px;
         transition: 230ms;
-        margin-left: 10px;
       }
 
       &.open {
