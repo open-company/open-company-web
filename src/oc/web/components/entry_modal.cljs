@@ -106,6 +106,7 @@
                   (when (:topic-slug entry-data)
                     (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
                       [:div.topic-tag
+                        {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data)))}
                         topic-name]))]]
               [:div.entry-modal-content
                 [:div.entry-modal-content-headline

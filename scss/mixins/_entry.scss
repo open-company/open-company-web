@@ -53,6 +53,12 @@
     line-height: 14px;
     text-align: center;
     padding: .5em .9em;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $carrot_text_blue;
+      color: white;
+    }
   }
 }
 
