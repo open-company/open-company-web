@@ -61,6 +61,12 @@ div.topics-columns {
           background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
         }
       }
+
+      div.filters-dropdown-name {
+        float: right;
+        margin-right: 24px;
+        margin-top: 8px;
+      }
     }
 
     div.dashboard-sharing-select-all {

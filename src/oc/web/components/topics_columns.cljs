@@ -97,11 +97,11 @@
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "New Update")))
-              ;; Board filters dropdown
-              (when (and (not is-mobile-size?)
-                         (not empty-board?))
-                (filters-dropdown))
+                    "New Update"))
+                ;; Board filters dropdown
+                (when (and (not is-mobile-size?)
+                           (not empty-board?))
+                  (filters-dropdown)))
               ;; Board content: empty board, add topic, topic view or topic cards
               (cond
                 (and is-dashboard
