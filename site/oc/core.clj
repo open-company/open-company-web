@@ -100,8 +100,10 @@
           [:a {:href "/?tif"} "Request Free Early Access"]]
         [:div.small-logos
           [:a.twitter
+            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
             [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
           [:a.medium
+            {:target "_blank" :href "https://medium.com/@Carrot.io" :title "Carrot on Medium"}
             [:img {:src (pages/cdn "/img/ML/home_page_medium.svg")}]]]
         [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column

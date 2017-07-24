@@ -12,10 +12,10 @@
     {:class container-class}
     [:div.small-logos
       [:a.twitter
-        {:href oc-urls/oc-twitter}
+        {:target "_blank" :href oc-urls/oc-twitter :title "Carrot on Twitter"}
         [:img {:src (utils/cdn "/img/ML/home_page_twitter.svg")}]]
       [:a.medium
-        {:href oc-urls/oc-medium}
+        {:target "_blank" :href oc-urls/oc-medium :title "Carrot on Medium"}
         [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
