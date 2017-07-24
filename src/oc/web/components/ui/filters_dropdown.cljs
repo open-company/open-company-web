@@ -11,12 +11,10 @@
 
 (defn board-filters-label [board-filters topics]
   (cond
-    ;; by topic order
-    (= board-filters :by-topic) "By Topic"
     ;; if the filter is a string it means we are filtering by a topic slug, get the topic name from the board data
     (string? board-filters) (or (:name (utils/get-topic topics board-filters)) (s/capital board-filters))
-    ;; in any other case we are showing by latest updates
-    :else "Latest Updates"))
+    ;; by topic order
+    :else "By Topic"))
 
 (defn compare-topic-names [topics topic-slug-1 topic-slug-2]
   (let [topic-name-1 (some #(when (= (:slug %) topic-slug-1) (:name %)) topics)
@@ -31,6 +29,16 @@
         board-filters (drv/react s :board-filters)
         topic-groups (group-by :topic-slug (:entries board-data))]
     [:div.filters-dropdown-name.group
+      (when-not (string? board-filters)
+        [:button.mlb-reset.filters-dropdown-latest.choice
+            {:type "button"
+             :class (when (= board-filters :latest) "select")
+             :on-click (fn []
+                         (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                         (router/nav! (oc-urls/board)))
+             :aria-haspopup true
+             :aria-expanded false}
+            "Latest"])
       (when (string? board-filters)
         [:button.mlb-reset.board-remove-filter
           {:on-click #(let [org-slug (router/current-org-slug)
@@ -40,9 +48,10 @@
                           (router/nav! (oc-urls/board-sort-by-topic))
                           (router/nav! (oc-urls/board))))}])
       [:div.filters-dropdown-container
-        [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle
+        [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle.choice
           {:type "button"
            :id "filters-dropdown-btn"
+           :class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
            :data-toggle (if (pos? (count topic-groups)) "dropdown" "")
            :aria-haspopup true
            :aria-expanded false}
@@ -53,13 +62,7 @@
           [:div.triangle]
           [:div.filters-dropdown-list-content
             [:ul
-              [:li.category
-                {:on-click (fn []
-                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-                              (router/nav! (oc-urls/board)))
-                 :class (if (= board-filters :latest) "select" "")}
-                "Latest Updates"]
-              [:li.category
+              [:li.category.choice
                 {:on-click (fn [_]
                               (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board-sort-by-topic)))
@@ -69,7 +72,7 @@
                 [:li.divider])
               (for [topic-slug (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
                     :let [t (some #(when (= (:slug %) topic-slug) %) (:topics board-data))]]
-                [:li
+                [:li.choice
                   {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or (:slug t) "uncategorized")))
                    :class (if (or (= board-filters (:slug t))
                                   (and (= board-filters "uncategorized")
