@@ -11,7 +11,8 @@
             [goog.object :as gobj]))
 
 (defn cut-body [entry-body]
-  (let [dom (.html (.not (js/$ (str "<div>" (gobj/get (utils/emojify entry-body) "__html") "</div>")) "img:not(.emojione)"))]
+  (let [cleaned-body (utils/strip-img-tags entry-body)
+        dom (.html (js/$ (str "<div>" (gobj/get (utils/emojify cleaned-body) "__html") "</div>")))]
     (.truncate js/$ dom (clj->js {:length 90 :words true :ellipsis "... <span class=\"read-full-update\">Read Full Update</span>"}))))
 
 (rum/defc entry-card-empty
