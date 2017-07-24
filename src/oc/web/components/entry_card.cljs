@@ -57,7 +57,7 @@
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
                                       s)}
-  [s entry-data show-topic? has-headline has-body]
+  [s entry-data has-headline has-body]
   [:div.entry-card
     {:class (str "entry-card-" (:uuid entry-data))
      :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
@@ -79,7 +79,7 @@
             (utils/time-since (:updated-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
-        (when (and (:topic-slug entry-data) show-topic?)
+        (when (:topic-slug entry-data)
           (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
             [:div.topic-tag
               {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data)))}
