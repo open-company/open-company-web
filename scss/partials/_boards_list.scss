@@ -9,6 +9,10 @@ div.left-boards-list {
     outline: none;
     margin-bottom: 34px; 
 
+    &:hover {
+      text-decoration: underline;
+    }
+
     span {
       font-size: 16px;
       color: $oc_gray_7;
@@ -107,6 +111,10 @@ div.left-boards-list {
         font-size: 14px;
         color: $oc_gray_7;
         @include avenir_M();
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
 
       button.remove-board {
@@ -158,6 +166,10 @@ div.left-boards-list {
     margin-top: 34px;
 
     button.about-carrot-btn {
+      &:hover {
+        text-decoration: underline;
+      }
+
       div.about-carrot-icon {
         background-image: cdnUrl("/img/ML/carrot_grey.svg");
         background-size: 16px 16px;
@@ -176,6 +188,10 @@ div.left-boards-list {
     }
 
     button.invite-people-btn {
+      &:hover {
+        text-decoration: underline;
+      }
+
       div.invite-people-icon {
         background-image: cdnUrl("/img/ML/invite_people.svg");
         background-size: 16px 16px;
