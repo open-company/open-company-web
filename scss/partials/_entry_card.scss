@@ -75,6 +75,7 @@ div.entry-card {
       div.topic-tag {
         margin-top: 0;
         float: right;
+        cursor: pointer;
       }
 
       @include entry-topic-tag();
