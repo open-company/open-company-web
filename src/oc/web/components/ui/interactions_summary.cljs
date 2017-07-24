@@ -14,7 +14,7 @@
   (let [comments-link (utils/link-for (:links entry-data) "comments")
         comments-authors (vec (sort-by :created-at (:authors comments-link)))
         max-reaction (get-max-count-reaction (:reactions entry-data))]
-    [:div.interactions-summary
+    [:div.interactions-summary.group
       ;; Reactions
       (when-not (zero? (:count max-reaction))
         [:div.is-reactions.group
