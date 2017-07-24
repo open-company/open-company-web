@@ -27,12 +27,18 @@ $(document).ready(function(){
   }
 
   $("#try-it-form-central").submit( function(e){
-    mailchimpApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show(); $(".try-it-combo-field").hide();}, function(){});
+    mailchimpApiSubmit(e, this, function(){
+      $(".carrot-box-thanks-top").show();
+      $(".try-it-combo-field-top").hide();
+    }, function(){});
     return false;
   });
 
   $("#try-it-form-bottom").submit( function(e){
-    mailchimpApiSubmit(e, this, function(){$(".carrot-box-thanks-bottom").show(); $(".try-it-combo-field").hide();}, function(){});
+    mailchimpApiSubmit(e, this, function(){
+      $(".carrot-box-thanks-bottom").show();
+      $(".try-it-combo-field-bottom").hide();
+    }, function(){});
     return false;
   });
 });

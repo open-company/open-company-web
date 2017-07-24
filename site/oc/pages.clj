@@ -23,7 +23,7 @@
       [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
       [:a.carrot-early-access-link.hidden {:href "/"} "/"]]])
 
-(defn try-it-form [form-id]
+(defn try-it-form [form-id try-it-class]
   [:form.validate
     {:action (or (env :oc-mailchimp-api-endpoint) "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
      :method "post"
@@ -31,6 +31,7 @@
      :class "mailchimp-api-subscribe-form"
      :no-validate true}
     [:div.try-it-combo-field
+      {:class try-it-class}
       [:div.mc-field-group
         [:input.mail.required
           {:type "text"
@@ -50,10 +51,10 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "Company updates that tell a better story"]
+        [:h1.headline "Company updates that get everyone aligned"]
         [:div.subheadline
-          "The easy way to build transparency and alignment - inside and outside the company."]
-        (try-it-form "try-it-form-central")
+          "It's never been easier to build transparency and alignment\nwith your team, investors and customers"]
+        (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
 
         ;; FIXME: Remove the carrot screenshot for the initial onboarding period
@@ -86,9 +87,9 @@
           [:img {:src (cdn "/img/ML/home_page_il_3_355_350.svg")}]
           [:div.description.group
             [:div.title
-              "Grow your business"]
+              "Build trust with a bigger audience"]
             [:div.subtitle
-              "Share the latest news with recruits, potential investors, and customers. Build trust with a bigger audience and they’ll reward you for it."]]]]
+              "Share the latest news with recruits, potential investors, and customers."]]]]
 
       (comment
         [:div.customers
@@ -115,7 +116,7 @@
         [:div.try-it-subtitle
           "Easy set-up • Free for small teams"]
         [:div
-          (try-it-form "try-it-form-bottom")]
+          (try-it-form "try-it-form-bottom" "try-it-combo-field-bottom")]
         (carrot-box-thanks "carrot-box-thanks-bottom")]]])
 
 (defn features [options]
@@ -166,7 +167,7 @@
           [:div.title
             "Share your news more broadly"]
           [:div.subtitle
-            "Share something beautiful via email or on the Web. Updates and stories are accessible by teams, but can also be made public or private."]]]]])
+            "Share something beautiful via email or on the Web with recruits, investors and customers. Updates and stories are accessible by teams, but can also be made public or private."]]]]])
 
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
@@ -237,15 +238,13 @@
         [:div.ovals-container-face.face-purple]
 
         [:div.about-subline
-          "Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company."]
+          "People are hyper-connected in the moment, but still struggle to know what’s really happening across the company."]
         [:div.paragraphs-container.group
           [:div.mobile-only.happy-face.yellow-happy-face]
           [:div.mobile-only.happy-face.red-happy-face]
           [:div.paragraphs-bg-container.group
             [:div.paragraph
-              "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
-            [:div.paragraph
-              "With that in mind we designed Carrot based" [:br] "on three principles:"]]
+              "The solution is surprisingly simple and effective - better company updates that build transparency and alignment. With that in mind we designed Carrot based on three principles:"]]
           [:div.mobile-only.happy-face.blue-happy-face]
           [:div.mobile-only.happy-face.purple-happy-face]
           [:div.mobile-only.happy-face.green-happy-face]]]
@@ -284,16 +283,19 @@
           [:div.column-left.group
             ;; Member: Stuart Levinson
             [:div.team-card.stuart-levinson
-              [:div.team-avatar]
+              [:div.team-avatar
+                [:img {:src "http://www.gravatar.com/avatar/6ef85399c45b7affe7fc8fb361a3366f?s=64"}]]
               [:div.team-member
                 [:div.team-name "Stuart Levinson"]
-                [:div.team-description "Prior to founding OpenCompany, Stuart started and sold two venture-backed startups. Venetica (acquired by IBM) pioneered a new type of enterprise integration software, and TalkTo (acquired by Path) launched the first messaging app to local businesses powered by a human + AI backend."]
+                [:div.team-description "CEO and cofounder."]
+                [:div.team-description "Prior to Carrot, Stuart founded and sold two venture-backed startups - Venetica (enterprise software acquired by IBM) and TalkTo (a messaging app acquired by Path). Those experiences, pre- and post-acquisitions, inspired the passion for transparency and its effect on overall alignment."]
                 [:div.team-media-links
                   [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                   [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
             ;; Member: Iacopo Carraro
             [:div.team-card.iacopo-carraro
-              [:div.team-avatar]
+              [:div.team-avatar
+                [:img {:src "http://www.gravatar.com/avatar/0224b757acf053e02d8cdf807620417c?s=64"}]]
               [:div.team-member
                 [:div.team-name "Iacopo Carraro"]
                 [:div.team-description "Iacopo is a full-stack engineer with lots of remote team and startup experience."]
@@ -305,9 +307,11 @@
           [:div.column-right.group
             ;; Member: Sean Johnson
             [:div.team-card.sean-johnson
-              [:div.team-avatar]
+              [:div.team-avatar
+                [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=64"}]]
               [:div.team-member
                 [:div.team-name "Sean Johnson"]
+                [:div.team-description "CTO and cofounder."]
                 [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
                 [:div.team-media-links
                   [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]

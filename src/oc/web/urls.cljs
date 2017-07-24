@@ -14,7 +14,7 @@
 
 (def features "/features")
 
-(def blog "http://blog.carrot.io")
+(def blog "https://blog.carrot.io")
 
 (def contact "/contact")
 
@@ -36,8 +36,6 @@
 (def oc-twitter "https://twitter.com/CarrotBuzz")
 
 (def oc-facebook "https://www.facebook.com/Carrot-111981319388047/")
-
-(def oc-medium "https://medium.com/@Carrot.io")
 
 (def oc-github "https://github.com/open-company")
 

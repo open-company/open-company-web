@@ -28,8 +28,8 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates that build transparency and alignment"]
-          [:div.subheadline#thank-you-top "It's never been easier to get everyone aligned - inside and outside the company."]
+          [:h1.headline "Company updates that get everyone aligned"]
+          [:div.subheadline#thank-you-top "It's never been easier to build transparency and alignment\nwith your team, investors and customers"]
           (when-not @(::thanks-box-top s)
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
           [:div.small-teams
@@ -67,9 +67,9 @@
             [:img {:src (utils/cdn "/img/ML/home_page_il_3_355_350.svg")}]
             [:div.description.group
               [:div.title
-                "Grow your business"]
+                "Build trust with a bigger audience"]
               [:div.subtitle
-                "Share the latest news with recruits, potential investors, and customers. Build trust with a bigger audience and they’ll reward you for it."]]]]
+                "Share the latest news with recruits, potential investors, and customers."]]]]
 
         (comment
           [:div.customers

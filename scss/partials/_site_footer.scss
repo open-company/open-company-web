@@ -56,7 +56,7 @@
       }
 
       div.small-logos {
-        margin-top: 40px;
+        margin-top: 73px;
 
         @include mobile(){
           margin-bottom: 20px;
@@ -101,6 +101,20 @@
         float: right;
         margin-right: 30px;
         width: 100px;
+
+        @include big_web(){
+          &.column-tour {
+            width: 110px;
+          }
+
+          &.column-integration {
+            width: 126px;
+          }
+
+          &.column-support {
+            width: 80px;
+          }
+        }
 
         @include mobile(){
           float: none;

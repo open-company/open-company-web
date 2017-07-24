@@ -170,6 +170,32 @@ div.ovals-container {
       height: auto;
       background-position: center top;
       background-size: 100%;
+
+      div.paragraph {
+        margin: -50px auto 80px;
+        padding: 100px 0;
+        max-height: 394px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 320px) {
+    div.paragraphs-bg-container {
+      div.paragraph {
+        margin-top: 0px;
+        padding-top: 40px;
+        margin-bottom: 3px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+    div.paragraphs-bg-container {
+      div.paragraph {
+        margin-top: 0px;
+        padding-top: 100px;
+        margin-bottom: 3px;
+      }
     }
   }
 
@@ -278,8 +304,6 @@ div.principles {
       @include mobile(){
         width: 100%;
         margin-left: 0px;
-        text-align: left;
-        font-size: 16px;
         max-width: initial;
       }
     }
@@ -346,7 +370,7 @@ div.about-alignment {
   div.quote {
     position: absolute;
     left: 50%;
-    margin-left: -480px;
+    margin-left: -540px;
     margin-top: 27px;
     top: 70px;
     width: 68px;
@@ -363,7 +387,7 @@ div.about-alignment {
   }
 
   div.about-alignment-description {
-    max-width: 1024px;
+    max-width: 1154px;
     padding: 0 117px;
     margin: 0 auto;
     font-size: 33px;
@@ -425,30 +449,25 @@ div.about-team {
         text-align: center;
       }
 
+      div.team-avatar {
+        width: 64px;
+        height: 64px;
+        img {
+          max-width: 64px;
+          max-height: 64px;
+          border-radius: 32px;
+        }
+      }
+
       &.new-member {
         div.team-avatar {
           background-image: cdnUrl("/img/ML/user_avatar_yellow.svg");
         }
       }
 
-      &.stuart-levinson {
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/user_avatar_red.svg");
-        }
-      }
-
       &.sean-johnson {
         @media screen and (min-width: 1122px){
-          height: 361px;
-        }
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/user_avatar_blue.svg");
-        }
-      }
-
-      &.iacopo-carraro {
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/user_avatar_purple.svg");
+          height: 400px;
         }
       }
 
@@ -498,7 +517,6 @@ div.about-team {
           margin-top: 12px;
 
           @media screen and (max-width: 1121px){
-            text-align: center;
             margin-top: 0px;
           }
         }
@@ -625,6 +643,7 @@ div.about-footer {
       color: #3a3d40;
       margin-top: 39px;
       max-width: 417px;
+      text-align: left;
     }
 
     a.link {
