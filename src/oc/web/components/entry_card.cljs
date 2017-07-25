@@ -82,7 +82,9 @@
         (when (:topic-slug entry-data)
           (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
             [:div.topic-tag
-              {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data)))}
+              {:on-click #(do
+                            (utils/event-stop %)
+                            (router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data))))}
               topic-name]))]]
     [:div.entry-card-content.group
       [:div.entry-card-headline
