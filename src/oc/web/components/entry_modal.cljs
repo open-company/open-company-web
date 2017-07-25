@@ -12,12 +12,12 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
 
-(defn dismiss-modal []
-  (dis/dispatch! [:board-nav (router/current-board-slug)]))
+(defn dismiss-modal [board-filters]
+  (dis/dispatch! [:board-nav (router/current-board-slug) board-filters]))
 
-(defn close-clicked [s]
+(defn close-clicked [s & [board-filters]]
   (reset! (::dismiss s) true)
-  (utils/after 180 dismiss-modal))
+  (utils/after 180 #(dismiss-modal board-filters)))
 
 (defn delete-clicked [e entry-data]
   (utils/event-stop e)
@@ -106,7 +106,7 @@
                   (when (:topic-slug entry-data)
                     (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
                       [:div.topic-tag
-                        {:on-click #(router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data)))}
+                        {:on-click #(close-clicked s (:topic-slug entry-data))}
                         topic-name]))]]
               [:div.entry-modal-content
                 [:div.entry-modal-content-headline
