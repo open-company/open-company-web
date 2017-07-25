@@ -950,7 +950,13 @@
 
 (defmethod dispatcher/action :entry-modal-fade-in
   [db [_ entry-uuid]]
-  (utils/after 10 #(router/nav! (oc-urls/entry entry-uuid)))
+  (utils/after 10
+   #(let [route (:route @router/path)
+          new-route (vec (conj route entry-uuid))
+          parts {:org (router/current-org-slug) :board (router/current-board-slug) :entry entry-uuid :query-params (:query-params @router/path)}]
+      (router/set-route! new-route parts)
+      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry entry-uuid))
+      (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
   (assoc db :entry-modal-fade-in entry-uuid))
 
 (defmethod dispatcher/action :entry-edit
@@ -1032,11 +1038,24 @@
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug]]
-  (let [next-board-filter (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest)
-        next-board-url (if (= next-board-filter :by-topic)
-                         (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
-                         (oc-urls/board (router/current-org-slug) board-slug))]
-    (utils/after 10 #(router/nav! next-board-url))
+  (let [next-board-filter (if (:entry-pushed db)
+                            ; If the modal was open from the dashboard, restore the previous opened filter
+                            (:board-filters db)
+                            ; If it was open directly from a link restore the last opened dashboard sort
+                            (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest))
+        next-board-url (if (keyword? next-board-filter)
+                         (if (= next-board-filter :by-topic)
+                           (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
+                           (oc-urls/board (router/current-org-slug) board-slug))
+                         (oc-urls/board-filter-by-topic next-board-filter))]
+    (utils/after 10
+      #(if (:entry-pushed db)
+         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+               parts (dissoc @router/path :route :entry)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
+         (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
 
 (defmethod dispatcher/action :entry-delete
