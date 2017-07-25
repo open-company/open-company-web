@@ -25,7 +25,7 @@
       (when-not (string? board-filters)
         [:button.mlb-reset.filters-dropdown-button.choice
             {:type "button"
-             :class (when (= board-filters :latest) "select")
+             :class (when (or (nil? board-filters) (= board-filters :latest)) "select")
              :on-click (fn []
                          (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                          (router/nav! (oc-urls/board)))}
