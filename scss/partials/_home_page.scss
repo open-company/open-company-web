@@ -31,6 +31,7 @@ div#wrap {
 
         @include mobile() {
           font-size: 32px;
+          line-height: 45px;
         }
       }
 
@@ -98,6 +99,7 @@ div#wrap {
         div.description {
           @media screen and (max-width: 1126px){
             margin-top: 60px;
+            padding: 0 16px;
           }
 
           @media screen and (min-width: 1127px){
@@ -109,14 +111,7 @@ div#wrap {
             @include avenir_H();
             font-size: 36px;
             letter-spacing: 0.1px;
-
-            @media screen and (max-width: 1126px){
-              text-align: center;
-            }
-
-            @media screen and (min-width: 1127px){
-              text-align: left;
-            }
+            text-align: left;
           }
 
           div.subtitle {

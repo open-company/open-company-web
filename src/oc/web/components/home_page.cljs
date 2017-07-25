@@ -69,7 +69,7 @@
               [:div.title
                 "Build trust with a bigger audience"]
               [:div.subtitle
-                "Share the latest news with recruits, potential investors, and customers."]]]]
+                "Share your updates with recruits, potential investors, and customers."]]]]
 
         (comment
           [:div.customers

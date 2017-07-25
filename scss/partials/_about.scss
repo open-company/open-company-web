@@ -162,45 +162,26 @@ div.ovals-container {
     }
   }
 
-  @include mobile(){
-    div.paragraphs-bg-container {
+  div.paragraphs-bg-container {
+
+    @include mobile(){
       background-image: cdnUrl("/img/ML/about_mobile_oval_bg.svg");
       background-repeat: no-repeat;
-      width: 100%;
       height: auto;
       background-position: center top;
       background-size: 100%;
-
-      div.paragraph {
-        margin: -50px auto 80px;
-        padding: 100px 0;
-        max-height: 394px;
-      }
+      padding: 30px 50px;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
     }
-  }
 
-  @media screen and (max-width: 320px) {
-    div.paragraphs-bg-container {
-      div.paragraph {
-        margin-top: 0px;
-        padding-top: 40px;
-        margin-bottom: 3px;
-      }
+    @media screen and (max-width: 320px) {
+      padding: 10px 0;
+      margin: 0px auto;
     }
-  }
 
-  @media screen and (max-width: 375px) {
-    div.paragraphs-bg-container {
-      div.paragraph {
-        margin-top: 0px;
-        padding-top: 100px;
-        margin-bottom: 3px;
-      }
-    }
-  }
-
-  @include big_web(){
-    div.paragraphs-bg-container {
+    @include big_web(){
       background-image: cdnUrl("/img/ML/about_oval_bg.svg");
       background-repeat: no-repeat;
       background-position: center;
@@ -214,7 +195,7 @@ div.ovals-container {
     font-size: 20px;
     text-align: center;
     color: $carrot_text_blue_2;
-    max-width: 547px;
+    max-width: 427px;
     margin: 20px auto 50px;
 
     &:last-child {
@@ -281,6 +262,7 @@ div.principles {
       max-width: 564px;
       text-align: left;
       margin-left: 160px;
+      color: #383b41;
 
       @include mobile(){
         width: 100%;
@@ -317,10 +299,6 @@ div.principles {
       div.principle-oval-bg {
         background-image: cdnUrl("/img/ML/about_principle_1_oval.svg");
       }
-
-      div.principle-title {
-        color: $carrot_orange;
-      }
     }
 
     &.principle-2 {
@@ -332,10 +310,6 @@ div.principles {
       div.principle-oval-bg {
         background-image: cdnUrl("/img/ML/about_principle_2_oval.svg");
       }
-
-      div.principle-title {
-        color: $carrot_green;
-      }
     }
 
     &.principle-3 {
@@ -346,10 +320,6 @@ div.principles {
 
       div.principle-oval-bg {
         background-image: cdnUrl("/img/ML/about_principle_3_oval.svg");
-      }
-
-      div.principle-title {
-        color: $carrot_text_blue;
       }
     }
   }
@@ -509,7 +479,7 @@ div.about-team {
           }
         }
 
-        div.team-description {
+        div.team-description, div.team-title {
           @include avenir_BOOK();
           font-size: 16px;
           line-height: 1.75;
@@ -517,7 +487,14 @@ div.about-team {
           margin-top: 12px;
 
           @media screen and (max-width: 1121px){
-            margin-top: 0px;
+            margin-top: 10px;
+          }
+        }
+
+        div.team-title {
+          margin-top: 4px;
+          @media screen and (max-width: 1121px){
+            text-align: center;
           }
         }
 
