@@ -23,7 +23,7 @@ Carrot simplifies how key business information is shared with stakeholders to cr
 
 [Carrot](https://carrot.io/) is GitHub for the rest of your company.
 
-Transparency expectations are changing. Organizations need to change as well if they are going to attract and retain savvy employees and investors. Just as open source changed the way we build software, transparency changes how we build successful companies with information that is open, interactive, and always accessible. Carrot, and the OpenCompany platform, turn transparency into a competitive advantage.
+Transparency expectations are changing. Organizations need to change as well if they are going to attract and retain savvy employees and investors. Just as open source changed the way we build software, transparency changes how we build successful companies with information that is open, interactive, and always accessible. Carrot turns transparency into a competitive advantage.
 
 To get started, head to: [Carrot](https://carrot.io/)
 
