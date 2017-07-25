@@ -1046,11 +1046,11 @@
                               (:board-filters db)
                               ; If it was open directly from a link restore the last opened dashboard sort
                               (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest)))
-        next-board-url (if (keyword? next-board-filter)
+        next-board-url (if (string? next-board-filter)
+                         (oc-urls/board-filter-by-topic next-board-filter)
                          (if (= next-board-filter :by-topic)
                            (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
-                           (oc-urls/board (router/current-org-slug) board-slug))
-                         (oc-urls/board-filter-by-topic next-board-filter))]
+                           (oc-urls/board (router/current-org-slug) board-slug)))]
     (utils/after 10
       #(if (:entry-pushed db)
          (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
