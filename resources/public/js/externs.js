@@ -40,6 +40,7 @@ $.animate = function(){};
 $.prop = function(){};
 $.dropdown = function(){};
 $.not = function(){};
+$.dotdotdot = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};

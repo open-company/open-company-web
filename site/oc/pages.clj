@@ -424,7 +424,7 @@
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; Truncate html string
-          [:script {:type "text/javascript" :src "/lib/truncate/jquery.truncate.js"}]
+          [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection

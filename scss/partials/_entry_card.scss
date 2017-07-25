@@ -100,11 +100,7 @@ div.entry-card {
 
     div.entry-card-body {
       @include entry-body();
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
+      display: block;
       line-height: 24px;
       max-height: #{24*3}px;
 
@@ -115,11 +111,6 @@ div.entry-card {
 
       a:hover {
         text-decoration: none !important;
-      }
-
-      p {
-        margin-top: 0px;
-        margin-bottom: 0px;
       }
 
       img:not(.emojione){

@@ -10,11 +10,6 @@
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [goog.object :as gobj]))
 
-(defn cut-body [entry-body]
-  (let [cleaned-body (utils/strip-img-tags entry-body)
-        dom (.html (js/$ (str "<div>" (gobj/get (utils/emojify cleaned-body) "__html") "</div>")))]
-    (.truncate js/$ dom (clj->js {:length 90 :words true :ellipsis "... <span class=\"read-full-update\">Read Full Update</span>"}))))
-
 (rum/defc entry-card-empty
   [read-only?]
   [:div.entry-card.empty-state.group
@@ -43,9 +38,27 @@
 (rum/defcs entry-card < rum/static
                         (rum/local false ::hovering-card)
                         (rum/local false ::showing-dropdown)
+                        (rum/local false ::truncated)
                         {:after-render (fn [s]
                                          (.click (js/$ "div.entry-card div.entry-card-body a") #(.preventDefault %))
+                                         (when (not @(::truncated s))
+                                           (let [entry-data (first (:rum/args s))
+                                                 body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")]
+                                             (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "... Read Full Update"})
+                                             (utils/after 10
+                                              #(let [$body (js/$ body-sel)
+                                                     i (.html $body)
+                                                     r (js/RegExp "... Read Full Update" "g")
+                                                     next-inner (.replace i r "... <span class=\"read-full-update\">Read Full Update</span>")]
+                                                 (.html $body next-inner)))
+                                             (reset! (::truncated s) true)))
                                          s)
+                         :did-remount (fn [o s]
+                                        (let [old-entry-data (first (:rum/args o))
+                                              new-entry-data (first (:rum/args s))]
+                                          (when (not= (:body old-entry-data) (:body new-entry-data))
+                                            (reset! (::truncated s) false)))
+                                        s)
                          :did-mount (fn [s]
                                       (let [entry-data (first (:rum/args s))]
                                         (.on (js/$ (str "div.entry-card-" (:uuid entry-data)))
@@ -90,9 +103,11 @@
       [:div.entry-card-headline
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
-      [:div.entry-card-body
-        {:dangerouslySetInnerHTML #js {"__html" (cut-body (:body entry-data))}
-         :class (when has-body "has-body")}]]
+      (let [body-without-images (utils/strip-img-tags (:body entry-data))
+            emojied-body (utils/emojify body-without-images)]
+        [:div.entry-card-body
+          {:dangerouslySetInnerHTML emojied-body
+           :class (when has-body "has-body")}])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
