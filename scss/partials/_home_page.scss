@@ -5,8 +5,8 @@ div#wrap {
 
     @include big_web(){
       background-image: cdnUrl("/img/ML/home_page_swoosh.svg");
-      background-position: 0px 0px;
-      background-size: cover;
+      background-position: 0px -159px;
+      background-size: 100% auto;
       background-repeat: no-repeat;
     }
   
@@ -36,7 +36,7 @@ div#wrap {
 
       div.subheadline {
         color: #4D4D4D;
-        font-size: 22px;
+        font-size: 24px;
         padding: 0 16px;
         @include avenir_R();
         line-height: 32px;
@@ -109,6 +109,14 @@ div#wrap {
             @include avenir_H();
             font-size: 36px;
             letter-spacing: 0.1px;
+
+            @media screen and (max-width: 1126px){
+              text-align: center;
+            }
+
+            @media screen and (min-width: 1127px){
+              text-align: left;
+            }
           }
 
           div.subtitle {
@@ -149,7 +157,7 @@ div#wrap {
               float: right;
               text-align: right;
               margin-top: 90px;
-              margin-right: 90px;
+              margin-right: 20px;
             }
           }
 
@@ -164,7 +172,7 @@ div#wrap {
             div.description {
               float: left;
               text-align: left;
-              margin-left: 60px;
+              margin-left: 50px;
               margin-top: 90px;
             }
           }
