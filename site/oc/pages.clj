@@ -56,6 +56,11 @@
           "It's never been easier to build transparency and alignment\nwith your team, investors and customers"]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
+        [:div.carrot-box-container.confirm-thanks.group
+          {:style #js {:display "none"}}
+          [:div.carrot-box-thanks
+            [:div.thanks-headline "You are Confirmed!"]
+            [:div.thanks-subheadline "Thank you for subscribing."]]]
 
         ;; FIXME: Remove the carrot screenshot for the initial onboarding period
         (comment

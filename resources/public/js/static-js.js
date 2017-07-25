@@ -20,6 +20,7 @@ function mailchimpApiSubmit(e, form, success, fail){
 
 $(document).ready(function(){
   var tif = getParameterByName("tif");
+  var confirm = getParameterByName("confirm");
   var rewriteUrl = window.location.pathname + window.location.hash;
   window.history.pushState({}, document.title, rewriteUrl);
   if (tif) {
@@ -41,6 +42,12 @@ $(document).ready(function(){
     }, function(){});
     return false;
   });
+
+  if (confirm) {
+    $(".confirm-thanks").show();
+    $(".carrot-box-thanks-top").hide();
+    $("#try-it-form-central").hide();
+  }
 });
 
 function getParameterByName(name, url) {
