@@ -13,21 +13,17 @@
 
 Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company. Employees and investors, co-founders and execs, customers and community, they all want more transparency. The solution is surprisingly simple and effective - great company updates that build transparency and alignment.
 
-With that in mind we designed the [Carrot](https://carrot.io/) application, and the [OpenCompany platform](https://github.com/open-company), based on three principles:
+With that in mind we designed the [Carrot](https://carrot.io/) software-as-a-service application, powered by the open source [OpenCompany platform](https://github.com/open-company). The product design is based on three principles:
 
 1. It has to be easy or no one will play.
 2. The "big picture" should always be visible.
 3. Alignment is valuable beyond the team, too.
 
-Carrot is a software-as-a-service application powered by the OpenCompany platform. Carrot simplifies how key business information is shared with stakeholders to create alignment.
-
-When information about growth, finances, ownership and challenges is shared transparently, it inspires trust, new ideas and new levels of stakeholder engagement. Carrot makes it easy for founders to engage with employees and investors, creating alignment for everyone.
+Carrot simplifies how key business information is shared with stakeholders to create alignment. When information about growth, finances, ownership and challenges is shared transparently, it inspires trust, new ideas and new levels of stakeholder engagement. Carrot makes it easy for founders to engage with employees and investors, creating alignment for everyone.
 
 [Carrot](https://carrot.io/) is GitHub for the rest of your company.
 
 Transparency expectations are changing. Organizations need to change as well if they are going to attract and retain savvy employees and investors. Just as open source changed the way we build software, transparency changes how we build successful companies with information that is open, interactive, and always accessible. Carrot, and the OpenCompany platform, turn transparency into a competitive advantage.
-
-Like the open companies we promote and support, the [OpenCompany](https://github.com/open-company) platform is open and transparent. The company supporting this effort, OpenCompany, LLC, is an open company. The [platform](https://github.com/open-company) is open source software, and open company data is [open data](https://en.wikipedia.org/wiki/Open_data) accessible through the [OpenCompany Storage Service](https://github.com/open-company/open-company-storage).
 
 To get started, head to: [Carrot](https://carrot.io/)
 
