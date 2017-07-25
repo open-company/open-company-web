@@ -80,8 +80,8 @@
                   [:img {:src "http://www.gravatar.com/avatar/99399ee082e57d67045cb005f9c2e4ef?s=64"}]]
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
-                  [:div.team-title "CEO and cofounder."]
-                  [:div.team-description "Prior to Carrot, started two venture-backed startups - Venetica (acquired by IBM) and TalkTo (acquired by Path). Those experiences, pre- and post-acquisitions, inspired a passion for transparency and its effect on overall alignment."]
+                  [:div.team-title "CEO and cofounder"]
+                  [:div.team-description "Prior to Carrot, Stuart started two venture-backed startups - Venetica (acquired by IBM) and TalkTo (acquired by Path). Those experiences, pre- and post-acquisitions, inspired a passion for transparency and its effect on overall alignment."]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                     [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
@@ -102,7 +102,7 @@
                   [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=64"}]]
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
-                  [:div.team-title "CTO and cofounder."]
+                  [:div.team-title "CTO and cofounder"]
                   [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
