@@ -117,7 +117,7 @@ div.entry-card {
         display: none;
       }
 
-      span.read-full-update {
+      a.read-full-update {
         @include avenir_R();
         font-size: 16px;
         color: $carrot_text_blue;
