@@ -1037,12 +1037,15 @@
   db)
 
 (defmethod dispatcher/action :board-nav
-  [db [_ board-slug]]
-  (let [next-board-filter (if (:entry-pushed db)
-                            ; If the modal was open from the dashboard, restore the previous opened filter
-                            (:board-filters db)
-                            ; If it was open directly from a link restore the last opened dashboard sort
-                            (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest))
+  [db [_ board-slug board-filters]]
+  (let [next-board-filter (if board-filters
+                            ; If a board filter is passed use it
+                            board-filters
+                            (if (:entry-pushed db)
+                              ; If the modal was open from the dashboard, restore the previous opened filter
+                              (:board-filters db)
+                              ; If it was open directly from a link restore the last opened dashboard sort
+                              (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest)))
         next-board-url (if (keyword? next-board-filter)
                          (if (= next-board-filter :by-topic)
                            (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
