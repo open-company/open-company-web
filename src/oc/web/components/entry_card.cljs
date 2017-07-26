@@ -35,6 +35,14 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+(defn truncate-body [body-sel]
+  (.dotdotdot (js/$ body-sel)
+   #js {:height 72
+        :wrap "word"
+        :watch true
+        :ellipsis "... "
+        :after "a.read-more"}))
+
 (rum/defcs entry-card < rum/static
                         (rum/local false ::hovering-card)
                         (rum/local false ::showing-dropdown)
@@ -50,8 +58,10 @@
                                            (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
                                            (when-not @(::truncated s)
-                                             (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "... " :after "a.read-more"})
-                                             (reset! (::truncated s) true)))
+                                             (truncate-body body-sel)
+                                             (utils/after 1 #(truncate-body body-sel))
+                                             (reset! (::truncated s) true))
+                                           )
                                          s)
                          :did-remount (fn [o s]
                                         (let [old-entry-data (first (:rum/args o))
