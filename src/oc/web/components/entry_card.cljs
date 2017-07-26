@@ -45,7 +45,7 @@
                                            #(when (not @(::truncated s))
                                               (let [entry-data (first (:rum/args s))
                                                     body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")]
-                                                (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "..." :after "a.read-more"})
+                                                (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "... " :after "a.read-more"})
                                                 (reset! (::truncated s) true))))
                                          s)
                          :did-remount (fn [o s]
