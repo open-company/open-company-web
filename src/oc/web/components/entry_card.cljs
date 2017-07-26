@@ -41,17 +41,12 @@
                         (rum/local false ::truncated)
                         {:after-render (fn [s]
                                          (.click (js/$ "div.entry-card div.entry-card-body a") #(.preventDefault %))
-                                         (when (not @(::truncated s))
-                                           (let [entry-data (first (:rum/args s))
-                                                 body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")]
-                                             (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "..." :after "a.read-full-update"})
-                                             ; (utils/after 50
-                                             ;  #(let [$body (js/$ body-sel)
-                                             ;         i (.html $body)
-                                             ;         r (js/RegExp "... Read Full Update" "g")
-                                             ;         next-inner (.replace i r "... <span class=\"read-full-update\">Read Full Update</span>")]
-                                             ;     (.html $body next-inner)))
-                                             (reset! (::truncated s) true)))
+                                          (utils/after 10
+                                           #(when (not @(::truncated s))
+                                              (let [entry-data (first (:rum/args s))
+                                                    body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")]
+                                                (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "..." :after "a.read-more"})
+                                                (reset! (::truncated s) true))))
                                          s)
                          :did-remount (fn [o s]
                                         (let [old-entry-data (first (:rum/args o))
@@ -76,7 +71,6 @@
      :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
-    ; [:div.hidden [:a.read-full-update "Read Full Update"]]
     ; Card header
     [:div.entry-card-head.group
       ; Card author
@@ -105,7 +99,7 @@
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
       (let [body-without-images (utils/strip-img-tags (:body entry-data))
-            emojied-body (utils/emojify (str body-without-images "<a class=\"read-full-update\">Read Full Update</a>"))]
+            emojied-body (utils/emojify (str body-without-images "<a class=\"read-more\">Read more</a>"))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (when has-body "has-body")}])]
