@@ -35,4 +35,4 @@
                 (user-avatar-image user-data true)])]
           ; Comments count
           [:div.is-comments-summary
-            (str (:count comments-link) " comments")]])]))
+            (str (:count comments-link) " comment" (when (> (:count comments-link) 1) "s"))]])]))
