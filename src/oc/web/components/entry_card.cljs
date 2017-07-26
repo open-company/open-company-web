@@ -42,9 +42,12 @@
                         {:after-render (fn [s]
                                          (let [entry-data (first (:rum/args s))
                                                body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
-                                               body-a-sel (str body-sel " a")]
+                                               body-a-sel (str body-sel " a")
+                                               read-more-sel (str body-a-sel ".read-more")]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
+                                           ; Prevent read more link to change directly the url
+                                           (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
                                            (when-not @(::truncated s)
                                              (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "... " :after "a.read-more"})
@@ -101,7 +104,7 @@
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
       (let [body-without-images (utils/strip-img-tags (:body entry-data))
-            emojied-body (utils/emojify (str body-without-images "<a class=\"read-more\">Read more</a>"))]
+            emojied-body (utils/emojify (str body-without-images "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (when has-body "has-body")}])]
