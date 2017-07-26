@@ -40,13 +40,15 @@
                         (rum/local false ::showing-dropdown)
                         (rum/local false ::truncated)
                         {:after-render (fn [s]
-                                         (.click (js/$ "div.entry-card div.entry-card-body a") #(.preventDefault %))
-                                          (utils/after 10
-                                           #(when (not @(::truncated s))
-                                              (let [entry-data (first (:rum/args s))
-                                                    body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")]
-                                                (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "... " :after "a.read-more"})
-                                                (reset! (::truncated s) true))))
+                                         (let [entry-data (first (:rum/args s))
+                                               body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
+                                               body-a-sel (str body-sel " a")]
+                                           ; Prevent body links in FoC
+                                           (.click (js/$ body-a-sel) #(.preventDefault %))
+                                           ; Truncate body text with dotdotdot
+                                           (when-not @(::truncated s)
+                                             (.dotdotdot (js/$ body-sel) #js {:height 72 :wrap "word" :watch true :ellipsis "... " :after "a.read-more"})
+                                             (reset! (::truncated s) true)))
                                          s)
                          :did-remount (fn [o s]
                                         (let [old-entry-data (first (:rum/args o))

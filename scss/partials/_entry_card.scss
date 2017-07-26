@@ -101,7 +101,6 @@ div.entry-card {
     div.entry-card-body {
       @include entry-body();
       display: block;
-      overflow: hidden;
       line-height: 24px;
       max-height: #{24*3}px;
 
