@@ -810,6 +810,12 @@
   (api/add-comment entry-uuid comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
+        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-data (get-in db board-key)
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-data (get (:entries board-data) entry-idx)
+        comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
+        new-board-data (update-in board-data [:entries entry-idx :links comments-link-idx :count] inc)
         comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
@@ -817,7 +823,9 @@
                                                :author {:name (jwt/get-key :name)
                                                         :avatar-url (jwt/get-key :avatar-url)
                                                         :user-id (jwt/get-key :user-id)}})]
-    (assoc-in db comments-key new-comments-data)))
+    (-> db
+      (assoc-in comments-key new-comments-data)
+      (assoc-in board-key new-board-data))))
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [entry-uuid]}]]
