@@ -307,8 +307,7 @@
                                    (fn [thumbnail-url]
                                     (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
                                     (media-image-add-if-finished s)))))
-                              (fn [res prog]
-                                (js/console.log "progress:" prog "res" res))
+                              (fn [res prog])
                               (fn [err]
                                 (js/console.log "err" err))))}]
               ; Add a video button
