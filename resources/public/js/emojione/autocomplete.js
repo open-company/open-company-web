@@ -69,7 +69,7 @@ function emojiAutocomplete() {
             index: 1
         }
         ],{
-            zIndex: 1100,
+            zIndex: 1131,
             maxCount: 20
         }).on({'textComplete:select': function (e, value, strategy) {
           // This will make sure React inputs receive a change event
