@@ -131,7 +131,7 @@
         [:div.entry-card-media-preview
           [:span.helper]
           [:img
-            {:src (.-src @(::first-body-image s))]])]
+            {:src (.-src @(::first-body-image s))}]])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
