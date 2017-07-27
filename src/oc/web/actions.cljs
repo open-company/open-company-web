@@ -810,14 +810,6 @@
   (api/add-comment entry-uuid comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        board-key (dispatcher/board-data-key org-slug board-slug)
-        board-data (get-in db board-key)
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
-        entry-data (get (:entries board-data) entry-idx)
-        comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
-        with-new-count (update-in board-data [:entries entry-idx :links comments-link-idx :count] inc)
-        new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
-        new-board-data (assoc-in with-new-count [:entries entry-idx :links comments-link-idx :authors] [new-author])
         comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
@@ -825,9 +817,7 @@
                                                :author {:name (jwt/get-key :name)
                                                         :avatar-url (jwt/get-key :avatar-url)
                                                         :user-id (jwt/get-key :user-id)}})]
-    (-> db
-      (assoc-in comments-key new-comments-data)
-      (assoc-in board-key new-board-data))))
+    (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [entry-uuid]}]]
@@ -873,8 +863,11 @@
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         entry-uuid (:entry-uuid interaction-data)
+        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-data (get-in db board-key)
         ; Entry data
-        entry-data (dispatcher/entry-data org-slug board-slug entry-uuid db)]
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-data (get (:entries board-data) entry-idx)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
@@ -886,7 +879,17 @@
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
             comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
-            is-current-user (= (jwt/get-key :user-id) (:user-id (:author comment-data)))]
+            current-user-id (jwt/get-key :user-id)
+            is-current-user (= current-user-id (:user-id (:author comment-data)))
+            ; update the comments link of the entry
+            comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
+            with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
+            old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
+            new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
+            new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
+                          old-authors
+                          (conj old-authors new-author))
+            with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
         ;; Refresh the topic data if the action coming in is from the current user
         ;; to get the new links to interact with
         (when is-current-user
@@ -895,7 +898,9 @@
         (when (not= (count all-old-comments-data) (count new-comments-data))
           (utils/pulse-comments-count entry-uuid))
         ; Update the local state with the new comments list
-        (assoc-in db comments-key sorted-comments-data))
+        (-> db
+            (assoc-in comments-key sorted-comments-data)
+            (assoc-in (concat board-key [:entries entry-idx]) with-authors)))
       ;; the entry is not present, refresh the full topic
       (do
         ;; force refresh of topic
