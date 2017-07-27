@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor]
             [goog.object :as googobj]
             [goog.events :as events]
@@ -219,7 +220,18 @@
            :role "textbox"
            :aria-multiline true
            :contentEditable true
-           :dangerouslySetInnerHTML @(::initial-body s)}]]
+           :dangerouslySetInnerHTML @(::initial-body s)}]
+        (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                       (let [headline (sel1 [:div.entry-edit-headline])
+                                             body     (sel1 [:div.entry-edit-body])]
+                                         (when (= (.-activeElement js/document) headline)
+                                           (headline-on-change s))
+                                         (when (= (.-activeElement js/document) body)
+                                           (body-on-change s))))
+                       :disabled (let [headline (sel1 [:div.entry-edit-headline])
+                                       body     (sel1 [:div.entry-edit-body])]
+                                   (not (or (= (.-activeElement js/document) headline)
+                                            (= (.-activeElement js/document) body))))})]
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-footer.group
         [:button.mlb-reset.mlb-default
