@@ -7,11 +7,13 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor]
             [cljsjs.rangy-selectionsaverestore]
-            [goog.object :as googobj]
+            [goog.object :as gobj]
+            [goog.dom :as gdom]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -37,12 +39,12 @@
   (when-let [body-el (sel1 [:div.entry-edit-body])]
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
-    (let [emojied-body (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
+    (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :body] emojied-body]))))
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
-    (let [emojied-headline   (utils/emoji-images-to-unicode (googobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline]))))
 
 (defn body-placeholder []
@@ -79,6 +81,24 @@
     ; move cursor at the end
     (utils/to-end-of-content-editable headline-el)))
 
+(defn media-image-add-if-finished [s]
+  (let [image @(::media-photo s)]
+    (when (and (contains? image :url)
+               (contains? image :width)
+               (contains? image :height)
+               (contains? image :thumbnail))
+      (.restoreSelection js/rangy @(::last-selection s))
+      (let [image-html (str "<img src=\"" (:url image) "\" data-thumbnail=\"" (:thumbnail image) "\" data-width=\"" (:width image) "\" data-height=\"" (:height image) "\" />")]
+        (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
+      (reset! (::last-selection s) nil)
+      (reset! (::media-photo s) nil)
+      (body-on-change s))))
+
+(defn img-on-load [s url img]
+  (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
+  (gdom/removeNode img)
+  (media-image-add-if-finished s))
+
 (defn create-new-topic [s]
   (when-not (empty? @(::new-topic s))
     (let [topics (:topics @(drv/get-ref s :board-data))
@@ -101,9 +121,9 @@
                         (rum/local "" ::new-topic)
                         (rum/local false ::focusing-create-topic)
                         (rum/local false ::media-expanded)
-                        (rum/local false ::media-photo-clicked)
-                        (rum/local false ::media-video-clicked)
-                        (rum/local false ::media-chart-clicked)
+                        (rum/local false ::media-photo)
+                        (rum/local false ::media-video)
+                        (rum/local false ::media-chart)
                         (rum/local nil ::window-click-listener)
                         (rum/local nil ::last-selection)
                         {:will-mount (fn [s]
@@ -132,11 +152,11 @@
                                               (reset! (::body-focused s) false))
                                            (reset! (::media-expanded s) false)
                                            ; If there was a last selection saved
-                                           (when @(::last-selection s)
+                                           (when (and (not @(::media-photo s))
+                                                      @(::last-selection s))
                                              ; remove the markers
-                                             (.removeMarkers js/rangy @(::last-selection s)))
-                                           ; lose the selection object
-                                           (reset! (::last-selection s) nil))))
+                                             (.removeMarkers js/rangy @(::last-selection s))
+                                             (reset! (::last-selection s) nil)))))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
@@ -267,31 +287,48 @@
               {:class (when @(::media-expanded s) "expanded")}
               ; Add a picture button
               [:button.mlb-reset.media.media-photo
-                {:class (when @(::media-photo-clicked s) "active")
+                {:class (when @(::media-photo s) "active")
                  :title "Add a picture"
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
                  :on-click (fn []
-                             (reset! (::media-photo-clicked s) true))}]
+                             (reset! (::media-photo s) true)
+                             (iu/upload! "image/*"
+                              (fn [res]
+                                (let [url (gobj/get res "url")
+                                      img   (gdom/createDom "img")]
+                                  (set! (.-onload img) #(img-on-load s url img))
+                                  (set! (.-className img) "hidden")
+                                  (gdom/append (.-body js/document) img)
+                                  (set! (.-src img) url)
+                                  (reset! (::media-photo s) {:res res :url url})
+                                  (iu/thumbnail! url
+                                   (fn [thumbnail-url]
+                                    (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
+                                    (media-image-add-if-finished s)))))
+                              (fn [res prog]
+                                (js/console.log "progress:" prog "res" res))
+                              (fn [err]
+                                (js/console.log "err" err))))}]
               ; Add a video button
               [:button.mlb-reset.media.media-video
-                {:class (when @(::media-video-clicked s) "active")
+                {:class (when @(::media-video s) "active")
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
                  :title "Add a video"
                  :on-click (fn []
-                             (reset! (::media-video-clicked s) true))}]
+                             (reset! (::media-video s) true))}]
               ; Add a chart button
               [:button.mlb-reset.media.media-chart
-                {:class (when @(::media-chart-clicked s) "active")
+                {:class (when @(::media-chart s) "active")
                  :title "Add a Google Sheet chart"
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
                  :on-click (fn []
-                             (reset! (::media-chart-clicked s) true))}]]]
+                             (reset! (::media-chart s) true))}]]]
           ; Emoji picker
           (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                          (let [headline (sel1 [:div.entry-edit-headline])
