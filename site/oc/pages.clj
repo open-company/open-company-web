@@ -412,8 +412,6 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css"}]
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
-          ;; Filestack
-          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
@@ -478,8 +476,6 @@
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
-          ;; Filestack
-          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
    :body [:body.small-footer
