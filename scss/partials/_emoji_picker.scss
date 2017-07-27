@@ -1,15 +1,24 @@
 div.emoji-picker {
   button.emoji-button{
-    font-size: 17px !important;
-    padding-top: 1px;
-    padding-bottom: 0px;
+    padding: 1px 0 0 0;
+    width: 25px;
+    height: 24px;
+    background-image: cdnUrl("/img/ML/emoji2x.png");
+    background-size: 25px 24px;
+    background-position: center;
+    opacity: 0.8;
+
+    img {
+      width: 25px;
+      height: 24px;
+    }
 
     &:hover {
-      color: rgba(78,90,107,1) !important;
+      opacity: 1;
     }
 
     &.disabled {
-      color: rgba(78, 90, 107, 0.2) !important;
+      opacity: 0.2;
     }
   }
 

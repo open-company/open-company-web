@@ -83,14 +83,13 @@
         last-active-element (::last-active-element s)
         disabled (::disabled s)]
     [:div.emoji-picker.relative
-      {:style {:width "15px"
-               :z-index 1020
-               :height "15px"}}
+      {:style {:width "25px"
+               :z-index 1132
+               :height "24px"}}
       [:button
         {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
-         :style {:font-size "15px"}
          :type "button"
-         :title "Add emoji"
+         :title "Insert emoji"
          :data-placement "top"
          :data-container "body"
          :data-toggle "tooltip"
@@ -99,8 +98,7 @@
                       (.preventDefault %)
                       (if (and @caret-pos (not @visible))
                         (reset! visible true)
-                        (reset! visible false)))}
-         [:i.fa.fa-smile-o]]
+                        (reset! visible false)))}]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
                  :top (if (= position "bottom") "25px" "-220px")
