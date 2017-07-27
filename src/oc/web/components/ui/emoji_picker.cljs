@@ -60,6 +60,9 @@
   (rum/local false ::disabled)
   
   {:init (fn [s p] (js/rangy.init) s)
+   :will-mount (fn [s]
+                 (check-focus s nil)
+                 s)
    :did-mount (fn [s] (when-not (utils/is-test-env?)
                         (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))
                               focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
@@ -101,7 +104,7 @@
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
                  :top (if (= position "bottom") "25px" "-220px")
-                 :left "0"}}
+                 :right "-10px"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search ""
                                                 :emojione #js {:sprites true
