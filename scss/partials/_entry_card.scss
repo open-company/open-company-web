@@ -98,6 +98,28 @@ div.entry-card {
       }
     }
 
+    div.entry-card-media-preview {
+      width: 72px;
+      height: 72px;
+      float: right;
+      text-align: center;
+      white-space: nowrap;
+      margin-top: 16px;
+
+      img {
+        max-width: 72px;
+        max-height: 72px;
+        border-radius: 8px;
+        vertical-align: middle;
+      }
+
+      .helper {
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+      }
+    }
+
     div.entry-card-body {
       @include entry-body();
       display: block;
@@ -107,6 +129,12 @@ div.entry-card {
       &.has-body {
         margin-top: 16px;
         height: #{24*3}px;
+      }
+
+      &.has-media-preview {
+        width: calc(100% - 72px - 16px;);
+        margin-right: 16px;
+        float: left;
       }
 
       p {

@@ -43,10 +43,14 @@
         :ellipsis "... "
         :after "a.read-more"}))
 
+(defn get-first-body-image [body]
+  (.get (.find (js/$ (str "<div>" body "</div>")) "img:not(.emojione)") 0))
+
 (rum/defcs entry-card < rum/static
                         (rum/local false ::hovering-card)
                         (rum/local false ::showing-dropdown)
                         (rum/local false ::truncated)
+                        (rum/local nil ::first-body-image)
                         {:after-render (fn [s]
                                          (let [entry-data (first (:rum/args s))
                                                body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
@@ -60,14 +64,18 @@
                                            (when-not @(::truncated s)
                                              (truncate-body body-sel)
                                              (utils/after 1 #(truncate-body body-sel))
-                                             (reset! (::truncated s) true))
-                                           )
+                                             (reset! (::truncated s) true)))
                                          s)
+                         :will-mount (fn [s]
+                                       (let [entry-data (first (:rum/args s))]
+                                         (reset! (::first-body-image s) (get-first-body-image (:body entry-data))))
+                                       s)
                          :did-remount (fn [o s]
                                         (let [old-entry-data (first (:rum/args o))
                                               new-entry-data (first (:rum/args s))]
                                           (when (not= (:body old-entry-data) (:body new-entry-data))
-                                            (reset! (::truncated s) false)))
+                                            (reset! (::truncated s) false)
+                                            (reset! (::first-body-image s) (get-first-body-image (:body new-entry-data)))))
                                         s)
                          :did-mount (fn [s]
                                       (let [entry-data (first (:rum/args s))]
@@ -117,7 +125,13 @@
             emojied-body (utils/emojify (str body-without-images "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
-           :class (when has-body "has-body")}])]
+           :class (utils/class-set {:has-body has-body
+                                    :has-media-preview @(::first-body-image s)})}])
+      (when @(::first-body-image s)
+        [:div.entry-card-media-preview
+          [:span.helper]
+          [:img
+            {:src (.-src @(::first-body-image s))}]])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
