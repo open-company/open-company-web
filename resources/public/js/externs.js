@@ -76,5 +76,7 @@ var filestack = {};
 filestack.init = function(){};
 filestack.pick = function(){};
 filestack.then = function(){};
+filestack.transform = function(){};
+filestack.storeURL = function(){};
 
 var mailchimpApiSubmit = function(){};
