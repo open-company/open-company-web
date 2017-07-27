@@ -26,12 +26,8 @@
         base-config   {:maxFiles 1
                        :maxSize (* 20 1024 1024) ; Limit the uploaded file to be at most 20MB
                        :storeTo store-to
-                       :transformOptions {
-                         :transformations {
-                           :crop true
-                           :rotate true
-                           :circle true
-                         }
+                       :transformations {
+                         :crop {:circle true}
                        }
                        :fromSources from-sources
                        ;; Selected cb
@@ -64,7 +60,7 @@
           (when (= (count files-uploaded)1)
             (success-cb (get files-uploaded 0))))))))
 
-(defn thumbnail [fs-url & [success-cb error-cb]]
+(defn thumbnail! [fs-url & [success-cb error-cb]]
   (let [fs-client (init-filestack)
         opts (clj->js {:resize {
                         :fit "crop"
