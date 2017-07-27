@@ -674,7 +674,8 @@
         unicode-string (.toImage js/emojione text-string)
         r (js/RegExp "<span " "ig")
         with-img (.replace unicode-string r "<img ")
-        without-span (.replace with-img (js/RegExp ">.{1,2}</span>" "ig") "/>")]
+        without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
+
     (if plain-text
       without-span
       #js {"__html" without-span})))
