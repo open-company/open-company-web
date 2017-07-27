@@ -134,7 +134,7 @@
                                     :has-media-preview @(::first-body-image s)})}])
       (when @(::first-body-image s)
         [:div.entry-card-media-preview
-          {:style #js {:background-image (str "url(" @(::first-body-image s) ")")}}])]
+          {:style #js {:backgroundImage (str "url(" @(::first-body-image s) ")")}}])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
