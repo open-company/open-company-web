@@ -989,13 +989,13 @@
 
 (defn pulse-reaction-count
   [entry-uuid reaction]
-  (let [selector (str "div." entry-uuid "-" reaction)]
+  (let [selector (str "div.reaction-" entry-uuid "-" reaction)]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn pulse-comments-count
   [entry-uuid]
-  (let [selector (str "div." entry-uuid "-comments-count")]
+  (let [selector (str "div.comments-count-" entry-uuid )]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
