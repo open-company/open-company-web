@@ -815,7 +815,9 @@
         entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
         entry-data (get (:entries board-data) entry-idx)
         comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
-        new-board-data (update-in board-data [:entries entry-idx :links comments-link-idx :count] inc)
+        with-new-count (update-in board-data [:entries entry-idx :links comments-link-idx :count] inc)
+        new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
+        new-board-data (assoc-in with-new-count [:entries entry-idx :links comments-link-idx :authors] [new-author])
         comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
