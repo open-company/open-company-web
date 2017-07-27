@@ -1,12 +1,22 @@
 (ns oc.web.lib.image-upload
   (:require [oc.web.local-settings :as ls]
-            [goog.object :as gobj]))
+            [cljsjs.filestack]
+            [goog.object :as gobj]
+            [oc.web.lib.raven :as sentry]))
 
-(def fs (atom nil))
+(def _fs (atom nil))
 
 (defn init-filestack []
-  (when js/filestack
-    (.init js/filestack ls/filestack-key)))
+  (if @_fs
+    @_fs
+    (let [new-fs (.init js/filestack ls/filestack-key)]
+      (reset! _fs new-fs)
+      new-fs)))
+
+(def store-to
+  {:container ls/attachments-bucket
+   :region "us-east-1"
+   :location "s3"})
 
 (defn upload!
   [type success-cb progress-cb error-cb & [finished-cb selected-cb started-cb]]
@@ -15,11 +25,7 @@
                         ["local_file_system" "googledrive" "dropbox" "onedrive" "box"])
         base-config   {:maxFiles 1
                        :maxSize (* 20 1024 1024) ; Limit the uploaded file to be at most 20MB
-                       :storeTo {
-                        :container ls/attachments-bucket
-                        :region "us-east-1"
-                        :location "s3"
-                       }
+                       :storeTo store-to
                        :transformOptions {
                          :transformations {
                            :crop true
@@ -48,13 +54,32 @@
                        :onFileUploadFailed error-cb}
         config        (if type
                         (merge base-config {:accept type})
-                        base-config)]
-    (when-not @fs
-      (reset! fs (init-filestack)))
+                        base-config)
+        fs (init-filestack)]
     (.then
-      (.pick @fs
+      (.pick fs
         (clj->js config))
       (fn [res]
         (let [files-uploaded (gobj/get res "filesUploaded")]
           (when (= (count files-uploaded)1)
             (success-cb (get files-uploaded 0))))))))
+
+(defn thumbnail [fs-url & [success-cb error-cb]]
+  (let [fs-client (init-filestack)
+        opts (clj->js {:resize {
+                        :fit "crop"
+                        :width 72
+                        :height 72
+                        :align "faces"}})
+       transformed-url (.transform fs-client fs-url opts)
+       storing-task (.storeURL fs-client transformed-url (clj->js store-to))]
+    (try
+      (.then storing-task
+        (fn [res]
+          (let [url (gobj/get res "url")]
+            (when (fn? success-cb)
+              (success-cb url)))))
+      (catch :default e
+        (sentry/capture-error e)
+        (when (fn? error-cb)
+          (error-cb e))))))
