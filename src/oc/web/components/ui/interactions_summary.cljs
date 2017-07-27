@@ -22,6 +22,7 @@
             (:reaction max-reaction)]
           ; Reactions count
           [:div.is-reactions-summary
+            {:class (str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction))}
             (:count max-reaction)]])
       ; Comments
       (when-not (zero? (:count comments-link))
@@ -35,4 +36,5 @@
                 (user-avatar-image user-data true)])]
           ; Comments count
           [:div.is-comments-summary
+            {:class (str "comments-count-" (:uuid entry-data))}
             (str (:count comments-link) " comment" (when (> (:count comments-link) 1) "s"))]])]))
