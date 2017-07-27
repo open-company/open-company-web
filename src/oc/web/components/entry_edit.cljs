@@ -10,6 +10,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor]
+            [cljsjs.rangy-selectionsaverestore]
             [goog.object :as googobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -94,6 +95,7 @@
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
+                        (rum/local false ::body-focused)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
                         (rum/local "" ::new-topic)
@@ -103,6 +105,7 @@
                         (rum/local false ::media-video-clicked)
                         (rum/local false ::media-chart-clicked)
                         (rum/local nil ::window-click-listener)
+                        (rum/local nil ::last-selection)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -122,7 +125,18 @@
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
                                       (setup-body-editor s)
-                                      (reset! (::window-click-listener s) (events/listen js/window EventType/CLICK #(when-not (utils/event-inside? % (sel1 [:div.entry-edit-controls-medias-container])) (reset! (::media-expanded s) false))))
+                                      (reset! (::window-click-listener s)
+                                       (events/listen js/window EventType/CLICK
+                                        #(when-not (utils/event-inside? % (sel1 [:div.entry-edit-controls-medias-container]))
+                                           (when-not (utils/event-inside? % (sel1 [:div.entry-edit-body]))
+                                              (reset! (::body-focused s) false))
+                                           (reset! (::media-expanded s) false)
+                                           ; If there was a last selection saved
+                                           (when @(::last-selection s)
+                                             ; remove the markers
+                                             (.removeMarkers js/rangy @(::last-selection s)))
+                                           ; lose the selection object
+                                           (reset! (::last-selection s) nil))))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
@@ -212,6 +226,7 @@
                         "Create"])]]]]]]
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-body
+        ; Headline element
         [:div.entry-edit-headline.emoji-autocomplete.emojiable
           {:content-editable true
            :placeholder "Title this (if you like)"
@@ -221,28 +236,36 @@
            :on-focus    #(headline-on-change s)
            :on-blur     #(headline-on-change s)
            :dangerouslySetInnerHTML @(::initial-headline s)}]
+        ; Body element
         [:div.entry-edit-body.emoji-autocomplete.emojiable
-          {;:placeholder (body-placeholder)
-           ;:data-placeholder (body-placeholder)
-           :role "textbox"
+          {:role "textbox"
            :aria-multiline true
            :contentEditable true
+           :on-focus #(reset! (::body-focused s) true)
            :dangerouslySetInnerHTML @(::initial-body s)}]
+        ; Bottom controls
         [:div.entry-edit-controls.group
+          ; Media handling
           [:div.entry-edit-controls-medias
+            ; Add media button
             [:button.mlb-reset.media.add-media-bt
               {:title "Insert media"
-               :class (when @(::media-expanded s) "expanded")
+               :class (utils/class-set {:expanded @(::media-expanded s)
+                                        :disabled (not @(::body-focused s))})
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
                :on-click (fn [e]
-                           (utils/event-stop e)
-                           (reset! (::media-expanded s) (not @(::media-expanded s)))
-                           (utils/after 1 #(utils/remove-tooltips))
-                           (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))}]
+                           (when @(::body-focused s)
+                             (utils/event-stop e)
+                             (reset! (::last-selection s) (.saveSelection js/rangy js/window))
+                             (reset! (::media-expanded s) (not @(::media-expanded s)))
+                             (utils/after 1 #(utils/remove-tooltips))
+                             (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))}]
+
             [:div.entry-edit-controls-medias-container
               {:class (when @(::media-expanded s) "expanded")}
+              ; Add a picture button
               [:button.mlb-reset.media.media-photo
                 {:class (when @(::media-photo-clicked s) "active")
                  :title "Add a picture"
@@ -251,6 +274,7 @@
                  :data-container "body"
                  :on-click (fn []
                              (reset! (::media-photo-clicked s) true))}]
+              ; Add a video button
               [:button.mlb-reset.media.media-video
                 {:class (when @(::media-video-clicked s) "active")
                  :data-toggle "tooltip"
@@ -259,6 +283,7 @@
                  :title "Add a video"
                  :on-click (fn []
                              (reset! (::media-video-clicked s) true))}]
+              ; Add a chart button
               [:button.mlb-reset.media.media-chart
                 {:class (when @(::media-chart-clicked s) "active")
                  :title "Add a Google Sheet chart"
@@ -267,6 +292,7 @@
                  :data-container "body"
                  :on-click (fn []
                              (reset! (::media-chart-clicked s) true))}]]]
+          ; Emoji picker
           (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                          (let [headline (sel1 [:div.entry-edit-headline])
                                                body     (sel1 [:div.entry-edit-body])]
@@ -284,8 +310,8 @@
           {:on-click #(do
                         (dis/dispatch! [:entry-save])
                         (close-clicked s))
-           :disabled (and (empty? (:body entry-editing))
-                          (empty? (:headline entry-editing)))}
+           :disabled (and (empty? (.text (js/$ (str "<div>" (:body entry-editing) "</div>"))))
+                          (empty? (.text (js/$ (str "<div>" (:headline entry-editing) "</div>")))))}
           (if new-entry? "Post" "Save")]
         [:button.mlb-reset.mlb-link-black
           {:on-click #(close-clicked s)}
