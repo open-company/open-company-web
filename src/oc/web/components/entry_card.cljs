@@ -47,7 +47,6 @@
   (let [$body (js/$ (str "<div>" body "</div>"))
         images (js->clj (js/$ "img:not(.emojione)" $body))
         found (atom nil)]
-    (js/console.log "all-images" (.-length images))
     (dotimes [el-num (.-length images)]
       (let [el (js/$ (aget images el-num))
             width (.data el "width")
