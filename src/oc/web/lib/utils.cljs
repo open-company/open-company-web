@@ -168,6 +168,9 @@
         (< v 100) "0")
     v))
 
+(defn get-time [js-date]
+  (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))

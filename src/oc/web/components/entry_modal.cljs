@@ -100,7 +100,7 @@
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
-                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
+                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
                       (utils/time-since (:updated-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
