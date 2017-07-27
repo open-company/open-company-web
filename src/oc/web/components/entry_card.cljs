@@ -63,7 +63,7 @@
                                            ; Truncate body text with dotdotdot
                                            (when-not @(::truncated s)
                                              (truncate-body body-sel)
-                                             (utils/after 1 #(truncate-body body-sel))
+                                             (utils/after 10 #(truncate-body body-sel))
                                              (reset! (::truncated s) true)))
                                          s)
                          :will-mount (fn [s]
@@ -131,7 +131,7 @@
         [:div.entry-card-media-preview
           [:span.helper]
           [:img
-            {:src (.-src @(::first-body-image s))}]])]
+            {:src (.-src @(::first-body-image s))]])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
