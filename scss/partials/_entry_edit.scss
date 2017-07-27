@@ -293,7 +293,7 @@ div.entry-edit-modal-container {
             width: 32px;
             height: 32px;
             background-position: center;
-            background-size: 12px 12px;
+            background-size: 12px;
             background-repeat: no-repeat;
             // padding: 10px;
             border-radius: 16px;
@@ -345,27 +345,30 @@ div.entry-edit-modal-container {
             }
 
             button.media-photo {
-              background-image: cdnUrl("/img/ML/media_photo.svg");
+              background-image: cdnUrl("/img/ML/media_photo.png");
+              background-size: 12px 12px;
 
               &.avtive, &:hover {
-                background-image: cdnUrl("/img/ML/media_photo_blue.svg");
+                background-image: cdnUrl("/img/ML/media_photo_blue.png");
               }
             }
 
             button.media-video {
-              background-image: cdnUrl("/img/ML/media_video.svg");
+              background-image: cdnUrl("/img/ML/media_video.png");
+              background-size: 12px 8px;
 
               &.avtive, &:hover {
-                background-image: cdnUrl("/img/ML/media_video_blue.svg");
+                background-image: cdnUrl("/img/ML/media_video_blue.png");
               }
             }
 
             button.media-chart {
               margin-right: 0px;
-              background-image: cdnUrl("/img/ML/media_chart.svg");
+              background-image: cdnUrl("/img/ML/media_chart.png");
+              background-size: 16px 8px;
 
               &.avtive, &:hover {
-                background-image: cdnUrl("/img/ML/media_chart_blue.svg");
+                background-image: cdnUrl("/img/ML/media_chart_blue.png");
               }
             }
 
