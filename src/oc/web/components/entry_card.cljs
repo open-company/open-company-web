@@ -44,7 +44,12 @@
         :after "a.read-more"}))
 
 (defn get-first-body-image [body]
-  (.get (.find (js/$ (str "<div>" body "</div>")) "img:not(.emojione)") 0))
+  (let [$body (js/$ (str "<div>" body "</div>"))
+        first-image (.first (js/$ "img:not(.emojione)" $body))]
+    (when (pos? (.-length first-image))
+      (if (.data first-image "thumbnail")
+        (.data first-image "thumbnail")
+        (.attr first-image "src")))))
 
 (rum/defcs entry-card < rum/static
                         (rum/local false ::hovering-card)
@@ -129,9 +134,7 @@
                                     :has-media-preview @(::first-body-image s)})}])
       (when @(::first-body-image s)
         [:div.entry-card-media-preview
-          [:span.helper]
-          [:img
-            {:src (.-src @(::first-body-image s))}]])]
+          {:style #js {:background-image (str "url(" @(::first-body-image s) ")")}}])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
