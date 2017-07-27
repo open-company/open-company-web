@@ -45,11 +45,21 @@
 
 (defn get-first-body-image [body]
   (let [$body (js/$ (str "<div>" body "</div>"))
-        first-image (.first (js/$ "img:not(.emojione)" $body))]
-    (when (pos? (.-length first-image))
-      (if (.data first-image "thumbnail")
-        (.data first-image "thumbnail")
-        (.attr first-image "src")))))
+        images (js->clj (js/$ "img:not(.emojione)" $body))
+        found (atom nil)]
+    (js/console.log "all-images" (.-length images))
+    (dotimes [el-num (.-length images)]
+      (let [el (js/$ (aget images el-num))
+            width (.data el "width")
+            height (.data el "height")]
+        (when (and (not @found)
+                   (or (<= width (* height 2))
+                       (<= height (* width 2))))
+          (reset! found
+            (if (.data el "thumbnail")
+              (.data el "thumbnail")
+              (.attr el "src"))))))
+    @found))
 
 (rum/defcs entry-card < rum/static
                         (rum/local false ::hovering-card)
