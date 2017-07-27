@@ -311,6 +311,10 @@ div.entry-edit-modal-container {
             transition: transform 230ms;
             float: left;
 
+            &.disabled {
+              opacity: 0.2;
+            }
+
             &:hover {
               background-image: cdnUrl("/img/ML/plus_blue.svg");
             }
@@ -324,8 +328,7 @@ div.entry-edit-modal-container {
           div.entry-edit-controls-medias-container {
             width: 0px;
             height: 32px;
-            transition: opacity 320ms;
-            opacity: 0;
+            transition: width 320ms;
             float: left;
             position: relative;
             overflow: hidden;
@@ -333,11 +336,12 @@ div.entry-edit-modal-container {
             button.media {
               margin-left: 0px;
               transform: rotate(0deg);
-              transition: transform 320ms, margin-left 320ms;
+              transition: transform 320ms, margin-left 320ms, opacity 320ms;
               float: left;
               top: 0px;
               left: 0px;
               position: absolute;
+              opacity: 0;
             }
 
             button.media-photo {
@@ -366,8 +370,11 @@ div.entry-edit-modal-container {
             }
 
             &.expanded {
-              width: 128px;
-              opacity: 1;
+              width: 250px;
+
+              button.media {
+                opacity: 1;
+              }
 
               button.media-photo {
                 transform: rotate(0deg);
