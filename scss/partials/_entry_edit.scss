@@ -243,7 +243,7 @@ div.entry-edit-modal-container {
     }
 
     div.entry-edit-modal-body {
-      margin: 24px 0;
+      margin: 24px 0 0;
 
       div.entry-edit-headline {
         border: none;
@@ -268,9 +268,9 @@ div.entry-edit-modal-container {
         color: $carrot_dark_gray;
         @include avenir_R();
         font-size: 16px;
-        margin: 24px 0 0;
+        margin: 24px 0;
         cursor: text;
-        min-height: 95px;
+        min-height: 85px;
         @include entry-body();
 
         &.medium-editor-placeholder:after {
@@ -282,8 +282,113 @@ div.entry-edit-modal-container {
         }
       }
 
-      div.emoji-picker {
-        float: right;
+      div.entry-edit-controls {
+        margin-bottom: 16px;
+
+        div.entry-edit-controls-medias {
+          float: left;
+
+          button.media {
+            margin-right: 16px;
+            width: 32px;
+            height: 32px;
+            background-position: center;
+            background-size: 12px 12px;
+            background-repeat: no-repeat;
+            // padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba($oc_gray_7, 0.8);
+            margin: 0 16px 0 0;
+            padding: 0;
+
+            &:hover, &.expanded, &.active {
+              border: 1px solid rgba($carrot_text_blue, 1);
+            }
+          }
+
+          button.add-media-bt {
+            background-image: cdnUrl("/img/ML/plus_gray.svg");
+            transition: transform 230ms;
+            float: left;
+
+            &:hover {
+              background-image: cdnUrl("/img/ML/plus_blue.svg");
+            }
+
+            &.expanded {
+              background-image: cdnUrl("/img/ML/plus_blue.svg");
+              transform: rotate(45deg);
+            }
+          }
+
+          div.entry-edit-controls-medias-container {
+            width: 0px;
+            height: 32px;
+            transition: opacity 320ms;
+            opacity: 0;
+            float: left;
+            position: relative;
+            overflow: hidden;
+
+            button.media {
+              margin-left: 0px;
+              transform: rotate(0deg);
+              transition: transform 320ms, margin-left 320ms;
+              float: left;
+              top: 0px;
+              left: 0px;
+              position: absolute;
+            }
+
+            button.media-photo {
+              background-image: cdnUrl("/img/ML/media_photo.svg");
+
+              &.avtive, &:hover {
+                background-image: cdnUrl("/img/ML/media_photo_blue.svg");
+              }
+            }
+
+            button.media-video {
+              background-image: cdnUrl("/img/ML/media_video.svg");
+
+              &.avtive, &:hover {
+                background-image: cdnUrl("/img/ML/media_video_blue.svg");
+              }
+            }
+
+            button.media-chart {
+              margin-right: 0px;
+              background-image: cdnUrl("/img/ML/media_chart.svg");
+
+              &.avtive, &:hover {
+                background-image: cdnUrl("/img/ML/media_chart_blue.svg");
+              }
+            }
+
+            &.expanded {
+              width: 128px;
+              opacity: 1;
+
+              button.media-photo {
+                transform: rotate(0deg);
+              }
+
+              button.media-video {
+                margin-left: 48px;
+                transform: rotate(360deg);
+              }
+
+              button.media-chart {
+                margin-left: 96px;
+                transform: rotate(720deg);
+              }
+            }
+          }
+        }
+
+        div.emoji-picker {
+          float: right;
+        }
       }
     }
 

@@ -98,6 +98,11 @@
                         (rum/local "" ::initial-headline)
                         (rum/local "" ::new-topic)
                         (rum/local false ::focusing-create-topic)
+                        (rum/local false ::media-expanded)
+                        (rum/local false ::media-photo-clicked)
+                        (rum/local false ::media-video-clicked)
+                        (rum/local false ::media-chart-clicked)
+                        (rum/local nil ::window-click-listener)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -117,6 +122,7 @@
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
                                       (setup-body-editor s)
+                                      (reset! (::window-click-listener s) (events/listen js/window EventType/CLICK #(when-not (utils/event-inside? % (sel1 [:div.entry-edit-controls-medias-container])) (reset! (::media-expanded s) false))))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
@@ -125,6 +131,7 @@
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
+                                         (events/unlistenByKey @(::window-click-listener s))
                                          s)}
   [s]
   (let [board-data (drv/react s :board-data)
@@ -136,10 +143,10 @@
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
        :on-click #(when (and (empty? (:body entry-editing))
-                             (empty? (:headline entry-editing)))
+                             (empty? (:headline entry-editing))
+                             (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
                     (close-clicked s))}
       [:div.entry-edit-modal.group
-        {:on-click #(utils/event-stop %)}
         [:div.entry-edit-modal-header.group
           (user-avatar-image current-user-data)
           [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:name board-data)]]
@@ -221,17 +228,56 @@
            :aria-multiline true
            :contentEditable true
            :dangerouslySetInnerHTML @(::initial-body s)}]
-        (emoji-picker {:add-emoji-cb (fn [editor emoji]
-                                       (let [headline (sel1 [:div.entry-edit-headline])
-                                             body     (sel1 [:div.entry-edit-body])]
-                                         (when (= (.-activeElement js/document) headline)
-                                           (headline-on-change s))
-                                         (when (= (.-activeElement js/document) body)
-                                           (body-on-change s))))
-                       :disabled (let [headline (sel1 [:div.entry-edit-headline])
-                                       body     (sel1 [:div.entry-edit-body])]
-                                   (not (or (= (.-activeElement js/document) headline)
-                                            (= (.-activeElement js/document) body))))})]
+        [:div.entry-edit-controls.group
+          [:div.entry-edit-controls-medias
+            [:button.mlb-reset.media.add-media-bt
+              {:title "Insert media"
+               :class (when @(::media-expanded s) "expanded")
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (reset! (::media-expanded s) (not @(::media-expanded s)))
+                           (utils/after 1 #(utils/remove-tooltips))
+                           (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))}]
+            [:div.entry-edit-controls-medias-container
+              {:class (when @(::media-expanded s) "expanded")}
+              [:button.mlb-reset.media.media-photo
+                {:class (when @(::media-photo-clicked s) "active")
+                 :title "Add a picture"
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :on-click (fn []
+                             (reset! (::media-photo-clicked s) true))}]
+              [:button.mlb-reset.media.media-video
+                {:class (when @(::media-video-clicked s) "active")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :title "Add a video"
+                 :on-click (fn []
+                             (reset! (::media-video-clicked s) true))}]
+              [:button.mlb-reset.media.media-chart
+                {:class (when @(::media-chart-clicked s) "active")
+                 :title "Add a Google Sheet chart"
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :on-click (fn []
+                             (reset! (::media-chart-clicked s) true))}]]]
+          (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                         (let [headline (sel1 [:div.entry-edit-headline])
+                                               body     (sel1 [:div.entry-edit-body])]
+                                           (when (= (.-activeElement js/document) headline)
+                                             (headline-on-change s))
+                                           (when (= (.-activeElement js/document) body)
+                                             (body-on-change s))))
+                         :disabled (let [headline (sel1 [:div.entry-edit-headline])
+                                         body     (sel1 [:div.entry-edit-body])]
+                                     (not (or (= (.-activeElement js/document) headline)
+                                              (= (.-activeElement js/document) body))))})]]
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-footer.group
         [:button.mlb-reset.mlb-default
