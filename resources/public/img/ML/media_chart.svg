@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="8px" viewBox="0 0 16 8" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+    <title>timeline</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Create-Entry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-size="16" font-family="MaterialIcons-Regular, Material Icons" font-weight="normal">
+        <g id="Components" transform="translate(-216.000000, -2603.000000)" fill="#637282">
+            <g id="Add-Entry-Modal" transform="translate(80.000000, 2342.000000)">
+                <text id="timeline">
+                    <tspan x="136" y="273">timeline</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
