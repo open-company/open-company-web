@@ -15,6 +15,7 @@ div.emoji-picker {
 
     &:hover {
       opacity: 1;
+      background-image: cdnUrl("/img/ML/emoji_blue2x.png");
     }
 
     &.disabled {
