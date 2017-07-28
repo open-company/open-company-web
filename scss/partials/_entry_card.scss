@@ -115,24 +115,27 @@ div.entry-card {
         cursor: pointer;
       }
 
-      &.video{
+      &:after {
+        position: absolute;
+        font-family: FontAwesome;
+        font-size: 20px;
+        color: white;
+        opacity: 0.5;
+        top: 50%;
+        left: 50%;
+      }
+
+      &:hover {
         &:after {
-          position: absolute;
-          font-family: FontAwesome;
+          opacity: 0.8;
+        }
+      }
+
+      &.video {
+        &:after {
           content: "\f04b";
-          font-size: 20px;
-          color: white;
-          opacity: 0.5;
-          top: 50%;
-          left: 50%;
           margin-left: -8px;
           margin-top: -14px;
-        }
-
-        &:hover {
-          &:after {
-            opacity: 0.8;
-          }
         }
       }
     }

@@ -61,7 +61,7 @@
                  :thumbnail (if (.data $el "thumbnail")
                               (.data $el "thumbnail")
                               (.attr $el "src"))})))
-          (reset! found {:type "video" :thumbnail (.data $el "thumbnail")}))))
+          (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")}))))
     @found))
 
 (rum/defcs entry-card < rum/static
@@ -158,7 +158,8 @@
         [:div.entry-card-media-preview
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
            :class (utils/class-set {:video (= (:type @(::first-body-image s)) "video")
-                                    :image (= (:type @(::first-body-image s)) "image")})}])]
+                                    :image (= (:type @(::first-body-image s)) "image")
+                                    :chart (= (:type @(::first-body-image s)) "chart")})}])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
