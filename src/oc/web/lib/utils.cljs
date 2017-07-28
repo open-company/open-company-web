@@ -566,6 +566,15 @@
          #js [0 scroll-y]
          (or duration oc-animation-duration))))
 
+(defn scroll-to-bottom [elem & [animated]]
+  (let [elem-scroll-top (.-scrollHeight elem)]
+    (.play
+    (new Scroll
+         elem
+         #js [0 (.-scrollTop elem)]
+         #js [0 elem-scroll-top]
+         (if animated 320 oc-animation-duration)))))
+
 (defn scroll-to-element [elem]
   (let [elem-scroll-top (offset-top elem)]
     (scroll-to-y elem-scroll-top)))
