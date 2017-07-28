@@ -136,7 +136,16 @@
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
       (let [body-without-images (utils/strip-img-tags (:body entry-data))
-            emojied-body (utils/emojify (str body-without-images "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
+            hidden-class (str "entry-body" (:uuid entry-data))
+            $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-images "</div>"))
+            appened-body (.append (js/$ (.-body js/document)) $body-content)
+            _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
+                                                                            (let [$parent (js/$ (.-parentNode this))]
+                                                                              (.remove $parent))))
+            $hidden-div (js/$ (str "." hidden-class))
+            body-without-preview (.html $hidden-div)
+            _ (.remove $hidden-div)
+            emojied-body (utils/emojify (str body-without-preview "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
