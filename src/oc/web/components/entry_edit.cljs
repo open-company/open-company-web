@@ -40,12 +40,14 @@
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
     (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :body] emojied-body]))))
+      (dis/dispatch! [:input [:entry-editing :body] emojied-body])
+      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
     (let [emojied-headline   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :headline] emojied-headline]))))
+      (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
+      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
 (defn body-placeholder []
   (let [first-name (jwt/get-key :first-name)]
@@ -194,7 +196,6 @@
                                           (js/console.log "entry-edit did-remount" (:temp-video entry-editing))
                                           (when (map? (:temp-video entry-editing))
                                             (dis/dispatch! [:input [:entry-editing :temp-video] nil])
-                                            (js/console.log "   adding video:" (:temp-video entry-editing))
                                             (media-video-add s (:temp-video entry-editing))))
                                         s)
                          :will-unmount (fn [s]
@@ -385,8 +386,7 @@
           {:on-click #(do
                         (dis/dispatch! [:entry-save])
                         (close-clicked s))
-           :disabled (and (empty? (.text (js/$ (str "<div>" (:body entry-editing) "</div>"))))
-                          (empty? (.text (js/$ (str "<div>" (:headline entry-editing) "</div>")))))}
+           :disabled (not (:has-changes entry-editing))}
           (if new-entry? "Post" "Save")]
         [:button.mlb-reset.mlb-link-black
           {:on-click #(close-clicked s)}
