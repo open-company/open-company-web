@@ -109,6 +109,32 @@ div.entry-card {
       background-position: center;
       background-size: cover;
       border-radius: 4px;
+      position: relative;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &.video{
+        &:after {
+          position: absolute;
+          font-family: FontAwesome;
+          content: "\f04b";
+          font-size: 20px;
+          color: white;
+          opacity: 0.5;
+          top: 50%;
+          left: 50%;
+          margin-left: -10px;
+          margin-top: -10px;
+        }
+
+        &:hover {
+          &:after {
+            opacity: 0.8;
+          }
+        }
+      }
     }
 
     div.entry-card-body {

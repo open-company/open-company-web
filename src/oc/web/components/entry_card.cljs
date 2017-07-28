@@ -43,21 +43,34 @@
         :ellipsis "... "
         :after "a.read-more"}))
 
-(defn get-first-body-image [body]
+(defn get-video-thumbnail [video-type video-id]
+  (cond
+    (= video-type "youtube")
+    (str "https://img.youtube.com/vi/" video-id "/0.jpg")
+    (= video-type "vimeo")
+    (str "https://i.vimeocdn.com/video/" video-id "_100x75.webp")))
+
+(defn get-first-body-thumbnail [body]
   (let [$body (js/$ (str "<div>" body "</div>"))
-        images (js->clj (js/$ "img:not(.emojione)" $body))
+        thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
-    (dotimes [el-num (.-length images)]
-      (let [el (js/$ (aget images el-num))
-            width (.data el "width")
-            height (.data el "height")]
-        (when (and (not @found)
-                   (or (<= width (* height 2))
-                       (<= height (* width 2))))
-          (reset! found
-            (if (.data el "thumbnail")
-              (.data el "thumbnail")
-              (.attr el "src"))))))
+    (dotimes [el-num (.-length thumb-els)]
+      (let [el (aget thumb-els el-num)
+            $el (js/$ el)]
+        (if (= (.-tagName el) "IMG")
+          (let [width (.data $el "width")
+                height (.data $el "height")]
+            (when (and (not @found)
+                       (or (<= width (* height 2))
+                           (<= height (* width 2))))
+              (reset! found
+                {:type "image"
+                 :thumbnail (if (.data $el "thumbnail")
+                              (.data $el "thumbnail")
+                              (.attr $el "src"))})))
+          (let [video-type (.data $el "video-type")
+                video-id (.data $el "video-id")]
+            (reset! found {:type "video" :thumbnail (get-video-thumbnail video-type video-id)})))))
     @found))
 
 (rum/defcs entry-card < rum/static
@@ -82,14 +95,14 @@
                                          s)
                          :will-mount (fn [s]
                                        (let [entry-data (first (:rum/args s))]
-                                         (reset! (::first-body-image s) (get-first-body-image (:body entry-data))))
+                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body entry-data))))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-entry-data (first (:rum/args o))
                                               new-entry-data (first (:rum/args s))]
                                           (when (not= (:body old-entry-data) (:body new-entry-data))
                                             (reset! (::truncated s) false)
-                                            (reset! (::first-body-image s) (get-first-body-image (:body new-entry-data)))))
+                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-entry-data)))))
                                         s)
                          :did-mount (fn [s]
                                       (let [entry-data (first (:rum/args s))]
@@ -140,8 +153,8 @@
             $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-images "</div>"))
             appened-body (.append (js/$ (.-body js/document)) $body-content)
             _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
-                                                                            (let [$parent (js/$ (.-parentNode this))]
-                                                                              (.remove $parent))))
+                                                                            (let [$this (js/$ this)]
+                                                                              (.remove $this))))
             $hidden-div (js/$ (str "." hidden-class))
             body-without-preview (.html $hidden-div)
             _ (.remove $hidden-div)
@@ -152,7 +165,9 @@
                                     :has-media-preview @(::first-body-image s)})}])
       (when @(::first-body-image s)
         [:div.entry-card-media-preview
-          {:style #js {:backgroundImage (str "url(" @(::first-body-image s) ")")}}])]
+          {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
+           :class (utils/class-set {:video (= (:type @(::first-body-image s)) "video")
+                                    :image (= (:type @(::first-body-image s)) "image")})}])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown
