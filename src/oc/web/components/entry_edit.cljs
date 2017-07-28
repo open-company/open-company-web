@@ -88,7 +88,7 @@
                (contains? image :height)
                (contains? image :thumbnail))
       (.restoreSelection js/rangy @(::last-selection s))
-      (let [image-html (str "<img src=\"" (:url image) "\" data-thumbnail=\"" (:thumbnail image) "\" data-width=\"" (:width image) "\" data-height=\"" (:height image) "\" />")]
+      (let [image-html (str "<img class=\"carrot-no-preview\" src=\"" (:url image) "\" data-thumbnail=\"" (:thumbnail image) "\" data-width=\"" (:width image) "\" data-height=\"" (:height image) "\" /><br/>")]
         (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
       (reset! (::last-selection s) nil)
       (reset! (::media-photo s) nil)
@@ -106,6 +106,24 @@
           topic-slug (unique-slug topics topic-name)]
       (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
       (reset! (::new-topic s) ""))))
+
+(defn get-video-html [video]
+  (cond
+    (= (:type video) :youtube)
+    (str "<iframe class=\"carrot-no-preview\" width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/" (:id video) "\" frameborder=\"0\" allowfullscreen></iframe><br/>")
+    (= (:type video) :vimeo)
+    (str "<iframe class=\"carrot-no-preview\" src=\"https://player.vimeo.com/video/" (:id video) "\" width=\"560\" height=\"315\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")))
+
+(defn media-video-add [s video-data]
+  (js/console.log "media-video-add:" video-data)
+  (let [video-html (get-video-html video-data)]
+    (js/console.log "media-video-add:" video-html)
+    (when video-html
+      (.restoreSelection js/rangy @(::last-selection s))
+      (js/pasteHtmlAtCaret video-html (.getSelection js/rangy js/window) false)
+      (reset! (::last-selection s) nil)
+      (reset! (::media-video s) false)
+      (body-on-change s))))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :board-data)
@@ -153,6 +171,8 @@
                                            (reset! (::media-expanded s) false)
                                            ; If there was a last selection saved
                                            (when (and (not @(::media-photo s))
+                                                      (not @(::media-video s))
+                                                      (not @(::media-chart s))
                                                       @(::last-selection s))
                                              ; remove the markers
                                              (.removeMarkers js/rangy @(::last-selection s))
@@ -162,6 +182,14 @@
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
                                          s)
+                         :did-remount (fn [o s]
+                                        (let [entry-editing @(drv/get-ref s :entry-editing)]
+                                          (js/console.log "entry-edit did-remount" (:temp-video entry-editing))
+                                          (when (map? (:temp-video entry-editing))
+                                            (dis/dispatch! [:input [:entry-editing :temp-video] nil])
+                                            (js/console.log "   adding video:" (:temp-video entry-editing))
+                                            (media-video-add s (:temp-video entry-editing))))
+                                        s)
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
@@ -240,6 +268,9 @@
                     (when @(::focusing-create-topic s)
                       [:button.mlb-reset.mlb-default.entry-edit-new-topic-create
                         {:on-click (fn [e]
+                                     (when @(::last-selection s)
+                                        (.removeMarkers js/rangy @(::last-selection s))
+                                        (reset! (::last-selection s) nil))
                                      (utils/event-stop e)
                                      (create-new-topic s))
                          :disabled (empty? (s/trim @(::new-topic s)))}
@@ -318,7 +349,8 @@
                  :data-container "body"
                  :title "Add a video"
                  :on-click (fn []
-                             (reset! (::media-video s) true))}]
+                             (reset! (::media-video s) true)
+                             (dis/dispatch! [:input [:entry-editing :media-video] true]))}]
               ; Add a chart button
               [:button.mlb-reset.media.media-chart
                 {:class (when @(::media-chart s) "active")
