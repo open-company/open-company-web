@@ -682,12 +682,12 @@
 
 (defn strip-HTML-tags [text]
   (when text
-    (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
+    (let [reg (js/RegExp. "</?[^>]+(>|$)" "ig")]
       (.replace text reg ""))))
 
 (defn strip-img-tags [text]
   (when text
-    (let [reg (js/RegExp. "<img/?[^>]+(>|$)" "g")]
+    (let [reg (js/RegExp. "<img/?[^>]+(>|$)" "ig")]
       (.replace text reg ""))))
 
 (defn disable-scroll []
