@@ -36,6 +36,7 @@
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
     [clojure-humanize "0.2.2"] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
+    [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
 
     ;; CLJSJS packages http://cljsjs.github.io/
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
@@ -51,7 +52,7 @@
 
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
-    [open-company/lib "0.11.2"] ; Library for OC projects https://github.com/open-company/open-company-lib
+    [open-company/lib "0.11.16"] ; Library for OC projects https://github.com/open-company/open-company-lib
     ; In addition to common functions, brings in the following common dependencies used by this project:
     ; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
