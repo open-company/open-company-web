@@ -88,11 +88,13 @@
                (contains? image :height)
                (contains? image :thumbnail))
       (.restoreSelection js/rangy @(::last-selection s))
-      (let [image-html (str "<img class=\"carrot-no-preview\" src=\"" (:url image) "\" data-thumbnail=\"" (:thumbnail image) "\" data-width=\"" (:width image) "\" data-height=\"" (:height image) "\" /><br/>")]
+      (let [image-html (str "<img class=\"carrot-no-preview\" src=\"" (:url image) "\" data-thumbnail=\"" (:thumbnail image) "\" data-width=\"" (:width image) "\" data-height=\"" (:height image) "\" /><br/><br/>")]
         (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
       (reset! (::last-selection s) nil)
       (reset! (::media-photo s) nil)
-      (body-on-change s))))
+      (body-on-change s)
+      (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
+      (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container])))))
 
 (defn img-on-load [s url img]
   (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
@@ -110,9 +112,9 @@
 (defn get-video-html [video]
   (cond
     (= (:type video) :youtube)
-    (str "<iframe class=\"carrot-no-preview\" width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/" (:id video) "\" frameborder=\"0\" allowfullscreen></iframe><br/>")
+    (str "<iframe class=\"carrot-no-preview\" width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/" (:id video) "\" frameborder=\"0\" allowfullscreen></iframe><br/><br/>")
     (= (:type video) :vimeo)
-    (str "<iframe class=\"carrot-no-preview\" src=\"https://player.vimeo.com/video/" (:id video) "\" width=\"560\" height=\"315\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")))
+    (str "<iframe class=\"carrot-no-preview\" src=\"https://player.vimeo.com/video/" (:id video) "\" width=\"560\" height=\"315\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><br/><br/>")))
 
 (defn media-video-add [s video-data]
   (js/console.log "media-video-add:" video-data)
@@ -123,7 +125,11 @@
       (js/pasteHtmlAtCaret video-html (.getSelection js/rangy js/window) false)
       (reset! (::last-selection s) nil)
       (reset! (::media-video s) false)
-      (body-on-change s))))
+      (body-on-change s)
+      (utils/after 100
+        #(do
+           (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
+           (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container])))))))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :board-data)
@@ -177,6 +183,7 @@
                                              ; remove the markers
                                              (.removeMarkers js/rangy @(::last-selection s))
                                              (reset! (::last-selection s) nil)))))
+                                      (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
