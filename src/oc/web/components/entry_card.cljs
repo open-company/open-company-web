@@ -43,13 +43,6 @@
         :ellipsis "... "
         :after "a.read-more"}))
 
-(defn get-video-thumbnail [video-type video-id]
-  (cond
-    (= video-type "youtube")
-    (str "https://img.youtube.com/vi/" video-id "/0.jpg")
-    (= video-type "vimeo")
-    (str "https://i.vimeocdn.com/video/" video-id "_100x75.webp")))
-
 (defn get-first-body-thumbnail [body]
   (let [$body (js/$ (str "<div>" body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
@@ -68,9 +61,7 @@
                  :thumbnail (if (.data $el "thumbnail")
                               (.data $el "thumbnail")
                               (.attr $el "src"))})))
-          (let [video-type (.data $el "video-type")
-                video-id (.data $el "video-id")]
-            (reset! found {:type "video" :thumbnail (get-video-thumbnail video-type video-id)})))))
+          (reset! found {:type "video" :thumbnail (.data $el "thumbnail")}))))
     @found))
 
 (rum/defcs entry-card < rum/static
