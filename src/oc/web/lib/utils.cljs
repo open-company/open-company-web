@@ -983,7 +983,7 @@
     (.replace gchart-url #"(?i)/u/\d+" "")
     ""))
 
-(defn check-google-chart-url [url]
+(defn valid-google-chart-url? [url]
   (when (string? url)
     (let [cleaned-url (clean-google-chart-url url)]
       (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))
