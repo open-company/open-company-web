@@ -22,6 +22,7 @@
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.entry-video-modal :refer (entry-video-modal)]
+            [oc.web.components.ui.entry-chart-modal :refer (entry-chart-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -124,6 +125,9 @@
           (when (and (:entry-editing data)
                      (:media-video (:entry-editing data)))
             (entry-video-modal))
+          (when (and (:entry-editing data)
+                     (:media-chart (:entry-editing data)))
+            (entry-chart-modal))
           (if board-error
             (dom/div {:class "fullscreen-page with-small-footer"}
               (login-required data))
