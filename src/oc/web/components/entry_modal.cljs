@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -104,7 +104,7 @@
                       (utils/time-since (:updated-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
-                    (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
+                    (let [topic-name (or (:topic-name entry-data) (string/upper (:topic-slug entry-data)))]
                       [:div.topic-tag
                         {:on-click #(close-clicked s (:topic-slug entry-data))}
                         topic-name]))]]
