@@ -113,17 +113,28 @@
 
 (defn get-video-thumbnail [video]
   (cond
-    (= (:type video-type) :youtube)
+    (= (:type video) :youtube)
     (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
-    (= (:type video-type) :vimeo)
+    (= (:type video) :vimeo)
     (str "https://i.vimeocdn.com/video/" (:id video) "_100x75.webp")))
 
 (defn get-video-html [video]
-  (cond
-    (= (:type video) :youtube)
-    (str "<iframe data-thumbnail=\"" (get-video-thumbnail video) "\" data-video-type=\"youtube\" data-video-id=\"" (:id video) "\" class=\"carrot-no-preview\" width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/" (:id video) "\" frameborder=\"0\" allowfullscreen></iframe><br/><br/>")
-    (= (:type video) :vimeo)
-    (str "<iframe data-thumbnail=\"" (get-video-thumbnail video) "\" data-video-type=\"vimeo\" data-video-id=\"" (:id video) "\" class=\"carrot-no-preview\" src=\"https://player.vimeo.com/video/" (:id video) "\" width=\"560\" height=\"315\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><br/><br/>")))
+  (str "<iframe "
+         "data-thumbnail=\"" (get-video-thumbnail video) "\" "
+         "data-video-type=\"youtube\" data-video-id=\"" (:id video) "\" "
+         "class=\"carrot-no-preview\" "
+         "width=\"560\" "
+         "height=\"315\" "
+         (cond
+           (= (:type video) :youtube)
+           (str "src=\"https://www.youtube.com/embed/" (:id video) "\" ")
+           (= (:type video) :vimeo)
+           (str "src=\"https://player.vimeo.com/video/" (:id video) "\" "))
+         "frameborder=\"0\" "
+         "webkitallowfullscreen "
+         "mozallowfullscreen "
+         "allowfullscreen>"
+        "</iframe><br/><br/>"))
 
 (defn media-video-add [s video-data]
   (js/console.log "media-video-add:" video-data)
