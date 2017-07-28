@@ -1,8 +1,9 @@
 (ns oc.web.components.entry-edit
   (:require [rum.core :as rum]
+            [cuerdas.core :as s]
+            [cljs-hash.goog :as gh]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [cuerdas.core :as s]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -15,6 +16,7 @@
             [goog.object :as gobj]
             [goog.dom :as gdom]
             [goog.events :as events]
+            [goog.Uri :as guri]
             [goog.events.EventType :as EventType]))
 
 (defn dismiss-modal [saving?]
@@ -90,7 +92,14 @@
                (contains? image :height)
                (contains? image :thumbnail))
       (.restoreSelection js/rangy @(::last-selection s))
-      (let [image-html (str "<img class=\"carrot-no-preview\" src=\"" (:url image) "\" data-thumbnail=\"" (:thumbnail image) "\" data-width=\"" (:width image) "\" data-height=\"" (:height image) "\" /><br/><br/>")]
+      (let [image-html (str "<img "
+                             "class=\"carrot-no-preview\" "
+                             "src=\"" (:url image) "\" "
+                             "data-media-type=\"chart\" "
+                             "data-thumbnail=\"" (:thumbnail image) "\" "
+                             "data-width=\"" (:width image) "\" "
+                             "data-height=\"" (:height image) "\" "
+                            "/><br/><br/>")]
         (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
       (reset! (::last-selection s) nil)
       (reset! (::media-photo s) nil)
@@ -121,6 +130,7 @@
 (defn get-video-html [video]
   (str "<iframe "
          "data-thumbnail=\"" (get-video-thumbnail video) "\" "
+         "data-media-type=\"video\" "
          "data-video-type=\"youtube\" data-video-id=\"" (:id video) "\" "
          "class=\"carrot-no-preview\" "
          "width=\"560\" "
@@ -137,14 +147,51 @@
         "</iframe><br/><br/>"))
 
 (defn media-video-add [s video-data]
-  (js/console.log "media-video-add:" video-data)
   (let [video-html (get-video-html video-data)]
-    (js/console.log "media-video-add:" video-html)
     (when video-html
       (.restoreSelection js/rangy @(::last-selection s))
       (js/pasteHtmlAtCaret video-html (.getSelection js/rangy js/window) false)
       (reset! (::last-selection s) nil)
       (reset! (::media-video s) false)
+      (body-on-change s)
+      (utils/after 100
+        #(do
+           (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
+           (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))))
+
+(defn get-chart-thumbnail [chart-id oid]
+  (str "https://docs.google.com/spreadsheets/d/" chart-id "/embed/oimg?id=" chart-id "&oid=" oid "&disposition=ATTACHMENT&bo=false&zx=sohupy30u1p"))
+
+(defn get-chart-html [s chart-url]
+ (let [entry-data (first (:rum/args s))
+       chart-id (str (:uuid entry-data) "-" (gh/hash :md5 chart-url))
+       url-fragment (last (clojure.string/split chart-url #"/spreadsheets/d/"))
+       chart-proxy-uri (str "/_/sheets-proxy/spreadsheets/d/" url-fragment)
+       parsed-uri (guri/parse chart-url)
+       oid (.get (.getQueryData parsed-uri) "oid")
+       splitted-path (clojure.string/split (.getPath parsed-uri) #"/")
+       chart-id (nth splitted-path (- (count splitted-path) 2))]
+  (str "<iframe "
+        "data-thumbnail=\"" (get-chart-thumbnail chart-id oid) "\" "
+        "data-media-type=\"chart\" "
+        "data-chart-id=\"" chart-id "\" "
+        "src=\"" chart-proxy-uri "\" "
+        "class=\"carrot-no-preview\" "
+        "width=\"560\" "
+        "height=\"315\" "
+        "frameborder=\"0\" "
+        "webkitallowfullscreen "
+        "mozallowfullscreen "
+        "allowfullscreen>"
+       "</iframe><br/><br/>")))
+
+(defn media-chart-add [s chart-url]
+  (let [chart-html (get-chart-html s chart-url)]
+    (when chart-html
+      (.restoreSelection js/rangy @(::last-selection s))
+      (js/pasteHtmlAtCaret chart-html (.getSelection js/rangy js/window) false)
+      (reset! (::last-selection s) nil)
+      (reset! (::media-chart s) false)
       (body-on-change s)
       (utils/after 100
         #(do
@@ -211,10 +258,12 @@
                                          s)
                          :did-remount (fn [o s]
                                         (let [entry-editing @(drv/get-ref s :entry-editing)]
-                                          (js/console.log "entry-edit did-remount" (:temp-video entry-editing))
                                           (when (map? (:temp-video entry-editing))
                                             (dis/dispatch! [:input [:entry-editing :temp-video] nil])
-                                            (media-video-add s (:temp-video entry-editing))))
+                                            (media-video-add s (:temp-video entry-editing)))
+                                          (when-not (empty? (:temp-chart entry-editing))
+                                            (dis/dispatch! [:input [:entry-editing :temp-chart] nil])
+                                            (media-chart-add s (:temp-chart entry-editing))))
                                         s)
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
@@ -326,7 +375,7 @@
           [:div.entry-edit-controls-medias
             ; Add media button
             [:button.mlb-reset.media.add-media-bt
-              {:title "Insert media"
+              {:title (if @(::media-expanded s) "Close" "Insert media")
                :class (utils/class-set {:expanded @(::media-expanded s)
                                         :disabled (not @(::body-focused s))})
                :data-toggle "tooltip"
@@ -385,7 +434,8 @@
                  :data-placement "top"
                  :data-container "body"
                  :on-click (fn []
-                             (reset! (::media-chart s) true))}]]]
+                             (reset! (::media-chart s) true)
+                             (dis/dispatch! [:input [:entry-editing :media-chart] true]))}]]]
           ; Emoji picker
           (emoji-picker {:add-emoji-cb (fn [editor emoji]
                                          (let [headline (sel1 [:div.entry-edit-headline])
