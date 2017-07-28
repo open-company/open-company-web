@@ -25,7 +25,7 @@
         y-groups (.exec yr url)
         v-groups (.exec vr url)]
     {:id (if (nth y-groups 1) (nth y-groups 1) (nth v-groups 4))
-     :type (if (nth y-groups 1) :youtuve :vimeo)}))
+     :type (if (nth y-groups 1) :youtube :vimeo)}))
   
 
 (defn valid-video-url? [url]
