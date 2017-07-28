@@ -94,7 +94,7 @@
       (reset! (::media-photo s) nil)
       (body-on-change s)
       (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
-      (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container])))))
+      (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))
 
 (defn img-on-load [s url img]
   (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
@@ -129,7 +129,7 @@
       (utils/after 100
         #(do
            (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
-           (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container])))))))
+           (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :board-data)
