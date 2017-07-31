@@ -36,9 +36,6 @@
 (defn attachment-upload-error-cb [state res error]
   (dis/dispatch! [:error-banner-show "An error has occurred while processing the file. Please try again." 5000]))
 
-(defn- add-attachment-tooltip [attachments]
-  (str "Add " (when (pos? (count attachments)) "another ") "attachment"))
-
 (defn dismiss-modal [saving?]
   (dis/dispatch! [:entry-edit/dismiss])
   (when-not saving?
@@ -480,7 +477,7 @@
       [:div.entry-edit-modal-footer.group
         ;; Attachments button
         [:button.mlb-reset.attachment
-          {:title (add-attachment-tooltip attachments)
+          {:title "Add attachment"
            :type "button"
            :data-toggle "tooltip"
            :data-container "body"
