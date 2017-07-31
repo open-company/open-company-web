@@ -484,7 +484,7 @@
                        (partial attachment-upload-success-cb s)
                        nil
                        (partial attachment-upload-error-cb s)))}
-            [:i.fa.fa-paperclip]]
+            [:i.mdi.mdi-paperclip]]
         [:button.mlb-reset.mlb-default.form-action-bt
           {:on-click #(do
                         (dis/dispatch! [:entry-save])
