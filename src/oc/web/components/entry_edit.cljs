@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.components.entry-attachments :refer (entry-attachments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [cljsjs.medium-editor]
@@ -18,6 +19,25 @@
             [goog.events :as events]
             [goog.Uri :as guri]
             [goog.events.EventType :as EventType]))
+
+(defn attachment-upload-success-cb [state res]
+  (let [url    (gobj/get res "url")]
+    (if-not url
+      (dis/dispatch! [:error-banner-show "An error has occurred while processing the file URL. Please try again." 5000])
+      (let [entry-editing   @(drv/get-ref state :entry-editing)
+            attachments (or (:attachments entry-editing) [])
+            attachment-data {:file-name (gobj/get res "filename")
+                             :file-type (gobj/get res "mimetype")
+                             :file-size (gobj/get res "size")
+                             :file-url url}]
+        (dis/dispatch! [:input [:entry-editing :attachments] (vec (conj attachments attachment-data))])
+        (dis/dispatch! [:input [:entry-editing :has-changes] true])))))
+
+(defn attachment-upload-error-cb [state res error]
+  (dis/dispatch! [:error-banner-show "An error has occurred while processing the file. Please try again." 5000]))
+
+(defn- add-attachment-tooltip [attachments]
+  (str "Add " (when (pos? (count attachments)) "another ") "attachment"))
 
 (defn dismiss-modal [saving?]
   (dis/dispatch! [:entry-edit/dismiss])
@@ -271,11 +291,12 @@
                                          (events/unlistenByKey @(::window-click-listener s))
                                          s)}
   [s]
-  (let [board-data (drv/react s :board-data)
-        topics (:topics board-data)
+  (let [board-data        (drv/react s :board-data)
+        topics            (:topics board-data)
         current-user-data (drv/react s :current-user-data)
-        entry-editing (drv/react s :entry-editing)
-        new-entry? (empty? (:uuid entry-editing))]
+        entry-editing     (drv/react s :entry-editing)
+        new-entry?        (empty? (:uuid entry-editing))
+        attachments       (:attachments entry-editing)]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
@@ -436,18 +457,36 @@
                  :on-click (fn []
                              (reset! (::media-chart s) true)
                              (dis/dispatch! [:input [:entry-editing :media-chart] true]))}]]]
-          ; Emoji picker
-          (emoji-picker {:add-emoji-cb (fn [editor emoji]
-                                         (let [headline (sel1 [:div.entry-edit-headline])
-                                               body     (sel1 [:div.entry-edit-body])]
-                                           (when (= (.-activeElement js/document) headline)
-                                             (headline-on-change s))
-                                           (when (= (.-activeElement js/document) body)
-                                             (body-on-change s))))
-                         :disabled (let [headline (sel1 [:div.entry-edit-headline])
-                                         body     (sel1 [:div.entry-edit-body])]
-                                     (not (or (= (.-activeElement js/document) headline)
-                                              (= (.-activeElement js/document) body))))})]]
+          [:div.entry-edit-controls-right
+            ; Emoji picker
+            (emoji-picker {:add-emoji-cb (fn [editor emoji]
+                                           (let [headline (sel1 [:div.entry-edit-headline])
+                                                 body     (sel1 [:div.entry-edit-body])]
+                                             (when (= (.-activeElement js/document) headline)
+                                               (headline-on-change s))
+                                             (when (= (.-activeElement js/document) body)
+                                               (body-on-change s))))
+                           :disabled (let [headline (sel1 [:div.entry-edit-headline])
+                                           body     (sel1 [:div.entry-edit-body])]
+                                       (not (or (= (.-activeElement js/document) headline)
+                                                (= (.-activeElement js/document) body))))})
+            ;; Attachments button
+            [:button.mlb-reset.attachment
+              {:title (add-attachment-tooltip attachments)
+               :type "button"
+               :data-toggle "tooltip"
+               :data-container "body"
+               :data-placement "top"
+               :on-click (fn [e]
+                          (.blur (.-target e))
+                          (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
+                          (iu/upload!
+                           nil
+                           (partial attachment-upload-success-cb s)
+                           nil
+                           (partial attachment-upload-error-cb s)))}
+                [:i.fa.fa-paperclip]]]]]
+      (entry-attachments attachments #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-footer.group
         [:button.mlb-reset.mlb-default
