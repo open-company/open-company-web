@@ -49,11 +49,13 @@ div.entry-attachments {
     label.entry-attachment-title {
       font-size: 12px;
       @include avenir_H();
+      color: $oc_gray_7;
     }
 
     label.entry-attachment-subtitle {
       font-size: 10px;
       @include avenir_B();
+      color: $carrot_light_gray;
     }
 
     button.remove-attachment {
