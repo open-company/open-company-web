@@ -262,6 +262,11 @@
                                            (when-not (utils/event-inside? % (sel1 [:div.entry-edit-body]))
                                               (reset! (::body-focused s) false))
                                            (reset! (::media-expanded s) false)
+                                           (doto (js/$ "button.add-media-bt")
+                                            (.tooltip "hide")
+                                            (.attr "data-original-title" "Insert media")
+                                            (.tooltip "fixTitle")
+                                            (.tooltip "show"))
                                            ; If there was a last selection saved
                                            (when (and (not @(::media-photo s))
                                                       (not @(::media-video s))
@@ -403,7 +408,12 @@
                              (reset! (::last-selection s) (.saveSelection js/rangy js/window))
                              (reset! (::media-expanded s) (not @(::media-expanded s)))
                              (utils/after 1 #(utils/remove-tooltips))
-                             (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))}]
+                             (utils/after 100 (fn []
+                                                (-> (js/$ "button.add-media-bt")
+                                                  (.tooltip "hide")
+                                                  (.attr "data-original-title" "Close")
+                                                  (.tooltip "fixTitle")
+                                                  (.tooltip "show"))))))}]
 
             [:div.entry-edit-controls-medias-container
               {:class (when @(::media-expanded s) "expanded")}
