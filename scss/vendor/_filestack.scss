@@ -1,6 +1,67 @@
 div.fsp-picker {
-  div.fsp-picker-modal {
+  background-color: rgba(0,0,0,0.6) !important;
 
+  div.fsp-modal {
+    background-color: #FCFBF7;
+
+    div.fsp-modal__sidebar {
+      transition: all 0s cubic-bezier(.84,.02,.37,.74) !important;
+      background-color: #FCFBF7;
+
+
+      &:hover {
+        width: 50px !important;
+        box-shadow: none;
+        border: inherit;
+      }
+
+      .fsp-source-list__item.active, .fsp-source-list__item:hover, .fsp-source-list__icon.fsp-icon {
+        background-color: transparent;
+      }
+    }
+
+    div.fsp-modal__body {
+      background-color: #FCFBF7;
+
+      div.fsp-header {
+        background-color: #FCFBF7;
+        border: none;
+
+        .fsp-picker__close-button, .fsp-picker__close-button:hover {
+          background-color: transparent;
+        }
+      }
+
+      div.fsp-content {
+        div.fsp-drop-area {
+          background-color: transparent;
+          &.active {
+            background-color: transparent;
+          }
+
+          div.fsp-drop-area__title.fsp-text__title {
+            color: transparent;
+            position: relative;
+
+            &:after {
+              content: "Select a file to upload";
+              color: #444444;
+              position: absolute;
+              width: 100%;
+              top: 0;
+              left: 0;
+              text-align: center;
+              height: 28px;
+              display: block;
+            }
+          }
+
+        }
+      }
+    }
+    div.fsp-picker-modal {
+
+    }
   }
 
   div.fsp-picker__footer {
