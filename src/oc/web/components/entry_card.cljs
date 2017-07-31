@@ -35,12 +35,12 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel]
+(defn truncate-body [body-sel & [add-ellipsis?]]
   (.dotdotdot (js/$ body-sel)
    #js {:height 72
         :wrap "word"
         :watch true
-        :ellipsis "... "
+        :ellipsis (if add-ellipsis? "... " "")
         :after "a.read-more"}))
 
 (defn get-first-body-thumbnail [body]
@@ -81,7 +81,7 @@
                                            ; Truncate body text with dotdotdot
                                            (when-not @(::truncated s)
                                              (truncate-body body-sel)
-                                             (utils/after 10 #(truncate-body body-sel))
+                                             (utils/after 10 #(truncate-body body-sel true))
                                              (reset! (::truncated s) true)))
                                          s)
                          :will-mount (fn [s]
