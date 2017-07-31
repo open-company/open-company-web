@@ -422,6 +422,7 @@ div.entry-edit-modal-container {
         height: 40px;
         opacity: 0.8;
         color: $oc_gray_7;
+        transform: rotate(90deg);
 
         &:hover {
           opacity: 1;
