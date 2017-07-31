@@ -8,10 +8,6 @@ div.entry-attachments {
     height: 43px;
     padding: 0.5rem 0.5rem 0.5rem 0;
 
-    &:not(:first-child) {
-      border-top: 1px solid rgba(78,90,107,0.2);
-    }
-
     & > * {
       opacity: 0.8;
       cursor: pointer;
