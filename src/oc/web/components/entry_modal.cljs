@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.components.entry-attachments :refer (entry-attachments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
@@ -137,7 +138,8 @@
                             "Edit"]
                           [:li
                             {:on-click #(delete-clicked % entry-data)}
-                            "Delete"]]]]]]]]]
+                            "Delete"]]]]]]
+                (entry-attachments (:attachments entry-data))]]]
           [:div.entry-right-column
             {:style #js {:minHeight column-height}}
             [:div.entry-right-column-content
