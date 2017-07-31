@@ -7,7 +7,7 @@ div.fsp-picker {
     div.fsp-modal__sidebar {
       transition: all 0s cubic-bezier(.84,.02,.37,.74) !important;
       background-color: #FCFBF7;
-
+      box-shadow: none;
 
       &:hover {
         width: 50px !important;
