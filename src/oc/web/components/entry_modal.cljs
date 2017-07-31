@@ -3,6 +3,8 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -44,6 +46,8 @@
                          (rum/local false ::animate)
                          (rum/local false ::hovering-card)
                          (rum/local false ::showing-dropdown)
+                         (rum/local nil ::column-height)
+                         (rum/local nil ::window-resize-listener)
                          rum/reactive
                          (drv/drv :entry-modal-fade-in)
                          {:before-render (fn [s]
@@ -51,6 +55,10 @@
                                                     (= @(drv/get-ref s :entry-modal-fade-in) (:uuid (first (:rum/args s)))))
                                              (reset! (::animate s) true))
                                            s)
+                          :will-mount (fn [s]
+                                        (reset! (::window-resize-listener s)
+                                         (events/listen js/window EventType/RESIZE #(reset! (::column-height s) nil)))
+                                        s)
                           :did-mount (fn [s]
                                        ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                        (dommy/add-class! (sel1 [:body]) :no-scroll)
@@ -70,13 +78,19 @@
                           :after-render (fn [s]
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
+                                          (when-not @(::column-height s)
+                                            (reset! (::column-height s) (str (max 284 (.height (js/$ ".entry-left-column"))) "px")))
                                           s)
                           :will-unmount (fn [s]
                                           ;; Remove no-scroll class from the body tag
                                           (dommy/remove-class! (sel1 [:body]) :no-scroll)
+                                          ;; Remove window resize listener
+                                          (when @(::window-resize-listener s)
+                                            (events/unlistenByKey @(::window-resize-listener s))
+                                            (reset! (::window-resize-listener s) nil))
                                           s)}
   [s entry-data]
-  (let [column-height (str (max 284 (.height (js/$ ".entry-left-column"))) "px")]
+  (let [column-height @(::column-height s)]
     [:div.entry-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
@@ -88,9 +102,9 @@
           {:on-click #(close-clicked s)}]
         [:div.entry-modal-inner.group
           [:div.entry-left-column
-            {:style #js {:minHeight column-height}}
+            {:style (when column-height {:minHeight column-height})}
             [:div.entry-left-column-content
-              {:style #js {:minHeight column-height}}
+              {:style (when column-height {:minHeight column-height})}
               [:div.entry-modal-head.group
                 [:div.entry-modal-head-left
                   (user-avatar-image (first (:author entry-data)))
@@ -141,6 +155,6 @@
                             "Delete"]]]]]]
                 (entry-attachments (:attachments entry-data))]]]
           [:div.entry-right-column
-            {:style #js {:minHeight column-height}}
+            {:style (when column-height {:minHeight column-height})}
             [:div.entry-right-column-content
               (comments (:uuid entry-data))]]]]]))
