@@ -35,12 +35,12 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel & [add-ellipsis?]]
+(defn truncate-body [body-sel]
   (.dotdotdot (js/$ body-sel)
    #js {:height 72
         :wrap "word"
         :watch true
-        :ellipsis (if add-ellipsis? "... " "")
+        :ellipsis "... "
         :after "a.read-more"}))
 
 (defn get-first-body-thumbnail [body]
@@ -79,10 +79,11 @@
                                            ; Prevent read more link to change directly the url
                                            (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
-                                           (when-not @(::truncated s)
+                                           (when (compare-and-set! (::truncated s) false true)
                                              (truncate-body body-sel)
-                                             (utils/after 10 #(truncate-body body-sel true))
-                                             (reset! (::truncated s) true)))
+                                             (utils/after 10 #(do
+                                                                (.trigger (js/$ body-sel) "destroy")
+                                                                (truncate-body body-sel)))))
                                          s)
                          :will-mount (fn [s]
                                        (let [entry-data (first (:rum/args s))]
@@ -92,8 +93,9 @@
                                         (let [old-entry-data (first (:rum/args o))
                                               new-entry-data (first (:rum/args s))]
                                           (when (not= (:body old-entry-data) (:body new-entry-data))
-                                            (reset! (::truncated s) false)
-                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-entry-data)))))
+                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-entry-data)))
+                                            (.trigger (js/$ (str "div.entry-card-" (:uuid old-entry-data) " div.entry-card-body")) "destroy")
+                                            (reset! (::truncated s) false)))
                                         s)
                          :did-mount (fn [s]
                                       (let [entry-data (first (:rum/args s))]
