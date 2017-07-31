@@ -1,7 +1,5 @@
 // BassCSS
 @import "vendor/bass";
-// Reset style of Filestack picker
-@import "vendor/_filestack";
 // Material design Bootstrap reset
 @import "vendor/_materialdesign";
 // Vars
@@ -15,6 +13,8 @@
 @import "modules/_fonts";
 @import "modules/_no_user_select";
 @import "modules/_animation";
+// Reset style of Filestack picker
+@import "vendor/_filestack";
 
 // Components
 @import "partials/_navbar";

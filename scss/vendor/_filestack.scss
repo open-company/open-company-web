@@ -1,5 +1,6 @@
 div.fsp-picker {
   background-color: rgba(255,255,255,0.4) !important;
+  @include avenir_M();
 
   div.fsp-modal {
     background-color: #FCFBF7;
@@ -21,10 +22,10 @@ div.fsp-picker {
     }
 
     div.fsp-modal__body {
-      background-color: #FCFBF7;
+      background-color: $carrot_settings_background;
 
       div.fsp-header {
-        background-color: #FCFBF7;
+        background-color: $carrot_settings_background;
         border: none;
 
         .fsp-picker__close-button, .fsp-picker__close-button:hover {
@@ -39,21 +40,37 @@ div.fsp-picker {
             background-color: transparent;
           }
 
-          div.fsp-drop-area__title.fsp-text__title {
-            color: transparent;
-            position: relative;
+          div.fsp-select-labels {
+            width: 100% !important;
 
-            &:after {
-              content: "Select a file to upload";
-              color: #444444;
-              position: absolute;
-              width: 100%;
-              top: 0;
-              left: 0;
-              text-align: center;
-              height: 28px;
-              display: block;
+            div.fsp-drop-area__title.fsp-text__title {
+              color: transparent;
+              position: relative;
+              @include avenir_M();
+
+              &:after {
+                content: "Select a file to upload";
+                position: absolute;
+                width: 100%;
+                top: 0;
+                left: 0;
+                text-align: center;
+                display: block;
+                font-size: 32px;
+                line-height: 44px;
+                color: #333333;
+              }
             }
+
+            div.fsp-drop-area__subtitle.fsp-text__subheader {
+              font-size: 16px;
+              line-height: 24px;
+              color: $oc_gray_7;
+              width: 100%;
+              text-align: center;
+              margin-top: 20px;
+            }
+
           }
 
         }
