@@ -306,7 +306,7 @@ div.entry-edit-modal-container {
             margin: 0 16px 0 0;
             padding: 0;
 
-            &:hover, &.expanded, &.active {
+            &:hover, &.active {
               border: 1px solid rgba($carrot_text_blue, 1);
             }
           }
@@ -325,7 +325,6 @@ div.entry-edit-modal-container {
             }
 
             &.expanded {
-              background-image: cdnUrl("/img/ML/plus_blue.svg");
               transform: rotate(45deg);
             }
           }
