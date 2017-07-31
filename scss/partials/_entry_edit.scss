@@ -124,10 +124,27 @@ div.entry-edit-modal-container {
               overflow: scroll;
               max-height: 250px;
 
-              li {
+              li.selectable {
                 margin: 6px 0;
+                cursor: pointer;
 
-                button.selectable {
+                &:hover {
+                  button {
+                    color: $carrot_dark_gray;
+                    text-decoration: underline;
+                    background-color: transparent;
+                  }
+                }
+
+                &.select {
+                  button {
+                    @include avenir_H();
+                    color: $carrot_dark_gray;
+                    background-color: transparent;
+                  }
+                }
+
+                button {
                   @include avenir_M();
                   font-size: 14px;
                   color: $oc_gray_7;
@@ -137,18 +154,6 @@ div.entry-edit-modal-container {
                   max-width: 60%;
                   margin: 0;
                   padding: 0;
-
-                  &.select {
-                    @include avenir_H();
-                    color: $carrot_dark_gray;
-                    background-color: transparent;
-                  }
-
-                  &:hover {
-                    color: $carrot_dark_gray;
-                    text-decoration: underline;
-                    background-color: transparent;
-                  }
                 }
 
                 &:hover {
@@ -417,6 +422,7 @@ div.entry-edit-modal-container {
         font-size: 22px;
         height: 40px;
         opacity: 0.8;
+        color: $oc_gray_7;
 
         &:hover {
           opacity: 1;

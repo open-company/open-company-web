@@ -326,12 +326,11 @@
                 [:ul
                   (for [t (sort #(compare (:name %1) (:name %2)) topics)
                         :let [selected (= (:topic-name entry-editing) (:name t))]]
-                    [:li.group
-                      {:key (str "entry-edit-dd-" (:slug t))}
-                      [:button.mlb-reset.selectable
-                        {:data-topic-slug (:slug t)
-                         :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
-                         :class (when selected "select")}
+                    [:li.selectable.group
+                      {:key (str "entry-edit-dd-" (:slug t))
+                       :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
+                       :class (when selected "select")}
+                      [:button.mlb-reset
                         (:name t)]
                       (when selected
                         [:button.mlb-reset.mlb-link.remove
