@@ -469,32 +469,32 @@
                            :disabled (let [headline (sel1 [:div.entry-edit-headline])
                                            body     (sel1 [:div.entry-edit-body])]
                                        (not (or (= (.-activeElement js/document) headline)
-                                                (= (.-activeElement js/document) body))))})
-            ;; Attachments button
-            [:button.mlb-reset.attachment
-              {:title (add-attachment-tooltip attachments)
-               :type "button"
-               :data-toggle "tooltip"
-               :data-container "body"
-               :data-placement "top"
-               :on-click (fn [e]
-                          (.blur (.-target e))
-                          (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
-                          (iu/upload!
-                           nil
-                           (partial attachment-upload-success-cb s)
-                           nil
-                           (partial attachment-upload-error-cb s)))}
-                [:i.fa.fa-paperclip]]]]]
+                                                (= (.-activeElement js/document) body))))})]]]
       (entry-attachments attachments #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-footer.group
-        [:button.mlb-reset.mlb-default
+        ;; Attachments button
+        [:button.mlb-reset.attachment
+          {:title (add-attachment-tooltip attachments)
+           :type "button"
+           :data-toggle "tooltip"
+           :data-container "body"
+           :data-placement "top"
+           :on-click (fn [e]
+                      (.blur (.-target e))
+                      (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
+                      (iu/upload!
+                       nil
+                       (partial attachment-upload-success-cb s)
+                       nil
+                       (partial attachment-upload-error-cb s)))}
+            [:i.fa.fa-paperclip]]
+        [:button.mlb-reset.mlb-default.form-action-bt
           {:on-click #(do
                         (dis/dispatch! [:entry-save])
                         (close-clicked s))
            :disabled (not (:has-changes entry-editing))}
           (if new-entry? "Post" "Save")]
-        [:button.mlb-reset.mlb-link-black
+        [:button.mlb-reset.mlb-link-black.form-action-bt
           {:on-click #(close-clicked s)}
           "Cancel"]]]]))

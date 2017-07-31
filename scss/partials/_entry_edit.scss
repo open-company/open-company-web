@@ -396,24 +396,8 @@ div.entry-edit-modal-container {
           }
         }
 
-        div.entry-edit-controls-right {
+        div.emoji-picker {
           float: right;
-
-          button.attachment {
-            float: right;
-            font-size: 16px;
-            margin-right: 15px;
-            margin-top: 2px;
-            opacity: 0.8;
-
-            &:hover {
-              opacity: 1;
-            }
-          }
-
-          div.emoji-picker {
-            float: right;
-          }
         }
       }
     }
@@ -426,7 +410,19 @@ div.entry-edit-modal-container {
       height: 40px;
       margin-top: 16px;
 
-      button {
+      button.attachment {
+        float: left;
+        font-size: 16px;
+        margin-right: 15px;
+        margin-top: 2px;
+        opacity: 0.8;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      button.form-action-bt {
         margin-left: 15px;
         float: right;
         height: 40px;
