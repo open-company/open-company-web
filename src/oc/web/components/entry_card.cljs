@@ -128,6 +128,9 @@
             (utils/time-since (:updated-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
+        ; Paperclip if the update has attachments
+        (when (pos? (count (:attachments entry-data)))
+          [:div.paperclip [:i.fa.fa-paperclip]])
         (when (:topic-slug entry-data)
           (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
             [:div.topic-tag

@@ -71,10 +71,20 @@ div.entry-card {
 
     div.entry-card-head-right {
       float: right;
+      position: relative;
 
       div.topic-tag {
         margin-top: 0;
         float: right;
+      }
+
+      div.paperclip {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        font-size: 30px;
+        transform: rotate(45deg);
+        opacity: 0.6;
       }
 
       @include entry-topic-tag();
