@@ -391,6 +391,8 @@
           [:link {:rel "stylesheet" :href "/css/normalize.css"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          ;; MaterialDesign icon fonts from https://materialdesignicons.com
+          [:link {:href "//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css" :media "all" :rel "stylesheet" :type "text/css"}]
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
@@ -466,6 +468,8 @@
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          ;; MaterialDesign icon fonts from https://materialdesignicons.com
+          [:link {:rel "stylesheet" :href "//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css" :media "all" :type "text/css"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Google fonts Domine and OpenSans
