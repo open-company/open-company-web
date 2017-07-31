@@ -330,15 +330,14 @@
                       {:key (str "entry-edit-dd-" (:slug t))}
                       [:button.mlb-reset.selectable
                         {:data-topic-slug (:slug t)
-                         :on-click #(dis/dispatch! [:input [:entry-editing :topic-name] (:name t)])
+                         :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
                          :class (when selected "select")}
                         (:name t)]
                       (when selected
                         [:button.mlb-reset.mlb-link.remove
                           {:on-click (fn [e]
                                        (utils/event-stop e)
-                                       (dis/dispatch! [:input [:entry-editing :topic-slug] nil])
-                                       (dis/dispatch! [:input [:entry-editing :topic-name] nil]))}
+                                       (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
                           "Remove"])])
                   [:li.divider]
                   [:li.entry-edit-new-topic.group
@@ -364,9 +363,6 @@
                     (when @(::focusing-create-topic s)
                       [:button.mlb-reset.mlb-default.entry-edit-new-topic-create
                         {:on-click (fn [e]
-                                     (when @(::last-selection s)
-                                        (.removeMarkers js/rangy @(::last-selection s))
-                                        (reset! (::last-selection s) nil))
                                      (utils/event-stop e)
                                      (create-new-topic s))
                          :disabled (empty? (s/trim @(::new-topic s)))}
