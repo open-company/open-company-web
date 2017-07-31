@@ -1,13 +1,23 @@
 div.fsp-picker {
-  background-color: rgba(255,255,255,0.4) !important;
+  background-color: rgba(#FCFBF7,0.4) !important;
   @include avenir_M();
 
+  div {
+    background-color: white;
+  }
+
   div.fsp-modal {
-    background-color: #FCFBF7;
+    background-color: white;
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+    border-radius: 8px;
+
+    div.fst-sidebar {
+      background-color: white;
+    }
 
     div.fsp-modal__sidebar {
       transition: all 0s cubic-bezier(.84,.02,.37,.74) !important;
-      background-color: #FCFBF7;
+      background-color: white;
       box-shadow: none;
 
       &:hover {
@@ -22,10 +32,10 @@ div.fsp-picker {
     }
 
     div.fsp-modal__body {
-      background-color: $carrot_settings_background;
+      background-color: white;
 
       div.fsp-header {
-        background-color: $carrot_settings_background;
+        background-color: white;
         border: none;
 
         .fsp-picker__close-button, .fsp-picker__close-button:hover {
@@ -34,6 +44,13 @@ div.fsp-picker {
       }
 
       div.fsp-content {
+        background-color: white;
+
+        div.fsp-footer {
+          background-color: white;
+          border-top: none;
+        }
+
         div.fsp-drop-area {
           background-color: transparent;
           &.active {
