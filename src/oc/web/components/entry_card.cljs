@@ -128,9 +128,7 @@
             (utils/time-since (:updated-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
-        ; Paperclip if the update has attachments
-        (when (pos? (count (:attachments entry-data)))
-          [:div.paperclip [:i.fa.fa-paperclip]])
+        ; Topic tag button
         (when (:topic-slug entry-data)
           (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
             [:div.topic-tag
@@ -139,9 +137,11 @@
                             (router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data))))}
               topic-name]))]]
     [:div.entry-card-content.group
+      ; Headline
       [:div.entry-card-headline
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
+      ; Body
       (let [body-without-images (utils/strip-img-tags (:body entry-data))
             hidden-class (str "entry-body" (:uuid entry-data))
             $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-images "</div>"))
@@ -157,6 +157,7 @@
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
                                     :has-media-preview @(::first-body-image s)})}])
+      ; Body preview
       (when @(::first-body-image s)
         [:div.entry-card-media-preview
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
