@@ -131,31 +131,31 @@
                 [:div.entry-modal-content-body
                   {:dangerouslySetInnerHTML (utils/emojify (:body entry-data))
                    :class (when (empty? (:headline entry-data)) "no-headline")}]
-                [:div.entry-modal-footer.group
-                  (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)
-                  [:div.entry-modal-footer-right
-                    [:div.more-dropdown.dropdown
-                      [:button.mlb-reset.entry-modal-more.dropdown-toggle
-                        {:type "button"
-                         :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-                         :id (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))
-                         :data-toggle "dropdown"
-                         :aria-haspopup true
-                         :aria-expanded false
-                         :title "More"}]
-                      [:div.dropdown-menu
-                        {:aria-labelledby (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))}
-                        [:div.triangle]
-                        [:ul.entry-modal-more-menu
-                          [:li
-                            {:on-click (fn [e]
-                                         (utils/event-stop e)
-                                         (dis/dispatch! [:entry-edit entry-data]))}
-                            "Edit"]
-                          [:li
-                            {:on-click #(delete-clicked % entry-data)}
-                            "Delete"]]]]]]
-                (entry-attachments (:attachments entry-data))]]]
+                (entry-attachments (:attachments entry-data))]
+              [:div.entry-modal-footer.group
+                (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)
+                [:div.entry-modal-footer-right
+                  [:div.more-dropdown.dropdown
+                    [:button.mlb-reset.entry-modal-more.dropdown-toggle
+                      {:type "button"
+                       :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
+                       :id (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))
+                       :data-toggle "dropdown"
+                       :aria-haspopup true
+                       :aria-expanded false
+                       :title "More"}]
+                    [:div.dropdown-menu
+                      {:aria-labelledby (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))}
+                      [:div.triangle]
+                      [:ul.entry-modal-more-menu
+                        [:li
+                          {:on-click (fn [e]
+                                       (utils/event-stop e)
+                                       (dis/dispatch! [:entry-edit entry-data]))}
+                          "Edit"]
+                        [:li
+                          {:on-click #(delete-clicked % entry-data)}
+                          "Delete"]]]]]]]]
           [:div.entry-right-column
             {:style (when column-height {:minHeight column-height})}
             [:div.entry-right-column-content
