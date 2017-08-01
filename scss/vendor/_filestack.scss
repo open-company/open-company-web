@@ -99,29 +99,8 @@ div.fsp-picker {
 
           &.active {
             span.fsp-source-list__icon {
-              // background-color: rgba($oc_gray_7, 0.4);
-              border: 1px solid rgba($oc_gray_7, 0.4);
+              background-color: $carrot_light_blue;
               border-radius: 19px;
-            }
-
-            span.fsp-icon--local_file_system {
-              background-image: cdnUrl("/img/ML/laptop-mac-blue.png");
-            }
-
-            span.fsp-icon--googledrive {
-              background-image: cdnUrl("/img/ML/google-drive-blue.png");
-            }
-
-            span.fsp-icon--dropbox {
-              background-image: cdnUrl("/img/ML/dropbox-blue.png");
-            }
-
-            span.fsp-icon--onedrive {
-              background-image: cdnUrl("/img/ML/onedrive-blue.png");
-            }
-
-            span.fsp-icon--box {
-              background-image: cdnUrl("/img/ML/box-blue.png");
             }
           }
 
@@ -129,15 +108,10 @@ div.fsp-picker {
             background-image: cdnUrl("/img/ML/laptop-mac.png");
             background-position: 50%;
             background-size: 22px 19px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/laptop-mac-blue.png");
-            }
           }
 
           span.fsp-source-list__icon:hover {
-            // background-color: rgba($oc_gray_7, 0.4);
-            border: 1px solid rgba($oc_gray_7, 0.4);
+            background-color: $carrot_light_blue;
             border-radius: 19px;
           }
 
@@ -145,40 +119,24 @@ div.fsp-picker {
             background-image: cdnUrl("/img/ML/google-drive.png");
             background-position: 50%;
             background-size: 22px 19px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/google-drive-blue.png");
-            }
           }
 
           span.fsp-icon--dropbox {
             background-image: cdnUrl("/img/ML/dropbox.png");
             background-position: 50%;
             background-size: 22px 19px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/dropbox-blue.png");
-            }
           }
 
           span.fsp-icon--onedrive {
             background-image: cdnUrl("/img/ML/onedrive.png");
             background-position: 50%;
             background-size: 22px 19px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/onedrive-blue.png");
-            }
           }
 
           span.fsp-icon--box {
             background-image: cdnUrl("/img/ML/box.png");
             background-position: 50%;
             background-size: 22px 19px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/box-blue.png");
-            }
           }
         }
       }
