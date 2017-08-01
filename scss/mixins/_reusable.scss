@@ -112,6 +112,7 @@
   -moz-transform: scale(#{$size / 64});
   width: 64px;
   height: 64px;
+  display: inline;
 }
 
 @mixin rich-editor-body($text_color: #444444, $font_size: 18){
