@@ -79,7 +79,8 @@
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
                                           (when-not @(::column-height s)
-                                            (reset! (::column-height s) (str (max 284 (.height (js/$ ".entry-left-column"))) "px")))
+                                            (reset! (::column-height s) (str (max 284 (.height (js/$ ".entry-left-column"))) "px"))
+                                            (.on (js/$ ".entry-modal-content-body img") "load") #(reset! (::column-height s) (str (max 284 (.height (js/$ ".entry-left-column"))) "px")))
                                           s)
                           :will-unmount (fn [s]
                                           ;; Remove no-scroll class from the body tag
