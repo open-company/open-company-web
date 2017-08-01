@@ -109,6 +109,7 @@
 
 @mixin emoji-size($size: 16){
   zoom: #{$size / 64};
+  -moz-transform: scale(#{$size / 64});
   width: 64px;
   height: 64px;
 }
