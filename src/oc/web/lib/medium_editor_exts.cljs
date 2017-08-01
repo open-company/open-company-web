@@ -43,16 +43,18 @@
 (def file-upload
   (let [class "file-upload-btn"
         hide-btn (fn []
+                    (js/console.log "hiding")
                     (when-let [el (js/document.getElementById "file-upload-ui")]
-                          (gstyle/setStyle el #js {:opacity 0})
-                          (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
+                      (js/console.log "   -hide-btn:" el)
+                      (gstyle/setStyle el #js {:opacity 0})
+                      (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
         pos-btn (fn [top-v]
                   (when-let [el (js/document.getElementById "file-upload-ui")]
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (+ top-v 5) "px")
-                                             :left "-5px"})))
+                                             :top (str (- top-v 2) "px")
+                                             :left "4px"})))
         show-btn (fn [_]
                    (utils/after 100
                     (fn []
@@ -60,6 +62,7 @@
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))
                             offset-top (gobj/get el "offsetTop" 0)]
+                        (js/console.log "show-btn:" el offset-top)
                         (when (and sel el)
                           (if (and (empty-paragraph? el) offset-top)
                             (pos-btn offset-top)
