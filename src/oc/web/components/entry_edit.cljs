@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.entry-attachments :refer (entry-attachments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -77,7 +78,9 @@
 (defn- setup-body-editor [state]
   (let [headline-el  (sel1 [:div.entry-edit-headline])
         body-el      (sel1 [:div.entry-edit-body])
-        body-editor  (new js/MediumEditor body-el (clj->js (utils/medium-editor-options (body-placeholder) false)))]
+        body-editor  (new js/MediumEditor body-el (clj->js (-> (body-placeholder)
+                                                            (utils/medium-editor-options  false)
+                                                            (editor/inject-extension editor/file-upload))))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
@@ -387,91 +390,81 @@
            :contentEditable true
            :on-focus #(reset! (::body-focused s) true)
            :dangerouslySetInnerHTML @(::initial-body s)}]
-        ; Bottom controls
-        [:div.entry-edit-controls.group
-          ; Media handling
-          [:div.entry-edit-controls-medias
-            ; Add media button
-            [:button.mlb-reset.media.add-media-bt
-              {:title (if @(::media-expanded s) "Close" "Insert media")
-               :class (utils/class-set {:expanded @(::media-expanded s)
-                                        :disabled (not @(::body-focused s))})
+        ; Media handling
+        [:div.entry-edit-controls-medias
+          {:id "file-upload-ui"
+           :style {:display "none"}}
+          ; Add media button
+          [:button.mlb-reset.media.add-media-bt
+            {:title (if @(::media-expanded s) "Close" "Insert media")
+             :class (utils/class-set {:expanded @(::media-expanded s)
+                                      :disabled (not @(::body-focused s))})
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :on-click (fn [e]
+                         (when @(::body-focused s)
+                           (utils/event-stop e)
+                           (reset! (::last-selection s) (.saveSelection js/rangy js/window))
+                           (reset! (::media-expanded s) (not @(::media-expanded s)))
+                           (utils/after 1 #(utils/remove-tooltips))
+                           (utils/after 100 (fn []
+                                              (-> (js/$ "button.add-media-bt")
+                                                (.tooltip "hide")
+                                                (.attr "data-original-title" "Close")
+                                                (.tooltip "fixTitle")
+                                                (.tooltip "show"))))))}]
+
+          [:div.entry-edit-controls-medias-container
+            {:class (when @(::media-expanded s) "expanded")}
+            ; Add a picture button
+            [:button.mlb-reset.media.media-photo
+              {:class (when @(::media-photo s) "active")
+               :title "Add a picture"
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
-               :on-click (fn [e]
-                           (when @(::body-focused s)
-                             (utils/event-stop e)
-                             (reset! (::last-selection s) (.saveSelection js/rangy js/window))
-                             (reset! (::media-expanded s) (not @(::media-expanded s)))
-                             (utils/after 1 #(utils/remove-tooltips))
-                             (utils/after 100 (fn []
-                                                (-> (js/$ "button.add-media-bt")
-                                                  (.tooltip "hide")
-                                                  (.attr "data-original-title" "Close")
-                                                  (.tooltip "fixTitle")
-                                                  (.tooltip "show"))))))}]
-
-            [:div.entry-edit-controls-medias-container
-              {:class (when @(::media-expanded s) "expanded")}
-              ; Add a picture button
-              [:button.mlb-reset.media.media-photo
-                {:class (when @(::media-photo s) "active")
-                 :title "Add a picture"
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :on-click (fn []
-                             (reset! (::media-photo s) true)
-                             (iu/upload! "image/*"
-                              (fn [res]
-                                (let [url (gobj/get res "url")
-                                      img   (gdom/createDom "img")]
-                                  (set! (.-onload img) #(img-on-load s url img))
-                                  (set! (.-className img) "hidden")
-                                  (gdom/append (.-body js/document) img)
-                                  (set! (.-src img) url)
-                                  (reset! (::media-photo s) {:res res :url url})
-                                  (iu/thumbnail! url
-                                   (fn [thumbnail-url]
-                                    (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
-                                    (media-image-add-if-finished s)))))
-                              (fn [res prog])
-                              (fn [err]
-                                (js/console.log "err" err))))}]
-              ; Add a video button
-              [:button.mlb-reset.media.media-video
-                {:class (when @(::media-video s) "active")
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :title "Add a video"
-                 :on-click (fn []
-                             (reset! (::media-video s) true)
-                             (dis/dispatch! [:input [:entry-editing :media-video] true]))}]
-              ; Add a chart button
-              [:button.mlb-reset.media.media-chart
-                {:class (when @(::media-chart s) "active")
-                 :title "Add a Google Sheet chart"
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :on-click (fn []
-                             (reset! (::media-chart s) true)
-                             (dis/dispatch! [:input [:entry-editing :media-chart] true]))}]]]
-          [:div.entry-edit-controls-right
-            ; Emoji picker
-            (emoji-picker {:add-emoji-cb (fn [editor emoji]
-                                           (let [headline (sel1 [:div.entry-edit-headline])
-                                                 body     (sel1 [:div.entry-edit-body])]
-                                             (when (= (.-activeElement js/document) headline)
-                                               (headline-on-change s))
-                                             (when (= (.-activeElement js/document) body)
-                                               (body-on-change s))))
-                           :disabled (let [headline (sel1 [:div.entry-edit-headline])
-                                           body     (sel1 [:div.entry-edit-body])]
-                                       (not (or (= (.-activeElement js/document) headline)
-                                                (= (.-activeElement js/document) body))))})]]]
+               :on-click (fn []
+                           (reset! (::media-photo s) true)
+                           (iu/upload! "image/*"
+                            (fn [res]
+                              (let [url (gobj/get res "url")
+                                    img   (gdom/createDom "img")]
+                                (set! (.-onload img) #(img-on-load s url img))
+                                (set! (.-className img) "hidden")
+                                (gdom/append (.-body js/document) img)
+                                (set! (.-src img) url)
+                                (reset! (::media-photo s) {:res res :url url})
+                                (iu/thumbnail! url
+                                 (fn [thumbnail-url]
+                                  (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
+                                  (media-image-add-if-finished s)))))
+                            (fn [res prog])
+                            (fn [err]
+                              (js/console.log "err" err))))}]
+            ; Add a video button
+            [:button.mlb-reset.media.media-video
+              {:class (when @(::media-video s) "active")
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :title "Add a video"
+               :on-click (fn []
+                           (reset! (::media-video s) true)
+                           (dis/dispatch! [:input [:entry-editing :media-video] true]))}]
+            ; Add a chart button
+            [:button.mlb-reset.media.media-chart
+              {:class (when @(::media-chart s) "active")
+               :title "Add a Google Sheet chart"
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :on-click (fn []
+                           (reset! (::media-chart s) true)
+                           (dis/dispatch! [:input [:entry-editing :media-chart] true]))}]]]
+        [:div.entry-edit-controls-right]]
+        ; Bottom controls
+        [:div.entry-edit-controls.group]
       (entry-attachments attachments #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
       [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-footer.group
