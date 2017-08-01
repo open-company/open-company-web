@@ -61,9 +61,8 @@ div.entry-modal-container {
         border-bottom-left-radius: 8px;
 
         div.entry-left-column-content {
-          padding: 24px 16px 0px 32px;
-          max-height: calc(100vh - 150px - 88px);
-          margin-bottom: 40px;
+          padding: 24px 16px 30px 32px;
+          max-height: calc(100vh - 150px - 48px);
           overflow-x: hidden;
           overflow-y: scroll;
 
@@ -88,7 +87,7 @@ div.entry-modal-container {
             float: none;
             width: 100%;
             position: relative;
-            margin-bottom: 14px;
+            padding-bottom: 64px;
 
             div.entry-modal-content-headline {
               margin-top: 24px;
@@ -104,87 +103,86 @@ div.entry-modal-container {
                 min-height: 166px;
               }
             }
-          }
+            div.entry-modal-footer {
+              width: 569px;
+              height: 40px;
+              position: absolute;
+              bottom: 0px;
+              background-color: white;
+              margin: 24px 16px 0 0;
+              padding-right: 4px;
 
-          div.entry-modal-footer {
-            width: 569px;
-            height: 40px;
-            position: absolute;
-            bottom: 0px;
-            background-color: white;
-            margin: 24px 16px 0 0;
-            padding-right: 6px;
-
-            div.reactions {
-              margin-top: 7px;
-            }
-
-            div.entry-modal-footer-right {
-              float: right;
-
-              div.more-dropdown {
-                float: right;
+              div.reactions {
                 margin-top: 7px;
-                margin-left: 10px;
-                width: 32px;
-                height: 32px;
+              }
 
-                button.entry-modal-more {
+              div.entry-modal-footer-right {
+                float: right;
+
+                div.more-dropdown {
+                  float: right;
+                  margin-top: 7px;
+                  margin-left: 10px;
                   width: 32px;
                   height: 32px;
-                  padding: 8px 0px 8px 16px;
-                  display: block;
-                  background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-                  background-position: right center;
-                  background-size: 6px 16px;
-                  background-repeat: no-repeat;
-                  margin-left: 6px;
-                }
 
-                div.dropdown-menu {
-                  position: absolute;
-                  top: -44px;
-                  left: -91px;
-                  border: none;
-                  outline: none;
-                  box-shadow: none;
-                  background-color: transparent;
-                  padding: 0 0 .3em;
-
-                  div.triangle {
-                    position: absolute;
-                    top: 50px;
-                    left: 90px;
-                    background-color: white;
-                    border-top: 1px solid rgba(177,184,192,0.50);
-                    border-left: 1px solid rgba(177,184,192,0.50);
-                    transform: rotate(135deg);
-                    width: 20px;
-                    height: 20px;
+                  button.entry-modal-more {
+                    width: 32px;
+                    height: 32px;
+                    padding: 8px 0px 8px 16px;
+                    display: block;
+                    background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+                    background-position: right center;
+                    background-size: 6px 16px;
+                    background-repeat: no-repeat;
+                    margin-left: 6px;
                   }
 
-                  ul.entry-modal-more-menu {
-                    background-color: white;
-                    border: 1px solid rgba(177,184,192,0.50);
-                    box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-                    border-radius: 5px;
-                    margin: 8px 0;
-                    padding: 10px 16px 6px;
-                    min-height: 50px;
-                    list-style-type: none;
-                    width: 100px;
+                  div.dropdown-menu {
+                    position: absolute;
+                    top: -44px;
+                    left: -91px;
+                    border: none;
+                    outline: none;
+                    box-shadow: none;
+                    background-color: transparent;
+                    padding: 0 0 .3em;
 
-                    li {
-                      margin: 6px 0;
-                      @include avenir_M();
-                      font-size: 14px;
-                      color: $oc_gray_7;
-                      cursor: pointer;
-                      background-color: transparent;
+                    div.triangle {
+                      position: absolute;
+                      top: 50px;
+                      left: 90px;
+                      background-color: white;
+                      border-top: 1px solid rgba(177,184,192,0.50);
+                      border-left: 1px solid rgba(177,184,192,0.50);
+                      transform: rotate(135deg);
+                      width: 20px;
+                      height: 20px;
+                    }
 
-                      &:hover {
-                        text-decoration: underline;
+                    ul.entry-modal-more-menu {
+                      background-color: white;
+                      border: 1px solid rgba(177,184,192,0.50);
+                      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                      border-radius: 5px;
+                      margin: 8px 0;
+                      padding: 10px 16px 6px;
+                      min-height: 50px;
+                      list-style-type: none;
+                      width: 100px;
+
+                      li {
+                        margin: 6px 0;
+                        @include avenir_M();
+                        font-size: 14px;
+                        color: $oc_gray_7;
+                        cursor: pointer;
                         background-color: transparent;
+
+                        &:hover {
+                          text-decoration: underline;
+                          background-color: transparent;
+                        }
                       }
                     }
                   }
