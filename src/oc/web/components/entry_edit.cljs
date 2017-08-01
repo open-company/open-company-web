@@ -237,6 +237,7 @@
                         (rum/local false ::media-chart)
                         (rum/local nil ::window-click-listener)
                         (rum/local nil ::last-selection)
+                        (rum/local false ::remove-no-scroll)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -254,7 +255,10 @@
                                        s)
                          :did-mount (fn [s]
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                      (dommy/add-class! (sel1 [:body]) :no-scroll)
+                                      (let [body (sel1 [:body])]
+                                        (when-not (dommy/has-class? body :no-scroll)
+                                          (reset! (::remove-no-scroll s) true)
+                                          (dommy/add-class! (sel1 [:body]) :no-scroll)))
                                       (setup-body-editor s)
                                       (reset! (::window-click-listener s)
                                        (events/listen js/window EventType/CLICK
@@ -292,7 +296,8 @@
                                         s)
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
-                                         (dommy/remove-class! (sel1 [:body]) :no-scroll)
+                                         (when @(::remove-no-scroll s)
+                                          (dommy/remove-class! (sel1 [:body]) :no-scroll))
                                          (events/unlistenByKey @(::window-click-listener s))
                                          s)}
   [s]

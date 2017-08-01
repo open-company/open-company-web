@@ -42,17 +42,9 @@
                                rum/reactive
                                (drv/drv :current-user-data)
                                (drv/drv :entry-editing)
-                               {:did-mount (fn [s]
-                                             ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                             (dommy/add-class! (sel1 [:body]) :no-scroll)
-                                             s)
-                                :after-render (fn [s]
+                               {:after-render (fn [s]
                                                 (when (not @(::first-render-done s))
                                                   (reset! (::first-render-done s) true))
-                                                s)
-                                :will-unmount (fn [s]
-                                                ;; Remove no-scroll class from the body tag
-                                                (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                                 s)}
   [s]
   (let [current-user-data (drv/react s :current-user-data)

@@ -26,9 +26,14 @@
                          rum/reactive
                          (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
+                         (rum/local false ::remove-no-scroll)
                          {:did-mount (fn [s]
-                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
+                                       ;; Add no-scroll to the body if it doesn't has it already
+                                       ;; to avoid scrolling while showing this modal
+                                       (let [body (sel1 [:body])]
+                                         (when-not (dommy/has-class? body :no-scroll)
+                                           (reset! (::remove-no-scroll s) true)
+                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
                                        s)
                           :after-render (fn [s]
                                           (when (not @(::first-render-done s))
@@ -39,7 +44,9 @@
                                           s)
                           :will-unmount (fn [s]
                                           ;; Remove no-scroll class from the body tag
-                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
+                                          ;; if it wasn't already there
+                                          (when @(::remove-no-scroll s)
+                                            (dommy/remove-class! (sel1 [:body]) :no-scroll))
                                           s)}
   "Customizable alert modal. It gets the following property from the :alert-modal derivative:
    :icon The src to use for an image, it's encapsulated in utils/cdn.
