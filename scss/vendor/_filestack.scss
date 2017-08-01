@@ -102,6 +102,26 @@ div.fsp-picker {
               background-color: rgba($oc_gray_7, 0.4);
               border-radius: 19px;
             }
+
+            span.fsp-icon--local_file_system {
+              background-image: cdnUrl("/img/ML/laptop-mac-blue.png");
+            }
+
+            span.fsp-icon--googledrive {
+              background-image: cdnUrl("/img/ML/google-drive-blue.png");
+            }
+
+            span.fsp-icon--dropbox {
+              background-image: cdnUrl("/img/ML/dropbox-blue.png");
+            }
+
+            span.fsp-icon--onedrive {
+              background-image: cdnUrl("/img/ML/onedrive-blue.png");
+            }
+
+            span.fsp-icon--box {
+              background-image: cdnUrl("/img/ML/box-blue.png");
+            }
           }
 
           span.fsp-icon--local_file_system {
@@ -111,7 +131,7 @@ div.fsp-picker {
           }
 
           span.fsp-icon--googledrive {
-            background-image: cdnUrl("/img/ML/gdrive.png");
+            background-image: cdnUrl("/img/ML/google-drive.png");
             background-position: center;
             background-size: 22px 19px;
           }
