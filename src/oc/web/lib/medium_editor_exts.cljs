@@ -37,23 +37,23 @@
 })
 
 (defn empty-paragraph? [el]
-  (and (= 1 (-> el .-childNodes .-length))
-       (= "BR" (some-> el .-childNodes (aget 0) .-tagName))))
+  (and (<= (-> el .-childNodes .-length) 1)
+       (empty? (.-nodeValue el))
+       (or (= "BR" (some-> el .-childNodes (aget 0) .-tagName))
+           (empty? (some-> el .-childNodes (aget 0) .-nodeValue)))))
 
 (def file-upload
-  (let [class "file-upload-btn"
-        hide-btn (fn []
-                    (js/console.log "hiding")
+  (let [hide-btn (fn []
                     (when-let [el (js/document.getElementById "file-upload-ui")]
-                      (js/console.log "   -hide-btn:" el)
                       (gstyle/setStyle el #js {:opacity 0})
+                      (.remove (.-classList el) "expanded")
                       (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
         pos-btn (fn [top-v]
                   (when-let [el (js/document.getElementById "file-upload-ui")]
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (+ top-v 136) "px")
+                                             :top (str (if (< top-v 136) (+ top-v 136) top-v) "px")
                                              :left "4px"})))
         show-btn (fn [_]
                    (utils/after 100
@@ -62,7 +62,6 @@
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))
                             offset-top (gobj/get el "offsetTop" 0)]
-                        (js/console.log "show-btn:" el offset-top)
                         (when (and sel el)
                           (if (and (empty-paragraph? el) offset-top)
                             (pos-btn offset-top)
@@ -74,4 +73,4 @@
                (doseq [el (.getEditorElements this)]
                  (.on (.-base this) el "click" (.bind show-btn this))
                  (.on (.-base this) el "keyup" (.bind show-btn this)))
-               (utils/after 100 #(hide-btn))))}))
+               (utils/after 1000 #(show-btn nil))))}))
