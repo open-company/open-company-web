@@ -117,8 +117,8 @@
                              "src=\"" (:url image) "\" "
                              "data-media-type=\"chart\" "
                              "data-thumbnail=\"" (:thumbnail image) "\" "
-                             "data-width=\"" (:width image) "\" "
-                             "data-height=\"" (:height image) "\" "
+                             "width=\"" (:width image) "\" "
+                             "height=\"" (:height image) "\" "
                             "/><br/><br/>")]
         (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
       (reset! (::last-selection s) nil)

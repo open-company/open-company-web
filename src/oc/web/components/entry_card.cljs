@@ -51,8 +51,8 @@
       (let [el (aget thumb-els el-num)
             $el (js/$ el)]
         (if (= (.-tagName el) "IMG")
-          (let [width (.data $el "width")
-                height (.data $el "height")]
+          (let [width (.attr $el "width")
+                height (.attr $el "height")]
             (when (and (not @found)
                        (or (<= width (* height 2))
                            (<= height (* width 2))))
