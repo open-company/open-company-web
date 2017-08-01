@@ -198,7 +198,7 @@
         "src=\"" chart-proxy-uri "\" "
         "class=\"carrot-no-preview\" "
         "width=\"550\" "
-        "height=\"550\" "
+        "height=\"430\" "
         "frameborder=\"0\" "
         "webkitallowfullscreen "
         "mozallowfullscreen "
