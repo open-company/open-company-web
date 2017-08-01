@@ -78,7 +78,7 @@ div.comments {
         div.comment-avatar {
           width: #{$comment_avatar_size}px;
           height: #{$comment_avatar_size}px;
-          background-position: center;
+          background-position: 50%;
           background-size: #{$comment_avatar_size}px #{$comment_avatar_size}px;
           border-radius: #{$comment_avatar_size / 2}px;
         }
