@@ -62,7 +62,8 @@ div.entry-modal-container {
 
         div.entry-left-column-content {
           padding: 24px 16px 30px 32px;
-          max-height: calc(100vh - 150px - 48px);
+          max-height: calc(100vh - 150px - 88px);
+          margin-bottom: 40px;
           overflow-x: hidden;
           overflow-y: scroll;
 
@@ -87,8 +88,7 @@ div.entry-modal-container {
             float: none;
             width: 100%;
             position: relative;
-            padding-bottom: 24px;
-            margin-bottom: 10px;
+            margin-bottom: 14px;
 
             div.entry-modal-content-headline {
               margin-top: 24px;

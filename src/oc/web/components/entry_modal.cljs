@@ -79,9 +79,9 @@
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
                                           (when-not @(::column-height s)
-                                            (reset! (::column-height s) (str (max 284 (.height (js/$ ".entry-left-column"))) "px"))
+                                            (reset! (::column-height s) (max 284 (.height (js/$ ".entry-left-column"))))
                                             (.load (js/$ ".entry-modal-content-body img")
-                                             #(reset! (::column-height s) (str (max 284 (.height (js/$ ".entry-left-column"))) "px"))))
+                                             #(reset! (::column-height s) (max 284 (.height (js/$ ".entry-left-column"))))))
                                           s)
                           :will-unmount (fn [s]
                                           ;; Remove no-scroll class from the body tag
@@ -104,9 +104,9 @@
           {:on-click #(close-clicked s)}]
         [:div.entry-modal-inner.group
           [:div.entry-left-column
-            {:style (when column-height {:minHeight column-height})}
+            {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.entry-left-column-content
-              {:style (when column-height {:minHeight column-height})}
+              {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
               [:div.entry-modal-head.group
                 [:div.entry-modal-head-left
                   (user-avatar-image (first (:author entry-data)))
@@ -157,6 +157,6 @@
                           {:on-click #(delete-clicked % entry-data)}
                           "Delete"]]]]]]]]
           [:div.entry-right-column
-            {:style (when column-height {:minHeight column-height})}
+            {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.entry-right-column-content
               (comments (:uuid entry-data))]]]]]))
