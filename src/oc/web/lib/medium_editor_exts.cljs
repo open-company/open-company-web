@@ -54,7 +54,7 @@
                                              :display "block"
                                              :opacity 1
                                              :top (str (if (< top-v 136) (+ top-v 136) top-v) "px")
-                                             :left "4px"})))
+                                             :left "6px"})))
         show-btn (fn [_]
                    (utils/after 100
                     (fn []
