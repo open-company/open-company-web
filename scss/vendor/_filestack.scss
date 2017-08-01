@@ -1,3 +1,45 @@
+@mixin carrot_button(){
+  cursor: pointer;
+  outline: none;
+  border-width: 0;
+  opacity: 0.9;
+  background-color: #D4F6E4;
+  color: #0E8749;
+  font-weight: 900;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: .2em 1em;
+  transition: opacity 230ms, color 230ms, background-color 230ms;
+  padding-top: 9px;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.2 !important;
+  }
+
+  &:hover, &:focus {
+    background-color: #3FBD7C;
+    color: #FFFFFF;
+    opacity: 1;
+  }
+
+  &:active, &.active {
+    background-color: #0E8749;
+    color: white;
+  }
+
+  &:disabled, &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: #D4F6E4;
+      color: #0E8749;
+    }
+  }
+}
+
 div.fsp-picker {
   background-color: rgba(#FCFBF7,0.4) !important;
   @include avenir_M();
@@ -27,6 +69,12 @@ div.fsp-picker {
       }
 
       div.fsp-source-list {
+        .fsp-source-list__item.active {
+          display: inherit !important;
+          .fsp-source-list__label {
+            display: none;
+          }
+        }
         .fsp-source-list__item.active, .fsp-source-list__item:hover, .fsp-source-list__icon.fsp-icon {
           background-color: transparent;
         }
@@ -48,6 +96,20 @@ div.fsp-picker {
         }
 
         .fsp-source-list__item {
+
+          &.active {
+            span.fsp-source-list__icon {
+              background-color: rgba($oc_gray_7, 0.4);
+              border-radius: 19px;
+            }
+          }
+
+          span.fsp-icon--local_file_system {
+            background-image: cdnUrl("/img/ML/laptop-mac.png");
+            background-position: center;
+            background-size: 22px 19px;
+          }
+
           span.fsp-icon--googledrive {
             background-image: cdnUrl("/img/ML/gdrive.png");
             background-position: center;
@@ -123,46 +185,44 @@ div.fsp-picker {
             }
             span.fsp-nav__right {
               span.fsp-button.fsp-button--primary {
-                cursor: pointer;
-                outline: none;
-                border-width: 0;
-                opacity: 0.9;
-                background-color: #D4F6E4;
-                color: #0E8749;
-                font-weight: 900;
-                border-radius: 4px;
-                font-size: 16px;
-                line-height: 1.5;
-                padding: .2em 1em;
-                transition: opacity 230ms, color 230ms, background-color 230ms;
-                padding-top: 9px;
-
-                &:disabled {
-                  cursor: not-allowed;
-                  opacity: 0.2 !important;
-                }
-
-                &:hover, &:focus {
-                  background-color: #3FBD7C;
-                  color: #FFFFFF;
-                  opacity: 1;
-                }
-
-                &:active, &.active {
-                  background-color: #0E8749;
-                  color: white;
-                }
-
-                &:disabled, &.disabled {
-                  opacity: 0.3;
-                  cursor: not-allowed;
-
-                  &:hover {
-                    background-color: #D4F6E4;
-                    color: #0E8749;
-                  }
-                }
+                @include carrot_button();
               }
+            }
+          }
+        }
+
+        div.fsp-cloud {
+          div.fsp-source-auth__wrapper {
+            div.fsp-text__title.fsp-source-auth__el {
+              color: transparent;
+              position: relative;
+              @include avenir_M();
+
+              &:after {
+                content: "Select a file to upload";
+                position: absolute;
+                width: 100%;
+                top: 0;
+                left: 0;
+                text-align: center;
+                display: block;
+                font-size: 32px;
+                line-height: 44px;
+                color: #333333;
+              }
+            }
+            div.fsp-source-auth__el {
+              font-size: 16px;
+              line-height: 24px;
+              color: $oc_gray_7;
+              width: 100%;
+              text-align: center;
+              margin-top: 20px;
+            }
+
+            button.fsp-button__auth.fsp-source-auth__el {
+              @include carrot_button();
+              width: auto;
             }
           }
         }
