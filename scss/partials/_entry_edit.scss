@@ -1,4 +1,4 @@
-$add_media_animation: 230ms;
+$add_media_animation: 0ms;
 
 div.entry-edit-modal-container {
   width: 100%;
@@ -293,7 +293,7 @@ div.entry-edit-modal-container {
         background-color: white;
 
         button.media {
-          width: 24px;
+          width: 25px;
           height: 24px;
           background-position: 50%;
           background-size: 12px;
@@ -310,12 +310,13 @@ div.entry-edit-modal-container {
 
         button.add-media-bt {
           background-image: cdnUrl("/img/ML/add_media_plus_gray.svg");
+          background-position: 0px 0px;
           transition: transform $add_media_animation, margin-right $add_media_animation;
           float: left;
           margin-right: 0px;
           border: none;
           background-size: 24px;
-          border-radius: none;
+          border-radius: inherit;
 
           &.disabled {
             opacity: 0.2;

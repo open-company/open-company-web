@@ -270,7 +270,7 @@
                                             (.tooltip "hide")
                                             (.attr "data-original-title" "Insert media")
                                             (.tooltip "fixTitle")
-                                            (.tooltip "show"))
+                                            (.tooltip "hide"))
                                            ; If there was a last selection saved
                                            (when (and (not @(::media-photo s))
                                                       (not @(::media-video s))
@@ -418,7 +418,7 @@
                                                 (.tooltip "hide")
                                                 (.attr "data-original-title" "Close")
                                                 (.tooltip "fixTitle")
-                                                (.tooltip "show"))))))}]
+                                                (.tooltip "hide"))))))}]
 
           [:div.entry-edit-controls-medias-container
             {:class (when @(::media-expanded s) "expanded")}
