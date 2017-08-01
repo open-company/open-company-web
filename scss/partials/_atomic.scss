@@ -8,7 +8,7 @@
 .mlb-reset {
   cursor: pointer;
   outline: none;
-  border-width: 0;
+  border: none;
   background-color: transparent;
   opacity: 0.9;
 
@@ -25,7 +25,6 @@
 .mlb-default {
   background-color: #D4F6E4;
   color: #0E8749;
-  font-weight: 900;
   border-radius: 4px;
   height: 40px;
   font-size: 16px;
