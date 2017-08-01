@@ -99,7 +99,8 @@ div.fsp-picker {
 
           &.active {
             span.fsp-source-list__icon {
-              background-color: rgba($oc_gray_7, 0.4);
+              // background-color: rgba($oc_gray_7, 0.4);
+              border: 1px solid rgba($oc_gray_7, 0.4);
               border-radius: 19px;
             }
 
@@ -126,32 +127,58 @@ div.fsp-picker {
 
           span.fsp-icon--local_file_system {
             background-image: cdnUrl("/img/ML/laptop-mac.png");
-            background-position: center;
+            background-position: 50%;
             background-size: 22px 19px;
+
+            &:hover {
+              background-image: cdnUrl("/img/ML/laptop-mac-blue.png");
+            }
+          }
+
+          span.fsp-source-list__icon:hover {
+            // background-color: rgba($oc_gray_7, 0.4);
+            border: 1px solid rgba($oc_gray_7, 0.4);
+            border-radius: 19px;
           }
 
           span.fsp-icon--googledrive {
             background-image: cdnUrl("/img/ML/google-drive.png");
-            background-position: center;
+            background-position: 50%;
             background-size: 22px 19px;
+
+            &:hover {
+              background-image: cdnUrl("/img/ML/google-drive-blue.png");
+            }
           }
 
           span.fsp-icon--dropbox {
             background-image: cdnUrl("/img/ML/dropbox.png");
-            background-position: center;
+            background-position: 50%;
             background-size: 22px 19px;
+
+            &:hover {
+              background-image: cdnUrl("/img/ML/dropbox-blue.png");
+            }
           }
 
           span.fsp-icon--onedrive {
             background-image: cdnUrl("/img/ML/onedrive.png");
-            background-position: center;
+            background-position: 50%;
             background-size: 22px 19px;
+
+            &:hover {
+              background-image: cdnUrl("/img/ML/onedrive-blue.png");
+            }
           }
 
           span.fsp-icon--box {
             background-image: cdnUrl("/img/ML/box.png");
-            background-position: center;
+            background-position: 50%;
             background-size: 22px 19px;
+
+            &:hover {
+              background-image: cdnUrl("/img/ML/box-blue.png");
+            }
           }
         }
       }
@@ -167,6 +194,41 @@ div.fsp-picker {
 
         .fsp-picker__close-button, .fsp-picker__close-button:hover {
           background-color: transparent;
+        }
+
+        .fsp-header-text--visible {
+          position: relative;
+          color: white;
+          margin-top: 12px;
+
+          &:after {
+            content: "My Computer";
+            text-align: center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 18px;
+            color: $oc_gray_7;
+          }
+        }
+
+        .fsp-picker__close-button.fsp-icon--close-modal {
+          width: 32px;
+          height: 32px;
+          background-color: $carrot_light_blue;
+          border-radius: 4px;
+          background-image: cdnUrl("/img/ML/board_remove_filter.png");
+          background-position: 50%;
+          background-repeat: no-repeat;
+          transition: 230ms;
+          opacity: 1;
+
+          &:hover {
+            background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
+            background-color: $carrot_text_blue;
+            opacity: 1;
+          }
         }
       }
 
