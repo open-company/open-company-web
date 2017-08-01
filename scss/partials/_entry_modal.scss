@@ -69,6 +69,7 @@ div.entry-modal-container {
           div.entry-modal-head{
             div.entry-modal-head-left {
               float: left;
+              min-width: 300px;
               @include entry-author();
             }
 
