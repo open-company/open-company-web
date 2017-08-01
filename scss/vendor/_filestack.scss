@@ -26,9 +26,54 @@ div.fsp-picker {
         border: inherit;
       }
 
-      .fsp-source-list__item.active, .fsp-source-list__item:hover, .fsp-source-list__icon.fsp-icon {
-        background-color: transparent;
+      div.fsp-source-list {
+        .fsp-source-list__item.active, .fsp-source-list__item:hover, .fsp-source-list__icon.fsp-icon {
+          background-color: transparent;
+        }
+
+        .fsp-source-list__item.active {
+          position: relative;
+          display: block;
+
+          &:after {
+            display: block;
+            width: 40px;
+            height: 40px;
+            top: 10px;
+            left: 10px;
+            border-radius: 20px;
+            background-color: rgba($oc_gray_7,0.4);
+            position: absolute;
+          }
+        }
+
+        .fsp-source-list__item {
+          span.fsp-icon--googledrive {
+            background-image: cdnUrl("/img/ML/gdrive.png");
+            background-position: center;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-icon--dropbox {
+            background-image: cdnUrl("/img/ML/dropbox.png");
+            background-position: center;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-icon--onedrive {
+            background-image: cdnUrl("/img/ML/onedrive.png");
+            background-position: center;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-icon--box {
+            background-image: cdnUrl("/img/ML/box.png");
+            background-position: center;
+            background-size: 22px 19px;
+          }
+        }
       }
+
     }
 
     div.fsp-modal__body {
@@ -49,6 +94,77 @@ div.fsp-picker {
         div.fsp-footer {
           background-color: white;
           border-top: none;
+
+          div.fsp-nav {
+
+            span.fsp-nav__left {
+
+              span.fsp-button.fsp-button--cancel {
+                cursor: pointer;
+                outline: none;
+                border-width: 0;
+                background-color: transparent;
+                opacity: 0.9;
+                background-color: transparent;
+                color: $carrot_dark_gray;
+                font-family: $oc_main_font;
+                font-weight: 900;
+
+                &:disabled {
+                  cursor: not-allowed;
+                  opacity: 0.2 !important;
+                }
+
+                &:hover {
+                  opacity: 1;
+                  text-decoration: underline;
+                }
+              }
+            }
+            span.fsp-nav__right {
+              span.fsp-button.fsp-button--primary {
+                cursor: pointer;
+                outline: none;
+                border-width: 0;
+                opacity: 0.9;
+                background-color: #D4F6E4;
+                color: #0E8749;
+                font-weight: 900;
+                border-radius: 4px;
+                font-size: 16px;
+                line-height: 1.5;
+                padding: .2em 1em;
+                transition: opacity 230ms, color 230ms, background-color 230ms;
+                padding-top: 9px;
+
+                &:disabled {
+                  cursor: not-allowed;
+                  opacity: 0.2 !important;
+                }
+
+                &:hover, &:focus {
+                  background-color: #3FBD7C;
+                  color: #FFFFFF;
+                  opacity: 1;
+                }
+
+                &:active, &.active {
+                  background-color: #0E8749;
+                  color: white;
+                }
+
+                &:disabled, &.disabled {
+                  opacity: 0.3;
+                  cursor: not-allowed;
+
+                  &:hover {
+                    background-color: #D4F6E4;
+                    color: #0E8749;
+                  }
+                }
+              }
+            }
+          }
         }
 
         div.fsp-drop-area {
