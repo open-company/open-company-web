@@ -102,8 +102,8 @@ div.ovals-container {
   }
 
   div.about-subline {
-    @include avenir_M();
-    font-size: 24px;
+    @include avenir_H();
+    font-size: 28px;
     letter-spacing: 0.2px;
     text-align: center;
     color: $carrot_dark_blue;
@@ -115,10 +115,6 @@ div.ovals-container {
       width: 100%;
       margin: 20px auto 0;
       font-size: 22px;
-    }
-
-    span.heavy {
-      @include avenir_H();
     }
   }
 
@@ -166,17 +162,165 @@ div.ovals-container {
     }
   }
 
+  div.paragraphs-bg-container {
+
+    @include mobile(){
+      background-image: cdnUrl("/img/ML/about_mobile_oval_bg.svg");
+      background-repeat: no-repeat;
+      height: auto;
+      background-position: 50% 0%;
+      background-size: 100%;
+      padding: 30px 50px;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+
+    @media screen and (max-width: 320px) {
+      padding: 10px 0;
+      margin: 0px auto;
+    }
+
+    @include big_web(){
+      background-image: cdnUrl("/img/ML/about_oval_bg.svg");
+      background-repeat: no-repeat;
+      background-position: 50%;
+      background-size: contain;
+      padding: 40px 0;
+    }
+  }
+
   div.paragraph {
-    @include avenir_M();
-    font-size: 24px;
+    @include avenir_BOOK();
+    font-size: 20px;
     text-align: center;
     color: $carrot_text_blue_2;
     max-width: 427px;
     margin: 20px auto 50px;
 
+    &:last-child {
+      @include avenir_H();
+    }
+
     @include mobile(){
       width: 100%;
-      font-size: 22px;
+    }
+  }
+}
+
+div.principles {
+  position: relative;
+  padding: 0 16px;
+
+  div.principle {
+    position: relative;
+    max-width: 746px;
+    margin: 76px auto 0;
+
+    @include mobile(){
+      text-align: center;
+      width: 100%;
+      text-align: center;
+    }
+
+    div.principle-logo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 80px;
+
+      @include mobile(){
+        position: relative;
+        left: 50%;
+        text-align: center;
+        margin-left: -40px;
+        margin-top: 20px;
+      }
+    }
+
+    div.principle-oval-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 251px;
+      height: 251px;
+      background-repeat: no-repeat;
+
+      @include mobile(){
+        width: 100%;
+        height: 100%;
+        margin-top: -30px;
+        background-position: 50% 0%;
+      }
+    }
+
+    div.principle-title {
+      padding-top: 90px;
+      font-size: 36px;
+      @include avenir_H();
+      max-width: 564px;
+      text-align: left;
+      margin-left: 160px;
+      color: #383b41;
+
+      @include mobile(){
+        width: 100%;
+        margin-left: 0px;
+        text-align: center;
+        padding-top: 30px;
+        font-size: 28px;
+        max-width: initial;
+      }
+    }
+
+    div.principle-description {
+      color: $carrot_text_blue_2;
+      @include avenir_BOOK();
+      font-size: 20px;
+      max-width: 564px;
+      text-align: left;
+      margin-left: 160px;
+      margin-top: 23px;
+
+      @include mobile(){
+        width: 100%;
+        margin-left: 0px;
+        max-width: initial;
+      }
+    }
+
+    &.principle-1 {
+
+      div.principle-logo {
+        background-image: cdnUrl("/img/ML/about_principle_1.svg");
+      }
+
+      div.principle-oval-bg {
+        background-image: cdnUrl("/img/ML/about_principle_1_oval.svg");
+      }
+    }
+
+    &.principle-2 {
+
+      div.principle-logo {
+        background-image: cdnUrl("/img/ML/about_principle_2.svg");
+      }
+
+      div.principle-oval-bg {
+        background-image: cdnUrl("/img/ML/about_principle_2_oval.svg");
+      }
+    }
+
+    &.principle-3 {
+
+      div.principle-logo {
+        background-image: cdnUrl("/img/ML/about_principle_3.svg");
+      }
+
+      div.principle-oval-bg {
+        background-image: cdnUrl("/img/ML/about_principle_3_oval.svg");
+      }
     }
   }
 }
