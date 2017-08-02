@@ -57,6 +57,15 @@
 
 (defn body-on-change [state]
   (when-let [body-el (sel1 [:div.entry-edit-body])]
+    ; Hide/show placeholder capturing the situation medium-editor ignores:
+    ; multiple empty Ps, img or iframes
+    (utils/after 1000
+     #(when-let [$body-el (js/$ "div.entry-edit-body.medium-editor-placeholder")]
+        (if (and (empty? (.text $body-el))
+                 (<= (.-length (.find $body-el "div, p")) 1)
+                 (zero? (.-length (.find $body-el "img, iframe"))))
+          (.removeClass $body-el "hide-placeholder")
+          (.addClass $body-el "hide-placeholder"))))
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
     (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
