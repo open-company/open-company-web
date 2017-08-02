@@ -280,6 +280,10 @@ div.entry-edit-modal-container {
         min-height: 85px;
         @include entry-body();
 
+        &.hide-placeholder:after {
+          display: none !important;
+        }
+
         &.medium-editor-placeholder:after {
           color: $oc_gray_7 !important;
         }

@@ -8,7 +8,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn dismiss-modal []
-  (dis/dispatch! [:input [:entry-editing :media-video] false]))
+  (dis/dispatch! [:input [:entry-editing :media-video] false])
+  (utils/after 100 #(.focus (sel1 [:div.entry-edit-body]))))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
@@ -45,7 +46,10 @@
                                {:after-render (fn [s]
                                                 (when (not @(::first-render-done s))
                                                   (reset! (::first-render-done s) true))
-                                                s)}
+                                                s)
+                                :did-mount (fn [s]
+                                            (utils/after 100 #(.focus (sel1 [:input.entry-video-modal-input])))
+                                            s)}
   [s]
   (let [current-user-data (drv/react s :current-user-data)
         entry-editing (drv/react s :entry-editing)]
@@ -59,7 +63,7 @@
         [:div.entry-video-modal-divider]
         [:div.entry-video-modal-content
           [:div.content-title "VIDEO LINK"]
-          [:input
+          [:input.entry-video-modal-input
             {:type "text"
              :value @(::video-url s)
              :on-change #(reset! (::video-url s) (.. % -target -value))
