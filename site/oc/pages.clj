@@ -53,7 +53,9 @@
       [:div.cta
         [:h1.headline "Team news that keeps everyone aligned"]
         [:div.subheadline
-          "Companies struggle to keep everyone on the same page.\nCarrot provides the big picture that brings them together."]
+          "Companies struggle to keep everyone on the same page."]
+        [:div.subheadline.second-line
+          "Carrot provides the big picture that brings them together."]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -245,8 +247,6 @@
         [:div.about-subline
           "It’s easy for teams to stay connected with workplace chat and live interactions. It’s awesome in the moment; but " [:span.heavy "spontaneous conversations make it difficult for everyone to have a common view of what’s important across the company"] "."]
         [:div.paragraphs-container.group
-          [:div.mobile-only.happy-face.yellow-happy-face]
-          [:div.mobile-only.happy-face.red-happy-face]
           [:div.paragraphs-bg-container.group
             [:div.paragraph
               "As teams grow, it becomes even more difficult to know what’s happening outside your immediate group. Key information gets lost in the noise."]
