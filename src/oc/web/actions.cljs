@@ -1102,3 +1102,18 @@
 (defmethod dispatcher/action :alert-modal-hide-done
   [db [_]]
   (dissoc db :alert-modal))
+
+(defmethod dispatcher/action :board-edit
+  [db [_ initial-board-data]]
+  (let [fixed-board-data (if initial-board-data
+                            initial-board-data
+                            {:name "" :slug "" :access "team"})]
+    (assoc db :board-editing fixed-board-data)))
+
+(defmethod dispatcher/action :board-edit-save
+  [db [_]]
+  db)
+
+(defmethod dispatcher/action :board-edit/dismiss
+  [db [_]]
+  (dissoc db :board-editing))
