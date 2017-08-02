@@ -87,7 +87,7 @@
                   ;; Settings button
                   (when-not (:read-only board-data)
                     (dom/button {:class "mlb-reset board-settings-bt"
-                                 :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))})))
+                                 :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
                            (not new-entry-edit)
