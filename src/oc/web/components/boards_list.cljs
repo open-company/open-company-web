@@ -59,8 +59,7 @@
             (when (and (not (responsive/is-tablet-or-mobile?))
                        (utils/link-for (:links org-data) "create"))
               (dom/button {:class "left-boards-list-top-title-button btn-reset right"
-                           :on-click #(when (nil? (:foce-key data))
-                                        (dis/dispatch! [:input [:create-board] ""]))
+                           :on-click #(dis/dispatch! [:board-edit nil])
                            :title "Create a new board"
                            :data-placement "top"
                            :data-toggle "tooltip"
