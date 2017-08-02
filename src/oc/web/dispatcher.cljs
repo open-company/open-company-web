@@ -145,6 +145,9 @@
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
+   :board-editing       [[:base]
+                          (fn [base]
+                            (:board-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]})
