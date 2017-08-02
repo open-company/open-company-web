@@ -115,7 +115,7 @@
       (let [image-html (str "<img "
                              "class=\"carrot-no-preview\" "
                              "src=\"" (:url image) "\" "
-                             "data-media-type=\"chart\" "
+                             "data-media-type=\"image\" "
                              "data-thumbnail=\"" (:thumbnail image) "\" "
                              "width=\"" (:width image) "\" "
                              "height=\"" (:height image) "\" "
