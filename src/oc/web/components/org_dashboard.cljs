@@ -16,6 +16,7 @@
             [oc.web.components.welcome-screen :refer (welcome-screen)]
             [oc.web.components.entry-modal :refer (entry-modal)]
             [oc.web.components.entry-edit :refer (entry-edit)]
+            [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -120,6 +121,8 @@
             (entry-modal (dis/entry-data)))
           (when (:entry-editing data)
             (entry-edit))
+          (when (:board-editing data)
+            (board-edit))
           (when (:alert-modal data)
             (alert-modal))
           (when (and (:entry-editing data)
