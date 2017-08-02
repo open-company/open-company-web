@@ -60,7 +60,7 @@
               [:div.title
                 "Share news more broadly"]
               [:div.subtitle
-                "By default, updates are accessible by your team; but they can also be made public. Ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]
+                "Updates can also be made public - ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->

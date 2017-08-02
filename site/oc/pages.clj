@@ -172,7 +172,7 @@
           [:div.title
             " Share news more broadly"]
           [:div.subtitle
-            " By default, updates are accessible by your team; but they can also be made public. Ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]])
+            "Updates can also be made public - ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]])
 
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."

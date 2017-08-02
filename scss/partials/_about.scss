@@ -110,6 +110,7 @@ div.ovals-container {
     max-width: 767px;
     margin: 0px auto 40px;
     padding-top: 50px;
+    text-align: left;
 
     @include mobile(){
       width: 100%;
@@ -171,13 +172,18 @@ div.ovals-container {
     font-size: 24px;
     text-align: center;
     color: $carrot_text_blue_2;
-    max-width: 427px;
     margin: 20px auto 50px;
+    text-align: left;
+    max-width: 767px;
 
     @include mobile(){
       width: 100%;
       font-size: 22px;
     }
+  }
+
+  &:last-child {
+    font-size: 28px;
   }
 }
 
