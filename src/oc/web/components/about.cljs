@@ -30,37 +30,18 @@
           [:div.ovals-container-face.face-purple]
 
           [:div.about-subline
-            "People are hyper-connected in the moment, but still struggle to know what’s really happening across the company."]
+            "It’s easy for teams to stay connected with workplace chat and live interactions. It’s awesome in the moment; but " [:span.heavy "spontaneous conversations make it difficult for everyone to have a common view of what’s important across the company"] "."]
           [:div.paragraphs-container.group
             [:div.mobile-only.happy-face.yellow-happy-face]
             [:div.mobile-only.happy-face.red-happy-face]
             [:div.paragraphs-bg-container.group
               [:div.paragraph
-                "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
+                "As teams grow, it becomes even more difficult to know what’s happening outside your immediate group. Key information gets lost in the noise."]
               [:div.paragraph
-                "With that in mind we designed Carrot based on three principles:"]]
+                "Carrot helps growing teams to see the big picture - creating transparency and company alignment for everyone."]]
             [:div.mobile-only.happy-face.blue-happy-face]
             [:div.mobile-only.happy-face.purple-happy-face]
             [:div.mobile-only.happy-face.green-happy-face]]]
-
-        [:div.principles.group
-          [:div.principle.principle-1
-            [:div.principle-oval-bg]
-            [:div.principle-logo]
-            [:div.principle-title "It has to be easy or no one will play"]
-            [:div.principle-description "Alignment might be essential for success, but achieving it has never been easy or fun. We’re changing that. With a simple structure and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
-
-          [:div.principle.principle-2
-            [:div.principle-oval-bg]
-            [:div.principle-logo]
-            [:div.principle-title "The “big picture” should always be visible"]
-            [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
-
-          [:div.principle.principle-3
-            [:div.principle-oval-bg]
-            [:div.principle-logo]
-            [:div.principle-title "Alignment is valuable beyond the team, too"]
-            [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
 
       ] ;<!-- main -->
 

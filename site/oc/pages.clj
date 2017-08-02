@@ -51,9 +51,9 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "Company updates that get everyone aligned"]
+        [:h1.headline "Team news that keeps everyone aligned"]
         [:div.subheadline
-          "It's never been easier to build transparency and alignment\nwith your team, investors and customers"]
+          "Companies struggle to keep everyone on the same page.\nCarrot provides the big picture that brings them together."]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -78,23 +78,23 @@
             [:div.title
               "Get aligned fast"]
             [:div.subtitle
-              "Check out what’s new this week, or get new employees up to speed in a flash. Updates are in one place and easy to find."]]]
+              "Whether your team is local or distributed, the big picture keeps everyone focused on what’s most important."]]]
 
         [:div.illustration.illustration-2.group
           [:img {:src (cdn "/img/ML/home_page_il_2_444_414.svg")}]
           [:div.description.group
             [:div.title
-              "Keep investors up to date"]
+              "Simplify Investor Updates"]
             [:div.subtitle
-              "Investors and advisors are happier - and more helpful - when they’re in the loop!"]]]
+              "Create updates for investors, advisors and other stakeholders in less time."]]]
 
         [:div.illustration.illustration-3.group
           [:img {:src (cdn "/img/ML/home_page_il_3_355_350.svg")}]
           [:div.description.group
             [:div.title
-              "Build trust with a bigger audience"]
+              "Engage a bigger audience"]
             [:div.subtitle
-              "Share your updates with recruits, potential investors, and customers."]]]]
+              "Share the latest with recruits, potential investors, customers and other outside stakeholders to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]]
 
       (comment
         [:div.customers
@@ -170,9 +170,9 @@
         [:img {:src (cdn "/img/ML/features_il_5_333_274.svg")}]
         [:div.description.group
           [:div.title
-            "Share your news more broadly"]
+            " Share news more broadly"]
           [:div.subtitle
-            "Share something beautiful via email or on the Web with recruits, investors and customers. Updates and stories are accessible by teams, but can also be made public or private."]]]]])
+            " By default, updates are accessible by your team; but they can also be made public. Ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]])
 
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
@@ -243,38 +243,18 @@
         [:div.ovals-container-face.face-purple]
 
         [:div.about-subline
-          "People are hyper-connected in the moment, but still struggle to know what’s really happening across the company."]
+          "It’s easy for teams to stay connected with workplace chat and live interactions. It’s awesome in the moment; but " [:span.heavy "spontaneous conversations make it difficult for everyone to have a common view of what’s important across the company"] "."]
         [:div.paragraphs-container.group
           [:div.mobile-only.happy-face.yellow-happy-face]
           [:div.mobile-only.happy-face.red-happy-face]
           [:div.paragraphs-bg-container.group
             [:div.paragraph
-              "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
+              "As teams grow, it becomes even more difficult to know what’s happening outside your immediate group. Key information gets lost in the noise."]
             [:div.paragraph
-              "With that in mind we designed Carrot based on three principles:"]]
+              "Carrot helps growing teams to see the big picture - creating transparency and company alignment for everyone."]]
           [:div.mobile-only.happy-face.blue-happy-face]
           [:div.mobile-only.happy-face.purple-happy-face]
           [:div.mobile-only.happy-face.green-happy-face]]]
-
-      [:div.principles.group
-        [:div.principle.principle-1
-          [:div.principle-oval-bg]
-          [:div.principle-logo]
-          [:div.principle-title "It has to be easy or no one will play"]
-          [:div.principle-description "Alignment might be essential for success, but achieving it has never been easy or fun. We’re changing that. With a simple structure and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
-
-        [:div.principle.principle-2
-          [:div.principle-oval-bg]
-          [:div.principle-logo]
-          [:div.principle-title "The “big picture” should always be visible"]
-          [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
-
-        [:div.principle.principle-3
-          [:div.principle-oval-bg]
-          [:div.principle-logo]
-          [:div.principle-title "Alignment is valuable beyond the team, too"]
-          [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
-
     ] ;<!-- main -->
 
     [:div.about-alignment

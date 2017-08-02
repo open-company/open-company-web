@@ -58,9 +58,9 @@
             [:img {:src (utils/cdn "/img/ML/features_il_5_333_274.svg")}]
             [:div.description.group
               [:div.title
-                "Share your news more broadly"]
+                "Share news more broadly"]
               [:div.subtitle
-                "Share something beautiful via email or on the Web with recruits, investors and customers. Updates and stories are accessible by teams, but can also be made public or private."]]]]
+                "By default, updates are accessible by your team; but they can also be made public. Ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
