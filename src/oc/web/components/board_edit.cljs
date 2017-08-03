@@ -90,7 +90,7 @@
                 :let [chs (if @(::slack-channel s)
                             (filter-team-channels (:channels t) @(::slack-channel s))
                             (:channels t))
-                      show-slack-team-name (and (pos? (count slack-teams))
+                      show-slack-team-name (and (> (count slack-teams) 1)
                                                 (pos? (count chs)))]]
             [:div.slack-team
               {:class (when show-slack-team-name "show-slack-name")
