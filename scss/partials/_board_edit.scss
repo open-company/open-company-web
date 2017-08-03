@@ -294,21 +294,41 @@ div.board-edit-container {
     top: 512px;
     overflow-y: scroll;
 
-    div.channel {
-      width: 100%;
-      padding: 0.4rem 0.8rem;
-      color: $carrot_dark_gray;
-      @include avenir_M();
-      font-size: 14px;
-      cursor: pointer;
+    div.slack-team{
 
-      &:hover {
-        text-decoration: underline;
+      &.show-slack-name {
+        div.channel {
+          padding: 0.4rem 1rem;
+        }
       }
 
-      span.ch {
-        font-size: 16px;
-        margin-right: 5px;
+      div.slack-team-name {
+        @include avenir_M();
+        font-size: 14px;
+        color: $carrot_light_gray;
+        padding: 0.4rem 0.8rem;
+      }
+
+      div.channel {
+        width: 100%;
+        padding: 0.4rem 0.8rem;
+        color: $carrot_dark_gray;
+        @include avenir_M();
+        font-size: 14px;
+        cursor: pointer;
+
+        &:hover {
+          span.ch {
+            text-decoration: underline;
+          }
+        }
+
+        span.ch-prefix {
+          @include avenir_R()
+          font-size: 16px;
+          color: $carrot_light_gray_1;
+          margin-right: 4px;
+        }
       }
     }
   }

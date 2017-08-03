@@ -28,18 +28,21 @@
                         (drv/drv :board-editing)
                         (drv/drv :current-user-data)
                         (drv/drv :org-data)
+                        (drv/drv :board-data)
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
                         (rum/local "" ::slack-channel)
-                        (rum/local [] ::channels)
                         (rum/local false ::show-channels-dropdown)
                         (rum/local nil ::window-click)
                         (rum/local true ::slack-enabled)
                         {:will-mount (fn [s]
                                       (dis/dispatch! [:teams-get])
+                                      (let [board-data @(drv/get-ref s :board-data)]
+                                        (when (:channel-id board-data)
+                                          (reset! (::slack-channel s) (or (str "#" (:channel-name board-data)) ""))))
                                       s)
                          :did-remount (fn [s]
                                         (when (and (not @(drv/get-ref s :team-channels))
@@ -67,11 +70,6 @@
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
                                          s)
-                         :before-render (fn [s]
-                                          (let [chs (:channels (first @(drv/get-ref s :team-channels)))]
-                                            (if (empty? @(::slack-channel s))
-                                              (assoc s ::channels (atom chs))
-                                              (assoc s ::channels (atom (filter-team-channels chs @(::slack-channel s)))))))
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
@@ -81,21 +79,36 @@
   (let [current-user-data (drv/react s :current-user-data)
         board-editing (drv/react s :board-editing)
         new-board? (not (contains? board-editing :links))
-        show-slack-channels? (not (empty? (:slug board-editing)))]
+        show-slack-channels? (not (empty? (:slug board-editing)))
+        slack-teams (drv/react s :team-channels)]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       (when @(::show-channels-dropdown s)
         [:div.board-edit-slack-channels-dropdown
-          (for [c @(::channels s)]
-            [:div.channel
-              {:value (:id c)
-               :on-click #(do
-                            (dis/dispatch! [:input [:board-editing :channel] c])
-                            (reset! (::slack-channel s) (str "#" (:name c)))
-                            (reset! (::show-channels-dropdown s) false))}
-              [:span.ch "#"]
-              (:name c)])])
+          (for [t slack-teams
+                :let [chs (if @(::slack-channel s)
+                            (filter-team-channels (:channels t) @(::slack-channel s))
+                            (:channels t))
+                      show-slack-team-name (and (pos? (count slack-teams))
+                                                (pos? (count chs)))]]
+            [:div.slack-team
+              {:class (when show-slack-team-name "show-slack-name")
+               :key (str "slack-chs-dd-" (:slack-org-id t))}
+              (when show-slack-team-name
+                [:div.slack-team-name (:name t)])
+              (for [c chs]
+               [:div.channel
+                 {:value (:id c)
+                  :key (str "slack-chs-dd-" (:slack-org-id t) "-" (:id c))
+                  :on-click #(do
+                               (dis/dispatch! [:input [:board-editing :channel-id] (:id c)])
+                               (dis/dispatch! [:input [:board-editing :channel-name] (:name c)])
+                               (dis/dispatch! [:input [:board-editing :slack-org-id] (:slack-org-id t)])
+                               (reset! (::slack-channel s) (str "#" (:name c)))
+                               (reset! (::show-channels-dropdown s) false))}
+                 [:span.ch-prefix "#"]
+                 [:span.ch (:name c)]])])])
       [:div.board-edit
         {:class (when show-slack-channels? "show-slack-channels")}
         [:div.board-edit-header.group
