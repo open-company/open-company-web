@@ -141,6 +141,14 @@ div.board-edit-container {
         height: 96px;
         margin-top: 6px;
 
+        div.tooltip {
+          .tooltip-inner {
+            white-space: normal;
+            max-width: 150px;
+            text-align: center;
+          }
+        }
+
         div.board-edit-access-bt {
           width: 33%;
           border: 1px solid rgba($carrot_light_gray_1, 0.5);
@@ -165,6 +173,7 @@ div.board-edit-container {
 
           &.selected {
             border: 2px solid $carrot_text_blue;
+            background-position: 50% 14px;
             padding: 0px;
           }
 
