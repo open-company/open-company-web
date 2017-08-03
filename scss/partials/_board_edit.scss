@@ -72,8 +72,23 @@ div.board-edit-container {
         color: $oc_gray_7;
       }
 
-      div.board-edit-name-label {
+      div.board-edit-name-label-container {
         margin-top: 16px;
+        height: 22px;
+
+        div.board-edit-name-label {
+          width: 85px;
+          float: left;
+          margin-top: 4px;
+        }
+
+        div.board-name-error {
+          color: $carrot_orange;
+          font-size: 16px;
+          @include avenir_R();
+          margin-left: 10px;
+          float: left;
+        }
       }
 
       input.board-edit-name-field {
@@ -93,6 +108,10 @@ div.board-edit-container {
           @include avenir_M();
           font-size: 14px;
           color: $carrot_light_gray_1;
+        }
+
+        &.board-name-error {
+          border: 1px solid $carrot_orange;
         }
       }
 
@@ -171,12 +190,28 @@ div.board-edit-container {
     div.board-edit-footer {
       height: 50px;
 
-      button {
+      div.board-edit-footer-left {
+        float: left;
+        button {
+          float: left;
+          margin-right: 16px;
+          padding-left: 0px;
+          text-align: left;
+        }
+      }
+
+      div.board-edit-footer-right {
         float: right;
-        width: 115px;
+        button {
+          float: right;
+          margin-left: 16px;
+          width: 115px;
+        }
+      }
+
+      button {
         height: 40px;
         margin-top: 10px;
-        margin-left: 16px;
       }
     }
   }

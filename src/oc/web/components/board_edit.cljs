@@ -46,11 +46,17 @@
             [:div.title "Editing " [:span.board-name (:name board-editing)]])]
         [:div.board-edit-divider]
         [:div.board-edit-body
-          [:div.board-edit-label.board-edit-name-label "BOARD NAME"]
+          [:div.board-edit-name-label-container.group
+            [:div.board-edit-label.board-edit-name-label "BOARD NAME"]
+            (when (:board-name-error board-editing)
+              [:div.board-name-error (:board-name-error board-editing)])]
           [:input.board-edit-name-field
             {:type "text"
+             :class (when (:board-name-error board-editing) "board-name-error")
              :value (:name board-editing)
-             :on-change #(dis/dispatch! [:input [:board-editing :name] (.. % -target -value)])
+             :on-change #(do
+                          (dis/dispatch! [:input [:board-editing :name] (.. % -target -value)])
+                          (dis/dispatch! [:input [:board-editing :board-name-error] nil]))
              :placeholder "Product, Development, Finance, Operations, etc."}]
           [:div.board-edit-label.board-edit-access-label "BOARD PERMISSIONS" [:span.more-info]]
           [:div.board-edit-access-field.group
@@ -68,13 +74,28 @@
               [:span.board-edit-access-title "Public"]]]]
         [:div.board-edit-divider]
         [:div.board-edit-footer
-          [:button.mlb-reset.mlb-default
-            {:type "button"
-             :disabled (or (empty? (:name board-editing))
-                           (empty? (:access board-editing)))
-             :on-click #(dis/dispatch! [:board-edit-save])}
-            (if new-board? "Create" "Save")]
-          [:button.mlb-reset.mlb-link-black
-            {:type "button"
-             :on-click #(close-clicked s)}
-            "Cancel"]]]]))
+          [:div.board-edit-footer-left
+            (when (and (not (empty? (:slug board-editing)))
+                       (utils/link-for (:links board-editing) "delete"))
+              [:button.mlb-reset.mlb-link-black
+                {:on-click (fn []
+                            (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
+                                                               :message "Delete this board?"
+                                                               :first-button-title "No"
+                                                               :first-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                                               :second-button-title "Yes"
+                                                               :second-button-cb #(do
+                                                                                    (dis/dispatch! [:board-delete (:slug board-editing)])
+                                                                                    (dis/dispatch! [:alert-modal-hide]))}]))}
+                "Delete"])]
+          [:div.board-edit-footer-right.group
+            [:button.mlb-reset.mlb-default
+              {:type "button"
+               :disabled (or (empty? (:name board-editing))
+                             (empty? (:access board-editing)))
+               :on-click #(dis/dispatch! [:board-edit-save])}
+              (if new-board? "Create" "Save")]
+            [:button.mlb-reset.mlb-link-black
+              {:type "button"
+               :on-click #(close-clicked s)}
+              "Cancel"]]]]]))
