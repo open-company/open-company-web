@@ -199,7 +199,7 @@
 
 (defn patch-board [data]
   (when data
-    (let [board-data (select-keys data [:name :slug :access])
+    (let [board-data (select-keys data [:name :slug :access :slack-org-id :channel-id :channel-name])
           json-data (cljs->json board-data)
           board-patch-link (utils/link-for (:links data) "partial-update")]
       (storage-patch (relative-href (:href board-patch-link))
