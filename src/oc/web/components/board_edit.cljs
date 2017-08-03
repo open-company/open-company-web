@@ -47,17 +47,9 @@
                                           (js/console.log "   reset! slack-channel" (or (str "#" (:channel-name (:slack-mirror board-data))) ""))
                                           (reset! (::slack-channel s) (or (str "#" (:channel-name (:slack-mirror board-data))) ""))))
                                       s)
-                         :did-remount (fn [s]
-                                        (js/console.log "board-edit/did-remount")
-                                        (when (and (not @(drv/get-ref s :team-channels))
-                                                   (not @(::team-channels-requested s)))
-                                          (when-let [team-data @(drv/get-ref s :team-data)]
-                                            (js/console.log "   team-channels-request")
-                                            (reset! (::team-channels-requested s) true)
-                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                        s)
                          :did-mount (fn [s]
                                       (js/console.log "board-edit/did-mount")
+                                      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
                                       (when (and (not @(drv/get-ref s :team-channels))
@@ -78,6 +70,15 @@
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
                                          s)
+                         :did-remount (fn [s]
+                                        (js/console.log "board-edit/did-remount")
+                                        (when (and (not @(drv/get-ref s :team-channels))
+                                                   (not @(::team-channels-requested s)))
+                                          (when-let [team-data @(drv/get-ref s :team-data)]
+                                            (js/console.log "   team-channels-request")
+                                            (reset! (::team-channels-requested s) true)
+                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
+                                        s)
                          :will-unmount (fn [s]
                                          (js/console.log "board-edit/will-unmount")
                                          ;; Remove no-scroll class from the body tag
