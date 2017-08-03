@@ -70,6 +70,8 @@
         [:div.board-edit-footer
           [:button.mlb-reset.mlb-default
             {:type "button"
+             :disabled (or (empty? (:name board-editing))
+                           (empty? (:access board-editing)))
              :on-click #(dis/dispatch! [:board-edit-save])}
             (if new-board? "Create" "Save")]
           [:button.mlb-reset.mlb-link-black

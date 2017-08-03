@@ -716,13 +716,6 @@
       (api/create-org (:name org-data) (:logo-url org-data))))
   db)
 
-(defmethod dispatcher/action :board-create
-  [db [_]]
-  (let [board-name (:create-board db)]
-    (when-not (string/blank? board-name)
-      (api/create-board board-name)))
-  db)
-
 (defmethod dispatcher/action :private-board-add
   [db [_]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
@@ -1112,6 +1105,11 @@
 
 (defmethod dispatcher/action :board-edit-save
   [db [_]]
+  (let [board-data (:board-editing db)]
+    (if (and (string/blank? (:slug board-data))
+             (not (string/blank? (:name board-data))))
+      (api/create-board (:name board-data) (:access board-data))
+      (api/patch-board board-data)))
   db)
 
 (defmethod dispatcher/action :board-edit/dismiss
