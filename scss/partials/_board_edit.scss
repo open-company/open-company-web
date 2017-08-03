@@ -7,6 +7,7 @@ div.board-edit-container {
   background-color: rgba(250,250,257,0.95);
   z-index: #{$navbar_zindex + 100};
   transition: opacity 180ms ease-in;
+  overflow-y: scroll;
 
   &.will-appear {
     opacity: 0;
@@ -26,6 +27,22 @@ div.board-edit-container {
     border-radius: 8px;
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
     padding: 24px 16px;
+
+    &.show-slack-channels {
+      height: 500px;
+    }
+
+    span.more-info {
+      width: 16px;
+      height: 16px;
+      background-image: cdnUrl("/img/ML/board_edit_more_info.svg");
+      background-size: 16px 16px;
+      background-position: 50%;
+      display: inline-block;
+      margin-left: 10px;
+      margin-bottom: -1px;
+      opacity: 0.5;
+    }
 
     div.board-edit-header {
       height: 44px;
@@ -117,18 +134,6 @@ div.board-edit-container {
 
       div.board-edit-access-label {
         margin-top: 26px;
-
-        span.more-info {
-          width: 16px;
-          height: 16px;
-          background-image: cdnUrl("/img/ML/board_edit_more_info.svg");
-          background-size: 16px 16px;
-          background-position: 50%;
-          display: inline-block;
-          margin-left: 10px;
-          margin-bottom: -1px;
-          opacity: 0.5;
-        }
       }
 
       div.board-edit-access-field {
@@ -187,6 +192,58 @@ div.board-edit-container {
       }
     }
 
+    div.board-edit-slack-channels-container {
+      background-color: rgba(#F2F1ED, 0.3);
+      height: 114px;
+      border-bottom: 1px solid rgba($carrot_light_gray_1, 0.3);
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      padding: 16px;
+
+      div.board-edit-slack-channels-label {
+        div.title {
+          font-size: 16px;
+          color: $carrot_dark_gray;
+          @include avenir_M();
+          float: left;
+          width: 70%;
+        }
+
+        div.carrot-checkbox {
+          float: right;
+        }
+      }
+
+      div.board-edit-slack-channels-field {
+        margin: 16px 0px;
+        position: relative;
+
+        input.board-edit-slack-channel {
+          width: 100%;
+          height: 40px;
+          border-radius: 2px;
+          background-color: white;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          @include avenir_M();
+          font-size: 14px;
+          color: $oc_gray_7;
+          padding: 0.4rem 0.8rem;
+          outline: none;
+
+          &[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
+
+          @include placeholder() {
+            @include avenir_M();
+            font-size: 14px;
+            color: $carrot_light_gray_1;
+          }
+        }
+      }
+    }
+
     div.board-edit-footer {
       height: 50px;
 
@@ -212,6 +269,37 @@ div.board-edit-container {
       button {
         height: 40px;
         margin-top: 10px;
+      }
+    }
+  }
+
+  div.board-edit-slack-channels-dropdown {
+    position: absolute;
+    z-index: #{$navbar_zindex + 103};
+    width: 520px;
+    max-height: 184px;
+    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    background-color: white;
+    left: 50%;
+    margin-left: -260px;
+    top: 512px;
+    overflow-y: scroll;
+
+    div.channel {
+      width: 100%;
+      padding: 0.4rem 0.8rem;
+      color: $carrot_dark_gray;
+      @include avenir_M();
+      font-size: 14px;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      span.ch {
+        font-size: 16px;
+        margin-right: 5px;
       }
     }
   }
