@@ -206,10 +206,14 @@
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:board (json->cljs body)])
-          (dispatcher/dispatch! [:board-edit/dismiss])
-          ;; Refresh the org data to make sure the list of boards is updated
-          (get-org (dispatcher/org-data)))))))
+          (if (= status 409)
+            ; Board name exists
+            (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
+            (do
+              (dispatcher/dispatch! [:board (json->cljs body)])
+              (dispatcher/dispatch! [:board-edit/dismiss])
+              ;; Refresh the org data to make sure the list of boards is updated
+              (get-org (dispatcher/org-data)))))))))
 
 (defn patch-org [data]
   (when data
@@ -584,8 +588,12 @@
          :json-params (cljs->json {:name board-name :access board-access})}
         (fn [{:keys [success status body]}]
           (let [board-data (if success (json->cljs body) {})]
-            (dispatcher/dispatch! [:board board-data])
-            (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))
+            (if (= status 409)
+              ; Board name exists
+              (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
+              (do
+                (dispatcher/dispatch! [:board board-data])
+                (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))))
 
 (defn add-author
   "Given a user-id add him as an author to the current org.
