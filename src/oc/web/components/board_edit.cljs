@@ -166,12 +166,19 @@
                                                   (when-not %
                                                     (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
             [:div.board-edit-slack-channels-field
+              {:class (when (not @(::slack-enabled s)) "disabled")}
               [:input.board-edit-slack-channel
                 {:value @(::slack-channel s)
                  :on-focus (fn [] (utils/after 100 #(reset! (::show-channels-dropdown s) true)))
                  :on-change #(reset! (::slack-channel s) (.. % -target -value))
                  :disabled (not @(::slack-enabled s))
-                 :placeholder "Select Channel..."}]]])
+                 :placeholder "Select Channel..."}]
+              [:i.fa
+                {:class (utils/class-set {:fa-angle-down (not @(::show-channels-dropdown s))
+                                          :fa-angle-up @(::show-channels-dropdown s)})
+                 :on-click #(do
+                              (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
+                              (utils/event-stop %))}]]])
         [:div.board-edit-footer
           [:div.board-edit-footer-left
             (when (and (not (empty? (:slug board-editing)))
