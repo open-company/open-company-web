@@ -41,8 +41,8 @@
                         {:will-mount (fn [s]
                                       (dis/dispatch! [:teams-get])
                                       (let [board-data @(drv/get-ref s :board-data)]
-                                        (when (:channel-id board-data)
-                                          (reset! (::slack-channel s) (or (str "#" (:channel-name board-data)) ""))))
+                                        (when (:channel-id (:slack-mirror board-data))
+                                          (reset! (::slack-channel s) (or (str "#" (:channel-name (:slack-mirror board-data))) ""))))
                                       s)
                          :did-remount (fn [s]
                                         (when (and (not @(drv/get-ref s :team-channels))
@@ -102,9 +102,9 @@
                  {:value (:id c)
                   :key (str "slack-chs-dd-" (:slack-org-id t) "-" (:id c))
                   :on-click #(do
-                               (dis/dispatch! [:input [:board-editing :channel-id] (:id c)])
-                               (dis/dispatch! [:input [:board-editing :channel-name] (:name c)])
-                               (dis/dispatch! [:input [:board-editing :slack-org-id] (:slack-org-id t)])
+                               (dis/dispatch! [:input [:board-editing :slack-mirror :channel-id] (:id c)])
+                               (dis/dispatch! [:input [:board-editing :slack-mirror :channel-name] (:name c)])
+                               (dis/dispatch! [:input [:board-editing :slack-mirror :slack-org-id] (:slack-org-id t)])
                                (reset! (::slack-channel s) (str "#" (:name c)))
                                (reset! (::show-channels-dropdown s) false))}
                  [:span.ch-prefix "#"]
