@@ -161,7 +161,10 @@
                 "Connect comments to Slack"
                 [:span.more-info]]
               (carrot-checkbox {:selected @(::slack-enabled s)
-                                :did-change-cb #(reset! (::slack-enabled s) %)})]
+                                :did-change-cb #(do
+                                                  (reset! (::slack-enabled s) %)
+                                                  (when-not %
+                                                    (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
             [:div.board-edit-slack-channels-field
               [:input.board-edit-slack-channel
                 {:value @(::slack-channel s)
