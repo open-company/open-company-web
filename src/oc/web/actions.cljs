@@ -1131,6 +1131,6 @@
   [db [_ {:keys [org body]}]]
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
-          fixed-all-activity (utils/fix-all-activity body)]
+          fixed-all-activity (utils/fix-all-activity (:collection body))]
       (assoc-in db all-activity-key fixed-all-activity))
     db))
