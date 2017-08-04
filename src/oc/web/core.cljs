@@ -286,16 +286,6 @@
           (drv-root org-editor target))
         (oc-wall-handler "Please sign in." target params)))
 
-    (defroute board-create-route (urls/create-board ":org") {:as params}
-      (timbre/info "Routing board-create-route" (urls/create-board ":org"))
-      (if (jwt/jwt)
-        (let [org (:org (:params params))]
-          (pre-routing (:query-params params))
-          (router/set-route! [org "create-board"] {:org org :query-params (:query-params params)})
-          (post-routing)
-          (drv-root board-editor target))
-        (oc-wall-handler "Please sign in to access this organization." target params)))
-
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
@@ -303,13 +293,21 @@
       (cook/remove-cookie! :show-login-overlay)
       (router/redirect! urls/home))
 
-    (defroute org-page-route (urls/org ":org") {:as params}
-      (timbre/info "Routing org-page-route" (urls/org ":org"))
+    (defroute org-route (urls/org ":org") {:as params}
+      (timbre/info "Routing org-route" (urls/org ":org"))
       (org-handler "org" target #(om/component) params))
 
-    (defroute org-page-slash-route (str (urls/org ":org") "/") {:as params}
-      (timbre/info "Routing org-page-route" (str (urls/org ":org") "/"))
+    (defroute org-slash-route (str (urls/org ":org") "/") {:as params}
+      (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
       (org-handler "org" target #(om/component) params))
+
+    (defroute all-activity-route (urls/all-activity ":org") {:as params}
+      (timbre/info "Routing all-activity-route" (urls/all-activity ":org"))
+      (org-handler "all-activity" target org-dashboard params))
+
+    (defroute all-activity-slash-route (str (urls/all-activity ":org") "/") {:as params}
+      (timbre/info "Routing all-activity-slash-route" (str (urls/all-activity ":org") "/"))
+      (org-handler "all-activity" target org-dashboard params))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
@@ -431,12 +429,13 @@
                                  user-profile-route
                                  ;; Org routes
                                  org-list-route
-                                 org-page-route
-                                 org-page-slash-route
+                                 org-route
+                                 org-slash-route
+                                 all-activity-route
+                                 all-activity-slash-route
                                  org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
-                                 board-create-route
                                  ;; Boards
                                  boards-list-route
                                  board-route
