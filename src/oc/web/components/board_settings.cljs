@@ -295,9 +295,6 @@
           (:loading data)
           (dom/div (dom/h4 "Loading data..."))
 
-          (get-in data (dis/board-access-error-key (router/current-org-slug) (router/current-board-slug)))
-          (login-required)
-
           ;; Org profile
           :else
           (dom/div {}
