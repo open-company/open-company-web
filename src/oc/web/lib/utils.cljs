@@ -331,7 +331,7 @@
   (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :topic-name topic-name)))
+      (assoc :topic-name topic-name))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
