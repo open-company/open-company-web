@@ -17,6 +17,9 @@
 (defn org-data-key [org-slug]
   [(keyword org-slug) :org-data])
 
+(defn all-activity-key [org-slug]
+  [(keyword org-slug) :all-activity])
+
 (defn board-data-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :board-data])
 
@@ -90,6 +93,10 @@
                           (fn [base org-slug]
                             (when org-slug
                               (get-in base (org-data-key org-slug))))]
+   :all-activity        [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (all-activity-key org-slug))))]
    :team-data           [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -184,6 +191,15 @@
     (org-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
+
+(defn all-activity-data
+  "Get org all activity data."
+  ([]
+    (all-activity-data @app-state))
+  ([data]
+    (all-activity-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (all-activity-key org-slug))))
 
 (defn board-data
   "Get board data."
