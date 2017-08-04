@@ -699,6 +699,11 @@
     (let [reg (js/RegExp. "<img/?[^>]+(>|$)" "ig")]
       (.replace text reg ""))))
 
+(defn strip-br-tags [text]
+  (when text
+    (let [reg (js/RegExp. "<br[ ]{0,}/?>" "ig")]
+      (.replace text reg ""))))
+
 (defn disable-scroll []
   (dommy/add-class! (sel1 [:body]) :no-scroll)
   (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
