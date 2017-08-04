@@ -47,7 +47,9 @@
                   :style {:width (str (- left-boards-list-width 20) "px")}}
           ;; All activity
           (when (jwt/user-is-part-of-the-team (:team-id org-data))
-            (dom/button {:class "all-activity group"}
+            (dom/button
+              {:class "all-activity group"
+               :on-click #(router/nav! (oc-urls/all-activity))}
               (dom/div {:class "all-activity-icon"})
               (dom/span "All Activity")))
           ;; Boards list
