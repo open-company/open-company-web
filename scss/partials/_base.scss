@@ -29,10 +29,47 @@ html, body {
 
 .tooltip {
   z-index: 1500;
+  &.in {
+    opacity: 1;
+  }
+
+  // Change Bootstrap tooltip style
+  &.top .tooltip-arrow {
+    border-top-color: $carrot_dark_gray;
+  }
+  &.top-left .tooltip-arrow {
+    border-top-color: $carrot_dark_gray;
+  }
+  &.top-right .tooltip-arrow {
+    border-top-color: $carrot_dark_gray;
+  }
+  &.right .tooltip-arrow {
+    border-right-color: $carrot_dark_gray;
+  }
+  &.left .tooltip-arrow {
+    border-left-color: $carrot_dark_gray;
+  }
+  &.bottom .tooltip-arrow {
+    border-bottom-color: $carrot_dark_gray;
+  }
+  &.bottom-left .tooltip-arrow {
+    border-bottom-color: $carrot_dark_gray;
+  }
+  &.bottom-right .tooltip-arrow {
+    border-bottom-color: $carrot_dark_gray;
+  }
+
   .tooltip-inner {
+    background-color: $carrot_dark_gray;
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
+    opacity: 1;
+    @include avenir_H();
+    font-size: 12px;
+    color: white;
+    line-height: 16px;
+    letter-spacing: 0.5;
   }
 }
 
