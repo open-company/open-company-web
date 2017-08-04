@@ -141,21 +141,21 @@
                :data-toggle "tooltip"
                :data-placement "top"
                :title "All team members can view this board. Authors can edit and share."}
-              [:span.board-edit-access-title "Team" [:span.more-info]]]
+              [:span.board-edit-access-title "Team"]]
             [:div.board-edit-access-bt.board-edit-access-private-bt
               {:class (when (= (:access board-editing) "private") "selected")
                :on-click #(dis/dispatch! [:input [:board-editing :access] "private"])
                :data-toggle "tooltip"
                :data-placement "top"
                :title "Only invited team members can view, edit and share this board."}
-              [:span.board-edit-access-title "Private" [:span.more-info]]]
+              [:span.board-edit-access-title "Private"]]
             [:div.board-edit-access-bt.board-edit-access-public-bt
               {:class (when (= (:access board-editing) "public") "selected")
                :on-click #(dis/dispatch! [:input [:board-editing :access] "public"])
                :data-toggle "tooltip"
                :data-placement "top"
                :title "This board is public to everyone and could show up in search engines like Google. Team authors can edit and share information."}
-              [:span.board-edit-access-title "Public" [:span.more-info]]]]]
+              [:span.board-edit-access-title "Public"]]]]
         [:div.board-edit-divider]
         (when show-slack-channels?
           [:div.board-edit-slack-channels-container
