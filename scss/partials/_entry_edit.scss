@@ -360,7 +360,7 @@ div.entry-edit-modal-container {
             background-image: cdnUrl("/img/ML/media_photo.png");
             background-size: 12px 12px;
 
-            &.avtive, &:hover {
+            &:hover {
               background-image: cdnUrl("/img/ML/media_photo_blue.png");
             }
           }
@@ -370,7 +370,7 @@ div.entry-edit-modal-container {
             background-size: 12px 8px;
             top: -14px;
 
-            &.avtive, &:hover {
+            &:hover {
               background-image: cdnUrl("/img/ML/media_video_blue.png");
             }
           }
@@ -381,7 +381,7 @@ div.entry-edit-modal-container {
             background-size: 16px 8px;
             top: -14px;
 
-            &.avtive, &:hover {
+            &:hover {
               background-image: cdnUrl("/img/ML/media_chart_blue.png");
             }
           }
@@ -400,7 +400,6 @@ div.entry-edit-modal-container {
             button.media-video {
               margin-left: 30px;
               transform: rotate(360deg);
-              top: -14px;
             }
 
             button.media-chart {
