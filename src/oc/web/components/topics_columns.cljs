@@ -34,7 +34,8 @@
                                       board-filters] :as data} owner options]
 
   (did-mount [_]
-    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
     (let [current-entry-uuid (router/current-entry-uuid)
