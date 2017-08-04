@@ -119,6 +119,10 @@
         (api/get-board board-data)
         ; The board wasn't found, showing a 404 page
         (router/redirect-404!))
+      ;; If it's all activity page, loads all activity for the current org
+      (utils/in? (:route @router/path) "all-activity")
+      (api/get-all-activity org-data)
+      ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-board"))
            (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
@@ -128,7 +132,7 @@
            (not (utils/in? (:route @router/path) "su-snapshot-preview"))
            (not (utils/in? (:route @router/path) "email-verification")))
       (cond
-        ;; Redirect to the first board if only one is presnet
+        ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
         (if (responsive/is-tablet-or-mobile?)
           (router/nav! (oc-urls/boards))
@@ -1117,3 +1121,16 @@
 (defmethod dispatcher/action :board-edit/dismiss
   [db [_]]
   (dissoc db :board-editing))
+
+(defmethod dispatcher/action :all-activity-get
+  [db [_]]
+  (api/get-all-activity (dispatcher/org-data))
+  db)
+
+(defmethod dispatcher/action :all-activity-get/finish
+  [db [_ {:keys [org body]}]]
+  (if body
+    (let [all-activity-key (dispatcher/all-activity-key org)
+          fixed-all-activity (utils/fix-all-activity body)]
+      (assoc-in db all-activity-key fixed-all-activity))
+    db))

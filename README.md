@@ -199,6 +199,8 @@ provided in the table below:
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |
+|  :all-activity-get | UI | Start loading all activity. |
+|  :all-activity-get/finish | API | All activity data loaded, dispatch them. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
