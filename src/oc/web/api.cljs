@@ -834,6 +834,14 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:entry-delete/finish]))))))
 
+(defn get-all-activity [org-data]
+  (when org-data
+    (when-let [all-activity-link (utils/link-for (:links org-data) "activity")]
+      (storage-get (relative-href (:href all-activity-link))
+        {:headers (headers-for-link all-activity-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:all-activity-get/finish {:org (:slug org-data) :body (if success (json->cljs body) nil)}]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go
