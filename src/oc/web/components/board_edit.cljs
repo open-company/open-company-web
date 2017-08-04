@@ -40,22 +40,18 @@
                         (rum/local nil ::window-click)
                         (rum/local true ::slack-enabled)
                         {:will-mount (fn [s]
-                                      (js/console.log "board-edit/will-mount")
                                       (dis/dispatch! [:teams-get])
                                       (let [board-data @(drv/get-ref s :board-data)]
                                         (when (:channel-id (:slack-mirror board-data))
-                                          (js/console.log "   reset! slack-channel" (or (str "#" (:channel-name (:slack-mirror board-data))) ""))
                                           (reset! (::slack-channel s) (or (str "#" (:channel-name (:slack-mirror board-data))) ""))))
                                       s)
                          :did-mount (fn [s]
-                                      (js/console.log "board-edit/did-mount")
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
                                       (when (and (not @(drv/get-ref s :team-channels))
                                                  (not @(::team-channels-requested s)))
                                           (when-let [team-data @(drv/get-ref s :team-data)]
-                                            (js/console.log "   team-channels-request")
                                             (reset! (::team-channels-requested s) true)
                                             (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                       (reset! (::window-click s)
@@ -66,21 +62,17 @@
                                              (reset! (::show-channels-dropdown s) false))))
                                       s)
                          :after-render (fn [s]
-                                         (js/console.log "board-edit/after-render")
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
                                          s)
                          :did-remount (fn [s]
-                                        (js/console.log "board-edit/did-remount")
                                         (when (and (not @(drv/get-ref s :team-channels))
                                                    (not @(::team-channels-requested s)))
                                           (when-let [team-data @(drv/get-ref s :team-data)]
-                                            (js/console.log "   team-channels-request")
                                             (reset! (::team-channels-requested s) true)
                                             (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                         s)
                          :will-unmount (fn [s]
-                                         (js/console.log "board-edit/will-unmount")
                                          ;; Remove no-scroll class from the body tag
                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                          (events/unlistenByKey @(::window-click s))
@@ -92,10 +84,6 @@
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (and (not (empty? (:slug board-editing)))
                                   (pos? (apply + (map #(-> % :channels count) slack-teams))))]
-    (js/console.log "board-edit/render" board-editing)
-    (js/console.log "  new?" new-board?)
-    (js/console.log "  slack-teams:" slack-teams)
-    (js/console.log "  show-slack-channels?" show-slack-channels?)
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
@@ -110,7 +98,6 @@
             [:div.slack-team
               {:class (when show-slack-team-name "show-slack-name")
                :key (str "slack-chs-dd-" (:slack-org-id t))}
-              (js/console.log "   -" (:slack-org-id t))
               (when show-slack-team-name
                 [:div.slack-team-name (:name t)])
               (for [c chs]
@@ -123,7 +110,6 @@
                                (dis/dispatch! [:input [:board-editing :slack-mirror :slack-org-id] (:slack-org-id t)])
                                (reset! (::slack-channel s) (str "#" (:name c)))
                                (reset! (::show-channels-dropdown s) false))}
-                  (js/console.log "      -" (:name c) " " (:id c))
                   [:span.ch-prefix "#"]
                   [:span.ch (:name c)]])])])
       [:div.board-edit
