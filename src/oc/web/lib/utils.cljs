@@ -704,6 +704,11 @@
     (let [reg (js/RegExp. "<br[ ]{0,}/?>" "ig")]
       (.replace text reg ""))))
 
+(defn strip-empty-tags [text]
+  (when text
+    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</p[ ]{0,}>" "ig")]
+      (.replace text reg ""))))
+
 (defn disable-scroll []
   (dommy/add-class! (sel1 [:body]) :no-scroll)
   (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
