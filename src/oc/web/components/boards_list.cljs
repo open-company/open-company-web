@@ -34,9 +34,6 @@
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (did-update [_ prev-props _]
-    (when (and (nil? (:create-board prev-props))
-               (not (nil? (om/get-props owner :create-board))))
-      (utils/after 100 #(.focus (js/$ "input.board-name"))))
     (when-not (utils/is-test-env?)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
@@ -47,7 +44,7 @@
                   :style {:width (str (- left-boards-list-width 20) "px")}}
           ;; All activity
           (when (jwt/user-is-part-of-the-team (:team-id org-data))
-            (dom/button {:class "all-activity group"}
+            (dom/button {:class (str "all-activity group" (when (utils/in? (:route @router/path) "all-activity") " selected"))}
               (dom/div {:class "all-activity-icon"})
               (dom/span "All Activity")))
           ;; Boards list
@@ -66,42 +63,24 @@
                            :data-container "body"})))
           (dom/div {:class (str "left-boards-list-items group")}
             (for [board (sorted-boards (:boards org-data))]
-              (dom/div {:class (utils/class-set {:left-boards-list-item true
-                                                 :highlight-on-hover (nil? (:foce-key data))
-                                                 :group true
-                                                 :selected (= (router/current-board-slug) (:slug board))})
-                        :style {:width (str (- left-boards-list-width 20 5) "px")}
+              (dom/div {:class "left-boards-list-item"
                         :data-board (name (:slug board))
                         :key (str "board-list-" (name (:slug board)))
                         :on-click #(dis/dispatch! [:board-nav (:slug board)])}
-                (dom/div {:class "internal has-news"
-                          :key (str "board-list-" (name (:slug board)) "-internal")}
-                  (or (:name board) (:slug board)))
-                (when (utils/link-for (:links board) "delete")
-                  (dom/button {:class "remove-board btn-reset"
-                               :title "Delete this board"
-                               :data-toggle "tooltip"
-                               :data-placement "top"
-                               :data-container "body"
-                               :on-click #(delete-board-alert % (:slug board))}
-                    (dom/i {:class "fa fa-times"})))))
-            (when-not (nil? (:create-board data))
-              (dom/div {:class "left-boards-list-item group"}
-                (dom/input {:class "board-name left"
-                            :value (:create-board data)
-                            :data-toggle "tooltip"
-                            :data-placement "right"
-                            :data-container "body"
-                            :title "Press Enter to submit or Escape to cancel."
-                            :on-change #(dis/dispatch! [:input [:create-board] (.. % -target -value)])
-                            :on-blur #(when (empty? (:create-board data))
-                                        (dis/dispatch! [:input [:create-board] nil]))
-                            :on-key-up (fn [e]
-                                            (cond
-                                              (= "Enter" (.-key e))
-                                              (dis/dispatch! [:board-create])
-                                              (= "Escape" (.-key e))
-                                              (dis/dispatch! [:input [:create-board] nil])))}))))
+                (when (or (= (:access board) "public")
+                          (= (:access board) "private"))
+                  (dom/img {:src (if (= (:access board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                            :class (if (= (:access board) "public") "public" "private")}))
+                (dom/div {:class (utils/class-set {:group true
+                                                   :board-name true
+                                                   :public-board (= (:access board) "public")
+                                                   :private-board (= (:access board) "private")
+                                                   :team-board (= (:access board) "team")})}
+                  (dom/div {:class (utils/class-set {:selected (= (router/current-board-slug) (:slug board))
+                                                     :internal true
+                                                     :has-news true})
+                            :key (str "board-list-" (name (:slug board)) "-internal")}
+                    (or (:name board) (:slug board)))))))
           (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
             (dom/div {:class "left-boards-list-top group"}
                       ;; Boards header
