@@ -8,6 +8,7 @@ div.all-activity {
     div.entry-card.all-activity-card {
       width: 617px;
       max-height: 403px;
+      margin: 0px 0px 20px 0px;
 
       div.entry-card-content {
         div.entry-card-headline {
@@ -17,6 +18,10 @@ div.all-activity {
         div.entry-card-body {
           max-height: #{24*4}px;
           // margin-top: 16px;
+
+          &.has-body {
+            height: initial;
+          }
         }
       }
     }
@@ -24,7 +29,58 @@ div.all-activity {
 
   div.all-activity-nav {
     float: right;
-    width: 80px;
-    background-color: blue;
+    width: 240px;
+
+    div.nav-year {
+      @include avenir_H();
+      font-size: 16px;
+      color: $oc_gray_7;
+      margin-bottom: 4px;
+      cursor: pointer;
+
+      &.selected {
+        color: $carrot_text_blue;
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &:not(:first-child) {
+        margin-top: 8px;
+      }
+    }
+
+    div.nav-month {
+      cursor: pointer;
+      margin-left: 24px;
+      position: relative;
+      @include avenir_M();
+      font-size: 14px;
+      color: $oc_gray_7;
+      padding: 2px 0;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &:before {
+        font-family: FontAwesome;
+        font-size: 9px;
+        content: "\f10c";
+        position: absolute;
+        color: $oc_gray_7;
+        top: 6px;
+        left: -24px;
+      }
+
+      &.selected{
+        color: $carrot_text_blue;
+        &:before {
+          color: $carrot_text_blue;
+          content: "\f111";
+        }
+      }
+    }
   }
 }

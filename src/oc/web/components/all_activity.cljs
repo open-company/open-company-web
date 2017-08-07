@@ -13,4 +13,13 @@
       [:div.all-activity-cards
         (for [e (:entries all-activity-data)]
           (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
-      [:div.all-activity-nav]]))
+      [:div.all-activity-nav
+        [:div.nav-year.selected
+          "2017"]
+        (for [m (reverse ["January" "February" "March" "April" "May" "June"])]
+          [:div.nav-month
+            {:class (when (= m "June") "selected")}
+            m])
+        [:div.nav-year
+          {:class ""}
+          "2016"]]]))
