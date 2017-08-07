@@ -33,7 +33,6 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
-            [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.org-logo-setup :refer (org-logo-setup)]

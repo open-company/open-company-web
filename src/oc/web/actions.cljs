@@ -87,7 +87,6 @@
         (and (jwt/jwt)
              (not (utils/in? (:route @router/path) "create-org"))
              (not (utils/in? (:route @router/path) "user-profile"))
-             (not (utils/in? (:route @router/path) "create-board"))
              (not (utils/in? (:route @router/path) "email-verification"))
              (not (utils/in? (:route @router/path) "about"))
              (not (utils/in? (:route @router/path) "features")))
@@ -123,8 +122,7 @@
       (utils/in? (:route @router/path) "all-activity")
       (api/get-all-activity org-data)
       ;; Board redirect handles
-      (and (not (utils/in? (:route @router/path) "create-board"))
-           (not (utils/in? (:route @router/path) "create-org"))
+      (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "updates-list"))
@@ -139,10 +137,7 @@
           (let [board-to (get-default-board org-data)]
             (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
               (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))))
-        ;; Redirect to create board if no board are present
-        :else
-        (router/nav! (oc-urls/create-board (:slug org-data))))))
+              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))))))
   ;; FIXME: temporarily remove stories loading
   ; (utils/after 100 #(api/get-updates))
   (-> db
