@@ -38,71 +38,70 @@
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
-    (when-not (:dashboard-sharing data)
-      (let [left-boards-list-width (- responsive/left-boards-list-width 20)]
-        (dom/div {:class "left-boards-list group"
-                  :style {:width (str (- left-boards-list-width 20) "px")}}
-          ;; All activity
-          (when (jwt/user-is-part-of-the-team (:team-id org-data))
-            (dom/button
-              {:class (str "all-activity group" (when (utils/in? (:route @router/path) "all-activity") " selected"))
-               :on-click #(router/nav! (oc-urls/all-activity))}
-              (dom/div {:class "all-activity-icon"})
-              (dom/span "All Activity")))
-          ;; Boards list
+    (let [left-boards-list-width (- responsive/left-boards-list-width 20)]
+      (dom/div {:class "left-boards-list group"
+                :style {:width (str (- left-boards-list-width 20) "px")}}
+        ;; All activity
+        (when (jwt/user-is-part-of-the-team (:team-id org-data))
+          (dom/button
+            {:class (str "all-activity group" (when (utils/in? (:route @router/path) "all-activity") " selected"))
+             :on-click #(router/nav! (oc-urls/all-activity))}
+            (dom/div {:class "all-activity-icon"})
+            (dom/span "All Activity")))
+        ;; Boards list
+        (dom/div {:class "left-boards-list-top group"}
+          ;; Boards header
+          (dom/h3 {:class "left-boards-list-top-title"}
+            (dom/div {:class "boards-icon"})
+            (dom/span "BOARDS"))
+          (when (and (not (responsive/is-tablet-or-mobile?))
+                     (utils/link-for (:links org-data) "create"))
+            (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+                         :on-click #(dis/dispatch! [:board-edit nil])
+                         :title "Create a new board"
+                         :data-placement "top"
+                         :data-toggle "tooltip"
+                         :data-container "body"})))
+        (dom/div {:class (str "left-boards-list-items group")}
+          (for [board (sorted-boards (:boards org-data))]
+            (dom/div {:class "left-boards-list-item"
+                      :data-board (name (:slug board))
+                      :key (str "board-list-" (name (:slug board)))
+                      :on-click #(dis/dispatch! [:board-nav (:slug board)])}
+              (when (or (= (:access board) "public")
+                        (= (:access board) "private"))
+                (dom/img {:src (if (= (:access board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                          :class (if (= (:access board) "public") "public" "private")}))
+              (dom/div {:class (utils/class-set {:group true
+                                                 :board-name true
+                                                 :public-board (= (:access board) "public")
+                                                 :private-board (= (:access board) "private")
+                                                 :team-board (= (:access board) "team")})}
+                (dom/div {:class (utils/class-set {:selected (= (router/current-board-slug) (:slug board))
+                                                   :internal true
+                                                   :has-news true})
+                          :key (str "board-list-" (name (:slug board)) "-internal")}
+                  (or (:name board) (:slug board)))))))
+        (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
           (dom/div {:class "left-boards-list-top group"}
-            ;; Boards header
-            (dom/h3 {:class "left-boards-list-top-title"}
-              (dom/div {:class "boards-icon"})
-              (dom/span "BOARDS"))
-            (when (and (not (responsive/is-tablet-or-mobile?))
-                       (utils/link-for (:links org-data) "create"))
-              (dom/button {:class "left-boards-list-top-title-button btn-reset right"
-                           :on-click #(dis/dispatch! [:board-edit nil])
-                           :title "Create a new board"
-                           :data-placement "top"
-                           :data-toggle "tooltip"
-                           :data-container "body"})))
-          (dom/div {:class (str "left-boards-list-items group")}
-            (for [board (sorted-boards (:boards org-data))]
-              (dom/div {:class "left-boards-list-item"
-                        :data-board (name (:slug board))
-                        :key (str "board-list-" (name (:slug board)))
-                        :on-click #(dis/dispatch! [:board-nav (:slug board)])}
-                (when (or (= (:access board) "public")
-                          (= (:access board) "private"))
-                  (dom/img {:src (if (= (:access board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
-                            :class (if (= (:access board) "public") "public" "private")}))
-                (dom/div {:class (utils/class-set {:group true
-                                                   :board-name true
-                                                   :public-board (= (:access board) "public")
-                                                   :private-board (= (:access board) "private")
-                                                   :team-board (= (:access board) "team")})}
-                  (dom/div {:class (utils/class-set {:selected (= (router/current-board-slug) (:slug board))
-                                                     :internal true
-                                                     :has-news true})
-                            :key (str "board-list-" (name (:slug board)) "-internal")}
-                    (or (:name board) (:slug board)))))))
-          (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
-            (dom/div {:class "left-boards-list-top group"}
-                      ;; Boards header
-                      (dom/h3 {:class "left-boards-list-top-title"}
-                        (dom/div {:class "stories-icon"})
-                        (dom/span "STORIES"))
-                      (when (and (not (responsive/is-tablet-or-mobile?))
-                                 true) ;; FIXME: replace with create storeis link check
-                        (dom/button {:class "left-boards-list-top-title-button btn-reset right"
-                                     :on-click #(identity %) ;; FIXME: Replace with story creation action
-                                     :title "Create a new story"
-                                     :data-placement "top"
-                                     :data-toggle "tooltip"
-                                     :data-container "body"}))))
-          (dom/div {:class "left-boards-list-footer"}
-            (when (and (router/current-org-slug)
-                       (jwt/is-admin? (:team-id org-data)))
-              (dom/button {:class "mlb-reset invite-people-btn"
-                           :on-click #(router/nav! (oc-urls/org-team-settings))}
-                (dom/div {:class "invite-people-icon"}) (dom/span "Invite People")))
-            (dom/button {:class "mlb-reset about-carrot-btn"
-                         :on-click #(router/nav! oc-urls/about)}
-              (dom/div {:class "about-carrot-icon"}) (dom/span "About Carrot"))))))))
+                    ;; Boards header
+                    (dom/h3 {:class "left-boards-list-top-title"}
+                      (dom/div {:class "stories-icon"})
+                      (dom/span "STORIES"))
+                    (when (and (not (responsive/is-tablet-or-mobile?))
+                               true) ;; FIXME: replace with create storeis link check
+                      (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+                                   :on-click #(identity %) ;; FIXME: Replace with story creation action
+                                   :title "Create a new story"
+                                   :data-placement "top"
+                                   :data-toggle "tooltip"
+                                   :data-container "body"}))))
+        (dom/div {:class "left-boards-list-footer"}
+          (when (and (router/current-org-slug)
+                     (jwt/is-admin? (:team-id org-data)))
+            (dom/button {:class "mlb-reset invite-people-btn"
+                         :on-click #(router/nav! (oc-urls/org-team-settings))}
+              (dom/div {:class "invite-people-icon"}) (dom/span "Invite People")))
+          (dom/button {:class "mlb-reset about-carrot-btn"
+                       :on-click #(router/nav! oc-urls/about)}
+            (dom/div {:class "about-carrot-icon"}) (dom/span "About Carrot")))))))

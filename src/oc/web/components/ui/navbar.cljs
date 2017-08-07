@@ -44,8 +44,6 @@
                               header-width
                               su-navbar
                               show-navigation-bar
-                              dashboard-selected-topics
-                              dashboard-sharing
                               is-dashboard
                               is-topic-view
                               is-update-preview] :as data} owner options]
@@ -98,42 +96,24 @@
                           (user-avatar {:classes "mlb-reset dropdown-toggle"})
                           (om/build menu {}))
                         ; FIXME: Remove the notification bell until we enable it.
-                        ; (dom/div {:class "right"
-                        ;           :style {:margin-right "0.5rem" :margin-top "5px"}}
-                        ;   (dom/img {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}))
-                        ; ;; FIXME: Comment out but not remove until we replace this with something.
+                        (dom/div {:class "right"
+                                  :style {:margin-right "0.5rem" :margin-top "5px"}}
+                          (dom/img {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}))
+                        ;; FIXME: Comment out but not remove until we replace this with something.
                         ; (when fixed-show-share-su-button
-                        ;   (if dashboard-sharing
-                        ;     (dom/div {:class "sharing-button-container"}
-                        ;       (dom/button {:class "btn-reset share-selected-topics-button right btn-solid"
-                        ;                    :title (share-new-tooltip (:team-id org-data))
-                        ;                    :data-toggle "tooltip"
-                        ;                    :data-container "body"
-                        ;                    :data-placement "left"
-                        ;                    :disabled (zero? (count dashboard-selected-topics))
-                        ;                    :on-click #(router/nav! (oc-urls/update-preview))}
-                        ;         (when (om/get-state owner :su-redirect)
-                        ;           (loading/small-loading))
-                        ;         (if (zero? (count dashboard-selected-topics))
-                        ;           "0 Topics selected"
-                        ;           (str "Share " (count dashboard-selected-topics) " topic" (when (not= (count dashboard-selected-topics) 1) "s"))))
-                        ;       (dom/button {:class "btn-reset btn-link right sharing-cancel"
-                        ;                    :on-click (fn []
-                        ;                                (dis/dispatch! [:dashboard-share-mode false]))}
-                        ;         "Cancel"))
-                        ;     (dom/div {:class "sharing-button-container"}
-                        ;       (dom/button {:class "btn-reset sharing-button right"
-                        ;                    :title (share-new-tooltip (:team-id org-data))
-                        ;                    :data-toggle "tooltip"
-                        ;                    :data-container "body"
-                        ;                    :data-placement "left"
-                        ;                    :disabled (not (nil? foce-key))
-                        ;                    :on-click (fn []
-                        ;                                (when (nil? foce-key)
-                        ;                                  (when is-topic-view
-                        ;                                     (router/nav! (oc-urls/board)))
-                        ;                                  (dis/dispatch! [:dashboard-share-mode true])))}
-                        ;         (dom/i {:class "fa fa-share"})))))
+                        ;   (dom/div {:class "sharing-button-container"}
+                        ;     (dom/button {:class "btn-reset sharing-button right"
+                        ;                  :title (share-new-tooltip (:team-id org-data))
+                        ;                  :data-toggle "tooltip"
+                        ;                  :data-container "body"
+                        ;                  :data-placement "left"
+                        ;                  :disabled (not (nil? foce-key))
+                        ;                  :on-click (fn []
+                        ;                              (when (nil? foce-key)
+                        ;                                (when is-topic-view
+                        ;                                   (router/nav! (oc-urls/board)))
+                        ;                                (dis/dispatch! [:dashboard-share-mode true])))}
+                        ;       (dom/i {:class "fa fa-share"}))))
                         )
                       (login-button)))))))
           (when (and (not (responsive/is-mobile-size?))

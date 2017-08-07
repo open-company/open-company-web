@@ -70,11 +70,6 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
-            (when (:dashboard-sharing data)
-              (dom/div {:class "dashboard-sharing-select-all"}
-                (dom/span "Click topics to include or")
-                (dom/button {:class "btn-reset btn-link"
-                             :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build boards-list data))
             (dom/div {:class "board-container right"
@@ -95,8 +90,7 @@
                 ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
                            (not (:foce-key data))
-                           (not (responsive/is-tablet-or-mobile?))
-                           (not (:dashboard-sharing data)))
+                           (not (responsive/is-tablet-or-mobile?)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})

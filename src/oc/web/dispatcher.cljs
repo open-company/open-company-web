@@ -7,7 +7,6 @@
 (defonce app-state (atom {:loading false
                           :mobile-menu-open false
                           :show-login-overlay false
-                          :dashboard-sharing false
                           :trend-bar-status :hidden}))
 
 ;; Data key paths

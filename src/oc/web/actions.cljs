@@ -612,30 +612,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :dashboard-select-topic
-  [db [_ board-slug topic-slug]]
-  (if (pos? (count (filter #(and (= board-slug (:board-slug %)) (= topic-slug (:topic-slug %))) (:dashboard-selected-topics db))))
-    (assoc db :dashboard-selected-topics (filter #(or (not= board-slug (:board-slug %)) (not= topic-slug (:topic-slug %))) (:dashboard-selected-topics db)))
-    (let [board-data (dispatcher/board-data db (router/current-org-slug) board-slug)
-          topic-data (get board-data (keyword topic-slug))
-          new-entry {:created-at (:created-at topic-data) :board-slug board-slug :topic-slug topic-slug}
-          next-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) new-entry))]
-      (assoc db :dashboard-selected-topics next-selected-topics))))
-
-(defmethod dispatcher/action :dashboard-select-all
-  [db [_ board-slug]]
-  (let [without-board-topics (filter #(not= (:board-slug %) board-slug) (:dashboard-selected-topics db))
-        board-data (dispatcher/board-data db (router/current-org-slug) board-slug)
-        all-topics (:topics board-data)
-        new-entries (vec (map #(hash-map :created-at (:created-at (get board-data (keyword %))) :board-slug board-slug :topic-slug (keyword %)) all-topics))]
-    (assoc db :dashboard-selected-topics (vec (concat without-board-topics new-entries)))))
-
-(defmethod dispatcher/action :dashboard-share-mode
-  [db [_ activate]]
-  (-> db
-    (assoc :dashboard-sharing activate)
-    (assoc :dashboard-selected-topics [])))
-
 (defmethod dispatcher/action :top-menu-show [db [_ topic]]
   (assoc db :show-top-menu topic))
 

@@ -21,12 +21,6 @@ div.org-dashboard {
     }
   }
 
-  &.dashboard-sharing {
-    div.dashboard-container div.sharing-boards {
-      min-height: calc(100vh - #{$footer_small_height}px);
-    }
-  }
-
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */

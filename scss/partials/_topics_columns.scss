@@ -71,28 +71,6 @@ div.topics-columns {
       }
     }
 
-    div.dashboard-sharing-select-all {
-      position: absolute;
-      right: 2px;
-      top: 0px;
-      padding-top: 5px;
-      
-      span {
-        font-family: $oc_main_font;
-        font-size: 12px;
-        font-weight: bold;
-        color:  $oc_gray_5;
-        opacity: 0.7;
-      }
-
-      button {
-        padding-top: 0px;
-        padding-left: 3px;
-        text-transform: none;
-        letter-spacing: normal;
-      }
-    }
-
     div.topics-column {
       margin-right: 0px;
       float: left;
