@@ -327,10 +327,11 @@
 
 (defn fix-entry
   "Add `:read-only` and `:topic-name` keys to the entry map"
-  [entry-body topics-data]
+  [entry-body board-slug topics-data]
   (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
+      (assoc :board-slug board-slug)
       (assoc :topic-name topic-name))))
 
 (defn fix-board
@@ -339,13 +340,15 @@
   (let [links (:links board-data)
         read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
-        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:topics board-data)) (:entries board-data))))]
+        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data))))]
     with-fixed-topics))
 
 (defn fix-all-activity
   "Fix org data coming from the API."
   [all-activity-data]
-  (assoc all-activity-data :entries (map #(fix-entry % nil) (:items all-activity-data))))
+  (-> all-activity-data
+    (dissoc :items)
+    (assoc :entries (vec (map #(fix-entry % (:board-slug %) nil) (:items all-activity-data))))))
 
 (defn fix-org
   "Fix org data coming from the API."
