@@ -44,6 +44,10 @@ div.all-activity {
 
     div.all-activity-nav-inner {
       position: fixed;
+      max-height: calc(100vh - 200px);
+      overflow-y: scroll;
+      min-width: 150px;
+      padding-right: 10px;
 
       div.nav-year {
         @include avenir_H();
