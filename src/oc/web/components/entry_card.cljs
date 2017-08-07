@@ -7,7 +7,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
+            [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
             [goog.object :as gobj]))
 
 (rum/defc entry-card-empty
@@ -75,7 +76,6 @@
                                                body-a-sel (str body-sel " a")
                                                read-more-sel (str body-a-sel ".read-more")
                                                is-all-activity (nth (:rum/args s) 3)]
-                                           (js/console.log "params:" is-all-activity)
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
                                            ; Prevent read more link to change directly the url
@@ -169,19 +169,23 @@
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
            :class (or (:type @(::first-body-image s)) "image")}])]
     [:div.entry-card-footer.group
-      (interactions-summary entry-data)
+      (if is-all-activity
+        [:div.all-activity-footer.group
+          (reactions entry-data)
+          (comments-summary entry-data)]
+        (interactions-summary entry-data))
       [:div.more-button.dropdown
         [:button.mlb-reset.more-ellipsis.dropdown-toggle
           {:type "button"
            :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-           :id (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))
+           :id (str "entry-card-more-" (:board-slug entry-data) "-" (:uuid entry-data))
            :on-click #(utils/event-stop %)
            :title "More"
            :data-toggle "dropdown"
            :aria-haspopup true
            :aria-expanded false}]
         [:div.dropdown-menu
-          {:aria-labelledby (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))}
+          {:aria-labelledby (str "entry-card-more-" (:board-slug entry-data) "-" (:uuid entry-data))}
           [:div.triangle]
           [:ul.entry-card-more-menu
             [:li

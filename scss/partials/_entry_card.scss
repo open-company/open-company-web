@@ -215,6 +215,19 @@ div.entry-card {
     bottom: 0px;
     left: 0px;
     margin: 15px 24px 16px;
+    height: 25px;
+
+    div.all-activity-footer {
+      float: left;
+
+      div.reactions {
+
+      }
+
+      div.comments-summary {
+        margin-left: 16px;
+      }
+    }
 
     div.interactions-summary {
       margin-top: 8px;
