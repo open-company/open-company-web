@@ -83,6 +83,7 @@
                          :entry-editing (:entry-editing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
+                         :is-all-activity (utils/in? (:route @router/path) "all-activity")
                          :show-top-menu (:show-top-menu data)
                          :board-filters (:board-filters data)}]
           (om/build topics-columns comp-data))))))

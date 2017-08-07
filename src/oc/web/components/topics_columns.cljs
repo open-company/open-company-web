@@ -11,7 +11,8 @@
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entry-card :refer (entry-card)]
-            [oc.web.components.entries-layout :refer (entries-layout)]))
+            [oc.web.components.entries-layout :refer (entries-layout)]
+            [oc.web.components.all-activity :refer (all-activity)]))
 
 (defn- update-active-topics [owner new-topic topic-data]
   (let [board-data (om/get-props owner :board-data)
@@ -30,6 +31,7 @@
                                       total-width
                                       board-data
                                       is-dashboard
+                                      is-all-activity
                                       is-stakeholder-update
                                       board-filters] :as data} owner options]
 
@@ -78,9 +80,9 @@
               (dom/div {:class "group"}
                 ;; Board name and settings button
                 (dom/div {:class "board-name"}
-                  (if (router/current-board-slug)
-                    (:name board-data)
-                    "All Activity")
+                  (if is-all-activity
+                    "All Activity"
+                    (:name board-data))
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not (:read-only board-data)))
@@ -91,7 +93,7 @@
                                  :title "Board settings"
                                  :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Say something button
-                (when (and (router/current-board-slug)
+                (when (and (not is-all-activity)
                            (not (:read-only (dis/org-data)))
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?)))
@@ -105,6 +107,9 @@
                   (filters-dropdown)))
               ;; Board content: empty board, add topic, topic view or topic cards
               (cond
+                (and is-dashboard
+                     is-all-activity)
+                (all-activity)
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-entry-uuid)
