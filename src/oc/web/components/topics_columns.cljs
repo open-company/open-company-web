@@ -78,9 +78,12 @@
               (dom/div {:class "group"}
                 ;; Board name and settings button
                 (dom/div {:class "board-name"}
-                  (:name board-data)
+                  (if (router/current-board-slug)
+                    (:name board-data)
+                    "All Activity")
                   ;; Settings button
-                  (when-not (:read-only board-data)
+                  (when (and (router/current-board-slug)
+                             (not (:read-only board-data)))
                     (dom/button {:class "mlb-reset board-settings-bt"
                                  :data-toggle "tooltip"
                                  :data-placement "top"
@@ -88,7 +91,8 @@
                                  :title "Board settings"
                                  :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Say something button
-                (when (and (not (:read-only (dis/org-data)))
+                (when (and (router/current-board-slug)
+                           (not (:read-only (dis/org-data)))
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"

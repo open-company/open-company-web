@@ -40,14 +40,17 @@
   (render [_]
     (let [left-boards-list-width (- responsive/left-boards-list-width 20)]
       (dom/div {:class "left-boards-list group"
-                :style {:width (str (- left-boards-list-width 20) "px")}}
+                :style {:width (str left-boards-list-width "px")}}
         ;; All activity
         (when (jwt/user-is-part-of-the-team (:team-id org-data))
           (dom/button
-            {:class (str "all-activity group" (when (utils/in? (:route @router/path) "all-activity") " selected"))
+            {:class "all-activity group"
              :on-click #(router/nav! (oc-urls/all-activity))}
             (dom/div {:class "all-activity-icon"})
-            (dom/span "All Activity")))
+            (dom/div
+              {:class (utils/class-set {:all-activity-label true
+                                        :selected (utils/in? (:route @router/path) "all-activity")})}
+              "All Activity")))
         ;; Boards list
         (dom/div {:class "left-boards-list-top group"}
           ;; Boards header

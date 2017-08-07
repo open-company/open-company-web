@@ -99,9 +99,10 @@
           all-activity-data (dis/all-activity-data data)
           entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
+      (js/console.log "all-activity-data" all-activity-data)
       (if (or (not org-data)
-              (not board-data)
-              (not all-activity-data))
+              (and (not board-data)
+                   (not all-activity-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))

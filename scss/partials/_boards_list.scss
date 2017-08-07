@@ -9,19 +9,24 @@ div.left-boards-list {
     outline: none;
     margin-bottom: 34px;
 
-    &.selected {
-      background-color: $carrot_light_blue;
-      color: #3E4547;
-    }
-
     &:hover {
       text-decoration: underline;
     }
 
-    span {
+    div.all-activity-label {
       font-size: 16px;
       color: $oc_gray_7;
       @include avenir_H();
+      border-radius: 3px;
+      padding: 0.2rem 0.4rem;
+      width: 135px;
+      margin-left: 19px;
+      text-align: left;
+
+      &.selected {
+        background-color: $carrot_light_blue;
+        color: #3E4547;
+      }
     }
 
     div.all-activity-icon {
@@ -31,7 +36,7 @@ div.left-boards-list {
       height: 16px;
       float: left;
       margin-right: 5px;
-      margin-top: 1px;
+      margin-top: 5px;
     }
   }
 
@@ -72,7 +77,7 @@ div.left-boards-list {
     button.left-boards-list-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 0px;
+      margin-right: 28px;
       margin-top: -6px;
       padding: 0;
       cursor: pointer;
@@ -98,17 +103,19 @@ div.left-boards-list {
     div.left-boards-list-item {
       cursor: default;
       color: $oc_gray_7;
+      margin-top: 10px;
 
       img.public {
         float: left;
         margin-left: 4px;
+        margin-top: 2px;
         width: 16px;
         height: 16px;
       }
 
       img.private{
         float: left;
-        margin-left: 4px;
+        margin-left: 6px;
         margin-top: 3px;
         width: 10px;
         height: 14px;
@@ -160,6 +167,7 @@ div.left-boards-list {
     margin-top: 34px;
 
     button.about-carrot-btn {
+      margin-top: 10px;
       &:hover {
         text-decoration: underline;
       }
