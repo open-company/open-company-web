@@ -1099,10 +1099,41 @@
   (api/get-all-activity (dispatcher/org-data))
   db)
 
+(defmethod dispatcher/action :all-activity-calendar
+  [db [_ calendar-link]]
+  (api/get-all-activity (dispatcher/org-data) calendar-link)
+  db)
+
 (defmethod dispatcher/action :all-activity-get/finish
   [db [_ {:keys [org body]}]]
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))]
       (assoc-in db all-activity-key fixed-all-activity))
+    db))
+
+(defmethod dispatcher/action :calendar-get
+  [db [_]]
+  (api/get-calendar (router/current-org-slug))
+  db)
+
+(defmethod dispatcher/action :calendar-get/finish
+  [db [_ {:keys [org body]}]]
+  (let [calendar-key (dispatcher/calendar-key org)]
+    (assoc-in db calendar-key body)))
+
+(defmethod dispatcher/action :all-activity-more
+  [db [_ more-link]]
+  (api/load-more-all-activity more-link)
+  db)
+
+(defmethod dispatcher/action :all-activity-more/finish
+  [db [_ {:keys [org body]}]]
+  (if body
+    (let [all-activity-key (dispatcher/all-activity-key org)
+          fixed-all-activity (utils/fix-all-activity (:collection body))
+          old-all-activity (get-in db all-activity-key)
+          all-activity-entries (concat (:entries old-all-activity) (:entries fixed-all-activity))
+          sorted-all-activities (vec (reverse (sort-by :created-at all-activity-entries)))]
+      (assoc-in db all-activity-key (assoc fixed-all-activity :entries sorted-all-activities)))
     db))
