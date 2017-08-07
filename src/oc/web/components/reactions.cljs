@@ -43,7 +43,7 @@
                          (when-not is-loading
                            (when-not (:reacted r)
                              (animate-reaction e s))
-                           (dis/dispatch! [:reaction-toggle entry-uuid r])))}
+                           (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}
             [:span.reaction (:reaction r)]
             [:div.count
               (:count r)]])])))
