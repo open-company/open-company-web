@@ -25,60 +25,72 @@ div.all-activity {
         }
       }
     }
+
+    div.load-next {
+      text-align: center;
+      margin-top: 24px;
+
+      button.load-next {
+        font-size: 16px;
+        @include avenir_H();
+      }
+    }
   }
 
   div.all-activity-nav {
     float: right;
     width: 240px;
+    position: relative;
 
-    div.nav-year {
-      @include avenir_H();
-      font-size: 16px;
-      color: $oc_gray_7;
-      margin-bottom: 4px;
-      cursor: pointer;
+    div.all-activity-nav-inner {
+      position: fixed;
 
-      &.selected {
-        color: $carrot_text_blue;
-      }
-
-      &:hover {
-        text-decoration: underline;
-      }
-
-      &:not(:first-child) {
-        margin-top: 8px;
-      }
-    }
-
-    div.nav-month {
-      cursor: pointer;
-      margin-left: 24px;
-      position: relative;
-      @include avenir_M();
-      font-size: 14px;
-      color: $oc_gray_7;
-      padding: 2px 0;
-
-      &:hover {
-        text-decoration: underline;
-      }
-
-      &:before {
-        font-family: FontAwesome;
-        font-size: 9px;
-        content: "\f10c";
-        position: absolute;
+      div.nav-year {
+        @include avenir_H();
+        font-size: 16px;
         color: $oc_gray_7;
-        top: 6px;
-        left: -24px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        margin-top: 8px;
+
+        &.selected {
+          color: $carrot_text_blue;
+        }
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
 
-      &.selected{
-        color: $carrot_text_blue;
+      div.nav-month {
+        cursor: pointer;
+        margin-left: 24px;
+        position: relative;
+        @include avenir_M();
+        font-size: 14px;
+        color: $oc_gray_7;
+        padding: 2px 0;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
         &:before {
+          font-family: FontAwesome;
+          font-size: 9px;
+          content: "\f10c";
+          position: absolute;
+          color: $oc_gray_7;
+          top: 6px;
+          left: -24px;
+        }
+
+        &.selected{
           color: $carrot_text_blue;
-          content: "\f111";
+          &:before {
+            color: $carrot_text_blue;
+            content: "\f111";
+          }
         }
       }
     }
