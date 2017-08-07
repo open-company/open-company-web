@@ -58,7 +58,7 @@ div.entry-card {
   }
 
   div.entry-card-head {
-    width: 384px;
+    width: 100%;
 
     div.entry-card-head-author {
       float: left;
@@ -83,7 +83,7 @@ div.entry-card {
   }
 
   div.entry-card-content {
-    width: 384px;
+    width: 100%;
 
     div.entry-card-headline {
       @include entry-headline();

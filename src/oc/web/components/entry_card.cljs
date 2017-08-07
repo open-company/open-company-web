@@ -35,9 +35,9 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel]
+(defn truncate-body [body-sel lines]
   (.dotdotdot (js/$ body-sel)
-   #js {:height 72
+   #js {:height (* 24 lines)
         :wrap "word"
         :watch true
         :ellipsis "... "
@@ -73,17 +73,19 @@
                                          (let [entry-data (first (:rum/args s))
                                                body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
                                                body-a-sel (str body-sel " a")
-                                               read-more-sel (str body-a-sel ".read-more")]
+                                               read-more-sel (str body-a-sel ".read-more")
+                                               is-all-activity (nth (:rum/args s) 3)]
+                                           (js/console.log "params:" is-all-activity)
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
                                            ; Prevent read more link to change directly the url
                                            (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
                                            (when (compare-and-set! (::truncated s) false true)
-                                             (truncate-body body-sel)
+                                             (truncate-body body-sel (if is-all-activity 4 3))
                                              (utils/after 10 #(do
                                                                 (.trigger (js/$ body-sel) "destroy")
-                                                                (truncate-body body-sel)))))
+                                                                (truncate-body body-sel (if is-all-activity 4 3))))))
                                          s)
                          :will-mount (fn [s]
                                        (let [entry-data (first (:rum/args s))]
@@ -108,9 +110,11 @@
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
                                       s)}
-  [s entry-data has-headline has-body]
-  [:div.entry-card
-    {:class (str "entry-card-" (:uuid entry-data))
+  [s entry-data has-headline has-body is-all-activity]
+  [:div
+    {:class (utils/class-set {:entry-card true
+                              (str "entry-card-" (:uuid entry-data)) true
+                              :all-activity-card is-all-activity})
      :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
@@ -136,7 +140,7 @@
             [:div.topic-tag
               {:on-click #(do
                             (utils/event-stop %)
-                            (router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data))))}
+                            (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug entry-data) (:topic-slug entry-data))))}
               topic-name]))]]
     [:div.entry-card-content.group
       ; Headline
@@ -154,7 +158,7 @@
             $hidden-div (js/$ (str "." hidden-class))
             body-without-preview (.html $hidden-div)
             _ (.remove $hidden-div)
-            emojied-body (utils/emojify (str body-without-preview "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
+            emojied-body (utils/emojify (str body-without-preview "<a class=\"read-more\" href=\"" (oc-urls/entry (:board-slug entry-data) (:uuid entry-data)) "\">Read more</a>"))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
