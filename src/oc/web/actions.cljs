@@ -210,7 +210,7 @@
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get db board-key)
         entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
-        new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (:topics board-data)))
+        new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
         sorted-entries (vec (sort-by :updated-at new-entries))
         new-board-data (assoc board-data :entries sorted-entries)]
   (assoc db board-key new-board-data)))
@@ -977,6 +977,7 @@
                                       :updated-at as-of
                                       :reactions []
                                       :uuid (utils/entry-uuid)})
+                   (:slug board-data)
                    (:topics board-data)))
 
 (defn entry-fixed-data [entry-data current-user-data as-of]
