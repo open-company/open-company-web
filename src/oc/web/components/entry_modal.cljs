@@ -133,7 +133,7 @@
                    :class (when (empty? (:headline entry-data)) "no-headline")}]
                 (entry-attachments (:attachments entry-data))
                 [:div.entry-modal-footer.group
-                  (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)
+                  (reactions entry-data)
                   [:div.entry-modal-footer-right
                     [:div.more-dropdown.dropdown
                       [:button.mlb-reset.entry-modal-more.dropdown-toggle
