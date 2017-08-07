@@ -18,7 +18,8 @@
           "2017"]
         (for [m (reverse ["January" "February" "March" "April" "May" "June"])]
           [:div.nav-month
-            {:class (when (= m "June") "selected")}
+            {:class (when (= m "June") "selected")
+             :key (str "nav-month-" m)}
             m])
         [:div.nav-year
           {:class ""}
