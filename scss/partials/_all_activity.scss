@@ -1,0 +1,30 @@
+div.all-activity {
+  width: 895px;
+
+  div.all-activity-cards {
+    float: left;
+    width: 617px;
+
+    div.entry-card.all-activity-card {
+      width: 617px;
+      max-height: 403px;
+
+      div.entry-card-content {
+        div.entry-card-headline {
+          // margin-top: 24px;
+        }
+
+        div.entry-card-body {
+          max-height: #{24*4}px;
+          // margin-top: 16px;
+        }
+      }
+    }
+  }
+
+  div.all-activity-nav {
+    float: right;
+    width: 80px;
+    background-color: blue;
+  }
+}
