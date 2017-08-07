@@ -169,7 +169,6 @@
                                        :org-data org-data
                                        :board-data board-data
                                        :entries-data []
-                                       :create-board (:create-board data)
                                        :new-topics nil
                                        :force-edit-topic (:force-edit-topic data)
                                        :foce-data-editing? (:foce-data-editing? data)
@@ -191,7 +190,6 @@
                                  :org-data org-data
                                  :board-data board-data
                                  :entries-data entries-data
-                                 :create-board (:create-board data)
                                  :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
                                  :force-edit-topic (:force-edit-topic data)
                                  :foce-data-editing? (:foce-data-editing? data)

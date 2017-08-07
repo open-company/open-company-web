@@ -75,7 +75,6 @@
                          :topics board-topics
                          :foce-data-editing? (:foce-data-editing? data)
                          :new-topics (:new-topics data)
-                         :create-board (:create-board data)
                          :org-data (:org-data data)
                          :board-data board-data
                          :entries-data (:entries-data data)
