@@ -83,6 +83,23 @@
 (defn vec-dissoc [coll elem]
   (vec (filter #(not= elem %) coll)))
 
+(defn full-month-string
+  [month]
+  (case month
+    1 "January"
+    2 "February"
+    3 "March"
+    4 "April"
+    5 "May"
+    6 "June"
+    7 "July"
+    8 "August"
+    9 "September"
+    10 "October"
+    11 "November"
+    12 "December"
+    ""))
+
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn month-string-int
  "Return the name of the month given the integer month number. Accept flags to transform the string:
@@ -93,20 +110,7 @@
   (let [short-month (in? flags :short)
         capitalize (in? flags :capitalize)
         uppercase (in? flags :uppercase)
-        month-string (case month
-                        1 "January"
-                        2 "February"
-                        3 "March"
-                        4 "April"
-                        5 "May"
-                        6 "June"
-                        7 "July"
-                        8 "August"
-                        9 "September"
-                        10 "October"
-                        11 "November"
-                        12 "December"
-                        "")
+        month-string (full-month-string month)
         short-string (if short-month (subs month-string 0 3) month-string)
         capitalized-string (if capitalize (s/capital short-string) short-string)
         uppercase-string (if uppercase (s/upper capitalized-string) capitalized-string)]
@@ -583,8 +587,8 @@
          #js [0 elem-scroll-top]
          (if animated 320 oc-animation-duration)))))
 
-(defn scroll-to-element [elem]
-  (let [elem-scroll-top (offset-top elem)]
+(defn scroll-to-element [elem & [offset]]
+  (let [elem-scroll-top (+ (offset-top elem) (or offset 0))]
     (scroll-to-y elem-scroll-top)))
 
 (defn scroll-top-with-id [id]
