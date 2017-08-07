@@ -934,13 +934,13 @@
   (assoc db :trend-bar-status status))
 
 (defmethod dispatcher/action :entry-modal-fade-in
-  [db [_ entry-uuid]]
+  [db [_ board-slug entry-uuid]]
   (utils/after 10
    #(let [route (:route @router/path)
           new-route (vec (conj route entry-uuid))
-          parts {:org (router/current-org-slug) :board (router/current-board-slug) :entry entry-uuid :query-params (:query-params @router/path)}]
+          parts {:org (router/current-org-slug) :board board-slug :entry entry-uuid :query-params (:query-params @router/path)}]
       (router/set-route! new-route parts)
-      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry entry-uuid))
+      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry board-slug entry-uuid))
       (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
   (assoc db :entry-modal-fade-in entry-uuid))
 

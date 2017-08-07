@@ -115,7 +115,7 @@
     {:class (utils/class-set {:entry-card true
                               (str "entry-card-" (:uuid entry-data)) true
                               :all-activity-card is-all-activity})
-     :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
+     :on-click #(dis/dispatch! [:entry-modal-fade-in (:board-slug entry-data) (:uuid entry-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
     ; Card header
