@@ -99,7 +99,6 @@
           all-activity-data (dis/all-activity-data data)
           entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
-      (js/console.log "all-activity-data" all-activity-data)
       (if (or (not org-data)
               (and (not board-data)
                    (not all-activity-data)))
