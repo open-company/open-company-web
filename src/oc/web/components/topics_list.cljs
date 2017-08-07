@@ -76,6 +76,7 @@
                          :new-topics (:new-topics data)
                          :org-data (:org-data data)
                          :board-data board-data
+                         :all-activity-data (:all-activity-data data)
                          :entries-data (:entries-data data)
                          :topics-data board-data
                          :foce-key (:foce-key data)

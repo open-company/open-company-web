@@ -30,6 +30,7 @@
                                       content-loaded
                                       total-width
                                       board-data
+                                      all-activity-data
                                       is-dashboard
                                       is-all-activity
                                       is-stakeholder-update
@@ -109,7 +110,7 @@
               (cond
                 (and is-dashboard
                      is-all-activity)
-                (all-activity)
+                (all-activity all-activity-data)
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-entry-uuid)
