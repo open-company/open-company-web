@@ -1100,18 +1100,21 @@
   db)
 
 (defmethod dispatcher/action :all-activity-calendar
-  [db [_ calendar-link]]
-  (api/get-all-activity (dispatcher/org-data) calendar-link)
+  [db [_ {:keys [link year month]}]]
+  (api/get-all-activity (dispatcher/org-data) link year month)
   db)
 
 (defmethod dispatcher/action :all-activity-get/finish
-  [db [_ {:keys [org body]}]]
+  [db [_ {:keys [org year month body]}]]
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
           sorted-entries (vec (reverse (sort-by :created-at (:entries fixed-all-activity))))
-          with-sorted-entries (assoc fixed-all-activity :entries sorted-entries)]
-      (assoc-in db all-activity-key with-sorted-entries))
+          with-sorted-entries (assoc fixed-all-activity :entries sorted-entries)
+          with-calendar-data (-> with-sorted-entries
+                                (assoc :year year)
+                                (assoc :month month))]
+      (assoc-in db all-activity-key with-calendar-data))
     db))
 
 (defmethod dispatcher/action :calendar-get
@@ -1138,9 +1141,14 @@
           fixed-all-activity (utils/fix-all-activity (:collection body))
           old-all-activity (get-in db all-activity-key)
           keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
+          ;; Keep only x elements before or after the new list
+          ; all-activity-entries (if (= direction :up)
+          ;                         (concat (:entries fixed-all-activity) (take default-activity-limit (:entries old-all-activity)))
+          ;                         (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries fixed-all-activity)))
+          ;; Keep all the elements
           all-activity-entries (if (= direction :up)
-                                  (concat (:entries fixed-all-activity) (take default-activity-limit (:entries old-all-activity)))
-                                  (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries fixed-all-activity)))
+                                  (concat (:entries fixed-all-activity) (:entries old-all-activity))
+                                  (concat (:entries old-all-activity) (:entries fixed-all-activity)))
           new-all-activity (-> fixed-all-activity
                               (assoc :entries (vec (reverse (sort-by :created-at all-activity-entries))))
                               (assoc :direction direction)
