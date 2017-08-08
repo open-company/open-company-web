@@ -1129,16 +1129,18 @@
   (api/load-more-all-activity more-link direction)
   db)
 
+(def default-activity-limit 50)
+
 (defmethod dispatcher/action :all-activity-more/finish
   [db [_ {:keys [org direction body]}]]
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
           old-all-activity (get-in db all-activity-key)
-          keeping-entries (min 50 (count (:entries old-all-activity)))
+          keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
           all-activity-entries (if (= direction :up)
-                                  (concat (:entries fixed-all-activity) (take 50 (:entries old-all-activity)))
-                                  (concat (take-last 50 (:entries old-all-activity)) (:entries fixed-all-activity)))
+                                  (concat (:entries fixed-all-activity) (take default-activity-limit (:entries old-all-activity)))
+                                  (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries fixed-all-activity)))
           new-all-activity (-> fixed-all-activity
                               (assoc :entries (vec (reverse (sort-by :created-at all-activity-entries))))
                               (assoc :direction direction)
