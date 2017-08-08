@@ -172,7 +172,6 @@
                           (rum/local nil ::scroll-to-entry)
                           (rum/local false ::debug)
                           {:will-mount (fn [s]
-                                        ; (js/console.log "router:" )
                                         (reset! (::debug s) (contains? (:query-params @router/path) :debug))
                                         (dbg s "all-activity/will-mount")
                                         (reset! (::scroll-listener s)
