@@ -11,4 +11,4 @@
     (login-overlays-handler)
     [:div.login-internal
       (login-required {:welcome welcome})]
-    (footer (responsive/total-layout-width-int (responsive/calc-card-width) (responsive/columns-num)))])
+    (footer (responsive/total-layout-width-int responsive/card-width (responsive/columns-num)))])

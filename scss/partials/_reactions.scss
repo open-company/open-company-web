@@ -8,13 +8,14 @@ div.reactions {
     font-size: 14px;
     font-weight: 300;
     border-radius: 4px;
-    padding: .15em .9em .1em;
+    padding: .35em .9em;
     margin-right: 5px;
     float: left;
     outline: none;
     background-color: transparent;
     opacity: 0.6;
     position: relative;
+    height: 26px;
 
     &.has-reactions {
       opacity: 1;

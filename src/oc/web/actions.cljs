@@ -158,6 +158,7 @@
                  (zero? (count (filter #(= (:uuid %) (router/current-entry-uuid)) (:entries board-data)))))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
+                 (not= (:board-filters db) "uncategorized")
                  (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
         (router/redirect-404!))
       (when (jwt/jwt)
@@ -171,9 +172,7 @@
                               old-board-data
                               fixed-board-data)]
       (-> db
-        (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
-        ;; show add topic if the board loaded is the one currently shown and it has no topics
-        (assoc :show-add-topic (:show-add-topic db))))))
+        (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)))))
 
 (defmethod dispatcher/action :new-topics-load/finish [db [_ body]]
   (if body
@@ -252,9 +251,8 @@
   (-> db
     (assoc :foce-key (keyword topic)) ; which topic is being FoCE
     (assoc :foce-data topic-data)     ; map of the in progress edits of the topic data
-    (assoc :foce-data-editing? false)   ; is the data portion of the topic (e.g. finance, growth) being edited
-    (assoc :show-top-menu nil)          ; dismiss top menu
-    (dissoc :show-add-topic)))          ; remove the add topic view)
+    (assoc :foce-data-editing? false) ; is the data portion of the topic (e.g. finance, growth) being edited
+    (assoc :show-top-menu nil)))      ; dismiss top menu
 
 (defn stop-foce [db]
   (let [board-data (dispatcher/board-data db (router/current-org-slug) (router/current-board-slug))
@@ -262,7 +260,6 @@
     (-> db
       (dissoc :foce-key)
       (dissoc :foce-data)
-      (assoc :show-add-topic show-add-topic)
       (dissoc :foce-data-editing?))))
 
 ;; Front of Card Edit topic
@@ -297,7 +294,6 @@
     (-> db
       (stop-foce)
       (assoc :prevent-topic-not-found-navigation true)
-      (assoc :show-add-topic (zero? (count new-topics)))
       (assoc-in (conj board-key :topics) new-topics)
       (assoc-in (conj board-key :archived) new-archived))))
 
@@ -615,10 +611,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :add-topic-show
-  [db [_ active]]
-  (assoc db :show-add-topic active))
-
 (defmethod dispatcher/action :dashboard-select-topic
   [db [_ board-slug topic-slug]]
   (if (pos? (count (filter #(and (= board-slug (:board-slug %)) (= topic-slug (:topic-slug %))) (:dashboard-selected-topics db))))
@@ -641,47 +633,7 @@
   [db [_ activate]]
   (-> db
     (assoc :dashboard-sharing activate)
-    (dissoc :show-add-topic)
     (assoc :dashboard-selected-topics [])))
-
-(defmethod dispatcher/action :topic-add
-  [db [_ topic topic-data]]
-  (let [board-data (dispatcher/board-data)
-        archived-topics (:archived board-data)
-        updated-archived (if (:was-archived topic-data)
-                            (vec (filter #(not= (:topic %) (name topic)) archived-topics))
-                            archived-topics)
-        updated-topics (conj (:topics board-data) (name topic))
-        updated-board-data (-> board-data
-                                (assoc :topics updated-topics)
-                                (assoc :archived updated-archived)
-                                (assoc (keyword topic) topic-data))
-        board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        next-db (assoc-in db board-data-key updated-board-data)]
-    (when (:was-archived topic-data)
-      (api/patch-topics updated-topics))
-    (if (:was-archived topic-data)
-     next-db
-     (start-foce next-db topic topic-data))))
-
-(defmethod dispatcher/action :add-topic-rollback
-  [db [_ topic-kw]]
-  (let [board-data-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        board-data (get-in db board-data-key)
-        topic-data (get board-data topic-kw)
-        archived-topics (:archived board-data)
-        updated-archived (if (:was-archived topic-data)
-                            (conj archived-topics {:topic (name topic-kw)
-                                                   :title (:title topic-data)})
-                            archived-topics)
-        updated-topics (utils/vec-dissoc (:topics board-data) (name topic-kw))
-        updated-board-data (-> board-data
-                                (dissoc topic-kw)
-                                (assoc :topics updated-topics)
-                                (assoc :archived updated-archived))]
-    (-> db
-      (assoc-in board-data-key updated-board-data)
-      (stop-foce))))
 
 (defmethod dispatcher/action :top-menu-show [db [_ topic]]
   (assoc db :show-top-menu topic))
@@ -911,8 +863,11 @@
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         entry-uuid (:entry-uuid interaction-data)
+        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-data (get-in db board-key)
         ; Entry data
-        entry-data (dispatcher/entry-data org-slug board-slug entry-uuid db)]
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-data (get (:entries board-data) entry-idx)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
@@ -924,7 +879,17 @@
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
             comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
-            is-current-user (= (jwt/get-key :user-id) (:user-id (:author comment-data)))]
+            current-user-id (jwt/get-key :user-id)
+            is-current-user (= current-user-id (:user-id (:author comment-data)))
+            ; update the comments link of the entry
+            comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
+            with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
+            old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
+            new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
+            new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
+                          old-authors
+                          (conj old-authors new-author))
+            with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
         ;; Refresh the topic data if the action coming in is from the current user
         ;; to get the new links to interact with
         (when is-current-user
@@ -933,7 +898,9 @@
         (when (not= (count all-old-comments-data) (count new-comments-data))
           (utils/pulse-comments-count entry-uuid))
         ; Update the local state with the new comments list
-        (assoc-in db comments-key sorted-comments-data))
+        (-> db
+            (assoc-in comments-key sorted-comments-data)
+            (assoc-in (concat board-key [:entries entry-idx]) with-authors)))
       ;; the entry is not present, refresh the full topic
       (do
         ;; force refresh of topic
@@ -998,5 +965,140 @@
 
 (defmethod dispatcher/action :entry-modal-fade-in
   [db [_ entry-uuid]]
-  (utils/after 10 #(router/nav! (oc-urls/entry entry-uuid)))
+  (utils/after 10
+   #(let [route (:route @router/path)
+          new-route (vec (conj route entry-uuid))
+          parts {:org (router/current-org-slug) :board (router/current-board-slug) :entry entry-uuid :query-params (:query-params @router/path)}]
+      (router/set-route! new-route parts)
+      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry entry-uuid))
+      (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
   (assoc db :entry-modal-fade-in entry-uuid))
+
+(defmethod dispatcher/action :entry-edit
+  [db [_ initial-entry-data]]
+  (assoc db :entry-editing initial-entry-data))
+
+(defmethod dispatcher/action :entry-edit/dismiss
+  [db [_ show?]]
+  (dissoc db :entry-editing))
+
+(defmethod dispatcher/action :topic-add
+  [db [_ topic-map use-in-new-entry?]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        next-topics (conj (:topics board-data) topic-map)
+        next-board-data (assoc board-data :topics next-topics)
+        next-db (assoc-in db board-key next-board-data)]
+    (if use-in-new-entry?
+      (-> next-db
+        (assoc-in [:entry-editing :topic-slug] (:slug topic-map))
+        (assoc-in [:entry-editing :topic-name] (:name topic-map)))
+      next-db)))
+
+(defn author-data [current-user-data as-of]
+  {:avatar-url (:avatar-url current-user-data)
+   :name (str (:first-name current-user-data) " " (:last-name current-user-data))
+   :user-id (:user-id current-user-data)
+   :updated-at as-of})
+
+(defn new-entry-fixed-data [entry-data board-data current-user-data as-of]
+  (utils/fix-entry (merge entry-data {:author [(author-data current-user-data as-of)]
+                                      :created-at as-of
+                                      :updated-at as-of
+                                      :reactions []
+                                      :uuid (utils/entry-uuid)})
+                   (:topics board-data)))
+
+(defn entry-fixed-data [entry-data current-user-data as-of]
+  (let [new-author (author-data current-user-data as-of)]
+    (merge entry-data {:updated-at as-of
+                       :author (if (sequential? (:author entry-data))
+                                 (conj (:author entry-data) new-author)
+                                 [(:author entry-data) new-author])})))
+
+(defmethod dispatcher/action :entry-save
+  [db [_]]
+  (let [entry-data (:entry-editing db)
+        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        as-of (utils/as-of-now)
+        new-entry? (empty? (:uuid entry-data))
+        current-user-data (:current-user-data db)
+        fixed-entry (if new-entry?
+                      (new-entry-fixed-data entry-data board-data current-user-data as-of)
+                      (entry-fixed-data entry-data current-user-data as-of))
+        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (:entries board-data))
+        new-entries (conj filtered-entries fixed-entry)
+        sorted-entries (vec (sort-by :updated-at new-entries))
+        next-board-data (assoc board-data :entries sorted-entries)
+        next-board-filters (if (= (:board-filters db) (:topic-slug entry-data))
+                              ; if it's filtering by the same topic of the new entry leave it be
+                              (:board-filters db)
+                              (if (keyword? (:board-filters db))
+                                ; if it's different but it's a keyword it means it's sorting (by latest or topic)
+                                (:board-filters db)
+                                ; else sort by latest because it's filtering by a different topic
+                                :latest))]
+    (if new-entry?
+      (api/create-entry entry-data)
+      (api/update-entry entry-data))
+    (-> db
+        (assoc-in board-key next-board-data)
+        (assoc :board-filters next-board-filters))))
+
+(defmethod dispatcher/action :entry-save/finish
+  [db [_]]
+  (api/get-board (dispatcher/board-data))
+  db)
+
+(defmethod dispatcher/action :board-nav
+  [db [_ board-slug board-filters]]
+  (let [next-board-filter (if board-filters
+                            ; If a board filter is passed use it
+                            board-filters
+                            (if (:entry-pushed db)
+                              ; If the modal was open from the dashboard, restore the previous opened filter
+                              (:board-filters db)
+                              ; If it was open directly from a link restore the last opened dashboard sort
+                              (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest)))
+        next-board-url (if (string? next-board-filter)
+                         (oc-urls/board-filter-by-topic next-board-filter)
+                         (if (= next-board-filter :by-topic)
+                           (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
+                           (oc-urls/board (router/current-org-slug) board-slug)))]
+    (utils/after 10
+      #(if (:entry-pushed db)
+         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+               parts (dissoc @router/path :route :entry)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
+         (router/nav! next-board-url)))
+    (assoc db :board-filters next-board-filter)))
+
+(defmethod dispatcher/action :entry-delete
+  [db [_ entry-data]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        filtered-entries (filter #(not= (:uudi %) (:uuid entry-data)) (:entries board-data))
+        sorted-entries (vec (sort-by :updated-at filtered-entries))
+        next-board-data (assoc board-data :entries sorted-entries)]
+    (api/delete-entry entry-data)
+    (assoc-in db board-key next-board-data)))
+
+(defmethod dispatcher/action :entry-delete/finish
+  [db [_]]
+  (api/get-board (dispatcher/board-data))
+  db)
+
+(defmethod dispatcher/action :alert-modal-show
+  [db [_ modal-data]]
+  (assoc db :alert-modal modal-data))
+
+(defmethod dispatcher/action :alert-modal-hide
+  [db [_]]
+  (assoc-in db [:alert-modal :dismiss] true))
+
+(defmethod dispatcher/action :alert-modal-hide-done
+  [db [_]]
+  (dissoc db :alert-modal))

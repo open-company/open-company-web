@@ -4,6 +4,7 @@ div.interactions-summary {
   div.is-reactions{
     float: left;
     margin-right: 24px;
+    height: 24px;
 
     div.is-reactions-reaction {
       float: left;
@@ -22,6 +23,7 @@ div.interactions-summary {
   div.is-comments {
     float: left;
     text-align: right;
+    height: 24px;
 
     div.is-comments-authors {
       float: left;

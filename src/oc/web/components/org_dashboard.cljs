@@ -15,10 +15,12 @@
             [oc.web.components.topics-list :refer (topics-list)]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
             [oc.web.components.entry-modal :refer (entry-modal)]
+            [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -52,7 +54,7 @@
      :new-topics-requested false
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
-                   (responsive/calc-card-width))
+                   responsive/card-width)
      :columns-num (responsive/dashboard-columns-num)})
 
   (did-mount [_]
@@ -63,7 +65,7 @@
       (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
                                                                                            :card-width (if (responsive/is-mobile-size?)
                                                                                                          (responsive/mobile-dashboard-card-width)
-                                                                                                         (responsive/calc-card-width))})))))
+                                                                                                         responsive/card-width)})))))
     (om/set-state! owner :window-click-listener
       (events/listen js/window EventType/CLICK (fn[e]
                                                  (when (and (:show-top-menu @dis/app-state)
@@ -114,6 +116,10 @@
             (login-overlays-handler))
           (when (router/current-entry-uuid)
             (entry-modal (dis/entry-data)))
+          (when (:entry-editing data)
+            (entry-edit))
+          (when (:alert-modal data)
+            (alert-modal))
           (if board-error
             (dom/div {:class "fullscreen-page with-small-footer"}
               (login-required data))
@@ -169,7 +175,7 @@
                                          :show-login-overlay (:show-login-overlay data)
                                          :foce-key (:foce-key data)
                                          :foce-data (:foce-data data)
-                                         :show-add-topic (:show-add-topic data)
+                                         :entry-editing (:entry-editing data)
                                          :dashboard-selected-topics (:dashboard-selected-topics data)
                                          :dashboard-sharing (:dashboard-sharing data)
                                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
@@ -191,7 +197,7 @@
                                    :show-login-overlay (:show-login-overlay data)
                                    :foce-key (:foce-key data)
                                    :foce-data (:foce-data data)
-                                   :show-add-topic (:show-add-topic data)
+                                   :entry-editing (:entry-editing data)
                                    :dashboard-selected-topics (:dashboard-selected-topics data)
                                    :dashboard-sharing (:dashboard-sharing data)
                                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)

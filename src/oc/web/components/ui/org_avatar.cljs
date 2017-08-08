@@ -33,11 +33,7 @@
            :on-click (fn [e]
                        (.preventDefault e)
                        (when should-show-link
-                         (when-let [board-data (dis/board-data)]
-                            (when (and board-data
-                                       (pos? (count (:topics board-data))))
-                              (dis/dispatch! [:dashboard-share-mode false])))
-                         (router/nav! avatar-link)))}
+                         (router/redirect! avatar-link)))}
           [:div.org-avatar-container.group
             (when show-org-avatar?
               [:div.org-avatar-border

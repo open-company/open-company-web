@@ -27,8 +27,8 @@
 (defn dashboard-columns-num []
   (let [win-width (ww)]
     (cond
-      (>= win-width c3-min-win-width)
-      3
+      ; (>= win-width c3-min-win-width)
+      ; 3
       (>= win-width mobile-2-columns-breakpoint)
       2
       :else
@@ -37,8 +37,8 @@
 (defn columns-num []
   (let [win-width (ww)]
     (cond
-      (>= win-width c3-min-win-width)
-      3
+      ; (>= win-width c3-min-win-width)
+      ; 3
       (>= win-width big-web-min-width)
       2
       :else
@@ -83,7 +83,8 @@
   (or (is-mobile-size?) (user-agent-mobile?)))
 
 (def topic-list-x-padding 20)
-(def topic-total-x-padding 20)
+(def topic-total-x-padding 32)
+(def topic-list-right-margin 36)
 (def left-boards-list-width 178)
 
 (defn is-tablet-or-mobile? []
@@ -94,64 +95,20 @@
         (= (gobj/get js/WURFL "form_factor") "Smartphone")
         (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
 
-(defn calc-card-width [& [force-columns]]
-  (let [win-width (ww)
-        columns (or force-columns (columns-num))]
-    (cond
-      (= columns 3)
-      (min (/ (- win-width
-                 (* topic-list-x-padding 2)
-                 (* topic-total-x-padding 3)
-                 (if (is-tablet-or-mobile?) 0 left-boards-list-width))
-              3)
-           420)
-      (= columns 2)
-      (max (/ (- win-width
-                 (* topic-list-x-padding 2)
-                 (* topic-total-x-padding 2)
-                 (if (is-tablet-or-mobile?) 0 left-boards-list-width))
-              2)
-           208))))
+(def card-width 432)
 
 (defn can-edit? []
   "Check if it's mobile based only on the UserAgent"
   (not (user-agent-mobile?)))
-
-(defn fullscreen-topic-width [card-width]
-  (let [win-width (ww)]
-    (if (> win-width big-web-min-width)
-      big-web-min-width
-      (min card-width win-width))))
-
-(def mobile-topic-total-x-padding 4)
-(def updates-content-list-width 280)
-(def updates-content-cards-right-margin 40)
-(def updates-content-cards-max-width 560)
-(def updates-content-cards-min-width 250)
-(def updates-max-total-width 1152)
-(def updates-list-breakpoint 958)
 
 (defn total-layout-width-int [card-width columns-num]
   (if (is-mobile-size?)
     (let [win-width (ww)]
       (- win-width 8 8))
     (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
-       (* topic-list-x-padding 2)                              ; the padding around all the columns
+       (* topic-list-x-padding 2)
+       topic-list-right-margin
        (if (is-tablet-or-mobile?) 0 left-boards-list-width)))) ; the left side panel with the topics list
-
-(defn calc-update-width [columns-num]
-  (let [card-width   (calc-card-width)
-        total-width-int (total-layout-width-int card-width columns-num)
-        fixed-total-width-int (if (<= total-width-int (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width))
-                                (+ updates-content-cards-min-width updates-content-cards-right-margin updates-content-list-width)
-                                total-width-int)
-        fixed-card-width (if (>= (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin) updates-content-cards-max-width)
-                            updates-content-cards-max-width
-                            (- fixed-total-width-int updates-content-list-width updates-content-cards-right-margin))]
-    fixed-card-width))
-
-(defn topic-view-width [card-width columns-num]
-  (* (+ card-width topic-total-x-padding) columns-num))
 
 (when (not (.-_phantom js/window))
   (events/listen js/window EventType/RESIZE #(set-browser-type!)))

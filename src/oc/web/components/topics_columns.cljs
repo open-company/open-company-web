@@ -7,7 +7,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.add-topic :refer (add-topic)]
             [oc.web.components.boards-list :refer (boards-list)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -35,7 +34,7 @@
                                       topics-data
                                       is-dashboard
                                       is-stakeholder-update
-                                      show-add-topic
+                                      new-entry-edit
                                       board-filters] :as data} owner options]
 
   (render [_]
@@ -54,7 +53,7 @@
                                                  :width "auto"}
                                             #js {:width total-width}))
           total-width-int (js/parseInt total-width 10)
-          empty-board? (zero? (count (:topics board-data)))]
+          empty-board? (zero? (count (:entries board-data)))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -79,7 +78,7 @@
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build boards-list data))
             (dom/div {:class "board-container right"
-                      :style {:width (str (- total-width-int responsive/left-boards-list-width 40) "px")}}
+                      :style {:width (str (- total-width-int responsive/left-boards-list-width responsive/topic-list-right-margin (* 2 responsive/topic-list-x-padding)) "px")}}
               ;; Board name row: board name, settings button and say something button
               (dom/div {:class "group"}
                 ;; Board name and settings button
@@ -91,36 +90,29 @@
                                  :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))})))
                 ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
-                           (not show-add-topic)
+                           (not new-entry-edit)
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?))
                            (not (:dashboard-sharing data)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
-                               :on-click #(dis/dispatch! [:add-topic-show true])}
+                               :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "Say something")))
-              ;; Board filters dropdown
-              (when (and (not is-mobile-size?)
-                         (not empty-board?))
-                (filters-dropdown))
+                    "New Update"))
+                ;; Board filters dropdown
+                (when (and (not is-mobile-size?)
+                           (not empty-board?))
+                  (filters-dropdown)))
               ;; Board content: empty board, add topic, topic view or topic cards
               (cond
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-entry-uuid)
-                     (not show-add-topic)
+                     (not new-entry-edit)
                      empty-board?)
                 (empty-board)
-                (and is-dashboard
-                     (not is-mobile-size?)
-                     (not current-entry-uuid)
-                     show-add-topic)
-                (dom/div {:class "add-topic-container group"}
-                  (add-topic (partial update-active-topics owner)))
                 ; for each column key contained in best layout
                 :else
-                (let [all-entries (:entries board-data)]
-                  (entries-layout all-entries board-filters)))))
+                (entries-layout board-data board-filters))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"

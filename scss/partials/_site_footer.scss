@@ -1,5 +1,5 @@
 .navbar-bottom {
-  background-color: $cr_dark_blue !important;
+  background-color: $carrot_dark_blue !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
@@ -56,7 +56,7 @@
       }
 
       div.small-logos {
-        margin-top: 40px;
+        margin-top: 73px;
 
         @include mobile(){
           margin-bottom: 20px;
@@ -70,7 +70,7 @@
         }
 
         a.medium {
-          margin-left: 10px;
+          margin-left: 20px;
           img {
             width: 22px;
             height: 22px;
@@ -101,6 +101,20 @@
         float: right;
         margin-right: 30px;
         width: 100px;
+
+        @include big_web(){
+          &.column-tour {
+            width: 110px;
+          }
+
+          &.column-integration {
+            width: 126px;
+          }
+
+          &.column-support {
+            width: 80px;
+          }
+        }
 
         @include mobile(){
           float: none;

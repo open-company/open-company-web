@@ -12,10 +12,10 @@
     {:class container-class}
     [:div.small-logos
       [:a.twitter
-        {:href oc-urls/oc-twitter}
+        {:target "_blank" :href oc-urls/oc-twitter :title "Carrot on Twitter"}
         [:img {:src (utils/cdn "/img/ML/home_page_twitter.svg")}]]
       [:a.medium
-        {:href oc-urls/oc-medium}
+        {:target "_blank" :href oc-urls/blog :title "Carrot on Medium"}
         [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
@@ -27,14 +27,15 @@
       [:div.left-column
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        [:div.small-links
-          [:a {:href oc-urls/home-try-it-focus} "Request Free Early Access"]]
+        ; FIXME: reactivate request early access
+        ; [:div.small-links
+        ;   [:a {:href oc-urls/home-try-it-focus} "Request Free Early Access"]]
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 
       [:div.right-column
 
-        [:div.column
+        [:div.column.column-support
           {:class (when (= @(::expanded s) :support) "expanded")}
           [:div.column-title
             {:on-click #(when (responsive/is-mobile-size?)
@@ -45,7 +46,7 @@
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Help"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
-        [:div.column
+        [:div.column.column-integration
           {:class (when (= @(::expanded s) :integration) "expanded")}
           [:div.column-title
             {:on-click #(when (responsive/is-mobile-size?)
@@ -55,7 +56,7 @@
             "INTEGRATIONS"]
           [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
 
-        [:div.column
+        [:div.column.column-company
           {:class (when (= @(::expanded s) :company) "expanded")}
           [:div.column-title
             {:on-click #(when (responsive/is-mobile-size?)
@@ -64,9 +65,9 @@
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
-          [:div.column-item [:a {:href oc-urls/blog} "Blog"]]]
+          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
-        [:div.column
+        [:div.column.column-tour
           {:class (when (= @(::expanded s) :tour) "expanded")}
           [:div.column-title
             {:on-click #(when (responsive/is-mobile-size?)

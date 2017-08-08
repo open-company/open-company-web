@@ -793,6 +793,39 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
+(def entry-keys [:headline :body :topic-name :attachments])
+
+(defn create-entry
+  [entry-data]
+  (when entry-data
+    (let [board-data (dispatcher/board-data)
+          create-entry-link (utils/link-for (:links board-data) "create" "POST")
+          cleaned-entry-data (select-keys entry-data entry-keys)]
+      (storage-post (:href create-entry-link)
+        {:headers (headers-for-link create-entry-link)
+         :json-params (cljs->json cleaned-entry-data)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:entry-save/finish]))))))
+
+(defn update-entry
+  [entry-data]
+  (when entry-data
+    (let [update-entry-link (utils/link-for (:links entry-data) "partial-update" "PATCH")
+          cleaned-entry-data (select-keys entry-data entry-keys)]
+      (storage-patch (:href update-entry-link)
+        {:headers (headers-for-link update-entry-link)
+         :json-params (cljs->json cleaned-entry-data)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:entry-save/finish]))))))
+
+(defn delete-entry [entry-data]
+  (when entry-data
+    (when-let [entry-delete-link (utils/link-for (:links entry-data) "delete")]
+      (storage-delete (:href entry-delete-link)
+        {:headers (headers-for-link entry-delete-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:entry-delete/finish]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go

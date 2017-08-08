@@ -80,5 +80,5 @@
                          :on-click #(router/nav! (oc-urls/org))}
                         (dom/label {:class (str "mt1" (when loading " ml2"))} "SKIP"))))
       (let [columns-num (responsive/columns-num)
-            card-width (responsive/calc-card-width)]
+            card-width responsive/card-width]
         (footer (responsive/total-layout-width-int card-width columns-num))))))

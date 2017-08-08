@@ -17,11 +17,12 @@ div.topics-columns {
     position: relative;
 
     div.board-container {
+      margin-right: 36px;
 
       div.board-name {
         @include avenir_M();
         font-size: 32px;
-        color: $cr_gray;
+        color: $carrot_gray;
         margin-bottom: 30px;
         float: left;
         margin-left: 15px;
@@ -44,7 +45,7 @@ div.topics-columns {
 
       button.add-to-board-btn {
         float: right;
-        margin-right: 5px;
+        margin-right: 16px;
 
         div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");
@@ -52,13 +53,19 @@ div.topics-columns {
           width: 16px;
           height: 16px;
           margin-right: 8px;
-          margin-top: 5px;
+          margin-top: 3px;
           float: left;
         }
 
-        &:hover div.add-to-board-pencil {
+        &:hover div.add-to-board-pencil, &:focus div.add-to-board-pencil, &:active div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
         }
+      }
+
+      div.filters-dropdown-name {
+        float: right;
+        margin-right: 24px;
+        margin-top: 8px;
       }
     }
 

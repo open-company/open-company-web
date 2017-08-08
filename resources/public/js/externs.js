@@ -12,7 +12,6 @@ $.position.top = {};
 $.position.left = {};
 $.appendTo = function(){};
 $.detach = function(){};
-$.height = function(){};
 $.find = function(){};
 $.data = function(){};
 $.sortable = function(){};
@@ -37,9 +36,11 @@ $.width = function(){};
 $.height = function(){};
 $.last = function(){};
 $.text = function(){};
-$.remove = function(){};
 $.animate = function(){};
 $.prop = function(){};
+$.dropdown = function(){};
+$.not = function(){};
+$.dotdotdot = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -76,4 +77,4 @@ filestack.init = function(){};
 filestack.pick = function(){};
 filestack.then = function(){};
 
-var mailchipApiSubmit = function(){};
+var mailchimpApiSubmit = function(){};

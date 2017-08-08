@@ -28,10 +28,10 @@
     {:columns-num (responsive/columns-num)})
 
   (render-state [_ {:keys [columns-num]}]
-    (utils/update-page-title "Carrot - Company updates and stories")
+    (utils/update-page-title "Carrot - Get everyone aligned")
     (when (:orgs data)
       (let [orgs-list (:orgs data)
-            card-width (responsive/calc-card-width)]
+            card-width responsive/card-width]
         (dom/div {:class "list-orgs"}
           ;show login overlays if needed
           (when-not (utils/is-test-env?)

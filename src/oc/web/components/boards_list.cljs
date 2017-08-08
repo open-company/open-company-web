@@ -46,9 +46,10 @@
         (dom/div {:class "left-boards-list group"
                   :style {:width (str (- left-boards-list-width 20) "px")}}
           ;; All activity
-          (dom/button {:class "all-activity group"}
-            (dom/div {:class "all-activity-icon"})
-            (dom/span "All Activity"))
+          (when (jwt/user-is-part-of-the-team (:team-id org-data))
+            (dom/button {:class "all-activity group"}
+              (dom/div {:class "all-activity-icon"})
+              (dom/span "All Activity")))
           ;; Boards list
           (dom/div {:class "left-boards-list-top group"}
             ;; Boards header
@@ -73,8 +74,7 @@
                         :style {:width (str (- left-boards-list-width 20 5) "px")}
                         :data-board (name (:slug board))
                         :key (str "board-list-" (name (:slug board)))
-                        :on-click #(when (nil? (:foce-key data))
-                                     (router/nav! (oc-urls/board (router/current-org-slug) (:slug board))))}
+                        :on-click #(dis/dispatch! [:board-nav (:slug board)])}
                 (dom/div {:class "internal has-news"
                           :key (str "board-list-" (name (:slug board)) "-internal")}
                   (or (:name board) (:slug board)))

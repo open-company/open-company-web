@@ -1,39 +1,57 @@
 div.entry-card {
   width: 432px;
-  max-height: 265px;
+  max-height: 295px;
   float: left;
   background-color: white;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-  border-radius: 4px;
-  padding: 32px 24px;
+  border-radius: 8px;
+  padding: 32px 24px 63px;
   margin: 10px 16px;
+  position: relative;
+
+  &.entry-card-placeholder {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+  }
 
   &.empty-state {
     border: none;
     box-shadow: none;
     background-color: transparent;
-    background-image: cdnUrl("/img/ML/entry_empty_state.svg");
-    background-size: 168px 120px;
-    background-position: 50% 40%;
-    background-repeat: no-repeat;
     margin-top: 20px;
+    flex: 1;
+    text-align: center;
+    width: 100%;
 
-    div.entry-card-title {
-      font-size: 14px;
-      color: $cr_light_gray;
-      @include avenir_H();
-      margin-top: 140px;
-      text-align: center;
+    div.empty-state-content {
+      height: 160px;
+      position: relative;
+      top: 50%;
+      margin-top: -80px;
 
-      button {
-        color: $cr_text_blue;
-        padding: 0;
-        margin: 0;
+      img {
+        width: 168px;
+        height: 120px;
+      }
 
-        &:hover, &:avtive, &:focus {
-          border: none;
-          outline: none;
-          text-decoration: underline;
+      div.entry-card-title {
+        font-size: 14px;
+        color: $carrot_light_gray;
+        @include avenir_H();
+        margin-top: 20px;
+        text-align: center;
+
+        button {
+          color: $carrot_text_blue;
+          padding: 0;
+          margin: 0;
+
+          &:hover, &:avtive, &:focus {
+            border: none;
+            outline: none;
+            text-decoration: underline;
+          }
         }
       }
     }
@@ -44,7 +62,7 @@ div.entry-card {
 
     div.entry-card-head-author {
       float: left;
-      width: 80%;
+      min-width: 60%;
       padding-right: 20px;
       overflow: hidden;
 
@@ -53,14 +71,13 @@ div.entry-card {
 
     div.entry-card-head-right {
       float: right;
-      width: 20%;
 
-      div.new {
+      div.topic-tag {
         margin-top: 0;
         float: right;
       }
 
-      @include entry-new();
+      @include entry-topic-tag();
     }
   }
 
@@ -69,34 +86,53 @@ div.entry-card {
 
     div.entry-card-headline {
       @include entry-headline();
-      margin-top: 24px;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
       max-height: 28px;
       white-space: nowrap;
+
+      &.has-headline {
+        margin-top: 24px;
+        height: 28px;
+      }
     }
 
     div.entry-card-body {
       @include entry-body();
-
-      margin-top: 24px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      display: block;
       line-height: 24px;
-      max-height: #{24*2}px;
+      max-height: #{24*3}px;
+
+      &.has-body {
+        margin-top: 16px;
+        height: #{24*3}px;
+      }
+
+      p {
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+
+      a:not(.read-more):hover {
+        text-decoration: none !important;
+      }
 
       img:not(.emojione){
         display: none;
       }
 
-      span.full-update {
-        color: $cr_text_blue;
+      a.read-more {
+        @include avenir_R();
+        font-size: 16px;
+        color: $carrot_text_blue;
         cursor: pointer;
-        margin-left: 5px;
+        // margin-left: 0px;
+        display: inline-block !important;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
 
       // // Uncomment this to programmatically add the read full update at the end of the last body tag
@@ -104,7 +140,7 @@ div.entry-card {
       //   &:after {
       //     content: "Read Full Update";
       //     @include entry-body;
-      //     color: $cr_text_blue;
+      //     color: $carrot_text_blue;
       //     cursor: pointer;
       //     margin-left: 5px;
       //   }
@@ -114,7 +150,7 @@ div.entry-card {
       //   &:after {
       //     content: "Read Full Update";
       //     @include entry-body;
-      //     color: $cr_text_blue;
+      //     color: $carrot_text_blue;
       //     cursor: pointer;
       //   } 
       // }
@@ -122,20 +158,78 @@ div.entry-card {
   }
 
   div.entry-card-footer {
-    margin-top: 15px;
+    position: absolute;
+    width: calc(100% - 48px);
+    bottom: 0px;
+    left: 0px;
+    margin: 15px 24px 16px;
+
+    div.interactions-summary {
+      margin-top: 8px;
+    }
 
     div.more-button {
       float: right;
+      position: relative;
+      margin-right: -6px;
 
       button.more-ellipsis {
-        width: 22px;
-        height: 22px;
-        padding: 4px 9px;
+        width: 32px;
+        height: 32px;
+        padding: 8px 0px 8px 16px;
         display: block;
         background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-        background-position: center;
-        background-size: 3px 13px;
+        background-position: right center;
+        background-size: 16px 16px;
         background-repeat: no-repeat;
+      }
+
+      div.dropdown-menu {
+        position: absolute;
+        top: -49px;
+        left: -91px;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        background-color: transparent;
+
+        div.triangle {
+          position: absolute;
+          top: 55px;
+          left: 90px;
+          background-color: white;
+          border-top: 1px solid rgba(177,184,192,0.50);
+          border-left: 1px solid rgba(177,184,192,0.50);
+          transform: rotate(135deg);
+          width: 20px;
+          height: 20px;
+        }
+
+        ul.entry-card-more-menu {
+          background-color: white;
+          border: 1px solid rgba(177,184,192,0.50);
+          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+          border-radius: 5px;
+          margin: 8px 0;
+          padding: 10px 16px 6px;
+          min-height: 50px;
+          list-style-type: none;
+          width: 100px;
+
+          li {
+            margin: 6px 0;
+            @include avenir_M();
+            font-size: 14px;
+            color: $oc_gray_7;
+            cursor: pointer;
+            background-color: transparent;
+
+            &:hover {
+              text-decoration: underline;
+              background-color: transparent;
+            }
+          }
+        }
       }
     }
   }

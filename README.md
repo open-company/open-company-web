@@ -192,8 +192,6 @@ provided in the table below:
 
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
-|  :add-topic-rollback | UI | Rollback the add topic to the board. User canceled action. |
-|  :add-topic-show | UI | Show the add topic view in the dashboard. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -202,6 +200,7 @@ provided in the table below:
 |  :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
 |  :board-create | UI | Start the request to create a new board for the current org. |
 |  :board-delete | UI | Delete a board of the current org. |
+|  :board-nav | UI | Navigate to another board: it needs an action because it reset the board filters before navigating away. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |
 |  :channels-enumerate | UI | Start the request to load the Slack channels give a Slack team. |
@@ -217,7 +216,13 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entry-delete | UI | Delete the selected entry. |
+|  :entry-delete/finish | API | Entry delete request finished, refresh the board data. |
+|  :entry-edit | UI | Start editing of an existing or a new entry. |
+|  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
+|  :entry-save | UI | Save the edited entry. |
+|  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :foce-data-editing-start | UI | Start the data edit for growth and finances topics. |
 |  :foce-input | UI | Save a new data for the current edited entry. |
@@ -261,7 +266,7 @@ provided in the table below:
 |  :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
 |  :top-menu-show | UI | Toggle the dropdown menu of the topic in the dashboard. |
 |  :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
-|  :topic-add | UI | Give a topic and its data add the topic to the current board. |
+|  :topic-add | UI | Add a new topic to the topics list of the current board. |
 |  :topic-archive | UI | Start the archive topic action. Call the API function to archive. |
 |  :topic-archive/success | API | Archive succesfully done, navigate to the board to reload the data without the topic. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |

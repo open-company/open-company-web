@@ -7,7 +7,6 @@
 (defonce app-state (atom {:loading false
                           :mobile-menu-open false
                           :show-login-overlay false
-                          :show-add-topic false
                           :dashboard-sharing false
                           :trend-bar-status :hidden}))
 
@@ -142,7 +141,13 @@
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
-                             :error-banner-time (:error-banner-time base)})]})
+                             :error-banner-time (:error-banner-time base)})]
+   :entry-editing       [[:base]
+                          (fn [base]
+                            (:entry-editing base))]
+   :alert-modal         [[:base]
+                          (fn [base]
+                            (:alert-modal base))]})
 
 ;; Action Loop =================================================================
 

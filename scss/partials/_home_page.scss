@@ -23,32 +23,33 @@ div#wrap {
       h1.headline {
         font-size: 48px;
         @include avenir_B();
-        color: $cr_dark_blue;
+        color: $carrot_dark_blue;
         padding: 0 16px;
-        max-width: 970px;
+        max-width: 1050px;
         margin: 0 auto 20px;
         line-height: 60px;
 
         @include mobile() {
           font-size: 32px;
+          line-height: 45px;
         }
       }
 
       div.subheadline {
         color: #4D4D4D;
-        font-size: 22px;
+        font-size: 24px;
         padding: 0 16px;
         @include avenir_R();
         line-height: 32px;
-        max-width: 530px;
-        margin: 20px auto 0;
+        max-width: 660px;
+        margin: 20px auto 40px;
       }
 
       button.get-started-centred-bt {
         max-width: 320px;
         height: 48px;
         border-radius: 8px;
-        background-color: $cr_text_blue;
+        background-color: $carrot_text_blue;
         color: white;
         padding: 3px 56px;
         @include avenir_H();
@@ -62,7 +63,7 @@ div#wrap {
       }
 
       div.small-teams {
-        color: $cr_dark_blue;
+        color: $carrot_dark_blue;
         font-size: 12px;
         @include avenir_H();
         margin-top: 16px;
@@ -98,6 +99,7 @@ div#wrap {
         div.description {
           @media screen and (max-width: 1126px){
             margin-top: 60px;
+            padding: 0 16px;
           }
 
           @media screen and (min-width: 1127px){
@@ -105,17 +107,19 @@ div#wrap {
           }
 
           div.title {
-            color: $cr_dark_blue;
+            color: $carrot_dark_blue;
             @include avenir_H();
             font-size: 36px;
             letter-spacing: 0.1px;
+            text-align: left;
           }
 
           div.subtitle {
-            color: $cr_dark_blue;
+            color: $carrot_dark_blue;
             @include avenir_M();
             font-size: 20px;
             line-height: 1.7;
+            text-align: left;
           }
         }
 
@@ -126,7 +130,6 @@ div#wrap {
             img {
               float: right;
               margin-right: 80px;
-              max-width: 416px;
             }
 
             div.description {
@@ -142,15 +145,14 @@ div#wrap {
 
             img {
               float: left;
-              margin-left: 80px;
-              max-width: 320px;
+              margin-left: 50px;
             }
 
             div.description {
               float: right;
               text-align: right;
               margin-top: 90px;
-              margin-right: 90px;
+              margin-right: 20px;
             }
           }
 
@@ -159,14 +161,13 @@ div#wrap {
 
             img {
               float: right;
-              margin-right: 130px;
-              max-width: 320px;
+              margin-right: 100px;
             }
 
             div.description {
               float: left;
               text-align: left;
-              margin-left: 60px;
+              margin-left: 50px;
               margin-top: 90px;
             }
           }
@@ -177,7 +178,7 @@ div#wrap {
     div.customers {
       width: 100%;
       margin: 50px auto 0;
-      background-color: $cr_dark_blue;
+      background-color: $carrot_dark_blue;
       padding: 60px 0;
       text-align: center;
 
@@ -309,7 +310,7 @@ div#wrap {
       }
 
       div.try-it-combo-field button.try-it-get-started {
-        background-color: $cr_dark_blue;
+        background-color: $carrot_dark_blue;
       }
 
       div.carrot-box-container {

@@ -25,7 +25,7 @@ h1.about {
   @include avenir_H();
   font-size: 40px;
   letter-spacing: 0.3px;
-  color: $cr_dark_blue;
+  color: $carrot_dark_blue;
   margin: 47px auto 0;
   padding: 0 16px;
   max-width: 575px;
@@ -36,7 +36,7 @@ div.divider-line {
   margin-top: 32px;
   width: 82px;
   height: 6px;
-  background-color: $cr_orange;
+  background-color: $carrot_orange;
   left: 50%;
   margin-left: -41px;
   position: relative;
@@ -106,7 +106,7 @@ div.ovals-container {
     font-size: 28px;
     letter-spacing: 0.2px;
     text-align: center;
-    color: $cr_dark_blue;
+    color: $carrot_dark_blue;
     max-width: 767px;
     margin: 0px auto 40px;
     padding-top: 50px;
@@ -162,19 +162,26 @@ div.ovals-container {
     }
   }
 
-  @include mobile(){
-    div.paragraphs-bg-container {
+  div.paragraphs-bg-container {
+
+    @include mobile(){
       background-image: cdnUrl("/img/ML/about_mobile_oval_bg.svg");
       background-repeat: no-repeat;
-      width: 100%;
       height: auto;
       background-position: center top;
       background-size: 100%;
+      padding: 30px 50px;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
     }
-  }
 
-  @include big_web(){
-    div.paragraphs-bg-container {
+    @media screen and (max-width: 320px) {
+      padding: 10px 0;
+      margin: 0px auto;
+    }
+
+    @include big_web(){
       background-image: cdnUrl("/img/ML/about_oval_bg.svg");
       background-repeat: no-repeat;
       background-position: center;
@@ -187,8 +194,8 @@ div.ovals-container {
     @include avenir_BOOK();
     font-size: 20px;
     text-align: center;
-    color: $cr_text_blue_2;
-    max-width: 547px;
+    color: $carrot_text_blue_2;
+    max-width: 427px;
     margin: 20px auto 50px;
 
     &:last-child {
@@ -255,6 +262,7 @@ div.principles {
       max-width: 564px;
       text-align: left;
       margin-left: 160px;
+      color: #383b41;
 
       @include mobile(){
         width: 100%;
@@ -267,7 +275,7 @@ div.principles {
     }
 
     div.principle-description {
-      color: $cr_text_blue_2;
+      color: $carrot_text_blue_2;
       @include avenir_BOOK();
       font-size: 20px;
       max-width: 564px;
@@ -278,8 +286,6 @@ div.principles {
       @include mobile(){
         width: 100%;
         margin-left: 0px;
-        text-align: left;
-        font-size: 16px;
         max-width: initial;
       }
     }
@@ -293,10 +299,6 @@ div.principles {
       div.principle-oval-bg {
         background-image: cdnUrl("/img/ML/about_principle_1_oval.svg");
       }
-
-      div.principle-title {
-        color: $cr_orange;
-      }
     }
 
     &.principle-2 {
@@ -307,10 +309,6 @@ div.principles {
 
       div.principle-oval-bg {
         background-image: cdnUrl("/img/ML/about_principle_2_oval.svg");
-      }
-
-      div.principle-title {
-        color: $cr_green;
       }
     }
 
@@ -323,16 +321,12 @@ div.principles {
       div.principle-oval-bg {
         background-image: cdnUrl("/img/ML/about_principle_3_oval.svg");
       }
-
-      div.principle-title {
-        color: $cr_text_blue;
-      }
     }
   }
 }
 
 div.about-alignment {
-  background-color: $cr_dark_blue;
+  background-color: $carrot_dark_blue;
   padding: 115px 0;
   position: relative;
   margin: 177px 0 0;
@@ -346,7 +340,7 @@ div.about-alignment {
   div.quote {
     position: absolute;
     left: 50%;
-    margin-left: -480px;
+    margin-left: -540px;
     margin-top: 27px;
     top: 70px;
     width: 68px;
@@ -363,7 +357,7 @@ div.about-alignment {
   }
 
   div.about-alignment-description {
-    max-width: 1024px;
+    max-width: 1154px;
     padding: 0 117px;
     margin: 0 auto;
     font-size: 33px;
@@ -383,7 +377,7 @@ div.about-alignment {
 
 div.about-team {
   padding: 114px 0 190px;
-  background-color: $cr_settings_background;
+  background-color: $carrot_settings_background;
 
   @include mobile(){
     padding: 50px 16px
@@ -402,7 +396,7 @@ div.about-team {
       @include avenir_H();
       font-size: 40px;
       letter-spacing: 0.3px;
-      color: $cr_dark_blue;
+      color: $carrot_dark_blue;
       margin-top: 35px;
     }
 
@@ -425,30 +419,25 @@ div.about-team {
         text-align: center;
       }
 
+      div.team-avatar {
+        width: 64px;
+        height: 64px;
+        img {
+          max-width: 64px;
+          max-height: 64px;
+          border-radius: 32px;
+        }
+      }
+
       &.new-member {
         div.team-avatar {
           background-image: cdnUrl("/img/ML/user_avatar_yellow.svg");
         }
       }
 
-      &.stuart-levinson {
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/user_avatar_red.svg");
-        }
-      }
-
       &.sean-johnson {
         @media screen and (min-width: 1122px){
-          height: 361px;
-        }
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/user_avatar_blue.svg");
-        }
-      }
-
-      &.iacopo-carraro {
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/user_avatar_purple.svg");
+          height: 333px;
         }
       }
 
@@ -490,7 +479,7 @@ div.about-team {
           }
         }
 
-        div.team-description {
+        div.team-description, div.team-title {
           @include avenir_BOOK();
           font-size: 16px;
           line-height: 1.75;
@@ -498,8 +487,14 @@ div.about-team {
           margin-top: 12px;
 
           @media screen and (max-width: 1121px){
+            margin-top: 10px;
+          }
+        }
+
+        div.team-title {
+          margin-top: 0px;
+          @media screen and (max-width: 1121px){
             text-align: center;
-            margin-top: 0px;
           }
         }
 
@@ -625,6 +620,7 @@ div.about-footer {
       color: #3a3d40;
       margin-top: 39px;
       max-width: 417px;
+      text-align: left;
     }
 
     a.link {
@@ -633,7 +629,7 @@ div.about-footer {
       @include avenir_H();
       font-size: 16px;
       text-align: center;
-      color: $cr_orange;
+      color: $carrot_orange;
       margin-top: 39px;
       padding: 13px 20px;
       display: inline-block;
@@ -654,7 +650,7 @@ div.container p {
   font-family: $oc_main_font;
   font-size: 18px;
   line-height: 1.4;
-  color: #4e5a6b;
+  color: $oc_gray_5;
 }
 
 div.container p.person {

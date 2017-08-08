@@ -17,10 +17,12 @@
             [oc.web.lib.iso4217 :refer (iso4217)]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [cuerdas.core :as s]
             [cljsjs.emojione] ; pulled in for cljsjs externs
             [defun.core :refer (defun)]
-            [cljsjs.web-animations])
+            [cljsjs.web-animations]
+            [cljs.reader :as reader])
   (:import  [goog.i18n NumberFormat]))
 
 (defn abs
@@ -310,16 +312,23 @@
       (fix-finances with-keys)
       with-keys)))
 
-(defn topic-name [topics-data topic-slug]
-  (when-let [topic-data (some #(when (= (:slug %) topic-slug) %) topics-data)]
-    (:name topic-data)))
+(defn css-color [color]
+  (let [colors (subvec (clojure.string/split color #"") 2)
+        red (take 2 colors)
+        green (take 2 (drop 2 colors))
+        blue (take 2 (drop 4 colors))]
+    (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
+
+(defn get-topic [topics-data topic-slug]
+  (some #(when (= (:slug %) topic-slug) %) topics-data))
 
 (defn fix-entry
   "Add `:read-only` and `:topic-name` keys to the entry map"
   [entry-body topics-data]
-  (-> entry-body
-    (assoc :read-only (readonly-entry? (:links entry-body)))
-    (assoc :topic-name (topic-name topics-data (:topic-slug entry-body)))))
+  (let [topic (get-topic topics-data (:topic-slug entry-body))]
+    (-> entry-body
+      (assoc :read-only (readonly-entry? (:links entry-body)))
+      (assoc :topic-name (:name topic)))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
@@ -672,6 +681,11 @@
     (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
       (.replace text reg ""))))
 
+(defn strip-img-tags [text]
+  (when text
+    (let [reg (js/RegExp. "<img/?[^>]+(>|$)" "g")]
+      (.replace text reg ""))))
+
 (defn disable-scroll []
   (dommy/add-class! (sel1 [:body]) :no-scroll)
   (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
@@ -697,6 +711,11 @@
   "Generate v4 GUID based on this http://stackoverflow.com/a/2117523"
   []
   (str (my-uuid) (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) (my-uuid) (my-uuid)))
+
+(defn entry-uuid
+  "Generate a UUID for an entry"
+ []
+ (str (my-uuid) "-" (my-uuid) "-" (my-uuid)))
 
 (defn event-stop [e]
   (.preventDefault e)
@@ -970,15 +989,19 @@
 
 (defn pulse-reaction-count
   [entry-uuid reaction]
-  (let [selector (str "div." entry-uuid "-" reaction)]
+  (let [selector (str "div.reaction-" entry-uuid "-" reaction)]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn pulse-comments-count
   [entry-uuid]
-  (let [selector (str "div." entry-uuid "-comments-count")]
+  (let [selector (str "div.comments-count-" entry-uuid )]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn cdn [img-src]
   (str (when-not (empty? ls/cdn-url) (str ls/cdn-url "/" ls/deploy-key)) img-src))
+
+
+(defn rgb-with-opacity [rgb opacity]
+  (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))

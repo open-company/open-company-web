@@ -1,19 +1,19 @@
 @include big_web(){
   body.trend-bar-collapsed {
     nav.oc-navbar {
-      height: #{$navbar_height + $cr_trend_collapsed_height}px;
+      height: #{$navbar_height + $carrot_trend_collapsed_height}px;
     }
   }
 
   body.trend-bar-expanded {
     nav.oc-navbar {
-      height: #{$navbar_height + $cr_trend_expanded_height}px;
+      height: #{$navbar_height + $carrot_trend_expanded_height}px;
     }
   }
 
   body.trend-bar-trending {
     nav.oc-navbar {
-      height: #{$navbar_height + $cr_trend_trending_height}px;
+      height: #{$navbar_height + $carrot_trend_trending_height}px;
     }
   }
 }
@@ -33,7 +33,7 @@ nav.oc-navbar {
   }
 
   @include big_web(){
-    height: #{$navbar_height + $cr_trend_collapsed_height}px;
+    height: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
 
   @include mobile(){

@@ -60,7 +60,7 @@
               [:div.title
                 "Share your news more broadly"]
               [:div.subtitle
-                "Share something beautiful via email or on the Web. Updates and stories are accessible by teams, but can also be made public or private."]]]]
+                "Share something beautiful via email or on the Web with recruits, investors and customers. Updates and stories are accessible by teams, but can also be made public or private."]]]]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->

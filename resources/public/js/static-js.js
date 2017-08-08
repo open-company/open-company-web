@@ -1,4 +1,4 @@
-function mailchipApiSubmit(e, form, success, fail){
+function mailchimpApiSubmit(e, form, success, fail){
   e.preventDefault();
   $.ajax({
     type: "POST",
@@ -20,6 +20,7 @@ function mailchipApiSubmit(e, form, success, fail){
 
 $(document).ready(function(){
   var tif = getParameterByName("tif");
+  var confirm = getParameterByName("confirm");
   var rewriteUrl = window.location.pathname + window.location.hash;
   window.history.pushState({}, document.title, rewriteUrl);
   if (tif) {
@@ -27,14 +28,26 @@ $(document).ready(function(){
   }
 
   $("#try-it-form-central").submit( function(e){
-    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-top").show(); $(".try-it-combo-field").hide();}, function(){});
+    mailchimpApiSubmit(e, this, function(){
+      $(".carrot-box-thanks-top").show();
+      $(".try-it-combo-field-top").hide();
+    }, function(){});
     return false;
   });
 
   $("#try-it-form-bottom").submit( function(e){
-    mailchipApiSubmit(e, this, function(){$(".carrot-box-thanks-bottom").show(); $(".try-it-combo-field").hide();}, function(){});
+    mailchimpApiSubmit(e, this, function(){
+      $(".carrot-box-thanks-bottom").show();
+      $(".try-it-combo-field-bottom").hide();
+    }, function(){});
     return false;
   });
+
+  if (confirm) {
+    $(".confirm-thanks").show();
+    $(".carrot-box-thanks-top").hide();
+    $("#try-it-form-central").hide();
+  }
 });
 
 function getParameterByName(name, url) {

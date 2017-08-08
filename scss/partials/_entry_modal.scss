@@ -30,7 +30,7 @@ div.entry-modal-container {
       left: 0px;
       width: 32px;
       height: 32px;
-      background-color: $cr_light_blue;
+      background-color: $carrot_light_blue;
       border-radius: 4px;
       background-image: cdnUrl("/img/ML/board_remove_filter.png");
       background-position: center;
@@ -40,7 +40,7 @@ div.entry-modal-container {
 
       &:hover {
         background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
-        background-color: $cr_text_blue;
+        background-color: $carrot_text_blue;
         opacity: 1;
       }
     }
@@ -49,6 +49,7 @@ div.entry-modal-container {
       width: 918px;
       background-color: white;
       border-radius: 8px;
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
       max-height: calc(100vh - 150px);
 
       div.entry-left-column {
@@ -60,63 +61,133 @@ div.entry-modal-container {
         border-bottom-left-radius: 8px;
 
         div.entry-left-column-content {
-          padding: 24px 16px 24px 32px;
+          padding: 24px 16px 30px 32px;
           max-height: calc(100vh - 150px - 48px);
-          overflow: scroll;
+          overflow-x: hidden;
+          overflow-y: scroll;
 
-          div.entry-card-head{
-            div.entry-card-head-left {
-              width: 80%;
+          div.entry-modal-head{
+            div.entry-modal-head-left {
               float: left;
               @include entry-author();
             }
 
-            div.entry-card-head-right {
-              width: 20%;
+            div.entry-modal-head-right {
               float: right;
-              div.new {
+              div.topic-tag {
                 float: right;
                 margin-top: 7px;
               }
 
-              @include entry-new();
-
-              button.entry-modal-more {
-                float: right;
-                margin-top: 7px;
-                margin-left: 10px;
-                width: 24px;
-                height: 24px;
-                background-image: cdnUrl("/img/ML/entry_modal_more.svg");
-                background-position: center;
-                background-repeat: no-repeat;
-                background-size: 24px 24px;
-                opacity: 0.6;
-
-                &:hover {
-                  opacity: 1;
-                }
-              }
+              @include entry-topic-tag();
             }
           }
 
-          div.entry-card-content {
+          div.entry-modal-content {
             float: none;
             width: 100%;
+            position: relative;
+            padding-bottom: 64px;
 
-            div.entry-card-content-headline {
+            div.entry-modal-content-headline {
               margin-top: 24px;
               @include entry-headline();
             }
 
-            div.entry-card-content-body {
+            div.entry-modal-content-body {
               margin-top: 24px;
               @include entry-body();
-            }
-          }
+              min-height: 114px;
 
-          div.entry-card-footer {
-            margin-top: 24px;
+              &.no-headline {
+                min-height: 166px;
+              }
+            }
+
+            div.entry-modal-footer {
+              margin-top: 24px;
+              width: 100%;
+              height: 40px;
+              position: absolute;
+              bottom: 0px;
+
+              div.reactions {
+                margin-top: 7px;
+              }
+
+              div.entry-modal-footer-right {
+                float: right;
+
+                div.more-dropdown {
+                  float: right;
+                  margin-top: 7px;
+                  margin-left: 10px;
+                  width: 32px;
+                  height: 32px;
+
+                  button.entry-modal-more {
+                    width: 32px;
+                    height: 32px;
+                    padding: 8px 0px 8px 16px;
+                    display: block;
+                    background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+                    background-position: right center;
+                    background-size: 16px 16px;
+                    background-repeat: no-repeat;
+                    margin-left: 6px;
+                  }
+
+                  div.dropdown-menu {
+                    position: absolute;
+                    top: -44px;
+                    left: -91px;
+                    border: none;
+                    outline: none;
+                    box-shadow: none;
+                    background-color: transparent;
+                    padding: 0 0 .3em;
+
+                    div.triangle {
+                      position: absolute;
+                      top: 50px;
+                      left: 90px;
+                      background-color: white;
+                      border-top: 1px solid rgba(177,184,192,0.50);
+                      border-left: 1px solid rgba(177,184,192,0.50);
+                      transform: rotate(135deg);
+                      width: 20px;
+                      height: 20px;
+                    }
+
+                    ul.entry-modal-more-menu {
+                      background-color: white;
+                      border: 1px solid rgba(177,184,192,0.50);
+                      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                      border-radius: 5px;
+                      margin: 8px 0;
+                      padding: 10px 16px 6px;
+                      min-height: 50px;
+                      list-style-type: none;
+                      width: 100px;
+
+                      li {
+                        margin: 6px 0;
+                        @include avenir_M();
+                        font-size: 14px;
+                        color: $oc_gray_7;
+                        cursor: pointer;
+                        background-color: transparent;
+
+                        &:hover {
+                          text-decoration: underline;
+                          background-color: transparent;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

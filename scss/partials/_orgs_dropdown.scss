@@ -33,17 +33,28 @@ div.orgs-dropdown {
     width: 300px;
     float: initial;
     padding-top: 0.3rem;
-    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
     li {
       a {
         padding-left: 0.3rem;
         padding-right: 0.3rem;
+
+        div.org-avatar-border {
+          float: left;
+          margin-top: -5px;
+
+          img.org-avatar-img {
+            margin-left: 0px !important;
+          }
+        }
+
         span.org-name {
           white-space: nowrap;
           width: 245px;
           overflow: hidden;
           text-overflow: ellipsis;
           margin-left: 54px !important;
+          margin-top: -30px !important;
 
           &.no-logo {
             margin-bottom: 0.5rem;

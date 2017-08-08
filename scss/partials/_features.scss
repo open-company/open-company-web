@@ -8,7 +8,7 @@ div.main.features {
     @include avenir_H();
     font-size: 40px;
     letter-spacing: 0.3px;
-    color: $cr_dark_blue;
+    color: $carrot_dark_blue;
     margin-top: 47px;
     padding: 0 16px;
   }
@@ -17,7 +17,7 @@ div.main.features {
     margin-top: 32px;
     width: 82px;
     height: 6px;
-    background-color: $cr_orange;
+    background-color: $carrot_orange;
     left: 50%;
     margin-left: -41px;
     position: relative;
@@ -51,17 +51,19 @@ div.main.features {
         }
 
         div.title {
-          color: $cr_dark_blue;
+          color: $carrot_dark_blue;
           @include avenir_H();
           font-size: 36px;
           letter-spacing: 0.1px;
+          text-align: left;
         }
 
         div.subtitle {
-          color: $cr_dark_blue;
+          color: $carrot_dark_blue;
           @include avenir_M();
           font-size: 20px;
           line-height: 1.7;
+          text-align: left;
         }
       }
 

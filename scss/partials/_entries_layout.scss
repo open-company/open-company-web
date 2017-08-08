@@ -28,4 +28,12 @@ div.entry-cards-container {
       }
     }
   }
+
+  div.entries-cards-container-row {
+    display: flex;
+
+    div.entry-card {
+      flex: 1;
+    }
+  }
 }

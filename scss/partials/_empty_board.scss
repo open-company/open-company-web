@@ -8,11 +8,11 @@ div.empty-board {
   div.empty-board-headline {
     @include avenir_H();
     font-size: 16px;
-    color: $cr_light_gray;
+    color: $carrot_light_gray;
     margin: 32px auto;
 
     button {
-      color: $cr_text_blue;
+      color: $carrot_text_blue;
       margin: 0;
       padding: 0;
     }

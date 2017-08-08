@@ -13,7 +13,7 @@ div.try-it-combo-field {
       height: 61px;
       @include avenir_M();
       font-size: 16px;
-      color: $cr_dark_blue;
+      color: $carrot_dark_blue;
       padding: 10px 20px;
       outline: none;
       border: 1px solid transparent;
@@ -49,7 +49,7 @@ div.try-it-combo-field {
   button.try-it-get-started {
     height: 61px;
     margin: 0;
-    background-color: $cr_text_blue;
+    background-color: $carrot_text_blue;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
     color: white;
@@ -69,7 +69,7 @@ div.get-started-button {
   button.mlb-get-started {
     height: 32px;
     border-radius: 6px;
-    background-color: $cr_text_blue;
+    background-color: $carrot_text_blue;
     @include avenir_H();
     font-size: 13px;
     color: white;
@@ -98,7 +98,7 @@ div.get-started-button {
     text-align: center;
 
     button.mlb-get-started {
-      background-color: $cr_text_blue;
+      background-color: $carrot_text_blue;
       color: white;
       font-size: 16px;
       @include avenir_H();

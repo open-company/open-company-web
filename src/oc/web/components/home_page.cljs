@@ -12,10 +12,15 @@
 (rum/defcs home-page < rum/static
                        (rum/local false ::thanks-box-top)
                        (rum/local false ::thanks-box-bottom)
+                       (rum/local false ::confirm)
                        {:did-mount (fn [s]
                                     (when (:tif (:query-params @router/path))
                                       (utils/after 1500 #(.focus (sel1 [:input.try-it-form-central-input]))))
-                                    s)}
+                                    s)
+                       :will-mount (fn [s]
+                                     (when (:confirm (:query-params @router/path))
+                                       (reset! (::confirm s) true))
+                                     s)}
   [s]
   [:div
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
@@ -28,14 +33,21 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates that build transparency and alignment"]
-          [:div.subheadline#thank-you-top "It's never been easier to get everyone aligned - inside and outside the company."]
-          (when-not @(::thanks-box-top s)
+          [:h1.headline "Company updates that get everyone aligned"]
+          [:div.subheadline#thank-you-top "It's never been easier to build transparency and alignment\nwith your team, investors and customers"]
+          (when (and (not @(::confirm s))
+                     (not @(::thanks-box-top s)))
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
           [:div.small-teams
             "Easy set-up • Free for small teams"]
-          (when @(::thanks-box-top s)
+          (when (and (not @(::confirm s))
+                     @(::thanks-box-top s))
             (carrot-box-thanks))
+          (when @(::confirm s)
+            [:div.carrot-box-container.group
+              [:div.carrot-box-thanks
+                [:div.thanks-headline "You are Confirmed!"]
+                [:div.thanks-subheadline "Thank you for subscribing."]]])
 
           ;; FIXME: Remove the carrot screenshot for the initial onboarding period
           (comment
@@ -67,9 +79,9 @@
             [:img {:src (utils/cdn "/img/ML/home_page_il_3_355_350.svg")}]
             [:div.description.group
               [:div.title
-                "Grow your business"]
+                "Build trust with a bigger audience"]
               [:div.subtitle
-                "Share the latest news with recruits, potential investors, and customers. Build trust with a bigger audience and they’ll reward you for it."]]]]
+                "Share your updates with recruits, potential investors, and customers."]]]]
 
         (comment
           [:div.customers

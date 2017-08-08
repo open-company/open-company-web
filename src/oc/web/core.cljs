@@ -178,9 +178,8 @@
     (pre-routing query-params)
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :entry entry :query-params query-params})
-    (swap! dis/app-state dissoc :show-add-topic)
     (when board-sort-or-filter
-      (swap! dis/app-state merge {:board-filters board-sort-or-filter :reset-default "asd"})
+      (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
         (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
     ;; do we have the company data already?
@@ -213,7 +212,8 @@
 
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
-      (when-not (contains? (:query-params params) :jwt)
+      (when (and (not (contains? (:query-params params) :jwt))
+                 (not (jwt/jwt)))
         (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
       (simple-handler home-page "login" target params))
 

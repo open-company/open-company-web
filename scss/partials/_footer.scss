@@ -69,7 +69,7 @@ div.footer {
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
-        color: #4e5a6b;
+        color: $oc_gray_5;
         margin-left: 20px;
         padding: 5.5px;
       }
@@ -101,7 +101,7 @@ div.footer {
 
       div.footer-bottom-right {
         float: right;
-        width: 165px;
+        width: 175px;
         height: 30px;
 
         @media screen and (max-width: 683px){

@@ -37,13 +37,14 @@
   padding: .2em 1em;
   transition: opacity 230ms, color 230ms, background-color 230ms;
 
-  &:hover {
+  &:hover, &:focus {
     background-color: #3FBD7C;
     color: #FFFFFF;
   }
 
-  &:active, &:focus, &.active {
+  &:active, &.active {
     background-color: #0E8749;
+    color: white;
   }
 
   &:disabled, &.disabled {
@@ -59,7 +60,7 @@
 
 .mlb-link {
   background-color: transparent;
-  color: $cr_text_blue;
+  color: $carrot_text_blue;
   font-family: $oc_main_font;
   font-weight: 900;
 
@@ -70,7 +71,7 @@
 
 .mlb-link-black {
   background-color: transparent;
-  color: $cr_dark_gray;
+  color: $carrot_dark_gray;
   font-family: $oc_main_font;
   font-weight: 900;
 
