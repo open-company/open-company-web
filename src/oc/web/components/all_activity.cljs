@@ -32,36 +32,102 @@
                (first ens))
         en))))
 
+(def _entries-batch-size 10)
+
+(defn set-entries-batch! [s]
+  (let [all-activity-data (first (:rum/args s))
+        from-idx 0
+        to-idx (min _entries-batch-size (count (:entries all-activity-data)))]
+    (reset! (::entries s) (subvec (vec(:entries all-activity-data)) from-idx to-idx))
+    (reset! (::to-idx s) to-idx)))
+
+(defn load-earlier-entries-batch! [s]
+  (let [all-activity-data (first (:rum/args s))
+        from-idx (max 0 (- @(::from-idx s) _entries-batch-size))
+        to-idx (min (max (- @(::to-idx s) _entries-batch-size) _entries-batch-size) (count (:entries all-activity-data)))]
+    (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
+    (reset! (::from-idx s) from-idx)
+    (reset! (::to-idx s) to-idx)))
+
+(defn load-older-entries-batch! [s]
+  (let [all-activity-data (first (:rum/args s))
+        from-idx (max 0 (- @(::to-idx s) (* 2 _entries-batch-size)))
+        to-idx (min (+ @(::to-idx s) _entries-batch-size) (count (:entries all-activity-data)))]
+    (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
+    (reset! (::from-idx s) from-idx)
+    (reset! (::to-idx s) to-idx)))
+
+(defn element-is-visible [el]
+  (let [el-offset-top (.-offsetTop el)
+        body-scroll (.-scrollTop (.-body js/document))
+        diff (- el-offset-top body-scroll)]
+    (and (> diff 0)
+         (< diff (.-innerHeight js/window)))))
+
+(defn switch-year-month [s]
+  (let [entries-batch @(::entries s)
+        first-visible-entry (loop [ens entries-batch
+                                   en (first entries-batch)]
+                              (let [el (sel1 [(str "div.entry-card-" (:uuid en))])]
+                                (if (element-is-visible el)
+                                  en
+                                  (recur (rest ens)
+                                         (first (rest ens))))))
+        js-date (utils/js-date (:created-at first-visible-entry))]
+    (reset! (::selected-year s) (.getFullYear js-date))
+    (reset! (::selected-month s) (inc (.getMonth js-date)))))
+
 (defn did-scoll [s e]
-  (when (or @(::has-next s)
-            @(::has-prev s))
-    (let [body (.-body js/document)
-          scroll-top (.-scrollTop body)
-          max-scroll (- (.-scrollHeight body) (.-innerHeight js/window))
-          min-scroll 0
-          direction (if (> @last-scroll scroll-top)
-                      :up
-                      (if (< @last-scroll scroll-top)
-                        :down
-                        :stale))]
-      (when (and @(::has-prev s)
-                 (= direction :up)
-                 (< (- scroll-top min-scroll) scroll-threshold))
-        (dis/dispatch! [:all-activity-more @(::has-prev s)])
-        (reset! (::scroll-to-entry s) false)
-        (reset! (::has-prev s) false))
-      (when (and @(::has-next s)
-                 (= direction :down)
-                 (< (- max-scroll scroll-top) scroll-threshold))
-        (dis/dispatch! [:all-activity-more @(::has-next s)])
-        (reset! (::scroll-to-entry s) false)
-        (reset! (::has-next s) false))))
+  ; (when (or @(::has-next s)
+  ;           @(::has-prev s))
+  ;   (let [body (.-body js/document)
+  ;         scroll-top (.-scrollTop body)
+  ;         max-scroll (- (.-scrollHeight body) (.-innerHeight js/window))
+  ;         min-scroll 0
+  ;         direction (if (> @last-scroll scroll-top)
+  ;                     :up
+  ;                     (if (< @last-scroll scroll-top)
+  ;                       :down
+  ;                       :stale))]
+  ;     (when (and @(::has-prev s)
+  ;                (= direction :up)
+  ;                (< (- scroll-top min-scroll) scroll-threshold))
+  ;       (dis/dispatch! [:all-activity-more @(::has-prev s)])
+  ;       (reset! (::scroll-to-entry s) false)
+  ;       (reset! (::has-prev s) false))
+  ;     (when (and @(::has-next s)
+  ;                (= direction :down)
+  ;                (< (- max-scroll scroll-top) scroll-threshold))
+  ;       (dis/dispatch! [:all-activity-more @(::has-next s)])
+  ;       (reset! (::scroll-to-entry s) false)
+  ;       (reset! (::has-next s) false))))
+  (let [body (.-body js/document)
+        scroll-top (.-scrollTop body)
+        max-scroll (- (.-scrollHeight body) (.-innerHeight js/window))
+        min-scroll 0
+        direction (if (> @last-scroll scroll-top)
+                    :up
+                    (if (< @last-scroll scroll-top)
+                      :down
+                      :stale))]
+    (when (and (= direction :up)
+               (< (- scroll-top min-scroll) scroll-threshold))
+      (load-earlier-entries-batch! s))
+    (when (and (= direction :down)
+               (< (- max-scroll scroll-top) scroll-threshold))
+      (load-older-entries-batch! s)))
+  (when @(::first-render-done s)
+    (switch-year-month s))
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
 (rum/defcs all-activity < rum/static
                           rum/reactive
                           (drv/drv :all-activity)
                           (drv/drv :calendar)
+                          (rum/local false ::first-render-done)
+                          (rum/local [] ::entries)
+                          (rum/local 0 ::from-idx)
+                          (rum/local 0 ::to-idx)
                           (rum/local nil ::scroll-listener)
                           (rum/local false ::has-next)
                           (rum/local false ::has-prev)
@@ -74,6 +140,7 @@
                                         (dis/dispatch! [:calendar-get])
                                         s)
                            :did-mount (fn [s]
+                                        (reset! (::first-render-done s) true)
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (let [all-activity-data (first (:rum/args s))
                                               next-link (utils/link-for (:links all-activity-data) "next")
@@ -84,7 +151,8 @@
                                           (when next-link
                                             (reset! (::has-next s) next-link))
                                           (when prev-link
-                                            (reset! (::has-prev s) prev-link)))
+                                            (reset! (::has-prev s) prev-link))
+                                          (set-entries-batch! s))
                                         s)
                            :did-remount (fn [o s]
                                           (let [all-activity-data (first (:rum/args s))
@@ -109,11 +177,12 @@
                                             (events/unlistenByKey @(::scroll-listener s)))
                                            s)}
   [s all-activity-data]
-  (let [calendar-data (drv/react s :calendar)]
+  (let [calendar-data (drv/react s :calendar)
+        entries-batch @(::entries s)]
     [:div.all-activity.group
       [:div.all-activity-cards
         [:div.group
-          (for [e (:entries all-activity-data)]
+          (for [e entries-batch]
             (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
