@@ -34,14 +34,18 @@
 
 (def _entries-batch-size 10)
 
-(defn set-entries-batch! [s]
+(defn set-entries-batch!
+  "Set the initial entries batch, from 0 to the minimum between the length of the entries array and the entries batch size."
+  [s]
   (let [all-activity-data (first (:rum/args s))
         from-idx 0
         to-idx (min _entries-batch-size (count (:entries all-activity-data)))]
     (reset! (::entries s) (subvec (vec(:entries all-activity-data)) from-idx to-idx))
     (reset! (::to-idx s) to-idx)))
 
-(defn load-earlier-entries-batch! [s]
+(defn load-earlier-entries-batch!
+  "Page scrolled up enough, move the entries batch to show the previous x elements."
+  [s]
   (let [all-activity-data (first (:rum/args s))
         from-idx (max 0 (- @(::from-idx s) _entries-batch-size))
         to-idx (min (max (- @(::to-idx s) _entries-batch-size) _entries-batch-size) (count (:entries all-activity-data)))]
@@ -49,7 +53,9 @@
     (reset! (::from-idx s) from-idx)
     (reset! (::to-idx s) to-idx)))
 
-(defn load-older-entries-batch! [s]
+(defn load-older-entries-batch!
+  "Page scrolled down enough, move the entries batch to show the next x elements."
+  [s]
   (let [all-activity-data (first (:rum/args s))
         from-idx (max 0 (- @(::to-idx s) (* 2 _entries-batch-size)))
         to-idx (min (+ @(::to-idx s) _entries-batch-size) (count (:entries all-activity-data)))]
@@ -57,14 +63,18 @@
     (reset! (::from-idx s) from-idx)
     (reset! (::to-idx s) to-idx)))
 
-(defn element-is-visible [el]
+(defn element-is-visible
+  "Check if the element is in the visible portion of the page, considered the page scroll."
+  [el]
   (let [el-offset-top (.-offsetTop el)
         body-scroll (.-scrollTop (.-body js/document))
         diff (- el-offset-top body-scroll)]
     (and (> diff 0)
          (< diff (.-innerHeight js/window)))))
 
-(defn switch-year-month [s]
+(defn switch-year-month
+  "Get the first visible entry and highlight the corresponding year and month in the calendar."
+  [s]
   (let [entries-batch @(::entries s)
         first-visible-entry (loop [ens entries-batch
                                    en (first entries-batch)]
