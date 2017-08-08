@@ -425,7 +425,6 @@
                                  org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
-                                 board-create-route
                                  ;; Boards
                                  boards-list-route
                                  board-route
