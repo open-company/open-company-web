@@ -18,6 +18,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.raven :as sentry]
+            [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.components.home :refer (home)]
@@ -470,14 +471,9 @@
     (timbre/error "Error: div#app is not defined!")
     (sentry/capture-message "Error: div#app is not defined!")))
 
-(defn config-log-level! [level]
-  (timbre/merge-config! {:level (keyword level)}))
-
-(set! (.-OCWebConfigLogLevel js/window) config-log-level!)
-
 (defn init []
   ;; Setup timbre log level
-  (config-log-level! ls/log-level)
+  (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Persist JWT in App State
   (dis/dispatch! [:jwt (jwt/get-contents)])
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
