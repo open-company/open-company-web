@@ -844,12 +844,12 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:all-activity-get/finish {:org (:slug org-data) :body (if success (json->cljs body) nil)}]))))))
 
-(defn load-more-all-activity [more-link]
-  (when more-link
+(defn load-more-all-activity [more-link direction]
+  (when (and more-link direction)
     (storage-get (relative-href (:href more-link))
       {:headers (headers-for-link more-link)}
       (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:all-activity-more/finish {:org (router/current-org-slug) :body (if success (json->cljs body) nil)}])))))
+        (dispatcher/dispatch! [:all-activity-more/finish {:org (router/current-org-slug) :direction direction :body (if success (json->cljs body) nil)}])))))
 
 (defn get-calendar [org-slug]
   (when org-slug
