@@ -80,7 +80,7 @@
 (defn pre-routing [query-params & [should-rewrite-url]]
   ;; Setup timbre log level
   (when (:log-level query-params)
-    (logging/config-log-level! (:log-level (:query-params @router/path))))
+    (logging/config-log-level! (:log-level query-params)))
   ; make sure the menu is closed
   (let [pathname (.. js/window -location -pathname)]
     (when (not= pathname (s/lower pathname))
