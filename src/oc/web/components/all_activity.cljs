@@ -5,6 +5,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.logging :as logging]
             [oc.web.components.entry-card :refer (entry-card)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -15,8 +16,8 @@
 (def last-scroll (atom 0))
 
 (defn dbg [s & args]
- (when @(::debug s)
-  (apply (partial js/console.log "DBG:") args)))
+  (when (= @logging/carrot-log-level :debug)
+    (apply (partial js/console.log "all-activity") args)))
 
 (defn- check-entry
   "Given an entry and a date string in the form YYYY-MM-DD
