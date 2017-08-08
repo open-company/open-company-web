@@ -8,14 +8,15 @@
             [oc.web.lib.logging :as logging]
             [oc.web.components.entry-card :refer (entry-card)]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [goog.events.EventType :as EventType]
+            [goog.object :as gobj]))
 
 ;; 800px from the end of the current rendered results as point to add more entries in the batch
 (def scroll-threshold 800)
 
 (def last-scroll (atom 0))
 
-(defn dbg [s & args]
+(defn dbg [& args]
   (when (= @logging/carrot-log-level :debug)
     (apply (partial js/console.log "all-activity") args)))
 
@@ -39,55 +40,14 @@
                (first ens))
         en))))
 
-(def _entries-batch-size 10)
-(def _entries-load-more-offset 2)
-
-(defn set-entries-batch!
-  "Set the initial entries batch, from 0 to the minimum between the length of the entries array and the entries batch size."
-  [s]
-  (let [all-activity-data (first (:rum/args s))
-        from-idx 0
-        to-idx (min _entries-batch-size (count (:entries all-activity-data)))]
-    (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
-    (reset! (::to-idx s) to-idx)))
-
-(defn load-earlier-entries-batch!
-  "Page scrolled up enough, move the entries batch to show the previous x elements."
-  [s]
-  (let [all-activity-data (first (:rum/args s))
-        from-idx (max 0 (- @(::from-idx s) _entries-batch-size))
-        to-idx (min (max (- @(::to-idx s) _entries-batch-size) _entries-batch-size) (count (:entries all-activity-data)))]
-    (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
-    (reset! (::from-idx s) from-idx)
-    (reset! (::to-idx s) to-idx)
-    ;; Load next all-activity if necessary
-    (when (and @(::has-next s)
-               (<= from-idx (* _entries-batch-size _entries-load-more-offset)))
-      (dis/dispatch! [:all-activity-more @(::has-next s) :up])
-      (reset! (::has-next s) false))))
-
-(defn load-older-entries-batch!
-  "Page scrolled down enough, move the entries batch to show the next x elements."
-  [s]
-  (let [all-activity-data (first (:rum/args s))
-        from-idx (max 0 (- @(::to-idx s) (* 2 _entries-batch-size)))
-        to-idx (min (+ @(::to-idx s) _entries-batch-size) (count (:entries all-activity-data)))]
-    (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
-    (reset! (::from-idx s) from-idx)
-    (reset! (::to-idx s) to-idx)
-    (dbg s "load-older-entries-batch from-idx" from-idx "to-idx" to-idx "count:" (count (:entries all-activity-data)) "prev-link" @(::has-prev s))
-    (when (and @(::has-prev s)
-               (>= to-idx (- (count (:entries all-activity-data)) (* _entries-batch-size _entries-load-more-offset))))
-      (dbg s "   loading prev!")
-      (dis/dispatch! [:all-activity-more @(::has-prev s) :down])
-      (reset! (::has-prev s) false))))
-
 (defn element-is-visible
   "Check if the element is in the visible portion of the page, considered the page scroll."
   [el]
   (let [el-offset-top (.-offsetTop el)
         body-scroll (.-scrollTop (.-body js/document))
         diff (- el-offset-top body-scroll)]
+    (dbg "   element-is-visible visible?" el (and (> diff 0)
+                                                  (< diff (.-innerHeight js/window))))
     (and (> diff 0)
          (< diff (.-innerHeight js/window)))))
 
@@ -108,53 +68,44 @@
 (defn switch-year-month
   "Get the first visible entry and highlight the corresponding year and month in the calendar."
   [s]
-  (let [entries-batch @(::entries s)
+  (let [entries-batch (:entries (first (:rum/args s)))
         first-visible-entry (get-first-visible-entry entries-batch)
         js-date (utils/js-date (:created-at first-visible-entry))]
+    (dbg "switch-year-month:" (count entries-batch) (.toDateString js-date) first-visible-entry)
     (reset! (::selected-year s) (.getFullYear js-date))
     (reset! (::selected-month s) (inc (.getMonth js-date)))))
 
-(defn did-scoll [s e]
-  ; (when (or @(::has-next s)
-  ;           @(::has-prev s))
-  ;   (let [body (.-body js/document)
-  ;         scroll-top (.-scrollTop body)
-  ;         max-scroll (- (.-scrollHeight body) (.-innerHeight js/window))
-  ;         min-scroll 0
-  ;         direction (if (> @last-scroll scroll-top)
-  ;                     :up
-  ;                     (if (< @last-scroll scroll-top)
-  ;                       :down
-  ;                       :stale))]
-  ;     (when (and @(::has-prev s)
-  ;                (= direction :up)
-  ;                (< (- scroll-top min-scroll) scroll-threshold))
-  ;       (dis/dispatch! [:all-activity-more @(::has-prev s)])
-  ;       (reset! (::scroll-to-entry s) false)
-  ;       (reset! (::has-prev s) false))
-  ;     (when (and @(::has-next s)
-  ;                (= direction :down)
-  ;                (< (- max-scroll scroll-top) scroll-threshold))
-  ;       (dis/dispatch! [:all-activity-more @(::has-next s)])
-  ;       (reset! (::scroll-to-entry s) false)
-  ;       (reset! (::has-next s) false))))
-  (let [body (.-body js/document)
-        scroll-top (.-scrollTop body)
-        max-scroll (- (.-scrollHeight body) (.-innerHeight js/window))
-        min-scroll 0
+(defn did-scroll
+  "Scroll listener, load more activities when the scroll is close to a margin."
+  [s e]
+  (let [scroll-top (.-scrollTop (.-body js/document))
         direction (if (> @last-scroll scroll-top)
                     :up
                     (if (< @last-scroll scroll-top)
                       :down
-                      :stale))]
-    (when (and (= direction :up)
-               (< (- scroll-top min-scroll) scroll-threshold))
-      (load-earlier-entries-batch! s))
-    (when (and (= direction :down)
-               (< (- max-scroll scroll-top) scroll-threshold))
-      (load-older-entries-batch! s)))
+                      :stale))
+        min-scroll 0
+        max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
+    ;; scrolling up
+    (when (and @(::has-next s)
+               (= direction :up)
+               (<= scroll-top (+ min-scroll scroll-threshold)))
+      (dbg "   :up" @(::has-next s))
+      ;; if the user is close to the top margin, load more results if there is a link
+      (dis/dispatch! [:all-activity-more @(::has-next s) :up])
+      (reset! (::has-next s) false))
+    ;; scrolling down
+    (when (and @(::has-prev s)
+               (= direction :down)
+               (>= scroll-top (- max-scroll scroll-threshold)))
+      (dbg "   :down" @(::has-prev s))
+      ;; if the user is close to the bottom margin, load more results if there is a link
+      (dis/dispatch! [:all-activity-more @(::has-prev s) :down])
+      (reset! (::has-prev s) false)))
+  ;; Highlight the right year/month
   (when @(::first-render-done s)
     (switch-year-month s))
+  ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
 (rum/defcs all-activity < rum/static
@@ -174,83 +125,58 @@
                           (rum/local false ::debug)
                           {:will-mount (fn [s]
                                         (reset! (::debug s) (contains? (:query-params @router/path) :debug))
-                                        (dbg s "all-activity/will-mount")
+                                        (dbg  "all-activity/will-mount")
                                         (reset! (::scroll-listener s)
-                                         (events/listen js/window EventType/SCROLL #(did-scoll s %)))
+                                         (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                                         (dis/dispatch! [:calendar-get])
                                         s)
                            :did-mount (fn [s]
-                                        (dbg s "all-activity/did-mount")
+                                        (dbg  "all-activity/did-mount")
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (let [all-activity-data (first (:rum/args s))
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))]
-                                          (dbg s "previous-link:" prev-link)
+                                          (dbg  "previous-link:" prev-link)
                                           (reset! (::selected-year s) (.getFullYear first-entry-date))
                                           (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))
                                           (when next-link
                                             (reset! (::has-next s) next-link))
                                           (when prev-link
-                                            (reset! (::has-prev s) prev-link))
-                                          (set-entries-batch! s))
+                                            (reset! (::has-prev s) prev-link)))
                                         s)
                            :did-remount (fn [o s]
-                                          (dbg s "all-activity/did-remount" (count (:entries (first (:rum/args s)))) (get-first-visible-entry (:entries (first (:rum/args s)))))
+                                          (dbg  "all-activity/did-remount" (count (:entries (first (:rum/args s)))))
+                                          (reset! (::first-render-done s) false)
                                           (let [all-activity-data (first (:rum/args s))
-                                                direction (:direction all-activity-data)
                                                 next-link (utils/link-for (:links all-activity-data) "previous")
-                                                prev-link (utils/link-for (:links all-activity-data) "next")
-                                                ; first-visible-entry (get-first-visible-entry (:entries all-activity-data))
-                                                ; visible-entry-offset (when first-visible-entry (* (- (.-offsetTop (sel1 [(str "div.entry-card-" (:uuid first-visible-entry))])) (.-scrollTop (.-body js/document))) -1))
-                                                ; entry-idx (utils/index-of (:entries all-activity-data) #(= (:uuid %) (:uuid first-visible-entry)))
-                                                saved-entries (or (:saved-entries all-activity-data) 0)
-                                                from-idx (if (= direction :down)
-                                                           (min @(::from-idx s) (count (:entries all-activity-data)))
-                                                           (max 0 (+ @(::from-idx s) saved-entries)))
-                                                to-idx (if (= direction :down)
-                                                         (min @(::to-idx s) (count (:entries all-activity-data)))
-                                                         (min (count (:entries all-activity-data)) (+ @(::to-idx s) saved-entries)))]
-                                            (dbg s "   next-link" next-link)
-                                            (dbg s "   prev-link" prev-link)
-                                            ; (dbg s "   first-visible-entry" (when first-visible-entry (-> first-visible-entry :created-at utils/js-date .toDateString)))
-                                            ; (dbg s "   visible-entry-offset" visible-entry-offset)
-                                            ; (dbg s "   entry-idx" entry-idx)
-                                            (dbg s "   from-idx" from-idx)
-                                            (dbg s "   to-idx" to-idx)
-                                            (reset! (::from-idx s) from-idx)
-                                            (reset! (::to-idx s) to-idx)
-                                            (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
-                                            ; (dbg s "   first-month-entry" first-month-entry)
-                                            (dbg s "   scroll-to-entry:" @(::scroll-to-entry s))
-                                            (when @(::scroll-to-entry s)
-                                              (let [first-month-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) (or @(::selected-month s) 1))]
-                                                (reset! (::scroll-to-entry s) (assoc first-month-entry :offset -100)))
-                                              ; (when first-visible-entry
-                                              ;   (reset! (::scroll-to-entry s) (assoc first-visible-entry :offset visible-entry-offset)))
-                                              )
+                                                prev-link (utils/link-for (:links all-activity-data) "next")]
                                             (when next-link
                                               (reset! (::has-next s) next-link))
                                             (when prev-link
-                                              (reset! (::has-prev s) prev-link)))
+                                              (reset! (::has-prev s) prev-link))
+                                            (when @(::scroll-to-entry s)
+                                              (let [first-month-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) (or @(::selected-month s) 1))]
+                                                (reset! (::scroll-to-entry s) (assoc first-month-entry :offset -20)))))
                                           s)
                            :after-render (fn [s]
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
                                            (when @(::scroll-to-entry s)
-                                             (dbg s "all-activity/after-render scroll-to-entry" @(::scroll-to-entry s))
+                                             (dbg  "all-activity/after-render scroll-to-entry" @(::scroll-to-entry s))
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))])]
                                                (utils/scroll-to-element entry-el (:offset @(::scroll-to-entry s)))
-                                               (reset! (::scroll-to-entry s) nil)))
+                                               (reset! (::scroll-to-entry s) nil))
+                                             (switch-year-month s))
                                            s)
                            :will-unmount (fn [s]
-                                          (dbg s "all-activity/will-unmount")
+                                          (dbg  "all-activity/will-unmount")
                                           (when @(::scroll-listener s)
                                             (events/unlistenByKey @(::scroll-listener s)))
                                            s)}
   [s all-activity-data]
   (let [calendar-data (drv/react s :calendar)
-        entries-batch @(::entries s)]
+        entries-batch (:entries all-activity-data)]
     [:div.all-activity.group
       [:div.all-activity-cards
         [:div.group
