@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -110,7 +111,7 @@
               (cond
                 (and is-dashboard
                      is-all-activity)
-                (all-activity all-activity-data)
+                (rum/with-key (all-activity all-activity-data) (str "all-activity" (apply str (map :uuid (:entries all-activity-data)))))
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-entry-uuid)
