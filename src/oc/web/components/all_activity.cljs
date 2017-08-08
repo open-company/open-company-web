@@ -46,8 +46,6 @@
   (let [el-offset-top (.-offsetTop el)
         body-scroll (.-scrollTop (.-body js/document))
         diff (- el-offset-top body-scroll)]
-    (dbg "   element-is-visible visible?" el (and (> diff 0)
-                                                  (< diff (.-innerHeight js/window))))
     (and (> diff 0)
          (< diff (.-innerHeight js/window)))))
 
@@ -71,7 +69,6 @@
   (let [entries-batch (:entries (first (:rum/args s)))
         first-visible-entry (get-first-visible-entry entries-batch)
         js-date (utils/js-date (:created-at first-visible-entry))]
-    (dbg "switch-year-month:" (count entries-batch) (.toDateString js-date) first-visible-entry)
     (reset! (::selected-year s) (.getFullYear js-date))
     (reset! (::selected-month s) (inc (.getMonth js-date)))))
 
@@ -122,7 +119,6 @@
                           (rum/local false ::debug)
                           {:will-mount (fn [s]
                                         (reset! (::debug s) (contains? (:query-params @router/path) :debug))
-                                        (dbg  "all-activity/will-mount")
                                         (reset! (::scroll-listener s)
                                          (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                                         (dis/dispatch! [:calendar-get])
@@ -131,43 +127,35 @@
                                         (dbg  "all-activity/did-mount")
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (let [all-activity-data (first (:rum/args s))
+                                              year (:year all-activity-data)
+                                              month (:month all-activity-data)
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
-                                              first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))]
-                                          (dbg  "previous-link:" prev-link)
-                                          (reset! (::selected-year s) (.getFullYear first-entry-date))
-                                          (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))
+                                              first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))
+                                              first-available-entry (get-first-available-entry (:entries all-activity-data) year month)]
+                                          (if (and year month)
+                                            (do
+                                              (reset! (::selected-year s) year)
+                                              (reset! (::selected-month s) month)
+                                              (reset! (::scroll-to-entry s) first-available-entry))
+                                            (do
+                                              (reset! (::selected-year s) (.getFullYear first-entry-date))
+                                              (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))))
                                           (when next-link
                                             (reset! (::has-next s) next-link))
                                           (when prev-link
                                             (reset! (::has-prev s) prev-link)))
                                         s)
-                           :did-remount (fn [o s]
-                                          (dbg  "all-activity/did-remount" (count (:entries (first (:rum/args s)))))
-                                          (reset! (::first-render-done s) false)
-                                          (let [all-activity-data (first (:rum/args s))
-                                                next-link (utils/link-for (:links all-activity-data) "previous")
-                                                prev-link (utils/link-for (:links all-activity-data) "next")]
-                                            (when next-link
-                                              (reset! (::has-next s) next-link))
-                                            (when prev-link
-                                              (reset! (::has-prev s) prev-link))
-                                            (when @(::scroll-to-entry s)
-                                              (let [first-month-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) (or @(::selected-month s) 1))]
-                                                (reset! (::scroll-to-entry s) (assoc first-month-entry :offset -20)))))
-                                          s)
                            :after-render (fn [s]
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
                                            (when @(::scroll-to-entry s)
-                                             (dbg  "all-activity/after-render scroll-to-entry" @(::scroll-to-entry s))
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))])]
-                                               (utils/scroll-to-element entry-el (:offset @(::scroll-to-entry s)))
+                                               (utils/scroll-to-element entry-el -20)
                                                (reset! (::scroll-to-entry s) nil))
                                              (switch-year-month s))
                                            s)
                            :will-unmount (fn [s]
-                                          (dbg  "all-activity/will-unmount")
                                           (when @(::scroll-listener s)
                                             (events/unlistenByKey @(::scroll-listener s)))
                                            s)}
@@ -190,7 +178,7 @@
                               (reset! (::selected-year s) (:year year))
                               (reset! (::selected-month s) nil)
                               (reset! (::scroll-to-entry s) true)
-                              (dis/dispatch! [:all-activity-calendar (utils/link-for (:links year) "self")]))
+                              (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links year) "self") :year (:year year) :month 1}]))
                  :class (when (= @(::selected-year s) (:year year)) "selected")}
                 (:year year)]
               (for [month (:months year)]
@@ -202,5 +190,5 @@
                                 (reset! (::selected-year s) (:year month))
                                 (reset! (::selected-month s) (:month month))
                                 (reset! (::scroll-to-entry s) true)
-                                (dis/dispatch! [:all-activity-calendar (utils/link-for (:links month) "self")]))}
+                                (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links month) "self") :year (:year month) :month (:month month)}]))}
                   (utils/full-month-string (:month month))])])]]]))
