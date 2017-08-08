@@ -75,7 +75,7 @@
                                                body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
                                                body-a-sel (str body-sel " a")
                                                read-more-sel (str body-a-sel ".read-more")
-                                               is-all-activity (nth (:rum/args s) 3)]
+                                               is-all-activity (get (:rum/args s) 3)]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
                                            ; Prevent read more link to change directly the url
