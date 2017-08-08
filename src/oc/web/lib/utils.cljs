@@ -587,9 +587,9 @@
          #js [0 elem-scroll-top]
          (if animated 320 oc-animation-duration)))))
 
-(defn scroll-to-element [elem & [offset]]
-  (let [elem-scroll-top (+ (offset-top elem) (or offset 0))]
-    (scroll-to-y elem-scroll-top)))
+(defn scroll-to-element [elem & [offset duration]]
+  (let [elem-scroll-top (+ (.-offsetTop elem) (or offset 0))]
+    (scroll-to-y elem-scroll-top duration)))
 
 (defn scroll-top-with-id [id]
   (offset-top (sel1 (str "#" id))))
