@@ -9,8 +9,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-;; One card avg height is 617px, let's set the threshold to 3 cards
-(def scroll-threshold 1851)
+;; 800px from the end of the current rendered results as point to add more entries in the batch
+(def scroll-threshold 800)
 
 (def last-scroll (atom 0))
 
