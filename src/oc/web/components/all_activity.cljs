@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.components.entry-card :refer (entry-card)]
             [goog.events :as events]
@@ -12,6 +13,10 @@
 (def scroll-threshold 1851)
 
 (def last-scroll (atom 0))
+
+(defn dbg [s & args]
+ (when @(::debug s)
+  (apply (partial js/console.log "DBG:") args)))
 
 (defn- check-entry
   "Given an entry and a date string in the form YYYY-MM-DD
@@ -69,8 +74,10 @@
     (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
     (reset! (::from-idx s) from-idx)
     (reset! (::to-idx s) to-idx)
+    (dbg s "load-older-entries-batch from-idx" from-idx "to-idx" to-idx "count:" (count (:entries all-activity-data)) "prev-link" @(::has-prev s))
     (when (and @(::has-prev s)
                (>= to-idx (- (count (:entries all-activity-data)) (* _entries-batch-size _entries-load-more-offset))))
+      (dbg s "   loading prev!")
       (dis/dispatch! [:all-activity-more @(::has-prev s) :down])
       (reset! (::has-prev s) false))))
 
@@ -163,17 +170,23 @@
                           (rum/local nil ::selected-year)
                           (rum/local nil ::selected-month)
                           (rum/local nil ::scroll-to-entry)
+                          (rum/local false ::debug)
                           {:will-mount (fn [s]
+                                        ; (js/console.log "router:" )
+                                        (reset! (::debug s) (contains? (:query-params @router/path) :debug))
+                                        (dbg s "all-activity/will-mount")
                                         (reset! (::scroll-listener s)
                                          (events/listen js/window EventType/SCROLL #(did-scoll s %)))
                                         (dis/dispatch! [:calendar-get])
                                         s)
                            :did-mount (fn [s]
+                                        (dbg s "all-activity/did-mount")
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (let [all-activity-data (first (:rum/args s))
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))]
+                                          (dbg s "previous-link:" prev-link)
                                           (reset! (::selected-year s) (.getFullYear first-entry-date))
                                           (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))
                                           (when next-link
@@ -183,6 +196,7 @@
                                           (set-entries-batch! s))
                                         s)
                            :did-remount (fn [o s]
+                                          (dbg s "all-activity/did-remount" (count (:entries (first (:rum/args s)))) (get-first-visible-entry (:entries (first (:rum/args s)))))
                                           (let [all-activity-data (first (:rum/args s))
                                                 direction (:direction all-activity-data)
                                                 next-link (utils/link-for (:links all-activity-data) "previous")
@@ -197,12 +211,24 @@
                                                 to-idx (if (= direction :down)
                                                          (min @(::to-idx s) (count (:entries all-activity-data)))
                                                          (min (count (:entries all-activity-data)) (+ @(::to-idx s) saved-entries)))]
+                                            (dbg s "   next-link" next-link)
+                                            (dbg s "   prev-link" prev-link)
+                                            ; (dbg s "   first-visible-entry" (when first-visible-entry (-> first-visible-entry :created-at utils/js-date .toDateString)))
+                                            ; (dbg s "   visible-entry-offset" visible-entry-offset)
+                                            ; (dbg s "   entry-idx" entry-idx)
+                                            (dbg s "   from-idx" from-idx)
+                                            (dbg s "   to-idx" to-idx)
                                             (reset! (::from-idx s) from-idx)
                                             (reset! (::to-idx s) to-idx)
                                             (reset! (::entries s) (subvec (vec (:entries all-activity-data)) from-idx to-idx))
+                                            ; (dbg s "   first-month-entry" first-month-entry)
+                                            (dbg s "   scroll-to-entry:" @(::scroll-to-entry s))
                                             (when @(::scroll-to-entry s)
                                               (let [first-month-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) (or @(::selected-month s) 1))]
-                                                (reset! (::scroll-to-entry s) (assoc first-month-entry :offset -100))))
+                                                (reset! (::scroll-to-entry s) (assoc first-month-entry :offset -100)))
+                                              ; (when first-visible-entry
+                                              ;   (reset! (::scroll-to-entry s) (assoc first-visible-entry :offset visible-entry-offset)))
+                                              )
                                             (when next-link
                                               (reset! (::has-next s) next-link))
                                             (when prev-link
@@ -212,11 +238,13 @@
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
                                            (when @(::scroll-to-entry s)
+                                             (dbg s "all-activity/after-render scroll-to-entry" @(::scroll-to-entry s))
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))])]
                                                (utils/scroll-to-element entry-el (:offset @(::scroll-to-entry s)))
                                                (reset! (::scroll-to-entry s) nil)))
                                            s)
                            :will-unmount (fn [s]
+                                          (dbg s "all-activity/will-unmount")
                                           (when @(::scroll-listener s)
                                             (events/unlistenByKey @(::scroll-listener s)))
                                            s)}
