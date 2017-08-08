@@ -834,15 +834,13 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:entry-delete/finish]))))))
 
-(defn get-all-activity [org-data & [activity-link]]
+(defn get-all-activity [org-data & [activity-link year month]]
   (when org-data
-    (let [all-activity-link (if activity-link
-                              activity-link
-                              (utils/link-for (:links org-data) "activity"))]
+    (let [all-activity-link (or activity-link (utils/link-for (:links org-data) "activity"))]
       (storage-get (relative-href (:href all-activity-link))
         {:headers (headers-for-link all-activity-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:all-activity-get/finish {:org (:slug org-data) :body (if success (json->cljs body) nil)}]))))))
+          (dispatcher/dispatch! [:all-activity-get/finish {:org (:slug org-data) :year year :month month :body (if success (json->cljs body) nil)}]))))))
 
 (defn load-more-all-activity [more-link direction]
   (when (and more-link direction)
