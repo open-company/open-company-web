@@ -1123,17 +1123,23 @@
     (assoc-in db calendar-key body)))
 
 (defmethod dispatcher/action :all-activity-more
-  [db [_ more-link]]
-  (api/load-more-all-activity more-link)
+  [db [_ more-link direction]]
+  (api/load-more-all-activity more-link direction)
   db)
 
 (defmethod dispatcher/action :all-activity-more/finish
-  [db [_ {:keys [org body]}]]
+  [db [_ {:keys [org direction body]}]]
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
           old-all-activity (get-in db all-activity-key)
-          all-activity-entries (concat (:entries old-all-activity) (:entries fixed-all-activity))
-          sorted-all-activities (vec (reverse (sort-by :created-at all-activity-entries)))]
-      (assoc-in db all-activity-key (assoc fixed-all-activity :entries sorted-all-activities)))
+          keeping-entries (min 50 (count (:entries old-all-activity)))
+          all-activity-entries (if (= direction :up)
+                                  (concat (:entries fixed-all-activity) (take 50 (:entries old-all-activity)))
+                                  (concat (take-last 50 (:entries old-all-activity)) (:entries fixed-all-activity)))
+          new-all-activity (-> fixed-all-activity
+                              (assoc :entries (vec all-activity-entries))
+                              (assoc :direction direction)
+                              (assoc :saved-entries keeping-entries))]
+      (assoc-in db all-activity-key new-all-activity))
     db))
