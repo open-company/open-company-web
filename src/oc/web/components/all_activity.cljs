@@ -113,9 +113,6 @@
                           (drv/drv :all-activity)
                           (drv/drv :calendar)
                           (rum/local false ::first-render-done)
-                          (rum/local [] ::entries)
-                          (rum/local 0 ::from-idx)
-                          (rum/local 0 ::to-idx)
                           (rum/local nil ::scroll-listener)
                           (rum/local false ::has-next)
                           (rum/local false ::has-prev)
@@ -176,11 +173,12 @@
                                            s)}
   [s all-activity-data]
   (let [calendar-data (drv/react s :calendar)
-        entries-batch (:entries all-activity-data)]
+        entries (:entries all-activity-data)]
     [:div.all-activity.group
+      {:key (str "all-activity-inner-" (apply str (map :uuid entries)))}
       [:div.all-activity-cards
         [:div.group
-          (for [e entries-batch]
+          (for [e entries]
             (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
