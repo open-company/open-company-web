@@ -1108,8 +1108,10 @@
   [db [_ {:keys [org body]}]]
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
-          fixed-all-activity (utils/fix-all-activity (:collection body))]
-      (assoc-in db all-activity-key fixed-all-activity))
+          fixed-all-activity (utils/fix-all-activity (:collection body))
+          sorted-entries (vec (reverse (sort-by :created-at (:entries fixed-all-activity))))
+          with-sorted-entries (assoc fixed-all-activity :entries sorted-entries)]
+      (assoc-in db all-activity-key with-sorted-entries))
     db))
 
 (defmethod dispatcher/action :calendar-get
@@ -1138,7 +1140,7 @@
                                   (concat (:entries fixed-all-activity) (take 50 (:entries old-all-activity)))
                                   (concat (take-last 50 (:entries old-all-activity)) (:entries fixed-all-activity)))
           new-all-activity (-> fixed-all-activity
-                              (assoc :entries (vec all-activity-entries))
+                              (assoc :entries (vec (reverse (sort-by :created-at all-activity-entries))))
                               (assoc :direction direction)
                               (assoc :saved-entries keeping-entries))]
       (assoc-in db all-activity-key new-all-activity))
