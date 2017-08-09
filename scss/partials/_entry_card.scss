@@ -5,7 +5,7 @@ div.entry-card {
   background-color: white;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
   border-radius: 8px;
-  padding: 32px 24px 63px;
+  padding: 24px 24px 72px;
   margin: 10px 16px;
   position: relative;
 
@@ -54,6 +54,51 @@ div.entry-card {
           }
         }
       }
+    }
+  }
+
+  &.all-activity-card {
+    div.entry-card-content{
+
+      div.entry-card-body {
+
+        &.has-media-preview {
+          width: 100%;
+          margin-right: 0px;
+          float: initial;
+        }
+      }
+
+      div.read-more {
+        width: 100%;
+        text-align: center;
+        margin-top: 24px;
+        color: $carrot_text_blue;
+        @include avenir_H();
+        font-size: 16px;
+      }
+
+      div.entry-card-media-preview {
+        width: 100%;
+        float: initial;
+        margin-top: 16px;
+        max-height: 200px;
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    }
+  }
+
+  div.entry-card-breadcrumb {
+    margin-bottom: 24px;
+    @include avenir_R();
+    font-size: 14px;
+    color: $oc_gray_7;
+
+    span.bold {
+      @include avenir_H();
     }
   }
 
@@ -152,7 +197,7 @@ div.entry-card {
       }
 
       &.has-media-preview {
-        width: calc(100% - 72px - 16px;);
+        width: calc(100% - 72px - 16px);
         margin-right: 16px;
         float: left;
       }
@@ -212,7 +257,7 @@ div.entry-card {
   div.entry-card-footer {
     position: absolute;
     width: calc(100% - 48px);
-    bottom: 0px;
+    bottom: 10px;
     left: 0px;
     margin: 15px 24px 16px;
     height: 25px;
@@ -225,7 +270,7 @@ div.entry-card {
       }
 
       div.comments-summary {
-        margin-left: 16px;
+        margin-left: 36px;
       }
     }
 
