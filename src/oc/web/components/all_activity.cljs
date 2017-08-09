@@ -184,7 +184,7 @@
               [:div.nav-year
                 {:on-click #(do
                               (reset! (::scroll-to-entry s) true)
-                              (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links year) "self") :year (:year year) :month 1}]))
+                              (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links year) "self") :year (:year year) :month (:month (first (:months year)))}]))
                  :class (when (= @(::selected-year s) (:year year)) "selected")}
                 (:year year)]
               (for [month (:months year)]
