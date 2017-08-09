@@ -7,12 +7,14 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.logging :as logging]
             [oc.web.components.entry-card :refer (entry-card)]
+            [oc.web.components.ui.loading :refer (rloading)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
 ;; 800px from the end of the current rendered results as point to add more entries in the batch
-(def scroll-threshold 800)
+(def scroll-card-threshold 3)
+(def card-avg-height 600)
 
 (defn dbg [& args]
   (apply (partial logging/dbg "all-activity") args))
@@ -57,10 +59,9 @@
 (defn element-is-visible
   "Check if the element is in the visible portion of the page, considered the page scroll."
   [el]
-  (let [el-offset-top (.-offsetTop el)
-        body-scroll (.-scrollTop (.-body js/document))
-        diff (- el-offset-top body-scroll)]
-    (> diff 0)))
+  (let [el-offset-top (.-top (.offset (js/$ el))) ; plus parent top offset
+        body-scroll (.-scrollTop (.-body js/document))]
+    (>= (- el-offset-top body-scroll) 0)))
 
 (defn get-first-visible-entry
   [entries]
@@ -79,14 +80,12 @@
 (defn highlight-calendar
   "Get the first visible entry and highlight the corresponding year and month in the calendar."
   [s]
-  (dbg "highligh-calendar retr:" @(::retrieving-calendar s) "scroll" @(::scroll-to-entry s))
   ;; When we are not retrieving calendar and not waiting to scroll to an entry
   (when (and (not @(::retrieving-calendar s))
              (not @(::scroll-to-entry s)))
     (let [entries-batch (:entries (first (:rum/args s)))
           first-visible-entry (get-first-visible-entry entries-batch)
           js-date (utils/js-date (:created-at first-visible-entry))]
-      (dbg "highlight-calendar" first-visible-entry (.getFullYear js-date) (inc (.getMonth js-date)))
       (reset! (::selected-year s) (.getFullYear js-date))
       (reset! (::selected-month s) (inc (.getMonth js-date))))))
 
@@ -103,8 +102,9 @@
         max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
     ;; scrolling up
     (when (and @(::has-next s)
+               (not @(::scroll-to-entry s))
                (= direction :up)
-               (<= scroll-top (+ min-scroll scroll-threshold)))
+               (= scroll-top min-scroll))
       (dbg "   :up" @(::has-next s))
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
@@ -114,7 +114,7 @@
     ;; scrolling down
     (when (and @(::has-prev s)
                (= direction :down)
-               (>= scroll-top (- max-scroll scroll-threshold)))
+               (>= scroll-top (- max-scroll (* scroll-card-threshold card-avg-height))))
       (dbg "   :down" @(::has-prev s))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
@@ -167,7 +167,7 @@
                                             (reset! (::has-prev s) prev-link)))
                                         s)
                            :did-mount (fn [s]
-                                        (dbg  "did-mount")
+                                        (dbg "did-mount")
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (reset! (::scroll-listener s)
                                          (events/listen js/window EventType/SCROLL #(did-scroll s %)))
@@ -175,15 +175,15 @@
                            :after-render (fn [s]
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
-                                           (dbg "after-render" @(::scroll-to-entry s))
                                            (when-let [scroll-to @(::scroll-to-entry s)]
-                                             (dbg "   sel:" (str "div.entry-card-" (:uuid @(::scroll-to-entry s))) (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))]))
+                                             (dbg "after-render " @(::scroll-to-entry s) "sel:" (str "div.entry-card-" (:uuid @(::scroll-to-entry s))) (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))]))
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid scroll-to))])]
                                                (dbg "scrolling to:" entry-el)
-                                               (utils/scroll-to-element entry-el -20))
-                                             (reset! (::scroll-to-entry s) nil))
+                                               (utils/scroll-to-element entry-el 100 0))
+                                             (utils/after 100 #(reset! (::scroll-to-entry s) nil)))
                                            s)
                            :did-remount (fn [_ s]
+                                          (dbg "did-remount")
                                           (let [all-activity-data (first (:rum/args s))]
                                             (when-not (:loading-more all-activity-data)
                                               (when @(::top-loading s)
@@ -200,13 +200,19 @@
   [s all-activity-data]
   (let [calendar-data (drv/react s :calendar)
         entries (:entries all-activity-data)]
-    (dbg "render" @(::selected-year s) @(::selected-month s))
     [:div.all-activity.group
       [:div.all-activity-cards
         (when @(::top-loading s)
           [:div.loading-updates.top-loading
             "Retrieving activity..."])
-        [:div.group
+        [:div.all-activity-cards-inner.group
+          (when (or @(::top-loading s)
+                    @(::retrieving-calendar s)
+                    (and (:loading-more all-activity-data)
+                         (not @(::first-render-done s)))
+                    @(::scroll-to-entry s))
+            [:div.entries-overlay
+              (rloading {:loading true})])
           (for [e entries]
             (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
@@ -224,7 +230,7 @@
                               (reset! (::selected-year s) (:year year))
                               (reset! (::selected-month s) month)
                               (reset! (::scroll-to-entry s) false)
-                              (reset! (::retrieving-calendar s) (str (:year month)))
+                              (reset! (::retrieving-calendar s) (str (:year year)))
                               (dis/dispatch! [:all-activity-calendar {:link link :year (:year year) :month month}]))
                  :class (when selected "selected")}
                 [:span.calendar-label (:year year)]

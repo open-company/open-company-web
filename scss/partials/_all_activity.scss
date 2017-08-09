@@ -15,18 +15,39 @@ div.all-activity {
       @include avenir_BOOKO();
     }
 
-    div.entry-card.all-activity-card {
-      width: 617px;
-      max-height: initial;
-      margin: 0px 0px 20px 0px;
+    div.all-activity-cards-inner {
+      position: relative;
 
-      div.entry-card-content {
+      div.entries-overlay {
+        position: fixed;
+        top: 82px;
+        left: 50%;
+        z-index: 1;
+        height: calc(100vh - 82px);
+        width: 667px;
+        margin-left: -400px;
+        background-color: $oc_gray_8;
+        background-image: cdnUrl("/img/ML/");
+        text-align: center;
 
-        div.entry-card-body {
-          max-height: #{24*4}px;
+        div.oc-loading {
+          margin: 100px auto;
+        }
+      }
 
-          &.has-body {
-            height: initial;
+      div.entry-card.all-activity-card {
+        width: 617px;
+        max-height: initial;
+        margin: 0px 0px 20px 0px;
+
+        div.entry-card-content {
+
+          div.entry-card-body {
+            max-height: #{24*4}px;
+
+            &.has-body {
+              height: initial;
+            }
           }
         }
       }
