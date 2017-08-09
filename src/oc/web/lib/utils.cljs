@@ -1040,11 +1040,11 @@
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
 
 (defn entry-date [js-date]
-  (str (apply str (take 3 (full-month-string (inc (.getMonth js-date))))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+  (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
 
 (defn entry-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
         updated-at (js-date (:updated-at entry-data))]
-    (str (entry-date created-at)
+    (str "Created on " (entry-date created-at)
       (when-not (= (:created-at entry-data) (:updated-at entry-data))
         (str "\nEdited on " (entry-date updated-at) " by " (:name (last (:author entry-data))))))))
