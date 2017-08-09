@@ -48,9 +48,9 @@
   [entries year month]
   (let [date-str (str year "-" (utils/add-zero month) "-" (days-for-month year month) "T23:59:59.999Z")]
     (loop [ens (vec (rest entries))
-           en nil]
+           en (first ens)]
       (if (and (pos? (count ens))
-               (check-entry (first ens) date-str))
+               (check-entry en date-str))
         (recur (vec (rest ens))
                (first ens))
         en))))
@@ -61,8 +61,7 @@
   (let [el-offset-top (.-offsetTop el)
         body-scroll (.-scrollTop (.-body js/document))
         diff (- el-offset-top body-scroll)]
-    (and (> diff 0)
-         (< diff (.-innerHeight js/window)))))
+    (> diff 0)))
 
 (defn get-first-visible-entry
   [entries]
@@ -81,11 +80,16 @@
 (defn highlight-calendar
   "Get the first visible entry and highlight the corresponding year and month in the calendar."
   [s]
-  (let [entries-batch (:entries (first (:rum/args s)))
-        first-visible-entry (get-first-visible-entry entries-batch)
-        js-date (utils/js-date (:created-at first-visible-entry))]
-    (reset! (::selected-year s) (.getFullYear js-date))
-    (reset! (::selected-month s) (inc (.getMonth js-date)))))
+  (dbg "highligh-calendar retr:" @(::retrieving-calendar s) "scroll" @(::scroll-to-entry s))
+  ;; When we are not retrieving calendar and not waiting to scroll to an entry
+  (when (and (not @(::retrieving-calendar s))
+             (not @(::scroll-to-entry s)))
+    (let [entries-batch (:entries (first (:rum/args s)))
+          first-visible-entry (get-first-visible-entry entries-batch)
+          js-date (utils/js-date (:created-at first-visible-entry))]
+      (dbg "highlight-calendar" first-visible-entry (.getFullYear js-date) (inc (.getMonth js-date)))
+      (reset! (::selected-year s) (.getFullYear js-date))
+      (reset! (::selected-month s) (inc (.getMonth js-date))))))
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -137,13 +141,8 @@
                           (rum/local nil ::scroll-to-entry)
                           (rum/local nil ::top-loading)
                           (rum/local nil ::bottom-loading)
+                          (rum/local nil ::retrieving-calendar)
                           {:will-mount (fn [s]
-                                        (reset! (::scroll-listener s)
-                                         (events/listen js/window EventType/SCROLL #(did-scroll s %)))
-                                        s)
-                           :did-mount (fn [s]
-                                        (dbg  "all-activity/did-mount")
-                                        (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (let [all-activity-data (first (:rum/args s))
                                               year (:year all-activity-data)
                                               month (:month all-activity-data)
@@ -151,7 +150,7 @@
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))
                                               first-available-entry (when (and year month) (get-first-available-entry (:entries all-activity-data) year month))]
-                                          (dbg "   year" year "month" month "first-available-entry" first-available-entry)
+                                          (dbg "will-mount   year" year "month" month "first-entry-date" first-entry-date "first-available-entry" first-available-entry)
                                           (if (and year month)
                                             (do
                                               (reset! (::selected-year s) year)
@@ -160,21 +159,28 @@
                                             (do
                                               (reset! (::selected-year s) (.getFullYear first-entry-date))
                                               (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))))
+                                          (reset! (::retrieving-calendar s) nil)
                                           (when next-link
                                             (reset! (::has-next s) next-link))
                                           (when prev-link
                                             (reset! (::has-prev s) prev-link)))
                                         s)
+                           :did-mount (fn [s]
+                                        (dbg  "did-mount")
+                                        (reset! last-scroll (.-scrollTop (.-body js/document)))
+                                        (reset! (::scroll-listener s)
+                                         (events/listen js/window EventType/SCROLL #(did-scroll s %)))
+                                        s)
                            :after-render (fn [s]
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
+                                           (dbg "after-render" @(::scroll-to-entry s))
                                            (when-let [scroll-to @(::scroll-to-entry s)]
-                                             (dbg "after-render" scroll-to (str "div.entry-card-" (:uuid scroll-to)) (sel1 [(str "div.entry-card-" (:uuid scroll-to))]))
+                                             (dbg "   sel:" (str "div.entry-card-" (:uuid @(::scroll-to-entry s))) (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))]))
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid scroll-to))])]
                                                (dbg "scrolling to:" entry-el)
                                                (utils/scroll-to-element entry-el -20))
-                                             (reset! (::scroll-to-entry s) nil)
-                                             (highlight-calendar s))
+                                             (reset! (::scroll-to-entry s) nil))
                                            s)
                            :will-unmount (fn [s]
                                           (when @(::scroll-listener s)
@@ -183,6 +189,7 @@
   [s all-activity-data]
   (let [calendar-data (drv/react s :calendar)
         entries (:entries all-activity-data)]
+    (dbg "all-activity/render" @(::selected-year s) @(::selected-month s))
     [:div.all-activity.group
       [:div.all-activity-cards
         (when @(::top-loading s)
@@ -203,10 +210,15 @@
               [:div.nav-year
                 {:on-click #(let [link (utils/link-for (:links year) "self")
                                   month (:month (first (:months year)))]
-                              (reset! (::scroll-to-entry s) true)
+                              (reset! (::selected-year s) (:year year))
+                              (reset! (::selected-month s) month)
+                              (reset! (::scroll-to-entry s) false)
+                              (reset! (::retrieving-calendar s) (str (:year month)))
                               (dis/dispatch! [:all-activity-calendar {:link link :year (:year year) :month month}]))
                  :class (when selected "selected")}
-                (:year year)]
+                [:span.calendar-label (:year year)]
+                (when (= @(::retrieving-calendar s) (str (:year year)))
+                  [:span.retrieving "Retrieving..."])]
               (when selected
                 (for [month (:months year)]
                   [:div.nav-month
@@ -214,6 +226,11 @@
                      :class (utils/class-set {:selected (and (= @(::selected-year s) (:year month))
                                                              (= @(::selected-month s) (:month month)))})
                      :on-click #(let [link (utils/link-for (:links month) "self")]
-                                  (reset! (::scroll-to-entry s) true)
+                                  (reset! (::selected-year s) (:year month))
+                                  (reset! (::selected-month s) (:month month))
+                                  (reset! (::scroll-to-entry s) false)
+                                  (reset! (::retrieving-calendar s) (str (:year month) (:month month)))
                                   (dis/dispatch! [:all-activity-calendar {:link link :year (:year month) :month (:month month)}]))}
-                    (utils/full-month-string (:month month))]))])]]]))
+                    [:span.calendar-label (utils/full-month-string (:month month))]
+                    (when (= @(::retrieving-calendar s) (str (:year month) (:month month)))
+                      [:span.retrieving "Retrieving..."])]))])]]]))
