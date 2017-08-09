@@ -6,6 +6,12 @@ div.all-activity {
     float: left;
     width: 617px;
 
+    div.loading-updates {
+      width: 100%;
+      text-align: center;
+      color: $oc_gray_7;
+    }
+
     div.entry-card.all-activity-card {
       width: 617px;
       max-height: initial;

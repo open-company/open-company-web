@@ -88,6 +88,8 @@
                (= direction :up)
                (<= scroll-top (+ min-scroll scroll-threshold)))
       (dbg "   :up" @(::has-next s))
+      ;; Show a spinner at the top
+      (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
       (dis/dispatch! [:all-activity-more @(::has-next s) :up])
       (reset! (::has-next s) false))
@@ -96,6 +98,8 @@
                (= direction :down)
                (>= scroll-top (- max-scroll scroll-threshold)))
       (dbg "   :down" @(::has-prev s))
+      ;; Show a spinner at the bottom
+      (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (dis/dispatch! [:all-activity-more @(::has-prev s) :down])
       (reset! (::has-prev s) false)))
@@ -116,6 +120,8 @@
                           (rum/local nil ::selected-year)
                           (rum/local nil ::selected-month)
                           (rum/local nil ::scroll-to-entry)
+                          (rum/local nil ::top-loading)
+                          (rum/local nil ::bottom-loading)
                           {:will-mount (fn [s]
                                         (reset! (::scroll-listener s)
                                          (events/listen js/window EventType/SCROLL #(did-scroll s %)))
@@ -160,11 +166,16 @@
   (let [calendar-data (drv/react s :calendar)
         entries (:entries all-activity-data)]
     [:div.all-activity.group
-      {:key (str "all-activity-inner-" (apply str (map :uuid entries)))}
       [:div.all-activity-cards
+        (when @(::top-loading s)
+          [:div.loading-updates.top-loading
+            [:i.fa.fa-spinner.fa-spin.fa-2x.fa-fw]])
         [:div.group
           (for [e entries]
-            (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]]
+            (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
+        (when @(::bottom-loading s)
+          [:div.loading-updates.bottom-loading
+            [:i.fa.fa-spinner.fa-spin.fa-2x.fa-fw]])]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
           (for [year calendar-data]
