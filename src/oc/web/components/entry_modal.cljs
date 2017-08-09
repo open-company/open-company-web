@@ -118,8 +118,7 @@
                       {:date-time (:created-at entry-data)
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-container "body"
-                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
+                       :title (utils/entry-tooltip entry-data)}
                       (utils/time-since (:created-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
