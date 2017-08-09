@@ -1125,7 +1125,10 @@
           with-sorted-entries (assoc fixed-all-activity :entries sorted-entries)
           with-calendar-data (-> with-sorted-entries
                                 (assoc :year year)
-                                (assoc :month month))]
+                                (assoc :month month)
+                                ;; Force the component to trigger a did-remount
+                                ;; or it won't see the finish of the loading
+                                (assoc :rand (rand 1000)))]
       (assoc-in db all-activity-key with-calendar-data))
     db))
 
