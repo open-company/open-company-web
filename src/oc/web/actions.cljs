@@ -936,9 +936,8 @@
 (defmethod dispatcher/action :entry-modal-fade-in
   [db [_ board-slug entry-uuid]]
   (utils/after 10
-   #(let [route (:route @router/path)
-          new-route (vec (conj route entry-uuid))
-          parts {:org (router/current-org-slug) :board board-slug :entry entry-uuid :query-params (:query-params @router/path)}]
+   #(let [new-route [(router/current-org-slug) board-slug entry-uuid "entry"]
+          parts {:org (router/current-org-slug) :board board-slug :entry entry-uuid :query-params (:query-params @router/path) :from-all-activity (not (router/current-board-slug))}]
       (router/set-route! new-route parts)
       (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry board-slug entry-uuid))
       (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
@@ -1046,6 +1045,19 @@
             (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
          (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
+
+(defmethod dispatcher/action :all-activity-nav
+  [db [_]]
+  (let [all-activity-url (oc-urls/all-activity)]
+    (utils/after 10
+      #(if (:entry-pushed db)
+         (let [route [(router/current-org-slug) "all-activity"]
+               parts (dissoc @router/path :route :entry :board)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
+         (router/nav! all-activity-url)))
+    db))
 
 (defmethod dispatcher/action :entry-delete
   [db [_ entry-data]]
