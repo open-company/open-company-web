@@ -184,6 +184,20 @@
                                                (utils/scroll-to-element entry-el -20))
                                              (reset! (::scroll-to-entry s) nil))
                                            s)
+                           :did-remount (fn [_ s]
+                                          (dbg "did-remount")
+                                          (let [all-activity-data (first (:rum/args s))]
+                                            (dbg "   -" (:loading-more all-activity-data))
+                                            (when-not (:loading-more all-activity-data)
+                                              (dbg "   toploading" @(::top-loading s))
+                                              (dbg "   bottomloading" @(::bottom-loading s))
+                                              (when @(::top-loading s)
+                                                (reset! (::top-loading s) false)
+                                                (reset! (::has-next s) nil))
+                                              (when @(::bottom-loading s)
+                                                (reset! (::bottom-loading s) false)
+                                                (reset! (::has-prev s) nil))))
+                                          s)
                            :will-unmount (fn [s]
                                           (when @(::scroll-listener s)
                                             (events/unlistenByKey @(::scroll-listener s)))
