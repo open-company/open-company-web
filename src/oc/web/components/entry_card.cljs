@@ -118,10 +118,13 @@
      :on-click #(dis/dispatch! [:entry-modal-fade-in (:board-slug entry-data) (:uuid entry-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
-    (when (and is-all-activity
-               (:topic-slug entry-data))
+    (when is-all-activity
       [:div.entry-card-breadcrumb
-        "In " [:span.bold (:board-name entry-data)] " → " [:span.bold (:topic-name entry-data)]])
+        "In " [:span.bold (:board-name entry-data)]
+        (when (:topic-slug entry-data)
+          " → ")
+        (when (:topic-slug entry-data)
+          [:span.bold (:topic-name entry-data)])])
     ; Card header
     [:div.entry-card-head.group
       ; Card author
@@ -130,12 +133,12 @@
         [:div.name (:name (first (:author entry-data)))]
         [:div.time-since
           [:time
-            {:date-time (:updated-at entry-data)
+            {:date-time (:created-at entry-data)
              :data-toggle "tooltip"
              :data-placement "top"
              :data-container "body"
              :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
-            (utils/time-since (:updated-at entry-data))]]]
+            (utils/time-since (:created-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
         ; Topic tag button
