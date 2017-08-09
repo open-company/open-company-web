@@ -192,6 +192,9 @@
                                               (when @(::bottom-loading s)
                                                 (reset! (::bottom-loading s) false)
                                                 (reset! (::has-prev s) nil))))
+                                          (when @(::retrieving-calendar s)
+                                            (reset! (::retrieving-calendar s) false)
+                                            (reset! (::scroll-to-entry s) nil))
                                           s)
                            :will-unmount (fn [s]
                                           (when @(::scroll-listener s)
