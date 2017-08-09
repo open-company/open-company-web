@@ -211,7 +211,7 @@
         board-data (get db board-key)
         entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
         new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
-        sorted-entries (vec (sort-by :updated-at new-entries))
+        sorted-entries (vec (sort-by :created-at new-entries))
         new-board-data (assoc board-data :entries sorted-entries)]
   (assoc db board-key new-board-data)))
 
@@ -999,7 +999,7 @@
                       (entry-fixed-data entry-data current-user-data as-of))
         filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (:entries board-data))
         new-entries (conj filtered-entries fixed-entry)
-        sorted-entries (vec (sort-by :updated-at new-entries))
+        sorted-entries (vec (sort-by :created-at new-entries))
         next-board-data (assoc board-data :entries sorted-entries)
         next-board-filters (if (= (:board-filters db) (:topic-slug entry-data))
                               ; if it's filtering by the same topic of the new entry leave it be
@@ -1064,7 +1064,7 @@
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
         filtered-entries (filter #(not= (:uudi %) (:uuid entry-data)) (:entries board-data))
-        sorted-entries (vec (sort-by :updated-at filtered-entries))
+        sorted-entries (vec (sort-by :created-at filtered-entries))
         next-board-data (assoc board-data :entries sorted-entries)]
     (api/delete-entry entry-data)
     (assoc-in db board-key next-board-data)))
@@ -1165,7 +1165,7 @@
                                   (concat (:entries fixed-all-activity) (:entries old-all-activity))
                                   (concat (:entries old-all-activity) (:entries fixed-all-activity)))
           new-all-activity (-> fixed-all-activity
-                              (assoc :entries (vec (reverse (sort-by :created-at all-activity-entries))))
+                              (assoc :entries (vec (reverse (sort-by :created-at (distinct all-activity-entries)))))
                               (assoc :direction direction)
                               (assoc :saved-entries keeping-entries))]
       (assoc-in db all-activity-key new-all-activity))
