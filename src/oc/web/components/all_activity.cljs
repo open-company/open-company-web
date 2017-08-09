@@ -116,12 +116,9 @@
                           (rum/local nil ::selected-year)
                           (rum/local nil ::selected-month)
                           (rum/local nil ::scroll-to-entry)
-                          (rum/local false ::debug)
                           {:will-mount (fn [s]
-                                        (reset! (::debug s) (contains? (:query-params @router/path) :debug))
                                         (reset! (::scroll-listener s)
                                          (events/listen js/window EventType/SCROLL #(did-scroll s %)))
-                                        (dis/dispatch! [:calendar-get])
                                         s)
                            :did-mount (fn [s]
                                         (dbg  "all-activity/did-mount")

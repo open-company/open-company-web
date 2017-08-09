@@ -39,7 +39,9 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (when is-all-activity
+        (dis/dispatch! [:calendar-get]))))
 
   (render [_]
     (let [current-entry-uuid (router/current-entry-uuid)
