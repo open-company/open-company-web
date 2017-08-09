@@ -28,10 +28,25 @@
         entry-date (utils/js-date (:created-at entry))]
     (>= (.getTime entry-date) (.getTime js-date))))
 
+(defn days-for-month [y m]
+  (case m
+    1 31
+    2 (if (= (mod y 4) 0) 29 28)
+    3 31
+    4 30
+    5 31
+    6 30
+    7 31
+    8 31
+    9 30
+    10 31
+    11 30
+    12 31))
+
 (defn get-first-available-entry
   "Given a list of entries and a year and a month get the first available entry from the first of that month."
   [entries year month]
-  (let [date-str (str year "-" (utils/add-zero month) "-01T00:00:00.000Z")]
+  (let [date-str (str year "-" (utils/add-zero month) "-" (days-for-month year month) "T23:59:59.999Z")]
     (loop [ens (vec (rest entries))
            en nil]
       (if (and (pos? (count ens))
@@ -135,7 +150,8 @@
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))
-                                              first-available-entry (get-first-available-entry (:entries all-activity-data) year month)]
+                                              first-available-entry (when (and year month) (get-first-available-entry (:entries all-activity-data) year month))]
+                                          (dbg "   year" year "month" month "first-available-entry" first-available-entry)
                                           (if (and year month)
                                             (do
                                               (reset! (::selected-year s) year)
@@ -152,11 +168,13 @@
                            :after-render (fn [s]
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
-                                           (when @(::scroll-to-entry s)
-                                             (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))])]
-                                               (utils/scroll-to-element entry-el -20 0)
-                                               (reset! (::scroll-to-entry s) nil))
-                                             (utils/after 0 #(highlight-calendar s)))
+                                           (when-let [scroll-to @(::scroll-to-entry s)]
+                                             (dbg "after-render" scroll-to (str "div.entry-card-" (:uuid scroll-to)) (sel1 [(str "div.entry-card-" (:uuid scroll-to))]))
+                                             (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid scroll-to))])]
+                                               (dbg "scrolling to:" entry-el)
+                                               (utils/scroll-to-element entry-el -20))
+                                             (reset! (::scroll-to-entry s) nil)
+                                             (highlight-calendar s))
                                            s)
                            :will-unmount (fn [s]
                                           (when @(::scroll-listener s)
@@ -178,21 +196,24 @@
             [:i.fa.fa-spinner.fa-spin.fa-2x.fa-fw]])]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
-          (for [year calendar-data]
+          (for [year calendar-data
+                :let [selected (= @(::selected-year s) (:year year))]]
             [:div.group
               {:key (str "calendar-" (:year year))}
               [:div.nav-year
-                {:on-click #(do
+                {:on-click #(let [link (utils/link-for (:links year) "self")
+                                  month (:month (first (:months year)))]
                               (reset! (::scroll-to-entry s) true)
-                              (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links year) "self") :year (:year year) :month (:month (first (:months year)))}]))
-                 :class (when (= @(::selected-year s) (:year year)) "selected")}
+                              (dis/dispatch! [:all-activity-calendar {:link link :year (:year year) :month month}]))
+                 :class (when selected "selected")}
                 (:year year)]
-              (for [month (:months year)]
-                [:div.nav-month
-                  {:key (str "year-" (:year month) "-month-" (:month month))
-                   :class (when (and (= @(::selected-year s) (:year month))
-                                     (= @(::selected-month s) (:month month))) "selected")
-                   :on-click #(do
-                                (reset! (::scroll-to-entry s) true)
-                                (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links month) "self") :year (:year month) :month (:month month)}]))}
-                  (utils/full-month-string (:month month))])])]]]))
+              (when selected
+                (for [month (:months year)]
+                  [:div.nav-month
+                    {:key (str "year-" (:year month) "-month-" (:month month))
+                     :class (utils/class-set {:selected (and (= @(::selected-year s) (:year month))
+                                                             (= @(::selected-month s) (:month month)))})
+                     :on-click #(let [link (utils/link-for (:links month) "self")]
+                                  (reset! (::scroll-to-entry s) true)
+                                  (dis/dispatch! [:all-activity-calendar {:link link :year (:year month) :month (:month month)}]))}
+                    (utils/full-month-string (:month month))]))])]]]))
