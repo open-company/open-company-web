@@ -16,7 +16,9 @@
             [oc.web.components.comments :refer (comments)]))
 
 (defn dismiss-modal [board-filters]
-  (dis/dispatch! [:board-nav (router/current-board-slug) board-filters]))
+  (if (:from-all-activity @router/path)
+    (dis/dispatch! [:all-activity-nav])
+    (dis/dispatch! [:board-nav (router/current-board-slug) board-filters])))
 
 (defn close-clicked [s & [board-filters]]
   (reset! (::dismiss s) true)
