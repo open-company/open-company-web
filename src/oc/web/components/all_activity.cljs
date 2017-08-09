@@ -160,6 +160,8 @@
                                               (reset! (::selected-year s) (.getFullYear first-entry-date))
                                               (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))))
                                           (reset! (::retrieving-calendar s) nil)
+                                          (reset! (::top-loading s) false)
+                                          (reset! (::bottom-loading s) false)
                                           (when next-link
                                             (reset! (::has-next s) next-link))
                                           (when prev-link
