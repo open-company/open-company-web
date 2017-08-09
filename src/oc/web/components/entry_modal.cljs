@@ -115,12 +115,12 @@
                   [:div.name (:name (first (:author entry-data)))]
                   [:div.time-since
                     [:time
-                      {:date-time (:updated-at entry-data)
+                      {:date-time (:created-at entry-data)
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
                        :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
-                      (utils/time-since (:updated-at entry-data))]]]
+                      (utils/time-since (:created-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
                     (let [topic-name (or (:topic-name entry-data) (string/upper (:topic-slug entry-data)))]
