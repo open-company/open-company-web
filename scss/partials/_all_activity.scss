@@ -10,7 +10,9 @@ div.all-activity {
       width: 100%;
       text-align: center;
       color: $oc_gray_7;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      @include avenir_BOOKO();
     }
 
     div.entry-card.all-activity-card {

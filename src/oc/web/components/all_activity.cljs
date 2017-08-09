@@ -187,13 +187,13 @@
       [:div.all-activity-cards
         (when @(::top-loading s)
           [:div.loading-updates.top-loading
-            [:i.fa.fa-spinner.fa-spin.fa-2x.fa-fw]])
+            "Retrieving activity..."])
         [:div.group
           (for [e entries]
             (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
-            [:i.fa.fa-spinner.fa-spin.fa-2x.fa-fw]])]
+            "Retrieving activity..."])]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
           (for [year calendar-data
