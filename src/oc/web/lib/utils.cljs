@@ -202,7 +202,8 @@
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
 
-      (pos? months-interval)
+      (or (pos? months-interval)
+          (> days-interval 7))
       (date-string past-js-date flags)
 
       (pos? days-interval)
