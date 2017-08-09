@@ -1142,7 +1142,10 @@
 (defmethod dispatcher/action :all-activity-more
   [db [_ more-link direction]]
   (api/load-more-all-activity more-link direction)
-  db)
+  (let [all-activity-key (dispatcher/all-activity-key (router/current-org-slug))
+        all-activity-data (get-in db all-activity-key)
+        next-all-activity-data (assoc all-activity-data :loading-more true)]
+    (assoc-in db all-activity-key next-all-activity-data)))
 
 (def default-activity-limit 50)
 
