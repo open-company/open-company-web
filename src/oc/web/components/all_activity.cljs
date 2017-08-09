@@ -63,7 +63,7 @@
           (recur (vec (rest ens))
                  (first (vec (rest ens)))))))))
 
-(defn switch-year-month
+(defn highlight-calendar
   "Get the first visible entry and highlight the corresponding year and month in the calendar."
   [s]
   (let [entries-batch (:entries (first (:rum/args s)))
@@ -105,7 +105,7 @@
       (reset! (::has-prev s) false)))
   ;; Highlight the right year/month
   (when @(::first-render-done s)
-    (switch-year-month s))
+    (highlight-calendar s))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
@@ -154,9 +154,9 @@
                                               (reset! (::first-render-done s) true))
                                            (when @(::scroll-to-entry s)
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))])]
-                                               (utils/scroll-to-element entry-el -20)
+                                               (utils/scroll-to-element entry-el -20 0)
                                                (reset! (::scroll-to-entry s) nil))
-                                             (switch-year-month s))
+                                             (utils/after 0 #(highlight-calendar s)))
                                            s)
                            :will-unmount (fn [s]
                                           (when @(::scroll-listener s)
@@ -183,8 +183,6 @@
               {:key (str "calendar-" (:year year))}
               [:div.nav-year
                 {:on-click #(do
-                              (reset! (::selected-year s) (:year year))
-                              (reset! (::selected-month s) nil)
                               (reset! (::scroll-to-entry s) true)
                               (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links year) "self") :year (:year year) :month 1}]))
                  :class (when (= @(::selected-year s) (:year year)) "selected")}
@@ -195,8 +193,6 @@
                    :class (when (and (= @(::selected-year s) (:year month))
                                      (= @(::selected-month s) (:month month))) "selected")
                    :on-click #(do
-                                (reset! (::selected-year s) (:year month))
-                                (reset! (::selected-month s) (:month month))
                                 (reset! (::scroll-to-entry s) true)
                                 (dis/dispatch! [:all-activity-calendar {:link (utils/link-for (:links month) "self") :year (:year month) :month (:month month)}]))}
                   (utils/full-month-string (:month month))])])]]]))
