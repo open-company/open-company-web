@@ -185,12 +185,8 @@
                                              (reset! (::scroll-to-entry s) nil))
                                            s)
                            :did-remount (fn [_ s]
-                                          (dbg "did-remount")
                                           (let [all-activity-data (first (:rum/args s))]
-                                            (dbg "   -" (:loading-more all-activity-data))
                                             (when-not (:loading-more all-activity-data)
-                                              (dbg "   toploading" @(::top-loading s))
-                                              (dbg "   bottomloading" @(::bottom-loading s))
                                               (when @(::top-loading s)
                                                 (reset! (::top-loading s) false)
                                                 (reset! (::has-next s) nil))
