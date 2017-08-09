@@ -172,9 +172,6 @@
         (< v 100) "0")
     v))
 
-(defn get-time [js-date]
-  (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
-
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))
@@ -1042,9 +1039,12 @@
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
 
+(defn entry-date [js-date]
+  (str (apply str (take 3 (full-month-string (inc (.getMonth js-date))))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+
 (defn entry-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
         updated-at (js-date (:updated-at entry-data))]
-    (str (.toDateString created-at) " at " (get-time created-at)
+    (str (entry-date created-at)
       (when-not (= (:created-at entry-data) (:updated-at entry-data))
-        (str "\nEdited on " (.toDateString updated-at) " at " (get-time updated-at) " by " (:name (last (:author entry-data))))))))
+        (str "\nEdited on " (entry-date updated-at) " by " (:name (last (:author entry-data))))))))
