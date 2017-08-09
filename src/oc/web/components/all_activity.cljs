@@ -193,12 +193,11 @@
                                                 (reset! (::has-prev s) nil)))
                                             (when @(::retrieving-calendar s)
                                               (reset! (::retrieving-calendar s) false))
-                                              ;; Scroll to the month
+                                              ;; Scroll to the first entry of the selected month if any
                                               (let [calendar-data @(drv/get-ref s :calendar)
                                                     year @(::selected-year s)
                                                     month (or @(::selected-month s) (:month (first (filter #(= (:year %) year) calendar-data))))
                                                     first-available-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) month)]
-                                                (dbg "   first-available-entry" first-available-entry "year" year "month" month)
                                                 (when first-available-entry
                                                   (reset! (::scroll-to-entry s) first-available-entry))))
                                           s)
