@@ -250,8 +250,9 @@
   ([org-slug board-slug entry-uuid]
     (entry-data org-slug board-slug entry-uuid @app-state))
   ([org-slug board-slug entry-uuid data]
-    (let [board-data (get-in data (board-data-key org-slug board-slug))]
-      (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))
+    (let [data-key (if (:from-all-activity @router/path) (all-activity-key org-slug) (board-data-key org-slug board-slug))
+          entries-data (:entries (get-in data data-key))]
+      (first (filter #(= (:uuid %) entry-uuid) entries-data)))))
 
 (defn comments-data
   ([]
