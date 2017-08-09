@@ -11,4 +11,8 @@
       (reset! carrot-log-level level-kw)
       (timbre/merge-config! {:level level-kw}))))
 
+(defn dbg [& args]
+  (when (= @carrot-log-level :debug)
+    (apply js/console.log args)))
+
 (set! (.-OCWebConfigLogLevel js/window) config-log-level!)

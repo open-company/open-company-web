@@ -14,11 +14,10 @@
 ;; 800px from the end of the current rendered results as point to add more entries in the batch
 (def scroll-threshold 800)
 
-(def last-scroll (atom 0))
-
 (defn dbg [& args]
-  (when (= @logging/carrot-log-level :debug)
-    (apply (partial js/console.log "all-activity") args)))
+  (apply (partial logging/dbg "all-activity") args))
+
+(def last-scroll (atom 0))
 
 (defn- check-entry
   "Given an entry and a date string in the form YYYY-MM-DD
@@ -201,7 +200,7 @@
   [s all-activity-data]
   (let [calendar-data (drv/react s :calendar)
         entries (:entries all-activity-data)]
-    (dbg "all-activity/render" @(::selected-year s) @(::selected-month s))
+    (dbg "render" @(::selected-year s) @(::selected-month s))
     [:div.all-activity.group
       [:div.all-activity-cards
         (when @(::top-loading s)
