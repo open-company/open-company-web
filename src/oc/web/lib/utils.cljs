@@ -577,7 +577,7 @@
          (.-body js/document)
          #js [0 (.-scrollTop (.-body js/document))]
          #js [0 scroll-y]
-         (or duration oc-animation-duration))))
+         (if (integer? duration) duration oc-animation-duration))))
 
 (defn scroll-to-bottom [elem & [animated]]
   (let [elem-scroll-top (.-scrollHeight elem)]
