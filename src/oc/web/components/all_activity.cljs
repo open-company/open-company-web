@@ -49,7 +49,7 @@
   [entries year month]
   (let [date-str (str year "-" (utils/add-zero month) "-" (days-for-month year month) "T23:59:59.999Z")]
     (loop [ens (vec (rest entries))
-           en (first ens)]
+           en (first entries)]
       (if (and (pos? (count ens))
                (check-entry en date-str))
         (recur (vec (rest ens))
@@ -176,7 +176,6 @@
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
                                            (when-let [scroll-to @(::scroll-to-entry s)]
-                                             (dbg "after-render " @(::scroll-to-entry s) "sel:" (str "div.entry-card-" (:uuid @(::scroll-to-entry s))) (sel1 [(str "div.entry-card-" (:uuid @(::scroll-to-entry s)))]))
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid scroll-to))])]
                                                (dbg "scrolling to:" entry-el)
                                                (utils/scroll-to-element entry-el 100 0))
@@ -191,10 +190,17 @@
                                                 (reset! (::has-next s) nil))
                                               (when @(::bottom-loading s)
                                                 (reset! (::bottom-loading s) false)
-                                                (reset! (::has-prev s) nil))))
-                                          (when @(::retrieving-calendar s)
-                                            (reset! (::retrieving-calendar s) false)
-                                            (reset! (::scroll-to-entry s) nil))
+                                                (reset! (::has-prev s) nil)))
+                                            (when @(::retrieving-calendar s)
+                                              (reset! (::retrieving-calendar s) false))
+                                              ;; Scroll to the month
+                                              (let [calendar-data @(drv/get-ref s :calendar)
+                                                    year @(::selected-year s)
+                                                    month (or @(::selected-month s) (:month (first (filter #(= (:year %) year) calendar-data))))
+                                                    first-available-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) month)]
+                                                (dbg "   first-available-entry" first-available-entry "year" year "month" month)
+                                                (when first-available-entry
+                                                  (reset! (::scroll-to-entry s) first-available-entry))))
                                           s)
                            :will-unmount (fn [s]
                                           (when @(::scroll-listener s)
