@@ -42,9 +42,9 @@ div.all-activity {
           top: 300px;
           position: absolute;
           width: 667px;
-          color: $oc_gray_7;
-          font-size: 13px;
-          @include avenir_BOOKO();
+          color: rgba($oc_gray_7, 0.5);
+          font-size: 16px;
+          @include avenir_M();
           text-align: center;
         }
       }
