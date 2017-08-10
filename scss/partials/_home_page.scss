@@ -25,7 +25,7 @@ div#wrap {
         @include avenir_B();
         color: $carrot_dark_blue;
         padding: 0 16px;
-        max-width: 1050px;
+        max-width: 690px;
         margin: 0 auto 20px;
         line-height: 60px;
 
@@ -41,7 +41,7 @@ div#wrap {
         padding: 0 16px;
         @include avenir_R();
         line-height: 32px;
-        max-width: 660px;
+        max-width: 800px;
         margin: 20px auto 0px;
 
         &.second-line {
@@ -143,7 +143,7 @@ div#wrap {
             div.description {
               float: left;
               text-align: left;
-              margin-top: 110px;
+              margin-top: 135px;
               margin-left: 50px
             }
           }
@@ -159,7 +159,7 @@ div#wrap {
             div.description {
               float: right;
               text-align: right;
-              margin-top: 90px;
+              margin-top: 130px;
               margin-right: 20px;
             }
           }

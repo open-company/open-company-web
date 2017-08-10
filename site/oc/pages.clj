@@ -51,11 +51,9 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "Team news that keeps everyone aligned"]
+        [:h1.headline "The company newsboard that keeps everyone aligned"]
         [:div.subheadline
-          "Companies struggle to keep everyone on the same page."]
-        [:div.subheadline.second-line
-          "Carrot provides the big picture that brings them together."]
+          "Carrot creates transparency for your team, investors and customers."]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -78,25 +76,25 @@
           [:img {:src (cdn "/img/ML/home_page_il_1_412_385.svg")}]
           [:div.description.group
             [:div.title
-              "Get aligned fast"]
+              "Get your team aligned"]
             [:div.subtitle
-              "Whether your team is local or distributed, the big picture keeps everyone focused on what’s most important."]]]
+              "Whether your team is local or distributed, keep everyone focused on what’s most important."]]]
 
         [:div.illustration.illustration-2.group
           [:img {:src (cdn "/img/ML/home_page_il_2_444_414.svg")}]
           [:div.description.group
             [:div.title
-              "Simplify Investor Updates"]
+              "Simplify investor updates"]
             [:div.subtitle
-              "Create updates for investors, advisors and other stakeholders in less time."]]]
+              "Create beautiful updates for investors and advisors in less time. It’s never been easier to keep them in the loop."]]]
 
         [:div.illustration.illustration-3.group
           [:img {:src (cdn "/img/ML/home_page_il_3_355_350.svg")}]
           [:div.description.group
             [:div.title
-              "Engage a bigger audience"]
+              "Expand your network"]
             [:div.subtitle
-              "Share the latest with recruits, potential investors, customers and other outside stakeholders to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]]
+              "Share news with recruits, potential investors and customers to keep them engaged and supportive. It’s an easy way to build trust and grow your business."]]]]
 
       (comment
         [:div.customers
@@ -172,7 +170,7 @@
         [:img {:src (cdn "/img/ML/features_il_5_333_274.svg")}]
         [:div.description.group
           [:div.title
-            " Share news more broadly"]
+            "Share news more broadly"]
           [:div.subtitle
             "Updates can also be made public - ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]])
 
