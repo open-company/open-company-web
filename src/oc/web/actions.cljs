@@ -51,18 +51,13 @@
 
 ;; Get the board to show counting the last accessed and the last created
 
-(defn newest-board [boards]
-  (first (sort-by :name boards)))
-
 (defn get-default-board [org-data]
-  (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
-      (if board
-        ; Get the last accessed board from the saved cookie
-        board
-        ; Fallback to the newest board if the saved board was not found
-        (newest-board (:boards org-data))))
-    (newest-board (:boards org-data))))
+  (when-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+    (when-not (= last-board-slug "all-activity")
+      (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
+        (when board
+          ; Get the last accessed board from the saved cookie
+          board)))))
 
 (defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
   (if success
@@ -135,9 +130,11 @@
         (if (responsive/is-tablet-or-mobile?)
           (router/nav! (oc-urls/boards))
           (let [board-to (get-default-board org-data)]
-            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
-              (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))))))
+            (if board-to
+              (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
+                (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
+                (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
+              (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
   ;; FIXME: temporarily remove stories loading
   ; (utils/after 100 #(api/get-updates))
   (-> db
@@ -1158,10 +1155,10 @@
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
           old-all-activity (get-in db all-activity-key)
-          next-links (vec (filter #(if (= direction :up) (= (:rel %) "previous") (= (:rel %) "next")) (:links fixed-all-activity)))
+          next-links (vec (remove #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous")) (:links fixed-all-activity)))
           link-to-move (if (= direction :up)
-                          (utils/link-for (:links old-all-activity) "previous")
-                          (utils/link-for (:links old-all-activity) "next"))
+                          (utils/link-for (:links old-all-activity) "next")
+                          (utils/link-for (:links old-all-activity) "previous"))
           fixed-next-links (if link-to-move
                               (vec (conj next-links link-to-move))
                               next-links)
