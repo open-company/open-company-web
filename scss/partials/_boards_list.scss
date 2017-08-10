@@ -8,25 +8,26 @@ div.left-boards-list {
     border: none;
     outline: none;
     margin-bottom: 44px;
+    border-radius: 3px;
+
+    &.selected {
+      background-color: $carrot_light_blue;
+      color: #3E4547;
+    }
 
     &:hover {
       text-decoration: underline;
     }
 
     div.all-activity-label {
+      border-radius: 3px;
       font-size: 16px;
       color: $oc_gray_7;
       @include avenir_H();
-      border-radius: 3px;
       padding: 0.2rem 0.4rem;
       width: 135px;
       margin-left: 19px;
       text-align: left;
-
-      &.selected {
-        background-color: $carrot_light_blue;
-        color: #3E4547;
-      }
     }
 
     div.all-activity-icon {
@@ -105,6 +106,15 @@ div.left-boards-list {
       cursor: default;
       color: $oc_gray_7;
       margin-top: 10px;
+      border-radius: 3px;
+
+      &.selected {
+        background-color: $carrot_light_blue;
+        color: #3E4547;
+        @include avenir_H();
+        font-size: 14px;
+        line-height: 1.71;
+      }
 
       img.public {
         float: left;
@@ -127,7 +137,7 @@ div.left-boards-list {
 
         div.internal {
           border-radius: 3px;
-          padding: 0 5px 0 5px;
+          padding: 0.1rem 5px 0 5px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -138,14 +148,6 @@ div.left-boards-list {
           color: $oc_gray_7;
           @include avenir_M();
           cursor: pointer;
-
-          &.selected {
-            background-color: $carrot_light_blue;
-            color: #3E4547;
-            @include avenir_H();
-            font-size: 14px;
-            line-height: 1.71;
-          }
 
           &:hover {
             text-decoration: underline;

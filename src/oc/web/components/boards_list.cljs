@@ -27,7 +27,7 @@
   (into [] (sort-by :name boards)))
 
 (defcomponent boards-list
-  [{:keys [org-data board-data card-width show-add-topic] :as data} owner options]
+  [{:keys [org-data show-add-topic] :as data} owner options]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -44,12 +44,13 @@
         ;; All activity
         (when (jwt/user-is-part-of-the-team (:team-id org-data))
           (dom/button
-            {:class "all-activity group"
+            {:class (utils/class-set {:all-activity true
+                                      :group true
+                                      :selected (utils/in? (:route @router/path) "all-activity")})
              :on-click #(router/nav! (oc-urls/all-activity))}
             (dom/div {:class "all-activity-icon"})
             (dom/div
-              {:class (utils/class-set {:all-activity-label true
-                                        :selected (utils/in? (:route @router/path) "all-activity")})}
+              {:class "all-activity-label"}
               "All Activity")))
         ;; Boards list
         (dom/div {:class "left-boards-list-top group"}
@@ -67,7 +68,8 @@
                          :data-container "body"})))
         (dom/div {:class (str "left-boards-list-items group")}
           (for [board (sorted-boards (:boards org-data))]
-            (dom/div {:class "left-boards-list-item"
+            (dom/div {:class (utils/class-set {:left-boards-list-item true
+                                               :selected (= (router/current-board-slug) (:slug board))})
                       :data-board (name (:slug board))
                       :key (str "board-list-" (name (:slug board)))
                       :on-click #(dis/dispatch! [:board-nav (:slug board)])}
@@ -80,9 +82,7 @@
                                                  :public-board (= (:access board) "public")
                                                  :private-board (= (:access board) "private")
                                                  :team-board (= (:access board) "team")})}
-                (dom/div {:class (utils/class-set {:selected (= (router/current-board-slug) (:slug board))
-                                                   :internal true
-                                                   :has-news true})
+                (dom/div {:class "internal"
                           :key (str "board-list-" (name (:slug board)) "-internal")}
                   (or (:name board) (:slug board)))))))
         (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
