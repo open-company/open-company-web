@@ -7,7 +7,7 @@ div.left-boards-list {
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 34px;
+    margin-bottom: 44px;
 
     &:hover {
       text-decoration: underline;
@@ -55,6 +55,7 @@ div.left-boards-list {
         font-size: 13px;
         color: $oc_gray_7;
         float: left;
+        margin-left: 5px;
       }
 
       div.boards-icon, div.stories-icon {
@@ -107,7 +108,7 @@ div.left-boards-list {
 
       img.public {
         float: left;
-        margin-left: 4px;
+        margin-left: 6px;
         margin-top: 2px;
         width: 16px;
         height: 16px;
@@ -115,23 +116,14 @@ div.left-boards-list {
 
       img.private{
         float: left;
-        margin-left: 6px;
+        margin-left: 8px;
         margin-top: 3px;
         width: 10px;
         height: 14px;
       }
 
       div.board-name {
-        margin-left: 20px;
-
-        // &.public-board {
-        //   margin-left: 4px;
-        // }
-
-        // &.private-board {
-        //   margin-left: 10px;
-        // }
-        // float: right;
+        margin-left: 25px;
 
         div.internal {
           border-radius: 3px;
@@ -164,7 +156,7 @@ div.left-boards-list {
   }
 
   div.left-boards-list-footer {
-    margin-top: 34px;
+    margin-top: 44px;
 
     button.about-carrot-btn {
       margin-top: 10px;
@@ -186,6 +178,7 @@ div.left-boards-list {
         font-size: 14px;
         line-height: 1.71;
         color: $oc_gray_7;
+        margin-left: 5px;
       }
     }
 
@@ -208,6 +201,7 @@ div.left-boards-list {
         font-size: 14px;
         line-height: 1.71;
         color: $oc_gray_7;
+        margin-left: 5px;
       }
     }
   }
