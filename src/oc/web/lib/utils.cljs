@@ -1039,12 +1039,32 @@
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
 
+(defn get-24h-time 
+  [js-date]
+  (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+
+(defn get-ampm-time
+  [js-date]
+  (let [hours (.getHours js-date)
+        minutes (add-zero (.getMinutes js-date))
+        ampm (if (>= hours 12) "pm" "am")
+        hours (mod hours 12)
+        hours (if (= hours 0) 12 hours)]
+    (str hours ":" minutes ampm)))
+
 (defn entry-date [js-date]
-  (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+  (let [r (js/RegExp "am|pm" "i")
+        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))
+        time-string (if-not h12
+                      (get-ampm-time js-date)
+                      (get-24h-time js-date))]
+    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
 
 (defn entry-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
-        updated-at (js-date (:updated-at entry-data))]
-    (str "Created on " (entry-date created-at)
-      (when-not (= (:created-at entry-data) (:updated-at entry-data))
-        (str "\nEdited on " (entry-date updated-at) " by " (:name (last (:author entry-data))))))))
+        updated-at (js-date (:updated-at entry-data))
+        created-str (entry-date created-at)
+        updated-str (entry-date updated-at)]
+    (if (= (:created-at entry-data) (:updated-at entry-data))
+      created-str
+      (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
