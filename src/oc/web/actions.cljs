@@ -1150,7 +1150,7 @@
         next-all-activity-data (assoc all-activity-data :loading-more true)]
     (assoc-in db all-activity-key next-all-activity-data)))
 
-(def default-activity-limit 50)
+; (def default-activity-limit 50)
 
 (defmethod dispatcher/action :all-activity-more/finish
   [db [_ {:keys [org direction body]}]]
@@ -1158,7 +1158,8 @@
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
           old-all-activity (get-in db all-activity-key)
-          keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
+          keeping-entries (count (:entries old-all-activity))
+          ; keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
           ;; Keep only x elements before or after the new list
           ; all-activity-entries (if (= direction :up)
           ;                         (concat (:entries fixed-all-activity) (take default-activity-limit (:entries old-all-activity)))
