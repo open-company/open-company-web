@@ -14,7 +14,7 @@
             [goog.object :as gobj]))
 
 ;; 800px from the end of the current rendered results as point to add more entries in the batch
-(def scroll-card-threshold 3)
+(def scroll-card-threshold 5)
 (def card-avg-height 600)
 
 (defn dbg [& args]
@@ -143,6 +143,7 @@
                           (rum/local nil ::bottom-loading)
                           (rum/local nil ::retrieving-calendar)
                           (rum/local false ::show-all-caught-up-message)
+                          (rum/local nil ::last-direction)
                           {:will-mount (fn [s]
                                         (let [all-activity-data (first (:rum/args s))
                                               year (:year all-activity-data)
@@ -172,6 +173,7 @@
                                                     to-month (inc (int (.getMonth created-date)))]
                                                 (reset! (::selected-year s) to-year)
                                                 (reset! (::selected-month s) to-month)
+                                                (reset! (::last-direction s) :up)
                                                 (reset! (::scroll-to-entry s) scroll-to-entry))
                                               ;; did scrolled down, results where simply concatenated, just need to update the calendar highlighting
                                               (if (= direction :down)
@@ -211,7 +213,8 @@
                                              (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid scroll-to))])]
                                                (dbg "scrolling to:" entry-el)
                                                (utils/scroll-to-element entry-el 100 0))
-                                             (utils/after 100 #(reset! (::scroll-to-entry s) nil)))
+                                             (utils/after 100 #(do (reset! (::scroll-to-entry s) nil)
+                                                                   (reset! (::last-direction s) nil))))
                                            s)
                            :did-remount (fn [_ s]
                                           (dbg "did-remount" (first (:rum/args s)))
@@ -262,9 +265,13 @@
                     @(::retrieving-calendar s)
                     (and (:loading-more all-activity-data)
                          (not @(::first-render-done s)))
-                    @(::scroll-to-entry s))
+                    @(::scroll-to-entry s)
+                    (= @(::last-direction s) :up))
             [:div.entries-overlay
-              (rloading {:loading true})])
+              (rloading {:loading true})
+              (when (or @(::top-loading s)
+                        (= @(::last-direction s) :up))
+                [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e entries]
             (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
         (when @(::bottom-loading s)

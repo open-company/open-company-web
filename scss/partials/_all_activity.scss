@@ -32,9 +32,20 @@ div.all-activity {
 
         div.oc-loading {
           margin: 100px auto;
+          height: 170px;
           div.oc-loading-inner {
             top: 110px;
           }
+        }
+
+        div.top-loading-message {
+          top: 300px;
+          position: absolute;
+          width: 667px;
+          color: $oc_gray_7;
+          font-size: 13px;
+          @include avenir_BOOKO();
+          text-align: center;
         }
       }
 
