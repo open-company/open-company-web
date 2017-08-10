@@ -8,7 +8,7 @@
             [oc.web.lib.logging :as logging]
             [oc.web.components.entry-card :refer (entry-card)]
             [oc.web.components.ui.loading :refer (rloading)]
-            [oc.web.components.ui.all-cought-up :refer (all-cought-up)]
+            [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -142,7 +142,7 @@
                           (rum/local nil ::top-loading)
                           (rum/local nil ::bottom-loading)
                           (rum/local nil ::retrieving-calendar)
-                          (rum/local false ::show-all-cought-up-message)
+                          (rum/local false ::show-all-caught-up-message)
                           {:will-mount (fn [s]
                                         (let [all-activity-data (first (:rum/args s))
                                               year (:year all-activity-data)
@@ -195,8 +195,8 @@
                                           (if prev-link
                                             (do
                                               (reset! (::has-prev s) prev-link)
-                                              (reset! (::show-all-cought-up-message s) false))
-                                            (reset! (::show-all-cought-up-message s) true)))
+                                              (reset! (::show-all-caught-up-message s) false))
+                                            (reset! (::show-all-caught-up-message s) true)))
                                         s)
                            :did-mount (fn [s]
                                         (dbg "did-mount")
@@ -223,7 +223,7 @@
                                               (when @(::bottom-loading s)
                                                 (reset! (::bottom-loading s) false)
                                                 (reset! (::has-prev s) nil)
-                                                (reset! (::show-all-cought-up-message s) true)))
+                                                (reset! (::show-all-caught-up-message s) true)))
                                             (when @(::retrieving-calendar s)
                                               (reset! (::retrieving-calendar s) false)
                                               ;; Scroll to the first entry of the selected month if any
@@ -238,10 +238,10 @@
                                                 (if prev-link
                                                   (do
                                                     (reset! (::has-prev s) prev-link)
-                                                    (reset! (::show-all-cought-up-message s) false))
+                                                    (reset! (::show-all-caught-up-message s) false))
                                                   (do
                                                     (reset! (::has-prev s) nil)
-                                                    (reset! (::show-all-cought-up-message s) true)))
+                                                    (reset! (::show-all-caught-up-message s) true)))
                                                 (when first-available-entry
                                                   (reset! (::scroll-to-entry s) first-available-entry)))))
                                           s)
@@ -270,8 +270,8 @@
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
-        (when @(::show-all-cought-up-message s)
-          (all-cought-up))]
+        (when @(::show-all-caught-up-message s)
+          (all-caught-up))]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
           (for [year calendar-data
