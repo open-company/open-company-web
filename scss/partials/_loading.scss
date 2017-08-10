@@ -43,9 +43,9 @@ div.oc-loading {
   }
 
   &.active div.oc-loading-inner {
-    -webkit-animation: -webkit-loading-frames 4s linear 1s;
+    -webkit-animation: -webkit-loading-frames 3.2s linear 1.8s;
     -webkit-animation-iteration-count: infinite;
-    animation: loading-frames 4s linear 1s;
+    animation: loading-frames 3.2s linear 1.8s;
     animation-iteration-count: infinite;
   }
 }
