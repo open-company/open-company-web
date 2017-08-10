@@ -145,19 +145,34 @@
                                         (let [all-activity-data (first (:rum/args s))
                                               year (:year all-activity-data)
                                               month (:month all-activity-data)
+                                              direction (:direction all-activity-data)
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))
                                               first-available-entry (when (and year month) (get-first-available-entry (:entries all-activity-data) year month))]
                                           (dbg "will-mount   year" year "month" month "first-entry-date" first-entry-date "first-available-entry" first-available-entry)
                                           (if (and year month)
+                                            ;; Loading from calendar since we have year and month from the click action
                                             (do
                                               (reset! (::selected-year s) year)
                                               (reset! (::selected-month s) month)
                                               (reset! (::scroll-to-entry s) first-available-entry))
-                                            (do
-                                              (reset! (::selected-year s) (.getFullYear first-entry-date))
-                                              (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))))
+                                            ;; First load or subsequent load more with different set of entries
+                                            (if (= direction :up)
+                                              ;; did scrolled up, we need to scroll to the first of the old entries to not lose the previous position
+                                              (let [saved-entries (:saved-entries all-activity-data)
+                                                    last-new-entry-idx (dec (- (count (:entries all-activity-data)) saved-entries))
+                                                    scroll-to-entry (get (:entries all-activity-data) last-new-entry-idx)
+                                                    created-date (utils/js-date (:created-at scroll-to-entry))
+                                                    to-year (.getFullYear created-date)
+                                                    to-month (inc (int (.getMonth created-date)))]
+                                                (reset! (::selected-year s) to-year)
+                                                (reset! (::selected-month s) to-month)
+                                                (reset! (::scroll-to-entry s) scroll-to-entry))
+                                              ;; did scrolled down, results where simply concatenated, just need to update the calendar highlighting
+                                              (do
+                                                (reset! (::selected-year s) (.getFullYear first-entry-date))
+                                                (reset! (::selected-month s) (inc (int (.getMonth first-entry-date)))))))
                                           (reset! (::retrieving-calendar s) nil)
                                           (reset! (::top-loading s) false)
                                           (reset! (::bottom-loading s) false)
@@ -197,7 +212,11 @@
                                               (let [calendar-data @(drv/get-ref s :calendar)
                                                     year @(::selected-year s)
                                                     month (or @(::selected-month s) (:month (first (filter #(= (:year %) year) calendar-data))))
-                                                    first-available-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) month)]
+                                                    first-available-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) month)
+                                                    next-link (utils/link-for (:links all-activity-data) "previous")
+                                                    prev-link (utils/link-for (:links all-activity-data) "next")]
+                                                (reset! (::has-next s) next-link)
+                                                (reset! (::has-prev s) prev-link)
                                                 (when first-available-entry
                                                   (reset! (::scroll-to-entry s) first-available-entry)))))
                                           s)
