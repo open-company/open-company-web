@@ -933,8 +933,15 @@
 (defmethod dispatcher/action :entry-modal-fade-in
   [db [_ board-slug entry-uuid]]
   (utils/after 10
-   #(let [new-route [(router/current-org-slug) "all-activity" board-slug entry-uuid "entry"]
-          parts {:org (router/current-org-slug) :board board-slug :entry entry-uuid :query-params (:query-params @router/path) :from-all-activity (not (router/current-board-slug))}]
+   #(let [from-all-activity (not (router/current-board-slug))
+          new-route (if from-all-activity
+                      [(router/current-org-slug) "all-activity" board-slug entry-uuid "entry"]
+                      [(router/current-org-slug) board-slug entry-uuid "entry"])
+          parts {:org (router/current-org-slug)
+                 :board board-slug
+                 :entry entry-uuid
+                 :query-params (:query-params @router/path)
+                 :from-all-activity from-all-activity}]
       (router/set-route! new-route parts)
       (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry board-slug entry-uuid))
       (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
