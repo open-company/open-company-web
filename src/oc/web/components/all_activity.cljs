@@ -170,9 +170,19 @@
                                                 (reset! (::selected-month s) to-month)
                                                 (reset! (::scroll-to-entry s) scroll-to-entry))
                                               ;; did scrolled down, results where simply concatenated, just need to update the calendar highlighting
-                                              (do
-                                                (reset! (::selected-year s) (.getFullYear first-entry-date))
-                                                (reset! (::selected-month s) (inc (int (.getMonth first-entry-date)))))))
+                                              (if (= direction :down)
+                                                ; Load more :down scroll, needs to set the calendar
+                                                (let [last-old-entry-idx (dec (:saved-entries all-activity-data))
+                                                      last-old-entry (get (:entries all-activity-data) last-old-entry-idx)
+                                                      created-date (utils/js-date (:created-at last-old-entry))
+                                                      to-year (.getFullYear created-date)
+                                                      to-month (inc (int (.getMonth created-date)))]
+                                                  (reset! (::selected-year s) to-year)
+                                                  (reset! (::selected-month s) to-month))
+                                                ; First load or calendar get
+                                                (do
+                                                  (reset! (::selected-year s) (.getFullYear first-entry-date))
+                                                  (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))))))
                                           (reset! (::retrieving-calendar s) nil)
                                           (reset! (::top-loading s) false)
                                           (reset! (::bottom-loading s) false)
