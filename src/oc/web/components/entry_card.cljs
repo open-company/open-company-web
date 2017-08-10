@@ -8,7 +8,7 @@
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
+            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [goog.object :as gobj]))
 
 (rum/defc entry-card-empty
@@ -180,11 +180,7 @@
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
            :class (or (:type @(::first-body-image s)) "image")}])]
     [:div.entry-card-footer.group
-      (if is-all-activity
-        [:div.all-activity-footer.group
-          (reactions entry-data)
-          (comments-summary entry-data)]
-        (interactions-summary entry-data))
+      (interactions-summary entry-data)
       [:div.more-button.dropdown
         [:button.mlb-reset.more-ellipsis.dropdown-toggle
           {:type "button"
