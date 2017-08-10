@@ -8,6 +8,7 @@
             [oc.web.lib.logging :as logging]
             [oc.web.components.entry-card :refer (entry-card)]
             [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.all-cought-up :refer (all-cought-up)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -141,6 +142,7 @@
                           (rum/local nil ::top-loading)
                           (rum/local nil ::bottom-loading)
                           (rum/local nil ::retrieving-calendar)
+                          (rum/local false ::show-all-cought-up-message)
                           {:will-mount (fn [s]
                                         (let [all-activity-data (first (:rum/args s))
                                               year (:year all-activity-data)
@@ -150,7 +152,9 @@
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))
                                               first-available-entry (when (and year month) (get-first-available-entry (:entries all-activity-data) year month))]
-                                          (dbg "will-mount   year" year "month" month "first-entry-date" first-entry-date "first-available-entry" first-available-entry)
+                                          (dbg "will-mount" all-activity-data)
+                                          (dbg "   next-link" next-link "prev-link" prev-link)
+                                          (dbg "   year" year "month" month "first-entry-date" first-entry-date "first-available-entry" first-available-entry)
                                           (if (and year month)
                                             ;; Loading from calendar since we have year and month from the click action
                                             (do
@@ -188,8 +192,11 @@
                                           (reset! (::bottom-loading s) false)
                                           (when next-link
                                             (reset! (::has-next s) next-link))
-                                          (when prev-link
-                                            (reset! (::has-prev s) prev-link)))
+                                          (if prev-link
+                                            (do
+                                              (reset! (::has-prev s) prev-link)
+                                              (reset! (::show-all-cought-up-message s) false))
+                                            (reset! (::show-all-cought-up-message s) true)))
                                         s)
                            :did-mount (fn [s]
                                         (dbg "did-mount")
@@ -207,7 +214,7 @@
                                              (utils/after 100 #(reset! (::scroll-to-entry s) nil)))
                                            s)
                            :did-remount (fn [_ s]
-                                          (dbg "did-remount")
+                                          (dbg "did-remount" (first (:rum/args s)))
                                           (let [all-activity-data (first (:rum/args s))]
                                             (when-not (:loading-more all-activity-data)
                                               (when @(::top-loading s)
@@ -215,7 +222,8 @@
                                                 (reset! (::has-next s) nil))
                                               (when @(::bottom-loading s)
                                                 (reset! (::bottom-loading s) false)
-                                                (reset! (::has-prev s) nil)))
+                                                (reset! (::has-prev s) nil)
+                                                (reset! (::show-all-cought-up-message s) true)))
                                             (when @(::retrieving-calendar s)
                                               (reset! (::retrieving-calendar s) false)
                                               ;; Scroll to the first entry of the selected month if any
@@ -225,8 +233,15 @@
                                                     first-available-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) month)
                                                     next-link (utils/link-for (:links all-activity-data) "previous")
                                                     prev-link (utils/link-for (:links all-activity-data) "next")]
+                                                (dbg "   next-link" next-link "prev-link" prev-link)
                                                 (reset! (::has-next s) next-link)
-                                                (reset! (::has-prev s) prev-link)
+                                                (if prev-link
+                                                  (do
+                                                    (reset! (::has-prev s) prev-link)
+                                                    (reset! (::show-all-cought-up-message s) false))
+                                                  (do
+                                                    (reset! (::has-prev s) nil)
+                                                    (reset! (::show-all-cought-up-message s) true)))
                                                 (when first-available-entry
                                                   (reset! (::scroll-to-entry s) first-available-entry)))))
                                           s)
@@ -254,7 +269,9 @@
             (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
-            "Retrieving activity..."])]
+            "Retrieving activity..."])
+        (when @(::show-all-cought-up-message s)
+          (all-cought-up))]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
           (for [year calendar-data
