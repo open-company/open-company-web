@@ -65,6 +65,7 @@
     (>= (- el-offset-top body-scroll) 0)))
 
 (defn get-first-visible-entry
+  "Given the list of entries rendered, get the first visible entry counting the page scroll."
   [entries]
   (when (pos? (count entries))
     (loop [ens entries
@@ -79,7 +80,7 @@
                  (first (vec (rest ens)))))))))
 
 (defn highlight-calendar
-  "Get the first visible entry and highlight the corresponding year and month in the calendar."
+  "Highlight the current visible entry year and month in the calendar."
   [s]
   ;; When we are not retrieving calendar and not waiting to scroll to an entry
   (when (and (not @(::retrieving-calendar s))
