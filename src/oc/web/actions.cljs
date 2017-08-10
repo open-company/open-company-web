@@ -1158,17 +1158,25 @@
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
           old-all-activity (get-in db all-activity-key)
+          next-links (vec (filter #(if (= direction :up) (= (:rel %) "previous") (= (:rel %) "next")) (:links fixed-all-activity)))
+          link-to-move (if (= direction :up)
+                          (utils/link-for (:links old-all-activity) "previous")
+                          (utils/link-for (:links old-all-activity) "next"))
+          fixed-next-links (if link-to-move
+                              (vec (conj next-links link-to-move))
+                              next-links)
+          with-links (assoc fixed-all-activity :links fixed-next-links)
           keeping-entries (count (:entries old-all-activity))
           ; keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
           ;; Keep only x elements before or after the new list
           ; all-activity-entries (if (= direction :up)
-          ;                         (concat (:entries fixed-all-activity) (take default-activity-limit (:entries old-all-activity)))
-          ;                         (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries fixed-all-activity)))
+          ;                         (concat (:entries with-links) (take default-activity-limit (:entries old-all-activity)))
+          ;                         (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries with-links)))
           ;; Keep all the elements
           all-activity-entries (if (= direction :up)
-                                  (concat (:entries fixed-all-activity) (:entries old-all-activity))
-                                  (concat (:entries old-all-activity) (:entries fixed-all-activity)))
-          new-all-activity (-> fixed-all-activity
+                                  (concat (:entries with-links) (:entries old-all-activity))
+                                  (concat (:entries old-all-activity) (:entries with-links)))
+          new-all-activity (-> with-links
                               (assoc :entries (vec (reverse (sort-by :created-at (distinct all-activity-entries)))))
                               (assoc :direction direction)
                               (assoc :saved-entries keeping-entries))]
