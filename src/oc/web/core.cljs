@@ -129,6 +129,8 @@
         query-params (:query-params params)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
+    (when (= route "all-activity")
+      (cook/set-cookie! (router/last-board-cookie org) "all-activity" (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save route
     (router/set-route! [org route] {:org org :query-params (:query-params params)})
