@@ -762,7 +762,7 @@
 (defn add-comment [entry-uuid comment-body]
   (when (and entry-uuid comment-body)
     (let [entry-data (dispatcher/entry-data entry-uuid)
-          add-comment-link (utils/link-for (:links entry-data) "comment" "POST")
+          add-comment-link (utils/link-for (:links entry-data) "create" "POST")
           json-data (cljs->json {:body comment-body})]
       (interaction-post (relative-href (:href add-comment-link))
         {:headers (headers-for-link add-comment-link)
