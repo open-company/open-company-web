@@ -59,7 +59,7 @@
   (render-state [_ {:keys [loading message]}]
     (dom/div {:class "org-editor"}
       (dom/div {:class "fullscreen-page group"}
-        (om/build navbar {:show-navigation-bar true})
+        (navbar)
         (dom/div {:class "org-editor-box group navbar-offset"}
           (dom/form {:on-submit (partial create-org-clicked owner)}
             (dom/div {:class "form-group"}

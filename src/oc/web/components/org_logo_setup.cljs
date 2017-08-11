@@ -10,7 +10,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.small-loading :as loading]
             [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.org-settings :as org-settings]))

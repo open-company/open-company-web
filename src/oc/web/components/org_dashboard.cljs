@@ -131,20 +131,7 @@
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
                            (router/current-entry-uuid))
-              (om/build navbar {:save-bt-active save-bt-active
-                                :org-data org-data
-                                :board-data board-data
-                                :card-width card-width
-                                :header-width total-width-int
-                                :columns-num columns-num
-                                :foce-key (:foce-key data)
-                                :show-share-su-button (utils/can-edit-topics? board-data)
-                                :show-login-overlay (:show-login-overlay data)
-                                :mobile-menu-open (:mobile-menu-open data)
-                                :auth-settings (:auth-settings data)
-                                :active :dashboard
-                                :show-navigation-bar (utils/company-has-topics? board-data)
-                                :is-dashboard (not (router/current-entry-uuid))}))
+              (navbar))
             (if (:show-welcome-screen data)
               (welcome-screen)
               (dom/div {:class "dashboard-container"}
