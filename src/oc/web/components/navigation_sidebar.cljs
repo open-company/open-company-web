@@ -1,4 +1,4 @@
-(ns oc.web.components.boards-list
+(ns oc.web.components.navigation-sidebar
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
@@ -26,7 +26,7 @@
 (defn sorted-boards [boards]
   (into [] (sort-by :name boards)))
 
-(defcomponent boards-list
+(defcomponent navigation-sidebar
   [{:keys [org-data show-add-topic] :as data} owner options]
 
   (did-mount [_]
@@ -38,9 +38,9 @@
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
-    (let [left-boards-list-width (- responsive/left-boards-list-width 20)]
-      (dom/div {:class "left-boards-list group"
-                :style {:width (str left-boards-list-width "px")}}
+    (let [left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)]
+      (dom/div {:class "left-navigation-sidebar group"
+                :style {:width (str left-navigation-sidebar-width "px")}}
         ;; All activity
         (when (jwt/user-is-part-of-the-team (:team-id org-data))
           (dom/button
@@ -53,22 +53,22 @@
               {:class "all-activity-label"}
               "All Activity")))
         ;; Boards list
-        (dom/div {:class "left-boards-list-top group"}
+        (dom/div {:class "left-navigation-sidebar-top group"}
           ;; Boards header
-          (dom/h3 {:class "left-boards-list-top-title"}
+          (dom/h3 {:class "left-navigation-sidebar-top-title"}
             (dom/div {:class "boards-icon"})
             (dom/span "BOARDS"))
           (when (and (not (responsive/is-tablet-or-mobile?))
                      (utils/link-for (:links org-data) "create"))
-            (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+            (dom/button {:class "left-navigation-sidebar-top-title-button btn-reset right"
                          :on-click #(dis/dispatch! [:board-edit nil])
                          :title "Create a new board"
                          :data-placement "top"
                          :data-toggle "tooltip"
                          :data-container "body"})))
-        (dom/div {:class (str "left-boards-list-items group")}
+        (dom/div {:class (str "left-navigation-sidebar-items group")}
           (for [board (sorted-boards (:boards org-data))]
-            (dom/div {:class (utils/class-set {:left-boards-list-item true
+            (dom/div {:class (utils/class-set {:left-navigation-sidebar-item true
                                                :selected (= (router/current-board-slug) (:slug board))})
                       :data-board (name (:slug board))
                       :key (str "board-list-" (name (:slug board)))
@@ -86,20 +86,20 @@
                           :key (str "board-list-" (name (:slug board)) "-internal")}
                   (or (:name board) (:slug board)))))))
         (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
-          (dom/div {:class "left-boards-list-top group"}
+          (dom/div {:class "left-navigation-sidebar-top group"}
                     ;; Boards header
-                    (dom/h3 {:class "left-boards-list-top-title"}
+                    (dom/h3 {:class "left-navigation-sidebar-top-title"}
                       (dom/div {:class "stories-icon"})
                       (dom/span "STORIES"))
                     (when (and (not (responsive/is-tablet-or-mobile?))
                                true) ;; FIXME: replace with create storeis link check
-                      (dom/button {:class "left-boards-list-top-title-button btn-reset right"
+                      (dom/button {:class "left-navigation-sidebar-top-title-button btn-reset right"
                                    :on-click #(identity %) ;; FIXME: Replace with story creation action
                                    :title "Create a new story"
                                    :data-placement "top"
                                    :data-toggle "tooltip"
                                    :data-container "body"}))))
-        (dom/div {:class "left-boards-list-footer"}
+        (dom/div {:class "left-navigation-sidebar-footer"}
           (when (and (router/current-org-slug)
                      (jwt/is-admin? (:team-id org-data)))
             (dom/button {:class "mlb-reset invite-people-btn"

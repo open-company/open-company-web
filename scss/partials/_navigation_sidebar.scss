@@ -1,4 +1,4 @@
-div.left-boards-list {
+div.left-navigation-sidebar {
   float: left;
   position: fixed;
   margin-right: 20px;
@@ -41,10 +41,10 @@ div.left-boards-list {
     }
   }
 
-  div.left-boards-list-top{
+  div.left-navigation-sidebar-top{
     border-radius: 4px;
 
-    .left-boards-list-top-title {
+    .left-navigation-sidebar-top-title {
       padding: 0 0 0 5px;
       margin: 0;
       float: left;
@@ -76,7 +76,7 @@ div.left-boards-list {
       }
     }
 
-    button.left-boards-list-top-title-button {
+    button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
       margin-right: 28px;
@@ -99,10 +99,10 @@ div.left-boards-list {
     }
   }
 
-  div.left-boards-list-items{
+  div.left-navigation-sidebar-items{
     cursor: pointer;
 
-    div.left-boards-list-item {
+    div.left-navigation-sidebar-item {
       cursor: default;
       color: $oc_gray_7;
       margin-top: 10px;
@@ -157,7 +157,7 @@ div.left-boards-list {
     }
   }
 
-  div.left-boards-list-footer {
+  div.left-navigation-sidebar-footer {
     margin-top: 44px;
 
     button.about-carrot-btn {
