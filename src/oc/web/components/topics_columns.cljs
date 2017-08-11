@@ -8,7 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.boards-list :refer (boards-list)]
+            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entry-card :refer (entry-card)]
@@ -77,9 +77,9 @@
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (when-not (responsive/is-tablet-or-mobile?)
-              (om/build boards-list data))
+              (om/build navigation-sidebar data))
             (dom/div {:class "board-container right"
-                      :style {:width (str (- total-width-int responsive/left-boards-list-width responsive/topic-list-right-margin (* 2 responsive/topic-list-x-padding)) "px")}}
+                      :style {:width (str (- total-width-int responsive/left-navigation-sidebar-width responsive/topic-list-right-margin (* 2 responsive/topic-list-x-padding)) "px")}}
               ;; Board name row: board name, settings button and say something button
               (dom/div {:class "group"}
                 ;; Board name and settings button
