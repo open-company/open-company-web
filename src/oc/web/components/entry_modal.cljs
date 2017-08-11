@@ -26,18 +26,18 @@
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :message "Delete this entry?"
-                    :first-button-title "No"
-                    :first-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :second-button-title "Yes"
-                    :second-button-cb #(do
-                                        (let [org-slug (router/current-org-slug)
-                                              board-slug (router/current-board-slug)
-                                              last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                                          (if (= last-filter :by-topic)
-                                            (router/nav! (oc-urls/board-sort-by-topic))
-                                            (router/nav! (oc-urls/board))))
-                                        (dis/dispatch! [:entry-delete entry-data])
-                                        (dis/dispatch! [:alert-modal-hide]))
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                       (let [org-slug (router/current-org-slug)
+                                             board-slug (router/current-board-slug)
+                                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
+                                         (if (= last-filter :by-topic)
+                                           (router/nav! (oc-urls/board-sort-by-topic))
+                                           (router/nav! (oc-urls/board))))
+                                       (dis/dispatch! [:entry-delete entry-data])
+                                       (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 

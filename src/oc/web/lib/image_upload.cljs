@@ -19,7 +19,7 @@
    :location "s3"})
 
 (defn upload!
-  [type success-cb progress-cb error-cb & [finished-cb selected-cb started-cb]]
+  [type success-cb progress-cb error-cb & [close-cb finished-cb selected-cb started-cb]]
   (let [from-sources (if (= type "image/*")
                         ["local_file_system" "imagesearch" "googledrive" "dropbox" "onedrive" "box"]
                         ["local_file_system" "googledrive" "dropbox" "onedrive" "box"])
@@ -47,7 +47,9 @@
                          (when (fn? finished-cb)
                            (finished-cb res)))
                        ;; Error cb
-                       :onFileUploadFailed error-cb}
+                       :onFileUploadFailed error-cb
+                       ;; Close cb
+                       :onClose close-cb}
         config        (if type
                         (merge base-config {:accept type})
                         base-config)

@@ -10,9 +10,10 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.medium-editor-exts :as editor]
-            [oc.web.components.entry-attachments :refer (entry-attachments)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.entry-attachments :refer (entry-attachments)]
             [cljsjs.medium-editor]
             [cljsjs.rangy-selectionsaverestore]
             [goog.object :as gobj]
@@ -20,6 +21,16 @@
             [goog.events :as events]
             [goog.Uri :as guri]
             [goog.events.EventType :as EventType]))
+
+(defn media-photo-add-error
+  "Show an error alert view for failed uploads."
+  []
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :title "Sorry!"
+                    :message "An error occurred with your image."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
+    (dis/dispatch! [:alert-modal-show alert-data])))
 
 (defn attachment-upload-success-cb [state res]
   (let [url    (gobj/get res "url")]
@@ -114,7 +125,7 @@
     ; move cursor at the end
     (utils/to-end-of-content-editable headline-el)))
 
-(defn media-image-add-if-finished [s]
+(defn media-photo-add-if-finished [s]
   (let [image @(::media-photo s)]
     (when (and (contains? image :url)
                (contains? image :width)
@@ -132,14 +143,24 @@
         (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
       (reset! (::last-selection s) nil)
       (reset! (::media-photo s) nil)
+      (reset! (::media-photo-did-success s) false)
       (body-on-change s)
       (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
       (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))
 
+(defn media-photo-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s]
+  (when-not @(::media-photo-did-success s)
+    (reset! (::media-photo s) false)
+    (when @(::last-selection s)
+      (.removeMarkers js/rangy @(::last-selection s))
+      (reset! (::last-selection s) nil))))
+
 (defn img-on-load [s url img]
   (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
   (gdom/removeNode img)
-  (media-image-add-if-finished s))
+  (media-photo-add-if-finished s))
 
 (defn create-new-topic [s]
   (when-not (empty? @(::new-topic s))
@@ -247,6 +268,7 @@
                         (rum/local nil ::window-click-listener)
                         (rum/local nil ::last-selection)
                         (rum/local false ::remove-no-scroll)
+                        (rum/local false ::media-photo-did-success)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -442,6 +464,7 @@
                            (reset! (::media-photo s) true)
                            (iu/upload! "image/*"
                             (fn [res]
+                              (reset! (::media-photo-did-success s) true)
                               (let [url (gobj/get res "url")
                                     img   (gdom/createDom "img")]
                                 (set! (.-onload img) #(img-on-load s url img))
@@ -452,10 +475,13 @@
                                 (iu/thumbnail! url
                                  (fn [thumbnail-url]
                                   (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
-                                  (media-image-add-if-finished s)))))
-                            (fn [res prog])
+                                  (media-photo-add-if-finished s)))))
+                            nil
                             (fn [err]
-                              (js/console.log "err" err))))}]
+                              (media-photo-add-error))
+                            (fn []
+                              ;; Delay the check because this is called on cancel but also on success
+                              (utils/after 1000 #(media-photo-dismiss-picker s)))))}]
             ; Add a video button
             [:button.mlb-reset.media.media-video
               {:class (when @(::media-video s) "active")
