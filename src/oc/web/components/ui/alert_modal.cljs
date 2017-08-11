@@ -14,13 +14,13 @@
 
 (defn first-button-clicked [alert-modal e]
   (utils/event-stop e)
-  (when (fn? (:first-button-cb alert-modal))
-    ((:first-button-cb alert-modal))))
+  (when (fn? (:link-button-cb alert-modal))
+    ((:link-button-cb alert-modal))))
 
 (defn yes-button-clicked [alert-modal e]
   (utils/event-stop e)
-  (when (fn? (:second-button-cb alert-modal))
-    ((:second-button-cb alert-modal))))
+  (when (fn? (:solid-button-cb alert-modal))
+    ((:solid-button-cb alert-modal))))
 
 (rum/defcs alert-modal < (drv/drv :alert-modal)
                          rum/reactive
@@ -52,10 +52,10 @@
    :icon The src to use for an image, it's encapsulated in utils/cdn.
    :title The title of the view.
    :message A description message to show in the view.
-   :first-button-title The title for the first button, it's black link styled.
-   :first-button-cb The function to execute when the first button is clicked.
-   :second-button-title The title for the second button, it's green solid styled.
-   :second-button-cb The function to execute when the second button is clicked."
+   :link-button-title The title for the first button, it's black link styled.
+   :link-button-cb The function to execute when the first button is clicked.
+   :solid-button-title The title for the second button, it's green solid styled.
+   :solid-button-cb The function to execute when the second button is clicked."
   [s]
   (let [alert-modal (drv/react s :alert-modal)]
     [:div.alert-modal-container
@@ -70,16 +70,16 @@
         (when (:message alert-modal)
           [:div.alert-modal-message
             (:message alert-modal)])
-        (when (or (:first-button-title alert-modal)
-                  (:second-button-title alert-modal))
+        (when (or (:link-button-title alert-modal)
+                  (:solid-button-title alert-modal))
           [:div.alert-modal-buttons.group
-            {:class (when (or (not (:first-button-title alert-modal))
-                              (not (:second-button-title alert-modal))) "single-button")}
-            (when (:first-button-title alert-modal)
+            {:class (when (or (not (:link-button-title alert-modal))
+                              (not (:solid-button-title alert-modal))) "single-button")}
+            (when (:link-button-title alert-modal)
               [:button.mlb-reset.mlb-link-black
                 {:on-click #(first-button-clicked alert-modal %)}
-                (:first-button-title alert-modal)])
-            (when (:second-button-title alert-modal)
+                (:link-button-title alert-modal)])
+            (when (:solid-button-title alert-modal)
               [:button.mlb-reset.mlb-default
                 {:on-click #(yes-button-clicked alert-modal %)}
-                (:second-button-title alert-modal)])])]]))
+                (:solid-button-title alert-modal)])])]]))

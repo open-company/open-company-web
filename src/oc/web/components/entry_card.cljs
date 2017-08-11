@@ -27,10 +27,10 @@
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :message "Delete this entry?"
-                    :first-button-title "No"
-                    :first-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :second-button-title "Yes"
-                    :second-button-cb #(do
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
                                         (dis/dispatch! [:entry-delete entry-data])
                                         (dis/dispatch! [:alert-modal-hide]))
                     }]
@@ -51,18 +51,19 @@
     (dotimes [el-num (.-length thumb-els)]
       (let [el (aget thumb-els el-num)
             $el (js/$ el)]
-        (if (= (.-tagName el) "IMG")
-          (let [width (.attr $el "width")
-                height (.attr $el "height")]
-            (when (and (not @found)
-                       (or (<= width (* height 2))
-                           (<= height (* width 2))))
-              (reset! found
-                {:type "image"
-                 :thumbnail (if (.data $el "thumbnail")
-                              (.data $el "thumbnail")
-                              (.attr $el "src"))})))
-          (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")}))))
+        (when-not @found
+          (if (= (s/lower (.-tagName el)) "img")
+            (let [width (.attr $el "width")
+                  height (.attr $el "height")]
+              (when (and (not @found)
+                         (or (<= width (* height 2))
+                             (<= height (* width 2))))
+                (reset! found
+                  {:type "image"
+                   :thumbnail (if (.data $el "thumbnail")
+                                (.data $el "thumbnail")
+                                (.attr $el "src"))})))
+            (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
     @found))
 
 (rum/defcs entry-card < rum/static
