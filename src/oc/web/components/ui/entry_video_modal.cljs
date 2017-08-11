@@ -27,7 +27,35 @@
         v-groups (.exec vr url)]
     {:id (if (nth y-groups 1) (nth y-groups 1) (nth v-groups 4))
      :type (if (nth y-groups 1) :youtube :vimeo)}))
-  
+
+(defn- get-vimeo-thumbnail-success [s video res]
+  (let [resp (aget res 0)
+        thumbnail (aget resp "thumbnail_small")
+        video-data (assoc video :thumbnail thumbnail)]
+    (dis/dispatch! [:input [:entry-editing :temp-video] video-data])
+    (close-clicked s)))
+
+(def _retry (atom 0))
+
+(declare get-vimeo-thumbnail)
+
+(defn- get-vimeo-thumbnail-retry [s video]
+  ;; Increment the retry count
+  (if (< (swap! _retry inc) 3)
+    ; Retry at most 3 times to load the video details
+    (get-vimeo-thumbnail s video)
+    ;; Add the video without thumbnail
+    (do
+      (dis/dispatch! [:input [:entry-editing :temp-video] video])
+      (close-clicked s))))
+
+(defn- get-vimeo-thumbnail [s video]
+  (.ajax js/$
+    #js {
+      :method "GET"
+      :url (str "http://vimeo.com/api/v2/video/" (:id video) ".json")
+      :success #(get-vimeo-thumbnail-success s video %)
+      :error #(get-vimeo-thumbnail-retry s video)}))
 
 (defn valid-video-url? [url]
   (let [trimmed-url (string/trim url)
@@ -36,6 +64,15 @@
     (when-not (empty? trimmed-url)
       (or (.match trimmed-url yr)
           (.match trimmed-url vr)))))
+
+(defn video-add-click [s]
+  (when (valid-video-url? @(::video-url s))
+    (let [video-data (get-video-data @(::video-url s))]
+      (if (= :vimeo (:type video-data))
+        (get-vimeo-thumbnail s video-data)
+        (do
+          (dis/dispatch! [:input [:entry-editing :temp-video] video-data])
+          (close-clicked s))))))
 
 (rum/defcs entry-video-modal < (rum/local false ::first-render-done)
                                (rum/local false ::dismiss)
@@ -70,10 +107,7 @@
              :placeholder "Link from YouTube or Vimeo"}]]
         [:div.entry-video-modal-buttons.group
           [:button.mlb-reset.mlb-default
-            {:on-click #(when (valid-video-url? @(::video-url s))
-                          (let [video-data (get-video-data @(::video-url s))]
-                            (dis/dispatch! [:input [:entry-editing :temp-video] video-data]))
-                          (close-clicked s))
+            {:on-click #(video-add-click s)
              :disabled (not (valid-video-url? @(::video-url s)))}
             "Add"]
           [:button.mlb-reset.mlb-link-black

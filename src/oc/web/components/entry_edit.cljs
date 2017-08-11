@@ -175,13 +175,14 @@
     (= (:type video) :youtube)
     (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
     (= (:type video) :vimeo)
-    (str "https://i.vimeocdn.com/video/" (:id video) "_100x75.webp")))
+    (:thumbnail video)))
 
 (defn get-video-html [video]
   (str "<iframe "
          "data-thumbnail=\"" (get-video-thumbnail video) "\" "
          "data-media-type=\"video\" "
-         "data-video-type=\"youtube\" data-video-id=\"" (:id video) "\" "
+         "data-video-type=\"" (name (:type video)) "\" "
+         "data-video-id=\"" (:id video) "\" "
          "class=\"carrot-no-preview\" "
          "width=\"560\" "
          "height=\"315\" "
@@ -425,6 +426,7 @@
            :aria-multiline true
            :contentEditable true
            :on-focus #(reset! (::body-focused s) true)
+           :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
            :dangerouslySetInnerHTML @(::initial-body s)}]
         ; Media handling
         [:div.entry-edit-controls-medias
