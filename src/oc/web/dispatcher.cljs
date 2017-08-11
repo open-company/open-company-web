@@ -72,6 +72,7 @@
    :entry-uuid          [[:route] (fn [route] (:entry route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
+   :loading             [[:base] (fn [base] (:loading base))]
    :updates-list        [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -160,7 +161,13 @@
                             (:board-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
-                            (:alert-modal base))]})
+                            (:alert-modal base))]
+   :navbar-data         [[:base :org-data :board-data]
+                          (fn [base org-data board-data]
+                            (let [navbar-data (select-keys base [:mobile-menu-open :header-width :show-login-overlay])]
+                              (-> navbar-data
+                                (assoc :org-data org-data)
+                                (assoc :board-data board-data))))]})
 
 ;; Action Loop =================================================================
 
