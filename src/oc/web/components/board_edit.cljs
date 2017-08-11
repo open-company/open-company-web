@@ -190,12 +190,12 @@
                 {:on-click (fn []
                             (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
                                                                :message "Delete this board?"
-                                                               :first-button-title "No"
-                                                               :first-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                                               :second-button-title "Yes"
-                                                               :second-button-cb #(do
-                                                                                    (dis/dispatch! [:board-delete (:slug board-editing)])
-                                                                                    (dis/dispatch! [:alert-modal-hide]))}]))}
+                                                               :link-button-title "No"
+                                                               :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                                               :solid-button-title "Yes"
+                                                               :solid-button-cb (fn []
+                                                                                  (dis/dispatch! [:board-delete (:slug board-editing)])
+                                                                                  (dis/dispatch! [:alert-modal-hide]))}]))}
                 "Delete"])]
           [:div.board-edit-footer-right.group
             [:button.mlb-reset.mlb-default
