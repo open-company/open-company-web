@@ -12,12 +12,12 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
-(defn first-button-clicked [alert-modal e]
+(defn link-button-clicked [alert-modal e]
   (utils/event-stop e)
   (when (fn? (:link-button-cb alert-modal))
     ((:link-button-cb alert-modal))))
 
-(defn yes-button-clicked [alert-modal e]
+(defn solid-button-clicked [alert-modal e]
   (utils/event-stop e)
   (when (fn? (:solid-button-cb alert-modal))
     ((:solid-button-cb alert-modal))))
@@ -77,9 +77,9 @@
                               (not (:solid-button-title alert-modal))) "single-button")}
             (when (:link-button-title alert-modal)
               [:button.mlb-reset.mlb-link-black
-                {:on-click #(first-button-clicked alert-modal %)}
+                {:on-click #(link-button-clicked alert-modal %)}
                 (:link-button-title alert-modal)])
             (when (:solid-button-title alert-modal)
               [:button.mlb-reset.mlb-default
-                {:on-click #(yes-button-clicked alert-modal %)}
+                {:on-click #(solid-button-clicked alert-modal %)}
                 (:solid-button-title alert-modal)])])]]))
