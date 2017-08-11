@@ -33,7 +33,7 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "The company newsboard"]
+          [:h1.headline "The Company Newsboard"]
           [:div.subheadline#thank-you-top
             "Carrot makes it easy to share the news and stories that keep your team, investors and customers informed and aligned."]
           (when (and (not @(::confirm s))
