@@ -365,7 +365,7 @@
           (pre-routing (:query-params params))
           (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
           (post-routing)
-          (drv-root mobile-boards-list target))
+          (drv-root #(om/component (mobile-boards-list)) target))
         (org-handler "boards-list" target #(om/component) params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
