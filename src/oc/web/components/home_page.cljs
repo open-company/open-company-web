@@ -33,9 +33,9 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "The company newsboard that keeps everyone aligned"]
+          [:h1.headline "The company newsboard"]
           [:div.subheadline#thank-you-top
-            "Carrot creates transparency for your team, investors and customers."]
+            "Carrot makes it easy to share the news and stories that keep your team, investors and customers informed and aligned."]
           (when (and (not @(::confirm s))
                      (not @(::thanks-box-top s)))
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
