@@ -42,6 +42,7 @@ $.dropdown = function(){};
 $.not = function(){};
 $.dotdotdot = function(){};
 $.trigger = function(){};
+$.ajax = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
