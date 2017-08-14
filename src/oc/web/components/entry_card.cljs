@@ -112,13 +112,15 @@
                                            (reset! (::showing-dropdown s) false))))
                                       s)}
   [s entry-data has-headline has-body is-all-activity]
-  [:div
-    {:class (utils/class-set {:entry-card true
-                              (str "entry-card-" (:uuid entry-data)) true
-                              :all-activity-card is-all-activity})
+  [:div.entry-card
+    {:class (utils/class-set {(str "entry-card-" (:uuid entry-data)) true
+                              :all-activity-card is-all-activity
+                              :story-card (= (:type entry-data) "story")})
      :on-click #(dis/dispatch! [:entry-modal-fade-in (:board-slug entry-data) (:uuid entry-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
+    (when (= (:type entry-data) "story")
+      [:div.triangle])
     (when is-all-activity
       [:div.entry-card-breadcrumb
         "In " [:span.bold (:board-name entry-data)]
