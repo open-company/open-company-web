@@ -13,6 +13,7 @@
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entry-card :refer (entry-card)]
             [oc.web.components.entries-layout :refer (entries-layout)]
+            [oc.web.components.stories-layout :refer (stories-layout)]
             [oc.web.components.all-activity :refer (all-activity)]))
 
 (defn- update-active-topics [owner new-topic topic-data]
@@ -104,7 +105,7 @@
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "New Update"))
+                    (if (= (:type board-data) "story") "New Story" "New Update")))
                 ;; Board filters dropdown
                 (when (and (not is-mobile-size?)
                            (not empty-board?))
@@ -121,7 +122,9 @@
                 (empty-board)
                 ; for each column key contained in best layout
                 :else
-                (entries-layout board-data board-filters))))
+                (if (= (:type board-data) "story")
+                  (stories-layout board-data)
+                  (entries-layout board-data board-filters)))))
           ;; 1 column or default
           :else
           (dom/div {:class "topics-column-container columns-1 group"
