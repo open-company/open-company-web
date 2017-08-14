@@ -93,9 +93,31 @@ div.entry-card {
 
   &.story-card {
     width: 667px;
+    float: right;
 
     div.triangle {
-      @include triangle(left, white, 10px);
+      background-color: white;
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+      width: 24px;
+      height: 24px;
+      transform: rotate(45deg);
+      position: absolute;
+      left: -10px;
+      top: 25px;
+    }
+
+    div.entry-card-content {
+      div.entry-card-headline.has-headline {
+        margin-top: 0px;
+      }
+
+      div.entry-card-body.has-body {
+        margin-top: 0px;
+
+        &.has-headline {
+          margin-top: 16px;
+        }
+      }
     }
   }
 

@@ -129,29 +129,30 @@
         (when (:topic-slug entry-data)
           [:span.bold (:topic-name entry-data)])])
     ; Card header
-    [:div.entry-card-head.group
-      ; Card author
-      [:div.entry-card-head-author
-        (user-avatar-image (first (:author entry-data)))
-        [:div.name (:name (first (:author entry-data)))]
-        [:div.time-since
-          [:time
-            {:date-time (:created-at entry-data)
-             :data-toggle "tooltip"
-             :data-placement "top"
-             :title (utils/entry-tooltip entry-data)}
-            (utils/time-since (:created-at entry-data))]]]
-      ; Card labels
-      [:div.entry-card-head-right
-        ; Topic tag button
-        (when (and (not is-all-activity)
-                   (:topic-slug entry-data))
-          (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
-            [:div.topic-tag
-              {:on-click #(do
-                            (utils/event-stop %)
-                            (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug entry-data) (:topic-slug entry-data))))}
-              topic-name]))]]
+    (when (= (:type entry-data) "entry")
+      [:div.entry-card-head.group
+        ; Card author
+        [:div.entry-card-head-author
+          (user-avatar-image (first (:author entry-data)))
+          [:div.name (:name (first (:author entry-data)))]
+          [:div.time-since
+            [:time
+              {:date-time (:created-at entry-data)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :title (utils/entry-tooltip entry-data)}
+              (utils/time-since (:created-at entry-data))]]]
+        ; Card labels
+        [:div.entry-card-head-right
+          ; Topic tag button
+          (when (and (not is-all-activity)
+                     (:topic-slug entry-data))
+            (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
+              [:div.topic-tag
+                {:on-click #(do
+                              (utils/event-stop %)
+                              (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug entry-data) (:topic-slug entry-data))))}
+                topic-name]))]])
     [:div.entry-card-content.group
       ; Headline
       [:div.entry-card-headline
@@ -173,6 +174,7 @@
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
+                                    :has-headline has-headline
                                     :has-media-preview @(::first-body-image s)})}])
       (when (and is-all-activity
                  has-body)
