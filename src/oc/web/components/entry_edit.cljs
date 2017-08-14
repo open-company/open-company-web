@@ -334,7 +334,7 @@
                                          s)}
   [s]
   (let [board-data        (drv/react s :board-data)
-        topics            (:topics board-data)
+        topics            (distinct (:topics board-data))
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
         new-entry?        (empty? (:uuid entry-editing))

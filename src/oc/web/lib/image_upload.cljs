@@ -49,7 +49,9 @@
                        ;; Error cb
                        :onFileUploadFailed error-cb
                        ;; Close cb
-                       :onClose close-cb}
+                       :onClose (fn []
+                          (when (fn? close-cb)
+                            (close-cb)))}
         config        (if type
                         (merge base-config {:accept type})
                         base-config)
