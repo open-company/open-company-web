@@ -9,20 +9,11 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]))
 
-(defn- delete-board-alert [e board-slug]
-  (utils/event-stop e)
-  (add-popover {:container-id "delete-board-alert"
-                :message "Are you sure you want to delete this board?"
-                :height "130px"
-                :success-title "DELETE"
-                :success-cb #(do
-                                (dis/dispatch! [:board-delete board-slug])
-                                (hide-popover nil "delete-board-alert"))
-                :cancel-title "KEEP IT"
-                :cancel-cb #(hide-popover nil "delete-board-alert")}))
-
 (defn sorted-boards [boards]
   (into [] (sort-by :name boards)))
+
+(defn sorted-stories [boards]
+  (into [] (sort-by :created-at boards)))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 (drv/drv :org-data)
@@ -36,7 +27,9 @@
                                               s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)]
+        left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
+        boards (vec (filter #(= (:type %) "entry") (:boards org-data)))
+        storyboards (vec (filter #(= (:type %) "story") (:boards org-data)))]
     [:div.left-navigation-sidebar.group
       {:style {:width (str left-navigation-sidebar-width "px")}}
       ;; All activity
@@ -58,13 +51,13 @@
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-            {:on-click #(dis/dispatch! [:board-edit nil])
+            {:on-click #(dis/dispatch! [:board-edit nil "entry"])
              :title "Create a new board"
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
       [:div.left-navigation-sidebar-items.group
-        (for [board (sorted-boards (:boards org-data))]
+        (for [board (sorted-boards boards)]
           [:div
             {:class (utils/class-set {:left-navigation-sidebar-item true
                                       :selected (= (router/current-board-slug) (:slug board))})
@@ -83,20 +76,51 @@
               [:div.internal
                 {:key (str "board-list-" (name (:slug board)) "-internal")}
                 (or (:name board) (:slug board))]]])]
-      (comment ;; FIXME: Temporarily comment out stories since we don't have backend support
-        [:div.left-navigation-sidebar-top.group
-          ;; Boards header
-          [:h3.left-navigation-sidebar-top-title
-            [:div.stories-icon]
-            [:span "STORIES"]]
-          (when (and (not (responsive/is-tablet-or-mobile?))
-                     true) ;; FIXME: replace with create storeis link check
-            [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-              {:on-click #(identity %) ;; FIXME: Replace with story creation action
-               :title "Create a new story"
-               :data-placement "top"
-               :data-toggle "tooltip"
-               :data-container "body"}])])
+      [:div.left-navigation-sidebar-top.group
+        ;; Boards header
+        [:h3.left-navigation-sidebar-top-title
+          [:div.stories-icon]
+          [:span "STORIES"]]
+        (when (and (not (responsive/is-tablet-or-mobile?))
+                   true) ;; FIXME: replace with create storeis link check
+          [:button.left-navigation-sidebar-top-title-button.btn-reset.right
+            {:on-click #(dis/dispatch! [:board-edit nil "story"])
+             :title "Create a new story"
+             :data-placement "top"
+             :data-toggle "tooltip"
+             :data-container "body"}])]
+      [:div.left-navigation-sidebar-items.group
+        (let [drafts-link (utils/link-for (:links org-data) "draft")]
+          (when (pos? (:count drafts-link))
+            [:div
+              {:class (utils/class-set {:left-navigation-sidebar-item true
+                                        :selected (utils/in? (:route @router/path) "drafts")})
+               :data-drafts true
+               :key "board-list-draft"
+               :on-click #(router/nav! (oc-urls/drafts))}
+              [:div.board-name.team-board.group
+                [:div.internal
+                  (str "Drafts" (:count drafts-link))]]]))
+        (for [storyboard (sorted-stories storyboards)]
+          [:div
+            {:class (utils/class-set {:left-navigation-sidebar-item true
+                                      :selected (= (router/current-board-slug) (:slug storyboard))})
+             :data-board (name (:slug storyboard))
+             :data-storyboard true
+             :key (str "board-list-" (name (:slug storyboard)))
+             :on-click #(dis/dispatch! [:board-nav (:slug storyboard)])}
+            (when (or (= (:access storyboard) "public")
+                      (= (:access storyboard) "private"))
+              [:img
+                {:src (if (= (:access storyboard) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                 :class (if (= (:access storyboard) "public") "public" "private")}])
+            [:div.board-name.group
+              {:class (utils/class-set {:public-board (= (:access storyboard) "public")
+                                        :private-board (= (:access storyboard) "private")
+                                        :team-board (= (:access storyboard) "team")})}
+              [:div.internal
+                {:key (str "board-list-" (name (:slug storyboard)) "-internal")}
+                (or (:name storyboard) (:slug storyboard))]]])]
       [:div.left-navigation-sidebar-footer
         (when (and (router/current-org-slug)
                    (jwt/is-admin? (:team-id org-data)))
