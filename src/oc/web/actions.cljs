@@ -1091,10 +1091,10 @@
   (dissoc db :alert-modal))
 
 (defmethod dispatcher/action :board-edit
-  [db [_ initial-board-data]]
+  [db [_ initial-board-data type]]
   (let [fixed-board-data (if initial-board-data
                             initial-board-data
-                            {:name "" :slug "" :access "team"})]
+                            {:name "" :slug "" :access "team" :type (or type "entry")})]
     (assoc db :board-editing fixed-board-data)))
 
 (defmethod dispatcher/action :board-edit-save
