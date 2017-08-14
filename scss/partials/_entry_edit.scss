@@ -174,64 +174,71 @@ div.entry-edit-modal-container {
                     text-decoration: underline;
                   }
                 }
+              }
 
-                &.divider {
-                  border-top: $carrot_light_gray;
-                  opacity: 0.8;
-                  width: calc(100% + 16px);
-                  cursor: default;
-                  margin: 12px 0 12px -16px;
-                  cursor: pointer;
+              li.divider {
+                border-top: 1px solid rgba($carrot_light_gray, 0.5);
+                width: calc(100% + 16px);
+                cursor: default;
+                margin: 12px 0 12px -16px;
+                min-height: initial;
+
+                &:hover {
+                  border-top: 1px solid rgba($carrot_light_gray, 0.5);
                   min-height: initial;
+                  background-color: transparent;
+                  color: transparent;
+                }
+              }
+
+              li.entry-edit-new-topic {
+
+                &:hover {
+                  background-color: initial;
                 }
 
-                &.entry-edit-new-topic {
+                button.entry-edit-new-topic-plus {
+                  width: 20px;
+                  height: 20px;
+                  padding: 0;
+                  float: left;
+                  margin-right: 10px;
+                  margin-top: 3px;
                   cursor: pointer;
+                  transition: $add_media_animation;
+                  background-color: rgba(82,222,149,0.25);
+                  background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+                  background-repeat: no-repeat;
+                  background-position: 50%;
+                  background-size: 8px 8px;
+                  border-radius: 2px;
+                  float: left;
 
-                  button.entry-edit-new-topic-plus {
-                    width: 20px;
-                    height: 20px;
-                    padding: 0;
-                    float: left;
-                    margin-right: 10px;
-                    margin-top: 3px;
-                    cursor: pointer;
-                    transition: $add_media_animation;
-                    background-color: rgba(82,222,149,0.25);
-                    background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-                    background-repeat: no-repeat;
-                    background-position: 50%;
-                    background-size: 8px 8px;
-                    border-radius: 2px;
-                    float: left;
-
-                    &:hover {
-                      background-color: #3FBD7C;
-                      background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
-                    }
+                  &:hover {
+                    background-color: #3FBD7C;
+                    background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
                   }
+                }
 
-                  button.entry-edit-new-topic-create {
-                    float: left;
-                    margin-left: 10px;
-                    height: 26px;
-                    font-size: 14px;
-                  }
+                button.entry-edit-new-topic-create {
+                  float: left;
+                  margin-left: 10px;
+                  height: 26px;
+                  font-size: 14px;
+                }
 
-                  input.entry-edit-new-topic-field {
-                    float: left;
-                    border: none;
-                    outline: none;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $carrot_dark_gray;
-                    margin: 0.3rem 0;
-                    padding: 0;
-                    // width: 100%;
+                input.entry-edit-new-topic-field {
+                  float: left;
+                  border: none;
+                  outline: none;
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $carrot_dark_gray;
+                  margin: 0.3rem 0;
+                  padding: 0;
 
-                    @include placeholder(){
-                      color: $carrot_light_gray;
-                    }
+                  @include placeholder(){
+                    color: $carrot_light_gray;
                   }
                 }
               }
