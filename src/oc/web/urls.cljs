@@ -129,6 +129,14 @@
   ([org-slug board-slug]
     (str (board org-slug board-slug) "/settings")))
 
+;; Storyboards
+
+(defn drafts
+  ([]
+    (drafts (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/drafts")))
+
 ;; Entries
 
 (defn entry
