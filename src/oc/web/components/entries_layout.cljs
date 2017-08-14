@@ -11,8 +11,8 @@
     (cond
       ;; :by-topic
       (= layout-type :by-topic)
-      (let [grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :updated-at v))))) (group-by :topic-slug (:entries board-data))))
-            sorted-topics (vec (reverse (sort #(compare (:updated-at (first (get grouped-entries %1))) (:updated-at (first (get grouped-entries %2)))) (keys grouped-entries))))]
+      (let [grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :created-at v))))) (group-by :topic-slug (:entries board-data))))
+            sorted-topics (vec (reverse (sort #(compare (:created-at (first (get grouped-entries %1))) (:created-at (first (get grouped-entries %2)))) (keys grouped-entries))))]
         (for [topic sorted-topics
               :let [entries-group (get grouped-entries topic)
                     topic-name (:topic-name (first entries-group))
@@ -61,7 +61,7 @@
       (let [filtered-entries (if (= layout-type "uncategorized")
                                 (vec (filter #(empty? (:topic-slug %)) (:entries board-data)))
                                 (vec (filter #(= (:topic-slug %) layout-type) (:entries board-data))))
-            sorted-entries (vec (reverse (sort-by :updated-at filtered-entries)))]
+            sorted-entries (vec (reverse (sort-by :created-at filtered-entries)))]
         [:div.entry-cards-container.by-specific-topic.group
           ; Calc the number of pairs
           (let [top-index (js/Math.ceil (/ (count sorted-entries) 2))]
@@ -86,7 +86,7 @@
                     [:div.entry-card.entry-card-placeholder]))]))])
       ;; :latest layout
       :else
-      (let [sorted-entries (vec (reverse (sort-by :updated-at (:entries board-data))))]
+      (let [sorted-entries (vec (reverse (sort-by :created-at (:entries board-data))))]
         [:div.entry-cards-container.group
           ; Get the max number of pairs
           (let [top-index (js/Math.ceil (/ (count sorted-entries) 2))]

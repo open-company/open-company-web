@@ -1,39 +1,41 @@
-div.entry-cards-container {
-  max-width: 928px;
+div.entries-layout {
+  div.entry-cards-container {
+    max-width: 928px;
 
-  &.by-topic {
-    width: 100%;
-    margin-top: 30px;
-  }
-
-  div.by-topic-header {
-    div.by-topic-header-title{
-      @include avenir_H();
-      font-size: 24px;
-      color: $oc_gray_7;
-      margin-left: 16px;
-      float: left;
+    &.by-topic {
+      width: 100%;
+      margin-top: 30px;
     }
 
-    button.view-all-updates {
-      font-size: 13px;
-      color: $oc_gray_7;
-      @include avenir_B();
-      float: right;
-      margin-top: 10px;
-      margin-right: 12px;
+    div.by-topic-header {
+      div.by-topic-header-title{
+        @include avenir_H();
+        font-size: 24px;
+        color: $oc_gray_7;
+        margin-left: 16px;
+        float: left;
+      }
 
-      &:hover {
-        text-decoration: underline;
+      button.view-all-updates {
+        font-size: 13px;
+        color: $oc_gray_7;
+        @include avenir_B();
+        float: right;
+        margin-top: 10px;
+        margin-right: 12px;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
-  }
 
-  div.entries-cards-container-row {
-    display: flex;
+    div.entries-cards-container-row {
+      display: flex;
 
-    div.entry-card {
-      flex: 1;
+      div.entry-card {
+        flex: 1;
+      }
     }
   }
 }
