@@ -3,6 +3,7 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [rum.core :as rum]
+            [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -49,7 +50,7 @@
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-entry-uuid
                                   (str "topics-columns-selected-topic-" current-entry-uuid)
-                                  (apply str (:topics board-data)))
+                                  (s/join "-" (map :slug (:topics board-data))))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
                                             #js {:width total-width}
@@ -108,7 +109,8 @@
                     (if (= (:type board-data) "story") "New Story" "New Update")))
                 ;; Board filters dropdown
                 (when (and (not is-mobile-size?)
-                           (not empty-board?))
+                           (not empty-board?)
+                           (= (:type board-data) "story"))
                   (filters-dropdown)))
               ;; Board content: empty board, add topic, topic view or topic cards
               (cond
