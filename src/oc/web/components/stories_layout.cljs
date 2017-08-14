@@ -2,8 +2,9 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as s]
-            [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.entry-card :refer (entry-card entry-card-empty)]))
 
@@ -20,7 +21,16 @@
                     has-body (not (empty? (:body story)))]]
           [:div.story-card-row.group
             {:key (str "story-latest-" (:uuid story))}
-            [:div.story-card-row-left.group
-              (user-avatar-image (first (:author story)))]
+            (let [author (first (:author story))]
+              [:div.story-card-row-left.group
+                (user-avatar-image author)
+                [:div.name (:name author)]
+                [:div.time-since
+                  [:time
+                    {:date-time (:created-at story)
+                     :data-toggle "tooltip"
+                     :data-placement "top"
+                     :title (utils/entry-tooltip story)}
+                    (utils/time-since (:created-at story))]]])
             (entry-card story has-headline has-body)])
         [:div.stories-vertical-line]])])
