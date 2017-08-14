@@ -46,8 +46,7 @@
       (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
   (render-state [_ {:keys [active-topics
-                           redirect-to-preview
-                           rerender]}]
+                           redirect-to-preview]}]
     (let [board-slug    (router/current-board-slug)
           board-data    (:board-data data)
           board-topics  (vec (filter #(contains? board-data %) (vec (map keyword (:topics board-data)))))
@@ -62,9 +61,7 @@
       (dom/div {:class (utils/class-set {:topic-list true
                                          :not-first-board (not= (:slug (first (:boards (dispatcher/org-data)))) (:slug board-data))
                                          :group true
-                                         :editable can-edit-secs})
-                :data-rerender rerender
-                :key (str "topic-list-" rerender)}
+                                         :editable can-edit-secs})}
         ;; Topics list columns
         (let [comp-data {:columns-num columns-num
                          :card-width card-width
