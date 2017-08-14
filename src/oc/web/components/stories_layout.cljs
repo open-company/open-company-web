@@ -13,6 +13,4 @@
         (for [story sorted-stories
               :let [has-headline (not (empty? (:headline story)))
                     has-body (not (empty? (:body story)))]]
-          [:div.story-cards-container-row.group
-            {:key (str "stories-row-" idx)}
-            (rum/with-key (entry-card story has-headline has-body) (str "story-latest-" (:uuid story)))])])])
+          (rum/with-key (entry-card story has-headline has-body) (str "story-latest-" (:uuid story))))])])
