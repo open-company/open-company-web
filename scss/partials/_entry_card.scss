@@ -91,6 +91,14 @@ div.entry-card {
     }
   }
 
+  &.story-card {
+    width: 667px;
+
+    div.triangle {
+      @include triangle(left, white, 10px);
+    }
+  }
+
   div.entry-card-breadcrumb {
     margin-bottom: 24px;
     @include avenir_R();
