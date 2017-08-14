@@ -1,11 +1,11 @@
 @import "../modules/_colors";
 
-@mixin entry-author(){
+@mixin entry-author($avatar_size: 32){
   div.user-avatar-img-container {
-    height: 32px;
+    height: #{$avatar_size}px;
     float: left;
     white-space: nowrap;
-    width: 32px;
+    width: #{$avatar_size};
     text-align: center;
     margin-right: 16px;
 
@@ -16,9 +16,9 @@
     }
 
     img.user-avatar-img {
-      max-width: 32px;
-      max-height: 32px;
-      border-radius: 16px;
+      max-width: #{$avatar_size}px;
+      max-height: #{$avatar_size}px;
+      border-radius: #{$avatar_size / 2}px;
       vertical-align: middle;
     }
   }
