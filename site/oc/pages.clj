@@ -53,7 +53,7 @@
       [:div.cta
         [:h1.headline "The Company Newsboard"]
         [:div.subheadline
-          "Share the news and stories that keep your team, investors and customers informed and aligned."]
+          "Share the news and stories that keep everyone informed and aligned."]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
