@@ -35,7 +35,7 @@
         [:div.cta
           [:h1.headline "The Company Newsboard"]
           [:div.subheadline#thank-you-top
-            "Carrot makes it easy to share the news and stories that keep your team, investors and customers informed and aligned."]
+            "Share the news and stories that keep your team, investors and customers others informed and aligned."]
           (when (and (not @(::confirm s))
                      (not @(::thanks-box-top s)))
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -72,9 +72,9 @@
             [:img {:src (utils/cdn "/img/ML/home_page_il_2_444_414.svg")}]
             [:div.description.group
               [:div.title
-                "Simplify investor updates"]
+                "Simplify all-hands and investor updates"]
               [:div.subtitle
-                "Create beautiful updates for investors and advisors in less time. It’s never been easier to keep them in the loop."]]]
+                "Create beautiful updates for your company, investors, and advisors in less time. It’s never been easier to keep all stakeholders in the loop."]]]
 
           [:div.illustration.illustration-3.group
             [:img {:src (utils/cdn "/img/ML/home_page_il_3_355_350.svg")}]
