@@ -14,14 +14,14 @@
 (rum/defc activity-card-empty
   [read-only?]
   [:div.activity-card.empty-state.group
-    [:div.empty-state-content
-      [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
-      [:div.activity-card-title
-        "This topic’s a little sparse. "
-        (when-not read-only?
+    (when-not read-only?
+      [:div.empty-state-content
+        [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
+        [:div.activity-card-title
+          "This topic’s a little sparse. "
           [:button.mlb-reset
             {:on-click #(dis/dispatch! [:activity-edit {}])}
-            "Add an update?"])]]])
+            "Add an update?"]]])])
 
 (defn delete-clicked [e activity-data]
   (utils/event-stop e)
