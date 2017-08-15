@@ -249,21 +249,24 @@
 (defn activity-data
   "Get activity data."
   ([]
-    (activity-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid) @app-state))
-  ([activity-uuid]
-    (activity-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
-  ([board-slug activity-uuid]
-    (activity-data (router/current-org-slug) board-slug activity-uuid @app-state))
-  ([org-slug board-slug activity-uuid]
-    (activity-data org-slug board-slug activity-uuid @app-state))
-  ([org-slug board-slug activity-uuid data]
+    (activity-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
+  ([activity-id]
+    (activity-data (router/current-org-slug) (router/current-board-slug) activity-id @app-state))
+  ([board-slug activity-id]
+    (activity-data (router/current-org-slug) board-slug activity-id @app-state))
+  ([org-slug board-slug activity-id]
+    (activity-data org-slug board-slug activity-id @app-state))
+  ([org-slug board-slug activity-id data]
     (let [data-key (if (:from-all-activity @router/path) (all-activity-key org-slug) (board-data-key org-slug board-slug))
-          entries-data (:entries (get-in data data-key))]
-      (first (filter #(= (:uuid %) activity-uuid) entries-data)))))
+          board-data (get-in data data-key)
+          activities-data (if (= (:type board-data) "story")
+                            (:stories board-data)
+                            (:entries board-data))]
+      (first (filter #(= (:uuid %) activity-id) activities-data)))))
 
 (defn comments-data
   ([]
-    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid) @app-state))
+    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
   ([activity-uuid]
     (comments-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
   ([org-slug board-slug activity-uuid]
