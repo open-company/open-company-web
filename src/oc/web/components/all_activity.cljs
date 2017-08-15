@@ -70,7 +70,7 @@
   (when (pos? (count items))
     (loop [ens items
            en (first items)]
-      (let [el (sel1 [(str "div.entry-card-" (:uuid en))])]
+      (let [el (sel1 [(str "div.activity-card-" (:uuid en))])]
         ;; Do not loop if there are no more items or if found the first visible entry
         (if (or (zero? (count ens))
                 (and el
@@ -211,7 +211,7 @@
                                            (when-not @(::first-render-done s)
                                               (reset! (::first-render-done s) true))
                                            (when-let [scroll-to @(::scroll-to-entry s)]
-                                             (when-let [entry-el (sel1 [(str "div.entry-card-" (:uuid scroll-to))])]
+                                             (when-let [entry-el (sel1 [(str "div.activity-card-" (:uuid scroll-to))])]
                                                (dbg "scrolling to:" entry-el)
                                                (utils/scroll-to-element entry-el 100 0))
                                              (utils/after 100 #(do (reset! (::scroll-to-entry s) nil)
