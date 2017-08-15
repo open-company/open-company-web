@@ -15,7 +15,7 @@ div.org-dashboard {
     min-height: calc(100vh - #{$footer_small_height}px - 44px);
   }
 
-  &.selected-topic-view.mobile-or-tablet {
+  &.modal-activity-view.mobile-or-tablet {
     div.page{
       padding-top: 0px;
     }

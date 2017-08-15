@@ -14,7 +14,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.components.topics-list :refer (topics-list)]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
-            [oc.web.components.entry-modal :refer (entry-modal)]
+            [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.ui.login-required :refer (login-required)]
@@ -44,7 +44,7 @@
 (def add-second-topic-tt-prefix "add-second-topic-")
 
 (defn refresh-board-data []
-  (when (not (router/current-activity-uuid))
+  (when (not (router/current-activity-id))
     (api/get-board (dis/board-data))))
 
 (defcomponent org-dashboard [data owner]
@@ -107,14 +107,14 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
-                                           :selected-topic-view (router/current-activity-uuid)
+                                           :modal-activity-view (router/current-activity-id)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :editing-topic (or (not (nil? (:foce-key data)))
                                                               (not (nil? (:show-top-menu data))))
                                            :main-scroll true
-                                           :no-scroll (router/current-activity-uuid)})}
-          (when (router/current-activity-uuid)
-            (entry-modal (dis/activity-data)))
+                                           :no-scroll (router/current-activity-id)})}
+          (when (router/current-activity-id)
+            (activity-modal (dis/activity-data)))
           (when (:entry-editing data)
             (entry-edit))
           (when (:board-editing data)
@@ -130,7 +130,7 @@
           (dom/div {:class "page"}
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
-                           (router/current-activity-uuid))
+                           (router/current-activity-id))
               (navbar))
             (if (:show-welcome-screen data)
               (welcome-screen)
