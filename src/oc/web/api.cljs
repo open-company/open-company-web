@@ -209,11 +209,7 @@
           (if (= status 409)
             ; Board name exists
             (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
-            (do
-              (dispatcher/dispatch! [:board (json->cljs body)])
-              (dispatcher/dispatch! [:board-edit/dismiss])
-              ;; Refresh the org data to make sure the list of boards is updated
-              (get-org (dispatcher/org-data)))))))))
+            (dispatcher/dispatch! [:board-edit/finish (json->cljs body)])))))))
 
 (defn patch-org [data]
   (when data
@@ -580,20 +576,18 @@
                 ; if not refirect the user to the slug
                 (router/redirect! org-url)))))))))
 
-(defn create-board [board-name board-access]
+(defn create-board [board-name board-access board-type]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
     (when (and board-name create-link)
       (storage-post (relative-href (:href create-link))
         {:headers (headers-for-link create-link)
-         :json-params (cljs->json {:name board-name :access board-access})}
+         :json-params (cljs->json {:name board-name :access board-access :type board-type})}
         (fn [{:keys [success status body]}]
           (let [board-data (if success (json->cljs body) {})]
             (if (= status 409)
               ; Board name exists
               (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
-              (do
-                (dispatcher/dispatch! [:board board-data])
-                (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))))
+              (dispatcher/dispatch! [:board-edit/finish board-data]))))))))
 
 (defn add-author
   "Given a user-id add him as an author to the current org.

@@ -71,6 +71,9 @@
                                           (when-let [team-data @(drv/get-ref s :team-data)]
                                             (reset! (::team-channels-requested s) true)
                                             (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
+                                        ;; Dismiss animated since the board-editing was removed
+                                        (when (nil? @(drv/get-ref s :board-editing))
+                                          (close-clicked s))
                                         s)
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag

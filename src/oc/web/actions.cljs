@@ -1115,7 +1115,7 @@
   (let [board-data (:board-editing db)]
     (if (and (string/blank? (:slug board-data))
              (not (string/blank? (:name board-data))))
-      (api/create-board (:name board-data) (:access board-data))
+      (api/create-board (:name board-data) (:access board-data) (or (:type board-data) "entry"))
       (api/patch-board board-data)))
   db)
 
@@ -1199,3 +1199,19 @@
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-activity-key new-all-activity))
     db))
+
+(defmethod dispatcher/action :board-edit/finish
+  [db [_ board-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (:slug board-data)
+        board-key (dispatcher/board-data-key org-slug (:slug board-data))
+        fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))]
+    (api/get-org (dispatcher/org-data))
+    (if (not= (:slug board-data) (router/current-board-slug))
+      ;; If creating a new board, redirect to that board page
+      (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug board-data))))
+      ;; If updating an existing board, refresh the org data
+      (api/get-org (dispatcher/org-data)))
+  (-> db
+    (assoc-in board-key fixed-board-data)
+    (dissoc :board-editing))))
