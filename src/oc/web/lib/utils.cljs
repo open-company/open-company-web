@@ -1088,7 +1088,7 @@
         hours (if (= hours 0) 12 hours)]
     (str hours ":" minutes ampm)))
 
-(defn entry-date [js-date]
+(defn activity-date [js-date]
   (let [r (js/RegExp "am|pm" "i")
         h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))
         time-string (if-not h12
@@ -1099,8 +1099,8 @@
 (defn activity-date-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
         updated-at (js-date (:updated-at entry-data))
-        created-str (entry-date created-at)
-        updated-str (entry-date updated-at)]
+        created-str (activity-date created-at)
+        updated-str (activity-date updated-at)]
     (if (= (:created-at entry-data) (:updated-at entry-data))
       created-str
       (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
