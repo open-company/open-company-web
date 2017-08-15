@@ -15,7 +15,7 @@
   [read-only?]
   [:div.activity-card.empty-state.group
     [:div.empty-state-content
-      [:img {:src (utils/cdn "/img/ML/activity_empty_state.svg")}]
+      [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
       [:div.activity-card-title
         "This topic’s a little sparse. "
         (when-not read-only?
