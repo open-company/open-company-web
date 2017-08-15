@@ -85,7 +85,7 @@
                    true) ;; FIXME: replace with create storeis link check
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "story"])
-             :title "Create a new story"
+             :title "Create a new storyboard"
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
