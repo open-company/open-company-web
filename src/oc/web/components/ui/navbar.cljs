@@ -53,10 +53,10 @@
                     [:div.dropdown.right
                       (user-avatar {:classes "mlb-reset dropdown-toggle"})
                       (menu)]
-                    ; FIXME: Remove the notification bell until we enable it.
-                    [:div.notification-bell.right
-                      [:img
-                        {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}]]]
+                    (comment ; FIXME: Remove the notification bell until we enable it.
+                      [:div.notification-bell.right
+                        [:img
+                          {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}]])]
                   (login-button)))]]]]
       (when-not (responsive/is-mobile-size?)
         (trend-bar (:name org-data)))

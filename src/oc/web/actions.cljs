@@ -67,8 +67,7 @@
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
           (api/get-org org-data)
-          (when (not (utils/in? (:route @router/path) "su-snapshot"))
-            (router/redirect-404!)))
+          (router/redirect-404!))
         ; In password reset flow, when the token is exchanged and the user is authed
         ; i reload the entry point to get the list of orgs
         ; and redirect the user to its first organization
@@ -121,8 +120,6 @@
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "updates-list"))
-           (not (utils/in? (:route @router/path) "su-snapshot"))
-           (not (utils/in? (:route @router/path) "su-snapshot-preview"))
            (not (utils/in? (:route @router/path) "email-verification")))
       (cond
         ;; Redirect to the first board if only one is present

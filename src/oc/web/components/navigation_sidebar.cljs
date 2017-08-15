@@ -82,7 +82,7 @@
           [:div.stories-icon]
           [:span "STORIES"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
-                   true) ;; FIXME: replace with create storeis link check
+                   (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "story"])
              :title "Create a new storyboard"
