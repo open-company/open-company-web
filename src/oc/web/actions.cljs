@@ -150,8 +150,8 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
-      (when (and (router/current-entry-uuid)
-                 (zero? (count (filter #(= (:uuid %) (router/current-entry-uuid)) (:entries board-data)))))
+      (when (and (router/current-activity-uuid)
+                 (zero? (count (filter #(= (:uuid %) (router/current-activity-uuid)) (:entries board-data)))))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
@@ -161,7 +161,7 @@
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
           (wsc/reconnect ws-link (jwt/get-key :user-id))))
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
-    (let [fixed-board-data (utils/fix-board board-data)
+    (let [fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))
           old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
                                      (:foce-key db))
@@ -758,26 +758,26 @@
   (assoc db :edit-user-profile-failed true))
 
 (defmethod dispatcher/action :comments-get
-  [db [_ entry-uuid]]
-  (api/get-comments entry-uuid)
+  [db [_ activity-uuid]]
+  (api/get-comments activity-uuid)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        entry-uuid (router/current-entry-uuid)
-        comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)]
+        activity-uuid (router/current-activity-uuid)
+        comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)]
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body]}]]
-  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid))
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid))
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ entry-uuid comment-body]]
-  (api/add-comment entry-uuid comment-body)
+  [db [_ activity-uuid comment-body]]
+  (api/add-comment activity-uuid comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
+        comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
                                                :created-at (utils/as-of-now)
@@ -787,28 +787,28 @@
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
-  [db [_ {:keys [entry-uuid]}]]
-  (api/get-comments entry-uuid)
+  [db [_ {:keys [activity-uuid]}]]
+  (api/get-comments activity-uuid)
   db)
 
 (defmethod dispatcher/action :reaction-toggle
-  [db [_ entry-uuid reaction-data]]
+  [db [_ activity-uuid reaction-data]]
   (let [board-key (dispatcher/board-data (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
         entry-data (get (:entries board-data) entry-idx)
         old-reactions-loading (or (:reactions-loading entry-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
         entry-key (concat board-key [:entries entry-idx])]
-    (api/toggle-reaction entry-uuid reaction-data)
+    (api/toggle-reaction activity-uuid reaction-data)
     (assoc-in db entry-key updated-entry-data)))
 
 (defmethod dispatcher/action :reaction-toggle/finish
-  [db [_ entry-uuid reaction reaction-data]]
+  [db [_ activity-uuid reaction reaction-data]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
         entry-data (get-in board-data [:entries entry-idx])
         next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
         entry-key (concat board-key [:entries entry-idx])]
@@ -829,23 +829,23 @@
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
-        entry-uuid (:entry-uuid interaction-data)
+        activity-uuid (:activity-uuid interaction-data)
         board-key (dispatcher/board-data-key org-slug board-slug)
         board-data (get-in db board-key)
         ; Entry data
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
         entry-data (get (:entries board-data) entry-idx)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
             comment-data (:interaction interaction-data)
             created-at (:created-at comment-data)
-            all-old-comments-data (dispatcher/comments-data entry-uuid)
+            all-old-comments-data (dispatcher/comments-data activity-uuid)
             old-comments-data (vec (filter :links all-old-comments-data))
             ; Add the new comment to the comments list, make sure it's not present already
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
-            comments-key (dispatcher/comments-key org-slug board-slug entry-uuid)
+            comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)
             current-user-id (jwt/get-key :user-id)
             is-current-user (= current-user-id (:user-id (:author comment-data)))
             ; update the comments link of the entry
@@ -863,7 +863,7 @@
           (api/get-entry entry-data))
         ;; Animate the comments count if we don't have already the same number of comments locally
         (when (not= (count all-old-comments-data) (count new-comments-data))
-          (utils/pulse-comments-count entry-uuid))
+          (utils/pulse-comments-count activity-uuid))
         ; Update the local state with the new comments list
         (-> db
             (assoc-in comments-key sorted-comments-data)
@@ -881,14 +881,14 @@
   (let [; Get the current router data
         org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        entry-uuid (:entry-uuid interaction-data)
+        activity-uuid (:entry-uuid interaction-data)
         ; Entry data
-        entry-data (dispatcher/entry-data entry-uuid)
+        entry-data (dispatcher/activity-data activity-uuid)
         ; Board data
         board-key (dispatcher/board-data-key org-slug board-slug)
         board-data (dispatcher/board-data)
         ; Entry idx
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
+        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
         entry-key (concat board-key [:entries entry-idx])]
     (if (and entry-data (not (empty? (:reactions entry-data))))
       ; If the entry is present in the local state and it has reactions
@@ -909,7 +909,7 @@
         (when is-current-user
           (api/get-entry entry-data))
         (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
-          (utils/pulse-reaction-count entry-uuid (:reaction reaction-data)))
+          (utils/pulse-reaction-count activity-uuid (:reaction reaction-data)))
         ; Update the entry in the local state with the new reaction
         (assoc-in db entry-key updated-entry-data))
       ;; the entry is not present, refresh the full topic
@@ -931,21 +931,21 @@
   (assoc db :trend-bar-status status))
 
 (defmethod dispatcher/action :entry-modal-fade-in
-  [db [_ board-slug entry-uuid]]
+  [db [_ board-slug activity-uuid]]
   (utils/after 10
    #(let [from-all-activity (not (router/current-board-slug))
           new-route (if from-all-activity
-                      [(router/current-org-slug) "all-activity" board-slug entry-uuid "entry"]
-                      [(router/current-org-slug) board-slug entry-uuid "entry"])
+                      [(router/current-org-slug) "all-activity" board-slug activity-uuid "activity"]
+                      [(router/current-org-slug) board-slug activity-uuid "activity"])
           parts {:org (router/current-org-slug)
                  :board board-slug
-                 :entry entry-uuid
+                 :entry activity-uuid
                  :query-params (:query-params @router/path)
                  :from-all-activity from-all-activity}]
       (router/set-route! new-route parts)
-      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry board-slug entry-uuid))
-      (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
-  (assoc db :entry-modal-fade-in entry-uuid))
+      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/activity board-slug activity-uuid))
+      (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed activity-uuid))))
+  (assoc db :entry-modal-fade-in activity-uuid))
 
 (defmethod dispatcher/action :entry-edit
   [db [_ initial-entry-data]]
@@ -979,7 +979,7 @@
                                       :created-at as-of
                                       :updated-at as-of
                                       :reactions []
-                                      :uuid (utils/entry-uuid)})
+                                      :uuid (utils/activity-uuid)})
                    (:slug board-data)
                    (:topics board-data)))
 
@@ -1125,9 +1125,9 @@
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
-          sorted-entries (vec (reverse (sort-by :created-at (:entries fixed-all-activity))))
-          with-sorted-entries (assoc fixed-all-activity :entries sorted-entries)
-          with-calendar-data (-> with-sorted-entries
+          sorted-items (vec (reverse (sort-by :created-at (:items fixed-all-activity))))
+          with-sorted-items (assoc fixed-all-activity :items sorted-items)
+          with-calendar-data (-> with-sorted-items
                                 (assoc :year year)
                                 (assoc :month month)
                                 ;; Force the component to trigger a did-remount
@@ -1170,19 +1170,19 @@
                               (vec (conj next-links link-to-move))
                               next-links)
           with-links (assoc fixed-all-activity :links fixed-next-links)
-          keeping-entries (count (:entries old-all-activity))
-          ; keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
+          keeping-items (count (:items old-all-activity))
+          ; keeping-items (min default-activity-limit (count (:items old-all-activity)))
           ;; Keep only x elements before or after the new list
-          ; all-activity-entries (if (= direction :up)
-          ;                         (concat (:entries with-links) (take default-activity-limit (:entries old-all-activity)))
-          ;                         (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries with-links)))
+          ; all-activity-items (if (= direction :up)
+          ;                         (concat (:items with-links) (take default-activity-limit (:items old-all-activity)))
+          ;                         (concat (take-last default-activity-limit (:items old-all-activity)) (:items with-links)))
           ;; Keep all the elements
-          all-activity-entries (if (= direction :up)
-                                  (concat (:entries with-links) (:entries old-all-activity))
-                                  (concat (:entries old-all-activity) (:entries with-links)))
+          all-activity-items (if (= direction :up)
+                                  (concat (:items with-links) (:items old-all-activity))
+                                  (concat (:items old-all-activity) (:items with-links)))
           new-all-activity (-> with-links
-                              (assoc :entries (vec (reverse (sort-by :created-at (distinct all-activity-entries)))))
+                              (assoc :items (vec (reverse (sort-by :created-at (distinct all-activity-items)))))
                               (assoc :direction direction)
-                              (assoc :saved-entries keeping-entries))]
+                              (assoc :saved-items keeping-items))]
       (assoc-in db all-activity-key new-all-activity))
     db))

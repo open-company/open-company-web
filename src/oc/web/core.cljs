@@ -404,13 +404,13 @@
       (timbre/info "Routing board-filter-by-topic-slash-route" (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/"))
       (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
 
-    (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
-      (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
-      (board-handler "entry" target org-dashboard params))
+    (defroute entry-route (urls/activity ":org" ":board" ":entry") {:as params}
+      (timbre/info "Routing entry-route" (urls/activity ":org" ":board" ":entry"))
+      (board-handler "activity" target org-dashboard params))
 
-    (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
-      (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
-      (board-handler "entry" target org-dashboard params))
+    (defroute entry-slash-route (str (urls/activity ":org" ":board" ":entry") "/") {:as params}
+      (timbre/info "Routing entry-route" (str (urls/activity ":org" ":board" ":entry") "/"))
+      (board-handler "activity" target org-dashboard params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")

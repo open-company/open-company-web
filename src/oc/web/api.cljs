@@ -754,10 +754,10 @@
               (router/nav! (oc-urls/org (router/current-org-slug)))
               (.reload (.-location js/window)))))))))
 
-(defn get-comments [entry-uuid]
-  (when entry-uuid
-    (let [entry-data (dispatcher/entry-data entry-uuid)
-          comments-link (utils/link-for (:links entry-data) "comments")]
+(defn get-comments [activity-uuid]
+  (when activity-uuid
+    (let [activity-data (dispatcher/activity-data activity-uuid)
+          comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
         (interaction-get (relative-href (:href comments-link))
           {:headers (headers-for-link comments-link)}
@@ -765,12 +765,12 @@
             (dispatcher/dispatch! [:comments-get/finish {:success success
                                                          :error (when-not success body)
                                                          :body (if (not (empty? body)) (json->cljs body) nil)
-                                                         :entry-uuid entry-uuid}])))))))
+                                                         :activity-uuid activity-uuid}])))))))
 
-(defn add-comment [entry-uuid comment-body]
-  (when (and entry-uuid comment-body)
-    (let [entry-data (dispatcher/entry-data entry-uuid)
-          add-comment-link (utils/link-for (:links entry-data) "create" "POST")
+(defn add-comment [activity-uuid comment-body]
+  (when (and activity-uuid comment-body)
+    (let [activity-data (dispatcher/activity-data activity-uuid)
+          add-comment-link (utils/link-for (:links activity-data) "create" "POST")
           json-data (cljs->json {:body comment-body})]
       (interaction-post (relative-href (:href add-comment-link))
         {:headers (headers-for-link add-comment-link)
@@ -779,17 +779,17 @@
           (dispatcher/dispatch! [:comment-add/finish {:success success
                                                       :error (when-not success body)
                                                       :body (if (not (empty? body)) (json->cljs body) nil)
-                                                      :entry-uuid entry-uuid}]))))))
+                                                      :activity-uuid activity-uuid}]))))))
 
 (defn toggle-reaction
-  [entry-uuid reaction-data]
-  (when (and entry-uuid reaction-data)
+  [activity-uuid reaction-data]
+  (when (and activity-uuid reaction-data)
     (let [reaction-link (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"])
           interaction-method (if (= (:method reaction-link) "PUT") interaction-put interaction-delete)]
       (interaction-method (relative-href (:href reaction-link))
         {:headers (headers-for-link reaction-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:reaction-toggle/finish entry-uuid (:reaction reaction-data) (if success (json->cljs body) nil)]))))))
+          (dispatcher/dispatch! [:reaction-toggle/finish activity-uuid (:reaction reaction-data) (if success (json->cljs body) nil)]))))))
 
 (defn get-entry
   [entry-data]

@@ -118,7 +118,7 @@
                       {:date-time (:created-at entry-data)
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :title (utils/entry-tooltip entry-data)}
+                       :title (utils/activity-date-tooltip entry-data)}
                       (utils/time-since (:created-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)

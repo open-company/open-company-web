@@ -103,7 +103,7 @@
 (defn current-board-slug []
   (:board @path))
 
-(defn current-entry-uuid []
+(defn current-activity-uuid []
   (:entry @path))
 
 (defn query-params []

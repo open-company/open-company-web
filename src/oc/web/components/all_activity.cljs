@@ -6,14 +6,14 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.logging :as logging]
-            [oc.web.components.entry-card :refer (entry-card)]
+            [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.ui.loading :refer (rloading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-;; 800px from the end of the current rendered results as point to add more entries in the batch
+;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 5)
 (def card-avg-height 600)
 
@@ -46,11 +46,11 @@
     12 31))
 
 (defn get-first-available-entry
-  "Given a list of entries and a year and a month get the first available entry from the first of that month."
-  [entries year month]
+  "Given a list of items and a year and a month get the first available entry from the first of that month."
+  [items year month]
   (let [date-str (str year "-" (utils/add-zero month) "-" (days-for-month year month) "T23:59:59.999Z")]
-    (loop [ens (vec (rest entries))
-           en (first entries)]
+    (loop [ens (vec (rest items))
+           en (first items)]
       (if (and (pos? (count ens))
                (check-entry en date-str))
         (recur (vec (rest ens))
@@ -65,13 +65,13 @@
     (>= (- el-offset-top body-scroll) 0)))
 
 (defn get-first-visible-entry
-  "Given the list of entries rendered, get the first visible entry counting the page scroll."
-  [entries]
-  (when (pos? (count entries))
-    (loop [ens entries
-           en (first entries)]
+  "Given the list of items rendered, get the first visible entry counting the page scroll."
+  [items]
+  (when (pos? (count items))
+    (loop [ens items
+           en (first items)]
       (let [el (sel1 [(str "div.entry-card-" (:uuid en))])]
-        ;; Do not loop if there are no more entries or if found the first visible entry
+        ;; Do not loop if there are no more items or if found the first visible entry
         (if (or (zero? (count ens))
                 (and el
                      (element-is-visible el)))
@@ -85,8 +85,8 @@
   ;; When we are not retrieving calendar and not waiting to scroll to an entry
   (when (and (not @(::retrieving-calendar s))
              (not @(::scroll-to-entry s)))
-    (let [entries-batch (:entries (first (:rum/args s)))
-          first-visible-entry (get-first-visible-entry entries-batch)
+    (let [items-batch (:items (first (:rum/args s)))
+          first-visible-entry (get-first-visible-entry items-batch)
           js-date (utils/js-date (:created-at first-visible-entry))]
       (reset! (::selected-year s) (.getFullYear js-date))
       (reset! (::selected-month s) (inc (.getMonth js-date))))))
@@ -152,8 +152,8 @@
                                               direction (:direction all-activity-data)
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
-                                              first-entry-date (utils/js-date (:created-at (first (:entries all-activity-data))))
-                                              first-available-entry (when (and year month) (get-first-available-entry (:entries all-activity-data) year month))]
+                                              first-entry-date (utils/js-date (:created-at (first (:items all-activity-data))))
+                                              first-available-entry (when (and year month) (get-first-available-entry (:items all-activity-data) year month))]
                                           (dbg "will-mount" all-activity-data)
                                           (dbg "   next-link" next-link "prev-link" prev-link)
                                           (dbg "   year" year "month" month "first-entry-date" first-entry-date "first-available-entry" first-available-entry)
@@ -163,12 +163,12 @@
                                               (reset! (::selected-year s) year)
                                               (reset! (::selected-month s) month)
                                               (reset! (::scroll-to-entry s) first-available-entry))
-                                            ;; First load or subsequent load more with different set of entries
+                                            ;; First load or subsequent load more with different set of items
                                             (if (= direction :up)
-                                              ;; did scrolled up, we need to scroll to the first of the old entries to not lose the previous position
-                                              (let [saved-entries (:saved-entries all-activity-data)
-                                                    last-new-entry-idx (dec (- (count (:entries all-activity-data)) saved-entries))
-                                                    scroll-to-entry (get (:entries all-activity-data) last-new-entry-idx)
+                                              ;; did scrolled up, we need to scroll to the first of the old items to not lose the previous position
+                                              (let [saved-items (:saved-items all-activity-data)
+                                                    last-new-entry-idx (dec (- (count (:items all-activity-data)) saved-items))
+                                                    scroll-to-entry (get (:items all-activity-data) last-new-entry-idx)
                                                     created-date (utils/js-date (:created-at scroll-to-entry))
                                                     to-year (.getFullYear created-date)
                                                     to-month (inc (int (.getMonth created-date)))]
@@ -179,8 +179,8 @@
                                               ;; did scrolled down, results where simply concatenated, just need to update the calendar highlighting
                                               (if (= direction :down)
                                                 ; Load more :down scroll, needs to set the calendar
-                                                (let [last-old-entry-idx (dec (:saved-entries all-activity-data))
-                                                      last-old-entry (get (:entries all-activity-data) last-old-entry-idx)
+                                                (let [last-old-entry-idx (dec (:saved-items all-activity-data))
+                                                      last-old-entry (get (:items all-activity-data) last-old-entry-idx)
                                                       created-date (utils/js-date (:created-at last-old-entry))
                                                       to-year (.getFullYear created-date)
                                                       to-month (inc (int (.getMonth created-date)))]
@@ -234,7 +234,7 @@
                                               (let [calendar-data @(drv/get-ref s :calendar)
                                                     year @(::selected-year s)
                                                     month (or @(::selected-month s) (:month (first (filter #(= (:year %) year) calendar-data))))
-                                                    first-available-entry (get-first-available-entry (:entries all-activity-data) @(::selected-year s) month)
+                                                    first-available-entry (get-first-available-entry (:items all-activity-data) @(::selected-year s) month)
                                                     next-link (utils/link-for (:links all-activity-data) "previous")
                                                     prev-link (utils/link-for (:links all-activity-data) "next")]
                                                 (dbg "   next-link" next-link "prev-link" prev-link)
@@ -255,7 +255,7 @@
                                            s)}
   [s all-activity-data]
   (let [calendar-data (drv/react s :calendar)
-        entries (:entries all-activity-data)]
+        items (:items all-activity-data)]
     [:div.all-activity.group
       [:div.all-activity-cards
         (when @(::top-loading s)
@@ -268,13 +268,13 @@
                          (not @(::first-render-done s)))
                     @(::scroll-to-entry s)
                     (= @(::last-direction s) :up))
-            [:div.entries-overlay
+            [:div.activities-overlay
               (rloading {:loading true})
               (when (or @(::top-loading s)
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
-          (for [e entries]
-            (rum/with-key (entry-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
+          (for [e items]
+            (rum/with-key (activity-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])

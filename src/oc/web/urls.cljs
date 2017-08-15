@@ -139,12 +139,12 @@
 
 ;; Entries
 
-(defn entry
-  "Entry url"
-  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid)))
-  ([entry-uuid] (entry (router/current-org-slug) (router/current-board-slug) entry-uuid))
-  ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
-  ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/update/" (name entry-uuid))))
+(defn activity
+  "Activity url"
+  ([] (activity (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid)))
+  ([activity-uuid] (activity (router/current-org-slug) (router/current-board-slug) activity-uuid))
+  ([board-slug activity-uuid] (activity (router/current-org-slug) board-slug activity-uuid))
+  ([org-slug board-slug activity-uuid] (str (board org-slug board-slug) "/update/" (name activity-uuid))))
 
 ;; Stakeholder update
 

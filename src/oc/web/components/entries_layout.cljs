@@ -3,7 +3,7 @@
             [cuerdas.core :as s]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
-            [oc.web.components.entry-card :refer (entry-card entry-card-empty)]))
+            [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
 
 (rum/defc entries-layout
   [board-data layout-type]
@@ -40,11 +40,11 @@
             [:div.entries-cards-container-row.group
               ; Render the first 2 entries
               (for [entry first-line-entries]
-                (rum/with-key (entry-card entry first-has-headline first-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
+                (rum/with-key (activity-card entry first-has-headline first-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
               ; If there is only 1 add the empty placeholder
               (when (= (count entries-group) 1)
                 (if (not (empty? topic-slug))
-                  (entry-card-empty (:read-only board-data))
+                  (activity-card-empty (:read-only board-data))
                   [:div.entry-card.entry-card-placeholder]))]
             ; If there are more than 2 entries, render the second row
             (when (> (count entries-group) 2)
@@ -52,7 +52,7 @@
                 ; Render the second 2 entries
                 (when (> (count entries-group) 2)
                   (for [entry (subvec entries-group 2 (min 4 (count entries-group)))]
-                    (rum/with-key (entry-card entry second-has-headline second-has-body) (str "entry-by-topic-" topic "-" (:uuid entry)))))
+                    (rum/with-key (activity-card entry second-has-headline second-has-body) (str "entry-by-topic-" topic "-" (:uuid entry)))))
                 ; If the total entries are 3 add a placeholder to avoid taking the full width
                 (when (= (count entries-group) 3)
                   [:div.entry-card.entry-card-placeholder])])]))
@@ -77,10 +77,10 @@
                 {:key (str "entries-row-" idx)}
                 ; Render the entries in the row
                 (for [entry entries]
-                  (rum/with-key (entry-card entry has-headline has-body) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
+                  (rum/with-key (activity-card entry has-headline has-body) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
                 ; If there is only one entry add the empty card placeholder
                 (if (= (count sorted-entries) 1)
-                  (entry-card-empty (:read-only board-data))
+                  (activity-card-empty (:read-only board-data))
                   ; If there is only one entry in this row, but it's not the first add the placheolder
                   (when (= (count entries) 1)
                     [:div.entry-card.entry-card-placeholder]))]))])
@@ -102,7 +102,7 @@
               [:div.entries-cards-container-row.group
                 {:key (str "entries-row-" idx)}
                 (for [entry entries]
-                  (rum/with-key (entry-card entry has-headline has-body) (str "entry-latest-" (:uuid entry))))
+                  (rum/with-key (activity-card entry has-headline has-body) (str "entry-latest-" (:uuid entry))))
                 ; If the row contains less than 2, add a placeholder div to avoid having the first cover the full width
                 (when (= (count entries) 1)
                   [:div.entry-card.entry-card-placeholder])]))]))])

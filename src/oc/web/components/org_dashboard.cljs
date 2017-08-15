@@ -44,7 +44,7 @@
 (def add-second-topic-tt-prefix "add-second-topic-")
 
 (defn refresh-board-data []
-  (when (not (router/current-entry-uuid))
+  (when (not (router/current-activity-uuid))
     (api/get-board (dis/board-data))))
 
 (defcomponent org-dashboard [data owner]
@@ -107,14 +107,14 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
-                                           :selected-topic-view (router/current-entry-uuid)
+                                           :selected-topic-view (router/current-activity-uuid)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :editing-topic (or (not (nil? (:foce-key data)))
                                                               (not (nil? (:show-top-menu data))))
                                            :main-scroll true
-                                           :no-scroll (router/current-entry-uuid)})}
-          (when (router/current-entry-uuid)
-            (entry-modal (dis/entry-data)))
+                                           :no-scroll (router/current-activity-uuid)})}
+          (when (router/current-activity-uuid)
+            (entry-modal (dis/activity-data)))
           (when (:entry-editing data)
             (entry-edit))
           (when (:board-editing data)
@@ -130,7 +130,7 @@
           (dom/div {:class "page"}
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
-                           (router/current-entry-uuid))
+                           (router/current-activity-uuid))
               (navbar))
             (if (:show-welcome-screen data)
               (welcome-screen)

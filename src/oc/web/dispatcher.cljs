@@ -46,8 +46,8 @@
 (defn entries-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :entries-data])
 
-(defn comments-key [org-slug board-slug entry-uuid]
- (vec (conj (entries-key org-slug board-slug) entry-uuid :comments-data)))
+(defn comments-key [org-slug board-slug activity-uuid]
+ (vec (conj (entries-key org-slug board-slug) activity-uuid :comments-data)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -69,7 +69,7 @@
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :topic-slug          [[:route] (fn [route] (:topic route))]
-   :entry-uuid          [[:route] (fn [route] (:entry route))]
+   :activity-uuid       [[:route] (fn [route] (:activity route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
    :loading             [[:base] (fn [base] (:loading base))]
@@ -128,15 +128,15 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :entry-data          [[:base :org-slug :board-slug :entry-uuid]
-                          (fn [base org-slug board-slug entry-uuid]
-                            (when (and org-slug board-slug entry-uuid)
+   :activity-data       [[:base :org-slug :board-slug :activity-uuid]
+                          (fn [base org-slug board-slug activity-uuid]
+                            (when (and org-slug board-slug activity-uuid)
                               (let [board-data (get-in base (board-data-key org-slug board-slug))]
-                                (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))]
-   :comments-data       [[:base :org-slug :board-slug :entry-uuid]
-                          (fn [base org-slug board-slug entry-uuid]
-                            (when (and org-slug board-slug entry-uuid)
-                              (let [comments-key (comments-key org-slug board-slug entry-uuid)
+                                (first (filter #(= (:uuid %) activity-uuid) (:entries board-data))))))]
+   :comments-data       [[:base :org-slug :board-slug :activity-uuid]
+                          (fn [base org-slug board-slug activity-uuid]
+                            (when (and org-slug board-slug activity-uuid)
+                              (let [comments-key (comments-key org-slug board-slug activity-uuid)
                                     comments-data (get-in base comments-key)]
                                 comments-data)))]
    :trend-bar-status    [[:base]
@@ -146,16 +146,16 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
-   :entry-modal-fade-in  [[:base]
-                          (fn [base]
-                            (:entry-modal-fade-in base))]
+   :activity-modal-fade-in [[:base]
+                             (fn [base]
+                               (:activity-modal-fade-in base))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
                              :error-banner-time (:error-banner-time base)})]
-   :entry-editing       [[:base]
+   :activity-editing    [[:base]
                           (fn [base]
-                            (:entry-editing base))]
+                            (:activity-editing base))]
    :board-editing       [[:base]
                           (fn [base]
                             (:board-editing base))]
@@ -246,30 +246,30 @@
   ([data org-slug board-slug k]
     (get-in data (conj (board-cache-key org-slug board-slug) k))))
 
-(defn entry-data
-  "Get entry data."
+(defn activity-data
+  "Get activity data."
   ([]
-    (entry-data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid) @app-state))
-  ([entry-uuid]
-    (entry-data (router/current-org-slug) (router/current-board-slug) entry-uuid @app-state))
-  ([board-slug entry-uuid]
-    (entry-data (router/current-org-slug) board-slug entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid]
-    (entry-data org-slug board-slug entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid data]
+    (activity-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid) @app-state))
+  ([activity-uuid]
+    (activity-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
+  ([board-slug activity-uuid]
+    (activity-data (router/current-org-slug) board-slug activity-uuid @app-state))
+  ([org-slug board-slug activity-uuid]
+    (activity-data org-slug board-slug activity-uuid @app-state))
+  ([org-slug board-slug activity-uuid data]
     (let [data-key (if (:from-all-activity @router/path) (all-activity-key org-slug) (board-data-key org-slug board-slug))
           entries-data (:entries (get-in data data-key))]
-      (first (filter #(= (:uuid %) entry-uuid) entries-data)))))
+      (first (filter #(= (:uuid %) activity-uuid) entries-data)))))
 
 (defn comments-data
   ([]
-    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid) @app-state))
-  ([entry-uuid]
-    (comments-data (router/current-org-slug) (router/current-board-slug) entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid]
-    (comments-data org-slug board-slug entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid data]
-    (get-in data (comments-key org-slug board-slug entry-uuid))))
+    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid) @app-state))
+  ([activity-uuid]
+    (comments-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
+  ([org-slug board-slug activity-uuid]
+    (comments-data org-slug board-slug activity-uuid @app-state))
+  ([org-slug board-slug activity-uuid data]
+    (get-in data (comments-key org-slug board-slug activity-uuid))))
 
 (defn entries-data
   ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))

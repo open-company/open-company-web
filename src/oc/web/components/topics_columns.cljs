@@ -12,7 +12,7 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            [oc.web.components.entry-card :refer (entry-card)]
+            [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.stories-layout :refer (stories-layout)]
             [oc.web.components.all-activity :refer (all-activity)]))
@@ -27,7 +27,7 @@
     (dis/dispatch! [:topic-add new-topic-kw fixed-topic-data])
     ; delay switch to topic view to make sure the FoCE data are in when loading the view
     (when (:was-archived topic-data)
-      (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data) new-topic)))))
+      (router/nav! (oc-urls/activity (router/current-org-slug) (:slug board-data) new-topic)))))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
@@ -46,10 +46,10 @@
         (dis/dispatch! [:calendar-get]))))
 
   (render [_]
-    (let [current-entry-uuid (router/current-entry-uuid)
+    (let [current-activity-uuid (router/current-activity-uuid)
           is-mobile-size? (responsive/is-mobile-size?)
-          columns-container-key (if current-entry-uuid
-                                  (str "topics-columns-selected-topic-" current-entry-uuid)
+          columns-container-key (if current-activity-uuid
+                                  (str "topics-columns-selected-topic-" current-activity-uuid)
                                   (s/join "-" (map :slug (:topics board-data))))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
@@ -61,7 +61,7 @@
                                                  :width "auto"}
                                             #js {:width total-width}))
           total-width-int (js/parseInt total-width 10)
-          empty-board? (zero? (count (:entries board-data)))]
+          empty-board? (and (zero? (count (:stories board-data))) (zero? (count (:entries board-data))))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :overflow-visible true
@@ -116,10 +116,10 @@
               (cond
                 (and is-dashboard
                      is-all-activity)
-                (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (map :uuid (:entries all-activity-data)))))
+                (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (map :uuid (:items all-activity-data)))))
                 (and is-dashboard
                      (not is-mobile-size?)
-                     (not current-entry-uuid)
+                     (not current-activity-uuid)
                      empty-board?)
                 (empty-board)
                 ; for each column key contained in best layout
@@ -133,7 +133,5 @@
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (for [topic (:topics board-data)
-                    :let [topic-data (get board-data (keyword topic))]
-                    :when (not (:placeholder topic-data))]
-                (entry-card topic-data)))))))))
+              (for [activity-data (if (= (:type board-data) "story") (:stories board-data) (:entries board-data))]
+                (activity-card activity-data)))))))))
