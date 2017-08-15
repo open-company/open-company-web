@@ -17,7 +17,7 @@ div.stories-layout {
         width: 220px;
         margin-top: 24px;
         z-index: 2;
-        @include entry-author(43);
+        @include activity-author(43);
         position: relative;
 
         div.user-avatar-img-container {

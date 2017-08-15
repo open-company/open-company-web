@@ -70,7 +70,7 @@ div.entry-modal-container {
             div.entry-modal-head-left {
               float: left;
               min-width: 300px;
-              @include entry-author();
+              @include activity-author();
             }
 
             div.entry-modal-head-right {
@@ -80,7 +80,7 @@ div.entry-modal-container {
                 margin-top: 7px;
               }
 
-              @include entry-topic-tag();
+              @include activity-tag();
             }
           }
 
@@ -92,12 +92,12 @@ div.entry-modal-container {
 
             div.entry-modal-content-headline {
               margin-top: 24px;
-              @include entry-headline();
+              @include activity-headline();
             }
 
             div.entry-modal-content-body {
               margin-top: 24px;
-              @include entry-body();
+              @include activity-body();
               min-height: 114px;
 
               &.no-headline {

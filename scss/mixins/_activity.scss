@@ -1,6 +1,6 @@
 @import "../modules/_colors";
 
-@mixin entry-author($avatar_size: 32){
+@mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
     height: #{$avatar_size}px;
     float: left;
@@ -49,7 +49,7 @@
   }
 }
 
-@mixin entry-topic-tag(){
+@mixin activity-tag(){
   div.topic-tag {
     height: 26px;
     border-radius: 4px;
@@ -69,7 +69,7 @@
   }
 }
 
-@mixin entry-headline(){
+@mixin activity-headline(){
   @include avenir_H();
   font-size: 20px;
   color: $carrot_dark_gray;
@@ -79,7 +79,7 @@
   }
 }
 
-@mixin entry-body(){
+@mixin activity-body(){
 
   &.medium-editor-placeholder:after {
     @include avenir_R();

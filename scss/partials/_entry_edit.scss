@@ -263,7 +263,7 @@ div.entry-edit-modal-container {
         border: none;
         outline: none;
         cursor: text;
-        @include entry-headline();
+        @include activity-headline();
         @include avenir_H();
         font-size: 18px;
         color: $carrot_dark_gray;
@@ -285,7 +285,7 @@ div.entry-edit-modal-container {
         margin: 24px 0;
         cursor: text;
         min-height: 85px;
-        @include entry-body();
+        @include activity-body();
 
         &.hide-placeholder:after {
           display: none !important;
