@@ -1,6 +1,5 @@
 div.activity-card {
   width: 432px;
-  max-height: 295px;
   float: left;
   background-color: white;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
@@ -160,6 +159,11 @@ div.activity-card {
   div.activity-card-content {
     width: 100%;
 
+    div.activity-card-title {
+      @include activity-title();
+      margin-bottom: 16px;
+    }
+
     div.activity-card-headline {
       @include activity-headline();
       text-overflow: ellipsis;
@@ -213,6 +217,15 @@ div.activity-card {
           margin-top: -14px;
         }
       }
+    }
+
+    div.story-banner {
+      margin-top: 16px;
+      width: 100%;
+      min-height: 200px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     div.activity-card-body {

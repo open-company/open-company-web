@@ -90,13 +90,15 @@
                                          s)
                          :will-mount (fn [s]
                                        (let [activity-data (first (:rum/args s))]
-                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data))))
+                                         (when (= (:type activity-data) "entry")
+                                          (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data)))))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-activity-data (first (:rum/args o))
                                               new-activity-data (first (:rum/args s))]
                                           (when (not= (:body old-activity-data) (:body new-activity-data))
-                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data)))
+                                            (when (= (:type new-activity-data) "entry")
+                                              (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data))))
                                             (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
                                             (reset! (::truncated s) false)))
                                         s)
@@ -116,7 +118,7 @@
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-activity-card is-all-activity
                               :story-card (= (:type activity-data) "story")})
-     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data)])
+     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
     (when (= (:type activity-data) "story")
@@ -156,10 +158,14 @@
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
                 topic-name]))]])
     [:div.activity-card-content.group
+      (when (= (:type activity-data) "story")
+        [:div.activity-card-title
+          {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
       ; Headline
-      [:div.activity-card-headline
-        {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-         :class (when has-headline "has-headline")}]
+      (when (= (:type activity-data) "entry")
+        [:div.activity-card-headline
+          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
+           :class (when has-headline "has-headline")}])
       ; Body
       (let [body-without-tags (-> activity-data :body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)
             hidden-class (str "activity-body" (:uuid activity-data))
@@ -171,7 +177,10 @@
             $hidden-div (js/$ (str "." hidden-class))
             body-without-preview (.html $hidden-div)
             _ (.remove $hidden-div)
-            read-more-html (str "<a class=\"read-more\" href=\"" (oc-urls/activity (:board-slug activity-data) (:uuid activity-data)) "\">Read more</a>")
+            activity-url (if (= (:type activity-data) "story")
+                           (oc-urls/story (:board-slug activity-data) (:slug activity-data))
+                           (oc-urls/entry (:board-slug activity-data) (:uuid activity-data)))
+            read-more-html (str "<a class=\"read-more\" href=\"" activity-url "\">Read more</a>")
             emojied-body (utils/emojify (str body-without-preview (if is-all-activity "" read-more-html)))]
         [:div.activity-card-body
           {:dangerouslySetInnerHTML emojied-body
@@ -185,7 +194,12 @@
       (when @(::first-body-image s)
         [:div.activity-card-media-preview
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
-           :class (or (:type @(::first-body-image s)) "image")}])]
+           :class (or (:type @(::first-body-image s)) "image")}])
+      (when (and (= (:type activity-data) "story")
+                 (not (empty? (:banner-url activity-data))))
+        [:div.story-banner
+          {:style #js {:backgroundImage (str "url(\"" (:banner-url activity-data) "\")")
+                       :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
     [:div.activity-card-footer.group
       (interactions-summary activity-data)
       [:div.more-button.dropdown
