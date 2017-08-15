@@ -189,7 +189,7 @@
                                     :has-media-preview @(::first-body-image s)})}])
       (when (and is-all-activity
                  has-body)
-        [:div.read-more "Read Full activity"])
+        [:div.read-more "Read Full Update"])
       ; Body preview
       (when @(::first-body-image s)
         [:div.activity-card-media-preview
