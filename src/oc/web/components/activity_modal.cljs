@@ -1,4 +1,4 @@
-(ns oc.web.components.entry-modal
+(ns oc.web.components.activity-modal
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
@@ -18,16 +18,18 @@
 (defn dismiss-modal [board-filters]
   (if (:from-all-activity @router/path)
     (dis/dispatch! [:all-activity-nav])
-    (dis/dispatch! [:board-nav (router/current-board-slug) board-filters])))
+    (if (= (:type (dis/board-data)) "story")
+      (dis/dispatch! [:storyboard-nav (router/current-board-slug)])
+      (dis/dispatch! [:board-nav (router/current-board-slug) board-filters]))))
 
 (defn close-clicked [s & [board-filters]]
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal board-filters)))
 
-(defn delete-clicked [e entry-data]
+(defn delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
-                    :message "Delete this entry?"
+                    :message (str "Delete this " (if (= (:type activity-data) "entry") "update" "story") "?")
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
@@ -38,12 +40,12 @@
                                          (if (= last-filter :by-topic)
                                            (router/nav! (oc-urls/board-sort-by-topic))
                                            (router/nav! (oc-urls/board))))
-                                       (dis/dispatch! [:entry-delete entry-data])
+                                       (dis/dispatch! [:entry-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(rum/defcs entry-modal < (rum/local false ::first-render-done)
+(rum/defcs activity-modal < (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
                          (rum/local false ::animate)
                          (rum/local false ::hovering-card)
@@ -51,10 +53,10 @@
                          (rum/local nil ::column-height)
                          (rum/local nil ::window-resize-listener)
                          rum/reactive
-                         (drv/drv :entry-modal-fade-in)
+                         (drv/drv :activity-modal-fade-in)
                          {:before-render (fn [s]
                                            (when (and (not @(::animate s))
-                                                    (= @(drv/get-ref s :entry-modal-fade-in) (:uuid (first (:rum/args s)))))
+                                                    (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
                                              (reset! (::animate s) true))
                                            s)
                           :will-mount (fn [s]
@@ -65,14 +67,14 @@
                                        ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                        (dommy/add-class! (sel1 [:body]) :no-scroll)
                                        ;; Scroll to the bottom of the comments box
-                                       (let [el (sel1 [:div.entry-right-column-content])]
+                                       (let [el (sel1 [:div.activity-right-column-content])]
                                           (set! (.-scrollTop el) (.-scrollHeight el)))
-                                       (let [entry-data (first (:rum/args s))]
-                                        (.on (js/$ (str "div.entry-modal-" (:uuid entry-data)))
+                                       (let [activity-data (first (:rum/args s))]
+                                        (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
                                          "show.bs.dropdown"
                                          (fn [e]
                                            (reset! (::showing-dropdown s) true)))
-                                        (.on (js/$ (str "div.entry-modal-" (:uuid entry-data)))
+                                        (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
                                          "hidden.bs.dropdown"
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
@@ -81,9 +83,9 @@
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
                                           (when-not @(::column-height s)
-                                            (reset! (::column-height s) (max 284 (.height (js/$ ".entry-left-column"))))
-                                            (.load (js/$ ".entry-modal-content-body img")
-                                             #(reset! (::column-height s) (max 284 (.height (js/$ ".entry-left-column"))))))
+                                            (reset! (::column-height s) (max 284 (.height (js/$ ".activity-left-column"))))
+                                            (.load (js/$ ".activity-modal-content-body img")
+                                             #(reset! (::column-height s) (max 284 (.height (js/$ ".activity-left-column"))))))
                                           s)
                           :will-unmount (fn [s]
                                           ;; Remove no-scroll class from the body tag
@@ -93,71 +95,75 @@
                                             (events/unlistenByKey @(::window-resize-listener s))
                                             (reset! (::window-resize-listener s) nil))
                                           s)}
-  [s entry-data]
+  [s activity-data]
   (let [column-height @(::column-height s)]
-    [:div.entry-modal-container
+    [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
-      [:div.entry-modal.group
-        {:class (str "entry-modal-" (:uuid entry-data))
+      [:div.activity-modal.group
+        {:class (str "activity-modal-" (:uuid activity-data))
          :on-mouse-over #(reset! (::hovering-card s) true)
          :on-mouse-leave #(reset! (::hovering-card s) false)}
-        [:button.close-entry-modal.mlb-reset
+        [:button.close-activity-modal.mlb-reset
           {:on-click #(close-clicked s)}]
-        [:div.entry-modal-inner.group
-          [:div.entry-left-column
+        [:div.activity-modal-inner.group
+          [:div.activity-left-column
             {:style (when column-height {:minHeight (str column-height "px")})}
-            [:div.entry-left-column-content
+            [:div.activity-left-column-content
               {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
-              [:div.entry-modal-head.group
-                [:div.entry-modal-head-left
-                  (user-avatar-image (first (:author entry-data)))
-                  [:div.name (:name (first (:author entry-data)))]
+              [:div.activity-modal-head.group
+                [:div.activity-modal-head-left
+                  (user-avatar-image (first (:author activity-data)))
+                  [:div.name (:name (first (:author activity-data)))]
                   [:div.time-since
                     [:time
-                      {:date-time (:created-at entry-data)
+                      {:date-time (:created-at activity-data)
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :title (utils/activity-date-tooltip entry-data)}
-                      (utils/time-since (:created-at entry-data))]]]
-                [:div.entry-modal-head-right
-                  (when (:topic-slug entry-data)
-                    (let [topic-name (or (:topic-name entry-data) (string/upper (:topic-slug entry-data)))]
+                       :title (utils/activity-date-tooltip activity-data)}
+                      (utils/time-since (:created-at activity-data))]]]
+                [:div.activity-modal-head-right
+                  (when (:topic-slug activity-data)
+                    (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                       [:div.topic-tag
-                        {:on-click #(close-clicked s (:topic-slug entry-data))}
+                        {:on-click #(close-clicked s (:topic-slug activity-data))}
                         topic-name]))]]
-              [:div.entry-modal-content
-                [:div.entry-modal-content-headline
-                  {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))}]
-                [:div.entry-modal-content-body
-                  {:dangerouslySetInnerHTML (utils/emojify (:body entry-data))
-                   :class (when (empty? (:headline entry-data)) "no-headline")}]
-                (entry-attachments (:attachments entry-data))
-                [:div.entry-modal-footer.group
-                  (reactions entry-data)
-                  [:div.entry-modal-footer-right
+              [:div.activity-modal-content
+                (when (= (:type activity-data) "story")
+                  [:div.activity-modal-content-title
+                    {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
+                (when (= (:type activity-data) "entry")
+                  [:div.activity-modal-content-headline
+                    {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+                [:div.activity-modal-content-body
+                  {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
+                   :class (when (empty? (:headline activity-data)) "no-headline")}]
+                (entry-attachments (:attachments activity-data))
+                [:div.activity-modal-footer.group
+                  (reactions activity-data)
+                  [:div.activity-modal-footer-right
                     [:div.more-dropdown.dropdown
-                      [:button.mlb-reset.entry-modal-more.dropdown-toggle
+                      [:button.mlb-reset.activity-modal-more.dropdown-toggle
                         {:type "button"
                          :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-                         :id (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))
+                         :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
                          :data-toggle "dropdown"
                          :aria-haspopup true
                          :aria-expanded false
                          :title "More"}]
                       [:div.dropdown-menu
-                        {:aria-labelledby (str "entry-modal-more-" (router/current-board-slug) "-" (:uuid entry-data))}
+                        {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
                         [:div.triangle]
-                        [:ul.entry-modal-more-menu
+                        [:ul.activity-modal-more-menu
                           [:li
                             {:on-click (fn [e]
                                          (utils/event-stop e)
-                                         (dis/dispatch! [:entry-edit entry-data]))}
+                                         (dis/dispatch! [:entry-edit activity-data]))}
                             "Edit"]
                           [:li
-                            {:on-click #(delete-clicked % entry-data)}
+                            {:on-click #(delete-clicked % activity-data)}
                             "Delete"]]]]]]]]]
-          [:div.entry-right-column
+          [:div.activity-right-column
             {:style (when column-height {:minHeight (str column-height "px")})}
-            [:div.entry-right-column-content
-              (comments (:uuid entry-data))]]]]]))
+            [:div.activity-right-column-content
+              (comments (:uuid activity-data))]]]]]))
