@@ -150,8 +150,8 @@
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
     (when is-currently-shown
-      (when (and (router/current-activity-uuid)
-                 (zero? (count (filter #(= (:uuid %) (router/current-activity-uuid)) (:entries board-data)))))
+      (when (and (router/current-activity-id)
+                 (zero? (count (filter #(= (:uuid %) (router/current-activity-id)) (:entries board-data)))))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
@@ -762,13 +762,13 @@
   (api/get-comments activity-uuid)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (router/current-activity-uuid)
+        activity-uuid (router/current-activity-id)
         comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)]
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body]}]]
-  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-uuid))
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id))
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
@@ -930,8 +930,8 @@
   [db [_ status]]
   (assoc db :trend-bar-status status))
 
-(defmethod dispatcher/action :entry-modal-fade-in
-  [db [_ board-slug activity-uuid]]
+(defmethod dispatcher/action :activity-modal-fade-in
+  [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
    #(let [from-all-activity (not (router/current-board-slug))
           new-route (if from-all-activity
@@ -939,13 +939,16 @@
                       [(router/current-org-slug) board-slug activity-uuid "activity"])
           parts {:org (router/current-org-slug)
                  :board board-slug
-                 :entry activity-uuid
+                 :activity activity-uuid
                  :query-params (:query-params @router/path)
-                 :from-all-activity from-all-activity}]
+                 :from-all-activity from-all-activity}
+          activity-url (if (= activity-type "story")
+                         (oc-urls/story board-slug activity-uuid)
+                         (oc-urls/entry board-slug activity-uuid))]
       (router/set-route! new-route parts)
-      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/activity board-slug activity-uuid))
-      (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed activity-uuid))))
-  (assoc db :entry-modal-fade-in activity-uuid))
+      (.pushState (.-history js/window) #js {} (.-title js/document) activity-url)
+      (reset! dispatcher/app-state (assoc @dispatcher/app-state :activity-pushed activity-uuid))))
+  (assoc db :activity-modal-fade-in activity-uuid))
 
 (defmethod dispatcher/action :entry-edit
   [db [_ initial-entry-data]]
@@ -1030,7 +1033,7 @@
   (let [next-board-filter (if board-filters
                             ; If a board filter is passed use it
                             board-filters
-                            (if (:entry-pushed db)
+                            (if (:activity-pushed db)
                               ; If the modal was open from the dashboard, restore the previous opened filter
                               (:board-filters db)
                               ; If it was open directly from a link restore the last opened dashboard sort
@@ -1041,25 +1044,38 @@
                            (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
                            (oc-urls/board (router/current-org-slug) board-slug)))]
     (utils/after 10
-      #(if (:entry-pushed db)
+      #(if (:activity-pushed db)
          (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-               parts (dissoc @router/path :route :entry)]
+               parts (dissoc @router/path :route :activity)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
          (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
+
+(defmethod dispatcher/action :storyboard-nav
+  [db [_ storyboard-slug]]
+  (let [next-board-url (oc-urls/board (router/current-org-slug) storyboard-slug)]
+    (utils/after 10
+      #(if (:activity-pushed db)
+         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+               parts (dissoc @router/path :route :activity)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+         (router/nav! next-board-url)))
+    db))
 
 (defmethod dispatcher/action :all-activity-nav
   [db [_]]
   (let [all-activity-url (oc-urls/all-activity)]
     (utils/after 10
-      #(if (:entry-pushed db)
+      #(if (:activity-pushed db)
          (let [route [(router/current-org-slug) "all-activity"]
                parts (dissoc @router/path :route :entry :board)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
          (router/nav! all-activity-url)))
     db))
 
