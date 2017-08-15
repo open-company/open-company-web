@@ -121,7 +121,8 @@
      :on-mouse-leave #(reset! (::hovering-card s) false)}
     (when (= (:type activity-data) "story")
       [:div.triangle])
-    (when is-all-activity
+    (when (and is-all-activity
+               (= (:type activity-data) "entry"))
       [:div.activity-card-breadcrumb
         "In " [:span.bold (:board-name activity-data)]
         (when (:topic-slug activity-data)
@@ -129,7 +130,8 @@
         (when (:topic-slug activity-data)
           [:span.bold (:topic-name activity-data)])])
     ; Card header
-    (when (= (:type activity-data) "activity")
+    (when (or is-all-activity
+              (= (:type activity-data) "entry"))
       [:div.activity-card-head.group
         ; Card author
         [:div.activity-card-head-author
