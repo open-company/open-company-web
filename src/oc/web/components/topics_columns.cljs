@@ -17,18 +17,6 @@
             [oc.web.components.stories-layout :refer (stories-layout)]
             [oc.web.components.all-activity :refer (all-activity)]))
 
-(defn- update-active-topics [owner new-topic topic-data]
-  (let [board-data (om/get-props owner :board-data)
-        new-topic-kw (keyword new-topic)
-        fixed-topic-data (merge topic-data {:topic new-topic
-                                            :new (not (:was-archived topic-data))
-                                            :loading (:was-archived topic-data)})
-        new-topics (conj (:topics board-data) new-topic)]
-    (dis/dispatch! [:topic-add new-topic-kw fixed-topic-data])
-    ; delay switch to topic view to make sure the FoCE data are in when loading the view
-    (when (:was-archived topic-data)
-      (router/nav! (oc-urls/activity (router/current-org-slug) (:slug board-data) new-topic)))))
-
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
                                       total-width
@@ -46,10 +34,10 @@
         (dis/dispatch! [:calendar-get]))))
 
   (render [_]
-    (let [current-activity-uuid (router/current-activity-uuid)
+    (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
-          columns-container-key (if current-activity-uuid
-                                  (str "topics-columns-selected-topic-" current-activity-uuid)
+          columns-container-key (if current-activity-id
+                                  (str "topics-columns-selected-topic-" current-activity-id)
                                   (s/join "-" (map :slug (:topics board-data))))
           topics-column-conatiner-style (if is-dashboard
                                           (if (responsive/window-exceeds-breakpoint)
@@ -119,7 +107,7 @@
                 (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (map :uuid (:items all-activity-data)))))
                 (and is-dashboard
                      (not is-mobile-size?)
-                     (not current-activity-uuid)
+                     (not current-activity-id)
                      empty-board?)
                 (empty-board)
                 ; for each column key contained in best layout
