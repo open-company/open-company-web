@@ -69,6 +69,16 @@
   }
 }
 
+@mixin activity-title(){
+  @include avenir_H();
+  font-size: 24px;
+  color: #212830;
+
+  .emojione {
+    @include emoji-size(22);
+  }
+}
+
 @mixin activity-headline(){
   @include avenir_H();
   font-size: 20px;
