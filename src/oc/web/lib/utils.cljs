@@ -282,6 +282,14 @@
          (nil? update-link)
          (nil? delete-link))))
 
+(defn readonly-storyboard? [links]
+  (let [new-link (link-for links "new")
+        update-link (link-for links "partial-update")
+        delete-link (link-for links "delete")]
+    (and (nil? new-link)
+         (nil? update-link)
+         (nil? delete-link))))
+
 (defn readonly-topic? [links]
   (let [create (link-for links "create")
         partial-update (link-for links "partial-update")
@@ -289,6 +297,12 @@
     (and (nil? create) (nil? partial-update) (nil? delete))))
 
 (defn readonly-entry? [links]
+  (let [create (link-for links "create")
+        partial-update (link-for links "partial-update")
+        delete (link-for links "delete")]
+    (and (nil? create) (nil? partial-update) (nil? delete))))
+
+(defn readonly-story? [links]
   (let [create (link-for links "create")
         partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
@@ -334,23 +348,45 @@
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
       (assoc :board-slug board-slug)
+      (assoc :type "entry")
       (assoc :topic-name topic-name))))
+
+(defn fix-story
+  "Add `:read-only`, :storyboard-slug and :uuid keys to the story map."
+  [story-body storyboard-slug]
+  (-> story-body
+    (assoc :read-only (readonly-story? (:links story-body)))
+    (assoc :uuid (:slug story-body))
+    (assoc :type "story")
+    (assoc :board-slug storyboard-slug)))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
   [board-data]
   (let [links (:links board-data)
-        read-only (readonly-board? links)
+        read-only (readonly-storyboard? links)
         with-read-only (assoc board-data :read-only read-only)
         with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data))))]
     with-fixed-topics))
 
+(defn fix-storyboard
+  "Add topic name in each topic and a topic sorter"
+  [storyboard-data]
+  (let [links (:links storyboard-data)
+        read-only (readonly-board? links)
+        with-read-only (assoc storyboard-data :read-only read-only)
+        with-fixed-stories (assoc with-read-only :stories (vec (map #(fix-story % (:slug storyboard-data)) (:stories storyboard-data))))]
+    with-fixed-stories))
+
+(defn fix-activity [activity collection-slug]
+  (if (= (:type activity) "story")
+    (fix-story activity collection-slug)
+    (fix-entry activity collection-slug nil)))
+
 (defn fix-all-activity
   "Fix org data coming from the API."
   [all-activity-data]
-  (-> all-activity-data
-    (dissoc :items)
-    (assoc :entries (vec (map #(fix-entry % (:board-slug %) nil) (:items all-activity-data))))))
+  (assoc all-activity-data :items (vec (map #(fix-activity % (:board-slug %)) (:items all-activity-data)))))
 
 (defn fix-org
   "Fix org data coming from the API."
@@ -745,7 +781,7 @@
   []
   (str (my-uuid) (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) (my-uuid) (my-uuid)))
 
-(defn entry-uuid
+(defn activity-uuid
   "Generate a UUID for an entry"
  []
  (str (my-uuid) "-" (my-uuid) "-" (my-uuid)))
@@ -1021,14 +1057,14 @@
          :iterations 3}))
 
 (defn pulse-reaction-count
-  [entry-uuid reaction]
-  (let [selector (str "div.reaction-" entry-uuid "-" reaction)]
+  [activity-uuid reaction]
+  (let [selector (str "div.reaction-" activity-uuid "-" reaction)]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn pulse-comments-count
-  [entry-uuid]
-  (let [selector (str "div.comments-count-" entry-uuid )]
+  [activity-uuid]
+  (let [selector (str "div.comments-count-" activity-uuid )]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
@@ -1060,7 +1096,7 @@
                       (get-24h-time js-date))]
     (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
 
-(defn entry-tooltip [entry-data]
+(defn activity-date-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
         updated-at (js-date (:updated-at entry-data))
         created-str (entry-date created-at)
