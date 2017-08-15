@@ -108,7 +108,7 @@
              :data-board (name (:slug storyboard))
              :data-storyboard true
              :key (str "board-list-" (name (:slug storyboard)))
-             :on-click #(dis/dispatch! [:board-nav (:slug storyboard)])}
+             :on-click #(dis/dispatch! [:storyboard-nav (:slug storyboard)])}
             (when (or (= (:access storyboard) "public")
                       (= (:access storyboard) "private"))
               [:img
