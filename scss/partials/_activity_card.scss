@@ -1,4 +1,4 @@
-div.entry-card {
+div.activity-card {
   width: 432px;
   max-height: 295px;
   float: left;
@@ -9,7 +9,7 @@ div.entry-card {
   margin: 10px 16px;
   position: relative;
 
-  &.entry-card-placeholder {
+  &.activity-card-placeholder {
     background-color: transparent;
     box-shadow: none;
     border: none;
@@ -35,7 +35,7 @@ div.entry-card {
         height: 120px;
       }
 
-      div.entry-card-title {
+      div.activity-card-title {
         font-size: 14px;
         color: $carrot_light_gray;
         @include avenir_H();
@@ -58,9 +58,9 @@ div.entry-card {
   }
 
   &.all-activity-card {
-    div.entry-card-content{
+    div.activity-card-content{
 
-      div.entry-card-body {
+      div.activity-card-body {
 
         &.has-media-preview {
           width: 100%;
@@ -78,7 +78,7 @@ div.entry-card {
         font-size: 16px;
       }
 
-      div.entry-card-media-preview {
+      div.activity-card-media-preview {
         width: 100%;
         float: initial;
         margin-top: 16px;
@@ -106,12 +106,12 @@ div.entry-card {
       top: 25px;
     }
 
-    div.entry-card-content {
-      div.entry-card-headline.has-headline {
+    div.activity-card-content {
+      div.activity-card-headline.has-headline {
         margin-top: 0px;
       }
 
-      div.entry-card-body.has-body {
+      div.activity-card-body.has-body {
         margin-top: 0px;
 
         &.has-headline {
@@ -121,7 +121,7 @@ div.entry-card {
     }
   }
 
-  div.entry-card-breadcrumb {
+  div.activity-card-breadcrumb {
     margin-bottom: 24px;
     @include avenir_R();
     font-size: 14px;
@@ -132,19 +132,19 @@ div.entry-card {
     }
   }
 
-  div.entry-card-head {
+  div.activity-card-head {
     width: 100%;
 
-    div.entry-card-head-author {
+    div.activity-card-head-author {
       float: left;
       min-width: 60%;
       padding-right: 20px;
       overflow: hidden;
 
-      @include entry-author();
+      @include activity-author();
     }
 
-    div.entry-card-head-right {
+    div.activity-card-head-right {
       float: right;
       position: relative;
 
@@ -153,15 +153,15 @@ div.entry-card {
         float: right;
       }
 
-      @include entry-topic-tag();
+      @include activity-tag();
     }
   }
 
-  div.entry-card-content {
+  div.activity-card-content {
     width: 100%;
 
-    div.entry-card-headline {
-      @include entry-headline();
+    div.activity-card-headline {
+      @include activity-headline();
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
@@ -173,7 +173,7 @@ div.entry-card {
       }
     }
 
-    div.entry-card-media-preview {
+    div.activity-card-media-preview {
       width: 72px;
       height: 72px;
       float: right;
@@ -215,8 +215,8 @@ div.entry-card {
       }
     }
 
-    div.entry-card-body {
-      @include entry-body();
+    div.activity-card-body {
+      @include activity-body();
       display: block;
       line-height: 24px;
       max-height: #{24*3}px;
@@ -266,7 +266,7 @@ div.entry-card {
       // div:last-child, p:last-child {
       //   &:after {
       //     content: "Read Full Update";
-      //     @include entry-body;
+      //     @include activity-body;
       //     color: $carrot_text_blue;
       //     cursor: pointer;
       //     margin-left: 5px;
@@ -276,7 +276,7 @@ div.entry-card {
       // &:empty {
       //   &:after {
       //     content: "Read Full Update";
-      //     @include entry-body;
+      //     @include activity-body;
       //     color: $carrot_text_blue;
       //     cursor: pointer;
       //   } 
@@ -284,7 +284,7 @@ div.entry-card {
     }
   }
 
-  div.entry-card-footer {
+  div.activity-card-footer {
     position: absolute;
     width: calc(100% - 48px);
     bottom: 10px;
@@ -333,7 +333,7 @@ div.entry-card {
           height: 20px;
         }
 
-        ul.entry-card-more-menu {
+        ul.activity-card-more-menu {
           background-color: white;
           border: 1px solid rgba(177,184,192,0.50);
           box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);

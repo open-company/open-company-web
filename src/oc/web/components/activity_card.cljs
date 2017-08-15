@@ -1,4 +1,4 @@
-(ns oc.web.components.entry-card
+(ns oc.web.components.activity-card
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
@@ -11,27 +11,27 @@
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [goog.object :as gobj]))
 
-(rum/defc entry-card-empty
+(rum/defc activity-card-empty
   [read-only?]
-  [:div.entry-card.empty-state.group
+  [:div.activity-card.empty-state.group
     [:div.empty-state-content
-      [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
-      [:div.entry-card-title
+      [:img {:src (utils/cdn "/img/ML/activity_empty_state.svg")}]
+      [:div.activity-card-title
         "This topic’s a little sparse. "
         (when-not read-only?
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit {}])}
+            {:on-click #(dis/dispatch! [:activity-edit {}])}
             "Add an update?"])]]])
 
-(defn delete-clicked [e entry-data]
+(defn delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
-                    :message "Delete this entry?"
+                    :message "Delete this activity?"
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                        (dis/dispatch! [:entry-delete entry-data])
+                                        (dis/dispatch! [:activity-delete activity-data])
                                         (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
@@ -66,14 +66,14 @@
             (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
     @found))
 
-(rum/defcs entry-card < rum/static
+(rum/defcs activity-card < rum/static
                         (rum/local false ::hovering-card)
                         (rum/local false ::showing-dropdown)
                         (rum/local false ::truncated)
                         (rum/local nil ::first-body-image)
                         {:after-render (fn [s]
-                                         (let [entry-data (first (:rum/args s))
-                                               body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
+                                         (let [activity-data (first (:rum/args s))
+                                               body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                                body-a-sel (str body-sel " a")
                                                read-more-sel (str body-a-sel ".read-more")
                                                is-all-activity (get (:rum/args s) 3)]
@@ -89,78 +89,78 @@
                                                                 (truncate-body body-sel is-all-activity)))))
                                          s)
                          :will-mount (fn [s]
-                                       (let [entry-data (first (:rum/args s))]
-                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body entry-data))))
+                                       (let [activity-data (first (:rum/args s))]
+                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data))))
                                        s)
                          :did-remount (fn [o s]
-                                        (let [old-entry-data (first (:rum/args o))
-                                              new-entry-data (first (:rum/args s))]
-                                          (when (not= (:body old-entry-data) (:body new-entry-data))
-                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-entry-data)))
-                                            (.trigger (js/$ (str "div.entry-card-" (:uuid old-entry-data) " div.entry-card-body")) "destroy")
+                                        (let [old-activity-data (first (:rum/args o))
+                                              new-activity-data (first (:rum/args s))]
+                                          (when (not= (:body old-activity-data) (:body new-activity-data))
+                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data)))
+                                            (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
                                             (reset! (::truncated s) false)))
                                         s)
                          :did-mount (fn [s]
-                                      (let [entry-data (first (:rum/args s))]
-                                        (.on (js/$ (str "div.entry-card-" (:uuid entry-data)))
+                                      (let [activity-data (first (:rum/args s))]
+                                        (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
                                          "show.bs.dropdown"
                                          (fn [e]
                                            (reset! (::showing-dropdown s) true)))
-                                        (.on (js/$ (str "div.entry-card-" (:uuid entry-data)))
+                                        (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
                                          "hidden.bs.dropdown"
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
                                       s)}
-  [s entry-data has-headline has-body is-all-activity]
-  [:div.entry-card
-    {:class (utils/class-set {(str "entry-card-" (:uuid entry-data)) true
+  [s activity-data has-headline has-body is-all-activity]
+  [:div.activity-card
+    {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-activity-card is-all-activity
-                              :story-card (= (:type entry-data) "story")})
-     :on-click #(dis/dispatch! [:entry-modal-fade-in (:board-slug entry-data) (:uuid entry-data)])
+                              :story-card (= (:type activity-data) "story")})
+     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
-    (when (= (:type entry-data) "story")
+    (when (= (:type activity-data) "story")
       [:div.triangle])
     (when is-all-activity
-      [:div.entry-card-breadcrumb
-        "In " [:span.bold (:board-name entry-data)]
-        (when (:topic-slug entry-data)
+      [:div.activity-card-breadcrumb
+        "In " [:span.bold (:board-name activity-data)]
+        (when (:topic-slug activity-data)
           " → ")
-        (when (:topic-slug entry-data)
-          [:span.bold (:topic-name entry-data)])])
+        (when (:topic-slug activity-data)
+          [:span.bold (:topic-name activity-data)])])
     ; Card header
-    (when (= (:type entry-data) "entry")
-      [:div.entry-card-head.group
+    (when (= (:type activity-data) "activity")
+      [:div.activity-card-head.group
         ; Card author
-        [:div.entry-card-head-author
-          (user-avatar-image (first (:author entry-data)))
-          [:div.name (:name (first (:author entry-data)))]
+        [:div.activity-card-head-author
+          (user-avatar-image (first (:author activity-data)))
+          [:div.name (:name (first (:author activity-data)))]
           [:div.time-since
             [:time
-              {:date-time (:created-at entry-data)
+              {:date-time (:created-at activity-data)
                :data-toggle "tooltip"
                :data-placement "top"
-               :title (utils/entry-tooltip entry-data)}
-              (utils/time-since (:created-at entry-data))]]]
+               :title (utils/activity-date-tooltip activity-data)}
+              (utils/time-since (:created-at activity-data))]]]
         ; Card labels
-        [:div.entry-card-head-right
+        [:div.activity-card-head-right
           ; Topic tag button
           (when (and (not is-all-activity)
-                     (:topic-slug entry-data))
-            (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
+                     (:topic-slug activity-data))
+            (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
               [:div.topic-tag
                 {:on-click #(do
                               (utils/event-stop %)
-                              (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug entry-data) (:topic-slug entry-data))))}
+                              (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
                 topic-name]))]])
-    [:div.entry-card-content.group
+    [:div.activity-card-content.group
       ; Headline
-      [:div.entry-card-headline
-        {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
+      [:div.activity-card-headline
+        {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
          :class (when has-headline "has-headline")}]
       ; Body
-      (let [body-without-tags (-> entry-data :body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)
-            hidden-class (str "entry-body" (:uuid entry-data))
+      (let [body-without-tags (-> activity-data :body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)
+            hidden-class (str "activity-body" (:uuid activity-data))
             $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
             appened-body (.append (js/$ (.-body js/document)) $body-content)
             _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
@@ -169,42 +169,42 @@
             $hidden-div (js/$ (str "." hidden-class))
             body-without-preview (.html $hidden-div)
             _ (.remove $hidden-div)
-            read-more-html (str "<a class=\"read-more\" href=\"" (oc-urls/entry (:board-slug entry-data) (:uuid entry-data)) "\">Read more</a>")
+            read-more-html (str "<a class=\"read-more\" href=\"" (oc-urls/activity (:board-slug activity-data) (:uuid activity-data)) "\">Read more</a>")
             emojied-body (utils/emojify (str body-without-preview (if is-all-activity "" read-more-html)))]
-        [:div.entry-card-body
+        [:div.activity-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
                                     :has-headline has-headline
                                     :has-media-preview @(::first-body-image s)})}])
       (when (and is-all-activity
                  has-body)
-        [:div.read-more "Read Full Entry"])
+        [:div.read-more "Read Full activity"])
       ; Body preview
       (when @(::first-body-image s)
-        [:div.entry-card-media-preview
+        [:div.activity-card-media-preview
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
            :class (or (:type @(::first-body-image s)) "image")}])]
-    [:div.entry-card-footer.group
-      (interactions-summary entry-data)
+    [:div.activity-card-footer.group
+      (interactions-summary activity-data)
       [:div.more-button.dropdown
         [:button.mlb-reset.more-ellipsis.dropdown-toggle
           {:type "button"
            :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-           :id (str "entry-card-more-" (:board-slug entry-data) "-" (:uuid entry-data))
+           :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
            :on-click #(utils/event-stop %)
            :title "More"
            :data-toggle "dropdown"
            :aria-haspopup true
            :aria-expanded false}]
         [:div.dropdown-menu
-          {:aria-labelledby (str "entry-card-more-" (:board-slug entry-data) "-" (:uuid entry-data))}
+          {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
           [:div.triangle]
-          [:ul.entry-card-more-menu
+          [:ul.activity-card-more-menu
             [:li
               {:on-click (fn [e]
                            (utils/event-stop e)
-                           (dis/dispatch! [:entry-edit entry-data]))}
+                           (dis/dispatch! [:activity-edit activity-data]))}
               "Edit"]
             [:li
-              {:on-click #(delete-clicked % entry-data)}
+              {:on-click #(delete-clicked % activity-data)}
               "Delete"]]]]]])
