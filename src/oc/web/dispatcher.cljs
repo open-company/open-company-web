@@ -153,9 +153,9 @@
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
                              :error-banner-time (:error-banner-time base)})]
-   :activity-editing    [[:base]
+   :entry-editing    [[:base]
                           (fn [base]
-                            (:activity-editing base))]
+                            (:entry-editing base))]
    :board-editing       [[:base]
                           (fn [base]
                             (:board-editing base))]
