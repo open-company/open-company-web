@@ -39,7 +39,7 @@
           unicode-c (apply str (map utils/unicode-char unicodes))
           shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
           ; new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")
-          new-html  (str "<img class=\"emojione emojione-" unicode-str "\" data-unicode=\"" unicode-c "\" title=\":" shortname ":\" />")]
+          new-html  (str "<img class=\"emojione emojione-" unicode-str "\" data-unicode=\"" unicode-c "\" title=\":" shortname ":\" alt=\"" unicode-c "\" />")]
         (js/pasteHtmlAtCaret new-html (.getSelection js/rangy js/window) false))))
 
 (defn check-focus [s _]
@@ -60,6 +60,9 @@
   (rum/local false ::disabled)
   
   {:init (fn [s p] (js/rangy.init) s)
+   :will-mount (fn [s]
+                 (check-focus s nil)
+                 s)
    :did-mount (fn [s] (when-not (utils/is-test-env?)
                         (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))
                               focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
@@ -80,14 +83,13 @@
         last-active-element (::last-active-element s)
         disabled (::disabled s)]
     [:div.emoji-picker.relative
-      {:style {:width "15px"
-               :z-index 1020
-               :height "15px"}}
+      {:style {:width "25px"
+               :z-index 1132
+               :height "24px"}}
       [:button
         {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
-         :style {:font-size "15px"}
          :type "button"
-         :title "Add emoji"
+         :title "Insert emoji"
          :data-placement "top"
          :data-container "body"
          :data-toggle "tooltip"
@@ -96,12 +98,11 @@
                       (.preventDefault %)
                       (if (and @caret-pos (not @visible))
                         (reset! visible true)
-                        (reset! visible false)))}
-         [:i.fa.fa-smile-o]]
+                        (reset! visible false)))}]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
                  :top (if (= position "bottom") "25px" "-220px")
-                 :left "0"}}
+                 :right "-10px"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search ""
                                                 :emojione #js {:sprites true

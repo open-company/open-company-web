@@ -1,0 +1,320 @@
+@mixin carrot_button(){
+  cursor: pointer;
+  outline: none;
+  border-width: 0;
+  opacity: 0.9;
+  background-color: #D4F6E4;
+  color: #0E8749;
+  font-weight: 900;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: .2em 1em;
+  transition: opacity 230ms, color 230ms, background-color 230ms;
+  padding-top: 9px;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.2 !important;
+  }
+
+  &:hover, &:focus {
+    background-color: #3FBD7C;
+    color: #FFFFFF;
+    opacity: 1;
+  }
+
+  &:active, &.active {
+    background-color: #0E8749;
+    color: white;
+  }
+
+  &:disabled, &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: #D4F6E4;
+      color: #0E8749;
+    }
+  }
+}
+
+div.fsp-picker {
+  background-color: rgba(#FCFBF7,0.4) !important;
+  @include avenir_M();
+
+  div {
+    background-color: white;
+  }
+
+  div.fsp-modal {
+    background-color: white;
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+    border-radius: 8px;
+
+    div.fst-sidebar {
+      background-color: white;
+    }
+
+    div.fsp-modal__sidebar {
+      transition: all 0s cubic-bezier(.84,.02,.37,.74) !important;
+      background-color: white;
+      box-shadow: none;
+
+      &:hover {
+        width: 50px !important;
+        box-shadow: none;
+        border: inherit;
+      }
+
+      div.fsp-source-list {
+        .fsp-source-list__item.active {
+          display: inherit !important;
+          .fsp-source-list__label {
+            display: none;
+          }
+        }
+        .fsp-source-list__item.active, .fsp-source-list__item:hover, .fsp-source-list__icon.fsp-icon {
+          background-color: transparent;
+        }
+
+        .fsp-source-list__item.active {
+          position: relative;
+          display: block;
+
+          &:after {
+            display: block;
+            width: 40px;
+            height: 40px;
+            top: 10px;
+            left: 10px;
+            border-radius: 20px;
+            background-color: rgba($oc_gray_7,0.4);
+            position: absolute;
+          }
+        }
+
+        .fsp-source-list__item {
+
+          &.active {
+            span.fsp-source-list__icon {
+              background-color: $carrot_light_blue;
+              border-radius: 19px;
+            }
+          }
+
+          span.fsp-icon--local_file_system {
+            background-image: cdnUrl("/img/ML/laptop-mac.png");
+            background-position: 50%;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-source-list__icon:hover {
+            background-color: $carrot_light_blue;
+            border-radius: 19px;
+          }
+
+          span.fsp-icon--googledrive {
+            background-image: cdnUrl("/img/ML/google-drive.png");
+            background-position: 50%;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-icon--dropbox {
+            background-image: cdnUrl("/img/ML/dropbox.png");
+            background-position: 50%;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-icon--onedrive {
+            background-image: cdnUrl("/img/ML/onedrive.png");
+            background-position: 50%;
+            background-size: 22px 19px;
+          }
+
+          span.fsp-icon--box {
+            background-image: cdnUrl("/img/ML/box.png");
+            background-position: 50%;
+            background-size: 22px 19px;
+          }
+        }
+      }
+
+    }
+
+    div.fsp-modal__body {
+      background-color: white;
+
+      div.fsp-header {
+        background-color: white;
+        border: none;
+
+        .fsp-picker__close-button, .fsp-picker__close-button:hover {
+          background-color: transparent;
+        }
+
+        .fsp-header-text--visible {
+          position: relative;
+          color: white;
+          margin-top: 12px;
+
+          &:after {
+            content: "My Computer";
+            text-align: center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 18px;
+            color: $oc_gray_7;
+          }
+        }
+
+        .fsp-picker__close-button.fsp-icon--close-modal {
+          width: 32px;
+          height: 32px;
+          background-color: $carrot_light_blue;
+          border-radius: 4px;
+          background-image: cdnUrl("/img/ML/board_remove_filter.png");
+          background-position: 50%;
+          background-repeat: no-repeat;
+          transition: 230ms;
+          opacity: 1;
+
+          &:hover {
+            background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
+            background-color: $carrot_text_blue;
+            opacity: 1;
+          }
+        }
+      }
+
+      div.fsp-content {
+        background-color: white;
+
+        div.fsp-footer {
+          background-color: white;
+          border-top: none;
+
+          div.fsp-nav {
+
+            span.fsp-nav__left {
+
+              span.fsp-button.fsp-button--cancel {
+                cursor: pointer;
+                outline: none;
+                border-width: 0;
+                background-color: transparent;
+                opacity: 0.9;
+                background-color: transparent;
+                color: $carrot_dark_gray;
+                font-family: $oc_main_font;
+                font-weight: 900;
+
+                &:disabled {
+                  cursor: not-allowed;
+                  opacity: 0.2 !important;
+                }
+
+                &:hover {
+                  opacity: 1;
+                  text-decoration: underline;
+                }
+              }
+            }
+            span.fsp-nav__right {
+              span.fsp-button.fsp-button--primary {
+                @include carrot_button();
+              }
+            }
+          }
+        }
+
+        div.fsp-cloud {
+          div.fsp-source-auth__wrapper {
+            div.fsp-text__title.fsp-source-auth__el {
+              color: transparent;
+              position: relative;
+              @include avenir_M();
+
+              &:after {
+                content: "Select a file to upload";
+                position: absolute;
+                width: 100%;
+                top: 0;
+                left: 0;
+                text-align: center;
+                display: block;
+                font-size: 32px;
+                line-height: 44px;
+                color: #333333;
+              }
+            }
+            div.fsp-source-auth__el {
+              font-size: 16px;
+              line-height: 24px;
+              color: $oc_gray_7;
+              width: 100%;
+              text-align: center;
+              margin-top: 20px;
+            }
+
+            button.fsp-button__auth.fsp-source-auth__el {
+              @include carrot_button();
+              width: auto;
+            }
+          }
+        }
+
+        div.fsp-drop-area {
+          background-color: transparent;
+          &.active {
+            background-color: transparent;
+          }
+
+          div.fsp-select-labels {
+            width: 100% !important;
+
+            div.fsp-drop-area__title.fsp-text__title {
+              color: transparent;
+              position: relative;
+              @include avenir_M();
+
+              &:after {
+                content: "Select a file to upload";
+                position: absolute;
+                width: 100%;
+                top: 0;
+                left: 0;
+                text-align: center;
+                display: block;
+                font-size: 32px;
+                line-height: 44px;
+                color: #333333;
+              }
+            }
+
+            div.fsp-drop-area__subtitle.fsp-text__subheader {
+              font-size: 16px;
+              line-height: 24px;
+              color: $oc_gray_7;
+              width: 100%;
+              text-align: center;
+              margin-top: 20px;
+            }
+
+          }
+
+        }
+      }
+    }
+    div.fsp-picker-modal {
+
+    }
+  }
+
+  div.fsp-picker__footer {
+    display: none;
+  }
+}

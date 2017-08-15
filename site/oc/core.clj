@@ -1,7 +1,8 @@
 (ns oc.core
   (:require [oc.pages :as pages]
             [boot.util :as util]
-            [hiccup.page :as hp]))
+            [hiccup.page :as hp]
+            [environ.core :refer (env)]))
 
 (def contact-email "hello@carrot.io")
 (def contact-mail-to (str "mailto:" contact-email))
@@ -14,6 +15,7 @@
    [:meta {:charset "utf-8"}]
    [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
+   [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
    [:title "Carrot - Get everyone aligned"]
    ;; Bootstrap - Latest compiled and minified CSS

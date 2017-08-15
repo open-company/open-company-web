@@ -1,3 +1,5 @@
+$add_media_animation: 0ms;
+
 div.entry-edit-modal-container {
   width: 100%;
   height: 100vh;
@@ -18,7 +20,7 @@ div.entry-edit-modal-container {
   }
 
   div.entry-edit-modal {
-    width: 648px;
+    width: 672px;
     min-height: 330px;
     margin: 100px auto 50px;
     position: relative;
@@ -26,7 +28,7 @@ div.entry-edit-modal-container {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
-    padding: 20px 24px 16px;
+    padding: 20px 36px 16px;
     
     div.entry-edit-modal-header{
       height: 44px;
@@ -124,10 +126,27 @@ div.entry-edit-modal-container {
               overflow: scroll;
               max-height: 250px;
 
-              li {
+              li.selectable {
                 margin: 6px 0;
+                cursor: pointer;
 
-                button.selectable {
+                &:hover {
+                  button {
+                    color: $carrot_dark_gray;
+                    text-decoration: underline;
+                    background-color: transparent;
+                  }
+                }
+
+                &.select {
+                  button {
+                    @include avenir_H();
+                    color: $carrot_dark_gray;
+                    background-color: transparent;
+                  }
+                }
+
+                button {
                   @include avenir_M();
                   font-size: 14px;
                   color: $oc_gray_7;
@@ -137,18 +156,6 @@ div.entry-edit-modal-container {
                   max-width: 60%;
                   margin: 0;
                   padding: 0;
-
-                  &.select {
-                    @include avenir_H();
-                    color: $carrot_dark_gray;
-                    background-color: transparent;
-                  }
-
-                  &:hover {
-                    color: $carrot_dark_gray;
-                    text-decoration: underline;
-                    background-color: transparent;
-                  }
                 }
 
                 &:hover {
@@ -167,64 +174,71 @@ div.entry-edit-modal-container {
                     text-decoration: underline;
                   }
                 }
+              }
 
-                &.divider {
-                  border-top: $carrot_light_gray;
-                  opacity: 0.8;
-                  width: calc(100% + 16px);
-                  cursor: default;
-                  margin: 12px 0 12px -16px;
-                  cursor: pointer;
+              li.divider {
+                border-top: 1px solid rgba($carrot_light_gray, 0.5);
+                width: calc(100% + 16px);
+                cursor: default;
+                margin: 12px 0 12px -16px;
+                min-height: initial;
+
+                &:hover {
+                  border-top: 1px solid rgba($carrot_light_gray, 0.5);
                   min-height: initial;
+                  background-color: transparent;
+                  color: transparent;
+                }
+              }
+
+              li.entry-edit-new-topic {
+
+                &:hover {
+                  background-color: initial;
                 }
 
-                &.entry-edit-new-topic {
+                button.entry-edit-new-topic-plus {
+                  width: 20px;
+                  height: 20px;
+                  padding: 0;
+                  float: left;
+                  margin-right: 10px;
+                  margin-top: 3px;
                   cursor: pointer;
+                  transition: $add_media_animation;
+                  background-color: rgba(82,222,149,0.25);
+                  background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+                  background-repeat: no-repeat;
+                  background-position: 50%;
+                  background-size: 8px 8px;
+                  border-radius: 2px;
+                  float: left;
 
-                  button.entry-edit-new-topic-plus {
-                    width: 20px;
-                    height: 20px;
-                    padding: 0;
-                    float: left;
-                    margin-right: 10px;
-                    margin-top: 3px;
-                    cursor: pointer;
-                    transition: 230ms;
-                    background-color: rgba(82,222,149,0.25);
-                    background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    background-size: 8px 8px;
-                    border-radius: 2px;
-                    float: left;
-
-                    &:hover {
-                      background-color: #3FBD7C;
-                      background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
-                    }
+                  &:hover {
+                    background-color: #3FBD7C;
+                    background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
                   }
+                }
 
-                  button.entry-edit-new-topic-create {
-                    float: left;
-                    margin-left: 10px;
-                    height: 26px;
-                    font-size: 14px;
-                  }
+                button.entry-edit-new-topic-create {
+                  float: left;
+                  margin-left: 10px;
+                  height: 26px;
+                  font-size: 14px;
+                }
 
-                  input.entry-edit-new-topic-field {
-                    float: left;
-                    border: none;
-                    outline: none;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $carrot_dark_gray;
-                    margin: 0.3rem 0;
-                    padding: 0;
-                    // width: 100%;
+                input.entry-edit-new-topic-field {
+                  float: left;
+                  border: none;
+                  outline: none;
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $carrot_dark_gray;
+                  margin: 0.3rem 0;
+                  padding: 0;
 
-                    @include placeholder(){
-                      color: $carrot_light_gray;
-                    }
+                  @include placeholder(){
+                    color: $carrot_light_gray;
                   }
                 }
               }
@@ -243,7 +257,7 @@ div.entry-edit-modal-container {
     }
 
     div.entry-edit-modal-body {
-      margin: 24px 0;
+      margin: 24px 0 0;
 
       div.entry-edit-headline {
         border: none;
@@ -268,10 +282,14 @@ div.entry-edit-modal-container {
         color: $carrot_dark_gray;
         @include avenir_R();
         font-size: 16px;
-        margin: 24px 0 0;
+        margin: 24px 0;
         cursor: text;
-        min-height: 95px;
+        min-height: 85px;
         @include entry-body();
+
+        &.hide-placeholder:after {
+          display: none !important;
+        }
 
         &.medium-editor-placeholder:after {
           color: $oc_gray_7 !important;
@@ -281,13 +299,158 @@ div.entry-edit-modal-container {
           margin: 0;
         }
       }
+
+      div.entry-edit-controls-medias {
+        background-color: white;
+
+        button.media {
+          width: 25px;
+          height: 24px;
+          background-position: 50%;
+          background-size: 12px;
+          background-repeat: no-repeat;
+          border-radius: 12px;
+          border: 1px solid rgba($oc_gray_7, 0.2);
+          padding: 0;
+          float: left;
+
+          &:hover, &.active {
+            border: 1px solid rgba($carrot_text_blue, 0.3);
+          }
+        }
+
+        button.add-media-bt {
+          background-image: cdnUrl("/img/ML/add_media_plus_gray.svg");
+          background-position: 0px 0px;
+          transition: transform $add_media_animation, margin-right $add_media_animation;
+          float: left;
+          margin-right: 0px;
+          border: none;
+          background-size: 24px;
+          border-radius: inherit;
+
+          &.disabled {
+            opacity: 0.2;
+          }
+
+          &:hover {
+            background-image: cdnUrl("/img/ML/add_media_plus_blue.svg");
+            border: none;
+          }
+
+          &.expanded {
+            transform: rotate(45deg);
+            margin-right: 10px;
+          }
+        }
+
+        div.entry-edit-controls-medias-container {
+          width: 0px;
+          height: 32px;
+          transition: width $add_media_animation;
+          float: left;
+          position: relative;
+          overflow: hidden;
+
+          button.media {
+            margin-left: 0px;
+            transform: rotate(0deg);
+            transition: transform $add_media_animation, margin-left $add_media_animation, opacity $add_media_animation;
+            float: left;
+            top: 0px;
+            left: 0px;
+            position: absolute;
+            opacity: 0;
+          }
+
+          button.media-photo {
+            background-image: cdnUrl("/img/ML/media_photo.png");
+            background-size: 12px 12px;
+
+            &.avtive, &:hover {
+              background-image: cdnUrl("/img/ML/media_photo_blue.png");
+            }
+          }
+
+          button.media-video {
+            background-image: cdnUrl("/img/ML/media_video.png");
+            background-size: 12px 8px;
+            top: -14px;
+
+            &.avtive, &:hover {
+              background-image: cdnUrl("/img/ML/media_video_blue.png");
+            }
+          }
+
+          button.media-chart {
+            margin-right: 0px;
+            background-image: cdnUrl("/img/ML/media_chart.png");
+            background-size: 16px 8px;
+            top: -14px;
+
+            &.avtive, &:hover {
+              background-image: cdnUrl("/img/ML/media_chart_blue.png");
+            }
+          }
+
+          &.expanded {
+            width: 250px;
+
+            button.media {
+              opacity: 1;
+            }
+
+            button.media-photo {
+              transform: rotate(0deg);
+            }
+
+            button.media-video {
+              margin-left: 30px;
+              transform: rotate(360deg);
+              top: -14px;
+            }
+
+            button.media-chart {
+              margin-left: 60px;
+              transform: rotate(720deg);
+            }
+          }
+        }
+      }
+
+      div.entry-edit-controls {
+        margin-bottom: 16px;
+
+        div.emoji-picker {
+          float: right;
+        }
+      }
+    }
+
+    div.topic-attachments a.topic-attachment {
+      border-top: 1px solid rgba(78,90,107,0.2);
     }
 
     div.entry-edit-modal-footer {
       height: 40px;
       margin-top: 16px;
 
-      button {
+      button.attachment {
+        float: left;
+        margin: 0 15px 0 0;
+        padding: 9px 0 0 0;
+        font-size: 22px;
+        height: 40px;
+        opacity: 0.8;
+        color: $oc_gray_7;
+        transform: rotate(90deg);
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      button.form-action-bt {
         margin-left: 15px;
         float: right;
         height: 40px;

@@ -2,7 +2,6 @@ $comment_avatar_size: 23;
 
 div.comments {
   width: 100%;
-  overflow: hidden;
   position: relative;
   height: 100%;
 
@@ -79,7 +78,7 @@ div.comments {
         div.comment-avatar {
           width: #{$comment_avatar_size}px;
           height: #{$comment_avatar_size}px;
-          background-position: center;
+          background-position: 50%;
           background-size: #{$comment_avatar_size}px #{$comment_avatar_size}px;
           border-radius: #{$comment_avatar_size / 2}px;
         }
@@ -121,24 +120,26 @@ div.comments {
       right: 0;
       position: absolute;
       bottom: 0px;
+      width: calc(100% + 16px);
 
       &.expanded{
         div.add-comment-internal {
           textarea.add-comment {
             height: 70px;
+            overflow: auto;
           }
         }
       }
 
       div.user-avatar-img-container {
-        width: 20px;
-        height: 20px;
+        width: 23px;
+        height: 23px;
         float: left;
 
         img.user-avatar-img {
-          max-width: 20px;
-          max-height: 20px;
-          border-radius: 10px;
+          max-width: 23px;
+          max-height: 23px;
+          border-radius: 11.5px;
         }
       }
 
@@ -156,6 +157,7 @@ div.comments {
           height: 18px;
           font-size: 14px;
           transition: 230ms;
+          overflow: hidden;
 
           @include placeholder {
             color: $carrot_light_gray_1;

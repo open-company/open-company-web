@@ -168,6 +168,9 @@
         (< v 100) "0")
     v))
 
+(defn get-time [js-date]
+  (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))
@@ -563,6 +566,15 @@
          #js [0 scroll-y]
          (or duration oc-animation-duration))))
 
+(defn scroll-to-bottom [elem & [animated]]
+  (let [elem-scroll-top (.-scrollHeight elem)]
+    (.play
+    (new Scroll
+         elem
+         #js [0 (.-scrollTop elem)]
+         #js [0 elem-scroll-top]
+         (if animated 320 oc-animation-duration)))))
+
 (defn scroll-to-element [elem]
   (let [elem-scroll-top (offset-top elem)]
     (scroll-to-y elem-scroll-top)))
@@ -635,7 +647,7 @@
   {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
-   :extensions #js {:autolist (js/AutoList.)}
+   :extensions {:autolist (js/AutoList.)}
    :autoLink true
    :anchor #js {:customClassOption nil
                 :customClassOptionText "Button"
@@ -671,19 +683,20 @@
         unicode-string (.toImage js/emojione text-string)
         r (js/RegExp "<span " "ig")
         with-img (.replace unicode-string r "<img ")
-        without-span (.replace with-img (js/RegExp ">.{1,2}</span>" "ig") "/>")]
+        without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
+
     (if plain-text
       without-span
       #js {"__html" without-span})))
 
 (defn strip-HTML-tags [text]
   (when text
-    (let [reg (js/RegExp. "</?[^>]+(>|$)" "g")]
+    (let [reg (js/RegExp. "</?[^>]+(>|$)" "ig")]
       (.replace text reg ""))))
 
 (defn strip-img-tags [text]
   (when text
-    (let [reg (js/RegExp. "<img/?[^>]+(>|$)" "g")]
+    (let [reg (js/RegExp. "<img/?[^>]+(>|$)" "ig")]
       (.replace text reg ""))))
 
 (defn disable-scroll []
@@ -970,7 +983,7 @@
     (.replace gchart-url #"(?i)/u/\d+" "")
     ""))
 
-(defn check-google-chart-url [url]
+(defn valid-google-chart-url? [url]
   (when (string? url)
     (let [cleaned-url (clean-google-chart-url url)]
       (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))

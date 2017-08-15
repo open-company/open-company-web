@@ -1,5 +1,7 @@
 // BassCSS
 @import "vendor/bass";
+// Material design Bootstrap reset
+@import "vendor/_materialdesign";
 // Vars
 @import "vars/main";
 // Mixins
@@ -11,6 +13,8 @@
 @import "modules/_fonts";
 @import "modules/_no_user_select";
 @import "modules/_animation";
+// Reset style of Filestack picker
+@import "vendor/_filestack";
 
 // Components
 @import "partials/_navbar";
@@ -76,3 +80,6 @@
 @import "partials/_entry_modal";
 @import "partials/_entry_edit";
 @import "partials/_alert_modal";
+@import "partials/_entry_video_modal";
+@import "partials/_entry_chart_modal";
+@import "partials/_entry_attachments";

@@ -33,7 +33,7 @@ div.entry-modal-container {
       background-color: $carrot_light_blue;
       border-radius: 4px;
       background-image: cdnUrl("/img/ML/board_remove_filter.png");
-      background-position: center;
+      background-position: 50%;
       background-repeat: no-repeat;
       transition: 230ms;
       opacity: 1;
@@ -69,6 +69,7 @@ div.entry-modal-container {
           div.entry-modal-head{
             div.entry-modal-head-left {
               float: left;
+              min-width: 300px;
               @include entry-author();
             }
 
@@ -103,13 +104,14 @@ div.entry-modal-container {
                 min-height: 166px;
               }
             }
-
             div.entry-modal-footer {
-              margin-top: 24px;
-              width: 100%;
+              width: 569px;
               height: 40px;
               position: absolute;
               bottom: 0px;
+              background-color: white;
+              margin: 24px 16px 0 0;
+              padding-right: 4px;
 
               div.reactions {
                 margin-top: 7px;
@@ -132,7 +134,7 @@ div.entry-modal-container {
                     display: block;
                     background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
                     background-position: right center;
-                    background-size: 16px 16px;
+                    background-size: 6px 16px;
                     background-repeat: no-repeat;
                     margin-left: 6px;
                   }

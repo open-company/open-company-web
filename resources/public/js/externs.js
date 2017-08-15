@@ -41,6 +41,8 @@ $.prop = function(){};
 $.dropdown = function(){};
 $.not = function(){};
 $.dotdotdot = function(){};
+$.trigger = function(){};
+$.ajax = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -76,5 +78,7 @@ var filestack = {};
 filestack.init = function(){};
 filestack.pick = function(){};
 filestack.then = function(){};
+filestack.transform = function(){};
+filestack.storeURL = function(){};
 
 var mailchimpApiSubmit = function(){};

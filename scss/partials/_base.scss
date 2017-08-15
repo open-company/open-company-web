@@ -27,10 +27,13 @@ html, body {
   }
 }
 
-.tooltip-inner {
-  white-space:pre-wrap;
-  max-width: none;
-  text-align: left;
+.tooltip {
+  z-index: 1500;
+  .tooltip-inner {
+    white-space:pre-wrap;
+    max-width: none;
+    text-align: left;
+  }
 }
 
 div.fullscreen-page {

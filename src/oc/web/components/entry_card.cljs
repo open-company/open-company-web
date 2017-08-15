@@ -26,10 +26,10 @@
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :message "Delete this entry?"
-                    :first-button-title "No"
-                    :first-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :second-button-title "Yes"
-                    :second-button-cb #(do
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
                                         (dis/dispatch! [:entry-delete entry-data])
                                         (dis/dispatch! [:alert-modal-hide]))
                     }]
@@ -43,10 +43,33 @@
         :ellipsis "... "
         :after "a.read-more"}))
 
+(defn get-first-body-thumbnail [body]
+  (let [$body (js/$ (str "<div>" body "</div>"))
+        thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
+        found (atom nil)]
+    (dotimes [el-num (.-length thumb-els)]
+      (let [el (aget thumb-els el-num)
+            $el (js/$ el)]
+        (when-not @found
+          (if (= (s/lower (.-tagName el)) "img")
+            (let [width (.attr $el "width")
+                  height (.attr $el "height")]
+              (when (and (not @found)
+                         (or (<= width (* height 2))
+                             (<= height (* width 2))))
+                (reset! found
+                  {:type "image"
+                   :thumbnail (if (.data $el "thumbnail")
+                                (.data $el "thumbnail")
+                                (.attr $el "src"))})))
+            (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
+    @found))
+
 (rum/defcs entry-card < rum/static
                         (rum/local false ::hovering-card)
                         (rum/local false ::showing-dropdown)
                         (rum/local false ::truncated)
+                        (rum/local nil ::first-body-image)
                         {:after-render (fn [s]
                                          (let [entry-data (first (:rum/args s))
                                                body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
@@ -57,16 +80,22 @@
                                            ; Prevent read more link to change directly the url
                                            (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
-                                           (when-not @(::truncated s)
+                                           (when (compare-and-set! (::truncated s) false true)
                                              (truncate-body body-sel)
-                                             (utils/after 1 #(truncate-body body-sel))
-                                             (reset! (::truncated s) true))
-                                           )
+                                             (utils/after 10 #(do
+                                                                (.trigger (js/$ body-sel) "destroy")
+                                                                (truncate-body body-sel)))))
                                          s)
+                         :will-mount (fn [s]
+                                       (let [entry-data (first (:rum/args s))]
+                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body entry-data))))
+                                       s)
                          :did-remount (fn [o s]
                                         (let [old-entry-data (first (:rum/args o))
                                               new-entry-data (first (:rum/args s))]
                                           (when (not= (:body old-entry-data) (:body new-entry-data))
+                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-entry-data)))
+                                            (.trigger (js/$ (str "div.entry-card-" (:uuid old-entry-data) " div.entry-card-body")) "destroy")
                                             (reset! (::truncated s) false)))
                                         s)
                          :did-mount (fn [s]
@@ -98,10 +127,11 @@
              :data-toggle "tooltip"
              :data-placement "top"
              :data-container "body"
-             :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
+             :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
             (utils/time-since (:updated-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
+        ; Topic tag button
         (when (:topic-slug entry-data)
           (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
             [:div.topic-tag
@@ -110,14 +140,31 @@
                             (router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data))))}
               topic-name]))]]
     [:div.entry-card-content.group
+      ; Headline
       [:div.entry-card-headline
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
+      ; Body
       (let [body-without-images (utils/strip-img-tags (:body entry-data))
-            emojied-body (utils/emojify (str body-without-images "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
+            hidden-class (str "entry-body" (:uuid entry-data))
+            $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-images "</div>"))
+            appened-body (.append (js/$ (.-body js/document)) $body-content)
+            _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
+                                                                            (let [$this (js/$ this)]
+                                                                              (.remove $this))))
+            $hidden-div (js/$ (str "." hidden-class))
+            body-without-preview (.html $hidden-div)
+            _ (.remove $hidden-div)
+            emojied-body (utils/emojify (str body-without-preview "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
-           :class (when has-body "has-body")}])]
+           :class (utils/class-set {:has-body has-body
+                                    :has-media-preview @(::first-body-image s)})}])
+      ; Body preview
+      (when @(::first-body-image s)
+        [:div.entry-card-media-preview
+          {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
+           :class (or (:type @(::first-body-image s)) "image")}])]
     [:div.entry-card-footer.group
       (interactions-summary entry-data)
       [:div.more-button.dropdown

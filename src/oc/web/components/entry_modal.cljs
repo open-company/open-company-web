@@ -2,12 +2,15 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.components.entry-attachments :refer (entry-attachments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
@@ -23,18 +26,18 @@
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :message "Delete this entry?"
-                    :first-button-title "No"
-                    :first-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :second-button-title "Yes"
-                    :second-button-cb #(do
-                                        (let [org-slug (router/current-org-slug)
-                                              board-slug (router/current-board-slug)
-                                              last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                                          (if (= last-filter :by-topic)
-                                            (router/nav! (oc-urls/board-sort-by-topic))
-                                            (router/nav! (oc-urls/board))))
-                                        (dis/dispatch! [:entry-delete entry-data])
-                                        (dis/dispatch! [:alert-modal-hide]))
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                       (let [org-slug (router/current-org-slug)
+                                             board-slug (router/current-board-slug)
+                                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
+                                         (if (= last-filter :by-topic)
+                                           (router/nav! (oc-urls/board-sort-by-topic))
+                                           (router/nav! (oc-urls/board))))
+                                       (dis/dispatch! [:entry-delete entry-data])
+                                       (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
@@ -43,6 +46,8 @@
                          (rum/local false ::animate)
                          (rum/local false ::hovering-card)
                          (rum/local false ::showing-dropdown)
+                         (rum/local nil ::column-height)
+                         (rum/local nil ::window-resize-listener)
                          rum/reactive
                          (drv/drv :entry-modal-fade-in)
                          {:before-render (fn [s]
@@ -50,6 +55,10 @@
                                                     (= @(drv/get-ref s :entry-modal-fade-in) (:uuid (first (:rum/args s)))))
                                              (reset! (::animate s) true))
                                            s)
+                          :will-mount (fn [s]
+                                        (reset! (::window-resize-listener s)
+                                         (events/listen js/window EventType/RESIZE #(reset! (::column-height s) nil)))
+                                        s)
                           :did-mount (fn [s]
                                        ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                        (dommy/add-class! (sel1 [:body]) :no-scroll)
@@ -69,13 +78,21 @@
                           :after-render (fn [s]
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
+                                          (when-not @(::column-height s)
+                                            (reset! (::column-height s) (max 284 (.height (js/$ ".entry-left-column"))))
+                                            (.load (js/$ ".entry-modal-content-body img")
+                                             #(reset! (::column-height s) (max 284 (.height (js/$ ".entry-left-column"))))))
                                           s)
                           :will-unmount (fn [s]
                                           ;; Remove no-scroll class from the body tag
                                           (dommy/remove-class! (sel1 [:body]) :no-scroll)
+                                          ;; Remove window resize listener
+                                          (when @(::window-resize-listener s)
+                                            (events/unlistenByKey @(::window-resize-listener s))
+                                            (reset! (::window-resize-listener s) nil))
                                           s)}
   [s entry-data]
-  (let [column-height (str (max 284 (.height (js/$ ".entry-left-column"))) "px")]
+  (let [column-height @(::column-height s)]
     [:div.entry-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
@@ -87,9 +104,9 @@
           {:on-click #(close-clicked s)}]
         [:div.entry-modal-inner.group
           [:div.entry-left-column
-            {:style #js {:minHeight column-height}}
+            {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.entry-left-column-content
-              {:style #js {:minHeight column-height}}
+              {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
               [:div.entry-modal-head.group
                 [:div.entry-modal-head-left
                   (user-avatar-image (first (:author entry-data)))
@@ -100,11 +117,11 @@
                        :data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
-                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (.toLocaleTimeString js-date)))}
+                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
                       (utils/time-since (:updated-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
-                    (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
+                    (let [topic-name (or (:topic-name entry-data) (string/upper (:topic-slug entry-data)))]
                       [:div.topic-tag
                         {:on-click #(close-clicked s (:topic-slug entry-data))}
                         topic-name]))]]
@@ -114,6 +131,7 @@
                 [:div.entry-modal-content-body
                   {:dangerouslySetInnerHTML (utils/emojify (:body entry-data))
                    :class (when (empty? (:headline entry-data)) "no-headline")}]
+                (entry-attachments (:attachments entry-data))
                 [:div.entry-modal-footer.group
                   (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)
                   [:div.entry-modal-footer-right
@@ -139,6 +157,6 @@
                             {:on-click #(delete-clicked % entry-data)}
                             "Delete"]]]]]]]]]
           [:div.entry-right-column
-            {:style #js {:minHeight column-height}}
+            {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.entry-right-column-content
               (comments (:uuid entry-data))]]]]]))

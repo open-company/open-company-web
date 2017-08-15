@@ -378,6 +378,7 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
@@ -391,6 +392,8 @@
           [:link {:rel "stylesheet" :href "/css/normalize.css"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          ;; MaterialDesign icon fonts from https://materialdesignicons.com
+          [:link {:href "//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css" :media "all" :rel "stylesheet" :type "text/css"}]
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
@@ -412,8 +415,6 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css"}]
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
-          ;; Filestack
-          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.4.1.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
@@ -458,6 +459,7 @@
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
+          [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
@@ -468,6 +470,8 @@
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          ;; MaterialDesign icon fonts from https://materialdesignicons.com
+          [:link {:rel "stylesheet" :href "//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css" :media "all" :type "text/css"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Google fonts Domine and OpenSans
@@ -478,8 +482,6 @@
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
-          ;; Filestack
-          [:script {:type "text/javascript" :src "//static.filestackapi.com/v3/filestack-0.1.10.js"}]
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
    :body [:body.small-footer

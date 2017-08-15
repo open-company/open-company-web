@@ -58,7 +58,7 @@ div.entry-card {
   }
 
   div.entry-card-head {
-    width: 100%;
+    width: 384px;
 
     div.entry-card-head-author {
       float: left;
@@ -71,6 +71,7 @@ div.entry-card {
 
     div.entry-card-head-right {
       float: right;
+      position: relative;
 
       div.topic-tag {
         margin-top: 0;
@@ -82,7 +83,7 @@ div.entry-card {
   }
 
   div.entry-card-content {
-    width: 100%;
+    width: 384px;
 
     div.entry-card-headline {
       @include entry-headline();
@@ -90,11 +91,52 @@ div.entry-card {
       width: 100%;
       overflow: hidden;
       max-height: 28px;
-      white-space: nowrap;
 
       &.has-headline {
         margin-top: 24px;
         height: 28px;
+      }
+    }
+
+    div.entry-card-media-preview {
+      width: 72px;
+      height: 72px;
+      float: right;
+      text-align: center;
+      white-space: nowrap;
+      margin-top: 16px;
+      overflow: hidden;
+      background-position: 50%;
+      background-size: cover;
+      border-radius: 4px;
+      position: relative;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:after {
+        position: absolute;
+        font-family: FontAwesome;
+        font-size: 20px;
+        color: white;
+        opacity: 0.5;
+        top: 50%;
+        left: 50%;
+      }
+
+      &:hover {
+        &:after {
+          opacity: 0.8;
+        }
+      }
+
+      &.video {
+        &:after {
+          content: "\f04b";
+          margin-left: -8px;
+          margin-top: -14px;
+        }
       }
     }
 
@@ -107,6 +149,16 @@ div.entry-card {
       &.has-body {
         margin-top: 16px;
         height: #{24*3}px;
+      }
+
+      &.has-media-preview {
+        width: calc(100% - 72px - 16px;);
+        margin-right: 16px;
+        float: left;
+      }
+
+      .carrot-no-preview {
+        display: none;
       }
 
       p {
@@ -180,7 +232,7 @@ div.entry-card {
         display: block;
         background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
         background-position: right center;
-        background-size: 16px 16px;
+        background-size: 6px 16px;
         background-repeat: no-repeat;
       }
 

@@ -990,9 +990,9 @@
         next-board-data (assoc board-data :topics next-topics)
         next-db (assoc-in db board-key next-board-data)]
     (if use-in-new-entry?
-      (-> next-db
-        (assoc-in [:entry-editing :topic-slug] (:slug topic-map))
-        (assoc-in [:entry-editing :topic-name] (:name topic-map)))
+      (assoc next-db :entry-editing (merge (:entry-editing next-db) {:topic-slug (:slug topic-map)
+                                                                     :topic-name (:name topic-map)
+                                                                     :has-changes true}))
       next-db)))
 
 (defn author-data [current-user-data as-of]
