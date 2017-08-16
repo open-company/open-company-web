@@ -192,6 +192,8 @@ provided in the table below:
 
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
+|  :activity-delete | UI | Delete the selected entry. |
+|  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |
@@ -221,8 +223,6 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
-|  :entry-delete | UI | Delete the selected entry. |
-|  :entry-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
