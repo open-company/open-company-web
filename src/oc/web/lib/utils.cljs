@@ -356,7 +356,6 @@
   [story-body storyboard-slug]
   (-> story-body
     (assoc :read-only (readonly-story? (:links story-body)))
-    (assoc :uuid (:slug story-body))
     (assoc :type "story")
     (assoc :board-slug storyboard-slug)))
 
