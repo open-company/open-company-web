@@ -820,13 +820,13 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:entry-save/finish]))))))
 
-(defn delete-entry [entry-data]
-  (when entry-data
-    (when-let [entry-delete-link (utils/link-for (:links entry-data) "delete")]
-      (storage-delete (:href entry-delete-link)
-        {:headers (headers-for-link entry-delete-link)}
+(defn delete-activity [activity-data]
+  (when activity-data
+    (when-let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
+      (storage-delete (:href activity-delete-link)
+        {:headers (headers-for-link activity-delete-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-delete/finish]))))))
+          (dispatcher/dispatch! [:activity-delete/finish]))))))
 
 (defn get-all-activity [org-data & [activity-link year month]]
   (when org-data
