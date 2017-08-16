@@ -51,7 +51,7 @@
               {:on-click (fn [_]
                             (dis/dispatch! [:comment-add activity-uuid @v])
                             (reset! v ""))}
-              "Reply"]]]]]))
+              "Add"]]]]]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
