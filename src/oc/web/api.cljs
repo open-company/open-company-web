@@ -209,7 +209,7 @@
           (if (= status 409)
             ; Board name exists
             (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
-            (dispatcher/dispatch! [:board-edit/finish (json->cljs body)])))))))
+            (dispatcher/dispatch! [:board-edit-save/finish (json->cljs body)])))))))
 
 (defn patch-org [data]
   (when data
@@ -587,7 +587,7 @@
             (if (= status 409)
               ; Board name exists
               (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
-              (dispatcher/dispatch! [:board-edit/finish board-data]))))))))
+              (dispatcher/dispatch! [:board-edit-save/finish board-data]))))))))
 
 (defn add-author
   "Given a user-id add him as an author to the current org.

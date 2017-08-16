@@ -197,8 +197,11 @@ provided in the table below:
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |
+|  :all-activity-calendar | UI | Load activities from a calendar link. |
 |  :all-activity-get | UI | Start loading all activity. |
 |  :all-activity-get/finish | API | All activity data loaded, dispatch them. |
+|  :all-activity-more | UI | Load more activities automatically when the user scrolls. |
+|  :all-activity-more/finish | API | More activities loaded, concatenate the new results with the old ones. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -209,10 +212,13 @@ provided in the table below:
 |  :board-delete | UI | Delete a board of the current org. |
 |  :board-edit | UI | Start the board edit for existing board and new board. |
 |  :board-edit-save | UI | Save the board edited data. |
+|  :board-edit-save/finish | API | Board created or updated. |
 |  :board-edit/dismiss | UI | Starts the dismiss process of the board editing modal. |
 |  :board-nav | UI | Navigate to another board: it needs an action because it reset the board filters before navigating away. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |
+|  :calendar-get | UI | Load the calendar data to show the AA sidebar. |
+|  :calendar-get/finish | API | Calendar data finished loading. |
 |  :channels-enumerate | UI | Start the request to load the Slack channels give a Slack team. |
 |  :channels-enumerate/success | API | Slack channels loaded, it saves them in the proper place of the app-state. |
 |  :comment-add | UI | Add a comment to an entry. |
