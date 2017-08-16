@@ -1076,17 +1076,17 @@
          (router/nav! all-activity-url)))
     db))
 
-(defmethod dispatcher/action :entry-delete
-  [db [_ entry-data]]
+(defmethod dispatcher/action :activity-delete
+  [db [_ activity-data]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
-        filtered-entries (filter #(not= (:uudi %) (:uuid entry-data)) (:entries board-data))
+        filtered-entries (filter #(not= (:uudi %) (:uuid activity-data)) (:entries board-data))
         sorted-entries (vec (sort-by :created-at filtered-entries))
         next-board-data (assoc board-data :entries sorted-entries)]
-    (api/delete-entry entry-data)
+    (api/delete-activity activity-data)
     (assoc-in db board-key next-board-data)))
 
-(defmethod dispatcher/action :entry-delete/finish
+(defmethod dispatcher/action :activity-delete/finish
   [db [_]]
   (api/get-board (dispatcher/board-data))
   db)
