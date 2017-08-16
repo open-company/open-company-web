@@ -51,7 +51,7 @@
 (defn setup-mobile-nav-height [mobile-menu-open]
   (when (responsive/is-mobile-size?)
     (let [nav-item (sel1 [:nav])
-          menu-items-count (count (sel [:ul.menu :li.oc-menu-item]))
+          menu-items-count (count (sel [:div.menu :div.oc-menu-item]))
           final-nav-height (str (+ nav-height
                                    (when mobile-menu-open (+ (* menu-item-height menu-items-count) 14)))
                                 "px")]
@@ -67,53 +67,55 @@
                                  s)}
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
-        menu-classes (str "menu"
-                       (if (responsive/is-mobile-size?)
-                          (when mobile-menu-open " mobile-menu-open")
-                          " dropdown-menu"))
         is-admin? (jwt/is-admin? (:team-id org-data))
         is-author? (utils/link-for (:links org-data) "create")]
-    [:div
-      {:class menu-classes
+    (js/console.log "menu/render" (utils/class-set {:menu true
+                                :dropdown-menu (not (responsive/is-mobile-size?))
+                                :mobile-menu-open (and (responsive/is-mobile-size?)
+                                                       mobile-menu-open)}))
+    [:div.menu.group
+      {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
+                                :mobile-menu-open (and (responsive/is-mobile-size?)
+                                                       mobile-menu-open)})
        :aria-labelledby "dropdown-toggle-menu"}
-      [:div.top-arrow
-        [:div.menu-header
-          [:div.user-name
-            (str "Hi " (jwt/get-key :first-name) "!")]
-          [:div.user-type
-            (cond
-              is-admin?
-              "You're an Admin"
-              is-author?
-              "You're a Contributor")]]
-        (when (and is-admin?
-                   (router/current-org-slug)
-                   (not (responsive/is-mobile-size?)))
-          [:div.oc-menu-item
-            [:a {:href (oc-urls/org-settings) :on-click team-settings-click} "Team Settings"]])
-        (when (and (router/current-org-slug)
-                   is-admin?)
-          [:div.oc-menu-item
-            [:a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Members"]])
-        (when (and (router/current-org-slug)
-                   is-admin?)
-          [:div.oc-menu-item
-            [:a {:href (oc-urls/org-team-settings) :on-click um-click} "Invite People"]])
-        (when (and (router/current-org-slug)
-                   is-admin?)
-          [:div.oc-menu-item.divider-item
-            [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
-        ;; Temp commenting this out since we need API support to know how many companies the user has
-        (when (and (jwt/jwt)
-                   (or is-admin?
-                       is-author?))
-          [:div.oc-menu-item.divider-item
-            [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
-        (when (jwt/jwt)
-          [:div.oc-menu-item
-            [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
-        (if (jwt/jwt)
-          [:div.oc-menu-item
-            [:a.sign-out {:href oc-urls/logout :on-click logout-click} "Sign Out"]]
-          [:div.oc-menu-item
-            [:a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up"]])]]))
+      [:div.top-arrow]
+      [:div.menu-header
+        [:div.user-name
+          (str "Hi " (jwt/get-key :first-name) "!")]
+        [:div.user-type
+          (cond
+            is-admin?
+            "You're an Admin"
+            is-author?
+            "You're a Contributor")]]
+      (when (and is-admin?
+                 (router/current-org-slug)
+                 (not (responsive/is-mobile-size?)))
+        [:div.oc-menu-item
+          [:a {:href (oc-urls/org-settings) :on-click team-settings-click} "Team Settings"]])
+      (when (and (router/current-org-slug)
+                 is-admin?)
+        [:div.oc-menu-item
+          [:a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Members"]])
+      (when (and (router/current-org-slug)
+                 is-admin?)
+        [:div.oc-menu-item
+          [:a {:href (oc-urls/org-team-settings) :on-click um-click} "Invite People"]])
+      (when (and (router/current-org-slug)
+                 is-admin?)
+        [:div.oc-menu-item.divider-item
+          [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
+      ;; Temp commenting this out since we need API support to know how many companies the user has
+      (when (and (jwt/jwt)
+                 (or is-admin?
+                     is-author?))
+        [:div.oc-menu-item.divider-item
+          [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
+      (when (jwt/jwt)
+        [:div.oc-menu-item
+          [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
+      (if (jwt/jwt)
+        [:div.oc-menu-item
+          [:a.sign-out {:href oc-urls/logout :on-click logout-click} "Sign Out"]]
+        [:div.oc-menu-item
+          [:a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up"]])]))
