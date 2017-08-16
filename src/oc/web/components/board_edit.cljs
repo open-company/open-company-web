@@ -199,7 +199,8 @@
                                                                :solid-button-title "Yes"
                                                                :solid-button-cb (fn []
                                                                                   (dis/dispatch! [:board-delete (:slug board-editing)])
-                                                                                  (dis/dispatch! [:alert-modal-hide]))}]))}
+                                                                                  (dis/dispatch! [:alert-modal-hide])
+                                                                                  (close-clicked s))}]))}
                 "Delete"])]
           [:div.board-edit-footer-right.group
             [:button.mlb-reset.mlb-default
