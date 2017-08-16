@@ -79,6 +79,9 @@
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
                                        s)
+                          :did-remount (fn [o s]
+                                         (reset! (::column-height s) nil)
+                                         s)
                           :after-render (fn [s]
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
