@@ -20,7 +20,7 @@
               :let [has-headline (not (empty? (:headline story)))
                     has-body (not (empty? (:body story)))]]
           [:div.story-card-row.group
-            {:key (str "story-latest-" (:slug story))}
+            {:key (str "story-latest-" (:uuid story))}
             (let [author (first (:author story))]
               [:div.story-card-row-left.group
                 (user-avatar-image author)

@@ -178,7 +178,7 @@
             body-without-preview (.html $hidden-div)
             _ (.remove $hidden-div)
             activity-url (if (= (:type activity-data) "story")
-                           (oc-urls/story (:board-slug activity-data) (:slug activity-data))
+                           (oc-urls/story (:board-slug activity-data) (:uuid activity-data))
                            (oc-urls/entry (:board-slug activity-data) (:uuid activity-data)))
             read-more-html (str "<a class=\"read-more\" href=\"" activity-url "\">Read more</a>")
             emojied-body (utils/emojify (str body-without-preview (if is-all-activity "" read-more-html)))]
