@@ -15,6 +15,16 @@
 (defn sorted-stories [boards]
   (into [] (sort-by :created-at boards)))
 
+(defn anchor-nav! [e url]
+  (utils/event-stop e)
+  (router/nav! url))
+
+(defn board-nav! [e board]
+  (utils/event-stop e)
+  (let [action-kw (if (= (:type board) "story") :storyboard-nav :board-nav)
+        board-slug (:slug board)]
+    (dis/dispatch! [action-kw board-slug])))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 (drv/drv :org-data)
                                 {:did-mount (fn [s]
@@ -34,11 +44,10 @@
       {:style {:width (str left-navigation-sidebar-width "px")}}
       ;; All activity
       (when (jwt/user-is-part-of-the-team (:team-id org-data))
-        [:button
-          {:class (utils/class-set {:all-activity true
-                                    :group true
-                                    :selected (utils/in? (:route @router/path) "all-activity")})
-           :on-click #(router/nav! (oc-urls/all-activity))}
+        [:a.all-activity.group
+          {:class (when (utils/in? (:route @router/path) "all-activity") "selected")
+           :href (oc-urls/all-activity)
+           :on-click #(anchor-nav! % (oc-urls/all-activity))}
           [:div.all-activity-icon]
           [:div.all-activity-label
               "All Activity"]])
@@ -58,12 +67,12 @@
              :data-container "body"}])]
       [:div.left-navigation-sidebar-items.group
         (for [board (sorted-boards boards)]
-          [:div
-            {:class (utils/class-set {:left-navigation-sidebar-item true
-                                      :selected (= (router/current-board-slug) (:slug board))})
+          [:a.left-navigation-sidebar-item
+            {:class (when (= (router/current-board-slug) (:slug board)) "selected")
              :data-board (name (:slug board))
              :key (str "board-list-" (name (:slug board)))
-             :on-click #(dis/dispatch! [:board-nav (:slug board)])}
+             :href (oc-urls/board (router/current-org-slug) (:slug board))
+             :on-click #(board-nav! % board)}
             (when (or (= (:access board) "public")
                       (= (:access board) "private"))
               [:img
@@ -92,23 +101,23 @@
       [:div.left-navigation-sidebar-items.group
         (let [drafts-link (utils/link-for (:links org-data) "draft")]
           (when (pos? (:count drafts-link))
-            [:div
-              {:class (utils/class-set {:left-navigation-sidebar-item true
-                                        :selected (utils/in? (:route @router/path) "drafts")})
+            [:a.left-navigation-sidebar-item
+              {:class (when (utils/in? (:route @router/path) "drafts") "selected")
                :data-drafts true
                :key "board-list-draft"
-               :on-click #(router/nav! (oc-urls/drafts))}
+               :href (oc-urls/drafts)
+               :on-click #(anchor-nav! % (oc-urls/drafts))}
               [:div.board-name.team-board.group
                 [:div.internal
                   (str "Drafts" (:count drafts-link))]]]))
         (for [storyboard (sorted-stories storyboards)]
-          [:div
-            {:class (utils/class-set {:left-navigation-sidebar-item true
-                                      :selected (= (router/current-board-slug) (:slug storyboard))})
+          [:a.left-navigation-sidebar-item
+            {:class (when (= (router/current-board-slug) (:slug storyboard)) "selected")
              :data-board (name (:slug storyboard))
              :data-storyboard true
              :key (str "board-list-" (name (:slug storyboard)))
-             :on-click #(dis/dispatch! [:storyboard-nav (:slug storyboard)])}
+             :href (oc-urls/board (router/current-org-slug) (:slug storyboard))
+             :on-click #(board-nav! % storyboard)}
             (when (or (= (:access storyboard) "public")
                       (= (:access storyboard) "private"))
               [:img
