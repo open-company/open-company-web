@@ -69,11 +69,7 @@
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         is-admin? (jwt/is-admin? (:team-id org-data))
         is-author? (utils/link-for (:links org-data) "create")]
-    (js/console.log "menu/render" (utils/class-set {:menu true
-                                :dropdown-menu (not (responsive/is-mobile-size?))
-                                :mobile-menu-open (and (responsive/is-mobile-size?)
-                                                       mobile-menu-open)}))
-    [:div.menu.group
+    [:div.menu
       {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
                                 :mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})
