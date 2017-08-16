@@ -25,8 +25,8 @@
                             <path d="M272,277 L48,277 C46.343,277 45,275.657 45,274 C45,272.343 46.343,271 48,271 L272,271 C273.657,271 275,272.343 275,274 C275,275.657 273.657,277 272,277" id="Fill-36" fill="#BCBCBB"></path>
                             <path d="M272,293 L48,293 C46.343,293 45,291.657 45,290 C45,288.343 46.343,287 48,287 L272,287 C273.657,287 275,288.343 275,290 C275,291.657 273.657,293 272,293" id="Fill-38" fill="#BCBCBB"></path>
                         </g>
-                        <text id="Investor-Update" font-family="Avenir-Heavy, Avenir" font-size="16" font-weight="600" letter-spacing="0.2031746" fill="#637282">
-                            <tspan x="21" y="37">Investor Update</tspan>
+                        <text id="Monthly-Update" font-family="Avenir-Heavy, Avenir" font-size="16" font-weight="600" letter-spacing="0.2031746" fill="#637282">
+                            <tspan x="21" y="37">Monthly Update</tspan>
                         </text>
                     </g>
                 </g>
