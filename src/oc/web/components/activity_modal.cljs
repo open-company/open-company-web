@@ -40,7 +40,7 @@
                                          (if (= last-filter :by-topic)
                                            (router/nav! (oc-urls/board-sort-by-topic))
                                            (router/nav! (oc-urls/board))))
-                                       (dis/dispatch! [:entry-delete activity-data])
+                                       (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
