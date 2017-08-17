@@ -167,15 +167,6 @@
       (-> db
         (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)))))
 
-(defmethod dispatcher/action :new-topics-load/finish [db [_ body]]
-  (if body
-    ;; signal to the app-state that the new-topics have been loaded
-    (-> db
-      (assoc-in (dispatcher/board-new-topics-key (router/current-org-slug) (router/current-board-slug)) (:templates (:response body)))
-      (assoc-in (dispatcher/board-new-categories-key (router/current-org-slug) (router/current-board-slug)) (:categories (:response body)))
-      (dissoc :loading))
-    db))
-
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
   (if body
@@ -790,25 +781,31 @@
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ activity-uuid reaction-data]]
-  (let [board-key (dispatcher/board-data (router/current-org-slug) (router/current-board-slug))
+  (let [is-all-activity (:from-all-activity @router/path)
+        org-slug (router/current-org-slug)
+        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
-        entry-data (get (:entries board-data) entry-idx)
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
+        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
+        entry-data (get (get board-data items-key) entry-idx)
         old-reactions-loading (or (:reactions-loading entry-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
-        entry-key (concat board-key [:entries entry-idx])]
+        entry-key (concat board-key [items-key entry-idx])]
     (api/toggle-reaction activity-uuid reaction-data)
     (assoc-in db entry-key updated-entry-data)))
 
 (defmethod dispatcher/action :reaction-toggle/finish
   [db [_ activity-uuid reaction reaction-data]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+  (let [is-all-activity (:from-all-activity @router/path)
+        org-slug (router/current-org-slug)
+        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
-        entry-data (get-in board-data [:entries entry-idx])
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
+        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
+        entry-data (get-in board-data [items-key entry-idx])
         next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
-        entry-key (concat board-key [:entries entry-idx])]
+        entry-key (concat board-key [items-key entry-idx])]
     (if (nil? reaction-data)
       (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)]
         (assoc-in db entry-key updated-entry-data))
@@ -826,12 +823,14 @@
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
+        is-all-activity (:from-all-activity @router/path)
         activity-uuid (:activity-uuid interaction-data)
-        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
         ; Entry data
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
-        entry-data (get (:entries board-data) entry-idx)]
+        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
+        entry-data (get (get board-data items-key) entry-idx)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
@@ -877,16 +876,18 @@
   [db interaction-data add-event?]
   (let [; Get the current router data
         org-slug (router/current-org-slug)
+        is-all-activity (:from-all-activity @router/path)
         board-slug (router/current-board-slug)
         activity-uuid (:entry-uuid interaction-data)
         ; Entry data
         entry-data (dispatcher/activity-data activity-uuid)
         ; Board data
-        board-key (dispatcher/board-data-key org-slug board-slug)
-        board-data (dispatcher/board-data)
+        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug board-slug))
+        board-data (get-in db board-key)
         ; Entry idx
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) activity-uuid))
-        entry-key (concat board-key [:entries entry-idx])]
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
+        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
+        entry-key (concat board-key [items-key entry-idx])]
     (if (and entry-data (not (empty? (:reactions entry-data))))
       ; If the entry is present in the local state and it has reactions
       (let [reaction-data (:interaction interaction-data)
