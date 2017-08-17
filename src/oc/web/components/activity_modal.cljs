@@ -18,9 +18,7 @@
 (defn dismiss-modal [board-filters]
   (if (:from-all-activity @router/path)
     (dis/dispatch! [:all-activity-nav])
-    (if (= (:type (dis/board-data)) "story")
-      (dis/dispatch! [:storyboard-nav (router/current-board-slug)])
-      (dis/dispatch! [:board-nav (router/current-board-slug) board-filters]))))
+    (dis/dispatch! [:board-nav (router/current-board-slug) board-filters])))
 
 (defn close-clicked [s & [board-filters]]
   (reset! (::dismiss s) true)
@@ -29,7 +27,7 @@
 (defn delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
-                    :message (str "Delete this " (if (= (:type activity-data) "entry") "update" "story") "?")
+                    :message (str "Delete this update?")
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
@@ -132,16 +130,12 @@
                 [:div.activity-modal-head-right
                   (when (:topic-slug activity-data)
                     (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                      [:div.topic-tag
+                      [:div.activity-tag
                         {:on-click #(close-clicked s (:topic-slug activity-data))}
                         topic-name]))]]
               [:div.activity-modal-content
-                (when (= (:type activity-data) "story")
-                  [:div.activity-modal-content-title
-                    {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
-                (when (= (:type activity-data) "entry")
-                  [:div.activity-modal-content-headline
-                    {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+                [:div.activity-modal-content-headline
+                  {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
                 [:div.activity-modal-content-body
                   {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                    :class (when (empty? (:headline activity-data)) "no-headline")}]
