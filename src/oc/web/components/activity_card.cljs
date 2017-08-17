@@ -20,7 +20,7 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:activity-edit {}])}
+            {:on-click #(dis/dispatch! [:entry-edit {}])}
             "Add an update?"]]])])
 
 (defn delete-clicked [e activity-data]
@@ -219,7 +219,7 @@
             [:li
               {:on-click (fn [e]
                            (utils/event-stop e)
-                           (dis/dispatch! [:activity-edit activity-data]))}
+                           (dis/dispatch! [:entry-edit activity-data]))}
               "Edit"]
             [:li
               {:on-click #(delete-clicked % activity-data)}
