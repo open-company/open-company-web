@@ -1069,7 +1069,7 @@
     (utils/after 10
       #(if (:activity-pushed db)
          (let [route [(router/current-org-slug) "all-activity"]
-               parts (dissoc @router/path :route :entry :board)]
+               parts (dissoc @router/path :route :board :activity)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
             (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
