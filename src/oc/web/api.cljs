@@ -739,7 +739,6 @@
           (dispatcher/dispatch! [:calendar-get/finish {:org (router/current-org-slug) :body (if success (json->cljs body) nil)}]))))))
 
 (defn get-story [story-uuid story-link]
-  (js/console.log "api/get-story" story-uuid story-link)
   (when story-link
     (storage-get (relative-href (:href story-link))
       {:headers (headers-for-link story-link)}
