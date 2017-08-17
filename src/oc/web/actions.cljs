@@ -145,10 +145,12 @@
   db)
 
 (defmethod dispatcher/action :board [db [_ board-data]]
- (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))]
+ (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))
+       is-all-activity (utils/in? (:route @router/path) "all-activity")
+       items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))]
     (when is-currently-shown
       (when (and (router/current-activity-id)
-                 (zero? (count (filter #(= (:uuid %) (router/current-activity-id)) (:entries board-data)))))
+                 (zero? (count (filter #(= (:uuid %) (router/current-activity-id)) (get board-data items-key)))))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
@@ -191,13 +193,14 @@
       (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
-  ;; FIXME: Disable this until we have editing back working
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+  (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
+        board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
-        entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
-        new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
+        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) entry-uuid))
+        new-entries (assoc (get board-data items-key) entry-idx (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
         sorted-entries (vec (sort-by :created-at new-entries))
-        new-board-data (assoc board-data :entries sorted-entries)]
+        new-board-data (assoc board-data items-key sorted-entries)]
   (assoc db board-key new-board-data)))
 
 (defn- get-updates [db]
@@ -863,7 +866,7 @@
         ; Update the local state with the new comments list
         (-> db
             (assoc-in comments-key sorted-comments-data)
-            (assoc-in (concat board-key [:entries entry-idx]) with-authors)))
+            (assoc-in (concat board-key [items-key entry-idx]) with-authors)))
       ;; the entry is not present, refresh the full topic
       (do
         ;; force refresh of topic
@@ -994,19 +997,22 @@
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)
-        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
+        org-slug (router/current-org-slug)
+        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
         as-of (utils/as-of-now)
         new-entry? (empty? (:uuid entry-data))
         current-user-data (:current-user-data db)
         fixed-entry (if new-entry?
                       (new-entry-fixed-data entry-data board-data current-user-data as-of)
                       (entry-fixed-data entry-data current-user-data as-of))
-        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (:entries board-data))
+        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (get board-data items-key))
         new-entries (conj filtered-entries fixed-entry)
-        sorted-entries (vec (sort-by :created-at new-entries))
-        next-board-data (assoc board-data :entries sorted-entries)
-        next-board-filters (if (= (:board-filters db) (:topic-slug entry-data))
+        sorted-entries (vec (reverse (sort-by :created-at new-entries)))
+        next-board-data (assoc board-data items-key sorted-entries)
+        next-board-filters (if (or is-all-activity (= (:board-filters db) (:topic-slug entry-data)))
                               ; if it's filtering by the same topic of the new entry leave it be
                               (:board-filters db)
                               (if (keyword? (:board-filters db))
@@ -1023,7 +1029,10 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_]]
-  (api/get-board (dispatcher/board-data))
+  (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))]
+    ;; FIXME: refresh the last loaded all-activity link
+    (when-not is-all-activity
+      (api/get-board (dispatcher/board-data))))
   db)
 
 (defmethod dispatcher/action :board-nav
@@ -1079,11 +1088,13 @@
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+  (let [is-all-activity (utils/in? (:route @router/path) "all-activity")
+        board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get-in db board-key)
-        filtered-entries (filter #(not= (:uudi %) (:uuid activity-data)) (:entries board-data))
+        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
+        filtered-entries (filter #(not= (:uudi %) (:uuid activity-data)) (get board-data items-key))
         sorted-entries (vec (sort-by :created-at filtered-entries))
-        next-board-data (assoc board-data :entries sorted-entries)]
+        next-board-data (assoc board-data items-key sorted-entries)]
     (api/delete-activity activity-data)
     (assoc-in db board-key next-board-data)))
 
