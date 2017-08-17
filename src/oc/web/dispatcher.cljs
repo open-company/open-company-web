@@ -23,7 +23,8 @@
   [(keyword org-slug) :calendar])
 
 (defn board-data-key [org-slug board-slug]
-  [(keyword org-slug) :boards (keyword board-slug) :board-data])
+  (let [board-key (if board-slug (keyword board-slug) :all-activity)]
+    [(keyword org-slug) :boards board-key :board-data]))
 
 (defn board-cache-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :cache])
@@ -44,7 +45,9 @@
   [(keyword org-slug) :updates (keyword update-slug)])
 
 (defn entries-key [org-slug board-slug]
-  [(keyword org-slug) :boards (keyword board-slug) :entries-data])
+  (if (nil? board-slug)
+    [(keyword org-slug) :boards :all-activity :entries-data]
+    [(keyword org-slug) :boards (keyword board-slug) :entries-data]))
 
 (defn comments-key [org-slug board-slug activity-uuid]
  (vec (conj (entries-key org-slug board-slug) activity-uuid :comments-data)))
