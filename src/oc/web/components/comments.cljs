@@ -70,9 +70,9 @@
                       rum/static
                       (rum/local false ::add-comment-focus)
                       (rum/local false ::needs-gradient)
-                      {:init (fn [s p]
-                              (dis/dispatch! [:comments-get (first (:rum/args s))])
-                              s)
+                      {:will-mount (fn [s]
+                                    (dis/dispatch! [:comments-get (first (:rum/args s))])
+                                    s)
                        :after-render (fn [s]
                                        (let [comments (js/$ ".comments")
                                              comments-internal-scroll (js/$ ".comments-internal-scroll")
