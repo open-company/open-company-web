@@ -68,7 +68,7 @@ div.story-container {
   div.story-content {
     width: 840px;
     min-height: 136px;
-    padding: 68px 80px;
+    padding: 68px 80px 32px;
     margin: 104px auto 32px;
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
@@ -108,6 +108,31 @@ div.story-container {
       @include activity-body();
       @include avenir_M();
       font-size: 20px;
+    }
+
+    div.story-content-footer {
+      margin-top: 46px;
+      text-align: center;
+
+      div.you-did-it {
+        @include avenir_BOOK();
+        font-size: 16px;
+        color: $carrot_light_gray_1;
+        float: left;
+        margin-top: 13px;
+        margin-left: 250px;
+      }
+
+      div.caught-up {
+        float: left;
+        margin-top: 5px;
+        width: 26px;
+        height: 33px;
+        background-image: cdnUrl("/img/ML/caught_up.svg");
+        background-size: 26px 33px;
+        background-repeat: no-repeat;
+        margin-left: 15px;
+      }
     }
   }
 }

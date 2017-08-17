@@ -23,7 +23,7 @@
     [:div.story-container
       [:div.story-header.group
         [:div.story-header-left
-          [:span.board-name (:board-name story-data)]
+          [:span.board-name (:storyboard-name story-data)]
           [:span.arrow ">"]
           [:span.story-title (:title story-data)]]
         [:div.story-header-right
@@ -50,10 +50,13 @@
         [:div.story-tags
           [:div.activity-tag
             {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
-            (:board-name story-data)]]
+            (:storyboard-name story-data)]]
         (when (:title story-data)
           [:div.story-title
             {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
         (when (:body story-data)
           [:div.story-body
-            {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])]]))
+            {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])
+        [:div.story-content-footer.group
+          [:div.you-did-it "The End. You did it!"]
+          [:div.caught-up]]]]))
