@@ -1142,14 +1142,11 @@
         story-data (dispatcher/activity-data story-uuid)
         story-link (utils/link-for (:links story-data) "self")
         fixed-story-link (or story-link {:href (str "/" (router/current-org-slug) "/" (router/current-board-slug) "/stories/" story-uuid)})]
-    (js/console.log "action/:story-get" story-data)
-    (js/console.log "   story-link" story-data)
-    (js/console.log "   fixed-story-link" fixed-story-link)
     (api/get-story story-uuid fixed-story-link))
   (assoc db :story-loading true))
 
 (defmethod dispatcher/action :story-get/finish
-  [db [_ story-uuid story-data]]
+  [db [_ {:keys [story-uuid story-data]}]]
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         story-key (dispatcher/story-key org-slug board-slug story-uuid)
