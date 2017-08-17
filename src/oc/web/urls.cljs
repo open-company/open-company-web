@@ -154,27 +154,3 @@
   ([story-uuid] (story (router/current-org-slug) (router/current-board-slug) story-uuid))
   ([board-slug story-uuid] (story (router/current-org-slug) board-slug story-uuid))
   ([org-slug board-slug story-uuid] (str (board org-slug board-slug) "/story/" (name story-uuid))))
-
-;; Stakeholder update
-
-; (defn updates-list
-;   ([]
-;     (updates-list (router/current-org-slug)))
-;   ([org-slug]
-;     (str (org org-slug) "/updates"))
-;   ([org-slug update-slug]
-;     (str (updates-list org-slug) "/" (name update-slug))))
-
-; (defn update-preview
-;   ([]
-;     (update-preview (router/current-org-slug)))
-;   ([org-slug]
-;     (str (updates-list org-slug) "/preview")))
-
-; (defn update-link
-;   ([]
-;     (update (router/current-org-slug) (router/current-update-date) (router/current-update-slug)))
-;   ([update-date update-slug]
-;     (update (router/current-org-slug) update-date update-slug))
-;   ([org-slug update-date update-slug]
-;     (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))
