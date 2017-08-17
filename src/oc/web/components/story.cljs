@@ -21,17 +21,8 @@
   [s]
   (let [board-data (drv/react s :board-data)
         story-data (drv/react s :story-data)
-        test-story-data {:title "This is my title"
-                         :created-at (utils/as-of-now)
-                         :updated-at (utils/as-of-now)
-                         :banner-url "http://lorempixel.com/630/480/animals/"
-                         :banner-width 640
-                         :banner-height 480
-                         :reactions [{:reaction "♥️" :count 20 :reacted false} {:reaction "♠️" :count 10 :reacted true} {:reaction "💣" :count 12 :reacted false}]
-                         :links [{:rel "comments" :href "/" :count "10" :authors [{:name "Iacopo Carraro" :avatar-url "https://cdn.filestackcontent.com/odtNwsWFQlK385Mb3jeQ"}]}]
-                         :author [{:name "Iacopo Carraro"
-                                   :avatar-url "https://cdn.filestackcontent.com/odtNwsWFQlK385Mb3jeQ"}]
-                         :body "<p>This is some body text</p><p>Another paragraph</p><ul><li>First list item</li><li>Second list item</li><li>Third list item</li></ul>"}]
+        story-author (if (map? (:author story-data)) (:author story-data) (first story-data))]
+    (js/console.log "story/render" story-data)
     [:div.story-container
       [:div.story-header.group
         [:div.story-header-left
@@ -47,10 +38,11 @@
       [:div.story-content
         (when (:banner-url story-data)
           [:div.story-banner
-            {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")}}])
+            {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
+                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
         [:div.story-author.group
-          (user-avatar-image (first (:author story-data)))
-          [:div.name (:name (first (:author story-data)))]
+          (user-avatar-image story-author)
+          [:div.name (:name story-author)]
           [:div.time-since
             [:time
               {:date-time (:created-at story-data)
