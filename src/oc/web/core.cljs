@@ -41,7 +41,8 @@
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]
-            [oc.web.components.error-banner :refer (error-banner)]))
+            [oc.web.components.error-banner :refer (error-banner)]
+            [oc.web.components.story :refer (story)]))
 
 (enable-console-print!)
 
@@ -207,6 +208,24 @@
     (pre-routing query-params)
     ;; save the route
     (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
+    ;; do we have the company data already?
+    (when (or (not (dis/board-data))              ;; if the company data are not present
+              (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
+                                                    ;; a subset of the company data loaded with a SU
+      (swap! dis/app-state merge {:loading true}))
+    (post-routing)
+    ;; render component
+    (drv-root component target)))
+
+;; Component specific to a storyboard
+(defn story-handler [component target params]
+  (let [org (:org (:params params))
+        storyboard (:storyboard (:params params))
+        story (:story (:params params))
+        query-params (:query-params params)]
+    (pre-routing query-params)
+    ;; save the route
+    (router/set-route! (vec (remove nil? [org storyboard (when story story) "story"])) {:org org :board storyboard :activity story :query-params query-params})
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
@@ -432,13 +451,13 @@
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
       (board-handler "activity" target org-dashboard params))
 
-    (defroute story-route (urls/story ":org" ":board" ":story") {:as params}
-      (timbre/info "Routing story-route" (urls/story ":org" ":board" ":story"))
-      (storyboard-handler "activity" target org-dashboard params))
+    (defroute story-route (urls/story ":org" ":storyboard" ":story") {:as params}
+      (timbre/info "Routing story-route" (urls/story ":org" ":storyboard" ":story"))
+      (story-handler #(om/component (story)) target params))
 
-    (defroute story-slash-route (str (urls/story ":org" ":board" ":story") "/") {:as params}
-      (timbre/info "Routing story-slash-route" (str (urls/story ":org" ":board" ":story") "/"))
-      (storyboard-handler "activity" target org-dashboard params))
+    (defroute story-slash-route (str (urls/story ":org" ":storyboard" ":story") "/") {:as params}
+      (timbre/info "Routing story-slash-route" (str (urls/story ":org" ":storyboard" ":story") "/"))
+      (story-handler #(om/component (story)) target params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
