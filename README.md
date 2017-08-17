@@ -265,6 +265,8 @@ provided in the table below:
 |  :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |
 |  :slack-team-add | UI | Start the request to add a Slack team to the current team. |
 |  :slack-token-refresh | UI | Refresh the data of the user signed in with Slack. |
+|  :story-get | UI | Load a story. |
+|  :story-get/finish | API | Story loaded. |
 |  :subscription | API | Save the new subscription data in the app-state. |
 |  :team-loaded | API | Save the team loaded data in the app-state. |
 |  :team-roster-loaded | API | Save the roster in the team data. |
@@ -274,9 +276,7 @@ provided in the table below:
 |  :topic-add | UI | Add a new topic to the topics list of the current board. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
 |  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
-|  :udpates-list-get | UI | Start the request to load the list of the prior updates for a certain org. |
 |  :update-loaded | API | Read and save the data of certain update in the app-state |
-|  :updates-list | API | Read and save the list of the prior updates in the app-state given an org. |
 |  :user-action | UI | Start a user action: given a team-id, a user data object, the action and a method make a request to complete the action. Can pass optional payload (if it's not a GET request). |
 |  :user-action/complete | API | Refresh the team data to show the completed user action. |
 |  :user-data | API | Current user data loaded, save them in the app-state. |
