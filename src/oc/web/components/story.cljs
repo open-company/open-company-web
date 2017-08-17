@@ -47,10 +47,11 @@
                :data-placement "top"
                :title (utils/activity-date-tooltip story-data)}
               (utils/time-since (:created-at story-data))]]]
-        [:div.story-tags
-          [:div.activity-tag
-            {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
-            (:storyboard-name story-data)]]
+        (when (:storyboard-name story-data)
+          [:div.story-tags
+            [:div.activity-tag
+              {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
+              (:storyboard-name story-data)]])
         (when (:title story-data)
           [:div.story-title
             {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
