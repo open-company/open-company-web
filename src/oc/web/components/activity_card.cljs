@@ -118,7 +118,9 @@
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-activity-card is-all-activity
                               :story-card (= (:type activity-data) "story")})
-     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
+     :on-click #(if (= (:type activity-data) "story")
+                  (router/nav! (oc-urls/story (:uuid activity-data)))
+                  (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
      :on-mouse-enter #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
     (when (= (:type activity-data) "story")
@@ -152,7 +154,7 @@
           (when (and (not is-all-activity)
                      (:topic-slug activity-data))
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
-              [:div.topic-tag
+              [:div.activity-tag
                 {:on-click #(do
                               (utils/event-stop %)
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
