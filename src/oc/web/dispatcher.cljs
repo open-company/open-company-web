@@ -257,11 +257,14 @@
   ([org-slug board-slug activity-id]
     (activity-data org-slug board-slug activity-id @app-state))
   ([org-slug board-slug activity-id data]
-    (let [data-key (if (:from-all-activity @router/path) (all-activity-key org-slug) (board-data-key org-slug board-slug))
+    (let [is-all-activity (:from-all-activity @router/path)
+          data-key (if is-all-activity (all-activity-key org-slug) (board-data-key org-slug board-slug))
           board-data (get-in data data-key)
-          activities-data (if (= (:type board-data) "story")
-                            (:stories board-data)
-                            (:entries board-data))]
+          activities-data (if is-all-activity
+                            (:items board-data)
+                            (if (= (:type board-data) "story")
+                              (:stories board-data)
+                              (:entries board-data)))]
       (first (filter #(= (:uuid %) activity-id) activities-data)))))
 
 (defn comments-data
