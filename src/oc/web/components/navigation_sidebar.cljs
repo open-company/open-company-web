@@ -39,13 +39,14 @@
   (let [org-data (drv/react s :org-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         boards (vec (filter #(= (:type %) "entry") (:boards org-data)))
-        storyboards (vec (filter #(= (:type %) "story") (:boards org-data)))]
+        storyboards (vec (filter #(= (:type %) "story") (:boards org-data)))
+        is-all-activity (utils/in? (:route @router/path) "all-activity")]
     [:div.left-navigation-sidebar.group
       {:style {:width (str left-navigation-sidebar-width "px")}}
       ;; All activity
       (when (jwt/user-is-part-of-the-team (:team-id org-data))
         [:a.all-activity.group
-          {:class (when (utils/in? (:route @router/path) "all-activity") "selected")
+          {:class (when is-all-activity "selected")
            :href (oc-urls/all-activity)
            :on-click #(anchor-nav! % (oc-urls/all-activity))}
           [:div.all-activity-icon]
@@ -68,7 +69,7 @@
       [:div.left-navigation-sidebar-items.group
         (for [board (sorted-boards boards)]
           [:a.left-navigation-sidebar-item
-            {:class (when (= (router/current-board-slug) (:slug board)) "selected")
+            {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug board))) "selected")
              :data-board (name (:slug board))
              :key (str "board-list-" (name (:slug board)))
              :href (oc-urls/board (router/current-org-slug) (:slug board))
@@ -112,7 +113,7 @@
                   (str "Drafts" (:count drafts-link))]]]))
         (for [storyboard (sorted-stories storyboards)]
           [:a.left-navigation-sidebar-item
-            {:class (when (= (router/current-board-slug) (:slug storyboard)) "selected")
+            {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "selected")
              :data-board (name (:slug storyboard))
              :data-storyboard true
              :key (str "board-list-" (name (:slug storyboard)))
