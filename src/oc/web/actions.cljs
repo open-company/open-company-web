@@ -1141,7 +1141,8 @@
   (let [story-uuid (router/current-activity-id)
         story-data (dispatcher/activity-data story-uuid)
         story-link (utils/link-for (:links story-data) "self")
-        fixed-story-link (or story-link {:href (str "/" (router/current-org-slug) "/" (router/current-board-slug) "/stories/" story-uuid)})]
+        fixed-story-link (or story-link {:href (str "/orgs/" (router/current-org-slug) "/boards/" (router/current-board-slug) "/stories/" story-uuid)
+                                         :accept "application/vnd.open-company.story.v1+json"})]
     (api/get-story story-uuid fixed-story-link))
   (assoc db :story-loading true))
 
