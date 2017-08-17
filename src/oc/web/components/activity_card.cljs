@@ -119,7 +119,7 @@
                               :all-activity-card is-all-activity
                               :story-card (= (:type activity-data) "story")})
      :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
-     :on-mouse-over #(reset! (::hovering-card s) true)
+     :on-mouse-enter #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
     (when (= (:type activity-data) "story")
       [:div.triangle])

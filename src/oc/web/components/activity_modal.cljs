@@ -105,7 +105,7 @@
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       [:div.activity-modal.group
         {:class (str "activity-modal-" (:uuid activity-data))
-         :on-mouse-over #(reset! (::hovering-card s) true)
+         :on-mouse-enter #(reset! (::hovering-card s) true)
          :on-mouse-leave #(reset! (::hovering-card s) false)}
         [:button.close-activity-modal.mlb-reset
           {:on-click #(close-clicked s)}]
