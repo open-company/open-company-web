@@ -89,7 +89,6 @@
                 ;; Say something button
                 (when (and (not is-all-activity)
                            (not (:read-only (dis/org-data)))
-                           (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:entry-edit {}])}

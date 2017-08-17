@@ -31,16 +31,6 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-(defn- get-new-topics-if-needed [owner]
-  (when-not (om/get-state owner :new-topics-requested)
-    (let [org-slug (keyword (router/current-org-slug))
-          board-slug (keyword (router/current-board-slug))
-          board-data (dis/board-data)]
-      (when (and (not (get-in (om/get-props owner) (dis/board-new-topics-key org-slug board-slug)))
-                 (seq board-data))
-        (om/update-state! owner :new-topics-requested not)
-        (utils/after 1000 #(api/get-new-topics))))))
-
 (def add-second-topic-tt-prefix "add-second-topic-")
 
 (defn refresh-board-data []
@@ -54,7 +44,6 @@
      :editing-topic false
      :save-bt-active false
      :add-second-topic-tt-shown false
-     :new-topics-requested false
      :card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    responsive/card-width)
@@ -62,19 +51,11 @@
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-    (when-not (:read-only (dis/board-data data))
-      (get-new-topics-if-needed owner))
     (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
                                                                                            :card-width (if (responsive/is-mobile-size?)
                                                                                                          (responsive/mobile-dashboard-card-width)
                                                                                                          responsive/card-width)})))))
-    (om/set-state! owner :window-click-listener
-      (events/listen js/window EventType/CLICK (fn[e]
-                                                 (when (and (:show-top-menu @dis/app-state)
-                                                            (not (utils/event-inside? e (sel1 [(str "div.topic[data-topic=" (name (:show-top-menu @dis/app-state)) "]")]))))
-                                                   (utils/event-stop e)
-                                                   (dis/dispatch! [:top-menu-show nil])))))
     (refresh-board-data)
     (om/set-state! owner :board-refresh-interval
       (js/setInterval #(refresh-board-data) (* 60 1000))))
@@ -82,14 +63,8 @@
   (will-unmount [_]
     (when (om/get-state owner :board-refresh-interval)
       (js/clearInterval (om/get-state owner :board-refresh-interval)))
-    (when (om/get-state owner :window-click-listener)
-      (events/unlistenByKey (om/get-state owner :window-click-listener)))
     (when (om/get-state owner :resize-listener)
       (events/unlistenByKey (om/get-state owner :resize-listener))))
-
-  (will-receive-props [_ next-props]
-    (when-not (:read-only (dis/board-data next-props))
-      (get-new-topics-if-needed owner)))
 
   (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
@@ -109,8 +84,6 @@
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
-                                           :editing-topic (or (not (nil? (:foce-key data)))
-                                                              (not (nil? (:show-top-menu data))))
                                            :main-scroll true
                                            :no-scroll (router/current-activity-id)})}
           (when (router/current-activity-id)
@@ -149,16 +122,11 @@
                      :board-data board-data
                      :all-activity-data all-activity-data
                      :entries-data entries-data
-                     :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
                      :force-edit-topic (:force-edit-topic data)
-                     :foce-data-editing? (:foce-data-editing? data)
                      :card-width card-width
                      :columns-num columns-num
                      :show-login-overlay (:show-login-overlay data)
-                     :foce-key (:foce-key data)
-                     :foce-data (:foce-data data)
                      :entry-editing (:entry-editing data)
                      :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                      :is-dashboard true
-                     :show-top-menu (:show-top-menu data)
                      :board-filters (:board-filters data)}))))))))))

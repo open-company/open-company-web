@@ -29,9 +29,6 @@
 (defn board-cache-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :cache])
 
-(defn board-new-topics-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :new-topics])
-
 (defn board-new-categories-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :new-categories])
 
@@ -94,7 +91,6 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
-   :foce-data           [[:base] (fn [base] (:foce-data base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -119,10 +115,6 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-channels-key (:team-id org-data)))))]
-   :board-new-topics    [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (get-in base (board-new-topics-key org-slug board-slug))))]
    :board-new-categories [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
@@ -175,8 +167,7 @@
 ;; Action Loop =================================================================
 
 (defmulti action (fn [db [action-type & _]]
-                   (when (and (not= action-type :input)
-                              (not= action-type :foce-input))
+                   (when (not= action-type :input)
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 

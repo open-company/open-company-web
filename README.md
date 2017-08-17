@@ -235,10 +235,6 @@ provided in the table below:
 |  :entry-save | UI | Save the edited entry. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
-|  :foce-data-editing-start | UI | Start the data edit for growth and finances topics. |
-|  :foce-input | UI | Save a new data for the current edited entry. |
-|  :foce-save | UI | Call the proper API function to save the topic data collected during FoCE. |
-|  :foce-start | UI | Setup the app-state for FoCE initializing the data with the given entry data (empty if new entry). |
 |  :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
 |  :invitation-confirmed | API | Confirm invitation request succeeded. |
 |  :invite-by-email | UI | Start the request to invite a user, check if the email is already present and use the resend link if possible. No-op if the user is already an active user of the team. |
@@ -254,7 +250,6 @@ provided in the table below:
 |  :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
 |  :name-pswd-collect | UI | Start the request to save the user name and password. |
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
-|  :new-topics-load/finish | API | Read the available new topics and save them in the app-state for later use. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
 |  :password-reset | UI | Start the request to reset the user password. |
@@ -275,11 +270,8 @@ provided in the table below:
 |  :team-roster-loaded | API | Save the roster in the team data. |
 |  :teams-get | UI | Start the request to load the list of teams. |
 |  :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
-|  :top-menu-show | UI | Toggle the dropdown menu of the topic in the dashboard. |
 |  :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
 |  :topic-add | UI | Add a new topic to the topics list of the current board. |
-|  :topic-archive | UI | Start the archive topic action. Call the API function to archive. |
-|  :topic-archive/success | API | Archive succesfully done, navigate to the board to reload the data without the topic. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
 |  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
 |  :udpates-list-get | UI | Start the request to load the list of the prior updates for a certain org. |

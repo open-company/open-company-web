@@ -1,13 +1,3 @@
-div.org-dashboard.editing-topic {
-  nav > *, div.left-topics-list, div.footer{
-    opacity: 0.2 !important;
-  }
-
-  div.topic.topic-edit, div.topic-topic-with-menu-open {
-    opacity: 1 !important;
-  }
-}
-
 div.org-dashboard {
   background-color: $oc_gray_8;
 

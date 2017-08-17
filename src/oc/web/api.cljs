@@ -230,66 +230,6 @@
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
-(def topic-private-keys [:topic
-                         :entries
-                         :author
-                         :links
-                         :loading
-                         :as-of
-                         :read-only
-                         :entries-cache
-                         :title-placeholder
-                         :body-placeholder
-                         :oc-editing
-                         :entries-data
-                         :new
-                         :placeholder
-                         :was-archived
-                         :created-at
-                         :updated-at
-                         :value
-                         :burn-rate
-                         :runway])
-
-(defn patch-topics [topics & [new-topic topic-name]]
-  (when topics
-    (let [slug (keyword (router/current-board-slug))
-          board-data (dispatcher/board-data)
-          board-patch-link (utils/link-for (:links board-data) "partial-update" "PATCH")
-          payload (if (and new-topic topic-name)
-                    {:topics topics
-                     (keyword topic-name) new-topic}
-                    {:topics topics})
-          json-data (cljs->json payload)]
-      (storage-patch (relative-href (:href board-patch-link))
-        {:json-params json-data
-         :headers (headers-for-link board-patch-link)}
-        (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:board (when success (json->cljs body))]))))))
-
-(defn remove-topic [topic-name]
-  (when (and topic-name)
-    (let [board-data (dispatcher/board-data)
-          topics (:topics board-data)
-          new-topics (apply merge (map (fn [[k v]]
-                                        {k (utils/vec-dissoc v topic-name)})
-                                    topics))]
-      (patch-topics new-topics))))
-
-(defn get-new-topics []
-  "Load new topics, avoid to start multiple request or reload it if it's already loading or loaded.
-   It's possible to force the load passing an optional boolean parameter."
-  (let [slug (keyword (router/current-board-slug))
-        board-data (dispatcher/board-data)
-        links (:links board-data)
-        add-topic-link (utils/link-for links "new" "GET")]
-    (when add-topic-link
-      (storage-get (relative-href (:href add-topic-link))
-        { :headers (headers-for-link add-topic-link)}
-        (fn [{:keys [success body]}]
-          (let [fixed-body (if body (json->cljs body) {})]
-            (dispatcher/dispatch! [:new-topics-load/finish {:response fixed-body :slug slug}])))))))
-
 (defn get-updates []
   (let [org-data (dispatcher/org-data)
         links (:links org-data)
@@ -683,17 +623,6 @@
       ;; Remove author call
       (when (and remove-author? remove-author-link)
         (remove-author user-author)))))
-
-(defn archive-topic
-  "Give a topic name and it's data, make the request to archive the topic."
-  [topic topic-data]
-  (when (and topic topic-data)
-    (when-let [archive-link (utils/link-for (:links topic-data) "archive")]
-      (storage-delete (relative-href (:href archive-link))
-        {:headers (headers-for-link archive-link)}
-        (fn [{:keys [status success body] :as response}]
-          (dispatcher/dispatch! [:topic-archive/success]))))))
-
 
 (defn add-private-board
   [board-data user-id user-type]

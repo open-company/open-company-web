@@ -39,9 +39,6 @@
     (get-state owner data nil))
 
   (will-receive-props [_ next-props]
-    (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
-                new-topic-data (-> next-props :board-data new-topic-foce)]
-      (dispatcher/dispatch! [:foce-start new-topic-foce new-topic-data]))
     (when-not (= (:board-data next-props) (:board-data data))
       (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
@@ -69,19 +66,14 @@
                          :content-loaded (:content-loaded data)
                          :loading (:loading data)
                          :topics board-topics
-                         :foce-data-editing? (:foce-data-editing? data)
-                         :new-topics (:new-topics data)
                          :org-data (:org-data data)
                          :board-data board-data
                          :all-activity-data (:all-activity-data data)
                          :entries-data (:entries-data data)
                          :topics-data board-data
-                         :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)
                          :entry-editing (:entry-editing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
                          :is-all-activity (utils/in? (:route @router/path) "all-activity")
-                         :show-top-menu (:show-top-menu data)
                          :board-filters (:board-filters data)}]
           (om/build topics-columns comp-data))))))

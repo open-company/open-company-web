@@ -163,7 +163,7 @@
     (let [fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))
           old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
-                                     (:foce-key db))
+                                     (:entry-editing db))
                               old-board-data
                               fixed-board-data)]
       (-> db
@@ -234,60 +234,12 @@
         (assoc-in (dispatcher/update-key org-slug update-slug) response)
         (dissoc :loading)))))
 
-(defn start-foce [db topic topic-data]
-  (-> db
-    (assoc :foce-key (keyword topic)) ; which topic is being FoCE
-    (assoc :foce-data topic-data)     ; map of the in progress edits of the topic data
-    (assoc :foce-data-editing? false) ; is the data portion of the topic (e.g. finance, growth) being edited
-    (assoc :show-top-menu nil)))      ; dismiss top menu
-
-(defn stop-foce [db]
-  (let [board-data (dispatcher/board-data db (router/current-org-slug) (router/current-board-slug))
-        show-add-topic (zero? (count (:topics board-data)))]
-    (-> db
-      (dissoc :foce-key)
-      (dissoc :foce-data)
-      (dissoc :foce-data-editing?))))
-
-;; Front of Card Edit topic
-(defmethod dispatcher/action :foce-start [db [_ topic-key topic-data]]
-  (if topic-key
-    (start-foce db topic-key topic-data)
-    (stop-foce db)))
-
-(defmethod dispatcher/action :foce-data-editing-start [db [_ value]]
-  (assoc db :foce-data-editing? value))
-
-(defmethod dispatcher/action :foce-input [db [_ topic-data-map]]
-  (let [old-data (:foce-data db)]
-    (assoc db :foce-data (merge old-data topic-data-map))))
-
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
 ;; https://github.com/metosin/lomakkeet/blob/master/src/cljs/lomakkeet/core.cljs
 
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
-
-(defmethod dispatcher/action :topic-archive [db [_ topic]]
-  (let [board-data (dispatcher/board-data)
-        topic-data ((keyword topic) board-data)
-        old-topics (:topics board-data)
-        new-topics (utils/vec-dissoc old-topics (name topic))
-        old-archived (:archived board-data)
-        new-archived (vec (conj old-archived {:title (:title ((keyword topic) board-data)) :topic (name topic)}))
-        board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))]
-    (api/archive-topic topic topic-data)
-    (-> db
-      (stop-foce)
-      (assoc :prevent-topic-not-found-navigation true)
-      (assoc-in (conj board-key :topics) new-topics)
-      (assoc-in (conj board-key :archived) new-archived))))
-
-(defmethod dispatcher/action :topic-archive/success
-  [db [_]]
-  (router/nav! (oc-urls/board))
-  (dissoc db :prevent-topic-not-found-navigation))
 
 ;; Store JWT in App DB so it can be easily accessed in actions etc.
 
@@ -599,9 +551,6 @@
   (let [reactions (:reactions entry)
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
-
-(defmethod dispatcher/action :top-menu-show [db [_ topic]]
-  (assoc db :show-top-menu topic))
 
 (defmethod dispatcher/action :welcome-screen-hide
   [db [_]]
