@@ -10,7 +10,6 @@
             [oc.web.components.ui.interactions-summary :refer (comments-summary)]))
 
 (rum/defcs story < rum/reactive
-                   (drv/drv :board-data)
                    (drv/drv :story-data)
                    {:will-mount (fn [s]
                                   (dis/dispatch! [:story-get (first (:rum/args s))])
@@ -19,13 +18,12 @@
                                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                     s)}
   [s]
-  (let [board-data (drv/react s :board-data)
-        story-data (drv/react s :story-data)
+  (let [story-data (drv/react s :story-data)
         story-author (if (map? (:author story-data)) (:author story-data) (first story-data))]
     [:div.story-container
       [:div.story-header.group
         [:div.story-header-left
-          [:span.board-name (:name board-data)]
+          [:span.board-name (:board-name story-data)]
           [:span.arrow ">"]
           [:span.story-title (:title story-data)]]
         [:div.story-header-right
@@ -52,7 +50,7 @@
         [:div.story-tags
           [:div.activity-tag
             {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
-            (:name board-data)]]
+            (:board-name story-data)]]
         (when (:title story-data)
           [:div.story-title
             {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
