@@ -32,14 +32,8 @@
 (defn board-new-categories-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :new-categories])
 
-(defn updates-list-key [org-slug]
-  [(keyword org-slug) :updates-list])
-
-(defn latest-update-key [org-slug]
-  [(keyword org-slug) :latest-su])
-
-(defn update-key [org-slug update-slug]
-  [(keyword org-slug) :updates (keyword update-slug)])
+(defn story-key [org-slug board-slug activity-uuid]
+  [(keyword org-slug) (keyword board-slug) :stories-data (keyword activity-uuid)])
 
 (defn entries-key [org-slug board-slug]
   (if (nil? board-slug)
@@ -70,13 +64,10 @@
    :board-slug          [[:route] (fn [route] (:board route))]
    :topic-slug          [[:route] (fn [route] (:topic route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
+   :story-uuid          [[:route] (fn [route] (:activity route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
    :loading             [[:base] (fn [base] (:loading base))]
-   :updates-list        [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when org-slug
-                              (:items (get-in base (updates-list-key org-slug)))))]
    :team-management     [[:base :route]
                           (fn [base route]
                             {:um-invite (:um-invite base)
@@ -126,8 +117,15 @@
    :activity-data       [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (when (and org-slug board-slug activity-uuid)
-                              (let [board-data (get-in base (board-data-key org-slug board-slug))]
-                                (first (filter #(= (:uuid %) activity-uuid) (:entries board-data))))))]
+                              (let [board-key (if (empty? board-slug) (all-activity-key org-slug) (board-data-key org-slug board-slug))
+                                    board-data (get-in base board-key)
+                                    items-key (if (empty? board-slug) :items (if (= (:type board-data) "story") :stories :entries))]
+                                (first (filter #(= (:uuid %) activity-uuid) (get board-data items-key))))))]
+   :story-data          [[:base :org-slug :board-slug :story-uuid]
+                          (fn [base org-slug board-slug story-uuid]
+                            (when (and org-slug board-slug story-uuid)
+                              (let [story-key (story-key org-slug board-slug story-uuid)]
+                                (get-in base story-key))))]
    :comments-data       [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (when (and org-slug board-slug activity-uuid)
