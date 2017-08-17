@@ -119,7 +119,6 @@
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
-           (not (utils/in? (:route @router/path) "updates-list"))
            (not (utils/in? (:route @router/path) "email-verification")))
       (cond
         ;; Redirect to the first board if only one is present
@@ -132,11 +131,7 @@
                 (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
                 (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
               (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
-  ;; FIXME: temporarily remove stories loading
-  ; (utils/after 100 #(api/get-updates))
-  (-> db
-    (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
-    (assoc :updates-list-loading (utils/in? (:route @router/path) "updates-list"))))
+  (assoc-in db (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data)))
 
 (defmethod dispatcher/action :boards-load-other [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
@@ -202,37 +197,6 @@
         sorted-entries (vec (sort-by :created-at new-entries))
         new-board-data (assoc board-data items-key sorted-entries)]
   (assoc db board-key new-board-data)))
-
-(defn- get-updates [db]
-  (api/get-updates)
-  (assoc db :updates-list-loading true))
-
-(defmethod dispatcher/action :udpates-list-get [db [_ {:keys [slug response]}]]
-  (get-updates db))
-
-(defmethod dispatcher/action :updates-list [db [_ {:keys [response]}]]
-  (-> db
-    (dissoc :loading)
-    (dissoc :updates-list-loading)
-    (assoc :updates-list-loaded true)
-    (assoc-in (dispatcher/updates-list-key (router/current-org-slug)) (:collection response))))
-
-(defmethod dispatcher/action :update-loaded [db [_ {:keys [org-slug update-slug response load-org-data]}]]
-  (let [org-data-keys [:logo-url :logo-width :logo-height :currency]
-        org-data      (-> response
-                          (select-keys org-data-keys)
-                          (assoc :name (:org-name response)))]
-    ; load-org-data is used to save the subset of company data that is returned with a stakeholder-update data
-    (if load-org-data
-      ; save the company data returned with the SU data
-      (-> db
-        (assoc-in (dispatcher/update-key org-slug update-slug) response)
-        (assoc-in (dispatcher/org-data-key org-slug) (utils/fix-org org-data))
-        (dissoc :loading))
-      ; save only the SU data
-      (-> db
-        (assoc-in (dispatcher/update-key org-slug update-slug) response)
-        (dissoc :loading)))))
 
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
@@ -541,11 +505,6 @@
   (if (responsive/is-mobile-size?)
     (assoc db :mobile-menu-open (not (:mobile-menu-open db)))
     db))
-
-(defmethod dispatcher/action :reset-updates-list
-  [db [_]]
-  ; Reset flag to reload su list when needed
-  (dissoc db :updates-list-loaded))
 
 (defn sort-reactions [entry]
   (let [reactions (:reactions entry)
@@ -1176,3 +1135,25 @@
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-activity-key new-all-activity))
     db))
+
+(defmethod dispatcher/action :story-get
+  [db [_]]
+  (let [story-uuid (router/current-activity-id)
+        story-data (dispatcher/activity-data story-uuid)
+        story-link (utils/link-for (:links story-data) "self")
+        fixed-story-link (or story-link {:href (str "/" (router/current-org-slug) "/" (router/current-board-slug) "/stories/" story-uuid)})]
+    (js/console.log "action/:story-get" story-data)
+    (js/console.log "   story-link" story-data)
+    (js/console.log "   fixed-story-link" fixed-story-link)
+    (api/get-story story-uuid fixed-story-link))
+  (assoc db :story-loading true))
+
+(defmethod dispatcher/action :story-get/finish
+  [db [_ story-uuid story-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        story-key (dispatcher/story-key org-slug board-slug story-uuid)
+        fixed-story-data (utils/fix-story story-data board-slug)]
+    (-> db
+      (dissoc :story-loading)
+      (assoc-in story-key fixed-story-data))))
