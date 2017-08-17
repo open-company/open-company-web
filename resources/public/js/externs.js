@@ -81,5 +81,9 @@ filestack.pick = function(){};
 filestack.then = function(){};
 filestack.transform = function(){};
 filestack.storeURL = function(){};
+// Moment
+var moment = {};
+moment.tz = {};
+moment.tz.guess = function(){};
 
 var mailchimpApiSubmit = function(){};
