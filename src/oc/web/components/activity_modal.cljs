@@ -52,6 +52,7 @@
                          (rum/local false ::showing-dropdown)
                          (rum/local nil ::column-height)
                          (rum/local nil ::window-resize-listener)
+                         (rum/local false ::close-hovering)
                          rum/reactive
                          (drv/drv :activity-modal-fade-in)
                          {:before-render (fn [s]
@@ -108,7 +109,10 @@
          :on-mouse-enter #(reset! (::hovering-card s) true)
          :on-mouse-leave #(reset! (::hovering-card s) false)}
         [:button.close-activity-modal.mlb-reset
-          {:on-click #(close-clicked s)}]
+          {:on-click #(close-clicked s)
+           :on-mouse-enter #(reset! (::close-hovering s) true)
+           :on-mouse-leave #(reset! (::close-hovering s) false)}
+          [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::close-hovering s) "_white") ".png")) :width 12 :height 12}]]
         [:div.activity-modal-inner.group
           [:div.activity-left-column
             {:style (when column-height {:minHeight (str column-height "px")})}

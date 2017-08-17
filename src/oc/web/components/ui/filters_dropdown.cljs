@@ -17,6 +17,7 @@
 (rum/defcs filters-dropdown < rum/reactive
                               (drv/drv :board-filters)
                               (drv/drv :board-data)
+                              (rum/local false ::remove-bt-hovering)
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
@@ -45,7 +46,10 @@
                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
                         (if (= last-filter :by-topic)
                           (router/nav! (oc-urls/board-sort-by-topic))
-                          (router/nav! (oc-urls/board))))}])
+                          (router/nav! (oc-urls/board))))
+           :on-mouse-enter #(reset! (::remove-bt-hovering s) true)
+           :on-mouse-leave #(reset! (::remove-bt-hovering s) false)}
+          [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::remove-bt-hovering s) "_white") ".png")) :width 12 :height 12}]])
       (when (string? board-filters)
         [:button.mlb-reset.filters-dropdown-button.choice
           {:type "button"

@@ -32,14 +32,10 @@ div.activity-modal-container {
       height: 32px;
       background-color: $carrot_light_blue;
       border-radius: 4px;
-      background-image: cdnUrl("/img/ML/board_remove_filter.png");
-      background-position: 50%;
-      background-repeat: no-repeat;
       transition: 230ms;
       opacity: 1;
 
       &:hover {
-        background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
         background-color: $carrot_text_blue;
         opacity: 1;
       }
