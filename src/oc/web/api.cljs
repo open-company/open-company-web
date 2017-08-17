@@ -230,49 +230,6 @@
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
-(defn get-updates []
-  (let [org-data (dispatcher/org-data)
-        links (:links org-data)
-        su-link (utils/link-for links "collection" "GET")]
-    (when su-link
-      (storage-get (relative-href (:href su-link))
-        {:headers (headers-for-link su-link)}
-        (fn [{:keys [success body]}]
-          (let [fixed-body (if success (json->cljs body) {})]
-            (dispatcher/dispatch! [:updates-list {:response fixed-body}])))))))
-
-(defn get-update
-  ([update-data load-org-data]
-    (when update-data
-      (let [update-link (utils/link-for (:links update-data) "self")]
-        (storage-get (relative-href (:href update-link))
-          {:headers (headers-for-link update-link)}
-          (fn [{:keys [success body] :as response}]
-            (let [fixed-body (if success (json->cljs body) {})
-                  response {:org-slug (router/current-org-slug)
-                            :update-slug (keyword (:slug update-data))
-                            :response fixed-body
-                            :load-org-data load-org-data}]
-              (dispatcher/dispatch! [:update-loaded response]))))))))
-
-(defn get-update-with-slug
-  ([org-slug update-slug load-org-data]
-    (when (and org-slug update-slug)
-      (let [update-link (str "/orgs/" org-slug "/updates/" update-slug)]
-        (storage-get update-link
-          { :headers {
-            ; required by Chrome
-            "Access-Control-Allow-Headers" "Content-Type"
-            ; custom content type
-            "content-type" (content-type "stakeholder-update")}}
-          (fn [{:keys [success body]}]
-            (let [fixed-body (if success (json->cljs body) {})
-                  response {:org-slug (keyword org-slug)
-                            :update-slug (keyword update-slug)
-                            :response fixed-body
-                            :load-org-data load-org-data}]
-              (dispatcher/dispatch! [:update-loaded response]))))))))
-
 (defn auth-with-email [email pswd]
   (when (and email pswd)
     (let [email-links (:links (:auth-settings @dispatcher/app-state))
@@ -780,6 +737,14 @@
         {:headers (headers-for-link calendar-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:calendar-get/finish {:org (router/current-org-slug) :body (if success (json->cljs body) nil)}]))))))
+
+(defn get-story [story-uuid story-link]
+  (js/console.log "api/get-story" story-uuid story-link)
+  (when story-link
+    (storage-get (relative-href (:href story-link))
+      {:headers (headers-for-link story-link)}
+      (fn [{:keys [status success body]}]
+        (dispatcher/dispatch! [:story-get/finish {:story-uuid story-uuid :story-data (if success (json->cljs body) nil)}])))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
