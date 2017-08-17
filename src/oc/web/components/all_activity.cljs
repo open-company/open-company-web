@@ -17,9 +17,6 @@
 (def scroll-card-threshold 5)
 (def card-avg-height 600)
 
-(defn dbg [& args]
-  (apply (partial logging/dbg "all-activity") args))
-
 (def last-scroll (atom 0))
 
 (defn- check-entry
@@ -107,7 +104,6 @@
                (not @(::scroll-to-entry s))
                (= direction :up)
                (= scroll-top min-scroll))
-      (dbg "   :up" @(::has-next s))
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
@@ -117,7 +113,6 @@
     (when (and @(::has-prev s)
                (= direction :down)
                (>= scroll-top (- max-scroll (* scroll-card-threshold card-avg-height))))
-      (dbg "   :down" @(::has-prev s))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
@@ -154,9 +149,6 @@
                                               prev-link (utils/link-for (:links all-activity-data) "next")
                                               first-entry-date (utils/js-date (:created-at (first (:items all-activity-data))))
                                               first-available-entry (when (and year month) (get-first-available-entry (:items all-activity-data) year month))]
-                                          (dbg "will-mount" all-activity-data)
-                                          (dbg "   next-link" next-link "prev-link" prev-link)
-                                          (dbg "   year" year "month" month "first-entry-date" first-entry-date "first-available-entry" first-available-entry)
                                           (if (and year month)
                                             ;; Loading from calendar since we have year and month from the click action
                                             (do
@@ -202,7 +194,6 @@
                                             (reset! (::show-all-caught-up-message s) true)))
                                         s)
                            :did-mount (fn [s]
-                                        (dbg "did-mount")
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
                                         (reset! (::scroll-listener s)
                                          (events/listen js/window EventType/SCROLL #(did-scroll s %)))
@@ -212,13 +203,11 @@
                                               (reset! (::first-render-done s) true))
                                            (when-let [scroll-to @(::scroll-to-entry s)]
                                              (when-let [entry-el (sel1 [(str "div.activity-card-" (:uuid scroll-to))])]
-                                               (dbg "scrolling to:" entry-el)
                                                (utils/scroll-to-element entry-el 100 0))
                                              (utils/after 100 #(do (reset! (::scroll-to-entry s) nil)
                                                                    (reset! (::last-direction s) nil))))
                                            s)
                            :did-remount (fn [_ s]
-                                          (dbg "did-remount" (first (:rum/args s)))
                                           (let [all-activity-data (first (:rum/args s))]
                                             (when-not (:loading-more all-activity-data)
                                               (when @(::top-loading s)
@@ -237,7 +226,6 @@
                                                     first-available-entry (get-first-available-entry (:items all-activity-data) @(::selected-year s) month)
                                                     next-link (utils/link-for (:links all-activity-data) "previous")
                                                     prev-link (utils/link-for (:links all-activity-data) "next")]
-                                                (dbg "   next-link" next-link "prev-link" prev-link)
                                                 (reset! (::has-next s) next-link)
                                                 (if prev-link
                                                   (do
