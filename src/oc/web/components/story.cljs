@@ -22,7 +22,6 @@
   (let [board-data (drv/react s :board-data)
         story-data (drv/react s :story-data)
         story-author (if (map? (:author story-data)) (:author story-data) (first story-data))]
-    (js/console.log "story/render" story-data)
     [:div.story-container
       [:div.story-header.group
         [:div.story-header-left

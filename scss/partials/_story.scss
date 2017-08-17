@@ -7,6 +7,8 @@ div.story-container {
 
   div.story-header {
     height: 72px;
+    position: fixed;
+    width: 100%;
     background-color: white;
     padding: 24px 32px;
     box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
@@ -67,7 +69,7 @@ div.story-container {
     width: 840px;
     min-height: 136px;
     padding: 68px 80px;
-    margin: 32px auto;
+    margin: 104px auto 32px;
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
     border-radius: 8px;
