@@ -67,19 +67,22 @@ div.story-container {
     width: 840px;
     min-height: 136px;
     padding: 68px 80px;
-    margin: 72px auto;
+    margin: 32px auto;
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
 
     div.story-banner {
       margin-left: -80px;
       margin-top: -68px;
       margin-bottom: 20px;
       width: 840px;
-      height: 240px;
+      max-height: 200px;
       background-position: 50%;
       background-size: cover;
       background-repeat: no-repeat;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
 
     div.story-author {
