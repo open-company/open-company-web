@@ -167,4 +167,4 @@
           [:div.activity-right-column
             {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.activity-right-column-content
-              (comments (:uuid activity-data))]]]]]))
+              (comments activity-data)]]]]]))
