@@ -16,7 +16,7 @@ div.story-container {
     div.story-header-left{
       float: left;
 
-      span.board-name {
+      a.board-name {
         @include avenir_H();
         font-size: 16px;
         color: $carrot_light_gray_1;

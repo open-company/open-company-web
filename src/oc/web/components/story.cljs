@@ -41,7 +41,10 @@
     [:div.story-container
       [:div.story-header.group
         [:div.story-header-left
-          [:span.board-name (:storyboard-name story-data)]
+          [:a.board-name
+            {:href (oc-urls/board (:board-slug story-data))
+             :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (:board-slug story-data))))}
+            (:storyboard-name story-data)]
           [:span.arrow ">"]
           [:span.story-title (:title story-data)]]
         [:div.story-header-right

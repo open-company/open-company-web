@@ -103,8 +103,8 @@
   "Board url"
   ([]
     (board (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug]
-    (board org-slug (router/current-board-slug)))
+  ([board-slug]
+    (board (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
 
