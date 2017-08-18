@@ -65,14 +65,25 @@
     (utils/after 200 #(scroll-to-bottom s)))
   (reset! (::add-comment-focus s) expanding?))
 
+(defn load-comments-if-needed [s]
+  (let [activity-data (first (:rum/args s))]
+    (when (and (not @(::comments-requested s))
+               activity-data)
+      (reset! (::comments-requested s) true)
+      (dis/dispatch! [:comments-get activity-data]))))
+
 (rum/defcs comments < (drv/drv :comments-data)
                       rum/reactive
                       rum/static
                       (rum/local false ::add-comment-focus)
                       (rum/local false ::needs-gradient)
+                      (rum/local false ::comments-requested)
                       {:will-mount (fn [s]
-                                    (dis/dispatch! [:comments-get (first (:rum/args s))])
+                                    (load-comments-if-needed s)
                                     s)
+                       :did-remount (fn [o s]
+                                      (load-comments-if-needed s)
+                                      s)
                        :after-render (fn [s]
                                        (let [comments (js/$ ".comments")
                                              comments-internal-scroll (js/$ ".comments-internal-scroll")
