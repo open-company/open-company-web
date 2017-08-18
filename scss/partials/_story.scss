@@ -44,12 +44,16 @@ div.story-container {
     div.story-header-right {
       float: right;
 
-      div.is-comments {
+      div.comments-summary-container {
         margin-left: 22px;
+        margin-top: 2px;
+        cursor: pointer;
+        float: left;
       }
 
       button.share-button {
         margin-left: 22px;
+        margin-top: -1;
         &:before {
           width: 22px;
           height: 14px;
@@ -73,6 +77,7 @@ div.story-container {
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
     border-radius: 8px;
+    transition: margin-left 230ms;
 
     div.story-banner {
       margin-left: -80px;
@@ -133,6 +138,40 @@ div.story-container {
         background-repeat: no-repeat;
         margin-left: 15px;
       }
+    }
+  }
+
+  div.story-comments-container {
+    position: fixed;
+    top: 72px;
+    height: calc(100vh - 72px);
+    width: 360px;
+    right: -392px;
+    transition: right 230ms;
+
+    &.comments-expanded {
+      right: 0px;
+    }
+
+    button.close-comments {
+      position: absolute;
+      top: 0px;
+      left: -32px;
+      width: 32px;
+      height: 32px;
+      background-color: $carrot_light_blue;
+      border-radius: 4px;
+      transition: 230ms;
+      opacity: 1;
+
+      &:hover {
+        background-color: $carrot_text_blue;
+        opacity: 1;
+      }
+    }
+
+    div.comments {
+      background-color: #F2F1ED;
     }
   }
 }
