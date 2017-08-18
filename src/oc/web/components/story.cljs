@@ -32,7 +32,7 @@
                                     s)}
   [s]
   (let [story-data (drv/react s :story-data)
-        story-author (if (map? (:author story-data)) (:author story-data) (first story-data))
+        story-author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))
         left-space (/ (- (.-innerWidth js/window) 840) 2)
         offset (if (> left-space default-comments-total-width)
                   0
