@@ -25,7 +25,9 @@
                                     (events/listen js/window EventType/RESIZE #(reset! (::comments-expanded s) @(::comments-expanded s))))
                                   s)
                     :after-render (fn [s]
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                                    (doto (js/$ "[data-toggle=\"tooltip\"]")
+                                      (.tooltip "fixTitle")
+                                      (.tooltip "hide"))
                                     s)
                     :will-unmount (fn [s]
                                     (events/unlistenByKey @(::window-resize s))
