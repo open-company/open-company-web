@@ -29,7 +29,7 @@
                          rum/reactive
                          (drv/drv :current-user-data)
                          rum/static
-  [s activity-uuid did-expand-cb]
+  [s activity-data did-expand-cb]
   (let [v (::v s)
         show-footer (::show-footer s)
         fixed-show-footer (or @show-footer (not (empty? @v)))
@@ -49,7 +49,7 @@
           [:div.reply-button-container
             [:button.btn-reset.reply-btn
               {:on-click (fn [_]
-                            (dis/dispatch! [:comment-add activity-uuid @v])
+                            (dis/dispatch! [:comment-add activity-data @v])
                             (reset! v ""))}
               "Add"]]]]]))
 
@@ -97,7 +97,7 @@
                                          ;; recall scroll to bottom if needed
                                          (scroll-to-bottom s))
                                        s)}
-  [s activity-uuid]
+  [s activity-data]
   (let [comments-data (drv/react s :comments-data)
         needs-gradient @(::needs-gradient s)]
     (if (:loading comments-data)
@@ -112,10 +112,10 @@
           (if (pos? (count comments-data))
             [:div.comments-internal-scroll
               (for [c comments-data]
-                (rum/with-key (comment-row c) (str "activity-" activity-uuid "-comment-" (:created-at c))))
+                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
               ]
             [:div.comments-internal-empty
               [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
               [:div "No comments yet"]
               [:div (str "Jump in and let everybody know what you think!")]])
-          (add-comment activity-uuid (partial add-comment-expand-cb s))]])))
+          (add-comment activity-data (partial add-comment-expand-cb s))]])))

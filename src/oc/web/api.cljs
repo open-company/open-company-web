@@ -646,10 +646,9 @@
                                                          :body (if (not (empty? body)) (json->cljs body) nil)
                                                          :activity-uuid (:uuid activity-data)}])))))))
 
-(defn add-comment [activity-uuid comment-body]
-  (when (and activity-uuid comment-body)
-    (let [activity-data (dispatcher/activity-data activity-uuid)
-          add-comment-link (utils/link-for (:links activity-data) "create" "POST")
+(defn add-comment [activity-data comment-body]
+  (when (and activity-data comment-body)
+    (let [add-comment-link (utils/link-for (:links activity-data) "create" "POST")
           json-data (cljs->json {:body comment-body})]
       (interaction-post (relative-href (:href add-comment-link))
         {:headers (headers-for-link add-comment-link)
@@ -658,7 +657,7 @@
           (dispatcher/dispatch! [:comment-add/finish {:success success
                                                       :error (when-not success body)
                                                       :body (if (not (empty? body)) (json->cljs body) nil)
-                                                      :activity-uuid activity-uuid}]))))))
+                                                      :activity-uuid (:uuid activity-data)}]))))))
 
 (defn toggle-reaction
   [activity-uuid reaction-data]

@@ -672,11 +672,11 @@
     (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ activity-uuid comment-body]]
-  (api/add-comment activity-uuid comment-body)
+  [db [_ activity-data comment-body]]
+  (api/add-comment activity-data comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)
+        comments-key (dispatcher/comments-key org-slug board-slug (:uuid activity-data))
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
                                                :created-at (utils/as-of-now)
