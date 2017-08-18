@@ -103,6 +103,18 @@ div.activity-card {
       position: absolute;
       left: -10px;
       top: 25px;
+
+      &:after {
+        content: "";
+        width: 14px;
+        height: 20px;
+        background-color: white;
+        box-shadow: none;
+        top: 9px;
+        left: 20px;
+        position: absolute;
+        transform: rotate(-45deg);
+      }
     }
 
     div.activity-card-content {
