@@ -117,5 +117,6 @@
             [:div.comments-internal-empty
               [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
               [:div "No comments yet"]
-              [:div (str "Jump in and let everybody know what you think!")]])
+              [:div "Jump in and let everybody know"]
+              [:div "what you think!"]])
           (add-comment activity-data (partial add-comment-expand-cb s))]])))

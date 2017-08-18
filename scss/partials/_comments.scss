@@ -68,6 +68,10 @@ div.comments {
 
       div {
         margin-top: 24px;
+
+        &:last-child {
+          margin-top: 0px;
+        }
       }
     }
 
