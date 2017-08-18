@@ -15,6 +15,9 @@
 (defn sorted-stories [boards]
   (into [] (sort-by :created-at boards)))
 
+(defn sorted-storyboards [boards]
+  (into [] (sort-by :name boards)))
+
 (defn anchor-nav! [e url]
   (utils/event-stop e)
   (router/nav! url))
@@ -111,7 +114,7 @@
               [:div.board-name.team-board.group
                 [:div.internal
                   (str "Drafts" (:count drafts-link))]]]))
-        (for [storyboard (sorted-stories storyboards)]
+        (for [storyboard (sorted-storyboards storyboards)]
           [:a.left-navigation-sidebar-item
             {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "selected")
              :data-board (name (:slug storyboard))
