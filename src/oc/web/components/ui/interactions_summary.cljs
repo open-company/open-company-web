@@ -22,10 +22,12 @@
           (:count max-reaction)]])))
 
 (rum/defc comments-summary < rum/static
-  [entry-data]
+  [entry-data show-zero-comments?]
   (let [comments-link (utils/link-for (:links entry-data) "comments")
-        comments-authors (vec (sort-by :created-at (:authors comments-link)))]
-    (when-not (zero? (:count comments-link))
+        comments-authors (vec (sort-by :created-at (:authors comments-link)))
+        comments-count (or (:count comments-link) 0)]
+    (when (or show-zero-comments?
+              (not (zero? comments-count)))
       [:div.is-comments
         ; Comments authors heads
         [:div.is-comments-authors.group
@@ -37,7 +39,7 @@
         ; Comments count
         [:div.is-comments-summary
           {:class (str "comments-count-" (:uuid entry-data))}
-          (str (:count comments-link) " comment" (when (> (:count comments-link) 1) "s"))]])))
+          (str comments-count " comment" (when (or (zero? comments-count) (> comments-count 1)) "s"))]])))
 
 (rum/defcs interactions-summary < rum/static
   [s entry-data]
