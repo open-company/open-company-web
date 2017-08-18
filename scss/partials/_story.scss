@@ -69,79 +69,143 @@ div.story-container {
     }
   }
 
-  div.story-content {
-    width: 840px;
-    min-height: 136px;
-    padding: 68px 80px 32px;
+  div.story-content-outer {
     margin: 104px auto 32px;
-    background-color: white;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    width: 840px;
     transition: margin-left 230ms;
 
-    div.story-author {
-      @include activity-author();
-    }
+    div.story-content {
+      min-height: 136px;
+      padding: 68px 80px 32px;
+      background-color: white;
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
 
-    div.story-banner {
-      margin-left: -80px;
-      margin-top: 50px;
-      margin-bottom: 20px;
-      width: 840px;
-      max-height: 200px;
-      background-position: 50%;
-      background-size: cover;
-      background-repeat: no-repeat;
-      // border-radius: 8px;
-      // border-top-left-radius: 8px;
-      // border-top-right-radius: 8px;
-    }
-
-    div.story-tags {
-      margin-top: 21px;
-      @include activity-tag();
-    }
-
-    div.story-title {
-      margin-top: 59px;
-      @include activity-title();
-      @include avenir_M();
-      font-size: 32px;
-    }
-
-    div.story-body {
-      margin-top: 8px;
-      @include activity-body();
-      @include avenir_M();
-      font-size: 20px;
-      color: $oc_gray_7;
-      * {
-        color: $oc_gray_7;
-      }
-    }
-
-    div.story-content-footer {
-      margin-top: 46px;
-      text-align: center;
-
-      div.you-did-it {
-        @include avenir_BOOK();
-        font-size: 16px;
-        color: $carrot_light_gray_1;
-        float: left;
-        margin-top: 13px;
-        margin-left: 250px;
+      div.story-author {
+        @include activity-author();
       }
 
-      div.caught-up {
-        float: left;
-        margin-top: 5px;
-        width: 26px;
-        height: 33px;
-        background-image: cdnUrl("/img/ML/caught_up.svg");
-        background-size: 26px 33px;
+      div.story-banner {
+        margin-left: -80px;
+        margin-top: 50px;
+        margin-bottom: 20px;
+        width: 840px;
+        max-height: 200px;
+        background-position: 50%;
+        background-size: cover;
         background-repeat: no-repeat;
-        margin-left: 15px;
+        // border-radius: 8px;
+        // border-top-left-radius: 8px;
+        // border-top-right-radius: 8px;
+      }
+
+      div.story-tags {
+        margin-top: 21px;
+        @include activity-tag();
+      }
+
+      div.story-title {
+        margin-top: 59px;
+        @include activity-title();
+        @include avenir_M();
+        font-size: 32px;
+      }
+
+      div.story-body {
+        margin-top: 8px;
+        @include activity-body();
+        @include avenir_M();
+        font-size: 20px;
+        color: $oc_gray_7;
+        * {
+          color: $oc_gray_7;
+        }
+      }
+
+      div.story-content-footer {
+        margin-top: 46px;
+        text-align: center;
+
+        div.you-did-it {
+          @include avenir_BOOK();
+          font-size: 16px;
+          color: $carrot_light_gray_1;
+          float: left;
+          margin-top: 13px;
+          margin-left: 250px;
+        }
+
+        div.caught-up {
+          float: left;
+          margin-top: 5px;
+          width: 26px;
+          height: 33px;
+          background-image: cdnUrl("/img/ML/caught_up.svg");
+          background-size: 26px 33px;
+          background-repeat: no-repeat;
+          margin-left: 15px;
+        }
+      }
+    }
+
+    div.related-container {
+      margin-top: 24px;
+
+      div.related-title {
+        @include avenir_H();
+        font-size: 20px;
+        color: #768594;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      div.related-story {
+        padding: 24px;
+        width: 408px;
+        height: 180px;
+        borer-radius: 4px;
+        background-color: white;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+
+        &.centered {
+          margin: 0px auto;
+        }
+
+        &:not(.centered) {
+          float: left;
+
+          &:last-child {
+            margin-left: 24px;
+          }
+        }
+
+        div.related-story-header {
+          @include activity-author();
+        }
+
+        div.related-story-title {
+          @include activity-title();
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-top: 16px;
+          width: 360px;
+        }
+
+        div.related-story-footer {
+          margin-top: 16px;
+
+          div.related-story-comments {
+            margin-left: 16px;
+            margin-top: 4px;
+            float: left;
+          }
+
+          div.reactions {
+            pointer-events: none;
+          }
+        }
       }
     }
   }

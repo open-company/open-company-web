@@ -12,6 +12,29 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(rum/defc related-story < rum/static
+  [story-data single-related]
+  (let [author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))]
+    [:div.related-story
+      {:class (when single-related "centered")
+       :on-click #(router/nav! (oc-urls/story (router/current-org-slug) (router/current-board-slug) (:uuid story-data)))}
+      [:div.related-story-header
+        (user-avatar-image author)
+        [:div.name (:name author)]
+          [:div.time-since
+            [:time
+              {:date-time (:created-at story-data)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :title (utils/activity-date-tooltip story-data)}
+              (utils/time-since (:created-at story-data))]]]
+      [:div.related-story-title
+        (:title story-data)]
+      [:div.related-story-footer.group
+        (reactions story-data)
+        [:div.related-story-comments
+          (comments-summary story-data true)]]]))
+
 (def default-comments-total-width 492)
 
 (rum/defcs story < rum/reactive
@@ -57,37 +80,42 @@
           [:button.mlb-reset.mlb-link.share-button
             {:on-click #()}
             "Share"]]]
-      [:div.story-content
-        {:class (when @(::comments-expanded s) "comments-expanded")
-         :style #js {:marginLeft (str (int margin-left) "px")}}
-        [:div.story-author.group
-          (user-avatar-image story-author)
-          [:div.name (:name story-author)]
-          [:div.time-since
-            [:time
-              {:date-time (:created-at story-data)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :title (utils/activity-date-tooltip story-data)}
-              (utils/time-since (:created-at story-data))]]]
-        (when (:banner-url story-data)
-          [:div.story-banner
-            {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
-        ; (when (:storyboard-name story-data)
-        ;   [:div.story-tags
-        ;     [:div.activity-tag
-        ;       {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
-        ;       (:storyboard-name story-data)]])
-        (when (:title story-data)
-          [:div.story-title
-            {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
-        (when (:body story-data)
-          [:div.story-body
-            {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])
-        [:div.story-content-footer.group
-          [:div.you-did-it "The End. You did it!"]
-          [:div.caught-up]]]
+      [:div.story-content-outer
+        {:style #js {:marginLeft (str (int margin-left) "px")}}
+        [:div.story-content
+          [:div.story-author.group
+            (user-avatar-image story-author)
+            [:div.name (:name story-author)]
+            [:div.time-since
+              [:time
+                {:date-time (:created-at story-data)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :title (utils/activity-date-tooltip story-data)}
+                (utils/time-since (:created-at story-data))]]]
+          (when (:banner-url story-data)
+            [:div.story-banner
+              {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
+                           :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
+          ; (when (:storyboard-name story-data)
+          ;   [:div.story-tags
+          ;     [:div.activity-tag
+          ;       {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
+          ;       (:storyboard-name story-data)]])
+          (when (:title story-data)
+            [:div.story-title
+              {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
+          (when (:body story-data)
+            [:div.story-body
+              {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])
+          [:div.story-content-footer.group
+            [:div.you-did-it "The End. You did it!"]
+            [:div.caught-up]]]
+        (when (pos? (count (:related story-data)))
+          [:div.related-container.group
+            [:div.related-title (str "Related Stories in " (:storyboard-name story-data))]
+            (for [story (:related story-data)]
+              (related-story story (= (count (:related story-data)) 1)))])]
       [:div.story-comments-container
         {:class (when @(::comments-expanded s) "comments-expanded")}
         [:button.close-comments.mlb-reset
