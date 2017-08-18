@@ -8,21 +8,36 @@
             [oc.web.components.comments :refer (comments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (comments-summary)]))
+            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
+
+(def default-comments-total-width 492)
 
 (rum/defcs story < rum/reactive
                    (drv/drv :story-data)
                    (rum/local false ::comments-expanded)
                    (rum/local false ::close-hovering)
+                   (rum/local nil ::window-resize)
                    {:will-mount (fn [s]
                                   (dis/dispatch! [:story-get (first (:rum/args s))])
+                                  (reset! (::window-resize s)
+                                    (events/listen js/window EventType/RESIZE #(reset! (::comments-expanded s) @(::comments-expanded s))))
                                   s)
                     :after-render (fn [s]
                                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                                    s)
+                    :will-unmount (fn [s]
+                                    (events/unlistenByKey @(::window-resize s))
                                     s)}
   [s]
   (let [story-data (drv/react s :story-data)
-        story-author (if (map? (:author story-data)) (:author story-data) (first story-data))]
+        story-author (if (map? (:author story-data)) (:author story-data) (first story-data))
+        left-space (/ (- (.-innerWidth js/window) 840) 2)
+        offset (if (> left-space default-comments-total-width)
+                  0
+                  (min (- left-space 24) (- default-comments-total-width left-space)))
+        margin-left (- left-space (when @(::comments-expanded s) offset))]
     [:div.story-container
       [:div.story-header.group
         [:div.story-header-left
@@ -39,7 +54,7 @@
             "Share"]]]
       [:div.story-content
         {:class (when @(::comments-expanded s) "comments-expanded")
-         :style #js {:marginLeft (str (int (/ (- (.-innerWidth js/window) 840 (when @(::comments-expanded s) 360)) 2)) "px")}}
+         :style #js {:marginLeft (str (int margin-left) "px")}}
         (when (:banner-url story-data)
           [:div.story-banner
             {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
