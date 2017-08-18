@@ -634,10 +634,9 @@
               (router/nav! (oc-urls/org (router/current-org-slug)))
               (.reload (.-location js/window)))))))))
 
-(defn get-comments [activity-uuid]
-  (when activity-uuid
-    (let [activity-data (dispatcher/activity-data activity-uuid)
-          comments-link (utils/link-for (:links activity-data) "comments")]
+(defn get-comments [activity-data]
+  (when activity-data
+    (let [comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
         (interaction-get (relative-href (:href comments-link))
           {:headers (headers-for-link comments-link)}
@@ -645,7 +644,7 @@
             (dispatcher/dispatch! [:comments-get/finish {:success success
                                                          :error (when-not success body)
                                                          :body (if (not (empty? body)) (json->cljs body) nil)
-                                                         :activity-uuid activity-uuid}])))))))
+                                                         :activity-uuid (:uuid activity-data)}])))))))
 
 (defn add-comment [activity-uuid comment-body]
   (when (and activity-uuid comment-body)
