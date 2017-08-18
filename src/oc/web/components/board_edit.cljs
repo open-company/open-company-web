@@ -136,7 +136,7 @@
              :on-change #(do
                           (dis/dispatch! [:input [:board-editing :name] (.. % -target -value)])
                           (dis/dispatch! [:input [:board-editing :board-name-error] nil]))
-             :placeholder "Product, Development, Finance, Operations, etc."}]
+             :placeholder (if (= (:type board-editing) "story") "All-hands, Investor Updates, Weekly Kickoffs, etc." "Product, Development, Finance, Operations, etc.")}]
           [:div.board-edit-label.board-edit-access-label (str (string/upper label) " PERMISSIONS")]
           [:div.board-edit-access-field.group
             [:div.board-edit-access-bt.board-edit-access-team-bt
