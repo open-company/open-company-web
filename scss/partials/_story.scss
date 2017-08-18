@@ -148,6 +148,8 @@ div.story-container {
     width: 360px;
     right: -392px;
     transition: right 230ms;
+    padding: 16px;
+    background-color: #F2F1ED;
 
     &.comments-expanded {
       right: 0px;
@@ -170,8 +172,17 @@ div.story-container {
       }
     }
 
-    div.comments {
-      background-color: #F2F1ED;
+    div.story-comments-container-inner {
+      height: 100%;
+      div.comments {
+        background-color: #F2F1ED;
+
+        div.comments-internal {
+          div.add-comment-box {
+            width: 100%;
+          }
+        }
+      }
     }
   }
 }

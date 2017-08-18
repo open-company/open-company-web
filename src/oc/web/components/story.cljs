@@ -42,8 +42,8 @@
       [:div.story-header.group
         [:div.story-header-left
           [:a.board-name
-            {:href (oc-urls/board (:board-slug story-data))
-             :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (:board-slug story-data))))}
+            {:href (oc-urls/board (router/current-board-slug))
+             :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-board-slug))))}
             (:storyboard-name story-data)]
           [:span.arrow ">"]
           [:span.story-title (:title story-data)]]
@@ -93,4 +93,5 @@
            :on-mouse-enter #(reset! (::close-hovering s) true)
            :on-mouse-leave #(reset! (::close-hovering s) false)}
           [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::close-hovering s) "_white") ".png")) :width 12 :height 12}]]
-        (comments story-data)]]))
+        [:div.story-comments-container-inner
+          (comments story-data)]]]))
