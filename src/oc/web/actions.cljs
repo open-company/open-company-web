@@ -657,8 +657,8 @@
   (assoc db :edit-user-profile-failed true))
 
 (defmethod dispatcher/action :comments-get
-  [db [_ activity-uuid]]
-  (api/get-comments activity-uuid)
+  [db [_ activity-data]]
+  (api/get-comments activity-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         activity-uuid (router/current-activity-id)
@@ -666,8 +666,8 @@
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
-  [db [_ {:keys [success error body]}]]
-  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id))
+  [db [_ {:keys [success error body activity-uuid]}]]
+  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
