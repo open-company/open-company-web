@@ -41,6 +41,25 @@ div.story-edit-container {
       }
     }
 
+    div.story-edit-header-center {
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      margin-left: -100px;
+      width: 200px;
+      height: 25px;
+      @include avenir_R();
+      font-size: 15px;
+      color: $carrot_light_gray_1;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 230ms;
+
+      &.showing {
+        opacity: 1;
+      }
+    }
+
     div.story-edit-header-right {
       float: right;
       margin-top: -6px;
@@ -77,6 +96,28 @@ div.story-edit-container {
     width: 840px;
     margin: 104px auto 32px;
 
+    div.story-edit-author {
+      @include activity-author();
+    }
+
+    div.story-edit-add-banner {
+      margin-left: -80px;
+      margin-top: 50px;
+      width: 840px;
+      height: 200px;
+      @include avenir_H();
+      font-size: 18px;
+      color: $oc_gray_7;
+      text-align: center;
+      padding-top: 88px;
+      cursor: pointer;
+      background-color: rgba(#F2F1ED, 0.3);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
     div.story-edit-banner {
       margin-left: -80px;
       margin-top: 50px;
@@ -86,9 +127,6 @@ div.story-edit-container {
       background-position: 50%;
       background-size: cover;
       background-repeat: no-repeat;
-      // border-radius: 8px;
-      // border-top-left-radius: 8px;
-      // border-top-right-radius: 8px;
     }
 
     div.story-edit-tags {

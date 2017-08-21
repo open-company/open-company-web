@@ -14,6 +14,25 @@
             [goog.events.EventType :as EventType]))
 
 (def default-story-title "Untitled Story")
+(def default-save-wait 2000)
+(def default-save-message-show 2000)
+
+(defn update-story-editing [s new-data]
+  (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) new-data {:has-changes true})])
+  (when @(::last-timeout s)
+    (js/clearTimeout @(::last-timeout s)))
+  (reset! (::last-timeout s)
+   (utils/after default-save-wait
+    (fn []
+      (reset! (::central-message s) "Saving")
+      (reset! (::last-timeout s)
+       (utils/after default-save-message-show
+         (fn []
+           (reset! (::central-message s) "Saved")
+           (reset! (::last-timeout s)
+            (utils/after default-save-message-show
+             (fn []
+               (reset! (::central-message s) "")))))))))))
 
 (defn body-on-change [state]
   (when-let [body-el (sel1 [:div.story-edit-body])]
@@ -29,14 +48,12 @@
     ; Attach paste listener to the body and all its children
     (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
     (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (dis/dispatch! [:input [:story-editing :body] emojied-body])
-      (dis/dispatch! [:input [:story-editing :has-changes] true]))))
+      (update-story-editing state {:body emojied-body}))))
 
 (defn- title-on-change [state]
   (when-let [title (sel1 [:div.story-edit-title])]
     (let [emojied-title   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML title)) "__html"))]
-      (dis/dispatch! [:input [:story-editing :title] emojied-title])
-      (dis/dispatch! [:input [:story-editing :has-changes] true]))))
+      (update-story-editing state {:title emojied-title}))))
 
 (defn- setup-body-editor [state]
   (let [title-el  (sel1 [:div.story-edit-title])
@@ -77,6 +94,8 @@
                         (rum/local "" ::initial-title)
                         (rum/local "" ::initial-body)
                         (rum/local nil ::initial-story-data)
+                        (rum/local "" ::central-message)
+                        (rum/local nil ::last-timeout)
                         {:will-mount (fn [s]
                                        (let [story-data @(drv/get-ref s :story-data)
                                              story-editing @(drv/get-ref s :story-editing)
@@ -116,7 +135,11 @@
                                          s)}
   [s]
   (let [story-data (drv/react s :story-editing)
-        story-author (drv/react s :current-user-data)]
+        story-author (if (:author story-data)
+                       (if (map? (:author story-data))
+                         (:author story-data)
+                         (first (:author story-data)))
+                       (drv/react s :current-user-data))]
     [:div.story-edit-container
       [:div.story-edit-header.group
         [:div.story-edit-header-left
@@ -127,6 +150,9 @@
           [:span.arrow ">"]
           [:span.story-edit-top-title
             {:dangerouslySetInnerHTML (utils/emojify (or (:title story-data) default-story-title))}]]
+        [:div.story-edit-header-center
+          {:class (when-not (empty? @(::central-message s)) "showing")}
+          @(::central-message s)]
         [:div.story-edit-header-right
           [:button.mlb-reset.mlb-link.share-button
             {:on-click #()}
@@ -135,10 +161,22 @@
             {:on-click #()}
             "Post"]]]
       [:div.story-edit-content
-        (when (:banner-url story-data)
+        [:div.story-edit-author.group
+          (user-avatar-image story-author)
+          [:div.name (or (:name story-author) (str (:first-name story-author) " " (:last-name story-author)))]
+          [:div.time-since
+            [:time
+              {:date-time (:created-at story-data)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :title (utils/activity-date-tooltip story-data)}
+              (utils/time-since (:created-at story-data))]]]
+        (if (:banner-url story-data)
           [:div.story-edit-banner
             {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
+                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}]
+          [:div.story-edit-add-banner
+            "Click here to upload your header image."])
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
            :placeholder default-story-title
