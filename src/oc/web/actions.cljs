@@ -119,7 +119,8 @@
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
-           (not (utils/in? (:route @router/path) "email-verification")))
+           (not (utils/in? (:route @router/path) "email-verification"))
+           (not (utils/in? (:route @router/path) "story-edit")))
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
@@ -1138,12 +1139,13 @@
 
 (defmethod dispatcher/action :story-get
   [db [_]]
-  (let [story-uuid (router/current-activity-id)
-        story-data (dispatcher/activity-data story-uuid)
-        story-link (utils/link-for (:links story-data) "self")
-        fixed-story-link (or story-link {:href (str "/orgs/" (router/current-org-slug) "/boards/" (router/current-board-slug) "/stories/" story-uuid)
-                                         :accept "application/vnd.open-company.story.v1+json"})]
-    (api/get-story story-uuid fixed-story-link))
+  (when (router/current-activity-id)
+    (let [story-uuid (router/current-activity-id)
+          story-data (dispatcher/activity-data story-uuid)
+          story-link (utils/link-for (:links story-data) "self")
+          fixed-story-link (or story-link {:href (str "/orgs/" (router/current-org-slug) "/boards/" (router/current-board-slug) "/stories/" story-uuid)
+                                           :accept "application/vnd.open-company.story.v1+json"})]
+      (api/get-story story-uuid fixed-story-link)))
   (assoc db :story-loading true))
 
 (defmethod dispatcher/action :story-get/finish
