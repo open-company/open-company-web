@@ -137,12 +137,6 @@
   ([org-slug]
     (str (org org-slug) "/drafts")))
 
-(defn new-story
-  "Create a new story."
-  ([] (new-story (router/current-org-slug) (router/current-board-slug)))
-  ([board-slug] (new-story (router/current-org-slug) board-slug))
-  ([org-slug board-slug] (str (board org-slug board-slug) "/story/new")))
-
 ;; Entries
 
 (defn entry
