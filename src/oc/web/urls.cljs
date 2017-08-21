@@ -137,6 +137,12 @@
   ([org-slug]
     (str (org org-slug) "/drafts")))
 
+(defn new-story
+  "Create a new story."
+  ([] (new-story (router/current-org-slug) (router/current-board-slug)))
+  ([board-slug] (new-story (router/current-org-slug) board-slug))
+  ([org-slug board-slug] (str (board org-slug board-slug) "/story/new")))
+
 ;; Entries
 
 (defn entry
@@ -154,3 +160,10 @@
   ([story-uuid] (story (router/current-org-slug) (router/current-board-slug) story-uuid))
   ([board-slug story-uuid] (story (router/current-org-slug) board-slug story-uuid))
   ([org-slug board-slug story-uuid] (str (board org-slug board-slug) "/story/" (name story-uuid))))
+
+(defn story-edit
+  "Edit an already created story."
+  ([] (story-edit (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([board-slug story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([org-slug board-slug story-uuid] (str (story org-slug board-slug story-uuid) "/edit")))
