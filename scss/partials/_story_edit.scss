@@ -1,0 +1,128 @@
+div.story-edit-container {
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  background-color: $oc_gray_8;
+  min-height: 100vh;
+
+  div.story-edit-header {
+    height: 72px;
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    padding: 24px 32px;
+    box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
+
+    div.story-edit-header-left{
+      float: left;
+
+      a.board-name {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_light_gray_1;
+        float: left;
+      }
+
+      span.arrow {
+        margin-left: 10px;
+        @include avenir_H();
+        font-size: 20px;
+        color: $carrot_light_gray_1;
+        margin-top: -3px;
+        float: left;
+      }
+
+      span.story-edit-top-title {
+        margin-left: 10px;
+        @include avenir_H();
+        font-size: 16px;
+        color: black;
+        float: left;
+      }
+    }
+
+    div.story-edit-header-right {
+      float: right;
+      margin-top: -6px;
+
+      button.share-button {
+        margin-right: 22px;
+        @include avenir_M();
+        font-size: 15px;
+        &:before {
+          width: 22px;
+          height: 14px;
+          display: inline-block;
+          content: "";
+          background-image: cdnUrl("/img/ML/story_share_icon.svg");
+          background-size: 14px 14px;
+          background-position: 0px;
+          background-repeat: no-repeat;
+          font-size: 14px;
+        }
+      }
+
+      button.post-button {
+        padding: .2em 2.5em;
+      }
+    }
+  }
+
+  div.story-edit-content {
+    min-height: 136px;
+    padding: 68px 80px 32px;
+    background-color: white;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    width: 840px;
+    margin: 104px auto 32px;
+
+    div.story-edit-banner {
+      margin-left: -80px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      width: 840px;
+      max-height: 200px;
+      background-position: 50%;
+      background-size: cover;
+      background-repeat: no-repeat;
+      // border-radius: 8px;
+      // border-top-left-radius: 8px;
+      // border-top-right-radius: 8px;
+    }
+
+    div.story-edit-tags {
+      margin-top: 21px;
+      @include activity-tag();
+    }
+
+    div.story-edit-title {
+      margin-top: 59px;
+      @include activity-title();
+      @include avenir_M();
+      font-size: 32px;
+      outline: none;
+      cursor: text;
+
+      &:empty:before {
+        content: attr(placeholder);
+        display: block;
+        font-style: none;
+      }
+    }
+
+    div.story-edit-body {
+      margin-top: 8px;
+      @include activity-body();
+      @include avenir_M();
+      font-size: 20px;
+      color: $oc_gray_7;
+      outline: none;
+      cursor: text;
+
+      * {
+        color: $oc_gray_7;
+      }
+    }
+  }
+}
