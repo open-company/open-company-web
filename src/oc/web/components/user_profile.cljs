@@ -69,11 +69,11 @@
         [:div.user-profile-content.group
           [:div.user-profile-avatar-box.group
             [:button.user-profile-avatar.mlb-reset
-              {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
+              {:on-click #(iu/upload! {:accept "image/*"} success-cb progress-cb error-cb)}
               (user-avatar-image current-user-data)]
             [:div.user-profile-avatar-change
               [:button.mlb-reset.mlb-link.upload-photo
-                {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
+                {:on-click #(iu/upload! {:accept "image/*"} success-cb progress-cb error-cb)}
                 [:span.user-avatar-upload-cta "Upload Photo"]
                 [:span.user-avatar-upload-description
                   "A 160x160 transparent Gif or PNG works best"]]]]

@@ -168,7 +168,7 @@
                      :data-placement "bottom"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(iu/upload!
-                                 "image/*"
+                                 {:accept "image/*"}
                                  (partial success-cb owner)
                                  (partial progress-cb owner)
                                  (partial error-cb owner))}

@@ -464,7 +464,7 @@
                :data-container "body"
                :on-click (fn []
                            (reset! (::media-photo s) true)
-                           (iu/upload! "image/*"
+                           (iu/upload! {:accept "image/*"}
                             (fn [res]
                               (reset! (::media-photo-did-success s) true)
                               (let [url (gobj/get res "url")
