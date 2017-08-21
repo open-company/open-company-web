@@ -42,7 +42,8 @@
             [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]
             [oc.web.components.error-banner :refer (error-banner)]
-            [oc.web.components.story :refer (story)]))
+            [oc.web.components.story :refer (story)]
+            [oc.web.components.story-edit :refer (story-edit)]))
 
 (enable-console-print!)
 
@@ -218,14 +219,14 @@
     (drv-root component target)))
 
 ;; Component specific to a storyboard
-(defn story-handler [component target params]
+(defn story-handler [component route target params]
   (let [org (:org (:params params))
         storyboard (:storyboard (:params params))
         story (:story (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org storyboard (when story story) "story"])) {:org org :board storyboard :activity story :query-params query-params})
+    (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
@@ -451,13 +452,29 @@
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
       (board-handler "activity" target org-dashboard params))
 
+    (defroute new-story-route (urls/new-story ":org" ":storyboard") {:as params}
+      (timbre/info "Routing new-story-route" (urls/new-story ":org" ":storyboard"))
+      (story-handler #(om/component (story-edit)) "story-edit" target params))
+
+    (defroute new-story-slash-route (str (urls/new-story ":org" ":storyboard") "/") {:as params}
+      (timbre/info "Routing new-story-slash-route" (str (urls/new-story ":org" ":storyboard") "/"))
+      (story-handler #(om/component (story-edit)) "story-edit" target params))
+
     (defroute story-route (urls/story ":org" ":storyboard" ":story") {:as params}
       (timbre/info "Routing story-route" (urls/story ":org" ":storyboard" ":story"))
-      (story-handler #(om/component (story)) target params))
+      (story-handler #(om/component (story)) "story" target params))
 
     (defroute story-slash-route (str (urls/story ":org" ":storyboard" ":story") "/") {:as params}
       (timbre/info "Routing story-slash-route" (str (urls/story ":org" ":storyboard" ":story") "/"))
-      (story-handler #(om/component (story)) target params))
+      (story-handler #(om/component (story)) "story" target params))
+
+    (defroute story-edit-route (urls/story-edit ":org" ":storyboard" ":story") {:as params}
+      (timbre/info "Routing story-edit-route" (urls/story-edit ":org" ":storyboard" ":story"))
+      (story-handler #(om/component (story-edit)) "story-edit" target params))
+
+    (defroute story-edit-slash-route (str (urls/story-edit ":org" ":storyboard" ":story") "/") {:as params}
+      (timbre/info "Routing story-edit-slash-route" (str (urls/story-edit ":org" ":storyboard" ":story") "/"))
+      (story-handler #(om/component (story-edit)) "story-edit" target params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
@@ -500,9 +517,15 @@
                                  ; Entry route
                                  entry-route
                                  entry-slash-route
+                                 ;; New story
+                                 new-story-route
+                                 new-story-slash-route
                                  ; Story route
                                  story-route
                                  story-slash-route
+                                 ; Story edit
+                                 story-edit-route
+                                 story-edit-slash-route
                                  ; ;; Board filter
                                  board-filter-by-topic-route
                                  board-filter-by-topic-slash-route
