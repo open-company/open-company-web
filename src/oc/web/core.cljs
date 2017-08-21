@@ -452,14 +452,6 @@
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
       (board-handler "activity" target org-dashboard params))
 
-    (defroute new-story-route (urls/new-story ":org" ":storyboard") {:as params}
-      (timbre/info "Routing new-story-route" (urls/new-story ":org" ":storyboard"))
-      (story-handler #(om/component (story-edit)) "story-edit" target params))
-
-    (defroute new-story-slash-route (str (urls/new-story ":org" ":storyboard") "/") {:as params}
-      (timbre/info "Routing new-story-slash-route" (str (urls/new-story ":org" ":storyboard") "/"))
-      (story-handler #(om/component (story-edit)) "story-edit" target params))
-
     (defroute story-route (urls/story ":org" ":storyboard" ":story") {:as params}
       (timbre/info "Routing story-route" (urls/story ":org" ":storyboard" ":story"))
       (story-handler #(om/component (story)) "story" target params))
@@ -517,9 +509,6 @@
                                  ; Entry route
                                  entry-route
                                  entry-slash-route
-                                 ;; New story
-                                 new-story-route
-                                 new-story-slash-route
                                  ; Story route
                                  story-route
                                  story-slash-route
