@@ -43,7 +43,7 @@
                    (rum/local false ::close-hovering)
                    (rum/local nil ::window-resize)
                    {:will-mount (fn [s]
-                                  (dis/dispatch! [:story-get (first (:rum/args s))])
+                                  (dis/dispatch! [:story-get])
                                   (reset! (::window-resize s)
                                     (events/listen js/window EventType/RESIZE #(reset! (::comments-expanded s) @(::comments-expanded s))))
                                   s)
@@ -97,11 +97,6 @@
             [:div.story-banner
               {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
                            :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
-          ; (when (:storyboard-name story-data)
-          ;   [:div.story-tags
-          ;     [:div.activity-tag
-          ;       {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
-          ;       (:storyboard-name story-data)]])
           (when (:title story-data)
             [:div.story-title
               {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
