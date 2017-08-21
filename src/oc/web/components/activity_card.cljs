@@ -221,7 +221,9 @@
             [:li
               {:on-click (fn [e]
                            (utils/event-stop e)
-                           (dis/dispatch! [:entry-edit activity-data]))}
+                           (if (= (:type activity-data) "story")
+                             (router/nav! (oc-urls/story-edit (:uuid activity-data)))
+                             (dis/dispatch! [:entry-edit activity-data])))}
               "Edit"]
             [:li
               {:on-click #(delete-clicked % activity-data)}
