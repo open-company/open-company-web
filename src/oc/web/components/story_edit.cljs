@@ -9,16 +9,26 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
+
+;; Update story
 
 (def default-story-title "Untitled Story")
 (def default-save-wait 2000)
 (def default-save-message-show 2000)
 
 (defn update-story-editing [s new-data]
-  (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) new-data {:has-changes true})])
+  (let [needs-fixed-title (and (contains? new-data :title)
+                                  (empty? (:title new-data)))
+        with-fixed-title (if needs-fixed-title
+                           (assoc new-data :title default-story-title)
+                           new-data)]
+    (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) with-fixed-title {:has-changes true})])
+    (when needs-fixed-title
+      (set! (.-innerHTML (sel1 [:div.story-edit-title])) default-story-title)))
   (when @(::last-timeout s)
     (js/clearTimeout @(::last-timeout s)))
   (reset! (::last-timeout s)
@@ -26,6 +36,8 @@
     (fn []
       (dis/dispatch! [:draft-autosave])
       (reset! (::central-message s) "Saving")))))
+
+;; Body change handling
 
 (defn body-on-change [state]
   (when-let [body-el (sel1 [:div.story-edit-body])]
@@ -63,6 +75,8 @@
     (events/listen title-el EventType/INPUT #(title-on-change state))
     (js/emojiAutocomplete)))
 
+;; Title handling
+
 (defn title-on-paste
   "Avoid to paste rich text into title, replace it with the plain text clipboard data."
   [state e]
@@ -78,24 +92,69 @@
     ; move cursor at the end
     (utils/to-end-of-content-editable title-el)))
 
+;; Banner handling
+
+(defn banner-add-if-finished [s]
+  (let [image @(::banner-url s)]
+    (when (and (contains? image :url)
+               (contains? image :width)
+               (contains? image :height))
+      (reset! (::banner-url s) nil)
+      (reset! (::banner-add-did-success s) false)
+      (update-story-editing s {:banner-url (:url image) :banner-width (:width image) :banner-height (:height image)}))))
+
+(defn banner-add-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s]
+  (when-not @(::banner-add-did-success s)
+    (reset! (::banner-url s) false)
+    (when @(::last-selection s)
+      (.removeMarkers js/rangy @(::last-selection s))
+      (reset! (::last-selection s) nil))))
+
+(defn banner-add-error
+  "Show an error alert view for failed uploads."
+  []
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :title "Sorry!"
+                    :message "An error occurred with your image."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
+    (dis/dispatch! [:alert-modal-show alert-data])))
+
+(defn banner-on-load [s url img]
+  (reset! (::banner-url s) (merge @(::banner-url s) {:width (.-width img) :height (.-height img)}))
+  (gdom/removeNode img)
+  (banner-add-if-finished s))
+
+(defn banner-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s]
+  (when-not @(::banner-add-did-success s)
+    (reset! (::banner-url s) false)))
+
 (rum/defcs story-edit < rum/reactive
+                        ;; Story edits
                         (drv/drv :story-editing)
-                        (drv/drv :current-user-data)
-                        (rum/local nil ::window-resize)
+                        ;; Medium editor
                         (rum/local nil ::body-editor)
+                        ;; Initial data
                         (rum/local "" ::initial-title)
                         (rum/local "" ::initial-body)
-                        (rum/local nil ::initial-story-editing)
+                        ;; Autosave
                         (rum/local "" ::central-message)
                         (rum/local nil ::last-timeout)
+                        ;; Needed to load the story data from the server
                         (rum/local nil ::activity-uuid)
+                        ;; Banner url
+                        (rum/local nil ::banner-url)
+                        (rum/local false ::banner-add-did-success)
                         {:will-mount (fn [s]
                                        (let [story-editing @(drv/get-ref s :story-editing)
-                                             initial-title (if (contains? story-editing :links) (:title story-editing) "")
-                                             initial-body (if (contains? story-editing :links) (:body story-editing) "")]
+                                             initial-title (if (empty? (:title story-editing)) default-story-title (:title story-editing))
+                                             initial-body (:body story-editing)]
                                          (reset! (::initial-title s) initial-title)
                                          (reset! (::initial-body s) initial-body)
-                                         (reset! (::initial-story-editing s) story-editing)
                                          (reset! (::activity-uuid s) (:uuid story-editing)))
                                        s)
                          :did-mount (fn [s]
@@ -105,12 +164,10 @@
                                         (when-let [story-editing @(drv/get-ref s :story-editing)]
                                           ;; Replace title and body only if the story wasn't loaded yet
                                           (when (nil? @(::activity-uuid s))
-                                            (let [initial-title (if (contains? story-editing :links) (:title story-editing) (:title story-editing))
-                                                  initial-body (if (contains? story-editing :links) (:body story-editing) (:body story-editing))]
-                                              (when (not= initial-title @(::initial-title s))
-                                                (reset! (::initial-title s) initial-title))
-                                              (when (not= initial-body @(::initial-body s))
-                                                (reset! (::initial-body s) initial-body))
+                                            (let [initial-title (if (empty? (:title story-editing)) default-story-title (:title story-editing))
+                                                  initial-body (:title story-editing)]
+                                              (reset! (::initial-title s) initial-title)
+                                              (reset! (::initial-body s) initial-body)
                                               (reset! (::activity-uuid s) (:uuid story-editing))))
                                           ;; If it's saving and there is no autosaving key in the entry-editing it means saving ended
                                           (when (and (= @(::central-message s) "Saving")
@@ -129,11 +186,9 @@
                                          s)}
   [s]
   (let [story-data (drv/react s :story-editing)
-        story-author (if (:author story-data)
-                       (if (map? (:author story-data))
-                         (:author story-data)
-                         (first (:author story-data)))
-                       (drv/react s :current-user-data))]
+        story-author (if (map? (:author story-data))
+                       (:author story-data)
+                       (first (:author story-data)))]
     [:div.story-edit-container
       [:div.story-edit-header.group
         [:div.story-edit-header-left
@@ -172,13 +227,36 @@
             {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
                          :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}
             [:button.mlb-reset.mlb-default.remove-banner
-              {:on-click #(update-story-editing s {:banner-url nil :banner-width nil :banner-height nil})}
+              {:on-click #(update-story-editing s {:banner-url nil :banner-width 0 :banner-height 0})}
               "Remove Image"]]
           [:div.story-edit-add-banner
+            {:on-click (fn []
+                         (iu/upload! {:accept "image/*" ; :imageMin [840 200]
+                                      :transformations {
+                                        :crop {
+                                          :aspectRatio (/ 840 200)}}}
+                           (fn [res]
+                             (reset! (::banner-add-did-success s) true)
+                             (let [url (gobj/get res "url")
+                                   img   (gdom/createDom "img")]
+                               (set! (.-onload img) #(banner-on-load s url img))
+                               (set! (.-className img) "hidden")
+                               (gdom/append (.-body js/document) img)
+                               (set! (.-src img) url)
+                               (reset! (::banner-url s) {:res res :url url})
+                               (iu/thumbnail! url
+                                 (fn [thumbnail-url]
+                                  (reset! (::banner-url s) (assoc @(::banner-url s) :thumbnail thumbnail-url))
+                                  (banner-add-if-finished s)))))
+                             nil
+                             (fn [err]
+                               (banner-add-error))
+                             (fn []
+                               ;; Delay the check because this is called on cancel but also on success
+                               (utils/after 1000 #(banner-dismiss-picker s)))))}
             "Click here to upload your header image."])
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
-           :placeholder default-story-title
            :on-paste    #(title-on-paste s %)
            :on-key-Up   #(title-on-change s)
            :on-key-down #(title-on-change s)
