@@ -33,7 +33,6 @@
                               :topic-data (get board-data (keyword (router/current-topic-slug)))
                               :entries-data entries-data
                               :read-only-board (:read-only board-data)
-                              :currency (:currency org-data)
                               :prevent-topic-not-found-navigation prevent-topic-not-found-navigation})
         (for [idx (range (count topics))
               :let [topic-kw (get topics idx)
@@ -48,7 +47,6 @@
                                 :topic-data sd
                                 :card-width card-width
                                 :read-only-board (:read-only board-data)
-                                :currency (:currency (dis/org-data))
                                 :is-dashboard is-dashboard
                                 :topic-flex-num idx}]]
           (when-not (:placeholder sd)

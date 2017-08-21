@@ -14,7 +14,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.iso4217 :refer (iso4217)]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
@@ -39,18 +38,6 @@
   (if show
     #js {}
     #js {:display "none"}))
-
-(defn get-currency [currency-code]
-  (let [kw (keyword currency-code)]
-    (when (contains? iso4217 kw) (kw iso4217))))
-
-(defn get-symbol-for-currency-code [currency-code]
-  (let [currency (get-currency currency-code)
-        sym (if (and (contains? currency :symbol)
-                     (not (clojure.string/blank? (:symbol currency))))
-              (:symbol currency)
-              currency-code)]
-    (or sym (:code currency))))
 
 (def channel-coll (atom {}))
 

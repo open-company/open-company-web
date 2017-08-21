@@ -2,7 +2,6 @@
 
 (def company {
   :name "Buffer"
-  :currency "USD"
   :slug "buffer"
   :uuid "1234"
 

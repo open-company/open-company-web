@@ -13,7 +13,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.iso4217 :as iso4217]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.footer :as footer]
             [oc.web.components.ui.small-loading :as loading]
