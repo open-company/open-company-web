@@ -222,7 +222,7 @@
               {:on-click (fn [e]
                            (utils/event-stop e)
                            (if (= (:type activity-data) "story")
-                             (router/nav! (oc-urls/story-edit (:uuid activity-data)))
+                             (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
                              (dis/dispatch! [:entry-edit activity-data])))}
               "Edit"]
             [:li
