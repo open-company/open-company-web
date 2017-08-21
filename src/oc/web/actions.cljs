@@ -146,7 +146,9 @@
        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))]
     (when is-currently-shown
       (when (and (router/current-activity-id)
-                 (zero? (count (filter #(= (:uuid %) (router/current-activity-id)) (get board-data items-key)))))
+                 (zero? (count (filter #(= (:uuid %) (router/current-activity-id)) (get board-data items-key))))
+                 (or (not (utils/in? (:route @router/path) "story-edit"))
+                     (= (:slug board-data) "drafts")))
         (router/redirect-404!))
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
@@ -161,9 +163,16 @@
           with-current-edit (if (and is-currently-shown
                                      (:entry-editing db))
                               old-board-data
-                              fixed-board-data)]
-      (-> db
-        (assoc-in (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)))))
+                              fixed-board-data)
+          story-editing (when (and (utils/in? (:route @router/path) "story-edit")
+                                   (router/current-activity-id)
+                                   (filter #(= (:uuid %) (router/current-activity-id)) (:stories fixed-board-data)))
+                          (first (filter #(= (:uuid %) (router/current-activity-id)) (:stories fixed-board-data))))
+          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
+          with-story-editing (if story-editing
+                                (assoc next-db :story-editing story-editing)
+                                next-db)]
+      with-story-editing)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
@@ -1157,3 +1166,24 @@
     (-> db
       (dissoc :story-loading)
       (assoc-in story-key fixed-story-data))))
+
+(defmethod dispatcher/action :story-create
+  [db [_]]
+  (let [board-data (dispatcher/board-data db (router/current-org-slug) (router/current-board-slug))]
+    (api/create-story board-data))
+  db)
+
+(defmethod dispatcher/action :story-create/finish
+  [db [_ story-data]]
+  (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) (router/current-board-slug) (:uuid story-data))))
+  (let [fixed-story (utils/fix-story story-data (router/current-board-slug))]
+    (assoc db :story-editing fixed-story)))
+
+(defmethod dispatcher/action :draft-autosave
+  [db [_]]
+  (utils/after 500 #(api/autosave-draft (:story-editing db)))
+  (assoc-in db [:story-editing :autosaving] true))
+
+(defmethod dispatcher/action :draft-autosave/finish
+  [db [_]]
+  (assoc db :story-editing (dissoc (:story-editing db) :autosaving)))
