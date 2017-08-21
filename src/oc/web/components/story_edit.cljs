@@ -165,12 +165,14 @@
           (user-avatar-image story-author)
           [:div.name (or (:name story-author) (str (:first-name story-author) " " (:last-name story-author)))]
           [:div.time-since
-            [:time
-              {:date-time (:created-at story-data)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :title (utils/activity-date-tooltip story-data)}
-              (utils/time-since (:created-at story-data))]]]
+            (if (:created-at story-data)
+              [:time
+                {:date-time (:created-at story-data)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :title (utils/activity-date-tooltip story-data)}
+                (utils/time-since (:created-at story-data))]
+              "Draft")]]
         (if (:banner-url story-data)
           [:div.story-edit-banner
             {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
