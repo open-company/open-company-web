@@ -743,6 +743,26 @@
       (fn [{:keys [status success body]}]
         (dispatcher/dispatch! [:story-get/finish {:story-uuid story-uuid :story-data (if success (json->cljs body) nil)}])))))
 
+(defn create-story [board-data & [story-data]]
+  (when board-data
+    (let [create-story-link (utils/link-for (:links board-data) "create")]
+      (when create-story-link
+        (storage-post (:href create-story-link)
+          {:headers (headers-for-link create-story-link)
+           :json-params (cljs->json (or story-data {}))}
+          (fn [{:keys [status success body]}]
+            (dispatcher/dispatch! [:story-create/finish (if success (json->cljs body) nil)])))))))
+
+(defn autosave-draft [story-data]
+  (when story-data
+    (let [autosave-link (utils/link-for (:links story-data) "partial-update")
+          fixed-story-data (select-keys story-data [:title :body])]
+      (storage-patch (:href autosave-link)
+        {:headers (headers-for-link autosave-link)
+         :json-params (cljs->json fixed-story-data)}
+        (fn [{:keys [success status body]}]
+          (dispatcher/dispatch! [:draft-autosave/finish]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go
