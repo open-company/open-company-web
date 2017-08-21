@@ -54,6 +54,7 @@ div.story-edit-container {
       text-align: center;
       opacity: 0;
       transition: opacity 230ms;
+      margin-top: 4px;
 
       &.showing {
         opacity: 1;

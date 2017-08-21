@@ -24,15 +24,8 @@
   (reset! (::last-timeout s)
    (utils/after default-save-wait
     (fn []
-      (reset! (::central-message s) "Saving")
-      (reset! (::last-timeout s)
-       (utils/after default-save-message-show
-         (fn []
-           (reset! (::central-message s) "Saved")
-           (reset! (::last-timeout s)
-            (utils/after default-save-message-show
-             (fn []
-               (reset! (::central-message s) "")))))))))))
+      (dis/dispatch! [:draft-autosave])
+      (reset! (::central-message s) "Saving")))))
 
 (defn body-on-change [state]
   (when-let [body-el (sel1 [:div.story-edit-body])]
@@ -86,47 +79,48 @@
     (utils/to-end-of-content-editable title-el)))
 
 (rum/defcs story-edit < rum/reactive
-                        (drv/drv :story-data)
                         (drv/drv :story-editing)
                         (drv/drv :current-user-data)
                         (rum/local nil ::window-resize)
                         (rum/local nil ::body-editor)
                         (rum/local "" ::initial-title)
                         (rum/local "" ::initial-body)
-                        (rum/local nil ::initial-story-data)
+                        (rum/local nil ::initial-story-editing)
                         (rum/local "" ::central-message)
                         (rum/local nil ::last-timeout)
+                        (rum/local nil ::activity-uuid)
                         {:will-mount (fn [s]
-                                       (let [story-data @(drv/get-ref s :story-data)
-                                             story-editing @(drv/get-ref s :story-editing)
-                                             initial-title (if (contains? story-data :links) (:title story-data) "")
-                                             initial-body (if (contains? story-data :links) (:body story-data) "")]
+                                       (let [story-editing @(drv/get-ref s :story-editing)
+                                             initial-title (if (contains? story-editing :links) (:title story-editing) "")
+                                             initial-body (if (contains? story-editing :links) (:body story-editing) "")]
                                          (reset! (::initial-title s) initial-title)
                                          (reset! (::initial-body s) initial-body)
-                                         (reset! (::initial-story-data s) story-data)
-                                         (if (router/current-activity-id)
-                                           (dis/dispatch! [:story-get])
-                                           (dis/dispatch! [:input [:story-editing] {:org-slug (router/current-org-slug)
-                                                                                    :board-slug (router/current-board-slug)
-                                                                                    :type "story"
-                                                                                    :title initial-title
-                                                                                    :body initial-body}])))
+                                         (reset! (::initial-story-editing s) story-editing)
+                                         (reset! (::activity-uuid s) (:uuid story-editing)))
                                        s)
                          :did-mount (fn [s]
                                       (utils/after 1000 #(setup-body-editor s))
                                       s)
                          :did-remount (fn [o s]
-                                        (when-let [story-data @(drv/get-ref s :story-data)]
-                                          (when (not= @(::initial-story-data s) story-data)
-                                            (let [story-editing @(drv/get-ref s :story-editing)
-                                                  initial-title (if (contains? story-data :links) (:title story-data) (:title story-editing))
-                                                  initial-body (if (contains? story-data :links) (:body story-data) (:body story-editing))]
-                                              (dis/dispatch! [:input [:story-editing] (merge story-data {:title initial-title
-                                                                                                         :body initial-body})])
+                                        (when-let [story-editing @(drv/get-ref s :story-editing)]
+                                          ;; Replace title and body only if the story wasn't loaded yet
+                                          (when (nil? @(::activity-uuid s))
+                                            (let [initial-title (if (contains? story-editing :links) (:title story-editing) (:title story-editing))
+                                                  initial-body (if (contains? story-editing :links) (:body story-editing) (:body story-editing))]
                                               (when (not= initial-title @(::initial-title s))
                                                 (reset! (::initial-title s) initial-title))
                                               (when (not= initial-body @(::initial-body s))
-                                                (reset! (::initial-body s) initial-body)))))
+                                                (reset! (::initial-body s) initial-body))
+                                              (reset! (::activity-uuid s) (:uuid story-editing))))
+                                          ;; If it's saving and there is no autosaving key in the entry-editing it means saving ended
+                                          (when (and (= @(::central-message s) "Saving")
+                                                     (not (:autosaving story-editing)))
+                                            (reset! (::central-message s) "Saved")
+                                            (reset! (::last-timeout s)
+                                             (utils/after default-save-message-show
+                                              (fn []
+                                                (reset! (::central-message s) "")
+                                                (reset! (::last-timeout s) nil))))))
                                         s)
                          :after-render (fn [s]
                                          (doto (js/$ "[data-toggle=\"tooltip\"]")
@@ -193,4 +187,3 @@
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         [:div.story-edit-body.emoji-autocomplete
           {:dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]]]))
-
