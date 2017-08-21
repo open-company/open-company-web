@@ -86,16 +86,24 @@
                                  :data-container "body"
                                  :title "Board settings"
                                  :on-click #(dis/dispatch! [:board-edit board-data])})))
-                ;; Say something button
+                ;; Add entry button
                 (when (and (not is-all-activity)
                            (not (:read-only (dis/org-data)))
-                           (not (responsive/is-tablet-or-mobile?)))
+                           (not (responsive/is-tablet-or-mobile?))
+                           (= (:type board-data) "entry"))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
-                               :on-click #(if (= (:type board-data) "story")
-                                           (router/nav! (oc-urls/new-story))
-                                           (dis/dispatch! [:entry-edit {}]))}
+                               :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
-                    (if (= (:type board-data) "story") "New Story" "New Update")))
+                    "New Update"))
+                (when (and (not is-all-activity)
+                           (not (:read-only (dis/board-data)))
+                           (not (responsive/is-tablet-or-mobile?))
+                           (= (:type board-data) "story")
+                           (utils/link-for (:links board-data) "create"))
+                  (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
+                               :on-click #(dis/dispatch! [:story-create])}
+                    (dom/div {:class "add-to-board-pencil"})
+                    "New Story"))
                 ;; Board filters dropdown
                 (when (and (not is-mobile-size?)
                            (not empty-board?)
