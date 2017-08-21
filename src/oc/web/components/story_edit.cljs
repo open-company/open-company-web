@@ -121,8 +121,8 @@
                                             (let [story-editing @(drv/get-ref s :story-editing)
                                                   initial-title (if (contains? story-data :links) (:title story-data) (:title story-editing))
                                                   initial-body (if (contains? story-data :links) (:body story-data) (:body story-editing))]
-                                              (dis/dispatch! [:input [:story-editing] (merge story-editing {:title initial-title
-                                                                                                            :body initial-body})])
+                                              (dis/dispatch! [:input [:story-editing] (merge story-data {:title initial-title
+                                                                                                         :body initial-body})])
                                               (when (not= initial-title @(::initial-title s))
                                                 (reset! (::initial-title s) initial-title))
                                               (when (not= initial-body @(::initial-body s))
@@ -176,7 +176,10 @@
         (if (:banner-url story-data)
           [:div.story-edit-banner
             {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}]
+                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}
+            [:button.mlb-reset.mlb-default.remove-banner
+              {:on-click #(update-story-editing s {:banner-url nil :banner-width nil :banner-height nil})}
+              "Remove Image"]]
           [:div.story-edit-add-banner
             "Click here to upload your header image."])
         [:div.story-edit-title.emoji-autocomplete

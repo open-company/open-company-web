@@ -127,6 +127,13 @@ div.story-edit-container {
       background-position: 50%;
       background-size: cover;
       background-repeat: no-repeat;
+      position: relative;
+
+      button.remove-banner {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+      }
     }
 
     div.story-edit-tags {
