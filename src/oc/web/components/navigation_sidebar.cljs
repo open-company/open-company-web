@@ -16,7 +16,7 @@
   (into [] (sort-by :created-at boards)))
 
 (defn sorted-storyboards [boards]
-  (into [] (sort-by :name boards)))
+  (into [] (sort-by :name (vec (filter #(not= (:slug %) "drafts") boards)))))
 
 (defn anchor-nav! [e url]
   (utils/event-stop e)
@@ -103,17 +103,18 @@
              :data-toggle "tooltip"
              :data-container "body"}])]
       [:div.left-navigation-sidebar-items.group
-        (let [drafts-link (utils/link-for (:links org-data) "draft")]
+        (let [drafts-board (first (filter #(= (:slug %) "drafts") (:boards org-data)))
+              drafts-link (utils/link-for (:links drafts-board) "self")]
           (when (pos? (:count drafts-link))
             [:a.left-navigation-sidebar-item
-              {:class (when (utils/in? (:route @router/path) "drafts") "selected")
+              {:class (when (= (router/current-board-slug) "drafts") "selected")
                :data-drafts true
                :key "board-list-draft"
                :href (oc-urls/drafts)
                :on-click #(anchor-nav! % (oc-urls/drafts))}
               [:div.board-name.team-board.group
                 [:div.internal
-                  (str "Drafts" (:count drafts-link))]]]))
+                  (str "Drafts (" (:count drafts-link) ")")]]]))
         (for [storyboard (sorted-storyboards storyboards)]
           [:a.left-navigation-sidebar-item
             {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "selected")
