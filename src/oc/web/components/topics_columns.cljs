@@ -91,7 +91,9 @@
                            (not (:read-only (dis/org-data)))
                            (not (responsive/is-tablet-or-mobile?)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
-                               :on-click #(dis/dispatch! [:entry-edit {}])}
+                               :on-click #(if (= (:type board-data) "story")
+                                           (router/nav! (oc-urls/new-story))
+                                           (dis/dispatch! [:entry-edit {}]))}
                     (dom/div {:class "add-to-board-pencil"})
                     (if (= (:type board-data) "story") "New Story" "New Update")))
                 ;; Board filters dropdown
