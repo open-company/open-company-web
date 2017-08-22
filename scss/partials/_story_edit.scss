@@ -39,6 +39,10 @@ div.story-edit-container {
         font-size: 16px;
         color: black;
         float: left;
+
+        .emojione {
+          @include emoji-size(14);
+        }
       }
     }
 
