@@ -168,9 +168,15 @@ div.story-edit-container {
       outline: none;
       cursor: text;
 
+      h2 {
+        font-size: 26px;
+      }
+
       * {
         color: $oc_gray_7;
       }
+
+      @include activity-attachment();
     }
   }
 }
