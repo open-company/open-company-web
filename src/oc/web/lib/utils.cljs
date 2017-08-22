@@ -676,7 +676,7 @@
              (.-offsetParent el)))))
 
 (defn medium-editor-options [placeholder hide-on-click & [show-subtitle]]
-  {:toolbar #js {:buttons #js ["bold" "italic" (when show-subtitle "h2") "unorderedlist" "anchor"]}
+  {:toolbar #js {:buttons (clj->js (remove nil? ["bold" "italic" (when show-subtitle "h2") "unorderedlist" "anchor"]))}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :extensions {:autolist (js/AutoList.)}
