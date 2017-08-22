@@ -52,7 +52,8 @@
                                     (doto (js/$ "[data-toggle=\"tooltip\"]")
                                       (.tooltip "fixTitle")
                                       (.tooltip "hide"))
-                                    (reset! (::show-you-did-it s) (> (.height (js/$ ".story-body")) 350))
+                                    ;; Show the you did it message only if the story-content div is taller than the window
+                                    (reset! (::show-you-did-it s) (> (+ (.height (js/$ ".story-content")) 68 32 104) (.-innerHeight js/window)))
                                     s)
                     :will-unmount (fn [s]
                                     (events/unlistenByKey @(::window-resize s))
