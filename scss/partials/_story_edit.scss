@@ -74,6 +74,19 @@ div.story-edit-container {
         margin-right: 22px;
         @include avenir_M();
         font-size: 15px;
+        padding: .2em 1.5em;
+        background-color: transparent;
+        color: $carrot_text_blue;
+        transition: background-color 230ms, color 230ms;
+
+        &:hover {
+          background-color: $carrot_text_blue;
+          color: white;
+          &:before {
+            background-image: cdnUrl("/img/ML/story_share_icon_white.svg");
+          }
+        }
+
         &:before {
           width: 22px;
           height: 14px;
