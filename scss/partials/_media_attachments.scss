@@ -1,8 +1,8 @@
-div.entry-attachments {
+div.media-attachments {
   padding-bottom: 15px !important;
   width: 100%;
 
-  a.entry-attachment {
+  a.media-attachment {
     display: block;
     width: 100%;
     height: 43px;
@@ -18,7 +18,7 @@ div.entry-attachments {
         opacity: 1;
       }
 
-      label.entry-attachment-title {
+      label.media-attachment-title {
         text-decoration: underline;
       }
 
@@ -46,13 +46,13 @@ div.entry-attachments {
       text-overflow: ellipsis;
     }
 
-    label.entry-attachment-title {
+    label.media-attachment-title {
       font-size: 12px;
       @include avenir_H();
       color: $oc_gray_7;
     }
 
-    label.entry-attachment-subtitle {
+    label.media-attachment-subtitle {
       font-size: 10px;
       @include avenir_B();
       color: $carrot_light_gray;
