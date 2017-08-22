@@ -42,6 +42,7 @@
                    (rum/local false ::comments-expanded)
                    (rum/local false ::close-hovering)
                    (rum/local nil ::window-resize)
+                   (rum/local false ::show-you-did-it)
                    {:will-mount (fn [s]
                                   (dis/dispatch! [:story-get])
                                   (reset! (::window-resize s)
@@ -51,6 +52,7 @@
                                     (doto (js/$ "[data-toggle=\"tooltip\"]")
                                       (.tooltip "fixTitle")
                                       (.tooltip "hide"))
+                                    (reset! (::show-you-did-it s) (> (.height (js/$ ".story-body")) 350))
                                     s)
                     :will-unmount (fn [s]
                                     (events/unlistenByKey @(::window-resize s))
@@ -104,6 +106,7 @@
             [:div.story-body
               {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])
           [:div.story-content-footer.group
+            {:class (when-not @(::show-you-did-it s) "hidden")}
             [:div.you-did-it "The End. You did it!"]
             [:div.caught-up]]]
         (when (pos? (count (:related story-data)))
