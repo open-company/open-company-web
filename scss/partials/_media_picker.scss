@@ -91,25 +91,41 @@ div.media-picker {
       }
     }
 
+    button.media-attachment {
+      background-image: cdnUrl("/img/ML/media_attachment.png");
+      background-size: 12px 8px;
+      top: -14px;
+
+      &:hover {
+        background-image: cdnUrl("/img/ML/media_attachment_blue.png");
+      }
+    }
+
+    button.media-divider-line {
+      background-image: cdnUrl("/img/ML/media_divider_line.png");
+      background-size: 12px 8px;
+      top: -14px;
+
+      &:hover {
+        background-image: cdnUrl("/img/ML/media_divider_line_blue.png");
+      }
+    }
+
     &.expanded {
-      width: 250px;
+      @for $i from 1 through 15 {
+        &.media-#{$i} {
+          width: #{160 + ($i * 30)}px;
+        }
+      }
 
       button.media {
         opacity: 1;
-      }
 
-      button.media-photo {
-        transform: rotate(0deg);
-      }
-
-      button.media-video {
-        margin-left: 30px;
-        transform: rotate(360deg);
-      }
-
-      button.media-chart {
-        margin-left: 60px;
-        transform: rotate(720deg);
+        @for $i from 0 through 14 {
+          &.media-#{$i} {
+            margin-left: #{$i * 30}px;
+          }
+        }
       }
     }
   }
