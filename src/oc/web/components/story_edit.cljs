@@ -115,10 +115,7 @@
   "Called every time the image picke close, reset to inital state."
   [s]
   (when-not @(::banner-add-did-success s)
-    (reset! (::banner-url s) false)
-    (when @(::last-selection s)
-      (.removeMarkers js/rangy @(::last-selection s))
-      (reset! (::last-selection s) nil))))
+    (reset! (::banner-url s) false)))
 
 (defn banner-add-error
   "Show an error alert view for failed uploads."
@@ -135,11 +132,7 @@
   (gdom/removeNode img)
   (banner-add-if-finished s))
 
-(defn banner-dismiss-picker
-  "Called every time the image picke close, reset to inital state."
-  [s]
-  (when-not @(::banner-add-did-success s)
-    (reset! (::banner-url s) false)))
+;; Media picker handling
 
 (defn media-picker-did-change [s]
   (body-on-change s)
@@ -184,7 +177,7 @@
                                           ;; Replace title and body only if the story wasn't loaded yet
                                           (when (nil? @(::activity-uuid s))
                                             (let [initial-title (if (empty? (:title story-editing)) default-story-title (:title story-editing))
-                                                  initial-body (:title story-editing)]
+                                                  initial-body (:body story-editing)]
                                               (reset! (::initial-title s) initial-title)
                                               (reset! (::initial-body s) initial-body)
                                               (reset! (::activity-uuid s) (:uuid story-editing))))
@@ -228,11 +221,11 @@
           {:class (when-not (empty? @(::central-message s)) "showing")}
           @(::central-message s)]
         [:div.story-edit-header-right
-          [:button.mlb-reset.mlb-link.share-button
+          [:button.mlb-reset.mlb-default.share-button
             {:on-click #()}
             "Share Draft"]
           [:button.mlb-reset.mlb-default.post-button
-            {:on-click #()}
+            {:on-click #(dis/dispatch! [:story-share])}
             "Post"]]]
       [:div.story-edit-content
         [:div.story-edit-author.group
@@ -268,17 +261,13 @@
                                (set! (.-className img) "hidden")
                                (gdom/append (.-body js/document) img)
                                (set! (.-src img) url)
-                               (reset! (::banner-url s) {:res res :url url})
-                               (iu/thumbnail! url
-                                 (fn [thumbnail-url]
-                                  (reset! (::banner-url s) (assoc @(::banner-url s) :thumbnail thumbnail-url))
-                                  (banner-add-if-finished s)))))
+                               (reset! (::banner-url s) {:res res :url url})))
                              nil
                              (fn [err]
                                (banner-add-error))
                              (fn []
                                ;; Delay the check because this is called on cancel but also on success
-                               (utils/after 1000 #(banner-dismiss-picker s)))))}
+                               (utils/after 1000 #(banner-add-dismiss-picker s)))))}
             "Click here to upload your header image."])
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
