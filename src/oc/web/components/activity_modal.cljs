@@ -10,7 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.entry-attachments :refer (entry-attachments)]
+            [oc.web.components.ui.media-attachments :refer (media-attachments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
@@ -139,7 +139,7 @@
                 [:div.activity-modal-content-body
                   {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                    :class (when (empty? (:headline activity-data)) "no-headline")}]
-                (entry-attachments (:attachments activity-data))
+                (media-attachments (:attachments activity-data))
                 [:div.activity-modal-footer.group
                   (reactions activity-data)
                   [:div.activity-modal-footer-right
