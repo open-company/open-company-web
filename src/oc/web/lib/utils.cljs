@@ -675,8 +675,8 @@
              (+ top (gobj/get el "offsetTop" 0))
              (.-offsetParent el)))))
 
-(defn medium-editor-options [placeholder hide-on-click]
-  {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
+(defn medium-editor-options [placeholder hide-on-click & [show-subtitle]]
+  {:toolbar #js {:buttons #js ["bold" "italic" (when show-subtitle "h2") "unorderedlist" "anchor"]}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :extensions {:autolist (js/AutoList.)}
