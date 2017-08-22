@@ -33,14 +33,16 @@
                (contains? image :height)
                (contains? image :thumbnail))
       (.restoreSelection js/rangy @(::last-selection s))
-      (let [image-html (str "<img "
+      (let [separator (nth (:rum/args s) 6)
+            image-html (str "<img "
                              "class=\"carrot-no-preview\" "
                              "src=\"" (:url image) "\" "
                              "data-media-type=\"image\" "
                              "data-thumbnail=\"" (:thumbnail image) "\" "
                              "width=\"" (:width image) "\" "
                              "height=\"" (:height image) "\" "
-                            "/><br/><br/>")]
+                            "/>"
+                            separator)]
         (js/pasteHtmlAtCaret image-html (.getSelection js/rangy js/window) false))
       (reset! (::last-selection s) nil)
       (reset! (::media-photo s) nil)
@@ -70,28 +72,30 @@
     (= (:type video) :vimeo)
     (:thumbnail video)))
 
-(defn get-video-html [video]
-  (str "<iframe "
-         "data-thumbnail=\"" (get-video-thumbnail video) "\" "
-         "data-media-type=\"video\" "
-         "data-video-type=\"" (name (:type video)) "\" "
-         "data-video-id=\"" (:id video) "\" "
-         "class=\"carrot-no-preview\" "
-         "width=\"560\" "
-         "height=\"315\" "
-         (cond
-           (= (:type video) :youtube)
-           (str "src=\"https://www.youtube.com/embed/" (:id video) "\" ")
-           (= (:type video) :vimeo)
-           (str "src=\"https://player.vimeo.com/video/" (:id video) "\" "))
-         "frameborder=\"0\" "
-         "webkitallowfullscreen "
-         "mozallowfullscreen "
-         "allowfullscreen>"
-        "</iframe><br/><br/>"))
+(defn get-video-html [s video]
+  (let [separator (nth (:rum/args s) 6)]
+    (str "<iframe "
+           "data-thumbnail=\"" (get-video-thumbnail video) "\" "
+           "data-media-type=\"video\" "
+           "data-video-type=\"" (name (:type video)) "\" "
+           "data-video-id=\"" (:id video) "\" "
+           "class=\"carrot-no-preview\" "
+           "width=\"560\" "
+           "height=\"315\" "
+           (cond
+             (= (:type video) :youtube)
+             (str "src=\"https://www.youtube.com/embed/" (:id video) "\" ")
+             (= (:type video) :vimeo)
+             (str "src=\"https://player.vimeo.com/video/" (:id video) "\" "))
+           "frameborder=\"0\" "
+           "webkitallowfullscreen "
+           "mozallowfullscreen "
+           "allowfullscreen>"
+         "</iframe>"
+         separator)))
 
 (defn media-video-add [s video-data]
-  (let [video-html (get-video-html video-data)
+  (let [video-html (get-video-html s video-data)
         body-did-change-cb (nth (:rum/args s) 2)]
     (when video-html
       (.restoreSelection js/rangy @(::last-selection s))
@@ -113,7 +117,8 @@
        parsed-uri (guri/parse chart-url)
        oid (.get (.getQueryData parsed-uri) "oid")
        splitted-path (clojure.string/split (.getPath parsed-uri) #"/")
-       chart-id (nth splitted-path (- (count splitted-path) 2))]
+       chart-id (nth splitted-path (- (count splitted-path) 2))
+       separator (nth (:rum/args s) 6)]
   (str "<iframe "
         "data-thumbnail=\"" (get-chart-thumbnail chart-id oid) "\" "
         "data-media-type=\"chart\" "
@@ -126,7 +131,8 @@
         "webkitallowfullscreen "
         "mozallowfullscreen "
         "allowfullscreen>"
-       "</iframe><br/><br/>")))
+       "</iframe>"
+       separator)))
 
 (defn media-chart-add [s chart-url]
   (let [chart-html (get-chart-html s chart-url)
@@ -142,7 +148,8 @@
 
 (defn get-attachment-html [s attachment]
   (let [prefix (str (utils/date-string (utils/js-date) [:year]) " - ")
-        subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))]
+        subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))
+        separator (nth (:rum/args s) 6)]
     (str "<a "
           "target=\"_blank\" "
           "contentEditable=\"false\" "
@@ -154,7 +161,8 @@
            "<i contentEditable=\"false\" class=\"file-mimetype fa " (utils/icon-for-mimetype (:file-type attachment)) "\"></i>"
            "<label contentEditable=\"false\" class=\"media-attachment-title\">" (:file-name attachment) "</label>"
            "<label contentEditable=\"false\" class=\"media-attachment-subtitle\">" subtitle "</label>"
-         "</a>")))
+         "</a>"
+         separator)))
 
 (defn media-attachment-dismiss-picker
   "Called every time the image picke close, reset to inital state."
@@ -202,13 +210,14 @@
 
 ;; Divider line
 
-(defn get-divider-line-html []
-  (str "<div "
-        "class=\"carrot-no-preview media-divider-line\" "
-        "contentEditable=\"false\"></div>"))
+(defn get-divider-line-html [s]
+  (let [separator (nth (:rum/args s) 6)]
+    (str "<p><hr "
+          "class=\"carrot-no-preview media-divider-line\" "
+          "contentEditable=\"false\" /></p>" separator)))
 
 (defn media-divider-line-add [s]
-  (let [divider-line-html (get-divider-line-html)
+  (let [divider-line-html (get-divider-line-html s)
         body-did-change-cb (nth (:rum/args s) 2)]
     (.restoreSelection js/rangy @(::last-selection s))
     (js/pasteHtmlAtCaret divider-line-html (.getSelection js/rangy js/window) false)
@@ -281,7 +290,7 @@
                                            (events/unlistenByKey @(::window-click-listener s))
                                            (events/unlistenByKey @(::document-focus-in s))
                                            s)}
-  [s media-config media-picker-id body-did-change-cb body-editor-sel data-editing dispatch-input-key]
+  [s media-config media-picker-id body-did-change-cb body-editor-sel data-editing dispatch-input-key separator]
   [:div.media-picker
     {:id media-picker-id
      :style {:display "none"}}
