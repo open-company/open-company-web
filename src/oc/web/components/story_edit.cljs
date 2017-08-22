@@ -290,4 +290,4 @@
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         [:div.story-edit-body.emoji-autocomplete
           {:dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
-        (media-picker @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]]))
+        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]]))
