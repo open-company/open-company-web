@@ -25,6 +25,7 @@
 (def default-save-message-show 2000)
 
 (defn story-autosave [s]
+  (reset! (::central-message s) nil)
   (when @(::last-timeout s)
     (js/clearTimeout @(::last-timeout s)))
   (reset! (::last-timeout s)
@@ -73,7 +74,7 @@
         body-el      (sel1 [:div.story-edit-body])
         body-editor  (new js/MediumEditor body-el (clj->js (-> "Say something..."
                                                             (utils/medium-editor-options false true)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {:left 44})))))]
+                                                            (editor/inject-extension (editor/media-upload media-picker-id {:left 44 :top -102})))))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
@@ -162,11 +163,9 @@
                         ;; Media picker
                         (rum/local "story-edit-media-picker" ::media-picker-id)
                         {:will-mount (fn [s]
-                                       (let [story-editing @(drv/get-ref s :story-editing)
-                                             initial-title (if (empty? (:title story-editing)) default-story-title (:title story-editing))
-                                             initial-body (:body story-editing)]
-                                         (reset! (::initial-title s) initial-title)
-                                         (reset! (::initial-body s) initial-body)
+                                       (let [story-editing @(drv/get-ref s :story-editing)]
+                                         (reset! (::initial-title s) (:title story-editing))
+                                         (reset! (::initial-body s) (:body story-editing))
                                          (reset! (::activity-uuid s) (:uuid story-editing)))
                                        s)
                          :did-mount (fn [s]
@@ -176,20 +175,14 @@
                                         (when-let [story-editing @(drv/get-ref s :story-editing)]
                                           ;; Replace title and body only if the story wasn't loaded yet
                                           (when (nil? @(::activity-uuid s))
-                                            (let [initial-title (if (empty? (:title story-editing)) default-story-title (:title story-editing))
-                                                  initial-body (:body story-editing)]
-                                              (reset! (::initial-title s) initial-title)
-                                              (reset! (::initial-body s) initial-body)
-                                              (reset! (::activity-uuid s) (:uuid story-editing))))
+                                            (reset! (::initial-title s) (:title story-editing))
+                                            (reset! (::initial-body s) (:body story-editing))
+                                            (reset! (::activity-uuid s) (:uuid story-editing)))
                                           ;; If it's saving and there is no autosaving key in the story-editing it means saving ended
                                           (when (and (= @(::central-message s) "Saving")
                                                      (not (:autosaving story-editing)))
                                             (reset! (::central-message s) "Saved")
-                                            (reset! (::last-timeout s)
-                                             (utils/after default-save-message-show
-                                              (fn []
-                                                (reset! (::central-message s) "")
-                                                (reset! (::last-timeout s) nil))))))
+                                            (reset! (::last-timeout s) nil)))
                                         s)
                          :after-render (fn [s]
                                          (doto (js/$ "[data-toggle=\"tooltip\"]")
@@ -212,14 +205,14 @@
         [:div.story-edit-header-left
           [:a.board-name
             {:href (oc-urls/board (router/current-board-slug))
-             :on-click #(utils/event-stop %)}
-            (or (:storyboard-name story-data) "Draft")]
+             :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-org-slug) (if (= (:status story-data) "draft") "drafts" (:board-slug story-data)))))}
+            (or (:storyboard-name story-data) "Drafts")]
           [:span.arrow ">"]
           [:span.story-edit-top-title
-            {:dangerouslySetInnerHTML (utils/emojify (or (:title story-data) default-story-title))}]]
-        [:div.story-edit-header-center
-          {:class (when-not (empty? @(::central-message s)) "showing")}
-          @(::central-message s)]
+            {:dangerouslySetInnerHTML (utils/emojify (if (empty? (:title story-data)) default-story-title (:title story-data)))}]
+          [:span.story-edit-header-left-save
+            {:class (when-not (empty? @(::central-message s)) "showing")}
+            @(::central-message s)]]
         [:div.story-edit-header-right
           [:button.mlb-reset.mlb-default.share-button
             {:on-click #()}
@@ -271,6 +264,7 @@
             "Click here to upload your header image."])
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
+           :placeholder default-story-title
            :on-paste    #(title-on-paste s %)
            :on-key-Up   #(title-on-change s)
            :on-key-down #(title-on-change s)
@@ -279,4 +273,4 @@
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         [:div.story-edit-body.emoji-autocomplete
           {:dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
-        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]]))
+        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing "<br />")]]))

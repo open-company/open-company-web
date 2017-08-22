@@ -88,8 +88,8 @@
         headline-el  (sel1 [:div.entry-edit-headline])
         body-el      (sel1 [:div.entry-edit-body])
         body-editor  (new js/MediumEditor body-el (clj->js (-> (body-placeholder)
-                                                            (utils/medium-editor-options  false)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {})))))]
+                                                            (utils/medium-editor-options false false)
+                                                            (editor/inject-extension (editor/media-upload media-picker-id {:top -100 :left 0} (.querySelector js/document ".entry-edit-modal-container"))))))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
@@ -272,7 +272,7 @@
            :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
            :dangerouslySetInnerHTML @(::initial-body s)}]
         ; Media handling
-        (media-picker [:photo :video :chart] @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing)
+        (media-picker [:photo :video :chart] @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing "<br/><br/>")
         [:div.entry-edit-controls-right]]
         ; Bottom controls
         [:div.entry-edit-controls.group]

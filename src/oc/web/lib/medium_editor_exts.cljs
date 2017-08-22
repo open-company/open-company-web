@@ -42,7 +42,7 @@
        (or (= "BR" (some-> el .-childNodes (aget 0) .-tagName))
            (empty? (some-> el .-childNodes (aget 0) .-nodeValue)))))
 
-(defn media-upload [upload-ui-id offset]
+(defn media-upload [upload-ui-id bt-offset & [scrolling-el]]
   (let [hide-btn (fn []
                     (when-let [el (js/document.getElementById upload-ui-id)]
                       (gstyle/setStyle el #js {:opacity 0})
@@ -53,17 +53,15 @@
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (if (< top-v 135)
-                                                         (+ top-v 135)
-                                                         (- top-v 1)) "px")
-                                             :left (str (+ 6 (:left offset)) "px")})))
+                                             :top (str (+ top-v (:top bt-offset) (when scrolling-el (.-scrollTop scrolling-el))) "px")
+                                             :left (str (+ 6 (:left bt-offset)) "px")})))
         show-btn (fn [_]
                    (utils/after 100
                     (fn []
                       (let [sel (js/window.getSelection)
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))
-                            offset-top (gobj/get el "offsetTop" 0)]
+                            offset-top (.-top (.offset (js/$ el)))]
                         (when (and sel el)
                           (if (and (empty-paragraph? el) offset-top)
                             (pos-btn offset-top)
