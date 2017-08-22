@@ -1,4 +1,8 @@
 @import "../modules/_colors";
+@import "../modules/_fonts";
+
+$bottom_margin: 25;
+$h2_top_margin: 20;
 
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
@@ -108,7 +112,7 @@
   }
 
   p, img, h1, h2, h3, h4, h5 {
-    margin: 0 0 10px;
+    margin: 0 0 #{$bottom_margin}px;
   }
 
   b, strong{
@@ -117,12 +121,10 @@
     font-weight: normal;
   }
 
-  h1, h2, h3, h4, h5 {
-    font-family: AvenirLTStd-Medium !important;
-    font-weight: normal !important;
-    font-style: normal !important;
-    font-weight: bold !important;
+  h2 {
+    margin-top: #{$bottom_margin + $h2_top_margin}px;
     font-size: 19px;
+    @include avenir_H();
   }
 
   a {
@@ -145,5 +147,85 @@
   p:last-child, & > div:last-child {
     margin-bottom: 0px;
     padding-bottom: 0px;
+  }
+
+  div.media-divider-line {
+    display: inline-block;
+    width: 90%;
+    margin-left: 5%;
+    height: 1px;
+    background-color: rgba($oc_gray_7, 0.4);
+    margin-top: #{$bottom_margin}px;
+    margin-bottom: #{$bottom_margin}px;
+  }
+}
+
+@mixin activity-attachment(){
+  a.media-attachment {
+    display: inline-block;
+    width: 100%;
+    height: 43px;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    margin-bottom: #{$bottom_margin}px;
+
+    & > * {
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
+    &:hover {
+      & > * {
+        opacity: 1;
+      }
+
+      label.media-attachment-title {
+        text-decoration: underline;
+      }
+
+      button.remove-attachment {
+        display: block;
+      }
+    }
+
+    i.file-mimetype {
+      width: 30px;
+      height: 30px;
+      color: $oc_gray_5;
+      float: left;
+      font-size: 24px;
+      margin-top: 2px;
+    }
+
+    label {
+      color: $oc_gray_5;
+      float: left;
+      width: calc(100% - 30px - 30px);
+      height: 16px;
+      margin-bottom: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    label.media-attachment-title {
+      font-size: 12px;
+      @include avenir_H();
+      color: $oc_gray_7;
+    }
+
+    label.media-attachment-subtitle {
+      font-size: 10px;
+      @include avenir_B();
+      color: $carrot_light_gray;
+    }
+
+    button.remove-attachment {
+      float: right;
+      width: 25px;
+      height: 25px;
+      margin: -15px 0 0 0;
+      padding: 0;
+      color: $oc_gray_5;
+      display: none;
+    }
   }
 }
