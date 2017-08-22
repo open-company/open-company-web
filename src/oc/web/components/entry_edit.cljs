@@ -272,7 +272,7 @@
            :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
            :dangerouslySetInnerHTML @(::initial-body s)}]
         ; Media handling
-        (media-picker @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing)
+        (media-picker [:photo :video :chart] @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing)
         [:div.entry-edit-controls-right]]
         ; Bottom controls
         [:div.entry-edit-controls.group]
