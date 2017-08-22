@@ -12,6 +12,7 @@ div.story-edit-container {
     background-color: white;
     padding: 24px 32px;
     box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
+    z-index: 1;
 
     div.story-edit-header-left{
       float: left;
@@ -96,6 +97,7 @@ div.story-edit-container {
     border-radius: 8px;
     width: 840px;
     margin: 104px auto 32px;
+    position: relative;
 
     div.story-edit-author {
       @include activity-author();

@@ -8,7 +8,11 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.media-picker :refer (media-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
+            [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -20,6 +24,15 @@
 (def default-save-wait 2000)
 (def default-save-message-show 2000)
 
+(defn story-autosave [s]
+  (when @(::last-timeout s)
+    (js/clearTimeout @(::last-timeout s)))
+  (reset! (::last-timeout s)
+   (utils/after default-save-wait
+    (fn []
+      (dis/dispatch! [:draft-autosave])
+      (reset! (::central-message s) "Saving")))))
+
 (defn update-story-editing [s new-data]
   (let [needs-fixed-title (and (contains? new-data :title)
                                   (empty? (:title new-data)))
@@ -29,13 +42,7 @@
     (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) with-fixed-title {:has-changes true})])
     (when needs-fixed-title
       (set! (.-innerHTML (sel1 [:div.story-edit-title])) default-story-title)))
-  (when @(::last-timeout s)
-    (js/clearTimeout @(::last-timeout s)))
-  (reset! (::last-timeout s)
-   (utils/after default-save-wait
-    (fn []
-      (dis/dispatch! [:draft-autosave])
-      (reset! (::central-message s) "Saving")))))
+  (story-autosave s))
 
 ;; Body change handling
 
@@ -61,11 +68,12 @@
       (update-story-editing state {:title emojied-title}))))
 
 (defn- setup-body-editor [state]
-  (let [title-el  (sel1 [:div.story-edit-title])
+  (let [media-picker-id @(::media-picker-id state)
+        title-el  (sel1 [:div.story-edit-title])
         body-el      (sel1 [:div.story-edit-body])
         body-editor  (new js/MediumEditor body-el (clj->js (-> "Say something..."
                                                             (utils/medium-editor-options false)
-                                                            (editor/inject-extension editor/file-upload))))]
+                                                            (editor/inject-extension (editor/media-upload media-picker-id {:left 44})))))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
@@ -133,9 +141,18 @@
   (when-not @(::banner-add-did-success s)
     (reset! (::banner-url s) false)))
 
+(defn media-picker-did-change [s]
+  (body-on-change s)
+  (story-autosave s)
+  (utils/after 100
+    #(do
+       (utils/to-end-of-content-editable (sel1 [:div.story-edit-body]))
+       (utils/scroll-to-bottom (.-body js/document) true))))
+
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
                         (drv/drv :story-editing)
+                        (drv/drv :alert-modal)
                         ;; Medium editor
                         (rum/local nil ::body-editor)
                         ;; Initial data
@@ -149,6 +166,8 @@
                         ;; Banner url
                         (rum/local nil ::banner-url)
                         (rum/local false ::banner-add-did-success)
+                        ;; Media picker
+                        (rum/local "story-edit-media-picker" ::media-picker-id)
                         {:will-mount (fn [s]
                                        (let [story-editing @(drv/get-ref s :story-editing)
                                              initial-title (if (empty? (:title story-editing)) default-story-title (:title story-editing))
@@ -169,7 +188,7 @@
                                               (reset! (::initial-title s) initial-title)
                                               (reset! (::initial-body s) initial-body)
                                               (reset! (::activity-uuid s) (:uuid story-editing))))
-                                          ;; If it's saving and there is no autosaving key in the entry-editing it means saving ended
+                                          ;; If it's saving and there is no autosaving key in the story-editing it means saving ended
                                           (when (and (= @(::central-message s) "Saving")
                                                      (not (:autosaving story-editing)))
                                             (reset! (::central-message s) "Saved")
@@ -190,6 +209,12 @@
                        (:author story-data)
                        (first (:author story-data)))]
     [:div.story-edit-container
+      (when (drv/react s :alert-modal)
+        (alert-modal))
+      (when (:media-video story-data)
+        (media-video-modal :story-editing))
+      (when (:media-chart story-data)
+        (media-chart-modal :story-editing))
       [:div.story-edit-header.group
         [:div.story-edit-header-left
           [:a.board-name
@@ -264,4 +289,5 @@
            :on-blur     #(title-on-change s)
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         [:div.story-edit-body.emoji-autocomplete
-          {:dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]]]))
+          {:dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
+        (media-picker @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]]))
