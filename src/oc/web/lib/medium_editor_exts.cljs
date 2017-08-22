@@ -42,19 +42,21 @@
        (or (= "BR" (some-> el .-childNodes (aget 0) .-tagName))
            (empty? (some-> el .-childNodes (aget 0) .-nodeValue)))))
 
-(def file-upload
+(defn media-upload [upload-ui-id offset]
   (let [hide-btn (fn []
-                    (when-let [el (js/document.getElementById "file-upload-ui")]
+                    (when-let [el (js/document.getElementById upload-ui-id)]
                       (gstyle/setStyle el #js {:opacity 0})
                       (.remove (.-classList el) "expanded")
                       (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
         pos-btn (fn [top-v]
-                  (when-let [el (js/document.getElementById "file-upload-ui")]
+                  (when-let [el (js/document.getElementById upload-ui-id)]
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (if (< top-v 135) (+ top-v 135) (- top-v 1)) "px")
-                                             :left "6px"})))
+                                             :top (str (if (< top-v 135)
+                                                         (+ top-v 135)
+                                                         (- top-v 1)) "px")
+                                             :left (str (+ 6 (:left offset)) "px")})))
         show-btn (fn [_]
                    (utils/after 100
                     (fn []
@@ -67,7 +69,7 @@
                             (pos-btn offset-top)
                             (hide-btn))))))
                    true)]
-    {:name "file-upload"
+    {:name "media-upload"
      :init (fn []
              (this-as this
                (doseq [el (.getEditorElements this)]
