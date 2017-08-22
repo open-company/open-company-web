@@ -22,8 +22,8 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.ui.entry-video-modal :refer (entry-video-modal)]
-            [oc.web.components.ui.entry-chart-modal :refer (entry-chart-modal)]
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
+            [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -96,10 +96,10 @@
             (alert-modal))
           (when (and (:entry-editing data)
                      (:media-video (:entry-editing data)))
-            (entry-video-modal))
+            (media-video-modal :entry-editing))
           (when (and (:entry-editing data)
                      (:media-chart (:entry-editing data)))
-            (entry-chart-modal))
+            (media-chart-modal :entry-editing))
           (dom/div {:class "page"}
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
