@@ -35,14 +35,7 @@
       (reset! (::central-message s) "Saving")))))
 
 (defn update-story-editing [s new-data]
-  (let [needs-fixed-title (and (contains? new-data :title)
-                                  (empty? (:title new-data)))
-        with-fixed-title (if needs-fixed-title
-                           (assoc new-data :title default-story-title)
-                           new-data)]
-    (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) with-fixed-title {:has-changes true})])
-    (when needs-fixed-title
-      (set! (.-innerHTML (sel1 [:div.story-edit-title])) default-story-title)))
+  (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) new-data {:has-changes true})])
   (story-autosave s))
 
 ;; Body change handling
