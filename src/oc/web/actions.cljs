@@ -1186,4 +1186,19 @@
 
 (defmethod dispatcher/action :draft-autosave/finish
   [db [_]]
+  (when (:story-editing-share db)
+    ;; Needs to publish the story
+    (if (= (:status (:story-editing db)) "draft")
+      (api/share-story (:story-editing db))
+      (router/nav! (oc-urls/story (router/current-org-slug) (router/current-board-slug) (:uuid (:story-editing db))))))
   (assoc db :story-editing (dissoc (:story-editing db) :autosaving)))
+
+(defmethod dispatcher/action :story-share
+  [db [_]]
+  (api/autosave-draft (:story-editing db))
+  (assoc db :story-editing-share true))
+
+(defmethod dispatcher/action :story-share/finish
+  [db [_ story-data]]
+  (router/nav! (oc-urls/story (router/current-org-slug) (router/current-board-slug) (:uuid story-data)))
+  db)

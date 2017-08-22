@@ -763,6 +763,14 @@
         (fn [{:keys [success status body]}]
           (dispatcher/dispatch! [:draft-autosave/finish]))))))
 
+(defn share-story [story-data]
+  (when story-data
+    (let [publish-link (utils/link-for (:links story-data) "publish")]
+      (storage-post (:href publish-link)
+        {:headers (headers-for-link publish-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:story-share/finish (if success (json->cljs body) nil)]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go
