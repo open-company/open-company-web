@@ -106,15 +106,17 @@
         (let [drafts-board (first (filter #(= (:slug %) "drafts") (:boards org-data)))
               drafts-link (utils/link-for (:links drafts-board) "self")]
           (when (pos? (:count drafts-link))
-            [:a.left-navigation-sidebar-item
-              {:class (when (= (router/current-board-slug) "drafts") "selected")
-               :data-drafts true
-               :key "board-list-draft"
-               :href (oc-urls/drafts)
-               :on-click #(anchor-nav! % (oc-urls/drafts))}
-              [:div.board-name.team-board.group
-                [:div.internal
-                  (str "Drafts (" (:count drafts-link) ")")]]]))
+            [:div.left-navigation-sidebar-draft
+              [:a.left-navigation-sidebar-item
+                {:class (when (= (router/current-board-slug) "drafts") "selected")
+                 :data-drafts true
+                 :key "board-list-draft"
+                 :href (oc-urls/drafts)
+                 :on-click #(anchor-nav! % (oc-urls/drafts))}
+                [:div.board-name.team-board.group
+                  [:div.internal
+                    (str "Drafts (" (:count drafts-link) ")")]]]
+              [:div.left-navigation-sidebar-draft-divider]]))
         (for [storyboard (sorted-storyboards storyboards)]
           [:a.left-navigation-sidebar-item
             {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "selected")
