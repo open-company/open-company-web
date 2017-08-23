@@ -267,7 +267,7 @@
                 [:input
                   {:type "text"
                    :id "share-draft-copy-text"
-                   :readonly true
+                   :readOnly true
                    :value (complete-story-edit-url (:uuid story-data))}]
                 [:button.mlb-reset.mlb-default.share-draft-copy-btn
                   {:on-click #(copy-clicked (:uuid story-data))}
