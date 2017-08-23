@@ -275,7 +275,8 @@ div.board-edit-container {
     }
 
     div.board-edit-footer {
-      height: 50px;
+      height: 40px;
+      margin-top: 15px;
 
       div.board-edit-footer-left {
         float: left;
@@ -284,6 +285,16 @@ div.board-edit-container {
           margin-right: 16px;
           padding-left: 0px;
           text-align: left;
+        }
+
+        button.cancel-btn {
+          color: $oc_gray_7;
+        }
+
+        button.delete-board {
+          color: $oc_gray_7;
+          @include avenir_M();
+          font-size: 16px;
         }
       }
 
@@ -298,7 +309,6 @@ div.board-edit-container {
 
       button {
         height: 40px;
-        margin-top: 10px;
       }
     }
   }

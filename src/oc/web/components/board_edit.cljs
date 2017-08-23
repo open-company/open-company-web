@@ -190,7 +190,7 @@
           [:div.board-edit-footer-left
             (when (and (not (empty? (:slug board-editing)))
                        (utils/link-for (:links board-editing) "delete"))
-              [:button.mlb-reset.mlb-link-black
+              [:button.mlb-reset.mlb-link-black.delete-board
                 {:on-click (fn []
                             (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
                                                                :message (str "Delete this " label "?")
@@ -209,7 +209,7 @@
                              (empty? (:access board-editing)))
                :on-click #(dis/dispatch! [:board-edit-save])}
               (if new-board? "Create" "Save")]
-            [:button.mlb-reset.mlb-link-black
+            [:button.mlb-reset.mlb-link-black.cancel-btn
               {:type "button"
                :on-click #(close-clicked s)}
               "Cancel"]]]]]))
