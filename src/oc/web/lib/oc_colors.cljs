@@ -45,7 +45,8 @@
   :carrot-green-1 "#0E8749"
   :carrot-text-blue-2 "#3B3D40"
   :carrot-light-blue "#DEE8FF"
-  :carrot-light-gray-1 "#B1B8C0"})
+  :carrot-light-gray-1 "#B1B8C0"
+  :carrot-light-gray-2 "#F2F1ED"})
 
 (defn get-color-by-kw [kw]
   (if (contains? oc-colors kw)
