@@ -76,6 +76,11 @@
                 ;; Board name and settings button
                 (dom/div {:class "board-name"}
                   (if is-all-activity
+                    (dom/div {:class "all-activity-icon"})
+                    (if (= (:type board-data) "story")
+                      (dom/div {:class "stories-icon"})
+                      (dom/div {:class "boards-icon"})))
+                  (if is-all-activity
                     "All Activity"
                     (:name board-data))
                   ;; Settings button
@@ -104,7 +109,7 @@
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:story-create])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "New Story"))
+                    "New"))
                 ;; Board filters dropdown
                 (when (and (not is-mobile-size?)
                            (not empty-board?)
