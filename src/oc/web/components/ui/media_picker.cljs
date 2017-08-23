@@ -167,11 +167,9 @@
 (defn media-attachment-dismiss-picker
   "Called every time the image picke close, reset to inital state."
   [s]
-  (js/console.log "media-attachment-dismiss-picker")
   (when-not @(::media-attachment-did-success s)
     (reset! (::media-attachment s) false)
     (when @(::last-selection s)
-      (js/console.log "   remove markers")
       (.removeMarkers js/rangy @(::last-selection s))
       (reset! (::last-selection s) nil))))
 
@@ -187,7 +185,6 @@
                          (media-attachment-dismiss-picker state)))))
 
 (defn attachment-upload-success-cb [state res]
-  (js/console.log "attachment-upload-success-cb" res)
   (reset! (::media-attachment-did-success state) true)
   (let [url (gobj/get res "url")]
     (if-not url
