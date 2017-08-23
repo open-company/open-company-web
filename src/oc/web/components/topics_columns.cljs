@@ -14,6 +14,7 @@
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.entries-layout :refer (entries-layout)]
+            [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.stories-layout :refer (stories-layout)]
             [oc.web.components.all-activity :refer (all-activity)]))
 
@@ -121,8 +122,16 @@
                 (empty-board)
                 ; for each column key contained in best layout
                 :else
-                (if (= (:type board-data) "story")
+                (cond
+                  ;; Drafts
+                  (and (= (:type board-data) "story")
+                       (= (:slug board-data) "drafts"))
+                  (drafts-layout board-data)
+                  ;; Stories
+                  (= (:type board-data) "story")
                   (stories-layout board-data)
+                  ;; Entries
+                  :else
                   (entries-layout board-data board-filters)))))
           ;; 1 column or default
           :else
