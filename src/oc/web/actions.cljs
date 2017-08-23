@@ -1190,7 +1190,7 @@
     ;; Needs to publish the story
     (if (= (:status (:story-editing db)) "draft")
       (api/share-story (:story-editing db))
-      (router/nav! (oc-urls/story (router/current-org-slug) (router/current-board-slug) (:uuid (:story-editing db))))))
+      (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
   (assoc db :story-editing (dissoc (:story-editing db) :autosaving)))
 
 (defmethod dispatcher/action :story-share
@@ -1200,5 +1200,5 @@
 
 (defmethod dispatcher/action :story-share/finish
   [db [_ story-data]]
-  (router/nav! (oc-urls/story (router/current-org-slug) (router/current-board-slug) (:uuid story-data)))
+  (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))
   db)
