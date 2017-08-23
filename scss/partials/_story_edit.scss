@@ -202,7 +202,7 @@ div.story-edit-container {
 
   div.story-edit-content {
     min-height: calc(100vh - 104px);
-    padding: 68px 80px 32px;
+    padding: 40px 80px 32px;
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
     border-radius: 8px;
@@ -216,7 +216,7 @@ div.story-edit-container {
 
     div.story-edit-add-banner {
       margin-left: -80px;
-      margin-top: 50px;
+      margin-top: 40px;
       width: 840px;
       height: 100px;
       @include avenir_H();
@@ -256,7 +256,7 @@ div.story-edit-container {
     }
 
     div.story-edit-title {
-      margin-top: 59px;
+      margin-top: 21px;
       @include activity-title();
       @include avenir_M();
       font-size: 32px;

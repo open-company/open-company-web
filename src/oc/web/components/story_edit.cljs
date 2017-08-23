@@ -317,6 +317,9 @@
                                ;; Delay the check because this is called on cancel but also on success
                                (utils/after 1000 #(banner-add-dismiss-picker s)))))}
             "Click here to upload your header image"])
+        [:div.story-edit-tags
+          [:div.activity-tag
+            (:storyboard-name story-data)]]
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
            :placeholder default-story-title
