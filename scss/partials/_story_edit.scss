@@ -150,7 +150,7 @@ div.story-edit-container {
         @include avenir_M();
         font-size: 15px;
         padding: .2em 1.5em;
-        background-color: transparent;
+        background-color: rgba($carrot_text_blue, 0.25);
         color: $carrot_text_blue;
         transition: background-color 230ms, color 230ms;
 
@@ -206,7 +206,7 @@ div.story-edit-container {
       text-align: center;
       padding-top: 88px;
       cursor: pointer;
-      background-color: rgba(#F2F1ED, 0.3);
+      background-color: rgba($carrot_light_gray_2, 0.3);
 
       &:hover {
         text-decoration: underline;

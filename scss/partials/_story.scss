@@ -230,7 +230,7 @@ div.story-container {
     right: -392px;
     transition: right 230ms;
     padding: 16px;
-    background-color: #F2F1ED;
+    background-color: $carrot_light_gray_2;
 
     &.comments-expanded {
       right: 0px;
@@ -256,7 +256,7 @@ div.story-container {
     div.story-comments-container-inner {
       height: 100%;
       div.comments {
-        background-color: #F2F1ED;
+        background-color: $carrot_light_gray_2;
 
         div.comments-internal {
           div.add-comment-box {
