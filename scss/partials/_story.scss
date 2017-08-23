@@ -38,6 +38,14 @@ div.story-container {
         font-size: 16px;
         color: black;
         float: left;
+        max-width: 400px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+        .emojione {
+          @include emoji-size(14);
+        }
       }
     }
 
@@ -109,6 +117,10 @@ div.story-container {
         @include activity-title();
         @include avenir_M();
         font-size: 32px;
+
+        .emojione {
+          @include emoji-size(30);
+        }
       }
 
       div.story-body {
@@ -149,7 +161,7 @@ div.story-container {
     }
 
     div.related-container {
-      margin-top: 24px;
+      margin-top: 46px;
 
       div.related-title {
         @include avenir_H();

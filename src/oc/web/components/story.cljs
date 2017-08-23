@@ -29,13 +29,16 @@
                :title (utils/activity-date-tooltip story-data)}
               (utils/time-since (:created-at story-data))]]]
       [:div.related-story-title
-        (:title story-data)]
+        {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]
       [:div.related-story-footer.group
         (reactions story-data)
         [:div.related-story-comments
           (comments-summary story-data true)]]]))
 
 (def default-comments-total-width 492)
+
+(defn should-show-you-did-it [s]
+  (reset! (::show-you-did-it s) (> (+ (.height (js/$ ".story-content")) 68 32 104) (.-innerHeight js/window))))
 
 (rum/defcs story < rum/reactive
                    (drv/drv :story-data)
@@ -44,16 +47,18 @@
                    (rum/local nil ::window-resize)
                    (rum/local false ::show-you-did-it)
                    {:will-mount (fn [s]
-                                  (dis/dispatch! [:story-get])
+                                  (utils/after 100 #(dis/dispatch! [:story-get]))
                                   (reset! (::window-resize s)
                                     (events/listen js/window EventType/RESIZE #(reset! (::comments-expanded s) @(::comments-expanded s))))
                                   s)
+                    :did-mount (fn [s]
+                                ;; Show the you did it message only if the story-content div is taller than the window
+                                (utils/after 1000 #(should-show-you-did-it s))
+                                s)
                     :after-render (fn [s]
                                     (doto (js/$ "[data-toggle=\"tooltip\"]")
                                       (.tooltip "fixTitle")
                                       (.tooltip "hide"))
-                                    ;; Show the you did it message only if the story-content div is taller than the window
-                                    (reset! (::show-you-did-it s) (> (+ (.height (js/$ ".story-content")) 68 32 104) (.-innerHeight js/window)))
                                     s)
                     :will-unmount (fn [s]
                                     (events/unlistenByKey @(::window-resize s))
@@ -74,7 +79,8 @@
              :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-board-slug))))}
             (:storyboard-name story-data)]
           [:span.arrow ">"]
-          [:span.story-title (:title story-data)]]
+          [:span.story-title
+            {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]]
         [:div.story-header-right
           (reactions story-data)
           [:div.comments-summary-container.group
