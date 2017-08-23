@@ -39,6 +39,10 @@ div.story-edit-container {
         font-size: 16px;
         color: black;
         float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 400px;
 
         .emojione {
           @include emoji-size(14);

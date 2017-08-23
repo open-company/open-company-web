@@ -202,7 +202,7 @@
             (or (:storyboard-name story-data) "Drafts")]
           [:span.arrow ">"]
           [:span.story-edit-top-title
-            {:dangerouslySetInnerHTML (utils/emojify (if (empty? (:title story-data)) default-story-title (:title story-data)))}]
+            {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title story-data)) default-story-title (:title story-data))))}]
           [:span.story-edit-header-left-save
             {:class (when-not (empty? @(::central-message s)) "showing")}
             @(::central-message s)]]
