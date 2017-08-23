@@ -182,13 +182,13 @@ div.story-edit-container {
   }
 
   div.story-edit-content {
-    min-height: calc(100vh - 136px);
+    min-height: calc(100vh - 104px);
     padding: 68px 80px 32px;
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
     border-radius: 8px;
     width: 840px;
-    margin: 104px auto 32px;
+    margin: 104px auto 0px;
     position: relative;
 
     div.story-edit-author {
