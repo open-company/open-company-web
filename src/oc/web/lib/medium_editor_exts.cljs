@@ -61,7 +61,8 @@
                       (let [sel (js/window.getSelection)
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))
-                            offset-top (.-top (.offset (js/$ el)))]
+                            offset (when el (.offset (js/$ el)))
+                            offset-top (int (when offset (.-top offset)))]
                         (when (and sel el)
                           (if (and (empty-paragraph? el) offset-top)
                             (pos-btn offset-top)
