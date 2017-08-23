@@ -13,6 +13,9 @@
                   (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug draft) (:uuid draft))))}
     (when draft
       [:div.draft-card-inner
+        [:div.draft-card-tag
+          [:div.activity-tag
+            (:storyboard-name draft)]]
         [:div.draft-card-title
           {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (or (:title draft) "Untitled Draft")))}]
         (let [empty-body? (empty? (:body draft))

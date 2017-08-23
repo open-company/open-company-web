@@ -21,6 +21,12 @@ div.drafts-layout {
           margin-right: 24px;
         }
 
+        div.draft-card-tag {
+          @include activity-tag();
+          padding: 16px 16px 0;
+          pointer-events: none;
+        }
+
         div.draft-card-title {
           @include activity-title();
           font-size: 24px;
