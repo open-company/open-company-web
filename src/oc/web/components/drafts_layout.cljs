@@ -30,11 +30,11 @@
 (rum/defc drafts-layout
   [drafts-data]
   [:div.drafts-layout
-    (let [sorted-drafts (vec (reverse (sort-by :created-at (take 3 (:stories drafts-data)))))]
+    (let [sorted-drafts (vec (reverse (sort-by :created-at (:stories drafts-data))))]
       [:div.draft-cards-container.group
         (for [idx (range (.ceil js/Math (/ (count sorted-drafts) 2)))
-              :let [first-draft (get sorted-drafts idx)
-                    second-draft (get sorted-drafts (inc idx))]]
+              :let [first-draft (get sorted-drafts (* idx 2))
+                    second-draft (get sorted-drafts (inc (* idx 2)))]]
           [:div.draft-card-row.group
             {:key (str "draft-row-" idx)}
             (draft-card first-draft)
