@@ -8,7 +8,7 @@
             [oc.web.components.comments :refer (comments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
+            [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -31,9 +31,7 @@
       [:div.related-story-title
         {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]
       [:div.related-story-footer.group
-        (reactions story-data)
-        [:div.related-story-comments
-          (comments-summary story-data true)]]]))
+        (interactions-summary story-data true)]]))
 
 (def default-comments-total-width 492)
 

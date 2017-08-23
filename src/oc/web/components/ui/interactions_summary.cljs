@@ -42,9 +42,9 @@
           (str comments-count " comment" (when (or (zero? comments-count) (> comments-count 1)) "s"))]])))
 
 (rum/defcs interactions-summary < rum/static
-  [s entry-data]
+  [s entry-data show-zero-comments?]
   [:div.interactions-summary.group
     ;; Reactions
     (reactions-summary entry-data)
     ; Comments
-    (comments-summary entry-data)])
+    (comments-summary entry-data show-zero-comments?)])
