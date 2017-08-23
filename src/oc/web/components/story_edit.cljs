@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -136,6 +137,16 @@
        (utils/to-end-of-content-editable (sel1 [:div.story-edit-body]))
        (utils/scroll-to-bottom (.-body js/document) true))))
 
+(defn complete-story-edit-url [uuid]
+  (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/story-edit (router/current-org-slug) (router/current-board-slug) uuid)))
+
+(defn share-draft-select-text []
+  (.select (sel1 [:input#share-draft-copy-text])))
+
+(defn copy-clicked [story-uuid]
+  (share-draft-select-text)
+  (utils/copy-to-clipboard (complete-story-edit-url story-uuid)))
+
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
                         (drv/drv :story-editing)
@@ -155,11 +166,20 @@
                         (rum/local false ::banner-add-did-success)
                         ;; Media picker
                         (rum/local "story-edit-media-picker" ::media-picker-id)
+                        ;; Shaer draft
+                        (rum/local false ::show-share-draft)
+                        (rum/local nil ::window-click-listener)
                         {:will-mount (fn [s]
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (reset! (::initial-title s) (:title story-editing))
                                          (reset! (::initial-body s) (:body story-editing))
                                          (reset! (::activity-uuid s) (:uuid story-editing)))
+                                       (reset! (::window-click-listener s)
+                                         (events/listen js/window EventType/CLICK
+                                          #(when (and @(::show-share-draft s)
+                                                      (not (utils/event-inside? % (sel1 [:div.share-draft-container])))
+                                                      (not (utils/event-inside? % (sel1 [:button.share-button]))))
+                                             (reset! (::show-share-draft s) false))))
                                        s)
                          :did-mount (fn [s]
                                       (utils/after 1000 #(setup-body-editor s))
@@ -181,7 +201,10 @@
                                          (doto (js/$ "[data-toggle=\"tooltip\"]")
                                            (.tooltip "fixTitle")
                                            (.tooltip "hide"))
-                                         s)}
+                                         s)
+                         :will-unmount (fn [s]
+                                        (events/unlistenByKey @(::window-click-listener s))
+                                        s)}
   [s]
   (let [story-data (drv/react s :story-editing)
         story-author (if (map? (:author story-data))
@@ -208,8 +231,27 @@
             @(::central-message s)]]
         [:div.story-edit-header-right
           [:button.mlb-reset.mlb-default.share-button
-            {:on-click #()}
+            {:on-click #(let [showing @(::show-share-draft s)]
+                         (when-not showing
+                           (utils/after 1000 share-draft-select-text))
+                         (reset! (::show-share-draft s) (not showing)))}
             "Share Draft"]
+          (when @(::show-share-draft s)
+            [:div.share-draft-container
+              [:div.share-draft-triangle]
+              [:div.share-draft-title
+                "Share a link to this draft"]
+              [:div.share-draft-description
+                "People with this link will be able to comment on your story, but not edit it."]
+              [:div.share-draft-link-box
+                [:input
+                  {:type "text"
+                   :id "share-draft-copy-text"
+                   :readonly true
+                   :value (complete-story-edit-url (:uuid story-data))}]
+                [:button.mlb-reset.mlb-default.share-draft-copy-btn
+                  {:on-click #(copy-clicked (:uuid story-data))}
+                  "Copy"]]])
           [:button.mlb-reset.mlb-default.post-button
             {:on-click #(dis/dispatch! [:story-share])}
             "Post"]]]

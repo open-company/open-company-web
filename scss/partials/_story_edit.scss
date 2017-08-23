@@ -71,6 +71,80 @@ div.story-edit-container {
       float: right;
       margin-top: -6px;
 
+      div.share-draft-container {
+        position: absolute;
+        width: 400px;
+        height: 186px;
+        background-color: white;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+        border: solid 0.5px rgba(177, 184, 192, 0.24);
+        z-index: 2;
+        top: 60px;
+        right: 40px;
+        border-radius: 4px;
+        padding: 24px;
+
+        div.share-draft-triangle {
+          position: absolute;
+          top: -11px;
+          left: 50%;
+          margin-left: -10px;
+          width: 20px;
+          height: 20px;
+          transform: rotate(45deg);
+          background-color: white;
+          border-top: solid 0.5px rgba(177, 184, 192, 0.24);
+          border-left: solid 0.5px rgba(177, 184, 192, 0.24);
+        }
+
+        div.share-draft-title {
+          @include avenir_H();
+          font-size: 15px;
+          color: $carrot_dark_gray;
+        }
+
+        div.share-draft-description {
+          @include avenir_R();
+          font-size: 15px;
+          color: $carrot_gray;
+          margin-top: 8px;
+        }
+
+        div.share-draft-link-box {
+          margin-top: 24px;
+          border-radius: 4px;
+          border: solid 0.5px rgba(177, 184, 192, 0.5);
+          padding: 8px 16px;
+          position: relative;
+          width: 351px;
+          height: 40px;
+
+          input {
+            @include avenir_R();
+            font-size: 14px;
+            color: $carrot_dark_gray;
+            padding: 0;
+            width: 264px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            outline: none;
+            border: none;
+          }
+
+          button.share-draft-copy-btn {
+            position: absolute;
+            right: 8px;
+            top: 7px;
+            width: 56px;
+            height: 26px;
+            font-size: 12px;
+            padding: 0;
+            text-align: center;
+          }
+        }
+      }
+
       button.share-button {
         margin-right: 22px;
         @include avenir_M();

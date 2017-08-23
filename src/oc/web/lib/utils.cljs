@@ -1090,3 +1090,8 @@
     (if (= (:created-at entry-data) (:updated-at entry-data))
       created-str
       (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+
+(defn copy-to-clipboard [text]
+  (try
+    (.execCommand js/document "copy")
+    (catch :default e)))
