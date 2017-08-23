@@ -26,7 +26,7 @@
 (defn delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
-                    :message "Delete this activity?"
+                    :message "Delete this?"
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
