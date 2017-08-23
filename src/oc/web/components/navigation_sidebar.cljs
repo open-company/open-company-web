@@ -93,12 +93,12 @@
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
           [:div.stories-icon]
-          [:span "STORIES"]]
+          [:span "SERIES"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "story"])
-             :title "Create a new storyboard"
+             :title "Create a new series"
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
