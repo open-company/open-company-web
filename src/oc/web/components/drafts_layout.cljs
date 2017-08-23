@@ -18,10 +18,12 @@
         (let [empty-body? (empty? (:body draft))
               fixed-body (if empty-body? "Say something..." (:body draft))
               final-body (-> fixed-body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)]
-          [:div.draft-card-body
-            {:class (utils/class-set {:empty-body empty-body?
-                                      :bottom-gradient (> (count fixed-body) 50)})
-             :dangerouslySetInnerHTML (utils/emojify final-body)}])
+          [:div
+            [:div.draft-card-body
+              {:class (utils/class-set {:empty-body empty-body?})
+               :dangerouslySetInnerHTML (utils/emojify final-body)}]
+            (when (> (count fixed-body) 50)
+              [:div.bottom-gradient])])
         [:div.draft-card-footer.group
           [:div.draft-card-footer-left
             (str "Edited " (utils/activity-date (utils/js-date (:updated-at draft))))]

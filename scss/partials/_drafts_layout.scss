@@ -31,35 +31,40 @@ div.drafts-layout {
 
         div.draft-card-body {
           @include activity-body();
-          font-size: 24px;
-          color: $carrot_dark_gray;
+          @include avenir_M();
+          font-size: 20px;
+          color: $oc_gray_7;
+          outline: none;
+          cursor: text;
           padding: 16px 16px 0px 16px;
           position: relative;
+
+          * {
+            color: $oc_gray_7;
+          }
 
           &.empty-body {
             opacity: 0.3;
             font-size: 16px;
             line-height: 32px;
           }
+        }
 
-          &.bottom-gradient:after {
-            position: absolute;
-            content: "";
-            display: block;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            height: 40px;
-            z-index: 10;
-            pointer-events: none;
-            background: -moz-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255,0) 100%); /* FF3.6+ */
-            background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba(255, 255, 255,0)), color-stop(100%,rgba(255, 255, 255,1))); /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* Opera 11.10+ */
-            background: -ms-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* IE10+ */
-            background: linear-gradient(to top,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* W3C */
-            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
-          }
+        div.bottom-gradient {
+          position: absolute;
+          bottom: 48px;
+          left: 0px;
+          right: 0px;
+          height: 40px;
+          z-index: 10;
+          pointer-events: none;
+          background: -moz-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255,0) 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba(255, 255, 255,0)), color-stop(100%,rgba(255, 255, 255,1))); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* IE10+ */
+          background: linear-gradient(to top,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* W3C */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
         }
 
         div.draft-card-footer {
