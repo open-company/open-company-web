@@ -147,6 +147,19 @@
   (share-draft-select-text)
   (utils/copy-to-clipboard (complete-story-edit-url story-uuid)))
 
+(defn delete-clicked [e story-data]
+  (utils/event-stop e)
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :message "Delete this?"
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                        (dis/dispatch! [:activity-delete story-data])
+                                        (dis/dispatch! [:alert-modal-hide]))
+                    }]
+    (dis/dispatch! [:alert-modal-show alert-data])))
+
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
                         (drv/drv :story-editing)
@@ -222,10 +235,17 @@
           [:a.board-name
             {:href (oc-urls/board (router/current-board-slug))
              :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-org-slug) (if (= (:status story-data) "draft") "drafts" (:board-slug story-data)))))}
-            (or (:storyboard-name story-data) "Drafts")]
+            (if (or (not (:storyboard-name story-data))
+                    (= (:type story-data) "draft"))
+              "Drafts"
+              (:storyboard-name story-data))]
           [:span.arrow ">"]
           [:span.story-edit-top-title
             {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title story-data)) default-story-title (:title story-data))))}]
+          [:button.mlb-reset.mlb-link-black.delete-link
+            {:on-click #(delete-clicked % story-data)}
+            "Delete"]]
+        [:div.story-edit-header-center
           [:span.story-edit-header-left-save
             {:class (when-not (empty? @(::central-message s)) "showing")}
             @(::central-message s)]]

@@ -49,9 +49,28 @@ div.story-edit-container {
         }
       }
 
+      button.delete-link {
+        margin-left: 24px;
+        @include avenir_H();
+        font-size: 11px;
+        color: $oc_gray_7;
+        opacity: 0.6;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    div.story-edit-header-center {
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      margin-left: -100px;
+      text-align: center;
+      width: 200px;
+
       span.story-edit-header-left-save {
-        margin-left: 10px;
-        width: 200px;
         height: 25px;
         @include avenir_R();
         font-size: 15px;
