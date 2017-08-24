@@ -1069,17 +1069,20 @@
   [js-date]
   (let [hours (.getHours js-date)
         minutes (add-zero (.getMinutes js-date))
-        ampm (if (>= hours 12) "pm" "am")
+        ampm (if (>= hours 12) " p.m." " a.m.")
         hours (mod hours 12)
         hours (if (= hours 0) 12 hours)]
     (str hours ":" minutes ampm)))
 
-(defn activity-date [js-date]
+(defn format-time-string [js-date]
   (let [r (js/RegExp "am|pm" "i")
-        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))
-        time-string (if-not h12
-                      (get-ampm-time js-date)
-                      (get-24h-time js-date))]
+        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))]
+    (if-not h12
+      (get-ampm-time js-date)
+      (get-24h-time js-date))))
+
+(defn activity-date [js-date]
+  (let [time-string (format-time-string js-date)]
     (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
 
 (defn activity-date-tooltip [entry-data]
@@ -1095,3 +1098,33 @@
   (try
     (.execCommand js/document "copy")
     (catch :default e)))
+
+(defn ordinal-suffix [i]
+  (let [j (mod i 10)
+        k (mod i 100)]
+    (cond
+      (and (= j 1) (not= k 11)) "st"
+      (and (= j 2) (not= k 12)) "nd"
+      (and (= j 3) (not= k 13)) "rd"
+      :else "th")))
+
+(defn draft-complete-date [jd]
+  (let [month (full-month-string (inc (.getMonth jd)))
+        day (.getDate jd)]
+   (str month " " day (ordinal-suffix day))))
+
+(defn draft-date [date]
+  (let [jd (js-date date)
+        now (js-date)
+        yesterday (js-date (- (.getTime now) (* 24 60 60 1000)))
+        is-today? (= (.getDate jd) (.getDate now))
+        is-yesterday? (= (.getDate jd) (.getDate yesterday))
+        same-year? (= (.getYear jd) (.getYear now))
+        partial-d (draft-complete-date jd)
+        t (format-time-string jd)]
+    (str "Edited "
+      (cond
+        is-today? (str "today, " t)
+        is-yesterday? (str "yesterday, " t)
+        same-year? partial-d
+        :else (str partial-d ", " (.getYear jd))))))
