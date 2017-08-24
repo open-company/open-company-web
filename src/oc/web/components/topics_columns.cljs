@@ -96,7 +96,7 @@
                                  :data-toggle "tooltip"
                                  :data-placement "top"
                                  :data-container "body"
-                                 :title "Board settings"
+                                 :title (if (= (:type board-data) "entry") "Board settings" "Series settings")
                                  :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Add entry button
                 (when (and (not is-all-activity)
