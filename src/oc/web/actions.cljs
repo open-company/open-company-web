@@ -1168,15 +1168,14 @@
       (assoc-in story-key fixed-story-data))))
 
 (defmethod dispatcher/action :story-create
-  [db [_]]
-  (let [board-data (dispatcher/board-data db (router/current-org-slug) (router/current-board-slug))]
-    (api/create-story board-data))
+  [db [_ board-data]]
+  (api/create-story board-data)
   db)
 
 (defmethod dispatcher/action :story-create/finish
-  [db [_ story-data]]
-  (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) (router/current-board-slug) (:uuid story-data))))
-  (let [fixed-story (utils/fix-story story-data (router/current-board-slug))]
+  [db [_ board-slug story-data]]
+  (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) board-slug (:uuid story-data))))
+  (let [fixed-story (utils/fix-story story-data board-slug)]
     (assoc db :story-editing fixed-story)))
 
 (defmethod dispatcher/action :draft-autosave

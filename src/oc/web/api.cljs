@@ -751,7 +751,7 @@
           {:headers (headers-for-link create-story-link)
            :json-params (cljs->json (or story-data {}))}
           (fn [{:keys [status success body]}]
-            (dispatcher/dispatch! [:story-create/finish (if success (json->cljs body) nil)])))))))
+            (dispatcher/dispatch! [:story-create/finish (:slug board-data) (if success (json->cljs body) nil)])))))))
 
 (defn autosave-draft [story-data]
   (when story-data
