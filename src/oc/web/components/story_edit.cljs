@@ -11,10 +11,11 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.media-picker :refer (media-picker)]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
             [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -181,6 +182,8 @@
                         (rum/local "story-edit-media-picker" ::media-picker-id)
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
+                        ;; Publish dialog
+                        (rum/local true ::show-publish-modal)
                         {:will-mount (fn [s]
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (reset! (::initial-title s) (:title story-editing))
@@ -223,6 +226,8 @@
         (media-video-modal :story-editing))
       (when (:media-chart story-data)
         (media-chart-modal :story-editing))
+      (when @(::show-publish-modal s)
+        (story-publish-modal #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-edit-header.group
         [:div.story-edit-header-left
           [:a.board-name
@@ -244,7 +249,7 @@
             @(::central-message s)]]
         [:div.story-edit-header-right
           [:button.mlb-reset.mlb-default.post-button
-            {:on-click #(dis/dispatch! [:story-share])}
+            {:on-click #(reset! (::show-publish-modal s) true)}
             "Publish"]]]
       [:div.story-edit-content
         [:div.story-edit-author.group
