@@ -23,9 +23,9 @@ div.left-navigation-sidebar {
 
     div.all-activity-label {
       border-radius: 3px;
-      font-size: 16px;
+      font-size: 14px;
       color: $oc_gray_7;
-      @include avenir_H();
+      @include avenir_M();
       padding: 0.2rem 0.4rem;
       width: 135px;
       margin-left: 19px;
@@ -34,11 +34,11 @@ div.left-navigation-sidebar {
 
     div.all-activity-icon {
       background-image: cdnUrl("/img/ML/activity_hamburger.svg");
-      background-size: 16px 16px;
-      width: 16px;
-      height: 16px;
+      background-size: 12px 12px;
+      width: 12px;
+      height: 12px;
       float: left;
-      margin-right: 5px;
+      margin-left: 4px;
       margin-top: 5px;
     }
   }
@@ -171,6 +171,7 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-footer {
 
     button.about-carrot-btn {
+      @include avenir_M();
       margin-top: 10px;
       &:hover {
         text-decoration: underline;
@@ -195,6 +196,8 @@ div.left-navigation-sidebar {
     }
 
     button.invite-people-btn {
+      @include avenir_M();
+
       &:hover {
         text-decoration: underline;
       }
