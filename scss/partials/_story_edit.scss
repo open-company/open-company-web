@@ -252,7 +252,13 @@ div.story-edit-container {
 
     div.story-edit-tags {
       margin-top: 21px;
+      position: relative;
       @include activity-tag();
+      div.dropdown-list-container {
+        left: -60px;
+        top: 30px;
+        width: 170px;
+      }
     }
 
     div.story-edit-title {

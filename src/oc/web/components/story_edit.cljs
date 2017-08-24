@@ -14,6 +14,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -160,10 +161,16 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+(defn did-select-storyboard-cb [s storyboard]
+  (let [story-data @(drv/get-ref s :story-editing)]
+    (when (not= (:value storyboard) (:board-slug story-data))
+      (update-story-editing s {:board-slug (:value storyboard) :redirect true}))))
+
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
                         (drv/drv :story-editing)
                         (drv/drv :alert-modal)
+                        (drv/drv :org-data)
                         ;; Medium editor
                         (rum/local nil ::body-editor)
                         ;; Initial data
@@ -182,6 +189,8 @@
                         ;; Shaer draft
                         (rum/local false ::show-share-draft)
                         (rum/local nil ::window-click-listener)
+                        ;; Storyboard tag
+                        (rum/local nil ::show-storyboards-list)
                         {:will-mount (fn [s]
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (reset! (::initial-title s) (:title story-editing))
@@ -319,7 +328,14 @@
             "Click here to upload your header image"])
         [:div.story-edit-tags
           [:div.activity-tag
-            (:storyboard-name story-data)]]
+            {:on-click #(reset! (::show-storyboards-list s) (not @(::show-storyboards-list s)))}
+            (:storyboard-name story-data)]
+          (when @(::show-storyboards-list s)
+            (let [org-data (drv/react s :org-data)
+                  storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts")) (:boards org-data))
+                  storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
+                  fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
+              (dropdown-list fixed-storyboards (:board-slug story-data) (partial did-select-storyboard-cb s) #(reset! (::show-storyboards-list s) false))))]
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
            :placeholder default-story-title

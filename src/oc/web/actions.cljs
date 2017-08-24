@@ -1179,18 +1179,21 @@
     (assoc db :story-editing fixed-story)))
 
 (defmethod dispatcher/action :draft-autosave
-  [db [_]]
+  [db [_ redirect]]
   (utils/after 500 #(api/autosave-draft (:story-editing db)))
   (assoc-in db [:story-editing :autosaving] true))
 
 (defmethod dispatcher/action :draft-autosave/finish
   [db [_]]
-  (when (:story-editing-share db)
-    ;; Needs to publish the story
-    (if (= (:status (:story-editing db)) "draft")
-      (api/share-story (:story-editing db))
-      (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
-  (assoc db :story-editing (dissoc (:story-editing db) :autosaving)))
+  (let [story-editing (:story-editing db)]
+    (when (:story-editing-share db)
+      ;; Needs to publish the story
+      (if (= (:status story-editing) "draft")
+        (api/share-story story-editing)
+        (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
+    (when (:redirect story-editing)
+      (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug story-editing) (:uuid story-editing))))
+    (assoc db :story-editing (dissoc story-editing :autosaving :redirect))))
 
 (defmethod dispatcher/action :story-share
   [db [_]]
