@@ -31,8 +31,6 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-(def add-second-topic-tt-prefix "add-second-topic-")
-
 (defn refresh-board-data []
   (when (not (router/current-activity-id))
     (api/get-board (dis/board-data))))
@@ -40,11 +38,7 @@
 (defcomponent org-dashboard [data owner]
 
   (init-state [_]
-    {:navbar-editing false
-     :editing-topic false
-     :save-bt-active false
-     :add-second-topic-tt-shown false
-     :card-width (if (responsive/is-mobile-size?)
+    {:card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    responsive/card-width)
      :columns-num (responsive/dashboard-columns-num)})
@@ -66,7 +60,7 @@
     (when (om/get-state owner :resize-listener)
       (events/unlistenByKey (om/get-state owner :resize-listener))))
 
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
+  (render-state [_ {:keys [columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
