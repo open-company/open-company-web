@@ -27,10 +27,10 @@
                 [:div.name (:name author)]
                 [:div.time-since
                   [:time
-                    {:date-time (:created-at story)
+                    {:date-time (:published-at story)
                      :data-toggle "tooltip"
                      :data-placement "top"
                      :title (utils/activity-date-tooltip story)}
-                    (utils/time-since (:created-at story))]]])
+                    (utils/time-since (:published-at story))]]])
             (activity-card story has-headline has-body)])
         [:div.stories-vertical-line]])])
