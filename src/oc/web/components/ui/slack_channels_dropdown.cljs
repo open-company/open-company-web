@@ -38,7 +38,7 @@
                                                                    (not (utils/event-inside? % (sel1 [:input.board-edit-slack-channel]))))
                                                           (reset! (::show-channels-dropdown s) false))))
                                                     s)
-                                      :did-remount (fn [s]
+                                      :did-remount (fn [o s]
                                                      (when (and (not @(drv/get-ref s :team-channels))
                                                                 (not @(::team-channels-requested s)))
                                                        (when-let [team-data @(drv/get-ref s :team-data)]
@@ -48,10 +48,10 @@
                                       :will-unmount (fn [s]
                                                       (events/unlistenByKey @(::window-click s))
                                                       s)}
-  [s {:keys [disabled initial-value did-change-cb]}]
+  [s {:keys [disabled initial-value did-change-cb] :as data}]
   (let [slack-teams (drv/react s :team-channels)]
     [:div.slack-channels-dropdown
-      {:class (when disabled "disabled")}
+      {:class (if disabled "disabled" "")}
       [:input.board-edit-slack-channel
         {:value @(::slack-channel s)
          :on-focus (fn [] (utils/after 100 #(reset! (::show-channels-dropdown s) true)))

@@ -27,8 +27,11 @@
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
+                        (rum/local false ::slack-enabled)
                         {:will-mount (fn [s]
                                       (dis/dispatch! [:teams-get])
+                                      (let [board-data @(drv/get-ref s :board-editing)]
+                                        (reset! (::slack-enabled s) (:slack-mirror board-data)))
                                       s)
                          :did-mount (fn [s]
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -39,7 +42,7 @@
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
                                          s)
-                         :did-remount (fn [s]
+                         :did-remount (fn [o s]
                                         ;; Dismiss animated since the board-editing was removed
                                         (when (nil? @(drv/get-ref s :board-editing))
                                           (close-clicked s))
@@ -118,9 +121,9 @@
             (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
                                       :initial-value (or (str "#" (:channel-name (:slack-mirror (drv/react s :board-data)))) "")
                                       :did-change-cb (fn [team channel]
-                                                      (dis/dispatch! [:input [:board-editing :slack-mirror :channel-id] (:id channel)])
-                                                      (dis/dispatch! [:input [:board-editing :slack-mirror :channel-name] (:name channel)])
-                                                      (dis/dispatch! [:input [:board-editing :slack-mirror :slack-org-id] (:slack-org-id team)]))})])
+                                                      (dis/dispatch! [:input [:board-editing :slack-mirror ] {:channel-id (:id channel)
+                                                                                                              :channel-name (:name channel)
+                                                                                                              :slack-org-id (:slack-org-id team)}]))})])
         [:div.board-edit-footer
           [:div.board-edit-footer-left
             (when (and (not (empty? (:slug board-editing)))
