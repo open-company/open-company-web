@@ -65,6 +65,16 @@ div.topics-columns {
         }
       }
 
+      div.new-story-container {
+        position: relative;
+        float: right;
+        div.dropdown-list-container {
+          left: -35px;
+          top: 47px;
+          width: 170px;
+        }
+      }
+
       button.add-to-board-btn {
         float: right;
         margin-right: 16px;
