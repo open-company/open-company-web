@@ -60,7 +60,7 @@
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
           [:div.boards-icon]
-          [:span "BOARDS"]]
+          [:span "Boards"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
@@ -93,7 +93,7 @@
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
           [:div.stories-icon]
-          [:span "SERIES"]]
+          [:span "Series"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
