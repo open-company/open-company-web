@@ -1,9 +1,15 @@
 div.drafts-layout {
+  margin-left: 16px;
+
   div.draft-cards-container {
     div.draft-card-row {
       display: flex;
       margin-top: 24px;
       width: 888px;
+
+      &:first-child {
+        margin-top: 0px;
+      }
 
       div.draft-card {
         flex: 1;
