@@ -17,7 +17,7 @@
           [:div.activity-tag
             (:storyboard-name draft)]]
         [:div.draft-card-title
-          {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (or (:title draft) "Untitled Draft")))}]
+          {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title draft)) "Untitled Draft" (:title draft))))}]
         (let [empty-body? (empty? (:body draft))
               fixed-body (if empty-body? "Say something..." (:body draft))
               final-body (-> fixed-body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)]
@@ -29,7 +29,7 @@
               [:div.bottom-gradient])])
         [:div.draft-card-footer.group
           [:div.draft-card-footer-left
-            (str "Edited " (utils/activity-date (utils/js-date (:updated-at draft))))]
+            (utils/draft-date (or (:updated-at draft) (:created-at draft)))]
           [:div.draft-card-footer-right ""]]])])
 
 (rum/defc drafts-layout
