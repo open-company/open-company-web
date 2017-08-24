@@ -117,8 +117,9 @@
         (when (pos? (count (:related story-data)))
           [:div.related-container.group
             [:div.related-title (str "Related Stories in " (:storyboard-name story-data))]
-            (for [story (:related story-data)]
-              (rum/with-key (related-story story (= (count (:related story-data)) 1)) (str "related-story-" (:uuid story))))])]
+            [:div.related-stories
+              (for [story (:related story-data)]
+                (rum/with-key (related-story story (= (count (:related story-data)) 1)) (str "related-story-" (:uuid story))))]])]
       [:div.story-comments-container
         {:class (when @(::comments-expanded s) "comments-expanded")}
         [:button.close-comments.mlb-reset

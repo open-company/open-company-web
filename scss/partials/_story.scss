@@ -171,42 +171,52 @@ div.story-container {
         margin-bottom: 16px;
       }
 
-      div.related-story {
-        padding: 24px;
-        width: 408px;
-        height: 180px;
-        borer-radius: 4px;
-        background-color: white;
-        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.03);
-        cursor: pointer;
+      div.related-stories {
+        display: flex;
 
-        &.centered {
-          margin: 0px auto;
-        }
+        div.related-story {
+          padding: 24px;
+          width: 408px;
+          border-radius: 4px;
+          background-color: white;
+          box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.03);
+          cursor: pointer;
+          flex: 1;
 
-        &:not(.centered) {
-          float: left;
-
-          &:last-child {
-            margin-left: 24px;
+          &.centered {
+            margin: 0px auto;
           }
-        }
 
-        div.related-story-header {
-          @include activity-author();
-        }
+          &:not(.centered) {
+            float: left;
 
-        div.related-story-title {
-          @include activity-title();
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          margin-top: 16px;
-          width: 360px;
-        }
+            &:last-child {
+              margin-left: 24px;
+            }
+          }
 
-        div.related-story-footer {
-          margin-top: 16px;
+          div.related-story-header {
+            @include activity-author();
+          }
+
+          div.related-story-title {
+            @include activity-title();
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 16px;
+            width: 360px;
+          }
+
+          div.related-story-footer {
+            div.is-reactions {
+              margin-top: 16px;
+            }
+
+            div.is-coments {
+              margin-top: 16px;
+            }
+          }
         }
       }
     }
