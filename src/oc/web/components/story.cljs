@@ -31,7 +31,7 @@
       [:div.related-story-title
         {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]
       [:div.related-story-footer.group
-        (interactions-summary story-data true)]]))
+        (interactions-summary story-data false)]]))
 
 (def default-comments-total-width 492)
 
