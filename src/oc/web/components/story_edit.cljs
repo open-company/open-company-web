@@ -141,13 +141,6 @@
 (defn complete-story-edit-url [uuid]
   (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/story-edit (router/current-org-slug) (router/current-board-slug) uuid)))
 
-(defn share-draft-select-text []
-  (.select (sel1 [:input#share-draft-copy-text])))
-
-(defn copy-clicked [story-uuid]
-  (share-draft-select-text)
-  (utils/copy-to-clipboard (complete-story-edit-url story-uuid)))
-
 (defn delete-clicked [e story-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
@@ -186,9 +179,6 @@
                         (rum/local false ::banner-add-did-success)
                         ;; Media picker
                         (rum/local "story-edit-media-picker" ::media-picker-id)
-                        ;; Shaer draft
-                        (rum/local false ::show-share-draft)
-                        (rum/local nil ::window-click-listener)
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
                         {:will-mount (fn [s]
@@ -196,12 +186,6 @@
                                          (reset! (::initial-title s) (:title story-editing))
                                          (reset! (::initial-body s) (:body story-editing))
                                          (reset! (::activity-uuid s) (:uuid story-editing)))
-                                       (reset! (::window-click-listener s)
-                                         (events/listen js/window EventType/CLICK
-                                          #(when (and @(::show-share-draft s)
-                                                      (not (utils/event-inside? % (sel1 [:div.share-draft-container])))
-                                                      (not (utils/event-inside? % (sel1 [:button.share-button]))))
-                                             (reset! (::show-share-draft s) false))))
                                        s)
                          :did-mount (fn [s]
                                       (utils/after 1000 #(setup-body-editor s))
@@ -260,31 +244,9 @@
             {:class (when-not (empty? @(::central-message s)) "showing")}
             @(::central-message s)]]
         [:div.story-edit-header-right
-          [:button.mlb-reset.mlb-default.share-button
-            {:on-click #(let [showing @(::show-share-draft s)]
-                         (when-not showing
-                           (utils/after 1000 share-draft-select-text))
-                         (reset! (::show-share-draft s) (not showing)))}
-            "Share Draft"]
-          (when @(::show-share-draft s)
-            [:div.share-draft-container
-              [:div.share-draft-triangle]
-              [:div.share-draft-title
-                "Share a link to this draft"]
-              [:div.share-draft-description
-                "People with this link will be able to comment on your story, but not edit it."]
-              [:div.share-draft-link-box
-                [:input
-                  {:type "text"
-                   :id "share-draft-copy-text"
-                   :readOnly true
-                   :value (complete-story-edit-url (:uuid story-data))}]
-                [:button.mlb-reset.mlb-default.share-draft-copy-btn
-                  {:on-click #(copy-clicked (:uuid story-data))}
-                  "Copy"]]])
           [:button.mlb-reset.mlb-default.post-button
             {:on-click #(dis/dispatch! [:story-share])}
-            "Post"]]]
+            "Publish"]]]
       [:div.story-edit-content
         [:div.story-edit-author.group
           (user-avatar-image story-author)
