@@ -42,7 +42,15 @@ div#wrap {
         @include avenir_R();
         line-height: 32px;
         max-width: 660px;
-        margin: 20px auto 40px;
+        margin: 20px auto 0px;
+
+        &.second-line {
+          margin: 0px auto 40px;
+
+          @include mobile(){
+            margin-top: 20px;
+          }
+        }
       }
 
       button.get-started-centred-bt {

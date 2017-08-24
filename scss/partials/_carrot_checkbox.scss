@@ -1,0 +1,45 @@
+$carrot_checkbox_animation: 130ms;
+
+div.carrot-checkbox {
+  display: block-inline;
+  width: 64px;
+  height: 26px;
+  border-radius: 100px;
+  background-color: rgba($carrot_light_gray_1, 0.3);
+  color: $carrot_light_gray_1;
+  transition: background-color $carrot_checkbox_animation, color $carrot_checkbox_animation;
+  padding-left: 26px;
+  position: relative;
+  cursor: pointer;
+  padding-top: 4px;
+  @include no-user-select();
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  span.dot {
+    position: absolute;
+    top: 4px;
+    left: 0px;
+    margin-left: 4px;
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    display: block;
+    border-radius: 9px;
+    transition: margin-left $carrot_checkbox_animation;
+  }
+
+  &.selected {
+    background-color: $carrot_text-blue;
+    color: white;
+    padding-left: 10px;
+
+    span.dot {
+      margin-left: 42px;
+    }
+  }
+}

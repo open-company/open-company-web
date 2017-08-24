@@ -92,12 +92,6 @@
   ([org-slug]
     (str (org org-slug) "/boards")))
 
-(defn create-board
-  ([]
-    (create-board (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/create-board")))
-
 (defn board
   "Board url"
   ([]

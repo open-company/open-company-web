@@ -192,6 +192,9 @@ provided in the table below:
 
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
+|  :alert-modal-hide | UI | Hide the alert modal view. |
+|  :alert-modal-show | UI | Show the alert modal view. |
+|  :alert-modal-hide-done | UI | Alert modal view hide finished. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -200,6 +203,9 @@ provided in the table below:
 |  :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
 |  :board-create | UI | Start the request to create a new board for the current org. |
 |  :board-delete | UI | Delete a board of the current org. |
+|  :board-edit | UI | Start the board edit for existing board and new board. |
+|  :board-edit-save | UI | Save the board edited data. |
+|  :board-edit/dismiss | UI | Starts the dismiss process of the board editing modal. |
 |  :board-nav | UI | Navigate to another board: it needs an action because it reset the board filters before navigating away. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |

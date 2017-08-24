@@ -33,7 +33,6 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
-            [oc.web.components.board-editor :refer (board-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.org-logo-setup :refer (org-logo-setup)]
@@ -286,16 +285,6 @@
           (drv-root org-editor target))
         (oc-wall-handler "Please sign in." target params)))
 
-    (defroute board-create-route (urls/create-board ":org") {:as params}
-      (timbre/info "Routing board-create-route" (urls/create-board ":org"))
-      (if (jwt/jwt)
-        (let [org (:org (:params params))]
-          (pre-routing (:query-params params))
-          (router/set-route! [org "create-board"] {:org org :query-params (:query-params params)})
-          (post-routing)
-          (drv-root board-editor target))
-        (oc-wall-handler "Please sign in to access this organization." target params)))
-
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
@@ -436,7 +425,6 @@
                                  org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
-                                 board-create-route
                                  ;; Boards
                                  boards-list-route
                                  board-route

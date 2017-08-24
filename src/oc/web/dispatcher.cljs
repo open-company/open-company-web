@@ -23,9 +23,6 @@
 (defn board-cache-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :cache])
 
-(defn board-access-error-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :error])
-
 (defn board-new-topics-key [org-slug board-slug]
   [(keyword org-slug) (keyword board-slug) :new-topics])
 
@@ -145,6 +142,9 @@
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
+   :board-editing       [[:base]
+                          (fn [base]
+                            (:board-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]})

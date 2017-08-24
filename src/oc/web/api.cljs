@@ -199,17 +199,21 @@
 
 (defn patch-board [data]
   (when data
-    (let [board-data (dissoc data :links :read-only)
+    (let [board-data (select-keys data [:name :slug :access :slack-mirror])
           json-data (cljs->json board-data)
-          links (:links (dispatcher/board-data))
-          board-patch-link (utils/link-for links "partial-update")]
+          board-patch-link (utils/link-for (:links data) "partial-update")]
       (storage-patch (relative-href (:href board-patch-link))
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:board (json->cljs body)])
-          ;; Refresh the org data to make sure the list of boards is updated
-          (get-org (dispatcher/org-data)))))))
+          (if (= status 409)
+            ; Board name exists
+            (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
+            (do
+              (dispatcher/dispatch! [:board (json->cljs body)])
+              (dispatcher/dispatch! [:board-edit/dismiss])
+              ;; Refresh the org data to make sure the list of boards is updated
+              (get-org (dispatcher/org-data)))))))))
 
 (defn patch-org [data]
   (when data
@@ -576,16 +580,20 @@
                 ; if not refirect the user to the slug
                 (router/redirect! org-url)))))))))
 
-(defn create-board [board-name]
+(defn create-board [board-name board-access]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
     (when (and board-name create-link)
       (storage-post (relative-href (:href create-link))
         {:headers (headers-for-link create-link)
-         :json-params (cljs->json {:name board-name})}
+         :json-params (cljs->json {:name board-name :access board-access})}
         (fn [{:keys [success status body]}]
           (let [board-data (if success (json->cljs body) {})]
-            (dispatcher/dispatch! [:board board-data])
-            (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))
+            (if (= status 409)
+              ; Board name exists
+              (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
+              (do
+                (dispatcher/dispatch! [:board board-data])
+                (router/redirect! (oc-urls/board (router/current-org-slug) (:slug board-data)))))))))))
 
 (defn add-author
   "Given a user-id add him as an author to the current org.
@@ -787,7 +795,7 @@
   [entry-data]
   (when entry-data
     (let [entry-self-link (utils/link-for (:links entry-data) "self" "GET")]
-      (storage-get (:href entry-self-link)
+      (storage-get (relative-href (:href entry-self-link))
         {:headers (headers-for-link entry-self-link)}
         (fn [{:keys [status success body]}]
           (if success
@@ -801,7 +809,7 @@
     (let [board-data (dispatcher/board-data)
           create-entry-link (utils/link-for (:links board-data) "create" "POST")
           cleaned-entry-data (select-keys entry-data entry-keys)]
-      (storage-post (:href create-entry-link)
+      (storage-post (relative-href (:href create-entry-link))
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
@@ -812,7 +820,7 @@
   (when entry-data
     (let [update-entry-link (utils/link-for (:links entry-data) "partial-update" "PATCH")
           cleaned-entry-data (select-keys entry-data entry-keys)]
-      (storage-patch (:href update-entry-link)
+      (storage-patch (relative-href (:href update-entry-link))
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]

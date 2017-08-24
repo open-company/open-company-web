@@ -28,14 +28,14 @@
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
                                       total-width
-                                      card-width
-                                      topics
                                       board-data
-                                      topics-data
                                       is-dashboard
                                       is-stakeholder-update
-                                      new-entry-edit
                                       board-filters] :as data} owner options]
+
+  (did-mount [_]
+    (when-not (utils/is-test-env?)
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render [_]
     (let [current-entry-uuid (router/current-entry-uuid)
@@ -87,10 +87,13 @@
                   ;; Settings button
                   (when-not (:read-only board-data)
                     (dom/button {:class "mlb-reset board-settings-bt"
-                                 :on-click #(router/nav! (oc-urls/board-settings (router/current-org-slug) (:slug board-data)))})))
+                                 :data-toggle "tooltip"
+                                 :data-placement "top"
+                                 :data-container "body"
+                                 :title "Board settings"
+                                 :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Say something button
                 (when (and (not (:read-only (dis/org-data)))
-                           (not new-entry-edit)
                            (not (:foce-key data))
                            (not (responsive/is-tablet-or-mobile?))
                            (not (:dashboard-sharing data)))
@@ -107,7 +110,6 @@
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-entry-uuid)
-                     (not new-entry-edit)
                      empty-board?)
                 (empty-board)
                 ; for each column key contained in best layout

@@ -7,7 +7,7 @@ div.left-boards-list {
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 34px; 
+    margin-bottom: 34px;
 
     &:hover {
       text-decoration: underline;
@@ -78,6 +78,7 @@ div.left-boards-list {
       background-position: 50%;
       background-size: 8px 8px;
       border-radius: 2px;
+      @include avenir_H();
 
       &:hover {
         background-color: #3FBD7C;
@@ -88,75 +89,63 @@ div.left-boards-list {
 
   div.left-boards-list-items{
     cursor: pointer;
-    padding-left: 20px;
 
     div.left-boards-list-item {
-      padding: 0 5px 0 5px;
-      border-radius: 3px;
-      font-family: $oc_main_font;
       cursor: default;
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.71;
       color: $oc_gray_7;
 
-      @include no-user-select();
-
-      div.internal {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 120px;
+      img.public {
         float: left;
-        font-size: 14px;
-        color: $oc_gray_7;
-        @include avenir_M();
-
-        &:hover {
-          text-decoration: underline;
-        }
+        margin-left: 4px;
+        width: 16px;
+        height: 16px;
       }
 
-      button.remove-board {
-        float: right;
-        margin-right: 2px;
-        color: $oc_gray_5;
-        opacity: 0;
-        width: 20px;
-        height: 20px;
-        font-weight: 300;
-        font-size: 14px;
-        margin-top: -3px;
+      img.private{
+        float: left;
+        margin-left: 4px;
+        margin-top: 3px;
+        width: 10px;
+        height: 14px;
       }
 
-      &:hover {
-        button.remove-board {
-          opacity: 0.8;
-        }
-      }
+      div.board-name {
+        margin-left: 20px;
 
-      &.selected {
-        background-color: $carrot_light_blue;
-        color: #3E4547;
+        // &.public-board {
+        //   margin-left: 4px;
+        // }
+
+        // &.private-board {
+        //   margin-left: 10px;
+        // }
+        // float: right;
 
         div.internal {
-          @include avenir_H();
+          border-radius: 3px;
+          padding: 0 5px 0 5px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          width: 120px;
+          float: left;
           font-size: 14px;
           line-height: 1.71;
-        }
-      }
+          color: $oc_gray_7;
+          @include avenir_M();
+          cursor: pointer;
 
-      &.highlight-on-hover {
-        cursor: pointer;
-      }
+          &.selected {
+            background-color: $carrot_light_blue;
+            color: #3E4547;
+            @include avenir_H();
+            font-size: 14px;
+            line-height: 1.71;
+          }
 
-      input.board-name {
-        width: #{$left_boards_list_width - 20 - 48}px;
-        height: 20px;
-        margin: 2px 0;
-
-        &:active, &:focus {
-          outline: none;
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
     }

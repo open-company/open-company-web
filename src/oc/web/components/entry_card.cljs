@@ -145,9 +145,9 @@
         {:dangerouslySetInnerHTML (utils/emojify (:headline entry-data))
          :class (when has-headline "has-headline")}]
       ; Body
-      (let [body-without-images (utils/strip-img-tags (:body entry-data))
+      (let [body-without-tags (-> entry-data :body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)
             hidden-class (str "entry-body" (:uuid entry-data))
-            $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-images "</div>"))
+            $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
             appened-body (.append (js/$ (.-body js/document)) $body-content)
             _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
                                                                             (let [$this (js/$ this)]

@@ -87,7 +87,6 @@
         (and (jwt/jwt)
              (not (utils/in? (:route @router/path) "create-org"))
              (not (utils/in? (:route @router/path) "user-profile"))
-             (not (utils/in? (:route @router/path) "create-board"))
              (not (utils/in? (:route @router/path) "email-verification"))
              (not (utils/in? (:route @router/path) "about"))
              (not (utils/in? (:route @router/path) "features")))
@@ -119,8 +118,7 @@
         (api/get-board board-data)
         ; The board wasn't found, showing a 404 page
         (router/redirect-404!))
-      (and (not (utils/in? (:route @router/path) "create-board"))
-           (not (utils/in? (:route @router/path) "create-org"))
+      (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "updates-list"))
@@ -135,10 +133,7 @@
           (let [board-to (get-default-board org-data)]
             (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
               (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))))
-        ;; Redirect to create board if no board are present
-        :else
-        (router/nav! (oc-urls/create-board (:slug org-data))))))
+              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))))))
   ;; FIXME: temporarily remove stories loading
   ; (utils/after 100 #(api/get-updates))
   (-> db
@@ -436,8 +431,10 @@
     ; team link may not be present for non-admins, if so they can still get team users from the roster
     (when team-link
       (api/get-team team-link))
-    (when roster-link
-      (api/get-team roster-link)))
+    ; ;; FIXME: Re-enable roster loading once it's fixed on auth side
+    ; (when roster-link
+    ;   (api/get-team roster-link))
+    )
   (assoc-in db [:teams-data :teams] teams))
 
 (defmethod dispatcher/action :team-loaded
@@ -714,13 +711,6 @@
   (let [org-data (:create-org db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data))))
-  db)
-
-(defmethod dispatcher/action :board-create
-  [db [_]]
-  (let [board-name (:create-board db)]
-    (when-not (string/blank? board-name)
-      (api/create-board board-name)))
   db)
 
 (defmethod dispatcher/action :private-board-add
@@ -1102,3 +1092,23 @@
 (defmethod dispatcher/action :alert-modal-hide-done
   [db [_]]
   (dissoc db :alert-modal))
+
+(defmethod dispatcher/action :board-edit
+  [db [_ initial-board-data]]
+  (let [fixed-board-data (if initial-board-data
+                            initial-board-data
+                            {:name "" :slug "" :access "team"})]
+    (assoc db :board-editing fixed-board-data)))
+
+(defmethod dispatcher/action :board-edit-save
+  [db [_]]
+  (let [board-data (:board-editing db)]
+    (if (and (string/blank? (:slug board-data))
+             (not (string/blank? (:name board-data))))
+      (api/create-board (:name board-data) (:access board-data))
+      (api/patch-board board-data)))
+  db)
+
+(defmethod dispatcher/action :board-edit/dismiss
+  [db [_]]
+  (dissoc db :board-editing))

@@ -33,8 +33,9 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Company updates that get everyone aligned"]
-          [:div.subheadline#thank-you-top "It's never been easier to build transparency and alignment\nwith your team, investors and customers"]
+          [:h1.headline "Team news that keeps everyone aligned"]
+          [:div.subheadline#thank-you-top
+            "Companies struggle to keep everyone on the same page.\nCarrot provides the big picture that brings them together."]
           (when (and (not @(::confirm s))
                      (not @(::thanks-box-top s)))
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -65,23 +66,23 @@
               [:div.title
                 "Get aligned fast"]
               [:div.subtitle
-                "Check out what’s new this week, or get new employees up to speed in a flash. Updates are in one place and easy to find."]]]
+                "Whether your team is local or distributed, the big picture keeps everyone focused on what’s most important."]]]
 
           [:div.illustration.illustration-2.group
             [:img {:src (utils/cdn "/img/ML/home_page_il_2_444_414.svg")}]
             [:div.description.group
               [:div.title
-                "Keep investors up to date"]
+                "Simplify Investor Updates"]
               [:div.subtitle
-                "Investors and advisors are happier - and more helpful - when they’re in the loop!"]]]
+                "Create updates for investors, advisors and other stakeholders in less time."]]]
 
           [:div.illustration.illustration-3.group
             [:img {:src (utils/cdn "/img/ML/home_page_il_3_355_350.svg")}]
             [:div.description.group
               [:div.title
-                "Build trust with a bigger audience"]
+                "Engage a bigger audience"]
               [:div.subtitle
-                "Share your updates with recruits, potential investors, and customers."]]]]
+                "Share the latest with recruits, potential investors, customers and other outside stakeholders to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]]
 
         (comment
           [:div.customers
