@@ -226,6 +226,7 @@
                                          s)
                          :will-unmount (fn [s]
                                         (events/unlistenByKey @(::window-click-listener s))
+                                        (utils/after 100 #(dis/dispatch! [:input [:story-editing] nil]))
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)
@@ -325,7 +326,7 @@
                              (fn []
                                ;; Delay the check because this is called on cancel but also on success
                                (utils/after 1000 #(banner-add-dismiss-picker s)))))}
-            "Click here to upload your header image"])
+            [:span.blue "Click here to upload"] " your header image"])
         [:div.story-edit-tags
           [:div.activity-tag
             {:on-click #(reset! (::show-storyboards-list s) (not @(::show-storyboards-list s)))}

@@ -227,8 +227,15 @@ div.story-edit-container {
       cursor: pointer;
       background-color: rgba($carrot_light_gray_2, 0.3);
 
+      span.blue {
+        color: $carrot_text_blue;
+      }
+
       &:hover {
         text-decoration: underline;
+        span.blue {
+          text-decoration: underline;
+        }
       }
     }
 
