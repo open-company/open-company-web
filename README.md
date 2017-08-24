@@ -195,6 +195,8 @@ provided in the table below:
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |
+|  :all-activity-get | UI | Start loading all activity. |
+|  :all-activity-get/finish | API | All activity data loaded, dispatch them. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -215,9 +217,6 @@ provided in the table below:
 |  :comment-add/finish | API | Request to add a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
 |  :comments-get | UI | Starts the request to load the comments given an entry UUID. |
 |  :comments-get/finish | API | Request to load the comments for an entry finished, could be it failed though. |
-|  :dashboard-select-all | UI | Given a board select all the topics for the share. |
-|  :dashboard-select-topic | UI | When in sharing mode toggle a topic in the selected set. |
-|  :dashboard-share-mode | UI | Toggle the sharing mode. |
 |  :default | - | Default action, never used, it's only a fallback |
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |

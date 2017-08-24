@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -11,7 +12,8 @@
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entry-card :refer (entry-card)]
-            [oc.web.components.entries-layout :refer (entries-layout)]))
+            [oc.web.components.entries-layout :refer (entries-layout)]
+            [oc.web.components.all-activity :refer (all-activity)]))
 
 (defn- update-active-topics [owner new-topic topic-data]
   (let [board-data (om/get-props owner :board-data)
@@ -29,13 +31,17 @@
                                       content-loaded
                                       total-width
                                       board-data
+                                      all-activity-data
                                       is-dashboard
+                                      is-all-activity
                                       is-stakeholder-update
                                       board-filters] :as data} owner options]
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (when is-all-activity
+        (dis/dispatch! [:calendar-get]))))
 
   (render [_]
     (let [current-entry-uuid (router/current-entry-uuid)
@@ -70,11 +76,6 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
-            (when (:dashboard-sharing data)
-              (dom/div {:class "dashboard-sharing-select-all"}
-                (dom/span "Click topics to include or")
-                (dom/button {:class "btn-reset btn-link"
-                             :on-click #(dis/dispatch! [:dashboard-select-all (:slug board-data)])} "select all")))
             (when-not (responsive/is-tablet-or-mobile?)
               (om/build boards-list data))
             (dom/div {:class "board-container right"
@@ -83,9 +84,12 @@
               (dom/div {:class "group"}
                 ;; Board name and settings button
                 (dom/div {:class "board-name"}
-                  (:name board-data)
+                  (if is-all-activity
+                    "All Activity"
+                    (:name board-data))
                   ;; Settings button
-                  (when-not (:read-only board-data)
+                  (when (and (router/current-board-slug)
+                             (not (:read-only board-data)))
                     (dom/button {:class "mlb-reset board-settings-bt"
                                  :data-toggle "tooltip"
                                  :data-placement "top"
@@ -93,10 +97,10 @@
                                  :title "Board settings"
                                  :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Say something button
-                (when (and (not (:read-only (dis/org-data)))
+                (when (and (not is-all-activity)
+                           (not (:read-only (dis/org-data)))
                            (not (:foce-key data))
-                           (not (responsive/is-tablet-or-mobile?))
-                           (not (:dashboard-sharing data)))
+                           (not (responsive/is-tablet-or-mobile?)))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
@@ -107,6 +111,9 @@
                   (filters-dropdown)))
               ;; Board content: empty board, add topic, topic view or topic cards
               (cond
+                (and is-dashboard
+                     is-all-activity)
+                (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (map :uuid (:entries all-activity-data)))))
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-entry-uuid)

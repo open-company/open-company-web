@@ -1,6 +1,6 @@
 @include big_web(){
   body.small-footer{
-    div.org-dashboard:not(.dashboard-sharing){
+    div.org-dashboard{
       div.topic-list {
         min-height: 100vh;
       }
@@ -32,7 +32,7 @@ div.org-dashboard.selected-topic-view.mobile-or-tablet {
   }
 }
 
-div.org-dashboard:not(.dashboard-sharing) div.topic-list{
+div.org-dashboard div.topic-list{
   @include big_web(){
     min-height: 100vh;
   }

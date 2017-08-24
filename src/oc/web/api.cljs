@@ -834,6 +834,30 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:entry-delete/finish]))))))
 
+(defn get-all-activity [org-data & [activity-link year month]]
+  (when org-data
+    (let [all-activity-link (or activity-link (utils/link-for (:links org-data) "activity"))]
+      (storage-get (relative-href (:href all-activity-link))
+        {:headers (headers-for-link all-activity-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:all-activity-get/finish {:org (:slug org-data) :year year :month month :body (if success (json->cljs body) nil)}]))))))
+
+(defn load-more-all-activity [more-link direction]
+  (when (and more-link direction)
+    (storage-get (relative-href (:href more-link))
+      {:headers (headers-for-link more-link)}
+      (fn [{:keys [status success body]}]
+        (dispatcher/dispatch! [:all-activity-more/finish {:org (router/current-org-slug) :direction direction :body (if success (json->cljs body) nil)}])))))
+
+(defn get-calendar [org-slug]
+  (when org-slug
+    (let [org-data (dispatcher/org-data)
+          calendar-link (utils/link-for (:links org-data) "calendar")]
+      (storage-get (relative-href (:href calendar-link))
+        {:headers (headers-for-link calendar-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:calendar-get/finish {:org (router/current-org-slug) :body (if success (json->cljs body) nil)}]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go

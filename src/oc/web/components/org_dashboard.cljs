@@ -96,16 +96,17 @@
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
+          all-activity-data (dis/all-activity-data data)
           entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
       (if (or (not org-data)
-              (not board-data))
+              (and (not board-data)
+                   (not all-activity-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
-                                           :dashboard-sharing (:dashboard-sharing data)
                                            :selected-topic-view (router/current-entry-uuid)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :editing-topic (or (not (nil? (:foce-key data)))
@@ -142,8 +143,6 @@
                                 :mobile-menu-open (:mobile-menu-open data)
                                 :auth-settings (:auth-settings data)
                                 :active :dashboard
-                                :dashboard-selected-topics (:dashboard-selected-topics data)
-                                :dashboard-sharing (:dashboard-sharing data)
                                 :show-navigation-bar (utils/company-has-topics? board-data)
                                 :is-dashboard (not (router/current-entry-uuid))}))
             (if (:show-welcome-screen data)
@@ -156,52 +155,23 @@
                     (when-not (:read-only board-data)
                       (dom/p {:class "empty-dashboard-msg"}
                         (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) ", your dashboard can be viewed after it's been created on a desktop browser."))))
-                  (if (:dashboard-sharing data)
-                    (dom/div {:class "sharing-boards"}
-                      (for [board (:boards org-data)
-                            :let [board-data (dis/board-data data (router/current-org-slug) (:slug board))]
-                            :when (pos? (count (:topics board-data)))]
-                        (dom/div {:class "sharing-board-container"}
-                          (dom/h3 {:class "board-title"} (:name board-data))
-                          (om/build topics-list
-                                      {:loading (:loading data)
-                                       :content-loaded (or (:loading board-data) (:loading data))
-                                       :org-data org-data
-                                       :board-data board-data
-                                       :entries-data []
-                                       :new-topics nil
-                                       :force-edit-topic (:force-edit-topic data)
-                                       :foce-data-editing? (:foce-data-editing? data)
-                                       :card-width card-width
-                                       :columns-num columns-num
-                                       :show-login-overlay (:show-login-overlay data)
-                                       :foce-key (:foce-key data)
-                                       :foce-data (:foce-data data)
-                                       :entry-editing (:entry-editing data)
-                                       :dashboard-selected-topics (:dashboard-selected-topics data)
-                                       :dashboard-sharing (:dashboard-sharing data)
-                                       :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                                       :is-dashboard true
-                                       :show-top-menu (:show-top-menu data)
-                                       :board-filters (:board-filters data)}))))
-                    (om/build topics-list
-                                {:loading (:loading data)
-                                 :content-loaded (or (:loading board-data) (:loading data))
-                                 :org-data org-data
-                                 :board-data board-data
-                                 :entries-data entries-data
-                                 :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
-                                 :force-edit-topic (:force-edit-topic data)
-                                 :foce-data-editing? (:foce-data-editing? data)
-                                 :card-width card-width
-                                 :columns-num columns-num
-                                 :show-login-overlay (:show-login-overlay data)
-                                 :foce-key (:foce-key data)
-                                 :foce-data (:foce-data data)
-                                 :entry-editing (:entry-editing data)
-                                 :dashboard-selected-topics (:dashboard-selected-topics data)
-                                 :dashboard-sharing (:dashboard-sharing data)
-                                 :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                                 :is-dashboard true
-                                 :show-top-menu (:show-top-menu data)
-                                 :board-filters (:board-filters data)})))))))))))
+                  (om/build topics-list
+                    {:loading (:loading data)
+                     :content-loaded (or (:loading board-data) (:loading data))
+                     :org-data org-data
+                     :board-data board-data
+                     :all-activity-data all-activity-data
+                     :entries-data entries-data
+                     :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
+                     :force-edit-topic (:force-edit-topic data)
+                     :foce-data-editing? (:foce-data-editing? data)
+                     :card-width card-width
+                     :columns-num columns-num
+                     :show-login-overlay (:show-login-overlay data)
+                     :foce-key (:foce-key data)
+                     :foce-data (:foce-data data)
+                     :entry-editing (:entry-editing data)
+                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                     :is-dashboard true
+                     :show-top-menu (:show-top-menu data)
+                     :board-filters (:board-filters data)}))))))))))

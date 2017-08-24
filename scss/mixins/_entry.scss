@@ -36,9 +36,16 @@
     text-overflow: ellipsis;
     width: calc(100% - 52px);
     @include avenir_R();
-    color: $oc_gray_7;
+    color: rgba($oc_gray_7, 0.5);
     font-size: 14px;
-    opacity: 0.5;
+
+    div.tooltip {
+      .tooltip-inner {
+        white-space:pre-wrap;
+        max-width: none;
+        text-align: center;
+      }
+    }
   }
 }
 

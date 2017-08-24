@@ -23,7 +23,7 @@
         (utils/after (+ 800 200 (* 7 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (rum/defcs reactions
-  [s topic-slug entry-uuid entry-data]
+  [s entry-data]
   (when-not (empty? (:reactions entry-data))
     (let [reactions-data (:reactions entry-data)
           reactions-loading (:reactions-loading entry-data)]
@@ -36,14 +36,14 @@
                                               :reacted (not (:reacted reaction-data))})
                         reaction-data)]]
           [:button.reaction-btn.btn-reset
-            {:key (str "topic-" topic-slug "-entry-" entry-uuid "-" idx)
+            {:key (str "-entry-" (:uuid entry-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
                                       :has-reactions (pos? (:count r))})
              :on-click (fn [e]
                          (when-not is-loading
                            (when-not (:reacted r)
                              (animate-reaction e s))
-                           (dis/dispatch! [:reaction-toggle entry-uuid r])))}
+                           (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}
             [:span.reaction (:reaction r)]
             [:div.count
               (:count r)]])])))

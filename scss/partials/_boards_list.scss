@@ -7,16 +7,27 @@ div.left-boards-list {
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 34px;
+    margin-bottom: 44px;
+    border-radius: 3px;
+
+    &.selected {
+      background-color: $carrot_light_blue;
+      color: #3E4547;
+    }
 
     &:hover {
       text-decoration: underline;
     }
 
-    span {
+    div.all-activity-label {
+      border-radius: 3px;
       font-size: 16px;
       color: $oc_gray_7;
       @include avenir_H();
+      padding: 0.2rem 0.4rem;
+      width: 135px;
+      margin-left: 19px;
+      text-align: left;
     }
 
     div.all-activity-icon {
@@ -26,7 +37,7 @@ div.left-boards-list {
       height: 16px;
       float: left;
       margin-right: 5px;
-      margin-top: 1px;
+      margin-top: 5px;
     }
   }
 
@@ -45,6 +56,7 @@ div.left-boards-list {
         font-size: 13px;
         color: $oc_gray_7;
         float: left;
+        margin-left: 5px;
       }
 
       div.boards-icon, div.stories-icon {
@@ -67,7 +79,7 @@ div.left-boards-list {
     button.left-boards-list-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 0px;
+      margin-right: 28px;
       margin-top: -6px;
       padding: 0;
       cursor: pointer;
@@ -93,37 +105,39 @@ div.left-boards-list {
     div.left-boards-list-item {
       cursor: default;
       color: $oc_gray_7;
+      margin-top: 10px;
+      border-radius: 3px;
+
+      &.selected {
+        background-color: $carrot_light_blue;
+        color: #3E4547;
+        @include avenir_H();
+        font-size: 14px;
+        line-height: 1.71;
+      }
 
       img.public {
         float: left;
-        margin-left: 4px;
+        margin-left: 6px;
+        margin-top: 2px;
         width: 16px;
         height: 16px;
       }
 
       img.private{
         float: left;
-        margin-left: 4px;
+        margin-left: 8px;
         margin-top: 3px;
         width: 10px;
         height: 14px;
       }
 
       div.board-name {
-        margin-left: 20px;
-
-        // &.public-board {
-        //   margin-left: 4px;
-        // }
-
-        // &.private-board {
-        //   margin-left: 10px;
-        // }
-        // float: right;
+        margin-left: 25px;
 
         div.internal {
           border-radius: 3px;
-          padding: 0 5px 0 5px;
+          padding: 0.1rem 5px 0 5px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -135,14 +149,6 @@ div.left-boards-list {
           @include avenir_M();
           cursor: pointer;
 
-          &.selected {
-            background-color: $carrot_light_blue;
-            color: #3E4547;
-            @include avenir_H();
-            font-size: 14px;
-            line-height: 1.71;
-          }
-
           &:hover {
             text-decoration: underline;
           }
@@ -152,9 +158,10 @@ div.left-boards-list {
   }
 
   div.left-boards-list-footer {
-    margin-top: 34px;
+    margin-top: 44px;
 
     button.about-carrot-btn {
+      margin-top: 10px;
       &:hover {
         text-decoration: underline;
       }
@@ -173,6 +180,7 @@ div.left-boards-list {
         font-size: 14px;
         line-height: 1.71;
         color: $oc_gray_7;
+        margin-left: 5px;
       }
     }
 
@@ -195,6 +203,7 @@ div.left-boards-list {
         font-size: 14px;
         line-height: 1.71;
         color: $oc_gray_7;
+        margin-left: 5px;
       }
     }
   }

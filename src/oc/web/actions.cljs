@@ -51,18 +51,13 @@
 
 ;; Get the board to show counting the last accessed and the last created
 
-(defn newest-board [boards]
-  (first (sort-by :name boards)))
-
 (defn get-default-board [org-data]
-  (if-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
-      (if board
-        ; Get the last accessed board from the saved cookie
-        board
-        ; Fallback to the newest board if the saved board was not found
-        (newest-board (:boards org-data))))
-    (newest-board (:boards org-data))))
+  (when-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+    (when-not (= last-board-slug "all-activity")
+      (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
+        (when board
+          ; Get the last accessed board from the saved cookie
+          board)))))
 
 (defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
   (if success
@@ -118,6 +113,10 @@
         (api/get-board board-data)
         ; The board wasn't found, showing a 404 page
         (router/redirect-404!))
+      ;; If it's all activity page, loads all activity for the current org
+      (utils/in? (:route @router/path) "all-activity")
+      (api/get-all-activity org-data)
+      ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-team-settings"))
            (not (utils/in? (:route @router/path) "org-settings"))
@@ -126,14 +125,16 @@
            (not (utils/in? (:route @router/path) "su-snapshot-preview"))
            (not (utils/in? (:route @router/path) "email-verification")))
       (cond
-        ;; Redirect to the first board if only one is presnet
+        ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
         (if (responsive/is-tablet-or-mobile?)
           (router/nav! (oc-urls/boards))
           (let [board-to (get-default-board org-data)]
-            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
-              (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-              (router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))))))
+            (if board-to
+              (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
+                (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
+                (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
+              (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
   ;; FIXME: temporarily remove stories loading
   ; (utils/after 100 #(api/get-updates))
   (-> db
@@ -206,8 +207,8 @@
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get db board-key)
         entry-idx (utils/index-of (:entries board-data) #(= (:uuid %) entry-uuid))
-        new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (:topics board-data)))
-        sorted-entries (vec (sort-by :updated-at new-entries))
+        new-entries (assoc (:entries board-data) entry-idx (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
+        sorted-entries (vec (sort-by :created-at new-entries))
         new-board-data (assoc board-data :entries sorted-entries)]
   (assoc db board-key new-board-data)))
 
@@ -608,30 +609,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :dashboard-select-topic
-  [db [_ board-slug topic-slug]]
-  (if (pos? (count (filter #(and (= board-slug (:board-slug %)) (= topic-slug (:topic-slug %))) (:dashboard-selected-topics db))))
-    (assoc db :dashboard-selected-topics (filter #(or (not= board-slug (:board-slug %)) (not= topic-slug (:topic-slug %))) (:dashboard-selected-topics db)))
-    (let [board-data (dispatcher/board-data db (router/current-org-slug) board-slug)
-          topic-data (get board-data (keyword topic-slug))
-          new-entry {:created-at (:created-at topic-data) :board-slug board-slug :topic-slug topic-slug}
-          next-selected-topics (vec (conj (or (:dashboard-selected-topics db) []) new-entry))]
-      (assoc db :dashboard-selected-topics next-selected-topics))))
-
-(defmethod dispatcher/action :dashboard-select-all
-  [db [_ board-slug]]
-  (let [without-board-topics (filter #(not= (:board-slug %) board-slug) (:dashboard-selected-topics db))
-        board-data (dispatcher/board-data db (router/current-org-slug) board-slug)
-        all-topics (:topics board-data)
-        new-entries (vec (map #(hash-map :created-at (:created-at (get board-data (keyword %))) :board-slug board-slug :topic-slug (keyword %)) all-topics))]
-    (assoc db :dashboard-selected-topics (vec (concat without-board-topics new-entries)))))
-
-(defmethod dispatcher/action :dashboard-share-mode
-  [db [_ activate]]
-  (-> db
-    (assoc :dashboard-sharing activate)
-    (assoc :dashboard-selected-topics [])))
-
 (defmethod dispatcher/action :top-menu-show [db [_ topic]]
   (assoc db :show-top-menu topic))
 
@@ -954,13 +931,19 @@
   (assoc db :trend-bar-status status))
 
 (defmethod dispatcher/action :entry-modal-fade-in
-  [db [_ entry-uuid]]
+  [db [_ board-slug entry-uuid]]
   (utils/after 10
-   #(let [route (:route @router/path)
-          new-route (vec (conj route entry-uuid))
-          parts {:org (router/current-org-slug) :board (router/current-board-slug) :entry entry-uuid :query-params (:query-params @router/path)}]
+   #(let [from-all-activity (not (router/current-board-slug))
+          new-route (if from-all-activity
+                      [(router/current-org-slug) "all-activity" board-slug entry-uuid "entry"]
+                      [(router/current-org-slug) board-slug entry-uuid "entry"])
+          parts {:org (router/current-org-slug)
+                 :board board-slug
+                 :entry entry-uuid
+                 :query-params (:query-params @router/path)
+                 :from-all-activity from-all-activity}]
       (router/set-route! new-route parts)
-      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry entry-uuid))
+      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/entry board-slug entry-uuid))
       (reset! dispatcher/app-state (assoc @dispatcher/app-state :entry-pushed entry-uuid))))
   (assoc db :entry-modal-fade-in entry-uuid))
 
@@ -997,6 +980,7 @@
                                       :updated-at as-of
                                       :reactions []
                                       :uuid (utils/entry-uuid)})
+                   (:slug board-data)
                    (:topics board-data)))
 
 (defn entry-fixed-data [entry-data current-user-data as-of]
@@ -1019,7 +1003,7 @@
                       (entry-fixed-data entry-data current-user-data as-of))
         filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (:entries board-data))
         new-entries (conj filtered-entries fixed-entry)
-        sorted-entries (vec (sort-by :updated-at new-entries))
+        sorted-entries (vec (sort-by :created-at new-entries))
         next-board-data (assoc board-data :entries sorted-entries)
         next-board-filters (if (= (:board-filters db) (:topic-slug entry-data))
                               ; if it's filtering by the same topic of the new entry leave it be
@@ -1066,12 +1050,25 @@
          (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
 
+(defmethod dispatcher/action :all-activity-nav
+  [db [_]]
+  (let [all-activity-url (oc-urls/all-activity)]
+    (utils/after 10
+      #(if (:entry-pushed db)
+         (let [route [(router/current-org-slug) "all-activity"]
+               parts (dissoc @router/path :route :entry :board)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
+            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :entry-pushed)))
+         (router/nav! all-activity-url)))
+    db))
+
 (defmethod dispatcher/action :entry-delete
   [db [_ entry-data]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
         filtered-entries (filter #(not= (:uudi %) (:uuid entry-data)) (:entries board-data))
-        sorted-entries (vec (sort-by :updated-at filtered-entries))
+        sorted-entries (vec (sort-by :created-at filtered-entries))
         next-board-data (assoc board-data :entries sorted-entries)]
     (api/delete-entry entry-data)
     (assoc-in db board-key next-board-data)))
@@ -1112,3 +1109,80 @@
 (defmethod dispatcher/action :board-edit/dismiss
   [db [_]]
   (dissoc db :board-editing))
+
+(defmethod dispatcher/action :all-activity-get
+  [db [_]]
+  (api/get-all-activity (dispatcher/org-data))
+  db)
+
+(defmethod dispatcher/action :all-activity-calendar
+  [db [_ {:keys [link year month]}]]
+  (api/get-all-activity (dispatcher/org-data) link year month)
+  db)
+
+(defmethod dispatcher/action :all-activity-get/finish
+  [db [_ {:keys [org year month body]}]]
+  (if body
+    (let [all-activity-key (dispatcher/all-activity-key org)
+          fixed-all-activity (utils/fix-all-activity (:collection body))
+          sorted-entries (vec (reverse (sort-by :created-at (:entries fixed-all-activity))))
+          with-sorted-entries (assoc fixed-all-activity :entries sorted-entries)
+          with-calendar-data (-> with-sorted-entries
+                                (assoc :year year)
+                                (assoc :month month)
+                                ;; Force the component to trigger a did-remount
+                                ;; or it won't see the finish of the loading
+                                (assoc :rand (rand 1000)))]
+      (assoc-in db all-activity-key with-calendar-data))
+    db))
+
+(defmethod dispatcher/action :calendar-get
+  [db [_]]
+  (api/get-calendar (router/current-org-slug))
+  db)
+
+(defmethod dispatcher/action :calendar-get/finish
+  [db [_ {:keys [org body]}]]
+  (let [calendar-key (dispatcher/calendar-key org)]
+    (assoc-in db calendar-key body)))
+
+(defmethod dispatcher/action :all-activity-more
+  [db [_ more-link direction]]
+  (api/load-more-all-activity more-link direction)
+  (let [all-activity-key (dispatcher/all-activity-key (router/current-org-slug))
+        all-activity-data (get-in db all-activity-key)
+        next-all-activity-data (assoc all-activity-data :loading-more true)]
+    (assoc-in db all-activity-key next-all-activity-data)))
+
+; (def default-activity-limit 50)
+
+(defmethod dispatcher/action :all-activity-more/finish
+  [db [_ {:keys [org direction body]}]]
+  (if body
+    (let [all-activity-key (dispatcher/all-activity-key org)
+          fixed-all-activity (utils/fix-all-activity (:collection body))
+          old-all-activity (get-in db all-activity-key)
+          next-links (vec (remove #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous")) (:links fixed-all-activity)))
+          link-to-move (if (= direction :up)
+                          (utils/link-for (:links old-all-activity) "next")
+                          (utils/link-for (:links old-all-activity) "previous"))
+          fixed-next-links (if link-to-move
+                              (vec (conj next-links link-to-move))
+                              next-links)
+          with-links (assoc fixed-all-activity :links fixed-next-links)
+          keeping-entries (count (:entries old-all-activity))
+          ; keeping-entries (min default-activity-limit (count (:entries old-all-activity)))
+          ;; Keep only x elements before or after the new list
+          ; all-activity-entries (if (= direction :up)
+          ;                         (concat (:entries with-links) (take default-activity-limit (:entries old-all-activity)))
+          ;                         (concat (take-last default-activity-limit (:entries old-all-activity)) (:entries with-links)))
+          ;; Keep all the elements
+          all-activity-entries (if (= direction :up)
+                                  (concat (:entries with-links) (:entries old-all-activity))
+                                  (concat (:entries old-all-activity) (:entries with-links)))
+          new-all-activity (-> with-links
+                              (assoc :entries (vec (reverse (sort-by :created-at (distinct all-activity-entries)))))
+                              (assoc :direction direction)
+                              (assoc :saved-entries keeping-entries))]
+      (assoc-in db all-activity-key new-all-activity))
+    db))

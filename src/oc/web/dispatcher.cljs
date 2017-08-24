@@ -7,7 +7,6 @@
 (defonce app-state (atom {:loading false
                           :mobile-menu-open false
                           :show-login-overlay false
-                          :dashboard-sharing false
                           :trend-bar-status :hidden}))
 
 ;; Data key paths
@@ -16,6 +15,12 @@
 
 (defn org-data-key [org-slug]
   [(keyword org-slug) :org-data])
+
+(defn all-activity-key [org-slug]
+  [(keyword org-slug) :all-activity])
+
+(defn calendar-key [org-slug]
+  [(keyword org-slug) :calendar])
 
 (defn board-data-key [org-slug board-slug]
   [(keyword org-slug) :boards (keyword board-slug) :board-data])
@@ -90,6 +95,14 @@
                           (fn [base org-slug]
                             (when org-slug
                               (get-in base (org-data-key org-slug))))]
+   :all-activity        [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (all-activity-key org-slug))))]
+   :calendar            [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (calendar-key org-slug))))]
    :team-data           [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -185,6 +198,24 @@
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
 
+(defn all-activity-data
+  "Get org all activity data."
+  ([]
+    (all-activity-data @app-state))
+  ([data]
+    (all-activity-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (all-activity-key org-slug))))
+
+(defn calendar-data
+  "Get org calendar data."
+  ([]
+    (calendar-data @app-state))
+  ([data]
+    (calendar-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (calendar-key org-slug))))
+
 (defn board-data
   "Get board data."
   ([]
@@ -219,8 +250,9 @@
   ([org-slug board-slug entry-uuid]
     (entry-data org-slug board-slug entry-uuid @app-state))
   ([org-slug board-slug entry-uuid data]
-    (let [board-data (get-in data (board-data-key org-slug board-slug))]
-      (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))
+    (let [data-key (if (:from-all-activity @router/path) (all-activity-key org-slug) (board-data-key org-slug board-slug))
+          entries-data (:entries (get-in data data-key))]
+      (first (filter #(= (:uuid %) entry-uuid) entries-data)))))
 
 (defn comments-data
   ([]
@@ -264,6 +296,9 @@
 (defn print-org-data []
   (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
+(defn print-all-activity-data []
+  (js/console.log (get-in @app-state (all-activity-key (router/current-org-slug)))))
+
 (defn print-team-data []
   (js/console.log (get-in @app-state (team-data-key (:team-id (org-data))))))
 
@@ -278,6 +313,7 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
+(set! (.-OCWebPrintAllActivityData js/window) print-all-activity-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)

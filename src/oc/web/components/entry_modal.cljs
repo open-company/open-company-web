@@ -16,7 +16,9 @@
             [oc.web.components.comments :refer (comments)]))
 
 (defn dismiss-modal [board-filters]
-  (dis/dispatch! [:board-nav (router/current-board-slug) board-filters]))
+  (if (:from-all-activity @router/path)
+    (dis/dispatch! [:all-activity-nav])
+    (dis/dispatch! [:board-nav (router/current-board-slug) board-filters])))
 
 (defn close-clicked [s & [board-filters]]
   (reset! (::dismiss s) true)
@@ -116,12 +118,11 @@
                   [:div.name (:name (first (:author entry-data)))]
                   [:div.time-since
                     [:time
-                      {:date-time (:updated-at entry-data)
+                      {:date-time (:created-at entry-data)
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-container "body"
-                       :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
-                      (utils/time-since (:updated-at entry-data))]]]
+                       :title (utils/entry-tooltip entry-data)}
+                      (utils/time-since (:created-at entry-data))]]]
                 [:div.entry-modal-head-right
                   (when (:topic-slug entry-data)
                     (let [topic-name (or (:topic-name entry-data) (string/upper (:topic-slug entry-data)))]
@@ -136,7 +137,7 @@
                    :class (when (empty? (:headline entry-data)) "no-headline")}]
                 (entry-attachments (:attachments entry-data))
                 [:div.entry-modal-footer.group
-                  (reactions (:topic-slug entry-data) (:uuid entry-data) entry-data)
+                  (reactions entry-data)
                   [:div.entry-modal-footer-right
                     [:div.more-dropdown.dropdown
                       [:button.mlb-reset.entry-modal-more.dropdown-toggle

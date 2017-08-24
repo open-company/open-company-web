@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [goog.object :as gobj]))
 
@@ -35,13 +36,13 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel]
+(defn truncate-body [body-sel is-all-activity]
   (.dotdotdot (js/$ body-sel)
-   #js {:height 72
+   #js {:height (* 24 (if is-all-activity 4 3))
         :wrap "word"
         :watch true
         :ellipsis "... "
-        :after "a.read-more"}))
+        :after (when-not is-all-activity "a.read-more")}))
 
 (defn get-first-body-thumbnail [body]
   (let [$body (js/$ (str "<div>" body "</div>"))
@@ -74,17 +75,18 @@
                                          (let [entry-data (first (:rum/args s))
                                                body-sel (str "div.entry-card-" (:uuid entry-data) " div.entry-card-body")
                                                body-a-sel (str body-sel " a")
-                                               read-more-sel (str body-a-sel ".read-more")]
+                                               read-more-sel (str body-a-sel ".read-more")
+                                               is-all-activity (get (:rum/args s) 3)]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
                                            ; Prevent read more link to change directly the url
                                            (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
                                            (when (compare-and-set! (::truncated s) false true)
-                                             (truncate-body body-sel)
+                                             (truncate-body body-sel is-all-activity)
                                              (utils/after 10 #(do
                                                                 (.trigger (js/$ body-sel) "destroy")
-                                                                (truncate-body body-sel)))))
+                                                                (truncate-body body-sel is-all-activity)))))
                                          s)
                          :will-mount (fn [s]
                                        (let [entry-data (first (:rum/args s))]
@@ -109,12 +111,21 @@
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
                                       s)}
-  [s entry-data has-headline has-body]
-  [:div.entry-card
-    {:class (str "entry-card-" (:uuid entry-data))
-     :on-click #(dis/dispatch! [:entry-modal-fade-in (:uuid entry-data)])
+  [s entry-data has-headline has-body is-all-activity]
+  [:div
+    {:class (utils/class-set {:entry-card true
+                              (str "entry-card-" (:uuid entry-data)) true
+                              :all-activity-card is-all-activity})
+     :on-click #(dis/dispatch! [:entry-modal-fade-in (:board-slug entry-data) (:uuid entry-data)])
      :on-mouse-over #(reset! (::hovering-card s) true)
      :on-mouse-leave #(reset! (::hovering-card s) false)}
+    (when is-all-activity
+      [:div.entry-card-breadcrumb
+        "In " [:span.bold (:board-name entry-data)]
+        (when (:topic-slug entry-data)
+          " → ")
+        (when (:topic-slug entry-data)
+          [:span.bold (:topic-name entry-data)])])
     ; Card header
     [:div.entry-card-head.group
       ; Card author
@@ -123,21 +134,21 @@
         [:div.name (:name (first (:author entry-data)))]
         [:div.time-since
           [:time
-            {:date-time (:updated-at entry-data)
+            {:date-time (:created-at entry-data)
              :data-toggle "tooltip"
              :data-placement "top"
-             :data-container "body"
-             :title (let [js-date (utils/js-date (:updated-at entry-data))] (str (.toDateString js-date) " at " (utils/get-time js-date)))}
-            (utils/time-since (:updated-at entry-data))]]]
+             :title (utils/entry-tooltip entry-data)}
+            (utils/time-since (:created-at entry-data))]]]
       ; Card labels
       [:div.entry-card-head-right
         ; Topic tag button
-        (when (:topic-slug entry-data)
+        (when (and (not is-all-activity)
+                   (:topic-slug entry-data))
           (let [topic-name (or (:topic-name entry-data) (s/upper (:topic-slug entry-data)))]
             [:div.topic-tag
               {:on-click #(do
                             (utils/event-stop %)
-                            (router/nav! (oc-urls/board-filter-by-topic (:topic-slug entry-data))))}
+                            (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug entry-data) (:topic-slug entry-data))))}
               topic-name]))]]
     [:div.entry-card-content.group
       ; Headline
@@ -155,11 +166,15 @@
             $hidden-div (js/$ (str "." hidden-class))
             body-without-preview (.html $hidden-div)
             _ (.remove $hidden-div)
-            emojied-body (utils/emojify (str body-without-preview "<a class=\"read-more\" href=\"" (oc-urls/entry (:uuid entry-data)) "\">Read more</a>"))]
+            read-more-html (str "<a class=\"read-more\" href=\"" (oc-urls/entry (:board-slug entry-data) (:uuid entry-data)) "\">Read more</a>")
+            emojied-body (utils/emojify (str body-without-preview (if is-all-activity "" read-more-html)))]
         [:div.entry-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
                                     :has-media-preview @(::first-body-image s)})}])
+      (when (and is-all-activity
+                 has-body)
+        [:div.read-more "Read Full Entry"])
       ; Body preview
       (when @(::first-body-image s)
         [:div.entry-card-media-preview
@@ -171,14 +186,14 @@
         [:button.mlb-reset.more-ellipsis.dropdown-toggle
           {:type "button"
            :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-           :id (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))
+           :id (str "entry-card-more-" (:board-slug entry-data) "-" (:uuid entry-data))
            :on-click #(utils/event-stop %)
            :title "More"
            :data-toggle "dropdown"
            :aria-haspopup true
            :aria-expanded false}]
         [:div.dropdown-menu
-          {:aria-labelledby (str "entry-card-more-" (router/current-board-slug) "-" (:uuid entry-data))}
+          {:aria-labelledby (str "entry-card-more-" (:board-slug entry-data) "-" (:uuid entry-data))}
           [:div.triangle]
           [:ul.entry-card-more-menu
             [:li

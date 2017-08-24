@@ -83,6 +83,23 @@
 (defn vec-dissoc [coll elem]
   (vec (filter #(not= elem %) coll)))
 
+(defn full-month-string
+  [month]
+  (case month
+    1 "January"
+    2 "February"
+    3 "March"
+    4 "April"
+    5 "May"
+    6 "June"
+    7 "July"
+    8 "August"
+    9 "September"
+    10 "October"
+    11 "November"
+    12 "December"
+    ""))
+
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn month-string-int
  "Return the name of the month given the integer month number. Accept flags to transform the string:
@@ -93,20 +110,7 @@
   (let [short-month (in? flags :short)
         capitalize (in? flags :capitalize)
         uppercase (in? flags :uppercase)
-        month-string (case month
-                        1 "January"
-                        2 "February"
-                        3 "March"
-                        4 "April"
-                        5 "May"
-                        6 "June"
-                        7 "July"
-                        8 "August"
-                        9 "September"
-                        10 "October"
-                        11 "November"
-                        12 "December"
-                        "")
+        month-string (full-month-string month)
         short-string (if short-month (subs month-string 0 3) month-string)
         capitalized-string (if capitalize (s/capital short-string) short-string)
         uppercase-string (if uppercase (s/upper capitalized-string) capitalized-string)]
@@ -168,9 +172,6 @@
         (< v 100) "0")
     v))
 
-(defn get-time [js-date]
-  (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
-
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
   (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))
@@ -198,7 +199,8 @@
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
 
-      (pos? months-interval)
+      (or (pos? months-interval)
+          (> days-interval 7))
       (date-string past-js-date flags)
 
       (pos? days-interval)
@@ -327,11 +329,12 @@
 
 (defn fix-entry
   "Add `:read-only` and `:topic-name` keys to the entry map"
-  [entry-body topics-data]
-  (let [topic (get-topic topics-data (:topic-slug entry-body))]
+  [entry-body board-slug topics-data]
+  (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :topic-name (:name topic)))))
+      (assoc :board-slug board-slug)
+      (assoc :topic-name topic-name))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
@@ -339,8 +342,15 @@
   (let [links (:links board-data)
         read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
-        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:topics board-data)) (:entries board-data))))]
+        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data))))]
     with-fixed-topics))
+
+(defn fix-all-activity
+  "Fix org data coming from the API."
+  [all-activity-data]
+  (-> all-activity-data
+    (dissoc :items)
+    (assoc :entries (vec (map #(fix-entry % (:board-slug %) nil) (:items all-activity-data))))))
 
 (defn fix-org
   "Fix org data coming from the API."
@@ -564,7 +574,7 @@
          (.-body js/document)
          #js [0 (.-scrollTop (.-body js/document))]
          #js [0 scroll-y]
-         (or duration oc-animation-duration))))
+         (if (integer? duration) duration oc-animation-duration))))
 
 (defn scroll-to-bottom [elem & [animated]]
   (let [elem-scroll-top (.-scrollHeight elem)]
@@ -575,9 +585,9 @@
          #js [0 elem-scroll-top]
          (if animated 320 oc-animation-duration)))))
 
-(defn scroll-to-element [elem]
-  (let [elem-scroll-top (offset-top elem)]
-    (scroll-to-y elem-scroll-top)))
+(defn scroll-to-element [elem & [offset duration]]
+  (let [elem-scroll-top (+ (.-offsetTop elem) (or offset 0))]
+    (scroll-to-y elem-scroll-top duration)))
 
 (defn scroll-top-with-id [id]
   (offset-top (sel1 (str "#" id))))
@@ -1028,3 +1038,33 @@
 
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
+
+(defn get-24h-time 
+  [js-date]
+  (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
+
+(defn get-ampm-time
+  [js-date]
+  (let [hours (.getHours js-date)
+        minutes (add-zero (.getMinutes js-date))
+        ampm (if (>= hours 12) "pm" "am")
+        hours (mod hours 12)
+        hours (if (= hours 0) 12 hours)]
+    (str hours ":" minutes ampm)))
+
+(defn entry-date [js-date]
+  (let [r (js/RegExp "am|pm" "i")
+        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))
+        time-string (if-not h12
+                      (get-ampm-time js-date)
+                      (get-24h-time js-date))]
+    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
+
+(defn entry-tooltip [entry-data]
+  (let [created-at (js-date (:created-at entry-data))
+        updated-at (js-date (:updated-at entry-data))
+        created-str (entry-date created-at)
+        updated-str (entry-date updated-at)]
+    (if (= (:created-at entry-data) (:updated-at entry-data))
+      created-str
+      (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))

@@ -60,8 +60,7 @@
                           (str (responsive/total-layout-width-int card-width columns-num) "px"))
           can-edit-secs (utils/can-edit-topics? board-data)]
       (dom/div {:class (utils/class-set {:topic-list true
-                                         :not-first-board (and (:dashboard-sharing data)
-                                                               (not= (:slug (first (:boards (dispatcher/org-data)))) (:slug board-data)))
+                                         :not-first-board (not= (:slug (first (:boards (dispatcher/org-data)))) (:slug board-data))
                                          :group true
                                          :editable can-edit-secs})
                 :data-rerender rerender
@@ -77,15 +76,15 @@
                          :new-topics (:new-topics data)
                          :org-data (:org-data data)
                          :board-data board-data
+                         :all-activity-data (:all-activity-data data)
                          :entries-data (:entries-data data)
                          :topics-data board-data
                          :foce-key (:foce-key data)
                          :foce-data (:foce-data data)
                          :entry-editing (:entry-editing data)
-                         :dashboard-selected-topics (:dashboard-selected-topics data)
-                         :dashboard-sharing (:dashboard-sharing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
+                         :is-all-activity (utils/in? (:route @router/path) "all-activity")
                          :show-top-menu (:show-top-menu data)
                          :board-filters (:board-filters data)}]
           (om/build topics-columns comp-data))))))

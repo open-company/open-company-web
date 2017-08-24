@@ -18,6 +18,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.raven :as sentry]
+            [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.components.home :refer (home)]
@@ -77,6 +78,9 @@
       (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to))))
 
 (defn pre-routing [query-params & [should-rewrite-url]]
+  ;; Setup timbre log level
+  (when (:log-level query-params)
+    (logging/config-log-level! (:log-level query-params)))
   ; make sure the menu is closed
   (let [pathname (.. js/window -location -pathname)]
     (when (not= pathname (s/lower pathname))
@@ -125,6 +129,8 @@
         query-params (:query-params params)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
+    (when (= route "all-activity")
+      (cook/set-cookie! (router/last-board-cookie org) "all-activity" (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save route
     (router/set-route! [org route] {:org org :query-params (:query-params params)})
@@ -292,13 +298,21 @@
       (cook/remove-cookie! :show-login-overlay)
       (router/redirect! urls/home))
 
-    (defroute org-page-route (urls/org ":org") {:as params}
-      (timbre/info "Routing org-page-route" (urls/org ":org"))
+    (defroute org-route (urls/org ":org") {:as params}
+      (timbre/info "Routing org-route" (urls/org ":org"))
       (org-handler "org" target #(om/component) params))
 
-    (defroute org-page-slash-route (str (urls/org ":org") "/") {:as params}
-      (timbre/info "Routing org-page-route" (str (urls/org ":org") "/"))
+    (defroute org-slash-route (str (urls/org ":org") "/") {:as params}
+      (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
       (org-handler "org" target #(om/component) params))
+
+    (defroute all-activity-route (urls/all-activity ":org") {:as params}
+      (timbre/info "Routing all-activity-route" (urls/all-activity ":org"))
+      (org-handler "all-activity" target org-dashboard params))
+
+    (defroute all-activity-slash-route (str (urls/all-activity ":org") "/") {:as params}
+      (timbre/info "Routing all-activity-slash-route" (str (urls/all-activity ":org") "/"))
+      (org-handler "all-activity" target org-dashboard params))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
@@ -420,8 +434,10 @@
                                  user-profile-route
                                  ;; Org routes
                                  org-list-route
-                                 org-page-route
-                                 org-page-slash-route
+                                 org-route
+                                 org-slash-route
+                                 all-activity-route
+                                 all-activity-slash-route
                                  org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
@@ -460,14 +476,9 @@
     (timbre/error "Error: div#app is not defined!")
     (sentry/capture-message "Error: div#app is not defined!")))
 
-(defn config-log-level! [level]
-  (timbre/merge-config! {:level (keyword level)}))
-
-(set! (.-OCWebConfigLogLevel js/window) config-log-level!)
-
 (defn init []
   ;; Setup timbre log level
-  (config-log-level! ls/log-level)
+  (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Persist JWT in App State
   (dis/dispatch! [:jwt (jwt/get-contents)])
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
