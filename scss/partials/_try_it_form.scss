@@ -14,34 +14,20 @@ div.try-it-combo-field {
       @include avenir_M();
       font-size: 16px;
       color: $carrot_dark_blue;
-      padding: 10px 20px;
+      padding: 11px 20px 10px;
       outline: none;
       border: 1px solid transparent;
+
+      @include big_web(){
+        border-top: 1px solid rgba(51,51,51,0.3);
+        border-bottom: 1px solid rgba(51,51,51,0.3);
+        border-left: 1px solid rgba(51,51,51,0.3);
+      }
 
       @include mobile() {
         width: 100%;
         border-radius: 8px;
-        border: 1px solid rgba(51,51,51,0.3);
-      }
-
-      @include placeholder() {
-        opacity: 0.5;
-      }
-
-      &:focus {
-        @include big_web(){
-          border-top: 1px solid rgba(51,51,51,0.3);
-          border-bottom: 1px solid rgba(51,51,51,0.3);
-          border-left: 1px solid rgba(51,51,51,0.3);
-        }
-
-        @include mobile() {
-          border: 1px solid rgba(51,51,51,0.5);
-        }
-
-        @include placeholder(){
-          opacity: 0.8;
-        }
+        border: 1px solid rgba(51,51,51,0.5);
       }
     }
   }
