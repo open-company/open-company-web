@@ -1018,7 +1018,9 @@
 
 (defmethod dispatcher/action :activity-delete/finish
   [db [_]]
-  (api/get-board (dispatcher/board-data))
+  (if (utils/in? (:route @router/path) "story-edit")
+    (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
+    (api/get-board (dispatcher/board-data)))
   db)
 
 (defmethod dispatcher/action :alert-modal-show
