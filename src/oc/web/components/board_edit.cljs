@@ -8,8 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:board-edit/dismiss]))
@@ -17,13 +16,6 @@
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal)))
-
-(defn filter-team-channels [channels s]
-  (let [look-for (string/lower
-                   (if (string/starts-with? s "#")
-                     (string/strip-prefix s "#")
-                     s))]
-    (vec (filter #(string/includes? (string/lower (:name %)) look-for) channels))))
 
 (rum/defcs board-edit < rum/reactive
                         (drv/drv :board-editing)
@@ -35,42 +27,19 @@
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
-                        (rum/local "" ::slack-channel)
-                        (rum/local false ::show-channels-dropdown)
-                        (rum/local nil ::window-click)
-                        (rum/local true ::slack-enabled)
                         {:will-mount (fn [s]
                                       (dis/dispatch! [:teams-get])
-                                      (let [board-data @(drv/get-ref s :board-data)]
-                                        (when (:channel-id (:slack-mirror board-data))
-                                          (reset! (::slack-channel s) (or (str "#" (:channel-name (:slack-mirror board-data))) ""))))
                                       s)
                          :did-mount (fn [s]
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
-                                      (when (and (not @(drv/get-ref s :team-channels))
-                                                 (not @(::team-channels-requested s)))
-                                          (when-let [team-data @(drv/get-ref s :team-data)]
-                                            (reset! (::team-channels-requested s) true)
-                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                      (reset! (::window-click s)
-                                        (events/listen js/window EventType/CLICK
-                                          #(when (and @(::show-channels-dropdown s)
-                                                      (not (utils/event-inside? % (sel1 [:div.board-edit-slack-channels-dropdown])))
-                                                      (not (utils/event-inside? % (sel1 [:input.board-edit-slack-channel]))))
-                                             (reset! (::show-channels-dropdown s) false))))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
                                          s)
                          :did-remount (fn [s]
-                                        (when (and (not @(drv/get-ref s :team-channels))
-                                                   (not @(::team-channels-requested s)))
-                                          (when-let [team-data @(drv/get-ref s :team-data)]
-                                            (reset! (::team-channels-requested s) true)
-                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                         ;; Dismiss animated since the board-editing was removed
                                         (when (nil? @(drv/get-ref s :board-editing))
                                           (close-clicked s))
@@ -78,7 +47,6 @@
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
-                                         (events/unlistenByKey @(::window-click s))
                                          s)}
   [s]
   (let [current-user-data (drv/react s :current-user-data)
@@ -91,31 +59,6 @@
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
-      (when @(::show-channels-dropdown s)
-        [:div.board-edit-slack-channels-dropdown
-          (for [t slack-teams
-                :let [chs (if @(::slack-channel s)
-                            (filter-team-channels (:channels t) @(::slack-channel s))
-                            (:channels t))
-                      show-slack-team-name (and (> (count slack-teams) 1)
-                                                (pos? (count chs)))]]
-            [:div.slack-team
-              {:class (when show-slack-team-name "show-slack-name")
-               :key (str "slack-chs-dd-" (:slack-org-id t))}
-              (when show-slack-team-name
-                [:div.slack-team-name (:name t)])
-              (for [c chs]
-               [:div.channel
-                 {:value (:id c)
-                  :key (str "slack-chs-dd-" (:slack-org-id t) "-" (:id c))
-                  :on-click #(do
-                               (dis/dispatch! [:input [:board-editing :slack-mirror :channel-id] (:id c)])
-                               (dis/dispatch! [:input [:board-editing :slack-mirror :channel-name] (:name c)])
-                               (dis/dispatch! [:input [:board-editing :slack-mirror :slack-org-id] (:slack-org-id t)])
-                               (reset! (::slack-channel s) (str "#" (:name c)))
-                               (reset! (::show-channels-dropdown s) false))}
-                  [:span.ch-prefix "#"]
-                  [:span.ch (:name c)]])])])
       [:div.board-edit
         {:class (when show-slack-channels? "show-slack-channels")}
         [:div.board-edit-header.group
@@ -172,20 +115,12 @@
                                                   (reset! (::slack-enabled s) %)
                                                   (when-not %
                                                     (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
-            [:div.board-edit-slack-channels-field
-              {:class (when (not @(::slack-enabled s)) "disabled")}
-              [:input.board-edit-slack-channel
-                {:value @(::slack-channel s)
-                 :on-focus (fn [] (utils/after 100 #(reset! (::show-channels-dropdown s) true)))
-                 :on-change #(reset! (::slack-channel s) (.. % -target -value))
-                 :disabled (not @(::slack-enabled s))
-                 :placeholder "Select Channel..."}]
-              [:i.fa
-                {:class (utils/class-set {:fa-angle-down (not @(::show-channels-dropdown s))
-                                          :fa-angle-up @(::show-channels-dropdown s)})
-                 :on-click #(do
-                              (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
-                              (utils/event-stop %))}]]])
+            (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
+                                      :initial-value (or (str "#" (:channel-name (:slack-mirror (drv/react s :board-data)))) "")
+                                      :did-change-cb (fn [team channel]
+                                                      (dis/dispatch! [:input [:board-editing :slack-mirror :channel-id] (:id channel)])
+                                                      (dis/dispatch! [:input [:board-editing :slack-mirror :channel-name] (:name channel)])
+                                                      (dis/dispatch! [:input [:board-editing :slack-mirror :slack-org-id] (:slack-org-id team)]))})])
         [:div.board-edit-footer
           [:div.board-edit-footer-left
             (when (and (not (empty? (:slug board-editing)))
