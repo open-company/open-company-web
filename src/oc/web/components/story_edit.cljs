@@ -209,7 +209,6 @@
                                            (.tooltip "hide"))
                                          s)
                          :will-unmount (fn [s]
-                                        (events/unlistenByKey @(::window-click-listener s))
                                         (utils/after 100 #(dis/dispatch! [:input [:story-editing] nil]))
                                         s)}
   [s]
