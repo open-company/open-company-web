@@ -38,7 +38,7 @@ div.alert-modal-container {
     div.alert-modal-title {
       @include avenir_H();
       font-size: 16px;
-      color: #212830;
+      color: $carrot_dark_gray_1;
       margin-top: 8px;
     }
 

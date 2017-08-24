@@ -69,7 +69,7 @@ div.media-chart-modal-container {
         div.media-chart-modal-content-title {
           font-size: 16px;
           @include avenir_R();
-          color: #212830;
+          color: $carrot_dark_gray_1;
         }
 
         div.media-chart-modal-content-ps {

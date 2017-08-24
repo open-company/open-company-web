@@ -77,7 +77,7 @@ $h2_top_margin: 20;
 @mixin activity-title(){
   @include avenir_H();
   font-size: 24px;
-  color: #212830;
+  color: $carrot_dark_gray_1;
 
   .emojione {
     @include emoji-size(22);
