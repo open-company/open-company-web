@@ -233,7 +233,7 @@
           [:a.board-name
             {:href (oc-urls/board (router/current-board-slug))
              :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-org-slug) (if (= (:status story-data) "draft") "drafts" (:board-slug story-data)))))}
-            (if (= (:type story-data) "draft")
+            (if (= (:status story-data) "draft")
               "Drafts"
               (:storyboard-name story-data))]
           [:span.arrow ">"]
