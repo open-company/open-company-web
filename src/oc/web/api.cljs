@@ -63,6 +63,7 @@
   (case (:method link)
     "POST" http/post
     "PUT" http/put
+    "PATCH" http/patch
     "DELETE" http/delete
     http/get))
 
