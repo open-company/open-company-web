@@ -26,69 +26,97 @@ div.story-publish-modal-container {
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     padding: 32px 24px;
 
-    div.title {
-      @include avenir_H();
-      font-size: 24px;
-      color: $carrot_light-gray_1;
+    div.story-publish-share {
+      div.title {
+        @include avenir_H();
+        font-size: 24px;
+        color: $carrot_light-gray_1;
 
-      span {
-        color: $carrot_dark_gray_1;
+        span {
+          color: $carrot_dark_gray_1;
+        }
       }
-    }
 
-    div.access {
-      margin-top: 24px;
-      @include avenir_R();
-      color: $carrot_gray;
-      font-size: 15px;
-    }
+      div.access {
+        margin-top: 24px;
+        @include avenir_R();
+        color: $carrot_gray;
+        font-size: 15px;
+      }
 
-    div.mediums-box {
-      margin-top: 24px;
-      border: 1px solid rgba($carrot_light_gray_1, 0.3);
-      width: calc(100% + 48px);
-      margin-left: -24px;
-      background-color: rgba($carrot_light_gray_2, 0.3);
+      div.mediums-box {
+        margin-top: 24px;
+        border: 1px solid rgba($carrot_light_gray_1, 0.3);
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        background-color: rgba($carrot_light_gray_2, 0.3);
 
-      div.medium {
-        @include avenir_M();
-        color: $carrot_dark_gray;
-        font-size: 16px;
-        padding: 16px 24px;
+        div.medium {
+          @include avenir_M();
+          color: $carrot_dark_gray;
+          font-size: 16px;
+          padding: 16px 24px;
 
-        div.carrot-checkbox {
-          float: right;
-        }
-
-        &:last-child {
-          border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
-        }
-
-        div.medium-row {
-          margin: 0px;
-          min-height: 40px;
-
-          &.subject {
-            margin-top: 8px;
+          div.carrot-checkbox {
+            float: right;
           }
 
-          &.note {
+          &:last-child {
+            border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
+          }
+
+          div.medium-row {
+            margin: 0px;
+            min-height: 40px;
+
+            &.subject {
+              margin-top: 8px;
+            }
+
+            &.note {
+              span.labels {
+                line-height: 1.8;
+                margin-top: 4px;
+                display: block;
+                float: left;
+                padding-top: 6px;
+                white-space: pre-wrap;
+                width: 100px;
+                text-align: left;
+              }
+
+              div.fields {
+                margin-top: 8px;
+                textarea {
+                  width: 340px;
+                  min-height: 77px;
+                  border-radius: 4px;
+                  background-color: white;
+                  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $oc_gray_7;
+                  padding: 0.4rem 0.8rem;
+                  outline: none;
+                }
+              }
+            }
+
             span.labels {
-              line-height: 1.8;
-              margin-top: 4px;
+              @include avenir_BOOK();
+              font-size: 16px;
+              color: $carrot_gray;
+              padding-top: 4px;
               display: block;
               float: left;
-              padding-top: 6px;
-              white-space: pre-wrap;
-              width: 100px;
-              text-align: left;
             }
 
             div.fields {
-              margin-top: 8px;
-              textarea {
+              float: right;
+
+              input {
                 width: 340px;
-                min-height: 77px;
+                height: 40px;
                 border-radius: 4px;
                 background-color: white;
                 border: 1px solid rgba($carrot_light_gray_1, 0.5);
@@ -100,47 +128,75 @@ div.story-publish-modal-container {
               }
             }
           }
+        }
+      }
 
-          span.labels {
-            @include avenir_BOOK();
-            font-size: 16px;
-            color: $carrot_gray;
-            padding-top: 4px;
-            display: block;
-            float: left;
-          }
+      div.publish-footer{
+        div.buttons {
+          float: right;
+          height: 48px;
+          margin-top: 24px;
 
-          div.fields {
-            float: right;
-
-            input {
-              width: 340px;
-              height: 40px;
-              border-radius: 4px;
-              background-color: white;
-              border: 1px solid rgba($carrot_light_gray_1, 0.5);
-              @include avenir_M();
-              font-size: 14px;
-              color: $oc_gray_7;
-              padding: 0.4rem 0.8rem;
-              outline: none;
-            }
+          button {
+            margin-left: 16px;
+            height: 48px;
+            padding: .2em 1.8em;
           }
         }
       }
     }
 
-    div.publish-footer{
-      div.buttons {
-        float: right;
-        height: 48px;
-        margin-top: 24px;
+    div.story-publish-modal-published {
+      text-align: center;
 
-        button {
-          margin-left: 16px;
-          height: 48px;
-          padding: .2em 1.8em;
+      div.publish-headline {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_dark_gray_1;
+        margin-top: 8px;
+      }
+
+      div.publish-url-container {
+        border: 1px solid rgba($carrot_light_gray_1, 0.6);
+        padding: 7px 4px 7px 16px;
+        border-radius: 4px;
+        margin: 16px auto 0;
+        width: 368px;
+        height: 40px;
+
+        input {
+          border: none;
+          outline: none;
+          padding: 0.3rem;
+          margin: 0;
+          width: 266px;
+          @include avenir_R();
+          color: $carrot_dark_gray;
+          font-size: 14px;
+          float: left;
         }
+
+        button.copy-btn {
+          width: 56px;
+          height: 26px;
+          text-align: center;
+          padding: 0;
+          margin: 0;
+          @include avenir_H();
+          font-size: 12px;
+          float: right;
+        }
+      }
+
+      div.publish-subheadline {
+        @include avenir_M();
+        font-size: 16px;
+        color: $carrot_dark_gray_1;
+        margin-top: 8px;
+      }
+
+      button.done-btn {
+        margin-top: 16px;
       }
     }
   }
