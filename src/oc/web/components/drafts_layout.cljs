@@ -29,7 +29,9 @@
               [:div.bottom-gradient])])
         [:div.draft-card-footer.group
           [:div.draft-card-footer-left
-            (utils/draft-date (or (:updated-at draft) (:created-at draft)))]
+            (let [author (:author draft)
+                  last-edit (if (map? author) author (last author))]
+              (utils/draft-date (:updated-at last-edit)))]
           [:div.draft-card-footer-right ""]]])])
 
 (rum/defc drafts-layout
