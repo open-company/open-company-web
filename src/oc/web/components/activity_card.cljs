@@ -121,8 +121,8 @@
      :on-click #(if (= (:type activity-data) "story")
                   (router/nav! (oc-urls/story (:uuid activity-data)))
                   (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
-     :on-mouse-enter #(reset! (::hovering-card s) true)
-     :on-mouse-leave #(reset! (::hovering-card s) false)}
+     :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
+     :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
     (when (= (:type activity-data) "story")
       [:div.triangle])
     (when (and is-all-activity
@@ -204,27 +204,28 @@
                        :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
     [:div.activity-card-footer.group
       (interactions-summary activity-data)
-      [:div.more-button.dropdown
-        [:button.mlb-reset.more-ellipsis.dropdown-toggle
-          {:type "button"
-           :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-           :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
-           :on-click #(utils/event-stop %)
-           :title "More"
-           :data-toggle "dropdown"
-           :aria-haspopup true
-           :aria-expanded false}]
-        [:div.dropdown-menu
-          {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
-          [:div.triangle]
-          [:ul.activity-card-more-menu
-            [:li
-              {:on-click (fn [e]
-                           (utils/event-stop e)
-                           (if (= (:type activity-data) "story")
-                             (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
-                             (dis/dispatch! [:entry-edit activity-data])))}
-              "Edit"]
-            [:li
-              {:on-click #(delete-clicked % activity-data)}
-              "Delete"]]]]]])
+      (when-not (:read-only activity-data)
+        [:div.more-button.dropdown
+          [:button.mlb-reset.more-ellipsis.dropdown-toggle
+            {:type "button"
+             :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
+             :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
+             :on-click #(utils/event-stop %)
+             :title "More"
+             :data-toggle "dropdown"
+             :aria-haspopup true
+             :aria-expanded false}]
+          [:div.dropdown-menu
+            {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
+            [:div.triangle]
+            [:ul.activity-card-more-menu
+              [:li
+                {:on-click (fn [e]
+                             (utils/event-stop e)
+                             (if (= (:type activity-data) "story")
+                               (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
+                               (dis/dispatch! [:entry-edit activity-data])))}
+                "Edit"]
+              [:li
+                {:on-click #(delete-clicked % activity-data)}
+                "Delete"]]]])]])
