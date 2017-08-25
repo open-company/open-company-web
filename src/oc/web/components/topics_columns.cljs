@@ -113,7 +113,7 @@
                              (= (:type board-data) "story")
                              (or (utils/link-for (:links board-data) "create")
                                  (= (:slug board-data) "drafts")))
-                    (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
+                    (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn" (when (= (:slug board-data) "drafts") " is-draft"))
                                  :on-click #(if (= (router/current-board-slug) "drafts")
                                               (om/set-state! owner :show-storyboards-dropdown (not show-storyboards-dropdown))
                                               (dis/dispatch! [:story-create board-data]))}

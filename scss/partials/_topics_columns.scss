@@ -79,6 +79,10 @@ div.topics-columns {
         float: right;
         margin-right: 16px;
 
+        &.is-draft {
+          margin-right: 24px;
+        }
+
         div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");
           background-size: 16px 16px;
