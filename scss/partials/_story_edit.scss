@@ -301,6 +301,19 @@ div.story-edit-container {
       }
 
       @include activity-attachment();
+
+      a.media-attachment {
+        display: inline-block;
+
+        label.media-attachment-title {
+          font-size: 16px;
+          margin-top: 4px;
+        }
+
+        label.media-attachment-subtitle {
+          display: none;
+        }
+      }
     }
   }
 }
