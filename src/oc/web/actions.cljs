@@ -111,7 +111,9 @@
         ; Load the board data since there is a link to the board in the org data
         (api/get-board board-data)
         ; The board wasn't found, showing a 404 page
-        (router/redirect-404!))
+        (if (= (router/current-board-slug) "drafts")
+          (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
+          (router/redirect-404!)))
       ;; If it's all activity page, loads all activity for the current org
       (utils/in? (:route @router/path) "all-activity")
       (api/get-all-activity org-data)
