@@ -118,6 +118,7 @@
           [:div.related-container.group
             [:div.related-title (str "Related Stories in " (:storyboard-name story-data))]
             [:div.related-stories
+              {:class (when (= (count (:related story-data)) 1) "single-related")}
               (for [story (:related story-data)]
                 (rum/with-key (related-story story (= (count (:related story-data)) 1)) (str "related-story-" (:uuid story))))]])]
       [:div.story-comments-container

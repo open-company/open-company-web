@@ -172,7 +172,9 @@ div.story-container {
       }
 
       div.related-stories {
-        display: flex;
+        &:not(.single-related){
+          display: flex;
+        }
 
         div.related-story {
           padding: 24px;
@@ -185,6 +187,7 @@ div.story-container {
 
           &.centered {
             margin: 0px auto;
+            flex: unset;
           }
 
           &:not(.centered) {
