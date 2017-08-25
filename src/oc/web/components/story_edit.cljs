@@ -183,7 +183,7 @@
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
                         ;; Publish dialog
-                        (rum/local true ::show-publish-modal)
+                        (rum/local false ::show-publish-modal)
                         {:will-mount (fn [s]
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (reset! (::initial-title s) (:title story-editing))
