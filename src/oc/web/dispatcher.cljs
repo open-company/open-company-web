@@ -163,7 +163,10 @@
                             (let [navbar-data (select-keys base [:mobile-menu-open :header-width :show-login-overlay])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
-                                (assoc :board-data board-data))))]})
+                                (assoc :board-data board-data))))]
+   :story-editing-publish [[:base]
+                           (fn [base]
+                              (:story-editing-published-url base))]})
 
 ;; Action Loop =================================================================
 
