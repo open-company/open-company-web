@@ -20,8 +20,7 @@
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]))
 
 (defn did-select-storyboard-cb [storyboard]
-  (let [board-data (dis/board-data @dis/app-state (router/current-org-slug) (:value storyboard))]
-    (dis/dispatch! [:story-create board-data])))
+  (dis/dispatch! [:story-create (clojure.set/rename-keys storyboard {:value :slug :label :name :links :links})]))
 
 (defcomponent topics-columns [{:keys [columns-num
                                       content-loaded
@@ -107,23 +106,31 @@
                                :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
                     "New"))
-                (dom/div {:class "new-story-container"}
-                  (when (and (not is-all-activity)
-                             (not (responsive/is-tablet-or-mobile?))
-                             (= (:type board-data) "story")
-                             (or (utils/link-for (:links board-data) "create")
-                                 (= (:slug board-data) "drafts")))
-                    (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn" (when (= (:slug board-data) "drafts") " is-draft"))
-                                 :on-click #(if (= (router/current-board-slug) "drafts")
-                                              (om/set-state! owner :show-storyboards-dropdown (not show-storyboards-dropdown))
-                                              (dis/dispatch! [:story-create board-data]))}
-                      (dom/div {:class "add-to-board-pencil"})
-                      "New"))
-                  (when show-storyboards-dropdown
-                    (let [storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts")) (:boards org-data))
-                          storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
-                          fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
-                      (dropdown-list fixed-storyboards nil did-select-storyboard-cb #(om/set-state! owner :show-storyboards-dropdown false)))))
+                (let [;; All the boards that are of story type, that are not drafts and that are not read-only
+                      storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
+                      ;; Select only the needed keys
+                      storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
+                      ;; Rename the keys for the dropdown
+                      fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
+                  (when (or (not (:read-only board-data))
+                            (and (= (:slug board-data) "drafts")
+                                 (pos? (count storyboards))))
+                    (dom/div {:class "new-story-container"}
+                      (when (and (not is-all-activity)
+                                 (not (responsive/is-tablet-or-mobile?))
+                                 (= (:type board-data) "story")
+                                 (or (utils/link-for (:links board-data) "create")
+                                     (= (:slug board-data) "drafts")))
+                        (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn" (when (= (:slug board-data) "drafts") " is-draft"))
+                                     :on-click #(if (= (router/current-board-slug) "drafts")
+                                                  (if (= (count fixed-storyboards) 1)
+                                                    (dis/dispatch! [:story-create (first storyboards)])
+                                                    (om/set-state! owner :show-storyboards-dropdown (not show-storyboards-dropdown)))
+                                                  (dis/dispatch! [:story-create board-data]))}
+                          (dom/div {:class "add-to-board-pencil"})
+                          "New"))
+                      (when show-storyboards-dropdown
+                        (dropdown-list fixed-storyboards nil did-select-storyboard-cb #(om/set-state! owner :show-storyboards-dropdown false))))))
                 ;; Board filters dropdown
                 (when (and (not is-mobile-size?)
                            (not empty-board?)
