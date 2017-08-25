@@ -53,7 +53,7 @@
       [:div.cta
         [:h1.headline "The Company Newsboard"]
         [:div.subheadline
-          "News and updates that create greater transparency and company alignment."]
+          "News and company updates that create greater transparency and alignment"]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
