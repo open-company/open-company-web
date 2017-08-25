@@ -76,7 +76,7 @@
                     :logo-url fixed-logo-url})))
 
 (defn- check-img-cb [owner data img result]
- (if-not result
+  (if-not result
     ; there was an error loading the logo, could be an invalid URL
     ; or the link doesn't contain an image
     (do
@@ -190,7 +190,7 @@
 (defn get-state [data current-state]
   (let [org-data (dis/org-data data)]
     {:slug (:slug org-data)
-     :initial-logo (:logo-url data)
+     :initial-logo (:logo-url org-data)
      :logo-url (or (:logo-url current-state) (:logo-url org-data))
      :org-name (or (:org-name current-state) (:name org-data))
      :loading false
@@ -213,7 +213,9 @@
                               (doto fade-animation
                                 (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
                                 (.play))))))
-      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)}))))
+      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
+    (when-not (om/get-state owner :loading)
+      (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
@@ -231,7 +233,7 @@
 
       (dom/div {:class "mx-auto my4 settings-container group"}
         
-        (when-not org-name
+        (when-not org-slug
           (dom/div {:class "settings-form-label org-settings"}
             (loading/small-loading)))
         
