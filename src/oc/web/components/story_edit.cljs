@@ -70,7 +70,7 @@
         body-el      (sel1 [:div.story-edit-body])
         body-editor  (new js/MediumEditor body-el (clj->js (-> "Say something..."
                                                             (utils/medium-editor-options false true)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {:left 44 :top -102})))))]
+                                                            (editor/inject-extension (editor/media-upload media-picker-id {:left 36 :top -106})))))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]

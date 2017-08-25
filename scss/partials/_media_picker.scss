@@ -2,12 +2,12 @@ div.media-picker {
   background-color: white;
 
   button.media {
-    width: 25px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     background-position: 50%;
     background-size: 12px;
     background-repeat: no-repeat;
-    border-radius: 12px;
+    border-radius: 32px;
     border: 1px solid rgba($oc_gray_7, 0.2);
     padding: 0;
     float: left;
@@ -19,12 +19,12 @@ div.media-picker {
 
   button.add-media-bt {
     background-image: cdnUrl("/img/ML/add_media_plus_gray.svg");
-    background-position: 0px 0px;
+    background-position: 50%;
     transition: transform $add_media_animation, margin-right $add_media_animation;
     float: left;
     margin-right: 0px;
     border: none;
-    background-size: 24px;
+    background-size: 32px;
     border-radius: inherit;
 
     &.disabled {
@@ -63,7 +63,7 @@ div.media-picker {
 
     button.media-photo {
       background-image: cdnUrl("/img/ML/media_photo.png");
-      background-size: 12px 12px;
+      background-size: 16px 16px;
 
       &:hover {
         background-image: cdnUrl("/img/ML/media_photo_blue.png");
@@ -72,8 +72,8 @@ div.media-picker {
 
     button.media-video {
       background-image: cdnUrl("/img/ML/media_video.png");
-      background-size: 12px 8px;
-      top: -14px;
+      background-size: 16px 12px;
+      top: -15px;
 
       &:hover {
         background-image: cdnUrl("/img/ML/media_video_blue.png");
@@ -83,8 +83,8 @@ div.media-picker {
     button.media-chart {
       margin-right: 0px;
       background-image: cdnUrl("/img/ML/media_chart.png");
-      background-size: 16px 8px;
-      top: -14px;
+      background-size: 20px 12px;
+      top: -15px;
 
       &:hover {
         background-image: cdnUrl("/img/ML/media_chart_blue.png");
@@ -93,8 +93,8 @@ div.media-picker {
 
     button.media-attachment {
       background-image: cdnUrl("/img/ML/media_attachment.png");
-      background-size: 12px 8px;
-      top: -14px;
+      background-size: 16px 12px;
+      top: -15px;
 
       &:hover {
         background-image: cdnUrl("/img/ML/media_attachment_blue.png");
@@ -103,8 +103,8 @@ div.media-picker {
 
     button.media-divider-line {
       background-image: cdnUrl("/img/ML/media_divider_line.png");
-      background-size: 12px 8px;
-      top: -14px;
+      background-size: 16px 12px;
+      top: -15px;
 
       &:hover {
         background-image: cdnUrl("/img/ML/media_divider_line_blue.png");
@@ -114,7 +114,7 @@ div.media-picker {
     &.expanded {
       @for $i from 1 through 15 {
         &.media-#{$i} {
-          width: #{160 + ($i * 30)}px;
+          width: #{160 + ($i * 40)}px;
         }
       }
 
@@ -123,7 +123,7 @@ div.media-picker {
 
         @for $i from 0 through 14 {
           &.media-#{$i} {
-            margin-left: #{$i * 30}px;
+            margin-left: #{$i * 40}px;
           }
         }
       }
