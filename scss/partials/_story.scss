@@ -132,6 +132,27 @@ div.story-container {
         * {
           color: $oc_gray_7;
         }
+        outline: none;
+        cursor: text;
+
+        h2 {
+          font-size: 26px;
+        }
+
+        @include activity-attachment();
+
+        a.media-attachment {
+          display: inline-block;
+
+          label.media-attachment-title {
+            font-size: 16px;
+            margin-top: 4px;
+          }
+
+          label.media-attachment-subtitle {
+            display: none;
+          }
+        }
       }
 
       div.story-content-footer {
