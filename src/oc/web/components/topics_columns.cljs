@@ -96,7 +96,7 @@
                                  :data-toggle "tooltip"
                                  :data-placement "top"
                                  :data-container "body"
-                                 :title (if (= (:type board-data) "entry") "Board settings" "Series settings")
+                                 :title (str (:name board-data) " settings")
                                  :on-click #(dis/dispatch! [:board-edit board-data])})))
                 ;; Add entry button
                 (when (and (not is-all-activity)
@@ -106,7 +106,7 @@
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                                :on-click #(dis/dispatch! [:entry-edit {}])}
                     (dom/div {:class "add-to-board-pencil"})
-                    "New Update"))
+                    "New"))
                 (dom/div {:class "new-story-container"}
                   (when (and (not is-all-activity)
                              (not (responsive/is-tablet-or-mobile?))

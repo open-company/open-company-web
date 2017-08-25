@@ -28,7 +28,7 @@
               [:div.title
                 "Simplicity"]
               [:div.subtitle
-                "Whether you’re adding a quick update about one topic, or writing a story that covers many, getting started is fast and simple."]]]
+                "Whether you’re adding a quick team update about one topic, or writing a regular stakeholder update that covers many, getting started is fast and simple."]]]
 
           [:div.illustration.illustration-2.group
             [:img {:src (utils/cdn "/img/ML/features_il_2_465_408.svg")}]

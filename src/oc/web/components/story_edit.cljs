@@ -23,7 +23,7 @@
 
 ;; Update story
 
-(def default-story-title "Untitled Story")
+(def default-story-title "Untitled")
 (def default-save-wait 2000)
 (def default-save-message-show 2000)
 
@@ -250,7 +250,7 @@
         [:div.story-edit-header-right
           [:button.mlb-reset.mlb-default.post-button
             {:on-click #(reset! (::show-publish-modal s) true)}
-            "Publish"]]]
+            "Post"]]]
       [:div.story-edit-content
         [:div.story-edit-author.group
           (user-avatar-image story-author)

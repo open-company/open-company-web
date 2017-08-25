@@ -59,9 +59,9 @@
         (if (not (empty? secure-uuid))
           [:div.story-publish-modal-published
             [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}]
-            [:div.published-headline "Your story has been posted and shared!"]
+            [:div.published-headline "Your update has been posted and shared!"]
             (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (router/current-org-slug) "/story/" secure-uuid)]
-              [:div.publish-url-container.group
+              [:div.published-url-container.group
                 [:input
                   {:value publish-url
                    :readOnly true
@@ -71,12 +71,13 @@
                               (.select (sel1 :input#story-publish-modal-published-url))
                               (utils/copy-to-clipboard))}
                   "Copy"]])
+            [:div.published-subheadline "You can also provide anyone with this link to your update."]
             [:button.mlb-reset.mlb-default.done-btn
               {:on-click #(close-clicked s)}
               "Done"]]
           [:div.story-publish-share
             [:div.title "Post " [:span (:title story-data)]]
-            [:div.access (str "Stories posted in " (:storyboard-name story-data) " "
+            [:div.access (str "Updates posted in " (:storyboard-name story-data) " "
               (cond
                 (= (:access story-data) "private") "are private and can be viewed by people you invite."
                 (= (:access story-data) "public") "are public and can be viewed by anyone that has the link."
@@ -139,4 +140,4 @@
                   "Cancel"]
                 [:button.mlb-reset.mlb-default
                   {:on-click #(dis/dispatch! [:story-share])}
-                  "Post story"]]]])]]))
+                  "Post"]]]])]]))

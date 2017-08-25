@@ -53,7 +53,7 @@
       [:div.cta
         [:h1.headline "The Company Newsboard"]
         [:div.subheadline
-          "Share the news and stories that keep everyone informed and aligned."]
+          "Share the news and updates that create greater transparency and company alignment."]
         (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -84,7 +84,7 @@
           [:img {:src (cdn "/img/ML/home_page_il_2_444_414.svg")}]
           [:div.description.group
             [:div.title
-              "Simplify all-hands and investor updates"]
+              "Simplify stakeholder updates"]
             [:div.subtitle
               "Create beautiful updates for your company, investors, and advisors in less time. It’s never been easier to keep all stakeholders in the loop."]]]
 
@@ -140,7 +140,7 @@
           [:div.title
             "Simplicity"]
           [:div.subtitle
-            "Whether you’re adding a quick update about one topic, or writing a story that covers many, getting started is fast and simple."]]]
+            "Whether you’re adding a quick team update about one topic, or writing a regular stakeholder update that covers many, getting started is fast and simple."]]]
 
       [:div.illustration.illustration-2.group
         [:img {:src (cdn "/img/ML/features_il_2_465_408.svg")}]

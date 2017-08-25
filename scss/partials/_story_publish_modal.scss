@@ -149,14 +149,14 @@ div.story-publish-modal-container {
     div.story-publish-modal-published {
       text-align: center;
 
-      div.publish-headline {
+      div.published-headline {
         @include avenir_H();
         font-size: 16px;
         color: $carrot_dark_gray_1;
         margin-top: 8px;
       }
 
-      div.publish-url-container {
+      div.published-url-container {
         border: 1px solid rgba($carrot_light_gray_1, 0.6);
         padding: 7px 4px 7px 16px;
         border-radius: 4px;
@@ -188,15 +188,15 @@ div.story-publish-modal-container {
         }
       }
 
-      div.publish-subheadline {
+      div.published-subheadline {
         @include avenir_M();
         font-size: 16px;
         color: $carrot_dark_gray_1;
-        margin-top: 8px;
+        margin-top: 16px;
       }
 
       button.done-btn {
-        margin-top: 16px;
+        margin-top: 24px;
       }
     }
   }
