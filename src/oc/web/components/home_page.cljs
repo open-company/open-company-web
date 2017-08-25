@@ -35,7 +35,7 @@
         [:div.cta
           [:h1.headline "The Company Newsboard"]
           [:div.subheadline#thank-you-top
-            "Share the news and updates that create greater transparency and company alignment."]
+            "News and updates that create greater transparency and company alignment."]
           (when (and (not @(::confirm s))
                      (not @(::thanks-box-top s)))
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
