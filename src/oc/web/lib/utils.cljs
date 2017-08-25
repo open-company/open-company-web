@@ -1094,7 +1094,7 @@
       created-str
       (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
 
-(defn copy-to-clipboard [text]
+(defn copy-to-clipboard []
   (try
     (.execCommand js/document "copy")
     (catch :default e)))
