@@ -114,6 +114,8 @@
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
           (router/redirect-404!)))
+      (router/current-secure-story-id)
+      (api/get-secure-story (router/current-org-slug) (router/current-secure-story-id))
       ;; If it's all activity page, loads all activity for the current org
       (utils/in? (:route @router/path) "all-activity")
       (api/get-all-activity org-data)
@@ -1131,8 +1133,8 @@
   [db [_ {:keys [story-uuid story-data]}]]
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        story-key (dispatcher/activity-key org-slug board-slug story-uuid)
-        fixed-story-data (utils/fix-story story-data board-slug)]
+        story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
+        fixed-story-data (utils/fix-story story-data (or (:storyboard-slug story-data) board-slug))]
     (-> db
       (dissoc :story-loading)
       (assoc-in story-key fixed-story-data))))
