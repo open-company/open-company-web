@@ -10,6 +10,7 @@ OCWebPrintActivitiesData(): to print all the activities loaded for the current b
 OCWebPrintActivityData(): to print the current activity data,
 OCWebPrintReactionsData(): to print the current activity reactions data,
 OCWebPrintCommentsData(): to print the current activity comments data,
+OCWebPrintActivityCommentsData(): to print the current activity comments data,
 OCWebPrintJWTContents(): to print the content of the JWT.
 OCWebHelp(): print this help,
 OCWebPrintAsciiArt(): print beautiful ASCII art,

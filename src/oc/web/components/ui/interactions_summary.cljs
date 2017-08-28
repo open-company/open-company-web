@@ -27,9 +27,10 @@
                               rum/reactive
                               (drv/drv :comments-data)
   [s entry-data show-zero-comments?]
-  (let [comments-data (drv/react s :comments-data)
+  (let [all-comments-data (drv/react s :comments-data)
+        comments-data (get all-comments-data (:uuid entry-data))
         comments-link (utils/link-for (:links entry-data) "comments")
-        has-comments-data (and (= (:uuid entry-data) (router/current-activity-id)) (pos? (count comments-data)))
+        has-comments-data (pos? (count comments-data))
         comments-authors (if has-comments-data
                            (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (vec (sort-by :created-at (:authors comments-link))))

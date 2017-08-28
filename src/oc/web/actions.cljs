@@ -660,12 +660,12 @@
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         activity-uuid (router/current-activity-id)
-        comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)]
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
-  (let [comments-key (dispatcher/comments-key (router/current-org-slug) (router/current-board-slug) activity-uuid)
+  (let [comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
@@ -674,7 +674,7 @@
   (api/add-comment activity-data comment-body)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        comments-key (dispatcher/comments-key org-slug board-slug (:uuid activity-data))
+        comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))
         comments-data (get-in db comments-key)
         new-comments-data (conj comments-data {:body comment-body
                                                :created-at (utils/as-of-now)
@@ -744,7 +744,7 @@
             ; Add the new comment to the comments list, make sure it's not present already
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (vec (sort-by :created-at new-comments-data))
-            comments-key (dispatcher/comments-key org-slug board-slug activity-uuid)
+            comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
             current-user-id (jwt/get-key :user-id)
             is-current-user (= current-user-id (:user-id (:author comment-data)))
             ; update the comments link of the entry

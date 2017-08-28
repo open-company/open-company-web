@@ -72,7 +72,7 @@
       (reset! (::comments-requested s) true)
       (dis/dispatch! [:comments-get activity-data]))))
 
-(rum/defcs comments < (drv/drv :comments-data)
+(rum/defcs comments < (drv/drv :activity-comments-data)
                       rum/reactive
                       rum/static
                       (rum/local false ::add-comment-focus)
@@ -98,7 +98,7 @@
                                          (scroll-to-bottom s))
                                        s)}
   [s activity-data]
-  (let [comments-data (drv/react s :comments-data)
+  (let [comments-data (drv/react s :activity-comments-data)
         needs-gradient @(::needs-gradient s)]
     (if (:loading comments-data)
       [:div.comments

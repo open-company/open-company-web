@@ -32,8 +32,11 @@
 (defn activity-key [org-slug board-slug activity-uuid]
   (vec (concat (board-data-key org-slug board-slug) [:fixed-items activity-uuid])))
 
-(defn comments-key [org-slug board-slug activity-uuid]
- (vec (conj (board-key org-slug board-slug) :comments-data activity-uuid)))
+(defn comments-key [org-slug board-slug]
+ (vec (conj (board-key org-slug board-slug) :comments-data)))
+
+(defn activity-comments-key [org-slug board-slug activity-uuid]
+ (vec (conj (comments-key org-slug board-slug) activity-uuid)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -106,10 +109,16 @@
                           (fn [base org-slug board-slug activity-uuid]
                             (when (and org-slug board-slug activity-uuid)
                               (get-in base (activity-key org-slug board-slug activity-uuid)-key)))]
-   :comments-data       [[:base :org-slug :board-slug :activity-uuid]
+   :comments-data       [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (let [comments-key (comments-key org-slug board-slug)
+                                    comments-data (get-in base comments-key)]
+                                comments-data)))]
+   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (when (and org-slug board-slug activity-uuid)
-                              (let [comments-key (comments-key org-slug board-slug activity-uuid)
+                              (let [comments-key (activity-comments-key org-slug board-slug activity-uuid)
                                     comments-data (get-in base comments-key)]
                                 comments-data)))]
    :trend-bar-status    [[:base]
@@ -228,13 +237,21 @@
 
 (defn comments-data
   ([]
-    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
+    (comments-data (router/current-org-slug) (router/current-board-slug) @app-state))
+  ([org-slug board-slug]
+    (comments-data org-slug board-slug @app-state))
+  ([org-slug board-slug data]
+    (get-in data (comments-key org-slug board-slug))))
+
+(defn activity-comments-data
+  ([]
+    (activity-comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
   ([activity-uuid]
-    (comments-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
+    (activity-comments-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
   ([org-slug board-slug activity-uuid]
-    (comments-data org-slug board-slug activity-uuid @app-state))
+    (activity-comments-data org-slug board-slug activity-uuid @app-state))
   ([org-slug board-slug activity-uuid data]
-    (get-in data (comments-key org-slug board-slug activity-uuid))))
+    (get-in data (activity-comments-key org-slug board-slug activity-uuid))))
 
 (defn teams-data
   ([] (teams-data @app-state))
@@ -285,6 +302,9 @@
   (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
 
 (defn print-comments-data []
+  (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug)))))
+
+(defn print-activity-comments-data []
   (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
@@ -297,3 +317,4 @@
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)

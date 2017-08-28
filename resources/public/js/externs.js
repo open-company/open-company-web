@@ -70,6 +70,7 @@ var OCWebPrintBoardData = function(){};
 var OCWebPrintActivitiesData = function(){};
 var OCWebPrintActivityData = function(){};
 var OCWebPrintCommentsData = function(){};
+var OCWebPrintActivityCommentsData = function(){};
 var OCWebPrintReactionsData = function(){};
 var OCWebPrintJWTContents = function(){};
 var OCWebHelp = function(){};
