@@ -8,6 +8,7 @@
             [oc.web.components.comments :refer (comments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -44,6 +45,7 @@
                    (rum/local false ::close-hovering)
                    (rum/local nil ::window-resize)
                    (rum/local false ::show-you-did-it)
+                   (rum/local false ::show-publish-modal)
                    {:will-mount (fn [s]
                                   (utils/after 100 #(dis/dispatch! [:story-get]))
                                   (reset! (::window-resize s)
@@ -70,6 +72,8 @@
                   (min (- left-space 24) (- default-comments-total-width left-space)))
         margin-left (- left-space (when @(::comments-expanded s) offset))]
     [:div.story-container
+      (when @(::show-publish-modal s)
+        (story-publish-modal #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-header.group
         [:div.story-header-left
           [:a.board-name
@@ -85,7 +89,7 @@
             {:on-click #(reset! (::comments-expanded s) (not @(::comments-expanded s)))}
             (comments-summary story-data true)]
           [:button.mlb-reset.mlb-link.share-button
-            {:on-click #()}
+            {:on-click #(reset! (::show-publish-modal s) true)}
             "Share"]]]
       [:div.story-content-outer
         {:style #js {:marginLeft (str (int margin-left) "px")}}
