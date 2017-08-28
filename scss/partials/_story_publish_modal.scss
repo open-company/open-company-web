@@ -209,7 +209,7 @@ div.story-publish-modal-container {
 
       div.published-url-container {
         border: 1px solid rgba($carrot_light_gray_1, 0.6);
-        padding: 7px 4px 7px 16px;
+        padding: 7px 4px 7px 8px;
         border-radius: 4px;
         margin: 16px auto 0;
         width: 368px;
@@ -220,7 +220,7 @@ div.story-publish-modal-container {
           outline: none;
           padding: 0.3rem;
           margin: 0;
-          width: 266px;
+          width: 288px;
           @include avenir_R();
           color: $carrot_dark_gray;
           font-size: 14px;
