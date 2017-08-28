@@ -2,6 +2,9 @@ div.left-navigation-sidebar {
   float: left;
   position: fixed;
   margin-right: 20px;
+  max-height: calc(100vh - 122px);
+  overflow: scroll;
+  padding-bottom: 20px;
 
   a.all-activity {
     display: block;
