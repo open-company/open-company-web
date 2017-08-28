@@ -8,13 +8,16 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
 
+(defn get-sorted-stories [storyboard-data]
+  (vec (reverse (sort-by :created-at (vals (:fixed-items storyboard-data))))))
+
 (rum/defc stories-layout < rum/static
                            {:after-render (fn [s]
                                             (dommy/set-style! (sel1 [:div.stories-vertical-line]) :height (str (+ (.-clientHeight (sel1 [:div.story-cards-container])) 30) "px"))
                                            s)}
   [storyboard-data]
-  [:div.stories-layout
-    (let [sorted-stories (vec (reverse (sort-by :created-at (:stories storyboard-data))))]
+  (let [sorted-stories (get-sorted-stories storyboard-data)]
+    [:div.stories-layout
       [:div.story-cards-container.group
         (for [story sorted-stories
               :let [has-headline (not (empty? (:headline story)))
@@ -33,4 +36,4 @@
                      :title (utils/activity-date-tooltip story)}
                     (utils/time-since (:published-at story))]]])
             (activity-card story has-headline has-body)])
-        [:div.stories-vertical-line]])])
+        [:div.stories-vertical-line]]]))

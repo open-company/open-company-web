@@ -11,7 +11,8 @@
     (cond
       ;; :by-topic
       (= layout-type :by-topic)
-      (let [grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :created-at v))))) (group-by :topic-slug (:entries board-data))))
+      (let [entries (vals (:fixed-items board-data))
+            grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :created-at v))))) (group-by :topic-slug entries)))
             sorted-topics (vec (reverse (sort #(compare (:created-at (first (get grouped-entries %1))) (:created-at (first (get grouped-entries %2)))) (keys grouped-entries))))]
         (for [topic sorted-topics
               :let [entries-group (get grouped-entries topic)
@@ -58,9 +59,10 @@
                   [:div.entry-card.entry-card-placeholder])])]))
       ;; by specific topic
       (string? layout-type)
-      (let [filtered-entries (if (= layout-type "uncategorized")
-                                (vec (filter #(empty? (:topic-slug %)) (:entries board-data)))
-                                (vec (filter #(= (:topic-slug %) layout-type) (:entries board-data))))
+      (let [entries (vals (:fixed-items board-data))
+            filtered-entries (if (= layout-type "uncategorized")
+                                (vec (filter #(empty? (:topic-slug %)) entries))
+                                (vec (filter #(= (:topic-slug %) layout-type) entries)))
             sorted-entries (vec (reverse (sort-by :created-at filtered-entries)))]
         [:div.entry-cards-container.by-specific-topic.group
           ; Calc the number of pairs
@@ -86,7 +88,8 @@
                     [:div.entry-card.entry-card-placeholder]))]))])
       ;; :latest layout
       :else
-      (let [sorted-entries (vec (reverse (sort-by :created-at (:entries board-data))))]
+      (let [entries (vals (:fixed-items board-data))
+            sorted-entries (vec (reverse (sort-by :created-at entries)))]
         [:div.entry-cards-container.group
           ; Get the max number of pairs
           (let [top-index (js/Math.ceil (/ (count sorted-entries) 2))]
