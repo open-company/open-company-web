@@ -339,7 +339,7 @@
       (assoc :topic-name topic-name))))
 
 (defn fix-story
-  "Add `:read-only`, :storyboard-slug and :uuid keys to the story map."
+  "Add `:read-only`, :board-slug and :uuid keys to the story map."
   [story-body storyboard-slug]
   (-> story-body
     (assoc :read-only (readonly-story? (:links story-body)))
@@ -363,7 +363,7 @@
   (let [links (:links storyboard-data)
         read-only (readonly-board? links)
         with-read-only (assoc storyboard-data :read-only read-only)
-        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % (:slug storyboard-data)) (:stories storyboard-data)))
+        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % (or (:storyboard-slug %) (:slug storyboard-data))) (:stories storyboard-data)))
         without-stories (dissoc with-read-only :stories)
         with-fixed-stories (assoc without-stories :fixed-items fixed-stories)]
     with-fixed-stories))
@@ -376,8 +376,8 @@
 (defn fix-all-activity
   "Fix org data coming from the API."
   [all-activity-data]
-  (assoc all-activity-data :items (vec (map #(fix-activity % (:board-slug %)) (:items all-activity-data))))
-  (let [fixed-activities-list (map #(fix-activity % (:board-slug %)) (:items all-activity-data))
+  (assoc all-activity-data :items (vec (map #(fix-activity % (or (:board-slug %) (:storyboard-slug %))) (:items all-activity-data))))
+  (let [fixed-activities-list (map #(fix-activity % (or (:board-slug %) (:storyboard-slug %))) (:items all-activity-data))
         without-items (dissoc all-activity-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
