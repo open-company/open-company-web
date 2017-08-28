@@ -61,7 +61,6 @@
         published-data (drv/react s :story-editing-publish)
         published? (not= (:status story-data) "draft")
         secure-uuid (if (:secure-uuid published-data) (:secure-uuid published-data) (:secure-uuid story-data))]
-    (js/console.log)
     [:div.story-publish-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
