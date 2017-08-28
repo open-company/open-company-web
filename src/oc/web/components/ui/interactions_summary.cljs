@@ -1,8 +1,9 @@
 (ns oc.web.components.ui.interactions-summary
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -28,10 +29,13 @@
   [s entry-data show-zero-comments?]
   (let [comments-data (drv/react s :comments-data)
         comments-link (utils/link-for (:links entry-data) "comments")
-        comments-authors (if comments-data
-                           (vec (map :author (sort-by :created-at comments-data)))
+        has-comments-data (and (= (:uuid entry-data) (router/current-activity-id)) (pos? (count comments-data)))
+        comments-authors (if has-comments-data
+                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (vec (sort-by :created-at (:authors comments-link))))
-        comments-count (if comments-data (count comments-data) (:count comments-link))]
+        comments-count (if has-comments-data
+                         (count comments-data)
+                         (:count comments-link))]
     (when (or show-zero-comments?
               (not (zero? comments-count)))
       [:div.is-comments
