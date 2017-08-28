@@ -13,8 +13,11 @@
 
 (def api-entry-point-key [:api-entry-point])
 
+(defn org-key [org-slug]
+  [(keyword org-slug)])
+
 (defn org-data-key [org-slug]
-  [(keyword org-slug) :org-data])
+  (vec (conj (org-key org-slug) :org-data)))
 
 (defn all-activity-key [org-slug]
   [(keyword org-slug) :all-activity])
@@ -24,13 +27,16 @@
 
 (defn board-key [org-slug board-slug]
   (let [board-key (if board-slug (keyword board-slug) :all-activity)]
-    [(keyword org-slug) :boards board-key]))
+    (vec (concat (org-key org-slug) [:boards board-key]))))
 
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
 
 (defn activity-key [org-slug board-slug activity-uuid]
   (vec (concat (board-data-key org-slug board-slug) [:fixed-items activity-uuid])))
+
+(defn secure-activity-key [org-slug secure-id]
+  (vec (concat (org-key org-slug) [:secure-stories secure-id])))
 
 (defn comments-key [org-slug board-slug]
  (vec (conj (board-key org-slug board-slug) :comments-data)))
@@ -59,6 +65,7 @@
    :board-slug          [[:route] (fn [route] (:board route))]
    :topic-slug          [[:route] (fn [route] (:topic route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
+   :secure-id           [[:route] (fn [route] (:secure-id route))]
    :story-uuid          [[:route] (fn [route] (:activity route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
@@ -105,10 +112,12 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :activity-data       [[:base :org-slug :board-slug :activity-uuid]
-                          (fn [base org-slug board-slug activity-uuid]
-                            (when (and org-slug board-slug activity-uuid)
-                              (get-in base (activity-key org-slug board-slug activity-uuid)-key)))]
+   :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
+                          (fn [base org-slug board-slug activity-uuid secure-id]
+                            (when (and org-slug (or (and board-slug activity-uuid) secure-id))
+                              (if (and board-slug activity-uuid)
+                                (get-in base (activity-key org-slug board-slug activity-uuid))
+                                (get-in base (secure-activity-key org-slug secure-id)))))]
    :comments-data       [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
@@ -298,6 +307,9 @@
 (defn print-activity-data []
   (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
+(defn print-secure-story-data []
+  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-story-id))))))
+
 (defn print-reactions-data []
   (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
 
@@ -315,6 +327,7 @@
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
+(set! (.-OCWebPrintSecureStoryData js/window) print-secure-story-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
