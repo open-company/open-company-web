@@ -308,7 +308,7 @@
   (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (defn print-secure-story-data []
-  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-story-id))))))
+  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-story-id)))))
 
 (defn print-reactions-data []
   (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
