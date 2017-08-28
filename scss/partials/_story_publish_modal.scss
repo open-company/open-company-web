@@ -32,6 +32,7 @@ div.story-publish-modal-container {
       color: $carrot_light-gray_1;
 
       span {
+        @include activity-title();
         color: $carrot_dark_gray_1;
       }
     }
