@@ -9,7 +9,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(rum/defc comment-row
+(rum/defc comment-row < rum/static
   [c]
   (let [author (:author c)]
     [:div.comment
