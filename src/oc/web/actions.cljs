@@ -166,8 +166,8 @@
                               fixed-board-data)
           story-editing (when (and (utils/in? (:route @router/path) "story-edit")
                                    (router/current-activity-id)
-                                   (filter #(= (:uuid %) (router/current-activity-id)) (:stories fixed-board-data)))
-                          (first (filter #(= (:uuid %) (router/current-activity-id)) (:stories fixed-board-data))))
+                                   (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
+                          (get (:fixed-items fixed-board-data) (router/current-activity-id)))
           next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
           with-story-editing (if story-editing
                                 (assoc next-db :story-editing story-editing)
@@ -739,7 +739,7 @@
       (let [; get the comment data from the ws message
             comment-data (:interaction interaction-data)
             created-at (:created-at comment-data)
-            all-old-comments-data (dispatcher/comments-data activity-uuid)
+            all-old-comments-data (dispatcher/activity-comments-data activity-uuid)
             old-comments-data (vec (filter :links all-old-comments-data))
             ; Add the new comment to the comments list, make sure it's not present already
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
