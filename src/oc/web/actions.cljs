@@ -143,12 +143,11 @@
   db)
 
 (defmethod dispatcher/action :board [db [_ board-data]]
- (let [is-currently-shown (= (:slug board-data) (router/current-board-slug))
-       is-all-activity (utils/in? (:route @router/path) "all-activity")
-       items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))]
+ (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
+       fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))]
     (when is-currently-shown
       (when (and (router/current-activity-id)
-                 (zero? (count (filter #(= (:uuid %) (router/current-activity-id)) (get board-data items-key))))
+                 (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                  (or (not (utils/in? (:route @router/path) "story-edit"))
                      (= (:slug board-data) "drafts")))
         (router/redirect-404!))
@@ -160,8 +159,7 @@
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
           (wsc/reconnect ws-link (jwt/get-key :user-id))))
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
-    (let [fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))
-          old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
+    (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
                                      (:entry-editing db))
                               old-board-data
@@ -203,11 +201,8 @@
   (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
         board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
-        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) entry-uuid))
-        new-entries (assoc (get board-data items-key) entry-idx (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
-        sorted-entries (vec (sort-by :created-at new-entries))
-        new-board-data (assoc board-data items-key sorted-entries)]
+        new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
+        new-board-data (assoc board-data :fixed-items new-entries)]
   (assoc db board-key new-board-data)))
 
 ;; This should be turned into a proper form library
@@ -585,13 +580,6 @@
   (api/refresh-slack-user)
   db)
 
-(defmethod dispatcher/action :set-board-cache!
-  [db [_ k v]]
-  (let [cache-key (dispatcher/board-cache-key (router/current-org-slug) (router/current-board-slug))]
-    (if (nil? v)
-      (update-in db cache-key dissoc k)
-      (assoc-in db (conj cache-key k) v))))
-
 (defmethod dispatcher/action :org-create
   [db [_]]
   (let [org-data (:create-org db)]
@@ -706,13 +694,11 @@
         org-slug (router/current-org-slug)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
-        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
-        entry-data (get (get board-data items-key) entry-idx)
+        entry-data (get (get board-data :fixed-items) activity-uuid)
         old-reactions-loading (or (:reactions-loading entry-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
-        entry-key (concat board-key [items-key entry-idx])]
+        entry-key (concat board-key [:fixed-items activity-uuid])]
     (api/toggle-reaction activity-uuid reaction-data)
     (assoc-in db entry-key updated-entry-data)))
 
@@ -722,11 +708,9 @@
         org-slug (router/current-org-slug)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
-        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
-        entry-data (get-in board-data [items-key entry-idx])
+        entry-data (get-in board-data [:fixed-items activity-uuid])
         next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
-        entry-key (concat board-key [items-key entry-idx])]
+        entry-key (concat board-key [:fixed-items activity-uuid])]
     (if (nil? reaction-data)
       (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)]
         (assoc-in db entry-key updated-entry-data))
@@ -748,10 +732,8 @@
         activity-uuid (:activity-uuid interaction-data)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
         ; Entry data
-        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
-        entry-data (get (get board-data items-key) entry-idx)]
+        entry-data (get (get board-data :fixed-items) activity-uuid)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
@@ -784,7 +766,7 @@
         ; Update the local state with the new comments list
         (-> db
             (assoc-in comments-key sorted-comments-data)
-            (assoc-in (concat board-key [items-key entry-idx]) with-authors)))
+            (assoc-in (concat board-key [:fixed-items activity-uuid]) with-authors)))
       ;; the entry is not present, refresh the full topic
       (do
         ;; force refresh of topic
@@ -806,9 +788,7 @@
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
         ; Entry idx
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
-        entry-idx (utils/index-of (get board-data items-key) #(= (:uuid %) activity-uuid))
-        entry-key (concat board-key [items-key entry-idx])]
+        entry-key (concat board-key [:fixed-items activity-uuid])]
     (if (and entry-data (not (empty? (:reactions entry-data))))
       ; If the entry is present in the local state and it has reactions
       (let [reaction-data (:interaction interaction-data)
@@ -919,17 +899,16 @@
         org-slug (router/current-org-slug)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
         as-of (utils/as-of-now)
         new-entry? (empty? (:uuid entry-data))
         current-user-data (:current-user-data db)
         fixed-entry (if new-entry?
                       (new-entry-fixed-data entry-data board-data current-user-data as-of)
                       (entry-fixed-data entry-data current-user-data as-of))
-        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (get board-data items-key))
+        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (get board-data :fixed-items))
         new-entries (conj filtered-entries fixed-entry)
         sorted-entries (vec (reverse (sort-by :created-at new-entries)))
-        next-board-data (assoc board-data items-key sorted-entries)
+        next-board-data (assoc board-data :fixed-items sorted-entries)
         next-board-filters (if (or is-all-activity (= (:board-filters db) (:topic-slug entry-data)))
                               ; if it's filtering by the same topic of the new entry leave it be
                               (:board-filters db)
@@ -1009,10 +988,9 @@
   (let [is-all-activity (utils/in? (:route @router/path) "all-activity")
         board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get-in db board-key)
-        items-key (if is-all-activity :items (if (= (:type board-data) "story") :stories :entries))
-        filtered-entries (filter #(not= (:uudi %) (:uuid activity-data)) (get board-data items-key))
+        filtered-entries (filter #(not= (:uuid %) (:uuid activity-data)) (get board-data :fixed-items))
         sorted-entries (vec (sort-by :created-at filtered-entries))
-        next-board-data (assoc board-data items-key sorted-entries)]
+        next-board-data (assoc board-data :fixed-items sorted-entries)]
     (api/delete-activity activity-data)
     (assoc-in db board-key next-board-data)))
 
@@ -1086,9 +1064,7 @@
   (if body
     (let [all-activity-key (dispatcher/all-activity-key org)
           fixed-all-activity (utils/fix-all-activity (:collection body))
-          sorted-items (vec (reverse (sort-by :created-at (:items fixed-all-activity))))
-          with-sorted-items (assoc fixed-all-activity :items sorted-items)
-          with-calendar-data (-> with-sorted-items
+          with-calendar-data (-> fixed-all-activity
                                 (assoc :year year)
                                 (assoc :month month)
                                 ;; Force the component to trigger a did-remount
@@ -1131,18 +1107,10 @@
                               (vec (conj next-links link-to-move))
                               next-links)
           with-links (assoc fixed-all-activity :links fixed-next-links)
-          keeping-items (count (:items old-all-activity))
-          ; keeping-items (min default-activity-limit (count (:items old-all-activity)))
-          ;; Keep only x elements before or after the new list
-          ; all-activity-items (if (= direction :up)
-          ;                         (concat (:items with-links) (take default-activity-limit (:items old-all-activity)))
-          ;                         (concat (take-last default-activity-limit (:items old-all-activity)) (:items with-links)))
-          ;; Keep all the elements
-          all-activity-items (if (= direction :up)
-                                  (concat (:items with-links) (:items old-all-activity))
-                                  (concat (:items old-all-activity) (:items with-links)))
+          new-items (merge (:fixed-items old-all-activity) (:fixed-items with-links))
+          keeping-items (count (:fixed-items old-all-activity))
           new-all-activity (-> with-links
-                              (assoc :items (vec (reverse (sort-by :created-at (distinct all-activity-items)))))
+                              (assoc :fixed-items new-items)
                               (assoc :direction direction)
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-activity-key new-all-activity))
@@ -1163,7 +1131,7 @@
   [db [_ {:keys [story-uuid story-data]}]]
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        story-key (dispatcher/story-key org-slug board-slug story-uuid)
+        story-key (dispatcher/activity-key org-slug board-slug story-uuid)
         fixed-story-data (utils/fix-story story-data board-slug)]
     (-> db
       (dissoc :story-loading)

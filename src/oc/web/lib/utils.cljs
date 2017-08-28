@@ -352,8 +352,10 @@
   (let [links (:links board-data)
         read-only (readonly-storyboard? links)
         with-read-only (assoc board-data :read-only read-only)
-        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data))))]
-    with-fixed-topics))
+        fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data)))
+        without-entries (dissoc with-read-only :entries)
+        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+    with-fixed-entries))
 
 (defn fix-storyboard
   "Add topic name in each topic and a topic sorter"
@@ -361,7 +363,9 @@
   (let [links (:links storyboard-data)
         read-only (readonly-board? links)
         with-read-only (assoc storyboard-data :read-only read-only)
-        with-fixed-stories (assoc with-read-only :stories (vec (map #(fix-story % (:slug storyboard-data)) (:stories storyboard-data))))]
+        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % (:slug storyboard-data)) (:stories storyboard-data)))
+        without-stories (dissoc with-read-only :stories)
+        with-fixed-stories (assoc without-stories :fixed-items fixed-stories)]
     with-fixed-stories))
 
 (defn fix-activity [activity collection-slug]
@@ -372,7 +376,12 @@
 (defn fix-all-activity
   "Fix org data coming from the API."
   [all-activity-data]
-  (assoc all-activity-data :items (vec (map #(fix-activity % (:board-slug %)) (:items all-activity-data)))))
+  (assoc all-activity-data :items (vec (map #(fix-activity % (:board-slug %)) (:items all-activity-data))))
+  (let [fixed-activities-list (map #(fix-activity % (:board-slug %)) (:items all-activity-data))
+        without-items (dissoc all-activity-data :items)
+        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
+        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
+    with-fixed-activities))
 
 (defn fix-org
   "Fix org data coming from the API."
