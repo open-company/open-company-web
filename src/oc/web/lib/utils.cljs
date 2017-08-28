@@ -1015,6 +1015,9 @@
     ;; Archives
     "application/gzip" "fa-file-archive-o",
     "application/zip" "fa-file-archive-o",
+    ;; Code
+    "text/css" "fa-file-code-o"
+    "text/php" "fa-file-code-o"
     ;; Generic case
     "fa-file"))
 
