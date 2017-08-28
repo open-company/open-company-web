@@ -87,95 +87,96 @@
               [:button.mlb-reset.mlb-default.done-btn
                 {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug publish-data)))}
                 "Done"])])
-        [:div.story-publish-share
-          [:div.access (str "Updates posted in " (:storyboard-name story-data) " "
-            (cond
-              (= (:access story-data) "private") "are private and can be viewed by people you invite."
-              (= (:access story-data) "public") "are public and can be viewed by anyone that has the link."
-              :else "can be viewed by anyone on the team."))]
-          [:div.mediums-box
-            [:div.medium
-              [:div.medium-row.group
-                [:span.labels "Share via Email"]
-                (carrot-checkbox {:selected (:email publish-data)
-                                  :did-change-cb #(reset! (::publish-data s) (merge publish-data {:email (not (:email publish-data))}))})]
-              (when (:email publish-data)
-                [:div.email-medium.group
-                  [:div.medium-row.group
-                    [:span.labels "To"]
-                    [:div.fields
-                      (item-input {:item-render email-item
-                                   :match-ptn #"(\S+)[,|\s]+"
-                                   :split-ptn #"[,|\s]+"
-                                   :container-node :div.email-field
-                                   :valid-item? utils/valid-email?
-                                   :on-change (fn [v] (reset! (::publish-data s)
-                                                        (merge publish-data
-                                                         {:email-data (merge email-data
-                                                          {:to v})})))})]]
-                  [:div.medium-row.subject.group
-                    [:span.labels "Subject"]
-                    [:div.fields
-                      [:input
-                        {:type "text"
-                         :value (:subject email-data)
-                         :on-change #(reset! (::publish-data s)
-                                      (merge publish-data
-                                       {:email-data (merge email-data
-                                         {:subject (.. % -target -value)})}))}]]]
-                  [:div.medium-row.note.group
-                    [:span.labels "Add a note (optional)"]
-                    [:div.fields
-                      [:textarea
-                        {:value (:note email-data)
-                         :on-change #(reset! (::publish-data s)
-                                      (merge publish-data
-                                       {:email-data (merge email-data
-                                        {:note (.. % -target -value)})}))}]]]])]
-            [:div.medium
-              [:div.medium-row.group
-                [:span.labels "Share to Slack"]
-                (carrot-checkbox {:selected (:slack publish-data)
-                                  :did-change-cb #(reset! (::publish-data s) (merge publish-data {:slack (not (:slack publish-data))}))})]
-              (when (:slack publish-data)
-                [:div.slack-medium.group
-                  [:div.medium-row.group
-                    [:span.labels "To"]
-                    [:div.fields
-                      (slack-channels-dropdown {:did-change-cb (fn [team channel]
-                                                                 (reset! (::publish-data s)
-                                                                   (merge publish-data
-                                                                    {:slack-data (merge slack-data
-                                                                     {:channel {:channel-id (:id channel)
-                                                                                :channel-name (:name channel)
-                                                                                :slack-org-id (:slack-org-id team)}})})))
-                                                :initial-value ""
-                                                :disabled false})]]
-                  [:div.medium-row.note.group
-                    [:span.labels "Add a note (optional)"]
-                    [:div.fields
-                      [:textarea
-                        {:value (:note slack-data)
-                         :on-change (fn [e]
-                                     (reset! (::publish-data s)
-                                      (merge publish-data
-                                       {:slack-data (merge slack-data
-                                        {:note (.. e -target -value)})})))}]]]])]]
-          [:div.publish-footer.group
-            [:div.buttons
-              [:button.mlb-reset.mlb-black-link
-                {:on-click #(close-clicked s)}
-                "Cancel"]
-              [:button.mlb-reset.mlb-default
-                {:on-click #(let [slack-share (when (:slack publish-data)
-                                                {:medium :slack
-                                                 :note (:note slack-data)
-                                                 :channel (:channel slack-data)})
-                                  email-share (when (:email publish-data)
-                                                {:medium :email
-                                                 :note (:note email-data)
-                                                 :subject (:subject email-data)
-                                                 :to (:to email-data)})
-                                  share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
-                             (dis/dispatch! [:story-share share-data]))}
-                (if published? "Share" "Post")]]]]]]))
+        (when (:secure-uuid published-data)
+          [:div.story-publish-share
+            [:div.access (str "Updates posted in " (:storyboard-name story-data) " "
+              (cond
+                (= (:access story-data) "private") "are private and can be viewed by people you invite."
+                (= (:access story-data) "public") "are public and can be viewed by anyone that has the link."
+                :else "can be viewed by anyone on the team."))]
+            [:div.mediums-box
+              [:div.medium
+                [:div.medium-row.group
+                  [:span.labels "Share via Email"]
+                  (carrot-checkbox {:selected (:email publish-data)
+                                    :did-change-cb #(reset! (::publish-data s) (merge publish-data {:email (not (:email publish-data))}))})]
+                (when (:email publish-data)
+                  [:div.email-medium.group
+                    [:div.medium-row.group
+                      [:span.labels "To"]
+                      [:div.fields
+                        (item-input {:item-render email-item
+                                     :match-ptn #"(\S+)[,|\s]+"
+                                     :split-ptn #"[,|\s]+"
+                                     :container-node :div.email-field
+                                     :valid-item? utils/valid-email?
+                                     :on-change (fn [v] (reset! (::publish-data s)
+                                                          (merge publish-data
+                                                           {:email-data (merge email-data
+                                                            {:to v})})))})]]
+                    [:div.medium-row.subject.group
+                      [:span.labels "Subject"]
+                      [:div.fields
+                        [:input
+                          {:type "text"
+                           :value (:subject email-data)
+                           :on-change #(reset! (::publish-data s)
+                                        (merge publish-data
+                                         {:email-data (merge email-data
+                                           {:subject (.. % -target -value)})}))}]]]
+                    [:div.medium-row.note.group
+                      [:span.labels "Add a note (optional)"]
+                      [:div.fields
+                        [:textarea
+                          {:value (:note email-data)
+                           :on-change #(reset! (::publish-data s)
+                                        (merge publish-data
+                                         {:email-data (merge email-data
+                                          {:note (.. % -target -value)})}))}]]]])]
+              [:div.medium
+                [:div.medium-row.group
+                  [:span.labels "Share to Slack"]
+                  (carrot-checkbox {:selected (:slack publish-data)
+                                    :did-change-cb #(reset! (::publish-data s) (merge publish-data {:slack (not (:slack publish-data))}))})]
+                (when (:slack publish-data)
+                  [:div.slack-medium.group
+                    [:div.medium-row.group
+                      [:span.labels "To"]
+                      [:div.fields
+                        (slack-channels-dropdown {:did-change-cb (fn [team channel]
+                                                                   (reset! (::publish-data s)
+                                                                     (merge publish-data
+                                                                      {:slack-data (merge slack-data
+                                                                       {:channel {:channel-id (:id channel)
+                                                                                  :channel-name (:name channel)
+                                                                                  :slack-org-id (:slack-org-id team)}})})))
+                                                  :initial-value ""
+                                                  :disabled false})]]
+                    [:div.medium-row.note.group
+                      [:span.labels "Add a note (optional)"]
+                      [:div.fields
+                        [:textarea
+                          {:value (:note slack-data)
+                           :on-change (fn [e]
+                                       (reset! (::publish-data s)
+                                        (merge publish-data
+                                         {:slack-data (merge slack-data
+                                          {:note (.. e -target -value)})})))}]]]])]]
+            [:div.publish-footer.group
+              [:div.buttons
+                [:button.mlb-reset.mlb-black-link
+                  {:on-click #(close-clicked s)}
+                  "Cancel"]
+                [:button.mlb-reset.mlb-default
+                  {:on-click #(let [slack-share (when (:slack publish-data)
+                                                  {:medium :slack
+                                                   :note (:note slack-data)
+                                                   :channel (:channel slack-data)})
+                                    email-share (when (:email publish-data)
+                                                  {:medium :email
+                                                   :note (:note email-data)
+                                                   :subject (:subject email-data)
+                                                   :to (:to email-data)})
+                                    share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
+                               (dis/dispatch! [:story-share share-data]))}
+                  (if published? "Share" "Post")]]]])]]))
