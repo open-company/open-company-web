@@ -34,10 +34,13 @@
               (utils/draft-date (:updated-at last-edit)))]
           [:div.draft-card-footer-right ""]]])])
 
+(defn get-sorted-drafts [drafts-data]
+  (vec (reverse (sort-by :created-at (vals (:fixed-items drafts-data))))))
+
 (rum/defc drafts-layout
   [drafts-data]
   [:div.drafts-layout
-    (let [sorted-drafts (vec (reverse (sort-by :created-at (:stories drafts-data))))]
+    (let [sorted-drafts (get-sorted-drafts drafts-data)]
       [:div.draft-cards-container.group
         (for [idx (range (.ceil js/Math (/ (count sorted-drafts) 2)))
               :let [first-draft (get sorted-drafts (* idx 2))
