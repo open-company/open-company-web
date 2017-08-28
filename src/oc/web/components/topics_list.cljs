@@ -69,7 +69,6 @@
                          :org-data (:org-data data)
                          :board-data board-data
                          :all-activity-data (:all-activity-data data)
-                         :entries-data (:entries-data data)
                          :topics-data board-data
                          :entry-editing (:entry-editing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)

@@ -17,7 +17,6 @@
                                           topics
                                           org-data
                                           board-data
-                                          entries-data
                                           topics-data
                                           is-dashboard
                                           is-stakeholder-update
@@ -31,7 +30,6 @@
                               :org-data org-data
                               :board-data board-data
                               :topic-data (get board-data (keyword (router/current-topic-slug)))
-                              :entries-data entries-data
                               :read-only-board (:read-only board-data)
                               :prevent-topic-not-found-navigation prevent-topic-not-found-navigation})
         (for [idx (range (count topics))
@@ -42,7 +40,6 @@
                                 :topic topic-kw
                                 :org-data org-data
                                 :board-data board-data
-                                :entries-data (get entries-data topic-kw [])
                                 :is-stakeholder-update is-stakeholder-update
                                 :topic-data sd
                                 :card-width card-width

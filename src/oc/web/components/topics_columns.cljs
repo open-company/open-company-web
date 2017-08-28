@@ -54,7 +54,7 @@
                                                  :width "auto"}
                                             #js {:width total-width}))
           total-width-int (js/parseInt total-width 10)
-          empty-board? (and (zero? (count (:stories board-data))) (zero? (count (:entries board-data))))
+          empty-board? (zero? (count (:fixed-items board-data)))
           org-data (dis/org-data)]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true

@@ -66,7 +66,6 @@
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
           all-activity-data (dis/all-activity-data data)
-          entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
       (if (or (not org-data)
               (and (not board-data)
@@ -115,7 +114,6 @@
                      :org-data org-data
                      :board-data board-data
                      :all-activity-data all-activity-data
-                     :entries-data entries-data
                      :force-edit-topic (:force-edit-topic data)
                      :card-width card-width
                      :columns-num columns-num
