@@ -18,7 +18,7 @@
   (let [author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))]
     [:div.related-story
       {:class (when single-related "centered")
-       :on-click #(router/nav! (oc-urls/story (router/current-org-slug) (router/current-board-slug) (:uuid story-data)))}
+       :on-click #(when story-data (router/nav! (oc-urls/story (router/current-org-slug) (:board-slug story-data) (:uuid story-data))))}
       [:div.related-story-header
         (user-avatar-image author)
         [:div.name (:name author)]
@@ -77,20 +77,22 @@
       [:div.story-header.group
         [:div.story-header-left
           [:a.board-name
-            {:href (oc-urls/board (router/current-board-slug))
-             :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-board-slug))))}
+            {:href (when story-data (oc-urls/board (:board-slug story-data)))
+             :on-click #(do (utils/event-stop %) (when story-data (router/nav! (oc-urls/board (:board-slug story-data)))))}
             (:storyboard-name story-data)]
           [:span.arrow ">"]
           [:span.story-title
             {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]]
         [:div.story-header-right
           (reactions story-data)
-          [:div.comments-summary-container.group
-            {:on-click #(reset! (::comments-expanded s) (not @(::comments-expanded s)))}
-            (comments-summary story-data true)]
-          [:button.mlb-reset.mlb-link.share-button
-            {:on-click #(reset! (::show-publish-modal s) true)}
-            "Share"]]]
+          (when (utils/link-for (:links story-data) "comments")
+            [:div.comments-summary-container.group
+              {:on-click #(reset! (::comments-expanded s) (not @(::comments-expanded s)))}
+              (comments-summary story-data true)])
+          (when (utils/link-for (:links story-data) "share")
+            [:button.mlb-reset.mlb-link.share-button
+              {:on-click #(reset! (::show-publish-modal s) true)}
+              "Share"])]]
       [:div.story-content-outer
         {:style #js {:marginLeft (str (int margin-left) "px")}}
         [:div.story-content
