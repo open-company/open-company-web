@@ -305,7 +305,7 @@
   (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-comments-data []
-  (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+  (js/console.log (get-in @app-state (activity-comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
