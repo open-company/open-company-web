@@ -259,7 +259,6 @@ provided in the table below:
 |  :pswd-collect | UI | Start the request to save the new user password on password request. |
 |  :pswd-collect/finish | API | Collect password request finished. |
 |  :reaction-toggle | UI | Toggle a reaction, temporarily change it in the local state then starts the request to save it server side. |
-|  :set-board-cache! | UI | Save some data of the current board, used for example by the growth topic to remember the last focused metric in the UI. |
 |  :signup-with-email | UI | Show the signup with email overlay. |
 |  :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
 |  :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |
