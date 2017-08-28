@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -73,7 +74,7 @@
                   "Copy"]])
             [:div.published-subheadline "You can also provide anyone with this link to your update."]
             [:button.mlb-reset.mlb-default.done-btn
-              {:on-click #(close-clicked s)}
+              {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug story-data)))}
               "Done"]]
           [:div.story-publish-share
             [:div.title "Post " [:span (:title story-data)]]
