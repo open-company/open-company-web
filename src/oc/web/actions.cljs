@@ -1159,18 +1159,18 @@
     (when (:story-editing-share db)
       ;; Needs to publish the story
       (when (= (:status story-editing) "draft")
-        (api/share-story story-editing)))
+        (api/share-story story-editing (:story-editing-share db))))
     ;; User when the user changes the board of a story
     (when (:redirect story-editing)
       (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug story-editing) (:uuid story-editing))))
     (assoc db :story-editing (dissoc story-editing :autosaving :redirect))))
 
 (defmethod dispatcher/action :story-share
-  [db [_]]
+  [db [_ share-data]]
   ;; Make a last autosave to make sure we have everything saved
   (api/autosave-draft (:story-editing db))
   ;; Remember to publish when autosave finishes
-  (assoc db :story-editing-share true))
+  (assoc db :story-editing-share share-data))
 
 (defmethod dispatcher/action :story-share/finish
   [db [_ story-data]]
