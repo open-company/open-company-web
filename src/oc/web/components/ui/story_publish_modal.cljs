@@ -181,7 +181,9 @@
                                                    :subject (:subject email-data)
                                                    :to (:to email-data)})
                                     share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
-                               (dis/dispatch! [(if published? :story-reshare :story-share) share-data])
+                               (when (or (not published?)
+                                         (not (empty? share-data)))
+                                 (dis/dispatch! [(if published? :story-reshare :story-share) share-data]))
                                (when published?
                                   (close-clicked s)))}
                   (if published? "Share" "Post")]]]])]]))
