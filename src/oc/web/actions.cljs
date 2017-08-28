@@ -1174,6 +1174,15 @@
   ;; Remember to publish when autosave finishes
   (assoc db :story-editing-share share-data))
 
+(defmethod dispatcher/action :story-reshare
+  [db [_ share-data]]
+  ;; Make a last autosave to make sure we have everything saved
+  (api/share-story (dispatcher/activity-data) share-data)
+  ;; Remember to publish when autosave finishes
+  (assoc db :story-reshare share-data))
+
 (defmethod dispatcher/action :story-share/finish
   [db [_ story-data]]
-  (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
+  (if (:story-reshare db)
+    (assoc db :story-reshare-done true)
+    (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data)))))

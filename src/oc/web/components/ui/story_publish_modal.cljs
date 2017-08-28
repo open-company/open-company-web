@@ -36,7 +36,8 @@
                                                (dommy/add-class! (sel1 [:body]) :no-scroll)
                                                (let [published-data @(drv/get-ref s :story-editing)]
                                                    (when (:secure-uuid published-data)
-                                                      (utils/after 500 #(.select (sel1 :input#story-publish-modal-published-url)))))
+                                                      (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
+                                                                          (.select story-published-url)))))
                                                s)
                                   :after-render (fn [s]
                                                   (when (not @(::first-render-done s))
@@ -45,7 +46,8 @@
                                   :did-remount (fn [o s]
                                                  (let [published-data @(drv/get-ref s :story-editing-publish)]
                                                    (when (:secure-uuid published-data)
-                                                      (utils/after 500 #(.select (sel1 :input#story-publish-modal-published-url)))))
+                                                      (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
+                                                                          (.select story-published-url)))))
                                                  s)
                                   :will-unmount (fn [s]
                                                   ;; Remove no-scroll class from the body tag
@@ -59,16 +61,20 @@
         published-data (drv/react s :story-editing-publish)
         published? (not= (:status story-data) "draft")
         secure-uuid (if (:secure-uuid published-data) (:secure-uuid published-data) (:secure-uuid story-data))]
+    (js/console.log)
     [:div.story-publish-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       [:div.story-publish-modal
-        (when-not published-data
+        (when (or (not published-data)
+                  published?)
           [:div.title (if published? "Share " "Post ") (when-not published? [:span {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])])
         (when (or (not (= (:status story-data) "draft")) (:secure-uuid published-data))
           [:div.story-publish-modal-published
-            [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}]
-            [:div.published-headline (str "Your update has been " (when (:secure-uuid published-data) "posted and ") "shared!")]
+            (when-not published?
+              [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}])
+            (when-not published?
+              [:div.published-headline (str "Your update has been " (when (:secure-uuid published-data) "posted and ") "shared!")])
             (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/secure-story (router/current-org-slug) secure-uuid))]
               [:div.published-url-container.group
                 [:input
@@ -80,18 +86,20 @@
                               (.select (sel1 :input#story-publish-modal-published-url))
                               (utils/copy-to-clipboard))}
                   "Copy"]])
-            [:div.published-subheadline (str "You can" (when (:secure-uuid published-data) " also") " provide anyone with this link to your update.")]
-            (when (:secure-uuid published-data)
+            [:div.published-subheadline (str "You can" (when (and (not published?) (:secure-uuid published-data)) " also") " provide anyone with this link to your update.")]
+            (when (and (not published?) (:secure-uuid published-data))
               [:button.mlb-reset.mlb-default.done-btn
                 {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:storyboard-slug published-data)))}
                 "Done"])])
-        (when-not (:secure-uuid published-data)
+        (when (or (not (:secure-uuid published-data))
+                  published?)
           [:div.story-publish-share
-            [:div.access (str "Updates posted in " (:storyboard-name story-data) " "
-              (cond
-                (= (:access story-data) "private") "are private and can be viewed by people you invite."
-                (= (:access story-data) "public") "are public and can be viewed by anyone that has the link."
-                :else "can be viewed by anyone on the team."))]
+            (when-not published?
+              [:div.access (str "Updates posted in " (:storyboard-name story-data) " "
+                (cond
+                  (= (:access story-data) "private") "are private and can be viewed by people you invite."
+                  (= (:access story-data) "public") "are public and can be viewed by anyone that has the link."
+                  :else "can be viewed by anyone on the team."))])
             [:div.mediums-box
               [:div.medium
                 [:div.medium-row.group
@@ -176,5 +184,7 @@
                                                    :subject (:subject email-data)
                                                    :to (:to email-data)})
                                     share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
-                               (dis/dispatch! [:story-share share-data]))}
+                               (dis/dispatch! [(if published? :story-reshare :story-share) share-data])
+                               (when published?
+                                  (close-clicked s)))}
                   (if published? "Share" "Post")]]]])]]))
