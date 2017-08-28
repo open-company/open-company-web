@@ -22,26 +22,18 @@
 (defn calendar-key [org-slug]
   [(keyword org-slug) :calendar])
 
-(defn board-data-key [org-slug board-slug]
+(defn board-key [org-slug board-slug]
   (let [board-key (if board-slug (keyword board-slug) :all-activity)]
-    [(keyword org-slug) :boards board-key :board-data]))
+    [(keyword org-slug) :boards board-key]))
 
-(defn board-cache-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :cache])
+(defn board-data-key [org-slug board-slug]
+  (conj (board-key org-slug board-slug) :board-data))
 
-(defn board-new-categories-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :new-categories])
-
-(defn story-key [org-slug board-slug activity-uuid]
-  [(keyword org-slug) (keyword board-slug) :stories-data (keyword activity-uuid)])
-
-(defn entries-key [org-slug board-slug]
-  (if (nil? board-slug)
-    [(keyword org-slug) :boards :all-activity :entries-data]
-    [(keyword org-slug) :boards (keyword board-slug) :entries-data]))
+(defn activity-key [org-slug board-slug activity-uuid]
+  (vec (concat (board-data-key org-slug board-slug) [:fixed-items activity-uuid])))
 
 (defn comments-key [org-slug board-slug activity-uuid]
- (vec (conj (entries-key org-slug board-slug) activity-uuid :comments-data)))
+ (vec (conj (board-key org-slug board-slug) :comments-data activity-uuid)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -106,10 +98,6 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-channels-key (:team-id org-data)))))]
-   :board-new-categories [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (get-in base (board-new-categories-key org-slug board-slug))))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
@@ -117,15 +105,7 @@
    :activity-data       [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (when (and org-slug board-slug activity-uuid)
-                              (let [board-key (if (empty? board-slug) (all-activity-key org-slug) (board-data-key org-slug board-slug))
-                                    board-data (get-in base board-key)
-                                    items-key (if (empty? board-slug) :items (if (= (:type board-data) "story") :stories :entries))]
-                                (first (filter #(= (:uuid %) activity-uuid) (get board-data items-key))))))]
-   :story-data          [[:base :org-slug :board-slug :story-uuid]
-                          (fn [base org-slug board-slug story-uuid]
-                            (when (and org-slug board-slug story-uuid)
-                              (let [story-key (story-key org-slug board-slug story-uuid)]
-                                (get-in base story-key))))]
+                              (get-in base (activity-key org-slug board-slug activity-uuid)-key)))]
    :comments-data       [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (when (and org-slug board-slug activity-uuid)
@@ -232,18 +212,6 @@
   ([data org-slug board-slug]
     (get-in data (board-data-key org-slug board-slug))))
 
-(defn board-cache
-  ([]
-    (board-cache @app-state))
-  ([data]
-    (board-cache data (router/current-org-slug) (router/current-board-slug)))
-  ([data org-slug]
-    (board-cache data org-slug (router/current-board-slug)))
-  ([data org-slug board-slug]
-    (get-in data (board-cache-key org-slug board-slug)))
-  ([data org-slug board-slug k]
-    (get-in data (conj (board-cache-key org-slug board-slug) k))))
-
 (defn activity-data
   "Get activity data."
   ([]
@@ -255,15 +223,8 @@
   ([org-slug board-slug activity-id]
     (activity-data org-slug board-slug activity-id @app-state))
   ([org-slug board-slug activity-id data]
-    (let [is-all-activity (:from-all-activity @router/path)
-          data-key (if is-all-activity (all-activity-key org-slug) (board-data-key org-slug board-slug))
-          board-data (get-in data data-key)
-          activities-data (if is-all-activity
-                            (:items board-data)
-                            (if (= (:type board-data) "story")
-                              (:stories board-data)
-                              (:entries board-data)))]
-      (first (filter #(= (:uuid %) activity-id) activities-data)))))
+    (let [activity-key (activity-key org-slug board-slug activity-id)]
+      (get-in data activity-key))))
 
 (defn comments-data
   ([]
@@ -274,11 +235,6 @@
     (comments-data org-slug board-slug activity-uuid @app-state))
   ([org-slug board-slug activity-uuid data]
     (get-in data (comments-key org-slug board-slug activity-uuid))))
-
-(defn entries-data
-  ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))
-  ([data] (entries-data data (router/current-org-slug) (router/current-board-slug)))
-  ([data org-slug board-slug] (get-in data (entries-key org-slug board-slug))))
 
 (defn teams-data
   ([] (teams-data @app-state))
@@ -319,8 +275,17 @@
 (defn print-board-data []
   (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
-(defn print-entries-data []
-  (js/console.log (get-in @app-state (entries-key (router/current-org-slug) (router/current-board-slug)))))
+(defn print-activities-data []
+  (js/console.log (get-in @app-state (conj (board-data-key (router/current-org-slug) (router/current-board-slug)) :fixed-items))))
+
+(defn print-activity-data []
+  (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+
+(defn print-reactions-data []
+  (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
+
+(defn print-comments-data []
+  (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
@@ -328,4 +293,7 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
-(set! (.-OCWebPrintEntriesData js/window) print-entries-data)
+(set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
+(set! (.-OCWebPrintActivityData js/window) print-activity-data)
+(set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
+(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
