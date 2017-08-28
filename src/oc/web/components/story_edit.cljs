@@ -187,9 +187,10 @@
                         {:will-mount (fn [s]
                                        (utils/after 100 #(dis/dispatch! [:story-get]))
                                        (let [story-editing @(drv/get-ref s :story-editing)]
-                                         (reset! (::initial-title s) (:title story-editing))
-                                         (reset! (::initial-body s) (:body story-editing))
-                                         (reset! (::activity-uuid s) (:uuid story-editing)))
+                                         (when (:uuid story-editing)
+                                           (reset! (::initial-title s) (:title story-editing))
+                                           (reset! (::initial-body s) (:body story-editing))
+                                           (reset! (::activity-uuid s) (:uuid story-editing))))
                                        s)
                          :did-mount (fn [s]
                                       (utils/after 1000 #(setup-body-editor s))
