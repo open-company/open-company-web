@@ -96,6 +96,10 @@ $h2_top_margin: 20;
 
 @mixin activity-body(){
 
+  &.medium-editor-placeholder-hidden:after {
+    display: none !important;
+  }
+
   &.medium-editor-placeholder:after {
     @include avenir_R();
     font-size: 16px;
