@@ -758,6 +758,14 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:story-share/finish (if success (json->cljs body) nil)]))))))
 
+(defn get-secure-story [org-slug secure-story-id]
+ (when secure-story-id
+    (let [story-link {:href (str "/orgs/" org-slug "/stories/" secure-story-id) :method "GET" :rel ""}]
+      (storage-http (method-for-link story-link) (:href story-link)
+        {:headers (headers-for-link story-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:story-get/finish {:story-uuid (router/current-secure-story-id) :story-data (if success (json->cljs body) {})}]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go
