@@ -69,7 +69,7 @@
           [:div.story-publish-modal-published
             [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}]
             [:div.published-headline (str "Your update has been " (when (:secure-uuid published-data) "posted and ") "shared!")]
-            (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (router/current-org-slug) "/story/" secure-uuid)]
+            (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/secure-story (router/current-org-slug) secure-uuid))]
               [:div.published-url-container.group
                 [:input
                   {:value publish-url
