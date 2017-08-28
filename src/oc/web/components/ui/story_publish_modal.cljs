@@ -17,14 +17,13 @@
     (utils/after 180 close-cb)))
 
 (rum/defcs story-publish-modal < rum/reactive
-                                 (drv/drv :story-editing)
                                  (drv/drv :story-editing-publish)
                                  (rum/local nil ::publish-data)
                                  (rum/local false ::dismiss)
                                  (rum/local false ::first-render-done)
                                  {:will-mount (fn [s]
                                                 (dis/dispatch! [:teams-get])
-                                                (let [story-data @(drv/get-ref s :story-editing)]
+                                                (let [story-data (first (:rum/args s))]
                                                   (reset! (::publish-data s) {:email false
                                                                               :slack false
                                                                               :email-data {:subject (.text (.html (js/$ "<textarea />") (:title story-data)))
@@ -34,7 +33,7 @@
                                   :did-mount (fn [s]
                                                ;; Add no-scroll to the body
                                                (dommy/add-class! (sel1 [:body]) :no-scroll)
-                                               (let [published-data @(drv/get-ref s :story-editing)]
+                                               (let [published-data (first (:rum/args s))]
                                                    (when (:secure-uuid published-data)
                                                       (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
                                                                           (.select story-published-url)))))
@@ -53,9 +52,8 @@
                                                   ;; Remove no-scroll class from the body tag
                                                   (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                                   s)}
-  [s close-cb]
-  (let [story-data (drv/react s :story-editing)
-        publish-data @(::publish-data s)
+  [s story-data close-cb]
+  (let [publish-data @(::publish-data s)
         slack-data (:slack-data publish-data)
         email-data (:email-data publish-data)
         published-data (drv/react s :story-editing-publish)

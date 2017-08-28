@@ -229,7 +229,7 @@
       (when (:media-chart story-data)
         (media-chart-modal :story-editing))
       (when @(::show-publish-modal s)
-        (story-publish-modal #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
+        (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-edit-header.group
         [:div.story-edit-header-left
           [:a.board-name

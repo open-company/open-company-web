@@ -73,7 +73,7 @@
         margin-left (- left-space (when @(::comments-expanded s) offset))]
     [:div.story-container
       (when @(::show-publish-modal s)
-        (story-publish-modal #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
+        (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-header.group
         [:div.story-header-left
           [:a.board-name
