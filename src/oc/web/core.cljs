@@ -223,10 +223,11 @@
   (let [org (:org (:params params))
         storyboard (:storyboard (:params params))
         story (:story (:params params))
+        secure-id (:secure-id (:params params))
         query-params (:query-params params)]
     (pre-routing query-params)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
+    (router/set-route! (vec (remove nil? [org storyboard route (when story story) secure-id])) {:org org :board storyboard :activity story :secure-id secure-id :query-params query-params})
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
@@ -397,6 +398,14 @@
         (team-handler "org-team-settings" target team-management-wrapper params)
         (oc-wall-handler "Please sign in to access this organization." target params)))
 
+    (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
+      (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
+      (story-handler #(om/component (story)) "secure-story" target params))
+
+    (defroute secure-story-slash-route (str (urls/secure-story ":org" ":secure-id") "/") {:as params}
+      (timbre/info "Routing secure-story-slash-route" (str (urls/secure-story ":org" ":secure-id") "/"))
+      (story-handler #(om/component (story)) "secure-story" target params))
+
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
@@ -497,6 +506,9 @@
                                  org-logo-setup-route
                                  org-settings-route
                                  org-team-settings-route
+                                 ; Secure story route
+                                 secure-story-route
+                                 secure-story-slash-route
                                  ;; Boards
                                  boards-list-route
                                  board-route
