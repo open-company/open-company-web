@@ -1174,4 +1174,4 @@
 
 (defmethod dispatcher/action :story-share/finish
   [db [_ story-data]]
-  (assoc db :story-editing-published-url story-data))
+  (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
