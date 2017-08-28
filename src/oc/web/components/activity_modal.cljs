@@ -46,7 +46,6 @@
 (rum/defcs activity-modal < (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
                          (rum/local false ::animate)
-                         (rum/local false ::hovering-card)
                          (rum/local false ::showing-dropdown)
                          (rum/local nil ::column-height)
                          (rum/local nil ::window-resize-listener)
@@ -103,9 +102,7 @@
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       [:div.activity-modal.group
-        {:class (str "activity-modal-" (:uuid activity-data))
-         :on-mouse-enter #(reset! (::hovering-card s) true)
-         :on-mouse-leave #(reset! (::hovering-card s) false)}
+        {:class (str "activity-modal-" (:uuid activity-data))}
         [:button.close-activity-modal.mlb-reset
           {:on-click #(close-clicked s)
            :on-mouse-enter #(reset! (::close-hovering s) true)
@@ -143,27 +140,27 @@
                 [:div.activity-modal-footer.group
                   (reactions activity-data)
                   [:div.activity-modal-footer-right
-                    [:div.more-dropdown.dropdown
-                      [:button.mlb-reset.activity-modal-more.dropdown-toggle
-                        {:type "button"
-                         :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-                         :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
-                         :data-toggle "dropdown"
-                         :aria-haspopup true
-                         :aria-expanded false
-                         :title "More"}]
-                      [:div.dropdown-menu
-                        {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
-                        [:div.triangle]
-                        [:ul.activity-modal-more-menu
-                          [:li
-                            {:on-click (fn [e]
-                                         (utils/event-stop e)
-                                         (dis/dispatch! [:entry-edit activity-data]))}
-                            "Edit"]
-                          [:li
-                            {:on-click #(delete-clicked % activity-data)}
-                            "Delete"]]]]]]]]]
+                    (when-not (:read-only activity-data)
+                      [:div.more-dropdown.dropdown
+                        [:button.mlb-reset.activity-modal-more.dropdown-toggle
+                          {:type "button"
+                           :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
+                           :data-toggle "dropdown"
+                           :aria-haspopup true
+                           :aria-expanded false
+                           :title "More"}]
+                        [:div.dropdown-menu
+                          {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
+                          [:div.triangle]
+                          [:ul.activity-modal-more-menu
+                            [:li
+                              {:on-click (fn [e]
+                                           (utils/event-stop e)
+                                           (dis/dispatch! [:entry-edit activity-data]))}
+                              "Edit"]
+                            [:li
+                              {:on-click #(delete-clicked % activity-data)}
+                              "Delete"]]]])]]]]]
           [:div.activity-right-column
             {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.activity-right-column-content
