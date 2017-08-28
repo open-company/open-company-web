@@ -39,7 +39,7 @@
   (reset! (::show-you-did-it s) (> (+ (.height (js/$ ".story-content")) 68 32 104) (.-innerHeight js/window))))
 
 (rum/defcs story < rum/reactive
-                   (drv/drv :story-data)
+                   (drv/drv :activity-data)
                    (rum/local false ::comments-expanded)
                    (rum/local false ::close-hovering)
                    (rum/local nil ::window-resize)
@@ -62,7 +62,7 @@
                                     (events/unlistenByKey @(::window-resize s))
                                     s)}
   [s]
-  (let [story-data (drv/react s :story-data)
+  (let [story-data (drv/react s :activity-data)
         story-author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))
         left-space (/ (- (.-innerWidth js/window) 840) 2)
         offset (if (> left-space default-comments-total-width)
