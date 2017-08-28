@@ -169,16 +169,7 @@
           {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
            :class (when has-headline "has-headline")}])
       ; Body
-      (let [body-without-tags (-> activity-data :body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)
-            hidden-class (str "activity-body" (:uuid activity-data))
-            $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
-            appened-body (.append (js/$ (.-body js/document)) $body-content)
-            _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
-                                                                            (let [$this (js/$ this)]
-                                                                              (.remove $this))))
-            $hidden-div (js/$ (str "." hidden-class))
-            body-without-preview (.html $hidden-div)
-            _ (.remove $hidden-div)
+      (let [body-without-preview (utils/body-without-preview (:body activity-data))
             activity-url (if (= (:type activity-data) "story")
                            (oc-urls/story (:board-slug activity-data) (:uuid activity-data))
                            (oc-urls/entry (:board-slug activity-data) (:uuid activity-data)))

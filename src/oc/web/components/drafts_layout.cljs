@@ -18,13 +18,13 @@
             (:storyboard-name draft)]]
         [:div.draft-card-title
           {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title draft)) "Untitled Draft" (:title draft))))}]
-        (let [empty-body? (empty? (:body draft))
-              fixed-body (if empty-body? "Say something..." (:body draft))
-              final-body (-> fixed-body utils/strip-img-tags utils/strip-br-tags utils/strip-empty-tags)]
+        (let [fixed-body (utils/body-without-preview (:body draft))
+              empty-body? (empty? (utils/strip-HTML-tags fixed-body))
+              final-body (utils/emojify (if empty-body? "Say something..." fixed-body))]
           [:div
             [:div.draft-card-body
               {:class (utils/class-set {:empty-body empty-body?})
-               :dangerouslySetInnerHTML (utils/emojify final-body)}]
+               :dangerouslySetInnerHTML final-body}]
             (when (> (count fixed-body) 50)
               [:div.bottom-gradient])])
         [:div.draft-card-footer.group

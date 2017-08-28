@@ -747,7 +747,7 @@
 
 (defn strip-empty-tags [text]
   (when text
-    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</p[ ]{0,}>" "ig")]
+    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
 
 (defn disable-scroll []
@@ -1140,3 +1140,16 @@
         is-yesterday? (str "yesterday, " t)
         same-year? partial-d
         :else (str partial-d ", " (.getYear jd))))))
+
+(defn body-without-preview [body]
+  (let [body-without-tags (-> body strip-img-tags strip-br-tags strip-empty-tags)
+        hidden-class (str "activity-body-" (int (rand 10000)))
+        $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
+        appened-body (.append (js/$ (.-body js/document)) $body-content)
+        _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
+                                                                        (let [$this (js/$ this)]
+                                                                          (.remove $this))))
+        $hidden-div (js/$ (str "." hidden-class))
+        body-without-preview (.html $hidden-div)
+        _ (.remove $hidden-div)]
+    body-without-preview))
