@@ -185,6 +185,7 @@
                         ;; Publish dialog
                         (rum/local false ::show-publish-modal)
                         {:will-mount (fn [s]
+                                       (utils/after 100 #(dis/dispatch! [:story-get]))
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (reset! (::initial-title s) (:title story-editing))
                                          (reset! (::initial-body s) (:body story-editing))
@@ -312,5 +313,6 @@
            :on-blur     #(title-on-change s)
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         [:div.story-edit-body.emoji-autocomplete
-          {:dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
+          {:class (utils/class-set {:medium-editor-placeholder-hidden (not (empty? @(::initial-body s)))})
+           :dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
         (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing "<br />")]]))
