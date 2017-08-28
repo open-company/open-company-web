@@ -749,11 +749,12 @@
         (fn [{:keys [success status body]}]
           (dispatcher/dispatch! [:draft-autosave/finish]))))))
 
-(defn share-story [story-data]
+(defn share-story [story-data share-data]
   (when story-data
-    (let [publish-link (utils/link-for (:links story-data) "publish")]
+    (let [publish-link (utils/link-for (:links story-data) (if (= (:status story-data) "draft") "publish" "share"))]
       (storage-http (method-for-link publish-link) (:href publish-link)
-        {:headers (headers-for-link publish-link)}
+        {:headers (headers-for-link publish-link)
+         :json-params (cljs->json share-data)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:story-share/finish (if success (json->cljs body) nil)]))))))
 
