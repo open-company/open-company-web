@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.interactions-summary
   (:require [rum.core :as rum]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -21,11 +22,16 @@
           {:class (str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction))}
           (:count max-reaction)]])))
 
-(rum/defc comments-summary < rum/static
-  [entry-data show-zero-comments?]
-  (let [comments-link (utils/link-for (:links entry-data) "comments")
-        comments-authors (vec (sort-by :created-at (:authors comments-link)))
-        comments-count (or (:count comments-link) 0)]
+(rum/defcs comments-summary < rum/static
+                              rum/reactive
+                              (drv/drv :comments-data)
+  [s entry-data show-zero-comments?]
+  (let [comments-data (drv/react s :comments-data)
+        comments-link (utils/link-for (:links entry-data) "comments")
+        comments-authors (if comments-data
+                           (vec (map :author (sort-by :created-at comments-data)))
+                           (vec (sort-by :created-at (:authors comments-link))))
+        comments-count (if comments-data (count comments-data) (:count comments-link))]
     (when (or show-zero-comments?
               (not (zero? comments-count)))
       [:div.is-comments
