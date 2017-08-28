@@ -27,7 +27,7 @@
                                                 (let [story-data @(drv/get-ref s :story-editing)]
                                                   (reset! (::publish-data s) {:email false
                                                                               :slack false
-                                                                              :email-data {:subject (or (:title story-data) "")
+                                                                              :email-data {:subject (.text (.html (js/$ "<textarea />") (:title story-data)))
                                                                                            :note ""}
                                                                               :slack-data {:note ""}}))
                                                 s)
@@ -64,13 +64,11 @@
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       [:div.story-publish-modal
         (when-not published-data
-          [:div.title (if published? "Share " "Post ") (when-not published? [:span (:title story-data)])])
+          [:div.title (if published? "Share " "Post ") (when-not published? [:span {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])])
         (when (or (not (= (:status story-data) "draft")) (:secure-uuid published-data))
           [:div.story-publish-modal-published
-            (when (:secure-uuid published-data)
-              [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}])
-            (when (:secure-uuid published-data)
-              [:div.published-headline "Your update has been posted and shared!"])
+            [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}]
+            [:div.published-headline (str "Your update has been " (when (:secure-uuid published-data) "posted and ") "shared!")]
             (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (router/current-org-slug) "/story/" secure-uuid)]
               [:div.published-url-container.group
                 [:input
@@ -82,12 +80,12 @@
                               (.select (sel1 :input#story-publish-modal-published-url))
                               (utils/copy-to-clipboard))}
                   "Copy"]])
-            [:div.published-subheadline "You can also provide anyone with this link to your update."]
+            [:div.published-subheadline (str "You can" (when (:secure-uuid published-data) " also") " provide anyone with this link to your update.")]
             (when (:secure-uuid published-data)
               [:button.mlb-reset.mlb-default.done-btn
-                {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug publish-data)))}
+                {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:storyboard-slug published-data)))}
                 "Done"])])
-        (when (:secure-uuid published-data)
+        (when-not (:secure-uuid published-data)
           [:div.story-publish-share
             [:div.access (str "Updates posted in " (:storyboard-name story-data) " "
               (cond
