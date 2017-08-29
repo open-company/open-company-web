@@ -69,8 +69,7 @@
         ; If i have an org slug let's load the org data
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
-          (when-not (utils/in? (:route @router/path) "story")
-            (api/get-org org-data))
+          (api/get-org org-data)
           (router/redirect-404!))
         ; In password reset flow, when the token is exchanged and the user is authed
         ; i reload the entry point to get the list of orgs
@@ -113,7 +112,8 @@
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
-        (api/get-board board-data)
+        (when (not (utils/in? (:route @router/path) "story"))
+          (api/get-board board-data))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
