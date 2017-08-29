@@ -33,20 +33,16 @@
                                   :did-mount (fn [s]
                                                ;; Add no-scroll to the body
                                                (dommy/add-class! (sel1 [:body]) :no-scroll)
-                                               (let [published-data (first (:rum/args s))]
-                                                   (when (:secure-uuid published-data)
-                                                      (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
-                                                                          (.select story-published-url)))))
+                                               (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
+                                                                   (.select story-published-url)))
                                                s)
                                   :after-render (fn [s]
                                                   (when (not @(::first-render-done s))
                                                     (reset! (::first-render-done s) true))
                                                   s)
                                   :did-remount (fn [o s]
-                                                 (let [published-data @(drv/get-ref s :story-editing-publish)]
-                                                   (when (:secure-uuid published-data)
-                                                      (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
-                                                                          (.select story-published-url)))))
+                                                 (utils/after 500 #(when-let [story-published-url (sel1 :input#story-publish-modal-published-url)]
+                                                                     (.select story-published-url)))
                                                  s)
                                   :will-unmount (fn [s]
                                                   ;; Remove no-scroll class from the body tag
@@ -61,7 +57,9 @@
         published-data (drv/react s :story-editing-publish)
         published? (not= (:status story-data) "draft")
         shared? (not (empty? (:secure-uuid published-data)))
-        secure-uuid (if (:secure-uuid published-data) (:secure-uuid published-data) (:secure-uuid story-data))]
+        secure-uuid (if (not (router/current-secure-story-id))
+                      (if (:secure-uuid published-data) (:secure-uuid published-data) (:secure-uuid story-data))
+                      (router/current-secure-story-id))]
     [:div.story-publish-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
