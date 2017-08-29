@@ -14,6 +14,7 @@
                if this item is valid or not
   :on-change is called with the list of items whenever it updates this may include
              invalid items which are currently being typed out
+  :on-intermediate-change is called on every change of the input field
   :match-ptn regex-pattern will be used to extract a 'submitted' value from the input
   :split-ptn regex-pattern will be used to split a string which might contain multiple values
              used to match items in pasted strings
@@ -26,7 +27,8 @@
   :placholder (default ) The placeholder of the input field"
   < (rum/local true ::show-input?) (rum/local [] ::items) (rum/local "" ::input)
   [s {:keys [item-render on-change match-ptn split-ptn tab-index
-             valid-item? container-node input-node placeholder auto-focus]
+             valid-item? container-node input-node placeholder auto-focus
+             on-intermediate-change]
       :or {valid-item? identity
            tab-index 0
            container-node :div
@@ -80,7 +82,10 @@
                         (on-change (swap! *items #(vec (distinct (conj % (.. e -target -value)))))))
                       (when (seq @*items) (reset! *show-input? false))
                       nil)
-         :on-change #(maybe-submit (.. % -target -value))}])]))
+         :on-change #(do
+                       (when (fn? on-intermediate-change)
+                         (on-intermediate-change (.. % -target -value)))
+                       (maybe-submit (.. % -target -value)))}])]))
 
 (rum/defc email-item [v delete! submitted?]
   [:div.email-item.inline-block.mr1.mb1.rounded
