@@ -369,9 +369,9 @@
     with-fixed-stories))
 
 (defn fix-activity [activity collection-slug]
-  (if (= (:type activity) "story")
-    (fix-story activity collection-slug)
-    (fix-entry activity collection-slug nil)))
+  (if (:board-slug activity)
+    (fix-entry activity collection-slug nil)
+    (fix-story activity collection-slug)))
 
 (defn fix-all-activity
   "Fix org data coming from the API."
