@@ -123,12 +123,12 @@
                   (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
-    (when (= (:type activity-data) "story")
+    (when (and (not is-all-activity)
+               (= (:type activity-data) "story"))
       [:div.triangle])
-    (when (and is-all-activity
-               (= (:type activity-data) "entry"))
+    (when is-all-activity
       [:div.activity-card-breadcrumb
-        "In " [:span.bold (:board-name activity-data)]
+        "In " [:span.bold (if (= (:type activity-data) "entry") (:board-name activity-data) (:storyboard-name activity-data))]
         (when (:topic-slug activity-data)
           " → ")
         (when (:topic-slug activity-data)
