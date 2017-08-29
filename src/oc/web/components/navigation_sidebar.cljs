@@ -60,12 +60,17 @@
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
           [:div.boards-icon]
-          [:span "Boards"]]
+          [:span
+            {:title "Boards keep team updates organized."
+             :data-placement "top"
+             :data-toggle "tooltip"
+             :data-container "body"}
+            "Boards"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "entry"])
-             :title "Boards keep team updates organized."
+             :title "Create a new board"
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
@@ -93,12 +98,17 @@
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
           [:div.stories-icon]
-          [:span "Snapshots"]]
+          [:span
+            {:title "Snapshots are great for summary updates."
+             :data-placement "top"
+             :data-toggle "tooltip"
+             :data-container "body"}
+            "Snapshots"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "story"])
-             :title "Snapshots are great for summary updates."
+             :title "Create a new snapshot category."
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
