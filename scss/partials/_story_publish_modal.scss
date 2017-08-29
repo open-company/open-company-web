@@ -90,6 +90,28 @@ div.story-publish-modal-container {
                 margin-top: 8px;
               }
 
+              div.fields.error {
+                position: relative;
+
+                & > input, & > textarea, & > div.email-field, & > div.slack-channels-dropdown input {
+                  border: 1px solid $carrot_orange !important;
+                }
+
+                & > div.slack-channels-dropdown i.fa{
+                  display: none;
+                }
+
+                &:after {
+                  font-family: "Material Design Icons";
+                  position: absolute;
+                  bottom: 8px;
+                  right: 4px;
+                  content: "\f5D6";
+                  font-size: 20px;
+                  color: $carrot_orange;
+                }
+              }
+
               &.note {
                 span.labels {
                   line-height: 1.8;

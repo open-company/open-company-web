@@ -110,25 +110,34 @@
                     [:div.medium-row.group
                       [:span.labels "To"]
                       [:div.fields
+                        {:class (when (:to-error email-data) "error")}
                         (item-input {:item-render email-item
                                      :match-ptn #"(\S+)[,|\s]+"
                                      :split-ptn #"[,|\s]+"
                                      :container-node :div.email-field
                                      :valid-item? utils/valid-email?
+                                     :on-intermediate-change (fn [_]
+                                                               (reset! (::publish-data s)
+                                                                (merge publish-data
+                                                                 {:email-data (merge email-data
+                                                                  {:to-error false})})))
                                      :on-change (fn [v] (reset! (::publish-data s)
                                                           (merge publish-data
                                                            {:email-data (merge email-data
-                                                            {:to v})})))})]]
+                                                            {:to v
+                                                             :to-error false})})))})]]
                     [:div.medium-row.subject.group
                       [:span.labels "Subject"]
                       [:div.fields
+                        {:class (when (:subject-error email-data) "error")}
                         [:input
                           {:type "text"
                            :value (:subject email-data)
                            :on-change #(reset! (::publish-data s)
                                         (merge publish-data
                                          {:email-data (merge email-data
-                                           {:subject (.. % -target -value)})}))}]]]
+                                           {:subject (.. % -target -value)
+                                            :subject-error false})}))}]]]
                     [:div.medium-row.note.group
                       [:span.labels "Add a note (optional)"]
                       [:div.fields
@@ -148,13 +157,20 @@
                     [:div.medium-row.group
                       [:span.labels "To"]
                       [:div.fields
-                        (slack-channels-dropdown {:did-change-cb (fn [team channel]
-                                                                   (reset! (::publish-data s)
-                                                                     (merge publish-data
-                                                                      {:slack-data (merge slack-data
-                                                                       {:channel {:channel-id (:id channel)
-                                                                                  :channel-name (:name channel)
-                                                                                  :slack-org-id (:slack-org-id team)}})})))
+                        {:class (when (:channel-error slack-data) "error")}
+                        (slack-channels-dropdown {:on-change (fn [team channel]
+                                                               (reset! (::publish-data s)
+                                                                (merge publish-data
+                                                                 {:slack-data (merge slack-data
+                                                                  {:channel {:channel-id (:id channel)
+                                                                             :channel-name (:name channel)
+                                                                             :slack-org-id (:slack-org-id team)}
+                                                                   :channel-error false})})))
+                                                  :on-intermediate-change (fn [_]
+                                                                           (reset! (::publish-data s)
+                                                                            (merge publish-data
+                                                                             {:slack-data (merge slack-data
+                                                                              {:channel-error false})})))
                                                   :initial-value ""
                                                   :disabled false})]]
                     [:div.medium-row.note.group
@@ -183,8 +199,15 @@
                                                    :subject (:subject email-data)
                                                    :to (:to email-data)})
                                     share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
-                               (when (or (not published?)
-                                         (not (empty? share-data)))
-                                 (dis/dispatch! [(if published? :story-reshare :story-share) share-data])))
+                                (if (or (and (:email publish-data) (empty? (:to email-data)))
+                                        (and (:slack publish-data) (empty? (:channel email-data))))
+                                  (do
+                                    (when (and (:email publish-data) (empty? (:to email-data)))
+                                      (reset! (::publish-data s) (merge publish-data {:email-data (merge email-data {:to-error true})})))
+                                    (when (and (:slack publish-data) (empty? (:channel slack-data)))
+                                      (reset! (::publish-data s) (merge publish-data {:slack-data (merge slack-data {:channel-error true})}))))
+                                  (when (or (not published?)
+                                            (not (empty? share-data)))
+                                    (dis/dispatch! [(if published? :story-reshare :story-share) share-data]))))
                    :disabled (and published? (not (:slack publish-data)) (not (:email publish-data)))}
                   (if published? "Share" "Post")]]]])]]))
