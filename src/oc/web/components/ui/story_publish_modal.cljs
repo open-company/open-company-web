@@ -87,7 +87,9 @@
             [:div.published-subheadline (str "You can" (when (and (not published?) shared?) " also") " provide anyone with this link to your update.")]
             (when shared?
               [:button.mlb-reset.mlb-default.done-btn
-                {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:storyboard-slug published-data)))}
+                {:on-click #(if published?
+                             (close-clicked s)
+                             (router/nav! (oc-urls/board (router/current-org-slug) (:storyboard-slug published-data))))}
                 "Done"])])
         (when (not shared?)
           [:div.story-publish-share
