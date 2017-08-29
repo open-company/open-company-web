@@ -63,6 +63,9 @@
   (if success
     (let [orgs (:items collection)]
       (cond
+        ; If I have the secure-id i need to load the story only
+        (router/current-secure-story-id)
+        (api/get-secure-story (router/current-org-slug) (router/current-secure-story-id))
         ; If i have an org slug let's load the org data
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
@@ -114,8 +117,6 @@
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
           (router/redirect-404!)))
-      (router/current-secure-story-id)
-      (api/get-secure-story (router/current-org-slug) (router/current-secure-story-id))
       ;; If it's all activity page, loads all activity for the current org
       (utils/in? (:route @router/path) "all-activity")
       (api/get-all-activity org-data)
