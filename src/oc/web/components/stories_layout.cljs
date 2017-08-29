@@ -9,7 +9,7 @@
             [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
 
 (defn get-sorted-stories [storyboard-data]
-  (vec (reverse (sort-by :created-at (vals (:fixed-items storyboard-data))))))
+  (vec (reverse (sort-by :published-at (vals (:fixed-items storyboard-data))))))
 
 (rum/defc stories-layout < rum/static
                            {:after-render (fn [s]
