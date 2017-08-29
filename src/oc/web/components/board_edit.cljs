@@ -121,10 +121,10 @@
                                                     (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
             (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
                                       :initial-value (or (str "#" (:channel-name (:slack-mirror (drv/react s :board-data)))) "")
-                                      :did-change-cb (fn [team channel]
-                                                      (dis/dispatch! [:input [:board-editing :slack-mirror ] {:channel-id (:id channel)
-                                                                                                              :channel-name (:name channel)
-                                                                                                              :slack-org-id (:slack-org-id team)}]))})])
+                                      :on-change (fn [team channel]
+                                                   (dis/dispatch! [:input [:board-editing :slack-mirror ] {:channel-id (:id channel)
+                                                                                                           :channel-name (:name channel)
+                                                                                                           :slack-org-id (:slack-org-id team)}]))})])
         [:div.board-edit-footer
           [:div.board-edit-footer-left
             (when (and (not (empty? (:slug board-editing)))

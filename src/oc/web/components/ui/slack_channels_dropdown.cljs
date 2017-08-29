@@ -48,14 +48,16 @@
                                       :will-unmount (fn [s]
                                                       (events/unlistenByKey @(::window-click s))
                                                       s)}
-  [s {:keys [disabled initial-value did-change-cb] :as data}]
+  [s {:keys [disabled initial-value on-change on-intermediate-change] :as data}]
   (let [slack-teams (drv/react s :team-channels)]
     [:div.slack-channels-dropdown
       {:class (if disabled "disabled" "")}
       [:input.board-edit-slack-channel
         {:value @(::slack-channel s)
          :on-focus (fn [] (utils/after 100 #(reset! (::show-channels-dropdown s) true)))
-         :on-change #(reset! (::slack-channel s) (.. % -target -value))
+         :on-change #(do
+                       (on-intermediate-change (.. % -target -value))
+                       (reset! (::slack-channel s) (.. % -target -value)))
          :disabled disabled
          :placeholder "Select Channel..."}]
       [:i.fa
@@ -82,7 +84,7 @@
                  {:value (:id c)
                   :key (str "slack-chs-dd-" (:slack-org-id t) "-" (:id c))
                   :on-click #(do
-                                (did-change-cb t c)
+                                (on-change t c)
                                 (reset! (::slack-channel s) (str "#" (:name c)))
                                 (reset! (::show-channels-dropdown s) false))}
                   [:span.ch-prefix "#"]
