@@ -69,7 +69,8 @@
         ; If i have an org slug let's load the org data
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
-          (api/get-org org-data)
+          (when-not (utils/in? (:route @router/path) "story")
+            (api/get-org org-data))
           (router/redirect-404!))
         ; In password reset flow, when the token is exchanged and the user is authed
         ; i reload the entry point to get the list of orgs
@@ -338,8 +339,11 @@
 
 (defmethod dispatcher/action :teams-get
   [db [_]]
-  (api/get-teams)
-  (assoc db :teams-data-requested true))
+  (if (utils/link-for (:links (:auth-settings db)) "collection")
+    (do
+      (api/get-teams)
+      (assoc db :teams-data-requested true))
+    db))
 
 (defmethod dispatcher/action :teams-loaded
   [db [_ teams]]
@@ -1184,6 +1188,4 @@
 
 (defmethod dispatcher/action :story-share/finish
   [db [_ story-data]]
-  (if (:story-reshare db)
-    (assoc db :story-reshare-done true)
-    (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data)))))
+  (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
