@@ -65,7 +65,7 @@
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "entry"])
-             :title "Create a new board"
+             :title "Boards keep team updates organized."
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
@@ -93,12 +93,12 @@
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
           [:div.stories-icon]
-          [:span "Series"]]
+          [:span "Snapshots"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "story"])
-             :title "Create a new series"
+             :title "Snapshots are great for summary updates."
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
