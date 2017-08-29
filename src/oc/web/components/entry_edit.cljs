@@ -281,7 +281,7 @@
       [:div.entry-edit-modal-footer.group
         ;; Attachments button
         [:button.mlb-reset.attachment
-          {:title "Add attachment"
+          {:title "Add an attachment"
            :type "button"
            :data-toggle "tooltip"
            :data-container "body"
