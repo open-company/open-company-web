@@ -42,6 +42,10 @@ div.story-publish-modal-container {
       @include avenir_R();
       color: $carrot_gray;
       font-size: 15px;
+
+      span.storyboard-name {
+        @include avenir_H();
+      }
     }
 
     div.story-publish-share {
