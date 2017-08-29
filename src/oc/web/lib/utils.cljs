@@ -1097,14 +1097,29 @@
   (let [time-string (format-time-string js-date)]
     (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
 
-(defn activity-date-tooltip [entry-data]
+(defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
         updated-at (js-date (:updated-at entry-data))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]
     (if (= (:created-at entry-data) (:updated-at entry-data))
-      created-str
-      (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+      (str "Posted on " created-str)
+      (str "Posted on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+
+(defn story-date-tooltip [story-data]
+  (let [published-at (js-date (:published-at story-data))
+        updated-at (js-date (:updated-at story-data))
+        edited-later? (> (.getTime updated-at) (.getTime published-at))
+        published-str (activity-date published-at)
+        updated-str (activity-date updated-at)]
+    (if (not edited-later?)
+      (str "Posted on " published-str)
+      (str "Posted on " published-str "\nEdited on " updated-str " by " (:name (last (:author story-data)))))))
+
+(defn activity-date-tooltip [activity-data]
+  (if (= (:type activity-data) "entry")
+    (entry-date-tooltip activity-data)
+    (story-date-tooltip activity-data)))
 
 (defn copy-to-clipboard []
   (try

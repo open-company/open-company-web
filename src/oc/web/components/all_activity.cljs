@@ -76,8 +76,13 @@
           (recur (vec (rest ens))
                  (first (vec (rest ens)))))))))
 
+(defn compare-activities [act-1 act-2]
+  (let [time-1 (if (= (:type act-1) "entry") (:created-at act-1) (:published-at act-1))
+        time-2 (if (= (:type act-2) "entry") (:created-at act-2) (:published-at act-2))]
+    (compare time-2 time-1)))
+
 (defn get-sorted-items [all-activity-data]
-  (vec (reverse (sort-by :created-at (vals (:fixed-items all-activity-data))))))
+  (vec (sort compare-activities (vals (:fixed-items all-activity-data)))))
 
 (defn highlight-calendar
   "Highlight the current visible entry year and month in the calendar."

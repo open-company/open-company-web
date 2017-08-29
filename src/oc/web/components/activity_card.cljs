@@ -142,12 +142,13 @@
           (user-avatar-image (first (:author activity-data)))
           [:div.name (:name (first (:author activity-data)))]
           [:div.time-since
-            [:time
-              {:date-time (:created-at activity-data)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :title (utils/activity-date-tooltip activity-data)}
-              (utils/time-since (:created-at activity-data))]]]
+            (let [t (if (= (:type activity-data) "story") (:published-at activity-data) (:created-at activity-data))]
+              [:time
+                {:date-time t
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :title (utils/activity-date-tooltip activity-data)}
+                (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
           ; Topic tag button
