@@ -58,6 +58,7 @@
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (and (not (empty? (:slug board-editing)))
                                   (pos? (apply + (map #(-> % :channels count) slack-teams))))
+        title (if (= (:type board-editing) "story") "Snapshot category" "Board")
         label (if (= (:type board-editing) "story") "category" "board")]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
@@ -67,7 +68,7 @@
         [:div.board-edit-header.group
           (user-avatar-image current-user-data)
           (if new-board?
-            [:div.title (str "Creating a new " (string/capital label))]
+            [:div.title (str "Creating a new " title)]
             [:div.title "Editing " [:span.board-name (:name board-editing)]])]
         [:div.board-edit-divider]
         [:div.board-edit-body
