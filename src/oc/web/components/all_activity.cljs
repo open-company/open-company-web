@@ -275,7 +275,7 @@
           (all-caught-up))]
       [:div.all-activity-nav
         [:div.all-activity-nav-inner
-          (for [year calendar-data
+          (for [year (vec (reverse (sort-by :year calendar-data)))
                 :let [selected (= @(::selected-year s) (:year year))]]
             [:div.group
               {:key (str "calendar-" (:year year))}
@@ -292,7 +292,7 @@
                 (when (= @(::retrieving-calendar s) (str (:year year)))
                   [:span.retrieving "Retrieving..."])]
               (when selected
-                (for [month (:months year)]
+                (for [month (vec (reverse (sort-by :month (:months year))))]
                   [:div.nav-month
                     {:key (str "year-" (:year month) "-month-" (:month month))
                      :class (utils/class-set {:selected (and (= @(::selected-year s) (:year month))
