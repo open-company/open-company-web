@@ -751,10 +751,13 @@
 
 (defn share-story [story-data share-data]
   (when story-data
-    (let [publish-link (utils/link-for (:links story-data) (if (= (:status story-data) "draft") "publish" "share"))]
+    (let [publish-link (utils/link-for (:links story-data) (if (= (:status story-data) "draft") "publish" "share"))
+          headers {:headers (headers-for-link publish-link)}
+          with-json-params (if (pos? (count share-data))
+                             (assoc headers :json-params (cljs->json share-data))
+                             headers)]
       (storage-http (method-for-link publish-link) (:href publish-link)
-        {:headers (headers-for-link publish-link)
-         :json-params (cljs->json share-data)}
+        with-json-params
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:story-share/finish (if success (json->cljs body) nil)]))))))
 
