@@ -26,7 +26,7 @@
                                                 (let [story-data (first (:rum/args s))]
                                                   (reset! (::publish-data s) {:email false
                                                                               :slack false
-                                                                              :email-data {:subject (.text (.html (js/$ "<textarea />") (:title story-data)))
+                                                                              :email-data {:subject (str (:org-name story-data) " " (:storyboard-name story-data) ": " (.text (.html (js/$ "<textarea />") (:title story-data))))
                                                                                            :note ""}
                                                                               :slack-data {:note ""}}))
                                                 s)
