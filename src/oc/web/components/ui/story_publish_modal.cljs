@@ -13,7 +13,7 @@
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
-  (let [close-cb (nth (:rum/args s) 0)]
+  (let [close-cb (nth (:rum/args s) 1)]
     (utils/after 180 close-cb)))
 
 (rum/defcs story-publish-modal < rum/reactive
