@@ -202,7 +202,7 @@
                                                    :to (:to email-data)})
                                     share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
                                 (if (or (and (:email publish-data) (empty? (:to email-data)))
-                                        (and (:slack publish-data) (empty? (:channel email-data))))
+                                        (and (:slack publish-data) (empty? (:channel slack-data))))
                                   (do
                                     (when (and (:email publish-data) (empty? (:to email-data)))
                                       (reset! (::publish-data s) (merge publish-data {:email-data (merge email-data {:to-error true})})))
