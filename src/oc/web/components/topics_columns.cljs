@@ -140,7 +140,7 @@
               (cond
                 (and is-dashboard
                      is-all-activity)
-                (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (map :uuid (:items all-activity-data)))))
+                (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (keys (:fixed-items all-activity-data)))))
                 (and is-dashboard
                      (not is-mobile-size?)
                      (not current-activity-id)
