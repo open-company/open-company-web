@@ -13,6 +13,11 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
+(defn get-activity-date [activity]
+  (if (= (:type activity) "entry")
+    (:created-at activity)
+    (:published-at activity)))
+
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 5)
 (def card-avg-height 600)
@@ -24,7 +29,7 @@
    check if the entry was created on the date or before."
   [entry date-str]
   (let [js-date (utils/js-date date-str)
-        entry-date (utils/js-date (:created-at entry))]
+        entry-date (utils/js-date (get-activity-date entry))]
     (>= (.getTime entry-date) (.getTime js-date))))
 
 (defn days-for-month [y m]
@@ -77,8 +82,8 @@
                  (first (vec (rest ens)))))))))
 
 (defn compare-activities [act-1 act-2]
-  (let [time-1 (if (= (:type act-1) "entry") (:created-at act-1) (:published-at act-1))
-        time-2 (if (= (:type act-2) "entry") (:created-at act-2) (:published-at act-2))]
+  (let [time-1 (get-activity-date act-1)
+        time-2 (get-activity-date act-2)]
     (compare time-2 time-1)))
 
 (defn get-sorted-items [all-activity-data]
@@ -92,7 +97,7 @@
              (not @(::scroll-to-entry s)))
     (let [items-batch (get-sorted-items (first (:rum/args s)))
           first-visible-entry (get-first-visible-entry items-batch)
-          js-date (utils/js-date (:created-at first-visible-entry))]
+          js-date (utils/js-date (get-activity-date first-visible-entry))]
       (reset! (::selected-year s) (.getFullYear js-date))
       (reset! (::selected-month s) (inc (.getMonth js-date))))))
 
@@ -156,7 +161,7 @@
                                               direction (:direction all-activity-data)
                                               next-link (utils/link-for (:links all-activity-data) "previous")
                                               prev-link (utils/link-for (:links all-activity-data) "next")
-                                              first-entry-date (utils/js-date (:created-at (first sorted-items)))
+                                              first-entry-date (utils/js-date (get-activity-date (first sorted-items)))
                                               first-available-entry (when (and year month) (get-first-available-entry (get-sorted-items all-activity-data) year month))]
                                           (if (and year month)
                                             ;; Loading from calendar since we have year and month from the click action
@@ -170,7 +175,7 @@
                                               (let [saved-items (:saved-items all-activity-data)
                                                     last-new-entry-idx (dec (- (count sorted-items) saved-items))
                                                     scroll-to-entry (get sorted-items last-new-entry-idx)
-                                                    created-date (utils/js-date (:created-at scroll-to-entry))
+                                                    created-date (utils/js-date (get-activity-date scroll-to-entry))
                                                     to-year (.getFullYear created-date)
                                                     to-month (inc (int (.getMonth created-date)))]
                                                 (reset! (::selected-year s) to-year)
@@ -182,7 +187,7 @@
                                                 ; Load more :down scroll, needs to set the calendar
                                                 (let [last-old-entry-idx (dec (:saved-items all-activity-data))
                                                       last-old-entry (get sorted-items last-old-entry-idx)
-                                                      created-date (utils/js-date (:created-at last-old-entry))
+                                                      created-date (utils/js-date (get-activity-date last-old-entry))
                                                       to-year (.getFullYear created-date)
                                                       to-month (inc (int (.getMonth created-date)))]
                                                   (reset! (::selected-year s) to-year)
