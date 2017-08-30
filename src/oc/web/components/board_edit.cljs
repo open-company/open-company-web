@@ -32,6 +32,11 @@
                                       (dis/dispatch! [:teams-get])
                                       (let [board-data @(drv/get-ref s :board-editing)]
                                         (reset! (::slack-enabled s) (:slack-mirror board-data)))
+                                      (when (and (not @(drv/get-ref s :team-channels))
+                                                 (not @(::team-channels-requested s)))
+                                        (when-let [team-data @(drv/get-ref s :team-data)]
+                                          (reset! (::team-channels-requested s) true)
+                                          (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                       s)
                          :did-mount (fn [s]
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -46,6 +51,11 @@
                                         ;; Dismiss animated since the board-editing was removed
                                         (when (nil? @(drv/get-ref s :board-editing))
                                           (close-clicked s))
+                                        (when (and (not @(drv/get-ref s :team-channels))
+                                                   (not @(::team-channels-requested s)))
+                                          (when-let [team-data @(drv/get-ref s :team-data)]
+                                            (reset! (::team-channels-requested s) true)
+                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                         s)
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag

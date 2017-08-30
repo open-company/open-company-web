@@ -20,6 +20,7 @@
                                      (rum/local nil ::team-channels-requested)
                                      (rum/local nil ::window-click)
                                      (rum/local "" ::slack-channel)
+                                     (rum/local false ::typing)
                                      rum/reactive
                                      (drv/drv :team-data)
                                      (drv/drv :team-channels)
@@ -54,9 +55,11 @@
       {:class (if disabled "disabled" "")}
       [:input.board-edit-slack-channel
         {:value @(::slack-channel s)
-         :on-focus (fn [] (utils/after 100 #(reset! (::show-channels-dropdown s) true)))
+         :on-focus (fn [] (utils/after 100 #(do (reset! (::typing s) false) (reset! (::show-channels-dropdown s) true))))
          :on-change #(do
-                       (on-intermediate-change (.. % -target -value))
+                       (reset! (::typing s) true)
+                       (when (fn? on-intermediate-change)
+                         (on-intermediate-change (.. % -target -value)))
                        (reset! (::slack-channel s) (.. % -target -value)))
          :disabled disabled
          :placeholder "Select Channel..."}]
@@ -64,12 +67,13 @@
         {:class (utils/class-set {:fa-angle-down (not @(::show-channels-dropdown s))
                                   :fa-angle-up @(::show-channels-dropdown s)})
          :on-click #(do
+                      (reset! (::typing s) false)
                       (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
                       (utils/event-stop %))}]
       (when @(::show-channels-dropdown s)
         [:div.slack-channels-dropdown-list
           (for [t slack-teams
-                :let [chs (if @(::slack-channel s)
+                :let [chs (if (and @(::typing s) @(::slack-channel s))
                             (filter-team-channels (:channels t) @(::slack-channel s))
                             (:channels t))
                       show-slack-team-name (and (> (count slack-teams) 1)
@@ -86,6 +90,7 @@
                   :on-click #(do
                                 (on-change t c)
                                 (reset! (::slack-channel s) (str "#" (:name c)))
-                                (reset! (::show-channels-dropdown s) false))}
+                                (reset! (::show-channels-dropdown s) false)
+                                (reset! (::typing s) false))}
                   [:span.ch-prefix "#"]
                   [:span.ch (:name c)]])])])]))
