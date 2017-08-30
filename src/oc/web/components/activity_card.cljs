@@ -119,7 +119,7 @@
                               :all-activity-card is-all-activity
                               :story-card (= (:type activity-data) "story")})
      :on-click #(if (= (:type activity-data) "story")
-                  (router/nav! (oc-urls/story (:uuid activity-data)))
+                  (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
                   (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
