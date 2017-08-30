@@ -20,10 +20,10 @@
   (vec (conj (org-key org-slug) :org-data)))
 
 (defn all-activity-key [org-slug]
-  [(keyword org-slug) :all-activity])
+  (vec (concat (org-key org-slug) [:boards :all-activity])))
 
 (defn calendar-key [org-slug]
-  [(keyword org-slug) :calendar])
+  (vec (conj (org-key org-slug) :calendar)))
 
 (defn board-key [org-slug board-slug]
   (let [board-key (if board-slug (keyword board-slug) :all-activity)]
@@ -33,7 +33,10 @@
   (conj (board-key org-slug board-slug) :board-data))
 
 (defn activity-key [org-slug board-slug activity-uuid]
-  (vec (concat (board-data-key org-slug board-slug) [:fixed-items activity-uuid])))
+  (let [board-key (if (= board-slug :all-activity)
+                    (all-activity-key org-slug)
+                    (board-data-key org-slug board-slug))]
+    (vec (concat board-key [:fixed-items activity-uuid]))))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-stories secure-id])))
