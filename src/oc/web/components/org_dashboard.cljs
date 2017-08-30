@@ -80,7 +80,9 @@
                                            :main-scroll true
                                            :no-scroll (router/current-activity-id)})}
           (when (router/current-activity-id)
-            (activity-modal (dis/activity-data)))
+            (let [from-aa (:from-all-activity @router/path)
+                  board-slug (if from-aa :all-activity (router/current-board-slug))]
+              (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
           (when (:entry-editing data)
             (entry-edit))
           (when (:board-editing data)
