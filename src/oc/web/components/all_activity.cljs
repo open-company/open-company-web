@@ -69,10 +69,12 @@
 (defn get-first-visible-entry
   "Given the list of items rendered, get the first visible entry counting the page scroll."
   [items]
+  (logging/dbg "get-first-visible-entry")
   (when (pos? (count items))
     (loop [ens items
            en (first items)]
       (let [el (sel1 [(str "div.activity-card-" (:uuid en))])]
+        (logging/dbg "   -" (utils/time-since (get-activity-date en)) "-visible?" (when el (element-is-visible el)) "-" (get-activity-date en))
         ;; Do not loop if there are no more items or if found the first visible entry
         (if (or (zero? (count ens))
                 (and el
@@ -92,12 +94,14 @@
 (defn highlight-calendar
   "Highlight the current visible entry year and month in the calendar."
   [s]
+  (logging/dbg "highlight-calendar")
   ;; When we are not retrieving calendar and not waiting to scroll to an entry
   (when (and (not @(::retrieving-calendar s))
              (not @(::scroll-to-entry s)))
     (let [items-batch (get-sorted-items (first (:rum/args s)))
           first-visible-entry (get-first-visible-entry items-batch)
           js-date (utils/js-date (get-activity-date first-visible-entry))]
+      (logging/dbg "highlight-calendar/first-visible entry" first-visible-entry)
       (reset! (::selected-year s) (.getFullYear js-date))
       (reset! (::selected-month s) (inc (.getMonth js-date))))))
 
@@ -257,6 +261,7 @@
                                             (events/unlistenByKey @(::scroll-listener s)))
                                            s)}
   [s all-activity-data]
+  (logging/dbg "all-activity/render" @(::selected-year s) @(::selected-month s))
   (let [calendar-data (drv/react s :calendar)
         items (get-sorted-items all-activity-data)]
     [:div.all-activity.group
