@@ -48,7 +48,7 @@ div.drafts-layout {
           color: $oc_gray_7;
           outline: none;
           cursor: text;
-          padding: 16px 16px 0px 16px;
+          padding: 16px;
           position: relative;
 
           * {
@@ -64,7 +64,7 @@ div.drafts-layout {
 
         div.bottom-gradient {
           position: absolute;
-          bottom: 48px;
+          bottom: 64px;
           left: 0px;
           right: 0px;
           height: 40px;
