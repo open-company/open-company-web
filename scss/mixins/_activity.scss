@@ -169,9 +169,8 @@ $h2_top_margin: 20;
   a.media-attachment {
     display: inline-block;
     width: 100%;
-    height: 43px;
-    padding: 0.5rem 0.5rem 0.5rem 0;
-    margin-bottom: #{$bottom_margin}px;
+    height: 26px;
+    padding: 0;
 
     & > * {
       opacity: 0.8;
