@@ -1090,7 +1090,7 @@
 (defn format-time-string [js-date]
   (let [r (js/RegExp "am|pm" "i")
         h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))]
-    (if-not h12
+    (if h12
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
