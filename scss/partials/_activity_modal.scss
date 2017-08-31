@@ -60,7 +60,7 @@ div.activity-modal-container {
           padding: 24px 16px 30px 32px;
           max-height: calc(100vh - 150px - 48px);
           overflow-x: hidden;
-          overflow-y: scroll;
+          overflow-y: auto;
 
           div.activity-modal-head{
             div.activity-modal-head-left {
@@ -208,7 +208,8 @@ div.activity-modal-container {
         div.activity-right-column-content {
           padding: 14px 32px 24px 16px;
           max-height: calc(100vh - 150px - 48px);
-          overflow: scroll;
+          overflow-x: hidden;
+          overflow-y: auto;
           position: absolute;
           bottom: 0px;
           width: 100%;

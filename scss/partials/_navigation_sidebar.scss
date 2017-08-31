@@ -3,7 +3,8 @@ div.left-navigation-sidebar {
   position: fixed;
   margin-right: 20px;
   max-height: calc(100vh - 122px);
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-bottom: 20px;
 
   a.all-activity {

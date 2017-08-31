@@ -123,7 +123,8 @@ div.entry-edit-modal-container {
               margin: 0;
               padding: 0;
               padding-right: 16px;
-              overflow: scroll;
+              overflow-x: hidden;
+              overflow-y: auto;
               max-height: 250px;
 
               li.selectable {
