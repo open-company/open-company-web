@@ -13,6 +13,8 @@
             [goog.events.EventType :as EventType]
             [clojure.contrib.humanize :refer (filesize)]))
 
+(def separator "<br /></p>")
+
 ;; Photo
 
 (defn media-photo-add-error
@@ -33,8 +35,7 @@
                (contains? image :height)
                (contains? image :thumbnail))
       (.restoreSelection js/rangy @(::last-selection s))
-      (let [separator (nth (:rum/args s) 6)
-            image-html (str "<img "
+      (let [image-html (str "<img "
                              "class=\"carrot-no-preview\" "
                              "src=\"" (:url image) "\" "
                              "data-media-type=\"image\" "
@@ -73,26 +74,25 @@
     (:thumbnail video)))
 
 (defn get-video-html [s video]
-  (let [separator (nth (:rum/args s) 6)]
-    (str "<iframe "
-           "data-thumbnail=\"" (get-video-thumbnail video) "\" "
-           "data-media-type=\"video\" "
-           "data-video-type=\"" (name (:type video)) "\" "
-           "data-video-id=\"" (:id video) "\" "
-           "class=\"carrot-no-preview\" "
-           "width=\"560\" "
-           "height=\"315\" "
-           (cond
-             (= (:type video) :youtube)
-             (str "src=\"https://www.youtube.com/embed/" (:id video) "\" ")
-             (= (:type video) :vimeo)
-             (str "src=\"https://player.vimeo.com/video/" (:id video) "\" "))
-           "frameborder=\"0\" "
-           "webkitallowfullscreen "
-           "mozallowfullscreen "
-           "allowfullscreen>"
-         "</iframe>"
-         separator)))
+  (str "<iframe "
+         "data-thumbnail=\"" (get-video-thumbnail video) "\" "
+         "data-media-type=\"video\" "
+         "data-video-type=\"" (name (:type video)) "\" "
+         "data-video-id=\"" (:id video) "\" "
+         "class=\"carrot-no-preview\" "
+         "width=\"560\" "
+         "height=\"315\" "
+         (cond
+           (= (:type video) :youtube)
+           (str "src=\"https://www.youtube.com/embed/" (:id video) "\" ")
+           (= (:type video) :vimeo)
+           (str "src=\"https://player.vimeo.com/video/" (:id video) "\" "))
+         "frameborder=\"0\" "
+         "webkitallowfullscreen "
+         "mozallowfullscreen "
+         "allowfullscreen>"
+       "</iframe>"
+       separator))
 
 (defn media-video-add [s video-data]
   (let [video-html (get-video-html s video-data)
@@ -117,8 +117,7 @@
        parsed-uri (guri/parse chart-url)
        oid (.get (.getQueryData parsed-uri) "oid")
        splitted-path (clojure.string/split (.getPath parsed-uri) #"/")
-       chart-id (nth splitted-path (- (count splitted-path) 2))
-       separator (nth (:rum/args s) 6)]
+       chart-id (nth splitted-path (- (count splitted-path) 2))]
   (str "<iframe "
         "data-thumbnail=\"" (get-chart-thumbnail chart-id oid) "\" "
         "data-media-type=\"chart\" "
@@ -148,8 +147,7 @@
 
 (defn get-attachment-html [s attachment]
   (let [prefix (str (utils/date-string (utils/js-date) [:year]) " - ")
-        subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))
-        separator (nth (:rum/args s) 6)]
+        subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))]
     (str "<a "
           "target=\"_blank\" "
           "contentEditable=\"false\" "
@@ -208,10 +206,9 @@
 ;; Divider line
 
 (defn get-divider-line-html [s]
-  (let [separator (nth (:rum/args s) 6)]
-    (str "<p><hr "
-          "class=\"carrot-no-preview media-divider-line\" "
-          "contentEditable=\"false\" /></p>" separator)))
+  (str "<p><hr "
+        "class=\"carrot-no-preview media-divider-line\" "
+        "contentEditable=\"false\" /></p>" separator))
 
 (defn media-divider-line-add [s]
   (let [divider-line-html (get-divider-line-html s)
@@ -287,7 +284,7 @@
                                            (events/unlistenByKey @(::window-click-listener s))
                                            (events/unlistenByKey @(::document-focus-in s))
                                            s)}
-  [s media-config media-picker-id body-did-change-cb body-editor-sel data-editing dispatch-input-key separator]
+  [s media-config media-picker-id body-did-change-cb body-editor-sel data-editing dispatch-input-key]
   [:div.media-picker
     {:id media-picker-id
      :style {:display "none"}}

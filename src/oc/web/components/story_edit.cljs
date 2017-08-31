@@ -316,4 +316,4 @@
         [:div.story-edit-body.emoji-autocomplete
           {:class (utils/class-set {:medium-editor-placeholder-hidden (not (empty? @(::initial-body s)))})
            :dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
-        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing "<br />")]]))
+        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]]))
