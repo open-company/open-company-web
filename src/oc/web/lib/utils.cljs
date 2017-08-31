@@ -344,6 +344,7 @@
   (-> story-body
     (assoc :read-only (readonly-story? (:links story-body)))
     (assoc :type "story")
+    (assoc :related (when (:related story-body) (map #(fix-story % (:storyboard-slug %)) (:related story-body))))
     (assoc :board-slug storyboard-slug)))
 
 (defn fix-board
