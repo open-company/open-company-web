@@ -16,7 +16,9 @@
         [:div.empty-board-headline
           (str "You don’t have any " (if storyboard? "snapshots" "updates") " in " (:name board-data) " yet. ")
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit {}])}
+            {:on-click #(if storyboard?
+                          (dis/dispatch! [:story-create board-data])
+                          (dis/dispatch! [:entry-edit {}]))}
             "Add one?"]])
       [:div
         {:class (utils/class-set {:empty-board-image (not storyboard?)
