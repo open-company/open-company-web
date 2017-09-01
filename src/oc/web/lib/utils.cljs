@@ -918,9 +918,6 @@
                        with-data)]
     with-metrics))
 
-(def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
-(def before-removing-entry-message "Are you sure you want to delete this entry?")
-
 (defn sum-revenues [finances-data]
   (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
         filtered-revenues (filter number? cleaned-revenues)]
