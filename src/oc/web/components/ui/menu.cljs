@@ -100,20 +100,19 @@
           [:a {:href (oc-urls/org-settings-team) :on-click um-click} "Manage Members"]])
       (when (and (router/current-org-slug)
                  is-admin?)
-        [:div.oc-menu-item
+        [:div.oc-menu-item.divider-item
           [:a {:href (oc-urls/org-settings-invite) :on-click invite-click} "Invite People"]])
-      (when (and (router/current-org-slug)
-                 is-admin?)
-        [:div.oc-menu-item.divider-item
-          [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
-      ;; Temp commenting this out since we need API support to know how many companies the user has
-      (when (and (jwt/jwt)
-                 (or is-admin?
-                     is-author?))
-        [:div.oc-menu-item.divider-item
-          [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
+      ; (when (and (router/current-org-slug)
+      ;            is-admin?)
+      ;   [:div.oc-menu-item.divider-item
+      ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
+      ; (when (and (jwt/jwt)
+      ;            (or is-admin?
+      ;                is-author?))
+      ;   [:div.oc-menu-item.divider-item
+      ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
       (when (jwt/jwt)
-        [:div.oc-menu-item
+        [:div.oc-menu-item.divider-item
           [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
       (if (jwt/jwt)
         [:div.oc-menu-item
