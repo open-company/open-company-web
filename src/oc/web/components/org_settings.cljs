@@ -61,6 +61,8 @@
                       (utils/in? (:route @router/path) "org-settings-invite") :org-settings-invite
                       :else :org-settings)
         org-data (drv/react s :org-editing)]
+    (when (:read-only org-data)
+      (utils/after 100 #(router/nav! (oc-urls/org (:slug org-data)))))
     [:div.org-settings.fullscreen-page
       (if org-data
         [:div
