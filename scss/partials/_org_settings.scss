@@ -163,7 +163,8 @@ div.org-settings-tabs {
       width: auto;
       height: 24px;
       margin: 0;
-      padding: 0 2px 0 2px;
+      padding: 0;
+      // padding: 0 2px 0 2px;
       cursor: pointer;
       @include avenir_M();
       font-size: 16px;
@@ -176,19 +177,23 @@ div.org-settings-tabs {
       }
     }
 
-    &:first-child {
-      a.org-settings-tab-link {
-        padding: 0 0 0 1px;
-      }
+    // &:first-child {
+    //   a.org-settings-tab-link {
+    //     padding: 0 0 0 1px;
+    //   }
+    // }
+
+    // &:last-child {
+    //   a.org-settings-tab-link {
+    //     padding: 0 1px 0 0;
+    //   }
+    // }
+
+    &:hover {
+      border-bottom: 4px solid $carrot_light_gray;
     }
 
-    &:last-child {
-      a.org-settings-tab-link {
-        padding: 0 1px 0 0;
-      }
-    }
-
-    &.active, &:hover {
+    &.active {
       border-bottom: 4px solid $carrot_text_blue;
 
       a.org-settings-tab-link {
@@ -196,7 +201,7 @@ div.org-settings-tabs {
         @include avenir_H();
         font-size: 16px;
         color: $carrot_text_blue;
-      }      
+      }
     }
   }
 }
