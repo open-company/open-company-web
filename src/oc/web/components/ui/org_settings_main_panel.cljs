@@ -26,7 +26,9 @@
 (rum/defc org-settings-main-panel
   < rum/static
     {:after-render (fn [s]
-                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                     (doto (js/$ "[data-toggle=\"tooltip\"]")
+                        (.tooltip "fixTitle")
+                        (.tooltip "hide"))
                      s)}
   [org-data]
   [:div.org-settings-panel
@@ -71,11 +73,14 @@
            :data-position "top"
            :class (when (empty? (:logo-url org-data)) "no-logo")}
           [:img.org-logo
-            {:src (if (not (empty? (:logo-url org-data)))
-                    (:logo-url org-data)
-                    (utils/cdn "/img/ML/carrot_grey.svg"))}]]
+            {:src (if (empty? (:logo-url org-data))
+                    (utils/cdn "/img/ML/carrot_grey.svg")
+                    (:logo-url org-data))}]]
         [:div.org-logo-label
-          [:div.cta "Change logo"]
+          [:div.cta
+            (if (empty? (:logo-url org-data))
+              "Add a logo"
+              "Change logo")]
           [:div.description "A 160x160 transparent PNG works best"]]]]
     ;; Save and cancel buttons
     [:div.org-settings-footer.group
