@@ -24,7 +24,6 @@
             [oc.web.components.home :refer (home)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.list-orgs :refer (list-orgs)]
-            [oc.web.components.team-management :refer (team-management-wrapper)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
@@ -36,7 +35,6 @@
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.org-logo-setup :refer (org-logo-setup)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
@@ -364,39 +362,29 @@
         (drv-root #(om/component (user-profile)) target)
         (oc-wall-handler "Please sign in to access this page." target params)))
 
-    (defroute org-logo-setup-route (urls/org-logo-setup ":org") {:as params}
-      (timbre/info "Routing org-logo-setup-route" (urls/org-logo-setup ":org"))
-      (let [org (:org (:params params))
-            query-params (:query-params params)]
-        (pre-routing query-params)
-        ;; save the route
-        (router/set-route! [org "org-settings" "logo"] {:org org :query-params query-params})
-        ;; load org data
-        (post-routing)
-        ;; do we have the company data already?
-        (when-not (dis/org-data)
-          (swap! dis/app-state assoc :loading true))
-      (if (jwt/jwt)
-        (drv-root org-logo-setup target)
-        (oc-wall-handler "Please sign in to access this organization." target params))))
-
     (defroute org-settings-route (urls/org-settings ":org") {:as params}
       (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
-      ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no entries and the user is looking at company profile
-      (swap! dis/app-state assoc :force-remove-loading true)
-      (if (jwt/jwt)
-        (org-handler "org-settings" target org-settings params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+      (org-handler "org-settings" target #(om/component (org-settings)) params))
 
-    (defroute org-team-settings-route (urls/org-team-settings ":org") {:as params}
-      (timbre/info "Routing org-team-settings-route" (urls/org-team-settings ":org"))
-      ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no entries and the user is looking at company profile
-      (swap! dis/app-state assoc :force-remove-loading true)
-      (if (jwt/jwt)
-        (team-handler "org-team-settings" target team-management-wrapper params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+    (defroute org-settings-slash-route (str (urls/org-settings ":org") "/") {:as params}
+      (timbre/info "Routing org-settings-slash-route" (str (urls/org-settings ":org") "/"))
+      (org-handler "org-settings" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-team-route (urls/org-settings-team ":org") {:as params}
+      (timbre/info "Routing org-settings-team-route" (urls/org-settings-team ":org"))
+      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-team-slash-route (str (urls/org-settings-team ":org") "/") {:as params}
+      (timbre/info "Routing org-settings-team-slash-route" (str (urls/org-settings-team ":org") "/"))
+      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-invite-route (urls/org-settings-invite ":org") {:as params}
+      (timbre/info "Routing org-settings-invite-route" (urls/org-settings-invite ":org"))
+      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-invite-slash-route (str (urls/org-settings-invite ":org") "/") {:as params}
+      (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
+      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
 
     (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
@@ -427,8 +415,6 @@
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
-      ; add force-remove-loading to avoid inifinte spinner
-      (swap! dis/app-state assoc :force-remove-loading true)
       (if (jwt/jwt)
         (board-handler "board-settings" target board-settings params)
         (oc-wall-handler "Please sign in to access this board." target params)))
@@ -503,9 +489,12 @@
                                  org-slash-route
                                  all-activity-route
                                  all-activity-slash-route
-                                 org-logo-setup-route
                                  org-settings-route
-                                 org-team-settings-route
+                                 org-settings-slash-route
+                                 org-settings-team-route
+                                 org-settings-team-slash-route
+                                 org-settings-invite-route
+                                 org-settings-invite-slash-route
                                  ; Secure story route
                                  secure-story-route
                                  secure-story-slash-route
