@@ -82,7 +82,7 @@
             ; First name
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "FIRST NAME"]
+                "First Name"]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -91,7 +91,7 @@
             ; Current password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "CURRENT PASSWORD"]
+                "Current Password"]
               [:div.user-profile-field
                 [:input
                   {:type "password"
@@ -100,7 +100,7 @@
             ; Email
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "EMAIL"]
+                "Email"]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -111,7 +111,7 @@
             ; Last name
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "LAST NAME"]
+                "Last Name"]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -120,7 +120,7 @@
             ; New password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "NEW PASSWORD"]
+                "New Password"]
               [:div.user-profile-field
                 [:input
                   {:type "password"
@@ -129,7 +129,7 @@
             ; Time zone
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "TIME ZONE"]
+                "Time Zone"]
               [:div.user-profile-field
                 [:select
                   {:value (:timezone current-user-data)
@@ -153,7 +153,7 @@
           ; Digest frequency
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "DIGEST FREQUENCY " [:i.fa.fa-info-circle]]
+              "Digest Frequency " [:i.fa.fa-info-circle]]
             [:div.user-profile-field.digest-frequency-field.digest-frequency
               [:select
                 {:value (:digest-frequency current-user-data)
