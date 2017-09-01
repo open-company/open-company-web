@@ -68,8 +68,8 @@
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (and (not (empty? (:slug board-editing)))
                                   (pos? (apply + (map #(-> % :channels count) slack-teams))))
-        title (if (= (:type board-editing) "story") "Snapshot category" "Board")
-        label (if (= (:type board-editing) "story") "category" "board")]
+        title (if (= (:type board-editing) "story") "Journal" "Board")
+        label (if (= (:type board-editing) "story") "journal" "board")]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}

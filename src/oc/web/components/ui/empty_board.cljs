@@ -12,9 +12,9 @@
     [:div.empty-board.group
       (if (:read-only board-data)
         [:div.empty-board-headline
-          (str "There aren't " (if storyboard? "snapshots" "updates") " in " (:name board-data) " yet. ")]
+          (str "There aren't " (if storyboard? "entries" "updates") " in " (:name board-data) " yet. ")]
         [:div.empty-board-headline
-          (str "You don’t have any " (if storyboard? "snapshots" "updates") " in " (:name board-data) " yet. ")
+          (str "You don’t have any " (if storyboard? "entries" "updates") " in " (:name board-data) " yet. ")
           [:button.mlb-reset
             {:on-click #(if storyboard?
                           (dis/dispatch! [:story-create board-data])

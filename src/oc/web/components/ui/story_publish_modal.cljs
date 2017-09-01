@@ -72,7 +72,7 @@
             (when shared?
               [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}])
             (when shared?
-              [:div.published-headline (str "Your snapshot has been " (when (not published?) "posted and ") "shared!")])
+              [:div.published-headline (str "Your journal has been " (when (not published?) "posted and ") "shared!")])
             (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/secure-story (router/current-org-slug) secure-uuid))]
               [:div.published-url-container.group
                 [:input
@@ -95,7 +95,7 @@
           [:div.story-publish-share
             (when (not published?)
               [:div.access
-                "Snapshots posted in "
+                "Journals posted in "
                 [:span.storyboard-name (:storyboard-name story-data)]
                 (cond
                   (= (:access story-data) "private") " are private and can be viewed by people you invite."

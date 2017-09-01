@@ -61,11 +61,7 @@
         [:h3.left-navigation-sidebar-top-title
           [:div.boards-icon]
           [:span
-            {:title "Boards keep team updates organized."
-             :data-placement "top"
-             :data-toggle "tooltip"
-             :data-container "body"}
-            "Boards"]]
+            "BOARDS"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
@@ -99,16 +95,12 @@
         [:h3.left-navigation-sidebar-top-title
           [:div.stories-icon]
           [:span
-            {:title "Snapshots are great for summary updates."
-             :data-placement "top"
-             :data-toggle "tooltip"
-             :data-container "body"}
-            "Snapshots"]]
+            "JOURNALS"]]
         (when (and (not (responsive/is-tablet-or-mobile?))
                    (utils/link-for (:links org-data) "create"))
           [:button.left-navigation-sidebar-top-title-button.btn-reset.right
             {:on-click #(dis/dispatch! [:board-edit nil "story"])
-             :title "Create a new snapshot category."
+             :title "Create a new journal"
              :data-placement "top"
              :data-toggle "tooltip"
              :data-container "body"}])]
