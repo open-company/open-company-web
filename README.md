@@ -252,6 +252,8 @@ provided in the table below:
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
+|  :org-edit | UI | Setup the data to start the organization settings editing. |
+|  :org-edit-save | UI | Save the organization data edited from settings. |
 |  :password-reset | UI | Start the request to reset the user password. |
 |  :password-reset/finish | API | Password reset request finished. |
 |  :private-board-action | UI | Given a private board, a user of this board and an action perform the action: change role or remove the user. |
