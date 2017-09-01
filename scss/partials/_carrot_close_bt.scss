@@ -1,0 +1,18 @@
+button.carrot-close-bt {
+  background-color: $carrot_light_blue;
+  border-radius: 4px;
+  transition: 230ms;
+  opacity: 1;
+  text-align: center;
+  padding-top: 5px;
+
+  img {
+    margin: 0;
+    padding: 0;
+  }
+
+  &:hover {
+    background-color: $carrot_text_blue;
+    opacity: 1;
+  }
+}
