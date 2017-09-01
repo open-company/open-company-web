@@ -143,7 +143,7 @@
         (when (and (router/current-org-slug)
                    (jwt/is-admin? (:team-id org-data)))
           [:button.mlb-reset.invite-people-btn
-            {:on-click #(router/nav! (oc-urls/org-team-settings))}
+            {:on-click #(router/nav! (oc-urls/org-settings-invite))}
             [:div.invite-people-icon]
             [:span "Invite People"]])
         [:button.mlb-reset.about-carrot-btn
