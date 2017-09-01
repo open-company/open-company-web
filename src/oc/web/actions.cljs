@@ -123,7 +123,8 @@
       (api/get-all-activity org-data)
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
-           (not (utils/in? (:route @router/path) "org-team-settings"))
+           (not (utils/in? (:route @router/path) "org-settings-invite"))
+           (not (utils/in? (:route @router/path) "org-settings-team"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "email-verification"))
            (not (utils/in? (:route @router/path) "story-edit")))
@@ -577,7 +578,7 @@
         team-data (dispatcher/team-data team-id)
         user-data (:current-user-data db)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) (:user-id user-data) team-id (oc-urls/org-team-settings (:slug org-data)))]
+        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) (:user-id user-data) team-id (oc-urls/org-settings-team (:slug org-data)))]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link)))
   db)
@@ -1189,3 +1190,16 @@
 (defmethod dispatcher/action :story-share/finish
   [db [_ story-data]]
   (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
+
+(defmethod dispatcher/action :org-edit
+  [db [_ org-data keep-edits?]]
+  (let [next-org-editing (if keep-edits?
+                            (merge org-data (:org-editing db))
+                            org-data)]
+    (assoc db :org-editing next-org-editing)))
+
+(defmethod dispatcher/action :org-edit-save
+  [db [_]]
+  (when (:org-editing db)
+    (api/patch-org (:org-editing db)))
+  db)
