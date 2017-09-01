@@ -8,6 +8,7 @@
             [oc.web.components.comments :refer (comments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
             [goog.events :as events]
@@ -42,7 +43,6 @@
 (rum/defcs story < rum/reactive
                    (drv/drv :activity-data)
                    (rum/local false ::comments-expanded)
-                   (rum/local false ::close-hovering)
                    (rum/local nil ::window-resize)
                    (rum/local false ::show-you-did-it)
                    (rum/local false ::show-publish-modal)
@@ -129,10 +129,6 @@
                 (rum/with-key (related-story story (= (count (:related story-data)) 1)) (str "related-story-" (:uuid story))))]])]
       [:div.story-comments-container
         {:class (when @(::comments-expanded s) "comments-expanded")}
-        [:button.close-comments.mlb-reset
-          {:on-click #(reset! (::comments-expanded s) false)
-           :on-mouse-enter #(reset! (::close-hovering s) true)
-           :on-mouse-leave #(reset! (::close-hovering s) false)}
-          [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::close-hovering s) "_white") ".png")) :width 12 :height 12}]]
+        (carrot-close-bt {:on-click #(reset! (::comments-expanded s) false)})
         [:div.story-comments-container-inner
           (comments story-data)]]]))

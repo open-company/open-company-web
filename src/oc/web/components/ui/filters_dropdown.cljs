@@ -8,7 +8,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]))
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
 
 (defn compare-topic-names [topics topic-slug-1 topic-slug-2]
   (let [topic-name-1 (some #(when (= (:slug %) topic-slug-1) (:name %)) topics)
@@ -19,7 +20,6 @@
                               (drv/drv :board-filters)
                               (drv/drv :board-data)
                               (rum/local false ::show-filters-dropdown)
-                              (rum/local false ::remove-bt-hovering)
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
@@ -42,16 +42,14 @@
                          (router/nav! (oc-urls/board-sort-by-topic)))}
             "By Topic"])
       (when (string? board-filters)
-        [:button.mlb-reset.board-remove-filter
-          {:on-click #(let [org-slug (router/current-org-slug)
-                            board-slug (router/current-board-slug)
-                            last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                        (if (= last-filter :by-topic)
-                          (router/nav! (oc-urls/board-sort-by-topic))
-                          (router/nav! (oc-urls/board))))
-           :on-mouse-enter #(reset! (::remove-bt-hovering s) true)
-           :on-mouse-leave #(reset! (::remove-bt-hovering s) false)}
-          [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::remove-bt-hovering s) "_white") ".png")) :width 12 :height 12}]])
+        (carrot-close-bt {:on-click #(let [org-slug (router/current-org-slug)
+                                           board-slug (router/current-board-slug)
+                                           last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
+                                       (if (= last-filter :by-topic)
+                                         (router/nav! (oc-urls/board-sort-by-topic))
+                                         (router/nav! (oc-urls/board))))
+                          :width 24
+                          :height 24}))
       (when (string? board-filters)
         [:button.mlb-reset.filters-dropdown-button.choice
           {:class (when (or (= board-filters :by-topic) (string? board-filters)) "select")

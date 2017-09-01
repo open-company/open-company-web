@@ -4,6 +4,16 @@
 
 div.org-settings {
   background-color: $oc_gray_8;
+  position: relative;
+
+  button.carrot-close-bt {
+    // Fallback for mobile that doesn't support fix positioning
+    position: absolute;
+    position: fixed;
+    left: 50%;
+    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
+    top: 0px;
+  }
 
   div.org-settings-inner {
     width: #{$settings_content_width}px;
@@ -11,7 +21,7 @@ div.org-settings {
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     background-color: white;
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow-x: visible;
     overflow-y: scroll;
     position: relative;
 

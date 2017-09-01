@@ -24,21 +24,10 @@ div.activity-modal-container {
     position: relative;
     overflow: visible;
 
-    button.close-activity-modal {
+    button.carrot-close-bt {
       position: absolute;
       top: 0px;
       left: 0px;
-      width: 32px;
-      height: 32px;
-      background-color: $carrot_light_blue;
-      border-radius: 4px;
-      transition: 230ms;
-      opacity: 1;
-
-      &:hover {
-        background-color: $carrot_text_blue;
-        opacity: 1;
-      }
     }
 
     div.activity-modal-inner {

@@ -10,8 +10,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.ui.media-attachments :refer (media-attachments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
+            [oc.web.components.ui.media-attachments :refer (media-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
 
@@ -49,7 +50,6 @@
                          (rum/local false ::showing-dropdown)
                          (rum/local nil ::column-height)
                          (rum/local nil ::window-resize-listener)
-                         (rum/local false ::close-hovering)
                          rum/reactive
                          (drv/drv :activity-modal-fade-in)
                          {:before-render (fn [s]
@@ -103,11 +103,7 @@
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
       [:div.activity-modal.group
         {:class (str "activity-modal-" (:uuid activity-data))}
-        [:button.close-activity-modal.mlb-reset
-          {:on-click #(close-clicked s)
-           :on-mouse-enter #(reset! (::close-hovering s) true)
-           :on-mouse-leave #(reset! (::close-hovering s) false)}
-          [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::close-hovering s) "_white") ".png")) :width 12 :height 12}]]
+        (carrot-close-bt {:on-click #(close-clicked s)})
         [:div.activity-modal-inner.group
           [:div.activity-left-column
             {:style (when column-height {:minHeight (str column-height "px")})}
