@@ -78,18 +78,19 @@
   ([org-slug]
     (str (org org-slug) "/settings")))
 
-(defn org-logo-setup
-  ([]
-    (org-logo-setup (router/current-org-slug)))
-  ([org-slug]
-    (str (org-settings org-slug) "/logo")))
-
-(defn org-team-settings
+(defn org-settings-team
   "Team settings url"
   ([]
-    (org-team-settings (router/current-org-slug)))
+    (org-settings-team (router/current-org-slug)))
   ([org-slug]
     (str (org-settings org-slug) "/team-management")))
+
+(defn org-settings-invite
+  "Invite people to team url"
+  ([]
+    (org-settings-invite (router/current-org-slug)))
+  ([org-slug]
+    (str (org-settings org-slug) "/invite")))
 
 ;; Boards
 
