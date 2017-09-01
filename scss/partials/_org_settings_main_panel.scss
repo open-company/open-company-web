@@ -1,0 +1,45 @@
+div.org-settings-main {
+  div.org-settings-panel-row.org-logo-row {
+    cursor: pointer;
+
+    div.org-logo-container {
+      float: left;
+      width: 64px;
+      height: 64px;
+      text-align: center;
+      margin-right: 16px;
+
+      &.no-logo {
+        border: 1px solid $carrot_light_gray;
+        border-radius: 4px;
+        opacity: 0.2;
+
+        img.org-logo {
+          margin-top: 8px;
+          height: 48px;
+        }
+      }
+
+      img.org-logo {
+        max-width: 64px;
+        max-height: 64px;
+        cursor: pointer;
+      }
+    }
+
+    div.org-logo-label {
+      div.cta {
+        @include avenir_H();
+        font-size: 16px;
+        color: $oc_gray_7;
+      }
+
+      div.description {
+        @include avenir_BOOK();
+        font-size: 14px;
+        color: $carrot_light_gray;
+        margin-top: 12px;
+      }
+    }
+  }
+}
