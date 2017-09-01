@@ -33,7 +33,12 @@
 (defn um-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-team-settings))))
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-team))))
+
+(defn invite-click [e]
+  (utils/event-stop e)
+  (dis/dispatch! [:mobile-menu-toggle])
+  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
 
 (defn sign-in-sign-up-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
@@ -92,11 +97,11 @@
       (when (and (router/current-org-slug)
                  is-admin?)
         [:div.oc-menu-item
-          [:a {:href (oc-urls/org-team-settings) :on-click um-click} "Manage Members"]])
+          [:a {:href (oc-urls/org-settings-team) :on-click um-click} "Manage Members"]])
       (when (and (router/current-org-slug)
                  is-admin?)
         [:div.oc-menu-item
-          [:a {:href (oc-urls/org-team-settings) :on-click um-click} "Invite People"]])
+          [:a {:href (oc-urls/org-settings-invite) :on-click invite-click} "Invite People"]])
       (when (and (router/current-org-slug)
                  is-admin?)
         [:div.oc-menu-item.divider-item
