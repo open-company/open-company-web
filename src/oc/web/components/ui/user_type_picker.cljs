@@ -8,7 +8,7 @@
                                                               hide-popover)]))
 
 (rum/defc user-type-dropdown < rum/static
-  [user-id user-type click-cb & [hide-admin?]]
+  [user-id user-type click-cb & [hide-admin? remove-cb]]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
       [:button.btn-reset.user-type-btn.dropdown-toggle
@@ -18,25 +18,26 @@
          :aria-expanded false}
         (case user-type
           :admin
-          [:i.fa.fa-gear]
+          "Admin"
           :author
-          [:i.fa.fa-pencil]
-          [:i.fa.fa-user])]
+          "Contributor"
+          "Viewer")]
       [:ul.dropdown-menu.user-type-dropdown-menu
         {:aria-labelledby user-dropdown-id}
         [:li
-          {:class (when (= user-type :viewer) "active")
-           :on-click #(click-cb :viewer)}
-          [:i.fa.fa-user] " View"]
+          {:on-click #(click-cb :viewer)}
+          "Viewer"]
         [:li
-          {:class (when (= user-type :author) "active")
-           :on-click #(click-cb :author)}
-          [:i.fa.fa-pencil] " Edit"]
+          {:on-click #(click-cb :author)}
+          "Contributor"]
         (when-not hide-admin?
           [:li
-            {:class (when (= user-type :admin) "active")
-             :on-click #(click-cb :admin)}
-            [:i.fa.fa-gear] " Admin"])]]))
+            {:on-click #(click-cb :admin)}
+            "Admin"])
+        (when (fn? remove-cb)
+          [:li.remove-li
+            {:on-click #(remove-cb)}
+            "Remove User"])]]))
 
 (defn show-role-explainer-popover [e & [hide-admin]]
   (.stopPropagation e)
