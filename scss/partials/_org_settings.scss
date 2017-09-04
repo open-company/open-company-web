@@ -119,6 +119,69 @@ div.org-settings {
           }
         }
 
+        table.org-settings-table {
+          width: 100%;
+          margin: 0;
+          padding: 0;
+
+          tr {
+
+            th {
+              @include avenir_H();
+              font-size: 14px;
+              color: $oc_gray_7;
+
+              &:last-child {
+                text-align: center;
+                width: 144px;
+              }
+            }
+
+            td {
+              padding: 16px 0;
+              border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
+              @include avenir_R();
+              font-size: 16px;
+              color: $carrot_dark_gray;
+
+              &:nth-child(2){
+                max-width: 220px;
+              }
+
+              div.td-status {
+                max-width: 220px;
+
+                div.status-label {
+                  float: left;
+                }
+
+                button {
+                  float: left;
+                  font-size: 14px;
+                  @include avenir_H();
+                  margin-left: 8px;
+                }
+              }
+
+              div.user-avatar-img-container {
+                margin-right: 16px;
+                float: left;
+
+                img {
+                  max-width: 32px;
+                  max-height: 32px;
+                  border-radius: 16px;
+                }
+              }
+
+              &:last-child {
+                text-align: center;
+                width: 144px;
+              }
+            }
+          }
+        }
+
         .org-settings-list {
           width: 100%;
 
@@ -194,7 +257,6 @@ div.org-settings-tabs {
       height: 24px;
       margin: 0;
       padding: 0;
-      // padding: 0 2px 0 2px;
       cursor: pointer;
       @include avenir_M();
       font-size: 16px;
@@ -206,18 +268,6 @@ div.org-settings-tabs {
         text-decoration: none;
       }
     }
-
-    // &:first-child {
-    //   a.org-settings-tab-link {
-    //     padding: 0 0 0 1px;
-    //   }
-    // }
-
-    // &:last-child {
-    //   a.org-settings-tab-link {
-    //     padding: 0 1px 0 0;
-    //   }
-    // }
 
     &:hover {
       border-bottom: 4px solid $carrot_light_gray;
