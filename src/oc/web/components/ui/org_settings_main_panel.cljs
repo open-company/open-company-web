@@ -39,7 +39,6 @@
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
-    (rum/local nil ::updated-at)
     {:will-mount (fn [s]
                    (reset-form s)
                    s)
