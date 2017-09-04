@@ -1,0 +1,45 @@
+div.org-settings-panel {
+  div.org-settings-panel-row.invite-from {
+
+    div.invite-from-label {
+      float: left;
+      @include avenir_H();
+      font-size: 16px;
+      color: $carrot_dark_gray;
+      width: 100px;
+    }
+
+    div.org-settings-panel-choice {
+      width: 68px;
+      float: left;
+      margin-left: 16px;
+
+      label {
+        @include avenir_M();
+        font-size: 16px;
+        color: $carrot_dark_gray;
+        margin-left: 8px;
+      }
+    }
+  }
+
+  div.org-settings-invite-table {
+    margin-top: 24px;
+
+    button.add-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      color: $carrot_green_1;
+      background-color: #D4F6E4;
+      @include avenir_H();
+      font-size: 14px;
+      padding: 0px;
+
+      &:hover {
+        background-color: #3FBD7C;
+        color: white;
+      }
+    }
+  }
+}
