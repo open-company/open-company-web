@@ -1,11 +1,11 @@
 // BassCSS
 @import "vendor/bass";
-// Material design Bootstrap reset
-@import "vendor/_materialdesign";
 // Vars
 @import "vars/main";
 // Mixins
 @import "mixins/_base";
+// Material design Bootstrap reset
+@import "vendor/_materialdesign";
 // General stuff
 @import "partials/_base";
 @import "partials/_colors";

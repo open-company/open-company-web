@@ -392,8 +392,6 @@
           [:link {:rel "stylesheet" :href "/css/normalize.css"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
-          ;; MaterialDesign icon fonts from https://materialdesignicons.com
-          [:link {:href "/css/material-design-icons/v2.0.46/materialdesignicons.min.css" :media "all" :rel "stylesheet" :type "text/css"}]
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
