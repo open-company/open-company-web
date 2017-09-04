@@ -2,6 +2,9 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
@@ -33,16 +36,17 @@
 
 (rum/defcs org-settings-main-panel
   < rum/reactive
-    (drv/drv :email-domains)
+    (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
+    (drv/drv :current-user-data)
     (rum/local nil ::updated-at)
     {:will-mount (fn [s]
                    (reset-form s)
                    s)
      :before-render (fn [s]
-                     (let [email-domains-data @(drv/get-ref s :email-domains)
-                           auth-settings (:auth-settings email-domains-data)
-                           teams-data-requested (:teams-data-requested email-domains-data)]
+                     (let [team-management-data @(drv/get-ref s :org-settings-team-management)
+                           auth-settings (:auth-settings team-management-data)
+                           teams-data-requested (:teams-data-requested team-management-data)]
                        (when (and auth-settings
                                   (not teams-data-requested))
                          (dis/dispatch! [:teams-get])))
@@ -53,7 +57,14 @@
                         (.tooltip "hide"))
                      s)}
   [s org-data]
-  (let [org-editing (drv/react s :org-editing)]
+  (let [org-editing (drv/react s :org-editing)
+        {:keys [query-params
+                um-domain-invite
+                add-email-domain-team-error
+                team-data]
+         :as team-management-data}
+                    (drv/react s :org-settings-team-management)
+        cur-user-data (drv/react s :current-user-data)]
     [:div.org-settings-panel
       ;; Panel rows
       [:div.org-settings-main
@@ -105,11 +116,52 @@
                 "Add a logo"
                 "Change logo")]
             [:div.description "A 160x160 transparent PNG works best"]]]
+        ;; Slack teams row
+        [:div.org-settings-panel-row.slack-teams-row.group
+          [:div.org-settings-label
+            [:label
+              {:title "Anyone who signs up with your Slack team can view team boards."
+               :data-toggle "tooltip"
+               :data-placement "top"}
+              "Slack Teams"]
+            (when (not (empty? (:access query-params)))
+              [:label.error
+                (cond
+                  (= (:access query-params) "team-exists")
+                  "This team was already added."
+                  (= (:access query-params) "team")
+                  "Team successfully added."
+                  (= (:access query-params) "bot")
+                  "Bot successfully added."
+                  :else
+                  "An error occurred, please try again.")])]
+          [:div.org-settings-list
+            (let [slack-bots (get (jwt/get-key :slack-bots) (:team-id org-data))]
+              (for [team (:slack-orgs team-data)]
+                [:div.org-settings-list-item.group
+                  {:key (str "slack-org-" (:slack-org-id team))}
+                  [:label.org-settings-list-item-name
+                    [:img.slack-logo {:src (utils/cdn "/img/slack.png")}]
+                    (:name team)]
+                  (when-not (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)
+                    (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                      (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings-team (:slug org-data)))]
+                        [:button.org-settings-list-item-btn.btn-reset
+                          {:on-click #(router/redirect! fixed-add-bot-link)
+                           :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"}
+                          "Add Bot"])))
+                  [:button.org-settings-list-item-remove-btn.btn-reset
+                    {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
+                     :title (str "Remove " (:name team) " Slack team")
+                     :data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-container "body"}
+                    "Remove"]]))]]
         ;; Email domains row
-        (let [{:keys [um-domain-invite add-email-domain-team-error team-data] :as email-domains-data} (drv/react s :email-domains)
-              valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))
-              team-data {:email-domains [{:domain "bago.me" :links [{:rel "remove" :href "/hello" :method "DELETE"}]}
-                                         {:domain "bago.space" :links [{:rel "remove" :href "/hello" :method "DELETE"}]}]}]
+        (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
             [:div.org-settings-label
               [:label
@@ -128,6 +180,7 @@
             [:div.org-settings-list
               (for [team (:email-domains team-data)]
                 [:div.org-settings-list-item.group
+                  {:key (str "email-domain-team-" (:domain team))}
                   [:span.org-settings-list-item-name (str "@" (:domain team))]
                   [:button.org-settings-list-item-remove-btn.btn-reset
                     {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}

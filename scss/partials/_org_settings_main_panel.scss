@@ -81,4 +81,20 @@ div.org-settings-main {
       height: 44px;
     }
   }
+
+  div.org-settings-panel-row.slack-teams-row {
+    div.org-settings-list {
+      div.org-settings-list-item {
+        label.org-settings-list-item-name{
+          img.slack-logo {
+            width: 16px;
+            height: 16px;
+            margin-top: 3px;
+            margin-right: 8px;
+            float: left;
+          }
+        }
+      }
+    }
+  }
 }
