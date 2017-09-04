@@ -91,13 +91,15 @@
                           (fn [base org-slug]
                             (when org-slug
                               (get-in base (org-data-key org-slug))))]
-   :email-domains       [[:base :org-data]
-                          (fn [base org-data]
+   :org-settings-team-management
+                        [[:base :route :org-data]
+                          (fn [base route org-data]
                             {:auth-settings (:auth-settings base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :teams-data-requested (:teams-data-requested base)
-                             :team-data (get-in base (team-data-key (:team-id org-data)))})]
+                             :team-data (get-in base (team-data-key (:team-id org-data)))
+                             :query-params (:query-params route)})]
    :all-activity        [[:base :org-slug]
                           (fn [base org-slug]
                             (when (and base org-slug)
