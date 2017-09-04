@@ -913,10 +913,9 @@
         fixed-entry (if new-entry?
                       (new-entry-fixed-data entry-data board-data current-user-data as-of)
                       (entry-fixed-data entry-data current-user-data as-of))
-        filtered-entries (filter #(not= (:uuid %) (:uuid fixed-entry)) (get board-data :fixed-items))
-        new-entries (conj filtered-entries fixed-entry)
-        sorted-entries (vec (reverse (sort-by :created-at new-entries)))
-        next-board-data (assoc board-data :fixed-items sorted-entries)
+        old-entries (:fixed-items board-data)
+        new-entries (assoc old-entries (:uuid fixed-entry) fixed-entry)
+        next-board-data (assoc board-data :fixed-items new-entries)
         next-board-filters (if (or is-all-activity (= (:board-filters db) (:topic-slug entry-data)))
                               ; if it's filtering by the same topic of the new entry leave it be
                               (:board-filters db)
