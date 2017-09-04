@@ -53,9 +53,9 @@
   }
 }
 
-.mlb-link {
+@mixin mlb-link($btcolor: $carrot_text_blue){
   background-color: transparent;
-  color: $carrot_text_blue;
+  color: $btcolor;
   @include avenir_M();
 
   &:hover {
@@ -63,14 +63,12 @@
   }
 }
 
-.mlb-link-black {
-  background-color: transparent;
-  color: $carrot_dark_gray;
-  @include avenir_M();
+.mlb-link {
+  @include mlb-link();
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.mlb-link-black {
+  @include mlb-link($carrot_dark_gray);
 }
 
 .btn-reset {
