@@ -8,7 +8,8 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.loading :refer (rloading)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]))
+            [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
+            [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]))
 
 ;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
@@ -56,8 +57,8 @@
           (org-settings-tabs (:slug org-data) settings-tab router/nav!)
           (case settings-tab
             :org-settings-team
-            (org-settings-main-panel org-data)
+            (org-settings-team-panel org-data)
             :org-settings-invite
-            (org-settings-main-panel org-data)
+            [:div.org-settings-panel]
             (rum/with-key (org-settings-main-panel org-data) (str "org-settings-main-panel-" (:updated-at org-data))))]]
       (rloading {:loading true}))))
