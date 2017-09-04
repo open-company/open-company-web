@@ -73,6 +73,10 @@
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
    :loading             [[:base] (fn [base] (:loading base))]
+   :teams-load          [[:base]
+                          (fn [base]
+                            {:team-data-requested (:teams-data-requested base)
+                             :auth-settings (:auth-settings base)})]
    :team-management     [[:base :route]
                           (fn [base route]
                             {:um-invite (:um-invite base)
@@ -91,14 +95,18 @@
                           (fn [base org-slug]
                             (when org-slug
                               (get-in base (org-data-key org-slug))))]
+   :team-data           [[:base :org-data]
+                          (fn [base org-data]
+                            (when org-data
+                              (get-in base (team-data-key (:team-id org-data)))))]
    :org-settings-team-management
-                        [[:base :route :org-data]
-                          (fn [base route org-data]
+                        [[:base :route :org-data :team-data]
+                          (fn [base route org-data team-data]
                             {:auth-settings (:auth-settings base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :teams-data-requested (:teams-data-requested base)
-                             :team-data (get-in base (team-data-key (:team-id org-data)))
+                             :team-data team-data
                              :query-params (:query-params route)})]
    :all-activity        [[:base :org-slug]
                           (fn [base org-slug]
@@ -108,10 +116,6 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (calendar-key org-slug))))]
-   :team-data           [[:base :org-data]
-                          (fn [base org-data]
-                            (when org-data
-                              (get-in base (team-data-key (:team-id org-data)))))]
    :team-roster         [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
