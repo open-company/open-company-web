@@ -39,43 +39,25 @@
   < rum/static
     rum/reactive
     (drv/drv :org-data)
-    (drv/drv :org-editing)
-    (rum/local nil ::updated-at)
-    {:will-mount (fn [s]
-                   (when-let [org-data @(drv/get-ref s :org-data)]
-                     (dis/dispatch! [:org-edit org-data false])
-                     (reset! (::updated-at s) (:updated-at org-data)))
-                   s)
-     :did-remount (fn [_ s]
-                    (when-let [org-data @(drv/get-ref s :org-data)]
-                      (dis/dispatch! [:org-edit org-data true])
-                      ;; If :updated-at changed from the last time it means the form was saved,
-                      ;; so it needs to disable the save button
-                      (when (not= (:updated-at org-data) @(::updated-at s))
-                        (reset! (::updated-at s) (:updated-at org-data))
-                        (dis/dispatch! [:input [:org-editing :has-changes] false])))
-                    s)}
   [s]
   (let [settings-tab (cond
                       (utils/in? (:route @router/path) "org-settings-team") :org-settings-team
                       (utils/in? (:route @router/path) "org-settings-invite") :org-settings-invite
                       :else :org-settings)
-        org-data (drv/react s :org-editing)]
+        org-data (drv/react s :org-data)]
     (when (:read-only org-data)
       (utils/after 100 #(router/nav! (oc-urls/org (:slug org-data)))))
-    [:div.org-settings.fullscreen-page
-      (if org-data
-        [:div
-          (carrot-close-bt {:on-click #(router/nav! (oc-urls/org (:slug org-data)))})
-          [:div.org-settings-inner
-            {:class (when (= :org-settings settings-tab) "has-save-buttons")}
-            [:div.org-settings-header
-              "Settings"]
-            (org-settings-tabs (:slug org-data) settings-tab router/nav!)
-            (case settings-tab
-              :org-settings-team
-              (org-settings-main-panel org-data)
-              :org-settings-invite
-              (org-settings-main-panel org-data)
-              (org-settings-main-panel org-data))]]
-        (rloading {:loading true}))]))
+    (if org-data
+      [:div.org-settings.fullscreen-page
+        (carrot-close-bt {:on-click #(router/nav! (oc-urls/org (:slug org-data)))})
+        [:div.org-settings-inner
+          [:div.org-settings-header
+            "Settings"]
+          (org-settings-tabs (:slug org-data) settings-tab router/nav!)
+          (case settings-tab
+            :org-settings-team
+            (org-settings-main-panel org-data)
+            :org-settings-invite
+            (org-settings-main-panel org-data)
+            (rum/with-key (org-settings-main-panel org-data) (str "org-settings-main-panel-" (:updated-at org-data))))]]
+      (rloading {:loading true}))))
