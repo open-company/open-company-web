@@ -35,8 +35,11 @@
                                                      (events/listen js/window EventType/CLICK
                                                        #(when (and @(::show-users-dropdown s)
                                                                    ; (not (utils/event-inside? % (sel1 [:div.board-edit-slack-channels-dropdown])))
-                                                                   (not (utils/event-inside? % (sel1 [:input.slack-users-dropdown]))))
-                                                          (reset! (::show-users-dropdown s) false))))
+                                                                   (not (utils/event-inside? % (.-parentElement (sel1 [:input.slack-users-dropdown])))))
+                                                          (reset! (::show-users-dropdown s) false)
+                                                          (let [{:keys [on-blur]} (first (:rum/args s))]
+                                                            (when (fn? on-blur)
+                                                              (on-blur))))))
                                                     s)
                                       :before-render (fn [s]
                                                        (let [teams-load-data @(drv/get-ref s :teams-load)]
@@ -47,7 +50,7 @@
                                       :will-unmount (fn [s]
                                                       (events/unlistenByKey @(::window-click s))
                                                       s)}
-  [s {:keys [disabled initial-value on-change on-intermediate-change] :as data}]
+  [s {:keys [disabled initial-value on-change on-intermediate-change on-focus on-blur] :as data}]
   (let [roster-data (drv/react s :team-roster)
         all-users (vec (filter #(= (:status %) "uninvited") (:users roster-data)))
         team-roster (vals (group-by :slack-org-id all-users))
@@ -60,7 +63,10 @@
        :key (str "slack-users-dropdown-" (count all-users))}
       [:input.slack-users-dropdown
         {:value @(::slack-user s)
-         :on-focus (fn [] (utils/after 100 #(do (reset! (::typing s) false) (reset! (::show-users-dropdown s) true))))
+         :on-focus (fn []
+                      (when (fn? on-focus) (on-focus))
+                      (utils/after 100 #(do (reset! (::typing s) false) (reset! (::show-users-dropdown s) true))))
+         :on-blur #(when (fn? on-blur) (on-blur))
          :on-change #(do
                        (reset! (::typing s) true)
                        (when (fn? on-intermediate-change)
@@ -73,8 +79,15 @@
           {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))
                                     :fa-angle-up @(::show-users-dropdown s)})
            :on-click #(when (not disabled)
-                        (reset! (::typing s) false)
-                        (reset! (::show-users-dropdown s) (not @(::show-users-dropdown s)))
+                        (let [next-value (not @(::show-users-dropdown s))]
+                          (reset! (::typing s) false)
+                          (reset! (::show-users-dropdown s) next-value)
+                          (when (and next-value
+                                     (fn? on-focus))
+                            (on-focus))
+                          (when (and (not next-value)
+                                     (fn? on-blur))
+                            (on-blur)))
                         (utils/event-stop %))}])
       (when @(::show-users-dropdown s)
         [:div.slack-users-dropdown-list
@@ -87,6 +100,8 @@
                            (on-change user)
                            (reset! (::slack-user s) (utils/name-or-email user))
                            (reset! (::show-users-dropdown s) false)
+                           (when (fn? on-blur)
+                              (on-blur))
                            (reset! (::typing s) false))}
               (user-avatar-image user)
               [:div.user-name
