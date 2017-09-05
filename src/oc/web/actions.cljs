@@ -421,7 +421,7 @@
         ;; but the type changed we need to change the user type too
         (when (and user
                   (not= old-user-type user-type))
-          (api/switch-user-type old-user-type user-type user (utils/get-author (:user-id user) (:authors org-data))))
+          (api/switch-user-type invite-data old-user-type user-type user (utils/get-author (:user-id user) (:authors org-data))))
         (api/send-invitation invite-data (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
         {:success true})
       {:error "User already active." :success false})))
