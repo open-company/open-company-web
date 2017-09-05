@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -101,11 +102,11 @@
                         {:on-click remove-fn}
                         "Cancel"])]]
                 [:td.role
-                  (user-type-dropdown (:user-id user)
-                                      user-type
-                                      #(api/switch-user-type user user-type % user author)
-                                      false
-                                      (if (and (not= "pending" (:status user))
-                                               (not= (:user-id user) (:user-id cur-user-data)))
-                                        remove-fn
-                                        nil))]])]]]]))
+                  (user-type-dropdown {:user-id (:user-id user)
+                                       :user-type user-type
+                                       :on-change #(api/switch-user-type user user-type % user author)
+                                       :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                       :on-remove (if (and (not= "pending" (:status user))
+                                                           (not= (:user-id user) (:user-id cur-user-data)))
+                                                    remove-fn
+                                                    nil)})]])]]]]))
