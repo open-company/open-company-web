@@ -8,12 +8,13 @@
                                                               hide-popover)]))
 
 (rum/defc user-type-dropdown < rum/static
-  [user-id user-type click-cb & [hide-admin? remove-cb]]
+  [user-id user-type click-cb & [hide-admin? remove-cb disabled]]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
       [:button.btn-reset.user-type-btn.dropdown-toggle
         {:id user-dropdown-id
-         :data-toggle "dropdown"
+         :data-toggle (if disabled "" "dropdown")
+         :disabled disabled
          :aria-haspopup true
          :aria-expanded false}
         (case user-type
