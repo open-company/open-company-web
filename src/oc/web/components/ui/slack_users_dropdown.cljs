@@ -48,14 +48,16 @@
                                                       (events/unlistenByKey @(::window-click s))
                                                       s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change] :as data}]
-  (let [all-users (vec (filter #(= (:status %) "uninvited") (:users (drv/react s :team-roster))))
+  (let [roster-data (drv/react s :team-roster)
+        all-users (vec (filter #(= (:status %) "uninvited") (:users roster-data)))
         team-roster (vals (group-by :slack-org-id all-users))
         sorted-team-roster (vec (map (fn [team] (vec (sort-by #(str (:first-name %) " " (:last-name %)) team))) team-roster))
         all-sorted-users (vec (apply concat sorted-team-roster))
         slack-orgs (:slack-orgs (drv/react s :team-data))
         slack-orgs-map (zipmap (map :slack-org-id slack-orgs) (map :name slack-orgs))]
     [:div.slack-users-dropdown
-      {:class (if disabled "disabled" "")}
+      {:class (if disabled "disabled" "")
+       :key (str "slack-users-dropdown-" (count all-users))}
       [:input.slack-users-dropdown
         {:value @(::slack-user s)
          :on-focus (fn [] (utils/after 100 #(do (reset! (::typing s) false) (reset! (::show-users-dropdown s) true))))
