@@ -515,7 +515,7 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the logo of the company if possible"
-  [invited-user invite-from user-type first-name last-name]
+  [complete-user-data invited-user invite-from user-type first-name last-name]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
@@ -543,8 +543,8 @@
                 (add-author (:user-id new-user))
                 (dispatcher/dispatch! [:invite-user/success]))
               ;; if not reload the users list immediately
-              (dispatcher/dispatch! [:invite-user/success]))
-            (dispatcher/dispatch! [:invite-user/failed])))))))
+              (dispatcher/dispatch! [:invite-user/success complete-user-data]))
+            (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))))
 
 (defn switch-user-type
   "Given an existing user switch user type"
