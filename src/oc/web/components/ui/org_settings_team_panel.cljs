@@ -41,7 +41,7 @@
             [:tr
               [:th "Name"]
               [:th "Status"]
-              [:th "Role"]]]
+              [:th.role "Role"]]]
           [:tbody
             (for [user (sort-by utils/name-or-email (:users team-data))
                   :let [user-type (utils/get-user-type user (dis/org-data))
@@ -55,8 +55,8 @@
                 [:td
                   (user-avatar-image user)
                   (utils/name-or-email user)]
-                [:td
-                  [:div.td-status.group
+                [:td.status-column
+                  [:div.status-column-inner.group
                     [:div.status-label (s/capital (:status user))]
                     (when (= "pending" (:status user))
                       [:button.mlb-reset.mlb-link
@@ -71,5 +71,5 @@
                       [:button.mlb-reset.mlb-link-red
                         {:on-click remove-fn}
                         "Cancel"])]]
-                [:td
+                [:td.rolw
                   (user-type-dropdown (:user-id user) user-type #(api/switch-user-type user-type % user author) false remove-fn)]])]]]]))
