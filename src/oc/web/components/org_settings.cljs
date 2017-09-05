@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
@@ -41,17 +42,21 @@
   < rum/static
     rum/reactive
     (drv/drv :org-data)
+    (drv/drv :alert-modal)
   [s]
   (let [settings-tab (cond
                       (utils/in? (:route @router/path) "org-settings-team") :org-settings-team
                       (utils/in? (:route @router/path) "org-settings-invite") :org-settings-invite
                       :else :org-settings)
-        org-data (drv/react s :org-data)]
+        org-data (drv/react s :org-data)
+        alert-modal-data (drv/react s :alert-modal)]
     (when (:read-only org-data)
       (utils/after 100 #(router/nav! (oc-urls/org (:slug org-data)))))
     (if org-data
       [:div.org-settings.fullscreen-page
         (carrot-close-bt {:on-click #(router/nav! (oc-urls/org (:slug org-data)))})
+        (when alert-modal-data
+          (alert-modal))
         [:div.org-settings-inner
           [:div.org-settings-header
             "Settings"]
