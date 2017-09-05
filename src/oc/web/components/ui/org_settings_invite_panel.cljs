@@ -51,7 +51,6 @@
         [:div.org-settings-panel-choice
           [:input
             {:type "radio"
-             ; :name "org-settings-invite-from-medium"
              :on-change #(reset! (::inviting-from s) (.. % -target -value))
              :value "email"
              :checked (= "email" @(::inviting-from s))
@@ -62,7 +61,6 @@
         [:div.org-settings-panel-choice
           [:input
             {:type "radio"
-             ; :name "org-settings-invite-from-medium"
              :on-change #(reset! (::inviting-from s) (.. % -target -value))
              :value "slack"
              :checked (= "slack" @(::inviting-from s))
@@ -76,7 +74,6 @@
         [:table.org-settings-table
           [:thead
             [:tr
-              [:th ""]
               [:th "Email Addresses"]
               [:th.role "Role "
                 [:i.mdi.mdi-information-outline]]
@@ -86,9 +83,6 @@
                   :let [user-data (get invite-users i)]]
               [:tr
                 {:key (str "invite-users-tabe-" i)}
-                [:td
-                  [:div.table-cardinal
-                    (inc i)]]
                 [:td.user-field
                   (if (= "slack" (:type user-data))
                     [:div
@@ -108,18 +102,14 @@
                 [:td.user-remove
                   [:button.mlb-reset.remove-user
                     {:on-click #(dis/dispatch! [:input [:invite-users] (utils/vec-dissoc invite-users user-data)])}
-                    [:i.mdi.mdi-delete]]]])
-            (let [plus-enabled (or (and (= "email" @(::inviting-from s))
-                                        (utils/valid-email? @(::inviting-email s)))
-                                   (and (= "slack" @(::inviting-from s))
-                                        (not (nil? @(::inviting-slack s)))))]
+                    [:i.mdi.mdi-delete]]]])]
+          (let [plus-enabled (or (and (= "email" @(::inviting-from s))
+                                      (utils/valid-email? @(::inviting-email s)))
+                                 (and (= "slack" @(::inviting-from s))
+                                      (not (empty? @(::inviting-slack s)))))]
+            [:tbody
               [:tr
                 {:key (str "invite-users-table-new")}
-                [:td
-                  [:button.mlb-reset.mlb-default.add-button
-                    {:disabled (not plus-enabled)
-                     :on-click #(add-inviting-user s)}
-                    "+"]]
                 [:td.user-field
                   [:div.user-input
                     [:input.org-settings-field
@@ -142,7 +132,15 @@
                     (rum/with-key
                       (user-type-dropdown (utils/guid) @(::inviting-user-type s) #(reset! (::inviting-user-type s) %) (not (jwt/is-admin? (:team-id org-data))) nil (not plus-enabled))
                       (str "user-type-dropdown-" (count invite-users)))]]
-                [:td.user-remove]])]]]
+                [:td.user-remove]]
+              [:tr
+                [:td
+                  [:button.mlb-reset.mlb-default.add-button
+                    {:disabled (not plus-enabled)
+                     :on-click #(add-inviting-user s)}
+                    "+"]]
+                [:td]
+                [:td]]])]]
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
