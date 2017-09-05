@@ -82,9 +82,10 @@ div.org-settings-panel {
         border-radius: 4px;
       }
     }
+  }
 
-    button.save-btn {
-      width: 164px;
-    }
+  button.save-btn {
+    width: 164px !important;
+    @include avenir_H();
   }
 }
