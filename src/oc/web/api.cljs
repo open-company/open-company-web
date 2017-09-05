@@ -541,14 +541,14 @@
                     (= user-type :admin))
               (let [new-user (json->cljs body)]
                 (add-author (:user-id new-user))
-                (dispatcher/dispatch! [:invite-user/success]))
+                (dispatcher/dispatch! [:invite-user/success complete-user-data]))
               ;; if not reload the users list immediately
               (dispatcher/dispatch! [:invite-user/success complete-user-data]))
             (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))))
 
 (defn switch-user-type
   "Given an existing user switch user type"
-  [old-user-type new-user-type user user-author]
+  [complete-user-data old-user-type new-user-type user user-author]
   (when (not= old-user-type new-user-type)
     (let [org-data           (dispatcher/org-data)
           add-admin-link     (utils/link-for (:links user) "add")
@@ -566,16 +566,16 @@
           {:headers (headers-for-link add-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
-              (dispatcher/dispatch! [:invite-user/success])
-              (dispatcher/dispatch! [:invite-user/failed])))))
+              (dispatcher/dispatch! [:invite-user/success complete-user-data])
+              (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))
       ;; Remove admin call
       (when (and remove-admin? remove-admin-link)
         (auth-http (method-for-link remove-admin-link) (relative-href remove-admin-link)
           {:headers (headers-for-link remove-admin-link)}
           (fn [{:keys [status success body]}]
             (if success
-              (dispatcher/dispatch! [:invite-user/success])
-              (dispatcher/dispatch! [:invite-user/failed])))))
+              (dispatcher/dispatch! [:invite-user/success complete-user-data])
+              (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))
       ;; Add author call
       (when (and add-author? add-author-link)
         (add-author (:user-id user)))
