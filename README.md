@@ -240,6 +240,9 @@ provided in the table below:
 |  :invite-by-email | UI | Start the request to invite a user, check if the email is already present and use the resend link if possible. No-op if the user is already an active user of the team. |
 |  :invite-by-email/failed | API | Invitation request failed, add the proper error in the app-state. |
 |  :invite-by-email/success | API | Reload the team data to show the new invited user, reset the app-state for invitation data. |
+|  :invite-users | UI | Invite the users in the list. |
+|  :invite-user/success | API | The user was successfully invited. |
+|  :invite-user/failed | API | The user was not invited due to an error. |
 |  :jwt | UI | Given the JWT decoded data, save them in the app-state. |
 |  :login-overlay-show | UI | Set the login overlay type in the app-state to show login, signup, password reset or collect name and password views. |
 |  :login-with-email | UI | Show the login with email overlay. |
