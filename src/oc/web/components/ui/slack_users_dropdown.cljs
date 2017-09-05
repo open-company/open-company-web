@@ -30,7 +30,7 @@
                                      (drv/drv :team-roster)
                                      {:will-mount (fn [s]
                                                     (let [initial-value (:initial-value (first (:rum/args s)))]
-                                                       (reset! (::slack-user s) initial-value))
+                                                       (reset! (::slack-user s) (or initial-value "")))
                                                     (reset! (::window-click s)
                                                      (events/listen js/window EventType/CLICK
                                                        #(when (and @(::show-users-dropdown s)

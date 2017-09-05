@@ -17,10 +17,10 @@ div.slack-users-dropdown {
     border-radius: 4px;
     background-color: white;
     border: 1px solid rgba($carrot_light_gray_1, 0.5);
-    @include avenir_M();
-    font-size: 14px;
-    color: $oc_gray_7;
-    padding: 0.4rem 0.8rem;
+    @include avenir_R();
+    font-size: 16px;
+    color: $carrot_dark_gray;
+    padding: 10px 16px;
     outline: none;
 
     &[disabled]{
@@ -28,9 +28,9 @@ div.slack-users-dropdown {
     }
 
     @include placeholder() {
-      @include avenir_M();
-      font-size: 14px;
-      color: $carrot_light_gray_1;
+      @include avenir_R();
+      font-size: 16px;
+      color: $carrot_light_gray;
     }
   }
 
