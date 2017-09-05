@@ -17,15 +17,18 @@
                 @(::inviting-email s))
         role @(::inviting-user-type s)
         invited-users (or (:invite-users @(drv/get-ref s :invite-users)) [])]
-    (dis/dispatch! [:input [:invite-users] (conj invited-users {:type type :user user :role role})])))
+    (reset! (::inviting-email s) "")
+    (reset! (::inviting-slack s) "")
+    (reset! (::inviting-user-type s) :viewer)
+    (dis/dispatch! [:input [:invite-users] (conj invited-users {:type type :user user :role (or role :viewer)})])))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-users)
     (rum/local "email" ::inviting-from)
-    (rum/local nil ::inviting-email)
-    (rum/local nil ::inviting-slack)
-    (rum/local nil ::inviting-user-type)
+    (rum/local "" ::inviting-email)
+    (rum/local "" ::inviting-slack)
+    (rum/local :viewer ::inviting-user-type)
     {:before-render (fn [s]
                      (let [invite-users-data @(drv/get-ref s :invite-users)]
                        (when (and (:auth-settings invite-users-data)
@@ -75,7 +78,7 @@
             [:tr
               [:th ""]
               [:th "Email Addresses"]
-              [:th "Role "
+              [:th.role "Role "
                 [:i.mdi.mdi-information-outline]]
               [:th ""]]]
           [:tbody
@@ -88,56 +91,64 @@
                     (inc i)]]
                 [:td.user-field
                   (if (= "slack" (:type user-data))
-                    (slack-users-dropdown {:on-change #(reset! (::inviting-slack s) %)
-                                           :disabled true
-                                           :on-intermediate-change #(reset! (::inviting-slack s) nil)
-                                           :initial-value (utils/name-or-email (:user user-data))})
+                    [:div
+                      {:class (when (:error user-data) "error")}
+                      (slack-users-dropdown {:on-change #()
+                                             :disabled true
+                                             :on-intermediate-change #()
+                                             :initial-value (utils/name-or-email (:user user-data))})]
                     [:input.org-settings-field.email-field
-                      {:type "email"
-                       :read-only true
+                      {:type "text"
+                       :class (when (:error user-data) "error")
+                       :disabled true
                        :value (:user user-data)}])]
                 [:td.user-type-field
                   [:div.user-type-dropdown
-                    (user-type-dropdown (utils/guid) (:type user-data) #(dis/dispatch! [:input [:invite-users] (assoc invite-users (merge user-data {:type %}) i)]))]]
+                    (user-type-dropdown (utils/guid) (:role user-data) #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:role %}))]))]]
                 [:td.user-remove
                   [:button.mlb-reset.remove-user
-                    {:on-click #(dis/dispatch! [:input [:invite-users] (dissoc invite-users i)])}
+                    {:on-click #(dis/dispatch! [:input [:invite-users] (utils/vec-dissoc invite-users user-data)])}
                     [:i.mdi.mdi-delete]]]])
-            [:tr
-              {:key (str "invite-users-table-new")}
-              [:td
-                [:button.mlb-reset.mlb-default.add-button
-                  {:disabled (not (or (and (= "email" @(::inviting-from s))
-                                           (utils/valid-email? @(::inviting-email s)))
-                                      (and (= "slack" @(::inviting-from s))
-                                           (not (nil? @(::inviting-slack s))))))
-                   :on-click #(add-inviting-user s)}
-                  "+"]]
-              [:td.user-field
-                [:div.user-input
-                  [:input.org-settings-field
-                    {:type "email"
-                     :style {:display (if (= "email" @(::inviting-from s)) "block" "none")}
-                     :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-                     :placeholder "email@example.com"
-                     :on-change #(reset! (::inviting-email s) (.. % -target -value))
-                     :value @(::inviting-email s)}]
-                  [:div
-                    {:style {:display (if (= "slack" @(::inviting-from s)) "block" "none")}}
-                    (slack-users-dropdown {:on-change #(reset! (::inviting-slack s) %)
-                                           :disabled false
-                                           :on-intermediate-change #(reset! (::inviting-slack s) nil)
-                                           :initial-value ""})]]]
-              [:td.user-type-field
-                [:div.user-type-dropdown
-                  (user-type-dropdown (utils/guid) @(::inviting-user-type s) #(reset! (::inviting-user-type s) %) (not (jwt/is-admin? (:team-id org-data))) nil true)]]
-              [:td]]]]]
+            (let [plus-enabled (or (and (= "email" @(::inviting-from s))
+                                        (utils/valid-email? @(::inviting-email s)))
+                                   (and (= "slack" @(::inviting-from s))
+                                        (not (nil? @(::inviting-slack s)))))]
+              [:tr
+                {:key (str "invite-users-table-new")}
+                [:td
+                  [:button.mlb-reset.mlb-default.add-button
+                    {:disabled (not plus-enabled)
+                     :on-click #(add-inviting-user s)}
+                    "+"]]
+                [:td.user-field
+                  [:div.user-input
+                    [:input.org-settings-field
+                      {:type "email"
+                       :style {:display (if (= "email" @(::inviting-from s)) "block" "none")}
+                       :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+                       :placeholder "email@example.com"
+                       :on-change #(reset! (::inviting-email s) (.. % -target -value))
+                       :value @(::inviting-email s)}]
+                    [:div
+                      {:style {:display (if (= "slack" @(::inviting-from s)) "block" "none")}}
+                      (rum/with-key
+                        (slack-users-dropdown {:on-change #(reset! (::inviting-slack s) %)
+                                               :disabled false
+                                               :on-intermediate-change #(reset! (::inviting-slack s) nil)
+                                               :initial-value ""})
+                        (str "slack-users-dropdown-" (count invite-users)))]]]
+                [:td.user-type-field
+                  [:div.user-type-dropdown
+                    (rum/with-key
+                      (user-type-dropdown (utils/guid) @(::inviting-user-type s) #(reset! (::inviting-user-type s) %) (not (jwt/is-admin? (:team-id org-data))) nil (not plus-enabled))
+                      (str "user-type-dropdown-" (count invite-users)))]]
+                [:td.user-remove]])]]]
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
-          {:on-click #()
+          {:on-click #(dis/dispatch! [:invite-users])
            :disabled (zero? (count invite-users))}
           (if (zero? (count invite-users)) "Send" (str "Send " (count invite-users) " Invites"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(dis/dispatch! [:input [:invite-user] []])}
+          {:on-click #(dis/dispatch! [:input [:invite-users] []])}
           "Cancel"]]]))

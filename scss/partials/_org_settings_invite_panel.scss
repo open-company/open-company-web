@@ -47,6 +47,12 @@ div.org-settings-panel {
       height: 40px;
     }
 
+    th.role {
+      i.mdi:before {
+        font-size: 14px;
+      }
+    }
+
     td.user-field {
       width: 365px;
       padding-right: 12px !important;
@@ -56,9 +62,32 @@ div.org-settings-panel {
       width: 180px;
     }
 
-    td.user-remove button.remove-user {
-      padding-top: 8px;
-      color: $carrot_light_gray;
+    td.user-remove {
+      width: 53px;
+
+      button.remove-user {
+        padding-top: 8px;
+        color: $carrot_light_gray;
+      }
+    }
+
+    input.org-settings-field.email-field[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    div.error div.slack-users-dropdown {
+      opacity: 1 !important;
+    }
+
+    input.error, div.error div.slack-users-dropdown input {
+      color: $carrot_orange !important;
+      border: 1px solid rgba($carrot_orange, 0.5) !important;
+      opacity: 1 !important;
+    }
+
+    div.error div.slack-users-dropdown i.fa {
+      color: $carrot_orange !important;
     }
 
     div.table-cardinal {
