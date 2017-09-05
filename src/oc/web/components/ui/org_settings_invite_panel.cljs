@@ -22,6 +22,30 @@
     (reset! (::inviting-user-type s) :viewer)
     (dis/dispatch! [:input [:invite-users] (conj invited-users {:type type :user user :role (or role :viewer)})])))
 
+(def default-user-type "email")
+(def default-row-num 3)
+(def default-user "")
+(def default-user-role :viewer)
+(def default-user-row {:type default-user-type :user default-user :role default-user-role})
+
+(defn valid-user? [user-map]
+  (or (and (= (:type user-map) "email")
+           (utils/valid-email? (:user user-map)))
+      (and (= (:type user-map) "slack")
+           (contains? (:user user-map) :slack-id)
+           (contains? (:user user-map) :slack-org-id))))
+
+(defn has-valid-user? [users-list]
+  (some #(valid-user? %) users-list))
+
+(defn user-type-did-change [s invite-users e]
+  (let [value (.. e -target -value)]
+    (when @(::last-focused-user s)
+      (let [idx (utils/index-of invite-users #(= (:user %) (:user @(::last-focused-user s))))
+            updated-user (merge @(::last-focused-user s) {:type value :user (if (= "email" value) "" {})})]
+         (dis/dispatch! [:input [:invite-users] (assoc invite-users idx updated-user)])))
+    (reset! (::inviting-from s) value)))
+
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-users)
@@ -29,7 +53,14 @@
     (rum/local "" ::inviting-email)
     (rum/local "" ::inviting-slack)
     (rum/local :viewer ::inviting-user-type)
-    {:before-render (fn [s]
+    (rum/local nil ::last-focused-user)
+    {:will-mount (fn [s]
+                   (let [inviting-users-data @(drv/get-ref s :invite-users)
+                        invite-users (:invite-users inviting-users-data)]
+                     (when (zero? (count invite-users))
+                      (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))])))
+                   s)
+     :before-render (fn [s]
                      (let [invite-users-data @(drv/get-ref s :invite-users)]
                        (when (and (:auth-settings invite-users-data)
                                   (not (:teams-data-requested invite-users-data)))
@@ -53,7 +84,7 @@
         [:div.org-settings-panel-choice
           [:input
             {:type "radio"
-             :on-change #(reset! (::inviting-from s) (.. % -target -value))
+             :on-change (partial user-type-did-change s invite-users)
              :value "email"
              :checked (= "email" @(::inviting-from s))
              :id "org-settings-invit-from-medium-email"}]
@@ -63,7 +94,7 @@
         [:div.org-settings-panel-choice
           [:input
             {:type "radio"
-             :on-change #(reset! (::inviting-from s) (.. % -target -value))
+             :on-change (partial user-type-did-change s invite-users)
              :value "slack"
              :checked (= "slack" @(::inviting-from s))
              :id "org-settings-invit-from-medium-slack"}]
@@ -92,7 +123,12 @@
                       (rum/with-key
                         (slack-users-dropdown {:on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user %}))])
                                                :on-intermediate-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user nil}))])
-                                               :initial-value (utils/name-or-email (:user user-data))})
+                                               :initial-value (utils/name-or-email (:user user-data))
+                                               :on-focus #(do
+                                                           (reset! (::inviting-from s) (:type user-data))
+                                                           (reset! (::last-focused-user s) user-data))
+                                               :on-blur (fn []
+                                                          (utils/after 500 #(reset! (::last-focused-user s) nil)))})
                         (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                     [:input.org-settings-field.email-field
                       {:type "text"
@@ -100,43 +136,27 @@
                        :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
                        :placeholder "email@example.com"
                        :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user (.. % -target -value)}))])
+                       :on-focus #(do
+                                    (reset! (::inviting-from s) (:type user-data))
+                                    (reset! (::last-focused-user s) user-data))
+                       :on-blur (fn []
+                                  (utils/after 500 #(reset! (::last-focused-user s) nil)))
                        :value (:user user-data)}])]
                 [:td.user-type-field
                   [:div.user-type-dropdown
-                    (user-type-dropdown (utils/guid) (:role user-data) #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:role %}))]))]]
+                    (user-type-dropdown {:user-id (utils/guid)
+                                         :user-type (:role user-data)
+                                         :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                         :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:role %}))])})]]
                 [:td.user-remove
                   [:button.mlb-reset.remove-user
                     {:on-click #(dis/dispatch! [:input [:invite-users] (utils/vec-dissoc invite-users user-data)])}
                     [:i.mdi.mdi-delete]]]])]
           [:tbody
             [:tr
-              {:key (str "invite-users-table-new")}
-              [:td.user-field
-                (if (= "email" @(::inviting-from s))
-                  [:div.user-input
-                    [:input.org-settings-field
-                      {:type "email"
-                       :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-                       :placeholder "email@example.com"
-                       :on-change #(reset! (::inviting-email s) (.. % -target -value))
-                       :value @(::inviting-email s)}]]
-                  [:div.user-input
-                    (rum/with-key
-                      (slack-users-dropdown {:on-change #(reset! (::inviting-slack s) %)
-                                             :disabled false
-                                             :on-intermediate-change #(reset! (::inviting-slack s) nil)
-                                             :initial-value ""})
-                      (str "slack-users-dropdown-" (count invite-users)))])]
-              [:td.user-type-field
-                [:div.user-type-dropdown
-                  (rum/with-key
-                    (user-type-dropdown (utils/guid) @(::inviting-user-type s) #(reset! (::inviting-user-type s) %) (not (jwt/is-admin? (:team-id org-data))))
-                    (str "user-type-dropdown-" (count uninvited-users) "-" (count invite-users)))]]
-              [:td.user-remove]]
-            [:tr
               [:td
                 [:button.mlb-reset.mlb-default.add-button
-                  {:on-click #(add-inviting-user s)}
+                  {:on-click #(dis/dispatch! [:input [:invite-users] (conj invite-users (assoc default-user-row :type @(::inviting-from s)))])}
                   "+"]]
               [:td]
               [:td]]]]]
@@ -144,8 +164,12 @@
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(dis/dispatch! [:invite-users])
-           :disabled (zero? (count invite-users))}
-          (if (zero? (count invite-users)) "Send" (str "Send " (count invite-users) " Invite" (when (> (count invite-users) 1) "s")))]
+           :disabled (not (has-valid-user? invite-users))}
+          (let [valid-users-count (count (filter #(valid-user? %) invite-users))
+                needs-plural (> valid-users-count 1)]
+            (if (zero? valid-users-count)
+              "Send"
+              (str "Send " valid-users-count " Invite" (when needs-plural "s"))))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
           {:on-click #(dis/dispatch! [:input [:invite-users] []])}
           "Cancel"]]]))
