@@ -8,13 +8,12 @@
                                                               hide-popover)]))
 
 (rum/defc user-type-dropdown < rum/static
-  [user-id user-type click-cb & [hide-admin? remove-cb disabled]]
+  [{:keys [user-id user-type on-change hide-admin on-remove]}]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
       [:button.btn-reset.user-type-btn.dropdown-toggle
         {:id user-dropdown-id
-         :data-toggle (if disabled "" "dropdown")
-         :disabled disabled
+         :data-toggle "dropdown"
          :aria-haspopup true
          :aria-expanded false}
         (case user-type
@@ -26,18 +25,21 @@
       [:ul.dropdown-menu.user-type-dropdown-menu
         {:aria-labelledby user-dropdown-id}
         [:li
-          {:on-click #(click-cb :viewer)}
+          {:on-click #(when (fn? on-change)
+                        (on-change :viewer))}
           "Viewer"]
         [:li
-          {:on-click #(click-cb :author)}
+          {:on-click #(when (fn? on-change)
+                        (on-change :author))}
           "Contributor"]
-        (when-not hide-admin?
+        (when-not hide-admin
           [:li
-            {:on-click #(click-cb :admin)}
+            {:on-click #(when (fn? on-change)
+                        (on-change :admin))}
             "Admin"])
-        (when (fn? remove-cb)
+        (when (fn? on-remove)
           [:li.remove-li
-            {:on-click #(remove-cb)}
+            {:on-click #(on-remove)}
             "Remove User"])]]))
 
 (defn show-role-explainer-popover [e & [hide-admin]]
