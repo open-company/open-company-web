@@ -100,5 +100,12 @@
                       [:button.mlb-reset.mlb-link-red
                         {:on-click remove-fn}
                         "Cancel"])]]
-                [:td.rolw
-                  (user-type-dropdown (:user-id user) user-type #(api/switch-user-type user-type % user author) false remove-fn)]])]]]]))
+                [:td.role
+                  (user-type-dropdown (:user-id user)
+                                      user-type
+                                      #(api/switch-user-type user user-type % user author)
+                                      false
+                                      (if (and (not= "pending" (:status user))
+                                               (not= (:user-id user) (:user-id cur-user-data)))
+                                        remove-fn
+                                        nil))]])]]]]))
