@@ -99,13 +99,18 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-data-key (:team-id org-data)))))]
-   :invite-users        [[:base :team-data :current-user-data]
-                          (fn [base team-data current-user-data]
+   :team-roster         [[:base :org-data]
+                          (fn [base org-data]
+                            (when org-data
+                              (get-in base (team-roster-key (:team-id org-data)))))]
+   :invite-users        [[:base :team-data :current-user-data :team-roster]
+                          (fn [base team-data current-user-data team-roster]
                             {:team-data team-data
                              :teams-data-requested (:teams-data-requested base)
                              :auth-settings (:auth-settings base)
                              :invite-users (:invite-users base)
-                             :current-user-data current-user-data})]
+                             :current-user-data current-user-data
+                             :team-roster team-roster})]
    :org-settings-team-management
                         [[:base :route :org-data :team-data]
                           (fn [base route org-data team-data]
@@ -123,10 +128,6 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (calendar-key org-slug))))]
-   :team-roster         [[:base :org-data]
-                          (fn [base org-data]
-                            (when org-data
-                              (get-in base (team-roster-key (:team-id org-data)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
