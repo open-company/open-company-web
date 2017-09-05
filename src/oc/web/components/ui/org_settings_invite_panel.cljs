@@ -135,8 +135,9 @@
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
-          {:on-click #(dis/dispatch! [:org-edit-save])}
-          "Save"]
+          {:on-click #()
+           :disabled (zero? (count invite-users))}
+          (if (zero? (count invite-users)) "Send" (str "Send " (count invite-users) " Invites"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #()}
+          {:on-click #(dis/dispatch! [:input [:invite-user] []])}
           "Cancel"]]]))
