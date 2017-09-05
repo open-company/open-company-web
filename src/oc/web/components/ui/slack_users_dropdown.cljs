@@ -66,13 +66,14 @@
                        (reset! (::slack-user s) (.. % -target -value)))
          :disabled disabled
          :placeholder "Select User..."}]
-      [:i.fa
-        {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))
-                                  :fa-angle-up @(::show-users-dropdown s)})
-         :on-click #(do
-                      (reset! (::typing s) false)
-                      (reset! (::show-users-dropdown s) (not @(::show-users-dropdown s)))
-                      (utils/event-stop %))}]
+      (when (not disabled)
+        [:i.fa
+          {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))
+                                    :fa-angle-up @(::show-users-dropdown s)})
+           :on-click #(when (not disabled)
+                        (reset! (::typing s) false)
+                        (reset! (::show-users-dropdown s) (not @(::show-users-dropdown s)))
+                        (utils/event-stop %))}])
       (when @(::show-users-dropdown s)
         [:div.slack-users-dropdown-list
           (for [user (if (and @(::typing s) @(::slack-user s))
