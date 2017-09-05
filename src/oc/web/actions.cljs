@@ -387,24 +387,19 @@
         (update-in (butlast channels-key) dissoc (last channels-key))
         (dissoc :enumerate-channels-requested)))))
 
-(defmethod dispatcher/action :invite-user
-  [db [_]]
-  (let [org-data (dispatcher/org-data)
-        invite-data (:um-invite db)
-        invite-from (:invite-from invite-data)
-        email (:email invite-data)
-        slack-user (:slack-user invite-data)
-        user-type (:user-type invite-data)
-        parsed-email (utils/parse-input-email email)
+(defn invite-user [org-data team-data invite-data]
+  (let [invite-from (:type invite-data)
+        email (:user invite-data)
+        slack-user (:user invite-data)
+        user-type (:role invite-data)
+        parsed-email (when (= "email" invite-from) (utils/parse-input-email email))
         email-name (:name parsed-email)
         email-address (:address parsed-email)
-        team-data (dispatcher/team-data (:team-id org-data))
         ;; check if the user being invited by email is already present in the users list.
         ;; from slack is not possible to select a user already invited since they are filtered by status before
         user  (when (= invite-from "email")
                 (first (filter #(= (:email %) email-address) (:users team-data))))
-        old-user-type (when user (utils/get-user-type user org-data))
-        new-user-type (:user-type invite-data)]
+        old-user-type (when user (utils/get-user-type user org-data))]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
     (if (or (not user)
@@ -425,36 +420,44 @@
         ;; If the user is already in the list
         ;; but the type changed we need to change the user type too
         (when (and user
-                  (not= old-user-type new-user-type))
-          (api/switch-user-type old-user-type new-user-type user (utils/get-author (:user-id user) (:authors org-data))))
-        (api/send-invitation (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
-        (update-in db [:um-invite] dissoc :error))
-      (if (and user
-               (not= (string/lower-case (:status user)) "pending"))
-        (assoc-in db [:um-invite :error] "User already active.")
-        db))))
+                  (not= old-user-type user-type))
+          (api/switch-user-type old-user-type user-type user (utils/get-author (:user-id user) (:authors org-data))))
+        (api/send-invitation invite-data (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
+        {:success true})
+      {:error "User already active." :success false})))
 
-(defmethod dispatcher/action :invite-user-reset
+(defmethod dispatcher/action :invite-users
   [db [_]]
-  (update-in db [:um-invite] dissoc :last-action-success))
+  (let [org-data (dispatcher/org-data)
+        team-data (dispatcher/team-data (:team-id org-data))
+        invite-users (:invite-users db)]
+    (if (count invite-users)
+      (loop [i 0
+             next-db db]
+        (let [inviting-user (get invite-users i)
+              resp (invite-user org-data team-data inviting-user)
+              next-invite-users (if (:success resp)
+                                  (:invite-users next-db)
+                                  (assoc-in (:invite-users next-db) [0 :error] (:error resp)))]
+          (if (< i (count invite-users))
+            (recur (inc i) (assoc next-db :invite-users next-invite-users))
+            (assoc next-db :invite-users next-invite-users))))
+      db)))
 
 (defmethod dispatcher/action :invite-user/success
-  [db [_]]
+  [db [_ user]]
   ; refresh the users list once the invitation succeded
   (api/get-teams)
-  (assoc db :um-invite {:email ""
-                        :user-type nil
-                        :invite-from "email"
-                        :last-action-success true
-                        :error nil}))
+  (let [inviting-users (:invite-users db)
+        next-inviting-users (utils/vec-dissoc inviting-users user)]
+    (assoc db :invite-users next-inviting-users)))
 
 (defmethod dispatcher/action :invite-user/failed
-  [db [_ email]]
-  ; refresh the users list once the invitation succeded
-  (api/get-teams)
-  (-> db
-      (assoc-in [:um-invite :error] true)
-      (assoc-in [:um-invite :last-action-success] false)))
+  [db [_ user]]
+  (let [inviting-users (:invite-users db)
+        idx (utils/index-of inviting-users #(= % user))
+        next-inviting-users (assoc-in inviting-users [idx :error] true)]
+    (assoc db :invite-users next-inviting-users)))
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]
