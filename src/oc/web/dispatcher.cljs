@@ -75,7 +75,7 @@
    :loading             [[:base] (fn [base] (:loading base))]
    :teams-load          [[:base]
                           (fn [base]
-                            {:team-data-requested (:teams-data-requested base)
+                            {:teams-data-requested (:teams-data-requested base)
                              :auth-settings (:auth-settings base)})]
    :team-management     [[:base :route]
                           (fn [base route]
@@ -99,6 +99,13 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-data-key (:team-id org-data)))))]
+   :invite-users        [[:base :team-data :current-user-data]
+                          (fn [base team-data current-user-data]
+                            {:team-data team-data
+                             :teams-data-requested (:teams-data-requested base)
+                             :auth-settings (:auth-settings base)
+                             :invite-users (:invite-users base)
+                             :current-user-data current-user-data})]
    :org-settings-team-management
                         [[:base :route :org-data :team-data]
                           (fn [base route org-data team-data]
