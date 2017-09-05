@@ -426,22 +426,33 @@
         {:success true})
       {:error "User already active." :success false})))
 
+(defn valid-inviting-user? [user]
+  (or (and (= "email" (:type user))
+           (utils/valid-email? (:user user)))
+      (and (= "email" (:type user))
+           (map? (:user user))
+           (contains? (:user user) :slack-org-id)
+           (contains? (:user user) :slack-id))))
+
 (defmethod dispatcher/action :invite-users
   [db [_]]
   (let [org-data (dispatcher/org-data)
         team-data (dispatcher/team-data (:team-id org-data))
         invite-users (:invite-users db)]
     (if (count invite-users)
-      (loop [i 0
-             next-db db]
-        (let [inviting-user (get invite-users i)
-              resp (invite-user org-data team-data inviting-user)
-              next-invite-users (if (:success resp)
-                                  (:invite-users next-db)
-                                  (assoc-in (:invite-users next-db) [0 :error] (:error resp)))]
-          (if (< i (count invite-users))
-            (recur (inc i) (assoc next-db :invite-users next-invite-users))
-            (assoc next-db :invite-users next-invite-users))))
+      (let [next-invite-users (loop [i 0
+                                     next-invite-users []]
+                                (let [inviting-user (get invite-users i)
+                                      resp (if (valid-inviting-user? inviting-user)
+                                             (invite-user org-data team-data inviting-user)
+                                             (assoc inviting-user :error true))
+                                      next-invite-users (if (:success resp)
+                                                          next-invite-users
+                                                          (conj next-invite-users (assoc inviting-user :error (:error resp))))]
+                                  (if (< i (dec (count invite-users)))
+                                    (recur (inc i) next-invite-users)
+                                    next-invite-users)))]
+        (assoc db :invite-users next-invite-users))
       db)))
 
 (defmethod dispatcher/action :invite-user/success
@@ -454,10 +465,10 @@
 
 (defmethod dispatcher/action :invite-user/failed
   [db [_ user]]
-  (let [inviting-users (:invite-users db)
-        idx (utils/index-of inviting-users #(= % user))
-        next-inviting-users (assoc-in inviting-users [idx :error] true)]
-    (assoc db :invite-users next-inviting-users)))
+  (let [invite-users (:invite-users db)
+        idx (utils/index-of invite-users #(= (:user %) (:user user)))
+        next-invite-users (assoc-in invite-users [idx :error] true)]
+    (assoc db :invite-users next-invite-users)))
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id invitation action method other-link-params payload]]
