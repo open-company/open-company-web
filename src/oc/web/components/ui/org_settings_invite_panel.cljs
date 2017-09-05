@@ -44,7 +44,9 @@
   (let [invite-users-data (drv/react s :invite-users)
         team-data (:team-data invite-users-data)
         invite-users (:invite-users invite-users-data)
-        cur-user-data (:current-user-data invite-users-data)]
+        cur-user-data (:current-user-data invite-users-data)
+        team-roster (:team-roster invite-users-data)
+        uninvited-users (filter #(= (:status %) "uninvited") (:users team-roster))]
     [:div.org-settings-panel
       [:div.org-settings-panel-row.invite-from.group
         [:div.invite-from-label "Invite with:"]
@@ -87,14 +89,17 @@
                   (if (= "slack" (:type user-data))
                     [:div
                       {:class (when (:error user-data) "error")}
-                      (slack-users-dropdown {:on-change #()
-                                             :disabled true
-                                             :on-intermediate-change #()
-                                             :initial-value (utils/name-or-email (:user user-data))})]
+                      (rum/with-key
+                        (slack-users-dropdown {:on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user %}))])
+                                               :on-intermediate-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user nil}))])
+                                               :initial-value (utils/name-or-email (:user user-data))})
+                        (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                     [:input.org-settings-field.email-field
                       {:type "text"
                        :class (when (:error user-data) "error")
-                       :disabled true
+                       :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+                       :placeholder "email@example.com"
+                       :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user (.. % -target -value)}))])
                        :value (:user user-data)}])]
                 [:td.user-type-field
                   [:div.user-type-dropdown
@@ -103,50 +108,44 @@
                   [:button.mlb-reset.remove-user
                     {:on-click #(dis/dispatch! [:input [:invite-users] (utils/vec-dissoc invite-users user-data)])}
                     [:i.mdi.mdi-delete]]]])]
-          (let [plus-enabled (or (and (= "email" @(::inviting-from s))
-                                      (utils/valid-email? @(::inviting-email s)))
-                                 (and (= "slack" @(::inviting-from s))
-                                      (not (empty? @(::inviting-slack s)))))]
-            [:tbody
-              [:tr
-                {:key (str "invite-users-table-new")}
-                [:td.user-field
+          [:tbody
+            [:tr
+              {:key (str "invite-users-table-new")}
+              [:td.user-field
+                (if (= "email" @(::inviting-from s))
                   [:div.user-input
                     [:input.org-settings-field
                       {:type "email"
-                       :style {:display (if (= "email" @(::inviting-from s)) "block" "none")}
                        :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
                        :placeholder "email@example.com"
                        :on-change #(reset! (::inviting-email s) (.. % -target -value))
-                       :value @(::inviting-email s)}]
-                    [:div
-                      {:style {:display (if (= "slack" @(::inviting-from s)) "block" "none")}}
-                      (rum/with-key
-                        (slack-users-dropdown {:on-change #(reset! (::inviting-slack s) %)
-                                               :disabled false
-                                               :on-intermediate-change #(reset! (::inviting-slack s) nil)
-                                               :initial-value ""})
-                        (str "slack-users-dropdown-" (count invite-users)))]]]
-                [:td.user-type-field
-                  [:div.user-type-dropdown
+                       :value @(::inviting-email s)}]]
+                  [:div.user-input
                     (rum/with-key
-                      (user-type-dropdown (utils/guid) @(::inviting-user-type s) #(reset! (::inviting-user-type s) %) (not (jwt/is-admin? (:team-id org-data))) nil (not plus-enabled))
-                      (str "user-type-dropdown-" (count invite-users)))]]
-                [:td.user-remove]]
-              [:tr
-                [:td
-                  [:button.mlb-reset.mlb-default.add-button
-                    {:disabled (not plus-enabled)
-                     :on-click #(add-inviting-user s)}
-                    "+"]]
-                [:td]
-                [:td]]])]]
+                      (slack-users-dropdown {:on-change #(reset! (::inviting-slack s) %)
+                                             :disabled false
+                                             :on-intermediate-change #(reset! (::inviting-slack s) nil)
+                                             :initial-value ""})
+                      (str "slack-users-dropdown-" (count invite-users)))])]
+              [:td.user-type-field
+                [:div.user-type-dropdown
+                  (rum/with-key
+                    (user-type-dropdown (utils/guid) @(::inviting-user-type s) #(reset! (::inviting-user-type s) %) (not (jwt/is-admin? (:team-id org-data))))
+                    (str "user-type-dropdown-" (count uninvited-users) "-" (count invite-users)))]]
+              [:td.user-remove]]
+            [:tr
+              [:td
+                [:button.mlb-reset.mlb-default.add-button
+                  {:on-click #(add-inviting-user s)}
+                  "+"]]
+              [:td]
+              [:td]]]]]
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(dis/dispatch! [:invite-users])
            :disabled (zero? (count invite-users))}
-          (if (zero? (count invite-users)) "Send" (str "Send " (count invite-users) " Invites"))]
+          (if (zero? (count invite-users)) "Send" (str "Send " (count invite-users) " Invite" (when (> (count invite-users) 1) "s")))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
           {:on-click #(dis/dispatch! [:input [:invite-users] []])}
           "Cancel"]]]))
