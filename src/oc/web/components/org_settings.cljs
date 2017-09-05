@@ -28,7 +28,7 @@
       [:a.org-settings-tab-link
         {:href (oc-urls/org-settings-team org-slug)
          :on-click #(do (utils/event-stop %) (on-click (oc-urls/org-settings-team org-slug)))}
-        "Menage Members"]]
+        "Manage Members"]]
     [:div.org-settings-tab
       {:class (when (= :org-settings-invite active-tab) "active")}
       [:a.org-settings-tab-link
