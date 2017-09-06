@@ -119,10 +119,11 @@
         [:div.org-settings-panel-row.slack-teams-row.group
           [:div.org-settings-label
             [:label
-              {:title "Anyone who signs up with your Slack team can view team boards."
-               :data-toggle "tooltip"
-               :data-placement "top"}
-              "Slack Teams"]
+              "Slack Teams"
+              [:i.mdi.mdi-information-outline
+                {:title "Anyone who signs up with your Slack team can contribute to team boards."
+                 :data-toggle "tooltip"
+                 :data-placement "top"}]]
             (when (not (empty? (:access query-params)))
               [:label.error
                 (cond
@@ -156,18 +157,18 @@
                     {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
                      :title (str "Remove " (:name team) " Slack team")
                      :data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"}
+                     :data-placement "top"}
                     "Remove"]]))]]
         ;; Email domains row
         (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
             [:div.org-settings-label
               [:label
-                {:title "Anyone who signs up with email can contribute to team boards."
-                 :data-toggle "tooltip"
-                 :data-placement "top"}
-                "Email Domains"]
+                "Email Domains"
+                [:i.mdi.mdi-information-outline
+                  {:title "Anyone who signs up with email can contribute to team boards."
+                   :data-toggle "tooltip"
+                   :data-placement "top"}]]
               (when add-email-domain-team-error
                 [:label.error
                   (cond

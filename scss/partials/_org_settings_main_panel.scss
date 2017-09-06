@@ -45,11 +45,12 @@ div.org-settings-main {
 
   div.org-settings-panel-row.email-domains-row {
     div.org-settings-label {
-      label:after {
-        display: inline-block;
-        margin-left: 16px;
-        content:"\F2FD";
-        font-family: "Material Design Icons";
+      i.mdi.mdi-information-outline {
+        margin-left: 8px;
+
+        &:before {
+          font-size: 14px;
+        }
       }
 
       div.tooltip {
@@ -59,12 +60,22 @@ div.org-settings-main {
 
     div.org-settings-list {
       margin-bottom: 16px;
+
+      div.org-settings-list-item {
+        div.org-settings-list-item-name {
+          @include avenir_R();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+        }
+      }
+
     }
 
     div.org-settings-field {
       float: left;
       width: 307px !important;
       margin-right: 26px;
+      height: 40px;
 
       input {
         @include placeholder(){
@@ -83,9 +94,27 @@ div.org-settings-main {
   }
 
   div.org-settings-panel-row.slack-teams-row {
+    div.org-settings-label {
+      i.mdi.mdi-information-outline {
+        margin-left: 8px;
+
+        &:before {
+          font-size: 14px;
+        }
+      }
+
+      div.tooltip {
+        width: 160px;
+      }
+    }
+
     div.org-settings-list {
       div.org-settings-list-item {
         label.org-settings-list-item-name{
+          @include avenir_R();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+
           img.slack-logo {
             width: 16px;
             height: 16px;
