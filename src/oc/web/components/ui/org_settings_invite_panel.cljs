@@ -36,16 +36,19 @@
                  (empty? (:temp-user user)))
         (dis/dispatch! [:input [:invite-users i :type] value])))))
 
+(defn setup-initial-rows [s]
+  (let [inviting-users-data @(drv/get-ref s :invite-users)
+        invite-users (:invite-users inviting-users-data)]
+    (when (zero? (count invite-users))
+      (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))]))))
+
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-users)
     (rum/local "email" ::inviting-from)
     (rum/local (int (rand 10000)) ::rand)
     {:will-mount (fn [s]
-                   (let [inviting-users-data @(drv/get-ref s :invite-users)
-                        invite-users (:invite-users inviting-users-data)]
-                     (when (zero? (count invite-users))
-                      (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))])))
+                   (setup-initial-rows s)
                    s)
      :before-render (fn [s]
                      (let [invite-users-data @(drv/get-ref s :invite-users)]
@@ -57,7 +60,10 @@
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
                         (.tooltip "hide"))
-                     s)}
+                     s)
+     :did-update (fn [s]
+                   (setup-initial-rows s)
+                   s)}
   [s org-data]
   (let [invite-users-data (drv/react s :invite-users)
         team-data (:team-data invite-users-data)
@@ -78,7 +84,7 @@
           [:label
             {:for "org-settings-invit-from-medium-email"}
             "Email"]]
-        (let [slack-enabled? (pos? (count (:slack-orgs team-data)))]
+        (let [slack-enabled? (jwt/team-has-bot? (:team-id team-data))]
           [:div.org-settings-panel-choice
             [:input
               {:type "radio"

@@ -138,7 +138,7 @@
                   :else
                   "An error occurred, please try again.")])]
           [:div.org-settings-list
-            (let [slack-bots (get (jwt/get-key :slack-bots) (:team-id org-data))]
+            (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
               (for [team (:slack-orgs team-data)]
                 [:div.org-settings-list-item.group
                   {:key (str "slack-org-" (:slack-org-id team))}
@@ -148,7 +148,7 @@
                     [:button.remove-team-btn.btn-reset
                       {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
                       "Remove Slack team"]]
-                  (when-not (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)
+                  (when-not (filter #(= (:slack-org-id %) (:slack-org-id team-data)) slack-bots)
                     (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
                       (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings (:slug org-data)))]
                         [:button.org-settings-list-item-btn.btn-reset
