@@ -72,7 +72,7 @@
                                                              (= columns-num 2))})
                     :style topics-column-conatiner-style
                     :key columns-container-key}
-            (when-not (responsive/is-tablet-or-mobile?)
+            (when-not (responsive/is-mobile-size?)
               (navigation-sidebar))
             (dom/div {:class "board-container right"
                       :style {:width (str (- total-width-int responsive/left-navigation-sidebar-width responsive/topic-list-right-margin (* 2 responsive/topic-list-x-padding)) "px")}}

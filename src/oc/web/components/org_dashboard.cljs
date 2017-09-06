@@ -103,24 +103,17 @@
             (if (:show-welcome-screen data)
               (welcome-screen)
               (dom/div {:class "dashboard-container"}
-                (if (and (empty? (:topics board-data)) (responsive/is-tablet-or-mobile?))
-                  (dom/div {:class "empty-dashboard"}
-                    (dom/h3 {:class "empty-dashboard-title"}
-                      "No topics have been created.")
-                    (when-not (:read-only board-data)
-                      (dom/p {:class "empty-dashboard-msg"}
-                        (str "Hi" (when (jwt/jwt) (str " " (jwt/get-key :name))) ", your dashboard can be viewed after it's been created on a desktop browser."))))
-                  (om/build topics-list
-                    {:loading (:loading data)
-                     :content-loaded (or (:loading board-data) (:loading data))
-                     :org-data org-data
-                     :board-data board-data
-                     :all-activity-data all-activity-data
-                     :force-edit-topic (:force-edit-topic data)
-                     :card-width card-width
-                     :columns-num columns-num
-                     :show-login-overlay (:show-login-overlay data)
-                     :entry-editing (:entry-editing data)
-                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                     :is-dashboard true
-                     :board-filters (:board-filters data)}))))))))))
+                (om/build topics-list
+                  {:loading (:loading data)
+                   :content-loaded (or (:loading board-data) (:loading data))
+                   :org-data org-data
+                   :board-data board-data
+                   :all-activity-data all-activity-data
+                   :force-edit-topic (:force-edit-topic data)
+                   :card-width card-width
+                   :columns-num columns-num
+                   :show-login-overlay (:show-login-overlay data)
+                   :entry-editing (:entry-editing data)
+                   :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                   :is-dashboard true
+                   :board-filters (:board-filters data)})))))))))
