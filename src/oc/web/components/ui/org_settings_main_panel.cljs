@@ -150,7 +150,7 @@
                       "Remove Slack Team"]]
                   (when-not (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)
                     (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
-                      (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings-team (:slug org-data)))]
+                      (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings (:slug org-data)))]
                         [:button.org-settings-list-item-btn.btn-reset
                           {:on-click #(router/redirect! fixed-add-bot-link)
                            :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
