@@ -1,11 +1,12 @@
 div.org-settings-panel {
   div.org-settings-team.org-settings-panel-row {
     th.role {
-      width: 144px;
+      padding-right: 16px;
     }
 
-    th:last-child, td:last-child {
+    th.role, td.role {
       text-align: right;
+      width: 144px;
     }
 
     td.status-column{
@@ -41,10 +42,6 @@ div.org-settings-panel {
 
       &:last-child {
         text-align: right;
-      }
-
-      &.role {
-        width: 144px;
       }
 
       ul.user-type-dropdown-menu {
