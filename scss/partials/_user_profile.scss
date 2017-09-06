@@ -1,9 +1,18 @@
-$user_profile_footer_height: 90px;
+@import "vars/main";
 
 div.user-profile {
 
   &.fullscreen-page {
     background-color: $carrot_settings_background;
+  }
+
+  button.carrot-close-bt {
+    // Fallback for mobile that doesn't support fix positioning
+    position: absolute;
+    position: fixed;
+    left: 50%;
+    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
+    top: 0px;
   }
 
   div.user-profile-header {
