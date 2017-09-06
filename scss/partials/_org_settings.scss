@@ -134,13 +134,6 @@ div.org-settings {
               font-size: 14px;
               color: $oc_gray_7;
 
-              &.role {
-                width: 144px;
-              }
-
-              &:last-child {
-                text-align: center;
-              }
             }
 
             td {
@@ -149,44 +142,6 @@ div.org-settings {
               @include avenir_R();
               font-size: 16px;
               color: $carrot_dark_gray;
-
-              &.status-column{
-                max-width: 220px;
-
-                div.status-column-inner {
-                  max-width: 220px;
-
-                  div.status-label {
-                    float: left;
-                  }
-
-                  button {
-                    float: left;
-                    font-size: 14px;
-                    @include avenir_H();
-                    margin-left: 8px;
-                  }
-                }
-              }
-
-              div.user-avatar-img-container {
-                margin-right: 16px;
-                float: left;
-
-                img {
-                  max-width: 32px;
-                  max-height: 32px;
-                  border-radius: 16px;
-                }
-              }
-
-              &:last-child {
-                text-align: center;
-              }
-
-              &.role {
-                width: 144px;
-              }
             }
           }
         }

@@ -1,0 +1,57 @@
+div.org-settings-panel {
+  div.org-settings-team.org-settings-panel-row {
+    th.role {
+      width: 144px;
+    }
+
+    th:last-child, td:last-child {
+      text-align: center;
+      padding-left: 32px;
+    }
+
+    td.status-column{
+      max-width: 220px;
+
+      div.status-column-inner {
+        max-width: 220px;
+
+        div.status-label {
+          float: left;
+        }
+
+        button {
+          float: left;
+          font-size: 14px;
+          @include avenir_H();
+          margin-left: 8px;
+        }
+      }
+    }
+
+    td {
+      div.user-avatar-img-container {
+        margin-right: 16px;
+        float: left;
+
+        img {
+          max-width: 32px;
+          max-height: 32px;
+          border-radius: 16px;
+        }
+      }
+
+      &:last-child {
+        text-align: right;
+      }
+
+      &.role {
+        width: 144px;
+      }
+
+      ul.user-type-dropdown-menu {
+        right: 0px;
+        left: unset;
+      }
+    }
+  }
+}
