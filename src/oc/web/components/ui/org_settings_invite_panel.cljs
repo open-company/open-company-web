@@ -78,16 +78,19 @@
           [:label
             {:for "org-settings-invit-from-medium-email"}
             "Email"]]
-        [:div.org-settings-panel-choice
-          [:input
-            {:type "radio"
-             :on-change (partial user-type-did-change s invite-users)
-             :value "slack"
-             :checked (= "slack" @(::inviting-from s))
-             :id "org-settings-invit-from-medium-slack"}]
-          [:label
-            {:for "org-settings-invit-from-medium-slack"}
-            "Slack"]]]
+        (let [slack-enabled? (pos? (count (:slack-orgs team-data)))]
+          [:div.org-settings-panel-choice
+            [:input
+              {:type "radio"
+               :on-change (partial user-type-did-change s invite-users)
+               :value "slack"
+               :checked (= "slack" @(::inviting-from s))
+               :disabled (not slack-enabled?)
+               :id "org-settings-invit-from-medium-slack"}]
+            [:label
+              {:for "org-settings-invit-from-medium-slack"
+               :style {:opacity (if slack-enabled? 1 0.4)}}
+              "Slack"]])]
       ;; Panel rows
       [:div.org-settings-invite-table.org-settings-panel-row
         ;; Team table
@@ -96,7 +99,10 @@
             [:tr
               [:th "Email Addresses"]
               [:th.role "Role "
-                [:i.mdi.mdi-information-outline]]
+                [:i.mdi.mdi-information-outline
+                  {:title "Roles describe access levels. Viewers can only view; Contributors and Admins can edit, too."
+                   :data-placement "top"
+                   :data-toggle "tooltip"}]]
               [:th ""]]]
           [:tbody
             {:key (str "org-settings-invite-table-" @(::rand s))}
