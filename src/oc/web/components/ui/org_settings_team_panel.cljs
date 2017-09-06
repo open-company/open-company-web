@@ -85,16 +85,22 @@
                 [:td.status-column
                   [:div.status-column-inner.group
                     [:div.status-label (s/capital (:status user))]
-                    (when (= "pending" (:status user))
+                    (when (and (= "pending" (:status user))
+                               (or (contains? user :email)
+                                   (contains? user :slack-id)))
                       [:button.mlb-reset.mlb-link
                         {:on-click (fn []
-                                     (dis/dispatch! [:input [:invite-users]
-                                                      [{:user (:email user)
-                                                        :type "email"
-                                                        :role user-type
-                                                        :error nil}]])
-                                     (reset! (::resending-invite s) true)
-                                     (utils/after 100 #(dis/dispatch! [:invite-users])))}
+                                     (let [invitation-type (if (contains? user :slack-id) "slack" "email")
+                                           inviting-user (if (= invitation-type "email")
+                                                            (:email user)
+                                                            (select-keys user [:first-name :last-name :slack-id :slack-org-id]))]
+                                       (dis/dispatch! [:input [:invite-users]
+                                                        [{:user inviting-user
+                                                          :type invitation-type
+                                                          :role user-type
+                                                          :error nil}]])
+                                       (reset! (::resending-invite s) true)
+                                       (utils/after 100 #(dis/dispatch! [:invite-users]))))}
                         "Resend"])
                     (when (and (= "pending" (:status user))
                                (utils/link-for (:links user) "remove"))
