@@ -149,7 +149,7 @@
                       {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
                       "Remove Slack team"]]
                   (when-not (filter #(= (:slack-org-id %) (:slack-org-id team-data)) slack-bots)
-                    (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
+                    (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
                       (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings (:slug org-data)))]
                         [:button.org-settings-list-item-btn.btn-reset
                           {:on-click #(router/redirect! fixed-add-bot-link)
