@@ -98,6 +98,10 @@ div.org-settings-main {
     font-size: 14px;
     color: $carrot_light_gray;
     margin-left: 16px;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   div.org-settings-panel-row.slack-teams-row {

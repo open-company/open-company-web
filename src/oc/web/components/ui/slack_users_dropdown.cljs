@@ -73,7 +73,7 @@
                          (on-intermediate-change (.. % -target -value)))
                        (reset! (::slack-user s) (.. % -target -value)))
          :disabled disabled
-         :placeholder "Select User..."}]
+         :placeholder (if (pos? (count all-users)) "Select User..." "No more members to add")}]
       (when (not disabled)
         [:i.fa
           {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))

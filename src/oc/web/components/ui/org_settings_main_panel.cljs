@@ -147,7 +147,7 @@
                     (:name team)
                     [:button.remove-team-btn.btn-reset
                       {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
-                      "Remove Slack Team"]]
+                      "Remove Slack team"]]
                   (when-not (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)
                     (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
                       (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings (:slug org-data)))]
@@ -191,7 +191,7 @@
                   [:span.org-settings-list-item-name (str "@" (:domain team))]
                   [:button.remove-team-btn.btn-reset
                     {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
-                    "Remove Email Domain"]])]
+                    "Remove email domain"]])]
             [:div.org-settings-field
               {:class (when add-email-domain-team-error "error")}
               [:input.um-invite-field.email
