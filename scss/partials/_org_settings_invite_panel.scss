@@ -56,6 +56,17 @@ div.org-settings-panel {
     td.user-field {
       width: 365px;
       padding-right: 12px !important;
+
+      div.user-avatar-img-container {
+        margin-right: 16px;
+        float: left;
+
+        img {
+          max-width: 32px;
+          max-height: 32px;
+          border-radius: 16px;
+        }
+      }
     }
 
     td.user-type-field {
