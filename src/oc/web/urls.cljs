@@ -83,7 +83,7 @@
   ([]
     (org-settings-team (router/current-org-slug)))
   ([org-slug]
-    (str (org-settings org-slug) "/team-management")))
+    (str (org-settings org-slug) "/team")))
 
 (defn org-settings-invite
   "Invite people to team url"
