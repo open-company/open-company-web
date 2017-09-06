@@ -125,7 +125,9 @@
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
             (when (not (empty? (:access query-params)))
-              [:label.error
+              [:label
+                {:class (if (or (= "bot" (:access query-params))
+                                (= "team" (:access query-params))) "success-message" "error")}
                 (cond
                   (= (:access query-params) "team-exists")
                   "This team was already added."
@@ -142,7 +144,10 @@
                   {:key (str "slack-org-" (:slack-org-id team))}
                   [:label.org-settings-list-item-name
                     [:img.slack-logo {:src (utils/cdn "/img/slack.png")}]
-                    (:name team)]
+                    (:name team)
+                    [:button.remove-team-btn.btn-reset
+                      {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
+                      "Remove Slack Team"]]
                   (when-not (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)
                     (when-let [add-bot-link (utils/link-for (:links team) "bot" "GET" {:auth-source "slack"})]
                       (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings-team (:slug org-data)))]
@@ -152,13 +157,15 @@
                            :data-toggle "tooltip"
                            :data-placement "top"
                            :data-container "body"}
-                          "Add Bot"])))
-                  [:button.org-settings-list-item-remove-btn.btn-reset
-                    {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)
-                     :title (str "Remove " (:name team) " Slack team")
-                     :data-toggle "tooltip"
-                     :data-placement "top"}
-                    "Remove"]]))]]
+                          "Add Bot"])))]))]
+          (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+            [:button.btn-reset.add-slack-team-bt
+                {:on-click #(dis/dispatch! [:slack-team-add])}
+                (str "Add "
+                     (if (zero? (count (:slack-orgs team-data)))
+                        "A"
+                        "Another")
+                     " Slack Team")])]
         ;; Email domains row
         (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
@@ -182,9 +189,9 @@
                 [:div.org-settings-list-item.group
                   {:key (str "email-domain-team-" (:domain team))}
                   [:span.org-settings-list-item-name (str "@" (:domain team))]
-                  [:button.org-settings-list-item-remove-btn.btn-reset
+                  [:button.remove-team-btn.btn-reset
                     {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
-                    "Remove"]])]
+                    "Remove Email Domain"]])]
             [:div.org-settings-field
               {:class (when add-email-domain-team-error "error")}
               [:input.um-invite-field.email

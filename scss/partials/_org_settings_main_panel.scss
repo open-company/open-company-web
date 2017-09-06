@@ -86,11 +86,18 @@ div.org-settings-main {
       }
     }
 
-    button.add-email-domain.bt {
+    button.add-email-domain-bt {
       float: left;
       width: 61px;
-      height: 44px;
+      height: 40px;
     }
+  }
+
+  button.remove-team-btn {
+    @include avenir_R();
+    font-size: 14px;
+    color: $carrot_light_gray;
+    margin-left: 16px;
   }
 
   div.org-settings-panel-row.slack-teams-row {
@@ -105,6 +112,39 @@ div.org-settings-main {
 
       div.tooltip {
         width: 160px;
+      }
+    }
+
+    button.add-slack-team-bt {
+      @include avenir_R();
+      font-size: 16px;
+      color: $carrot_light_gray;
+      margin-top: 16px;
+      position: relative;
+      padding-right: 28px;
+
+      &:after {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        background-color: rgba(#52DE95, 0.25);
+        color: $carrot_green;
+        content: "+";
+        font-size: 16px;
+        text-decoration: none;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+      }
+
+      &:hover{
+        text-decoration: underline;
+        &:after {
+          color: white;
+          background-color: $carrot_green_1;
+          text-decoration: none;
+        }
       }
     }
 
