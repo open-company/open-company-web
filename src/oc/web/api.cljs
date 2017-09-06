@@ -372,13 +372,15 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:user-data (json->cljs body)])))))
 
+(def user-profile-keys [:first-name :last-name :email :password :avatar-url])
+
 (defn patch-user-profile [old-user-data new-user-data]
   (when (and (:links old-user-data)
              (map? new-user-data))
     (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")]
       (auth-http (method-for-link user-update-link) (relative-href user-update-link)
         {:headers (headers-for-link user-update-link)
-         :json-params (cljs->json (dissoc new-user-data :links :updated-at :created-at))}
+         :json-params (cljs->json (select-keys new-user-data user-profile-keys))}
          (fn [{:keys [status body success]}]
            (if (= status 422)
               (dispatcher/dispatch! [:user-profile-update/failed])
