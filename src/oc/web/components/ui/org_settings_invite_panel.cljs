@@ -11,7 +11,7 @@
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
 
 (def default-user-type "email")
-(def default-row-num 3)
+(def default-row-num 1)
 (def default-user "")
 (def default-slack-user {})
 (def default-user-role :author)
