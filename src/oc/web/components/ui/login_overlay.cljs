@@ -91,7 +91,7 @@
                 "OR SIGN UP VIA EMAIL"
                 :else
                 "OR SIGN IN VIA EMAIL")]]]
-          [:div.login-overlay-footer.py2.px3.mt1.group
+          [:div.login-overlay-footer.group
             (cond
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
                 [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])}
@@ -170,7 +170,7 @@
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
                 "Sign In"]]]]]
-      [:div.login-overlay-footer.py2.px3.mt1.group
+      [:div.login-overlay-footer.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
           "Don't have an account? "
           [:span.blue-link "SIGN UP NOW."]]]]])
@@ -275,7 +275,7 @@
                               (utils/event-stop %)
                               (dis/dispatch! [:signup-with-email]))}
                 "Sign Up"]]]]]
-      [:div.login-overlay-footer.py2.px3.mt1.group
+      [:div.login-overlay-footer.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))}
           "Already have an account? "
           [:span.blue-link "SIGN IN NOW."]]]]])

@@ -206,10 +206,12 @@ div.login-overlay-container {
     }
 
     div.login-overlay-footer {
-      background-color: rgba(78, 90, 107, 0.1);
+      background-color: $carrot_light_gray_2;
       position: relative;
       width: 100%;
       bottom: 0px;
+      padding: 16px 32px;
+      margin-top: 16px;
 
       @include mobile(){
         position: relative;
