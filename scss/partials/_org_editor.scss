@@ -5,6 +5,7 @@ div.org-editor {
 
     nav {
       border-bottom: 10px solid $carrot_orange;
+      height: #{$navbar_height + $carrot_trend_collapsed_height}px;
     }
 
     @include mobile(){
