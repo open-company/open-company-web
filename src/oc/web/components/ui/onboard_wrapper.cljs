@@ -56,7 +56,7 @@
                       nil
                       (fn [_])
                       nil)}
-        (user-avatar-image )
+        (user-avatar-image @(::user-data s))
         [:div.add-picture-link
           "Upload profile photo"]
         [:div.add-picture-link-subtitle

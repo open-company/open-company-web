@@ -8,9 +8,6 @@ div.onboard-wrapper-container {
     display: flex;
 
     div.onboard-wrapper-left {
-      // width: 50%;
-      // height: 100%;
-      // float: left;
       background-color: $carrot_dark_bg_gray;
       padding: 21px;
       flex: 1;
@@ -44,9 +41,6 @@ div.onboard-wrapper-container {
     }
 
     div.onboard-wrapper-right {
-      // width: 50%;
-      // height: 100%;
-      // float: right;
       text-align: center;
       flex: 1;
       position: absolute;
@@ -181,7 +175,7 @@ div.invitee-lander {
 
   div.invitee-form {
     width: 340px;
-    margin: 0 auto;
+    margin: 0 auto 32px;
     text-align: left;
 
     div.logo-upload-container {
