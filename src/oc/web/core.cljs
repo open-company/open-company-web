@@ -41,7 +41,8 @@
             [oc.web.components.board-settings :refer (board-settings)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.story :refer (story)]
-            [oc.web.components.story-edit :refer (story-edit)]))
+            [oc.web.components.story-edit :refer (story-edit)]
+            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
 
 (enable-console-print!)
 
@@ -308,6 +309,24 @@
     ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
     ;     (router/redirect! (urls/org-settings s))))
 
+    (defroute email-wall-route urls/email-wall {:keys [query-params] :as params}
+      (timbre/info "Routing email-wall-route" urls/email-wall)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/home))
+      (pre-routing query-params)
+      (router/set-route! ["email-wall"] {:query-params query-params})
+      (post-routing)
+      (drv-root #(om/component (onboard-wrapper)) target))
+
+    (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
+      (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
+      (when (jwt/jwt)
+        (router/redirect! urls/home))
+      (pre-routing query-params)
+      (router/set-route! ["email-wall"] {:query-params query-params})
+      (post-routing)
+      (drv-root #(om/component (onboard-wrapper)) target))
+
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
@@ -481,6 +500,10 @@
                                  confirm-invitation-route
                                  password-reset-route
                                  ;  ; subscription-callback-route
+                                 ;; Email wall
+                                 email-wall-route
+                                 email-wall-slash-route
+                                 ;; Home page
                                  home-page-route
                                  user-profile-route
                                  ;; Org routes
