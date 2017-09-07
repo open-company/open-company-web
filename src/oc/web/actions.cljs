@@ -429,7 +429,7 @@
 (defn valid-inviting-user? [user]
   (or (and (= "email" (:type user))
            (utils/valid-email? (:user user)))
-      (and (= "email" (:type user))
+      (and (= "slack" (:type user))
            (map? (:user user))
            (contains? (:user user) :slack-org-id)
            (contains? (:user user) :slack-id))))
