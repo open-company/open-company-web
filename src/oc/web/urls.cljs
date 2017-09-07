@@ -47,6 +47,8 @@
 
 (def password-reset "/reset")
 
+(def email-wall "/email-required")
+
 ;; User
 
 (def user-profile "/profile")
