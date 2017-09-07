@@ -50,7 +50,7 @@
         {:on-click #(iu/upload! {:accept "image/*" ; :imageMin [840 200]
                                  :transformations {
                                    :crop {
-                                     :aspectRatio (/ 840 200)}}}
+                                     :aspectRatio 1}}}
                       (fn [res]
                         (reset! (::user-data s) (assoc @(::user-data s) :avatar-url (gobj/get res "url"))))
                       nil
