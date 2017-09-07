@@ -44,7 +44,7 @@ div.login-overlay-container {
     border-radius: 8px;
     padding: 0px 0px 0px;
     max-height: calc(100vh - 80px);
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 
     @include mobile{
@@ -219,7 +219,7 @@ div.login-overlay-container {
       }
 
       a {
-        color: $oc_gray_7;
+        color: $carrot_light_gray;
         @include avenir_H();
         font-size: 14px;
 

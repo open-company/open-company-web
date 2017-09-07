@@ -23,7 +23,7 @@ div.org-settings {
     background-color: white;
     min-height: 100vh;
     overflow-x: visible;
-    overflow-y: scroll;
+    overflow-y: auto;
     position: relative;
 
     & > div {
