@@ -12,7 +12,8 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.icon :as i]
-            [oc.web.components.ui.small-loading :refer (small-loading)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
 
 (defn close-overlay [e]
   (utils/event-stop e)
@@ -50,12 +51,6 @@
                     (dommy/remove-class! (sel1 [:body]) :no-scroll))
                    s)})
 
-(rum/defc close-button
-  []
-  [:button.close {:on-click (partial close-overlay)}
-    (let [close-color (if (responsive/is-mobile-size?) (occ/get-color-by-kw :oc-gray-5) "white")]
-      (i/icon :simple-remove {:class "inline mr1" :stroke "4" :color close-color :accent-color close-color}))])
-
 (rum/defcs login-signup-with-slack < rum/reactive
                                      (rum/local false ::sign-up-slack-clicked)
                                      dont-scroll
@@ -64,7 +59,7 @@
         slack-error [:span.block.red "There was an issue validating with Slack."]]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
-      (close-button)
+      (carrot-close-bt {:on-click close-overlay})
       [:div.login-overlay.login-with-slack
         {:on-click #(utils/event-stop %)}
         [:div.login-overlay-cta.pl2.pr2.group
@@ -73,16 +68,16 @@
           (if @(::sign-up-slack-clicked state)
             [:div
               [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
-              [:button.btn-reset.btn-solid.login-button
+              [:button.mlb-reset.mlb-default.login-button
                 {:on-click #(do
                               (.preventDefault %)
                               (when (:auth-settings @dis/app-state)
                                 (dis/dispatch! [:login-with-slack])))
                  :disabled (not (:auth-settings (rum/react dis/app-state)))}
-                "GOT IT"]]
+                "Got It"]]
             [:div
               (when (:access (:query-params @router/path)) slack-error)
-              [:button.btn-reset.mt2.login-button.slack-button
+              [:button.mlb-reset.mt2.login-button.slack-button
                 {:on-click #(reset! (::sign-up-slack-clicked state) true)}
                 (str action-title " with ")
                 [:span.slack "Slack"]
@@ -101,11 +96,11 @@
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
                 [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])}
                   "Already have an account? "
-                   [:span.underline "SIGN IN NOW."]]
+                   [:span.blue-link "SIGN IN NOW."]]
                 :else
                 [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-email])}
                   "Don't have an account? "
-                   [:span.underline "SIGN UP NOW."]])]]]))
+                   [:span.blue-link "SIGN UP NOW."]])]]]))
 
 (rum/defcs login-with-email < rum/reactive
                               (merge dont-scroll
@@ -113,7 +108,7 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (close-button)
+    (carrot-close-bt {:on-click close-overlay})
     [:div.login-overlay.login-with-email.group
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -143,7 +138,7 @@
         [:form.sign-in-form
           {:id "sign-in-form"}
           [:div.sign-in-label-container
-            [:label.sign-in-label "EMAIL"]]
+            [:label.sign-in-label "Email"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.email
               {:value (:email (:login-with-email (rum/react dis/app-state)))
@@ -155,7 +150,7 @@
                :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
-            [:label.sign-in-label "PASSWORD"]]
+            [:label.sign-in-label "Password"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.pswd
               {:value (:pswd (:login-with-email (rum/react dis/app-state)))
@@ -166,19 +161,19 @@
                :name "pswd"}]]
           [:div.group.pb3.mt3
             [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "FORGOT PASSWORD?"]]
+              [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "Forgot Password?"]]
             [:div.right
-              [:button.btn-reset.btn-solid
+              [:button.mlb-reset.mlb-default
                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
                                (nil? (utils/link-for (:links (:auth-settings (rum/react dis/app-state))) "authenticate" "GET" {:auth-source "email"})))
                  :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
-                "SIGN IN"]]]]]
+                "Sign In"]]]]]
       [:div.login-overlay-footer.py2.px3.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
           "Don't have an account? "
-          [:span.underline "SIGN UP NOW."]]]]])
+          [:span.blue-link "SIGN UP NOW."]]]]])
 
 (rum/defcs signup-with-email < rum/reactive
                                (merge dont-scroll
@@ -186,7 +181,7 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (close-button)
+    (carrot-close-bt {:on-click close-overlay})
     [:div.login-overlay.signup-with-email.group
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -222,7 +217,7 @@
            :action ""
            :method "GET"}
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "sign-up-firstname"} "YOUR NAME"]]
+            [:label.sign-in-label {:for "sign-up-firstname"} "Your Name"]]
           [:div.sign-in-field-container.group
             [:input.sign-in-field.firstname.half.left
               {:value (:firstname (:signup-with-email (rum/react dis/app-state)))
@@ -242,7 +237,7 @@
                :tabIndex 2
                :name "lastname"}]]
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "sign-up-email"} "EMAIL"]]
+            [:label.sign-in-label {:for "sign-up-email"} "Email"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.email
               {:value (:email (:signup-with-email (rum/react dis/app-state)))
@@ -255,7 +250,7 @@
                :autoCapitalize "none"
                :name "email"}]]
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "sign-up-pswd"} "PASSWORD"]]
+            [:label.sign-in-label {:for "sign-up-pswd"} "Password"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.pswd
               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
@@ -268,9 +263,9 @@
                :name "pswd"}]]
           [:div.group.pb3.mt3
             [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "FORGOT PASSWORD?"]]
+              [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "Forgot Password?"]]
             [:div.right
-              [:button.btn-reset.btn-solid
+              [:button.mlb-reset.mlb-default
                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
                                (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
                                     (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
@@ -279,11 +274,11 @@
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:signup-with-email]))}
-                "SIGN UP"]]]]]
+                "Sign Up"]]]]]
       [:div.login-overlay-footer.py2.px3.mt1.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))}
           "Already have an account? "
-          [:span.underline "SIGN IN NOW."]]]]])
+          [:span.blue-link "SIGN IN NOW."]]]]])
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
@@ -291,7 +286,7 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (close-button)
+    (carrot-close-bt {:on-click close-overlay})
     [:div.login-overlay.password-reset
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -307,7 +302,7 @@
             [:div.red "An error occurred, please try again."]))
         [:form.sign-in-form
           [:div.sign-in-label-container
-            [:label.sign-in-label "PLEASE ENTER YOUR EMAIL ADDRESS"]]
+            [:label.sign-in-label "Please enter your email address"]]
           [:div.sign-in-field-container.email
             [:input.sign-in-field
               {:value (:email (:password-reset (rum/react dis/app-state)))
@@ -320,20 +315,21 @@
           (if (:success (:password-reset (rum/react dis/app-state)))
             [:div.group.pb3.mt3
               [:div.right
-                [:dubtton.btn-reset.btn-solid
+                [:dubtton.mlb-reset.mlb-default
                   {:on-click #(dis/dispatch! [:login-overlay-show nil])}
-                  "DONE"]]]
+                  "Done"]]]
             [:div.group.pb3.mt3
               [:div.right.ml1
-                [:button.btn-reset.btn-solid
+                [:button.mlb-reset.mlb-default
                   {:on-click #(dis/dispatch! [:password-reset])
                    :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
-                  "RESET PASSWORD"]]
+                  "Reset Password"]]
               [:div.right
-                [:button.btn-reset.btn-outline
+                [:button.mlb-reset.mlb-link-black
                   {:on-click #(dis/dispatch! [:login-overlay-show nil])
+                   :style {:margin-top "6px"}
                    :disabled (not (:auth-settings (rum/react dis/app-state)))}
-                  "CANCEL"]]])]]]])
+                  "Cancel"]]])]]]])
 
 (rum/defcs collect-name-password < rum/reactive
                                    (merge
@@ -364,7 +360,7 @@
             "."])
         [:form.sign-in-form
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "collect-name-pswd-firstname"} "YOUR NAME"]]
+            [:label.sign-in-label {:for "collect-name-pswd-firstname"} "Your Name"]]
           [:div.sign-in-field-container.group
             [:input.sign-in-field.firstname.half.left
               {:value (:firstname (:collect-name-pswd (rum/react dis/app-state)))
@@ -383,7 +379,7 @@
                :tabIndex 2
                :name "lastname"}]]
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
+            [:label.sign-in-label {:for "signup-pswd"} "Password"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.pswd
               {:value (:pswd (:collect-name-pswd (rum/react dis/app-state)))
@@ -396,14 +392,14 @@
                :name "pswd"}]]
           [:div.group.my3
             [:div.right
-              [:button.btn-reset.btn-solid
+              [:button.mlb-reset.mlb-default
                 {:disabled (or (and (s/blank? (:firstname (:collect-name-pswd (rum/react dis/app-state))))
                                     (s/blank? (:lastname (:collect-name-pswd (rum/react dis/app-state)))))
                                (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 5))
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:name-pswd-collect]))}
-                "LET ME IN"]]]]]]])
+                "Let Me In"]]]]]]])
 
 (rum/defcs collect-password < rum/reactive
                               (merge
@@ -432,7 +428,7 @@
             "."])
         [:form.sign-in-form
           [:div.sign-in-label-container
-            [:label.sign-in-label {:for "signup-pswd"} "PASSWORD"]]
+            [:label.sign-in-label {:for "signup-pswd"} "Password"]]
           [:div.sign-in-field-container
             [:input.sign-in-field.pswd
               {:value (:pswd (:collect-pswd (rum/react dis/app-state)))
@@ -445,12 +441,12 @@
                :name "pswd"}]]
           [:div.group.my3
             [:div.right
-              [:button.btn-reset.btn-solid
+              [:button.mlb-reset.mlb-defautl
                 {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 5)
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:pswd-collect]))}
-                "LET ME IN"]]]]]]])
+                "Let Me In"]]]]]]])
 
 (rum/defcs login-overlays-handler < rum/static
                                     rum/reactive
