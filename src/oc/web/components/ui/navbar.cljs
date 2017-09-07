@@ -25,8 +25,8 @@
                                     (when-not (responsive/is-tablet-or-mobile?)
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
                                   s)}
-  [s]
-  (let [{:keys [show-login-overlay mobile-menu-open header-width org-data board-data] :as navbar-data} (drv/react s :navbar-data)]
+  [s disabled-user-menu]
+  (let [{:keys [show-login-overlay mobile-menu-open org-data board-data] :as navbar-data} (drv/react s :navbar-data)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -38,7 +38,6 @@
       (when (not (utils/is-test-env?))
         (login-overlays-handler))
       [:div.oc-navbar-header.group
-        {:style {:width (if header-width (str header-width "px") "100%")}}
         [:div.oc-navbar-header-container.group
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
@@ -51,8 +50,9 @@
                 (if (jwt/jwt)
                   [:div.group
                     [:div.dropdown.right
-                      (user-avatar {:classes "mlb-reset dropdown-toggle"})
-                      (menu)]
+                      (user-avatar {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle")) :disable-menu disabled-user-menu})
+                      (when-not disabled-user-menu
+                        (menu))]
                     (comment ; FIXME: Remove the notification bell until we enable it.
                       [:div.notification-bell.right
                         [:img

@@ -57,6 +57,7 @@ nav.oc-navbar {
     margin: 0 auto;
     padding: 20px 28px 0;
     height: #{$navbar_height}px;
+    width: 100%;
 
     div.oc-navbar-separator {
       border-bottom: 1px solid rgba(78,90,107,0.1);

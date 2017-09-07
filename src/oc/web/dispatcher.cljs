@@ -185,7 +185,7 @@
                             (:alert-modal base))]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
-                            (let [navbar-data (select-keys base [:mobile-menu-open :header-width :show-login-overlay])]
+                            (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
