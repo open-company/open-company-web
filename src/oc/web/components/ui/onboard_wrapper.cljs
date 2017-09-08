@@ -443,9 +443,7 @@
         (if (not (empty? email))
           [:span.email-address email]
           (str "your email address"))
-        "."]
-      [:button.mlb-reset.resend-email
-        "Resend email"]]))
+        "."]]))
 
 (rum/defc email-verified < rum/static
                             (vertical-center-mixin ".email-wall")
