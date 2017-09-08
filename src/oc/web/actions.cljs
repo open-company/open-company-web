@@ -87,11 +87,12 @@
              (not (utils/in? (:route @router/path) "email-verification"))
              (not (utils/in? (:route @router/path) "about"))
              (not (utils/in? (:route @router/path) "features"))
-             (not (utils/in? (:route @router/path) "email-wall")))
+             (not (utils/in? (:route @router/path) "email-wall"))
+             (not (utils/in? (:route @router/path) "sign-up")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
-            (zero? (count orgs))   (router/nav! oc-urls/create-org)
+            (zero? (count orgs)) (router/nav! oc-urls/sign-up-profile)
             ; if there is a login-redirect use it
             (and (jwt/jwt) login-redirect)  (do
                                               (cook/remove-cookie! :login-redirect)
@@ -128,7 +129,9 @@
            (not (utils/in? (:route @router/path) "org-settings-team"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "email-verification"))
-           (not (utils/in? (:route @router/path) "story-edit")))
+           (not (utils/in? (:route @router/path) "story-edit"))
+           (not (utils/in? (:route @router/path) "sign-up"))
+           (not (utils/in? (:route @router/path) "email-wall")))
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
@@ -190,7 +193,8 @@
         ; if showing the create organization UI load the list of teams
         ; to use the team name as suggestion and to PATCH the name back
         ; if it doesn't has one yet
-        (utils/in? (:route @router/path) "create-org")
+        (or (utils/in? (:route @router/path) "create-org")
+            (utils/in? (:route @router/path) "sign-up"))
         (utils/after 100 #(api/get-teams))
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
@@ -318,21 +322,24 @@
 
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
-  (api/signup-with-email (:firstname (:signup-with-email db)) (:lastname (:signup-with-email db)) (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
+  (api/signup-with-email (or (:firstname (:signup-with-email db)) "") (or (:lastname (:signup-with-email db)) "") (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
   (dissoc db :signup-with-email-error))
 
 (defmethod dispatcher/action :signup-with-email/failed
-  [db [_ error]]
-  (assoc db :signup-with-email-error error))
+  [db [_ status]]
+  (assoc-in db [:signup-with-email :error] status))
 
 (defmethod dispatcher/action :signup-with-email/success
   [db [_ jwt]]
   (if (empty? jwt)
-    (assoc db :signup-with-email-error :verify-email)
+    (do
+      (utils/after 200 #(router/nav! oc-urls/email-wall))
+      (assoc db :signup-with-email-error :verify-email))
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point)
-      (dissoc db :show-login-overlay))))
+      (dissoc db :signup-with-email-error))))
 
 (defmethod dispatcher/action :auth-settings-get
   [db [_]]
@@ -605,7 +612,7 @@
 
 (defmethod dispatcher/action :org-create
   [db [_]]
-  (let [org-data (:create-org db)]
+  (let [org-data (:org-editing db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data))))
   db)
