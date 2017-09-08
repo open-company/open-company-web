@@ -88,19 +88,19 @@
                                 (dis/dispatch! [:login-overlay-show (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
               (cond
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-                "OR SIGN UP VIA EMAIL"
+                "or Sign Up via email"
                 :else
-                "OR SIGN IN VIA EMAIL")]]]
+                "or Sign In via email")]]]
           [:div.login-overlay-footer.group
             (cond
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
                 [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])}
                   "Already have an account? "
-                   [:span.blue-link "SIGN IN NOW."]]
+                   [:span.blue-link "Sign In now."]]
                 :else
                 [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-email])}
                   "Don't have an account? "
-                   [:span.blue-link "SIGN UP NOW."]])]]]))
+                   [:span.blue-link "Sign Up now."]])]]]))
 
 (rum/defcs login-with-email < rum/reactive
                               (merge dont-scroll
@@ -173,7 +173,7 @@
       [:div.login-overlay-footer.group
         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
           "Don't have an account? "
-          [:span.blue-link "SIGN UP NOW."]]]]])
+          [:span.blue-link "Sign Up now."]]]]])
 
 ; (rum/defcs signup-with-email < rum/reactive
 ;                                (merge dont-scroll
@@ -278,7 +278,7 @@
 ;       [:div.login-overlay-footer.group
 ;         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))}
 ;           "Already have an account? "
-;           [:span.blue-link "SIGN IN NOW."]]]]])
+;           [:span.blue-link "Sign In now."]]]]])
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
