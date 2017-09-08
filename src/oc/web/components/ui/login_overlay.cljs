@@ -5,7 +5,7 @@
             [goog.object :as gobj]
             [goog.style :as gstyle]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.urls :as oc-url]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -133,7 +133,7 @@
               "System troubles logging in."
               [:br]
               "Please try again, then "
-              [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
+              [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
               "."]))
         [:form.sign-in-form
           {:id "sign-in-form"}
@@ -175,110 +175,110 @@
           "Don't have an account? "
           [:span.blue-link "SIGN UP NOW."]]]]])
 
-(rum/defcs signup-with-email < rum/reactive
-                               (merge dont-scroll
-                                 {:did-mount (fn [s] (.focus (sel1 [:input.firstname])) s)})
-  [state]
-  [:div.login-overlay-container.group
-    {:on-click (partial close-overlay)}
-    (carrot-close-bt {:on-click close-overlay})
-    [:div.login-overlay.signup-with-email.group
-      {:on-click #(utils/event-stop %)}
-      [:div.login-overlay-cta.pl2.pr2.group
-        [:div.sign-in-cta "Sign Up"
-          (when-not (:auth-settings (rum/react dis/app-state))
-            (small-loading))]]
-      [:div.pt2.pl3.pr3.pb2.group
-        (when-not (nil? (:signup-with-email-error (rum/react dis/app-state)))
-          (cond
-            (= (:signup-with-email-error (rum/react dis/app-state)) :verify-email)
-            [:span.small-caps.green
-              "Hey buddy, go verify your email, eh?"]
-            (= (:signup-with-email-error (rum/react dis/app-state)) 409)
-            [:span.small-caps.red
-              "This email address already has an account. "
-              [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])} "Would you like to sign in with that account?"]
-              [:br]
-              "Please try again, or "
-              [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "reset your password"]
-              "."]
-            (= (:signup-with-email-error (rum/react dis/app-state)) 400)
-            [:span.small-caps.red
-              "An error occurred while processing your data, please check the fields and try again."]
-            :else
-            [:span.small-caps.red
-              "System troubles logging in."
-              [:br]
-              "Please try again, then "
-              [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
-              "."]))
-        [:form.sign-in-form
-          {:id "sign-up-form"
-           :action ""
-           :method "GET"}
-          [:div.sign-in-label-container
-            [:label.sign-in-label {:for "sign-up-firstname"} "Your Name"]]
-          [:div.sign-in-field-container.group
-            [:input.sign-in-field.firstname.half.left
-              {:value (:firstname (:signup-with-email (rum/react dis/app-state)))
-               :id "sign-up-firstname"
-               :auto-focus true
-               :on-change #(dis/dispatch! [:input [:signup-with-email :firstname] (.-value (sel1 [:input.firstname]))])
-               :placeholder "First name"
-               :type "text"
-               :tabIndex 1
-               :name "firstname"}]
-            [:input.sign-in-field.lastname.half.right
-              {:value (:lastname (:signup-with-email (rum/react dis/app-state)))
-               :id "sign-up-lastname"
-               :on-change #(dis/dispatch! [:input [:signup-with-email :lastname] (.-value (sel1 [:input.lastname]))])
-               :placeholder "Last name"
-               :type "text"
-               :tabIndex 2
-               :name "lastname"}]]
-          [:div.sign-in-label-container
-            [:label.sign-in-label {:for "sign-up-email"} "Email"]]
-          [:div.sign-in-field-container
-            [:input.sign-in-field.email
-              {:value (:email (:signup-with-email (rum/react dis/app-state)))
-               :id "sign-up-email"
-               :on-change #(dis/dispatch! [:input [:signup-with-email :email] (.-value (sel1 [:input.email]))])
-               :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-               :placeholder "email@example.com"
-               :type "email"
-               :tabIndex 3
-               :autoCapitalize "none"
-               :name "email"}]]
-          [:div.sign-in-label-container
-            [:label.sign-in-label {:for "sign-up-pswd"} "Password"]]
-          [:div.sign-in-field-container
-            [:input.sign-in-field.pswd
-              {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
-               :id "sign-up-pswd"
-               :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.-value (sel1 [:input.pswd]))])
-               :pattern ".{4,}"
-               :placeholder "at least 5 characters"
-               :type "password"
-               :tabIndex 4
-               :name "pswd"}]]
-          [:div.group.pb3.mt3
-            [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "Forgot Password?"]]
-            [:div.right
-              [:button.mlb-reset.mlb-default
-                {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
-                               (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
-                                    (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
-                               (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
-                               (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
-                 :on-click #(do
-                              (utils/event-stop %)
-                              (dis/dispatch! [:signup-with-email]))}
-                "Sign Up"]]]]]
-      [:div.login-overlay-footer.group
-        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))}
-          "Already have an account? "
-          [:span.blue-link "SIGN IN NOW."]]]]])
+; (rum/defcs signup-with-email < rum/reactive
+;                                (merge dont-scroll
+;                                  {:did-mount (fn [s] (.focus (sel1 [:input.firstname])) s)})
+;   [state]
+;   [:div.login-overlay-container.group
+;     {:on-click (partial close-overlay)}
+;     (carrot-close-bt {:on-click close-overlay})
+;     [:div.login-overlay.signup-with-email.group
+;       {:on-click #(utils/event-stop %)}
+;       [:div.login-overlay-cta.pl2.pr2.group
+;         [:div.sign-in-cta "Sign Up"
+;           (when-not (:auth-settings (rum/react dis/app-state))
+;             (small-loading))]]
+;       [:div.pt2.pl3.pr3.pb2.group
+;         (when-not (nil? (:signup-with-email-error (rum/react dis/app-state)))
+;           (cond
+;             (= (:signup-with-email-error (rum/react dis/app-state)) :verify-email)
+;             [:span.small-caps.green
+;               "Hey buddy, go verify your email, eh?"]
+;             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
+;             [:span.small-caps.red
+;               "This email address already has an account. "
+;               [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])} "Would you like to sign in with that account?"]
+;               [:br]
+;               "Please try again, or "
+;               [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "reset your password"]
+;               "."]
+;             (= (:signup-with-email-error (rum/react dis/app-state)) 400)
+;             [:span.small-caps.red
+;               "An error occurred while processing your data, please check the fields and try again."]
+;             :else
+;             [:span.small-caps.red
+;               "System troubles logging in."
+;               [:br]
+;               "Please try again, then "
+;               [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
+;               "."]))
+;         [:form.sign-in-form
+;           {:id "sign-up-form"
+;            :action ""
+;            :method "GET"}
+;           [:div.sign-in-label-container
+;             [:label.sign-in-label {:for "sign-up-firstname"} "Your Name"]]
+;           [:div.sign-in-field-container.group
+;             [:input.sign-in-field.firstname.half.left
+;               {:value (:firstname (:signup-with-email (rum/react dis/app-state)))
+;                :id "sign-up-firstname"
+;                :auto-focus true
+;                :on-change #(dis/dispatch! [:input [:signup-with-email :firstname] (.-value (sel1 [:input.firstname]))])
+;                :placeholder "First name"
+;                :type "text"
+;                :tabIndex 1
+;                :name "firstname"}]
+;             [:input.sign-in-field.lastname.half.right
+;               {:value (:lastname (:signup-with-email (rum/react dis/app-state)))
+;                :id "sign-up-lastname"
+;                :on-change #(dis/dispatch! [:input [:signup-with-email :lastname] (.-value (sel1 [:input.lastname]))])
+;                :placeholder "Last name"
+;                :type "text"
+;                :tabIndex 2
+;                :name "lastname"}]]
+;           [:div.sign-in-label-container
+;             [:label.sign-in-label {:for "sign-up-email"} "Email"]]
+;           [:div.sign-in-field-container
+;             [:input.sign-in-field.email
+;               {:value (:email (:signup-with-email (rum/react dis/app-state)))
+;                :id "sign-up-email"
+;                :on-change #(dis/dispatch! [:input [:signup-with-email :email] (.-value (sel1 [:input.email]))])
+;                :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+;                :placeholder "email@example.com"
+;                :type "email"
+;                :tabIndex 3
+;                :autoCapitalize "none"
+;                :name "email"}]]
+;           [:div.sign-in-label-container
+;             [:label.sign-in-label {:for "sign-up-pswd"} "Password"]]
+;           [:div.sign-in-field-container
+;             [:input.sign-in-field.pswd
+;               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
+;                :id "sign-up-pswd"
+;                :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.-value (sel1 [:input.pswd]))])
+;                :pattern ".{4,}"
+;                :placeholder "at least 5 characters"
+;                :type "password"
+;                :tabIndex 4
+;                :name "pswd"}]]
+;           [:div.group.pb3.mt3
+;             [:div.left.forgot-password
+;               [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "Forgot Password?"]]
+;             [:div.right
+;               [:button.mlb-reset.mlb-default
+;                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
+;                                (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
+;                                     (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
+;                                (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
+;                                (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
+;                  :on-click #(do
+;                               (utils/event-stop %)
+;                               (dis/dispatch! [:signup-with-email]))}
+;                 "Sign Up"]]]]]
+;       [:div.login-overlay-footer.group
+;         [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))}
+;           "Already have an account? "
+;           [:span.blue-link "SIGN IN NOW."]]]]])
 
 (rum/defcs password-reset < rum/reactive
                             (merge dont-scroll
@@ -356,7 +356,7 @@
             "System troubles logging in."
             [:br]
             "Please try again, then "
-            [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
+            [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
             "."])
         [:form.sign-in-form
           [:div.sign-in-label-container
@@ -424,7 +424,7 @@
             "System troubles logging in."
             [:br]
             "Please try again, then "
-            [:a.underline.red {:href oc-url/contact-mail-to} "contact support"]
+            [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
             "."])
         [:form.sign-in-form
           [:div.sign-in-label-container
@@ -458,7 +458,9 @@
     (login-with-email)
     ; signup via email
     (= (drv/react s :show-login-overlay) :signup-with-email)
-    (signup-with-email)
+    (do
+      (utils/after 150 #(router/nav! oc-urls/sign-up))
+      [:div])
     ; password reset
     (= (drv/react s :show-login-overlay) :password-reset)
     (password-reset)
