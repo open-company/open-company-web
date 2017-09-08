@@ -214,7 +214,7 @@
         (fn [{:keys [success body status]}]
           (if (= status 409)
             ; Board name exists
-            (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
+            (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists or isn't allowed"])
             (dispatcher/dispatch! [:board-edit-save/finish (json->cljs body)])))))))
 
 (def org-keys [:name :logo-url :logo-width :logo-height])
@@ -487,7 +487,7 @@
           (let [board-data (if success (json->cljs body) {})]
             (if (= status 409)
               ; Board name exists
-              (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists"])
+              (dispatcher/dispatch! [:input [:board-editing :board-name-error] "Board name already exists or isn't allowed"])
               (dispatcher/dispatch! [:board-edit-save/finish board-data]))))))))
 
 (defn add-author
@@ -753,7 +753,7 @@
 (defn autosave-draft [story-data]
   (when story-data
     (let [autosave-link (utils/link-for (:links story-data) "partial-update")
-          fixed-story-data (select-keys story-data [:title :body :banner-url :banner-width :banner-height])]
+          fixed-story-data (clojure.set/rename-keys (select-keys story-data [:title :body :board-slug :banner-url :banner-width :banner-height]) {:board-slug :storyboard-slug})]
       (storage-http (method-for-link autosave-link) (:href autosave-link)
         {:headers (headers-for-link autosave-link)
          :json-params (cljs->json fixed-story-data)}
