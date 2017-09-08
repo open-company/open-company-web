@@ -742,7 +742,7 @@
 (defn autosave-draft [story-data]
   (when story-data
     (let [autosave-link (utils/link-for (:links story-data) "partial-update")
-          fixed-story-data (select-keys story-data [:title :body :banner-url :banner-width :banner-height])]
+          fixed-story-data (clojure.set/rename-keys (select-keys story-data [:title :body :board-slug :banner-url :banner-width :banner-height]) {:board-slug :storyboard-slug})]
       (storage-http (method-for-link autosave-link) (:href autosave-link)
         {:headers (headers-for-link autosave-link)
          :json-params (cljs->json fixed-story-data)}
