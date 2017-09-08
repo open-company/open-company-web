@@ -247,6 +247,15 @@
     ;; render component
     (drv-root component target)))
 
+(defn slack-lander-check [params]
+  (pre-routing (:query-params params) true)
+  (let [jwt (jwt/get-contents)
+        slack-profile-cookie (router/slack-profile-filled-cookie (jwt/get-key :user-id))
+        slack-profile-cookie-value (cook/get-cookie slack-profile-cookie)]
+    (if slack-profile-cookie-value
+      (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])
+      (utils/after 100 #(router/nav! urls/slack-lander)))))
+
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
@@ -302,6 +311,16 @@
       (timbre/info "Routing slack-lander-team-slash-route" (str urls/slack-lander-team "/"))
       (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
 
+    (defroute slack-lander-check-route urls/slack-lander-check {:as params}
+      (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
+      ;; Check if the user already have filled the needed data or if it needs to
+      (slack-lander-check params))
+
+    (defroute slack-lander-check-slash-route (str urls/slack-lander-check "/") {:as params}
+      (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
+      ;; Check if the user already have filled the needed data or if it needs to
+      (slack-lander-check params))
+
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
       (simple-handler about "about" target params))
@@ -346,9 +365,10 @@
 
     (defroute email-wall-route urls/email-wall {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-route" urls/email-wall)
-      (when-not (jwt/jwt)
+      ;; Email wall is shown only to not logged in users
+      (when (jwt/jwt)
         (router/redirect! urls/home))
-      (pre-routing query-params)
+      (pre-routing query-params true)
       (router/set-route! ["email-wall"] {:query-params query-params})
       (post-routing)
       (drv-root #(om/component (onboard-wrapper :email-wall)) target))
@@ -357,7 +377,7 @@
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
       (when (jwt/jwt)
         (router/redirect! urls/home))
-      (pre-routing query-params)
+      (pre-routing query-params true)
       (router/set-route! ["email-wall"] {:query-params query-params})
       (post-routing)
       (drv-root #(om/component (onboard-wrapper :email-wall)) target))
@@ -533,6 +553,8 @@
                                  signup-route
                                  signup-slash-route
                                  ;; Signup slack
+                                 slack-lander-check-route
+                                 slack-lander-check-slash-route
                                  slack-lander-team-route
                                  slack-lander-team-slash-route
                                  slack-lander-route
