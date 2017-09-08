@@ -289,11 +289,11 @@
          :headers (headers-for-link auth-url)}
         (fn [{:keys [success body status]}]
          (if success
-            (dispatcher/dispatch! [:signup-with-email/success body])
+            (dispatcher/dispatch! [:signup-with-email/success status body])
             (dispatcher/dispatch! [:signup-with-email/failed status])))))))
 
-(defn get-teams []
-  (let [enumerate-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "collection" "GET")]
+(defn get-teams [auth-settings]
+  (let [enumerate-link (utils/link-for (:links auth-settings) "collection" "GET")]
     (auth-http (method-for-link enumerate-link) (relative-href enumerate-link)
       {:headers (headers-for-link enumerate-link)}
       (fn [{:keys [success body status]}]
@@ -393,6 +393,7 @@
                           (if (:success res)
                             (update-jwt-cookie! (:body res))
                             (dispatcher/dispatch! [:logout])))))))
+                (cook/set-cookie! (router/slack-profile-filled-cookie (:user-id old-user-data)) true (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                 (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn collect-name-password [firstname lastname pswd]
