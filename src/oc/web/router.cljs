@@ -127,6 +127,11 @@
   [org-slug board-slug]
   (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
 
+(defn slack-profile-filled-cookie
+  "Cookie used to save if a user has already filled in his data when signing up with Slack."
+  [user-id]
+  (str "slack-profile-filled-" user-id))
+
 (defn print-router-path []
   (js/console.log @path))
 
