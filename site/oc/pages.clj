@@ -398,8 +398,6 @@
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
-          ;; Google fonts Domine and OpenSans
-          [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; Google fonts Muli
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;;  Medium Editor css
@@ -470,8 +468,6 @@
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
           ;; jQuery UI CSS
           [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
-          ;; Google fonts Domine and OpenSans
-          [:link {:type "text/css" :rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300,800|Domine:400,700"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
           ;; Google fonts Muli
