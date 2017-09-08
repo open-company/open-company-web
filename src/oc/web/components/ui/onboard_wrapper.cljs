@@ -206,8 +206,7 @@
            :value (:name org-editing)
            :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
         [:button.continue
-          {:disabled (or (empty? (:name org-editing))
-                         (empty? (:logo-url org-editing)))
+          {:disabled (empty? (:name org-editing))
            :on-click #(dis/dispatch! [:org-create])}
           "Create my team"]]]))
 
@@ -350,8 +349,7 @@
            :value (:name org-editing)
            :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
         [:button.continue
-          {:disabled (or (empty? (:name org-editing))
-                         (empty? (:logo-url org-editing)))
+          {:disabled (empty? (:name org-editing))
            :on-click #(dis/dispatch! [:org-create])}
           "Create my team"]]]))
 
