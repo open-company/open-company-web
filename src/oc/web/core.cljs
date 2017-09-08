@@ -264,8 +264,43 @@
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
-      (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
-      (simple-handler home-page "sign-up" target params))
+      (simple-handler #(onboard-wrapper :email-lander) "sign-up" target params))
+
+    (defroute signup-slash-route (str urls/sign-up "/") {:as params}
+      (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
+      (simple-handler #(onboard-wrapper :email-lander) "sign-up" target params))
+
+    (defroute signup-profile-route urls/sign-up-profile {:as params}
+      (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
+      (simple-handler #(onboard-wrapper :email-lander-profile) "sign-up" target params))
+
+    (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
+      (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
+      (simple-handler #(onboard-wrapper :email-lander-profile) "sign-up" target params))
+
+    (defroute signup-team-route urls/sign-up-team {:as params}
+      (timbre/info "Routing signup-team-route" urls/sign-up-team)
+      (simple-handler #(onboard-wrapper :email-lander-team) "sign-up" target params))
+
+    (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
+      (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
+      (simple-handler #(onboard-wrapper :email-lander-team) "sign-up" target params))
+
+    (defroute slack-lander-route urls/slack-lander {:as params}
+      (timbre/info "Routing slack-lander-route" urls/slack-lander)
+      (simple-handler #(onboard-wrapper :slack-lander) "sign-up" target params))
+
+    (defroute slack-lander-slash-route (str urls/slack-lander "/") {:as params}
+      (timbre/info "Routing slack-lander-slash-route" (str urls/slack-lander "/"))
+      (simple-handler #(onboard-wrapper :slack-lander) "sign-up" target params))
+
+    (defroute slack-lander-team-route urls/slack-lander-team {:as params}
+      (timbre/info "Routing slack-lander-team-route" urls/slack-lander-team)
+      (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
+
+    (defroute slack-lander-team-slash-route (str urls/slack-lander-team "/") {:as params}
+      (timbre/info "Routing slack-lander-team-slash-route" (str urls/slack-lander-team "/"))
+      (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
@@ -316,7 +351,7 @@
       (pre-routing query-params)
       (router/set-route! ["email-wall"] {:query-params query-params})
       (post-routing)
-      (drv-root #(om/component (onboard-wrapper)) target))
+      (drv-root #(om/component (onboard-wrapper :email-wall)) target))
 
     (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
@@ -325,7 +360,7 @@
       (pre-routing query-params)
       (router/set-route! ["email-wall"] {:query-params query-params})
       (post-routing)
-      (drv-root #(om/component (onboard-wrapper)) target))
+      (drv-root #(om/component (onboard-wrapper :email-wall)) target))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
@@ -490,7 +525,22 @@
     (def route-dispatch!
       (secretary/uri-dispatcher [_loading_route
                                  login-route
+                                 ;; Signup email
+                                 signup-profile-route
+                                 signup-profile-slash-route
+                                 signup-team-route
+                                 signup-team-slash-route
                                  signup-route
+                                 signup-slash-route
+                                 ;; Signup slack
+                                 slack-lander-team-route
+                                 slack-lander-team-slash-route
+                                 slack-lander-route
+                                 slack-lander-slash-route
+                                 ;; Email wall
+                                 email-wall-route
+                                 email-wall-slash-route
+                                 ;; Marketing site components
                                  about-route
                                  features-route
                                  pricing-route
@@ -500,9 +550,6 @@
                                  confirm-invitation-route
                                  password-reset-route
                                  ;  ; subscription-callback-route
-                                 ;; Email wall
-                                 email-wall-route
-                                 email-wall-slash-route
                                  ;; Home page
                                  home-page-route
                                  user-profile-route
