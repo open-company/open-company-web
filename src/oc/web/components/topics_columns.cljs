@@ -32,11 +32,14 @@
                                       is-stakeholder-update
                                       board-filters] :as data} owner options]
 
+  (will-mount [_]
+    (when (and (not (utils/is-test-env?))
+               is-all-activity)
+      (utils/after 100 #(dis/dispatch! [:calendar-get]))))
+
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-      (when is-all-activity
-        (dis/dispatch! [:calendar-get]))))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
   (render-state [_ {:keys [show-storyboards-dropdown]}]
     (let [current-activity-id (router/current-activity-id)
