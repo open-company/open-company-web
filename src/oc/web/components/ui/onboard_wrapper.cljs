@@ -1,10 +1,12 @@
 (ns oc.web.components.ui.onboard-wrapper
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -37,11 +39,11 @@
       [:div.onboard-form
         [:div.field-label
           "Enter email"
-          (when-not (= (:error signup-with-email) 409)
+          (when (= (:error signup-with-email) 409)
             [:span.error "Email already exists"])]
         [:input.field
           {:type "email"
-           :class (when-not (= (:error signup-with-email) 409) "error")
+           :class (when (= (:error signup-with-email) 409) "error")
            :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
            :value (:email signup-with-email)
            :on-change #(dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)])}]
@@ -108,7 +110,7 @@
                           nil
                           (fn [_])
                           nil)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] nil]))}
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
           (user-avatar-image user-data)
           [:div.add-picture-link
             (if (empty? (:avatar-url user-data))
@@ -129,19 +131,13 @@
            :value (:last-name user-data)
            :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
         [:button.continue
-          {:disabled (or (empty? (:first-name user-data))
-                         (empty? (:last-name user-data))
+          {:disabled (or (and (empty? (:first-name user-data))
+                              (empty? (:last-name user-data)))
                          (empty? (:avatar-url user-data)))
            :on-click #(do
                         (reset! (::saving s) true)
                         (dis/dispatch! [:user-profile-save]))}
           "Continue"]]]))
-
-(defn team-logo-on-load [s url img]
-  (reset! (::team-data s) (merge @(::team-data s) {:logo-url url
-                                                   :logo-width (.-width img)
-                                                   :logo-height (.-height img)}))
-  (gdom/removeNode img))
 
 (rum/defcs email-lander-team < rum/reactive
                                (drv/drv :teams-data)
@@ -215,115 +211,149 @@
            :on-click #(dis/dispatch! [:org-create])}
           "Create my team"]]]))
 
-(rum/defcs slack-lander < rum/static
-                          (rum/local nil ::user-data)
+(rum/defcs slack-lander < rum/reactive
+                          (drv/drv :edit-user-profile)
+                          (rum/local false ::saving)
+                          {:will-mount (fn [s]
+                                         (dis/dispatch! [:reset-user-profile])
+                                         s)
+                           :will-update (fn [s]
+                                         (when (and @(::saving s)
+                                                    (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
+                                                    (not (:error @(drv/get-ref s :edit-user-profile))))
+                                            (utils/after 100 #(router/nav! oc-urls/sign-up-team)))
+                                         s)}
   [s]
-  [:div.onboard-lander
-    [:div.steps.two-steps
-      [:div.step-1
-        "Get Started"]
-      [:div.step-progress-bar]
-      [:div.step-2
-        "Your Team"]]
-    [:div.main-cta
-      [:div.title
-        "Tell us about yourself"]
-      [:div.subtitle
-        "This information will be visible to your team"]]
-    [:div.onboard-form
-      [:div.logo-upload-container
-        {:on-click #(if (empty? (:avatar-url @(::user-data s)))
-                      (iu/upload! {:accept "image/*" ; :imageMin [840 200]
-                                   :transformations {
-                                     :crop {
-                                       :aspectRatio 1}}}
-                        (fn [res]
-                          (reset! (::user-data s) (assoc @(::user-data s) :avatar-url (gobj/get res "url"))))
-                        nil
-                        (fn [_])
-                        nil)
-                      (reset! (::user-data s) (merge @(::user-data s) {:avatar-url nil})))}
-        (user-avatar-image @(::user-data s))
-        [:div.add-picture-link
-          (if (empty? (:avatar-url @(::user-data s)))
-            "Upload profile photo"
-            "Delete profile photo")]
-        [:div.add-picture-link-subtitle
-          "A 160x160 PNG or JPG works best"]]
-      [:div.field-label
-        "First name"]
-      [:input.field
-        {:type "text"
-         :value (:first-name @(::user-data s))
-         :on-change #(reset! (::user-data s) (assoc @(::user-data s) :first-name (.. % -target -value)))}]
-      [:div.field-label
-        "Last name"]
-      [:input.field
-        {:type "text"
-         :value (:last-name @(::user-data s))
-         :on-change #(reset! (::user-data s) (assoc @(::user-data s) :last-name (.. % -target -value)))}]
-      [:button.continue
-        "Sign Up"]]])
+  (let [edit-user-profile (drv/react s :edit-user-profile)
+        user-data (:user-data edit-user-profile)]
+    [:div.onboard-lander
+      [:div.steps.two-steps
+        [:div.step-1
+          "Get Started"]
+        [:div.step-progress-bar]
+        [:div.step-2
+          "Your Team"]]
+      [:div.main-cta
+        [:div.title
+          "Tell us about yourself"]
+        [:div.subtitle
+          "This information will be visible to your team"]]
+      [:div.onboard-form
+        [:div.logo-upload-container
+          {:on-click #(if (empty? (:avatar-url user-data))
+                        (iu/upload! {:accept "image/*"
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}}
+                          (fn [res]
+                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                          nil
+                          (fn [_])
+                          nil)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
+          (user-avatar-image user-data)
+          [:div.add-picture-link
+            (if (empty? (:avatar-url user-data))
+              "Upload profile photo"
+              "Delete profile photo")]
+          [:div.add-picture-link-subtitle
+            "A 160x160 PNG or JPG works best"]]
+        [:div.field-label
+          "First name"]
+        [:input.field
+          {:type "text"
+           :value (:first-name user-data)
+           :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+        [:div.field-label
+          "Last name"]
+        [:input.field
+          {:type "text"
+           :value (:last-name user-data)
+           :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+        [:button.continue
+          {:disabled (or (and (empty? (:first-name user-data))
+                              (empty? (:last-name user-data)))
+                         (empty? (:avatar-url user-data)))
+           :on-click #(do
+                        (reset! (::saving s) true)
+                        (dis/dispatch! [:user-profile-save true]))}
+          "Sign Up"]]]))
 
-(rum/defcs slack-lander-team < rum/static
-                               (rum/local nil ::team-data)
+(rum/defcs slack-lander-team < rum/reactive
+                               (drv/drv :teams-load)
+                               (drv/drv :teams-data)
+                               (drv/drv :org-editing)
+                               (rum/local false ::saving)
+                               {:will-update (fn [s]
+                                               (let [org-editing @(drv/get-ref s :org-editing)
+                                                     teams-data @(drv/get-ref s :teams-data)
+                                                     teams-load @(drv/get-ref s :teams-load)]
+                                                 ;; Load the list of teams if it's not already
+                                                 (when (and (empty? teams-data)
+                                                            (:auth-settings teams-load)
+                                                            (not (:teams-data-requested teams-load)))
+                                                   (dis/dispatch! [:teams-get]))
+                                                 ;; If the team is loaded setup the form
+                                                 (when (and (nil? (:name org-editing))
+                                                            (not (empty? teams-data)))
+                                                   (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
+                                               s)}
   [s]
-  [:div.onboard-lander.second-step
-    [:div.steps.two-steps
-      [:div.step-1
-        "Get Started"]
-      [:div.step-progress-bar]
-      [:div.step-2
-        "Your Team"]]
-    [:div.main-cta
-      [:div.title
-        "About your team"]
-      [:div.subtitle
-        "How your company will appear on Carrot"]]
-    [:div.onboard-form
-      [:div.logo-upload-container
-        {:on-click (fn [_]
-                    (if (empty? (:logo-url @(::team-data s)))
-                      (iu/upload! {:accept "image/*" ; :imageMin [840 200]
-                                   :transformations {
-                                     :crop {
-                                       :aspectRatio 1}}}
-                        (fn [res]
-                          (let [url (gobj/get res "url")
-                                img (gdom/createDom "img")]
-                            (set! (.-onload img) #(team-logo-on-load s url img))
-                            (set! (.-className img) "hidden")
-                            (gdom/append (.-body js/document) img)
-                            (set! (.-src img) url)))
-                        nil
-                        (fn [_])
-                        nil)
-                      (reset! (::team-data s) (merge @(::team-data s) {:logo-url nil}))))}
-        (user-avatar-image @(::team-data s))
-        [:div.add-picture-link
-          (if (empty? (:logo-url @(::team-data s)))
-            "Upload logo"
-            "Delete logo")]
-        [:div.add-picture-link-subtitle
-          "A 160x160 PNG or JPG works best"]]
-      [:div.field-label
-        "Team name"]
-      [:input.field
-        {:type "text"
-         :value (:name @(::team-data s))
-         :on-change #(reset! (::team-data s) (assoc @(::team-data s) :name (.. % -target -value)))}]
-      [:div.field-label
-        "Email domain"]
-      [:input.field
-        {:type "text"
-         :auto-capitalize "none"
-         :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
-         :value (:email-domain @(::team-data s))
-         :on-change #(reset! (::team-data s) (assoc @(::team-data s) :email-domain (.. % -target -value)))}]
-      [:div.field-description
-        "Anyone who signs up with this email domain can view team Boards"]
-      [:button.continue
-        "Create my team"]]])
+  (let [teams-data (drv/react s :teams-data)
+        org-editing (drv/react s :org-editing)]
+    [:div.onboard-lander.second-step
+      [:div.steps.two-steps
+        [:div.step-1
+          "Get Started"]
+        [:div.step-progress-bar]
+        [:div.step-2
+          "Your Team"]]
+      [:div.main-cta
+        [:div.title
+          "About your team"]
+        [:div.subtitle
+          "How your company will appear on Carrot"]]
+      [:div.onboard-form
+        [:div.logo-upload-container
+          {:on-click (fn [_]
+                      (if (empty? (:logo-url org-editing))
+                        (iu/upload! {:accept "image/*" ; :imageMin [840 200]
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}}
+                          (fn [res]
+                            (let [url (gobj/get res "url")
+                                  img (gdom/createDom "img")]
+                              (set! (.-onload img) #(do
+                                                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
+                                                      (gdom/removeNode img)))
+                              (set! (.-className img) "hidden")
+                              (gdom/append (.-body js/document) img)
+                              (set! (.-src img) url)))
+                          nil
+                          (fn [_])
+                          nil)
+                        (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
+                                                                                  :logo-width 0
+                                                                                  :logo-height 0})])))}
+          (org-avatar org-editing false)
+          [:div.add-picture-link
+            (if (empty? (:logo-url org-editing))
+              "Upload logo"
+              "Delete logo")]
+          [:div.add-picture-link-subtitle
+            "A 160x160 PNG or JPG works best"]]
+        [:div.field-label
+          "Team name"]
+        [:input.field
+          {:type "text"
+           :value (:name org-editing)
+           :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
+        [:button.continue
+          {:disabled (or (empty? (:name org-editing))
+                         (empty? (:logo-url org-editing)))
+           :on-click #(dis/dispatch! [:org-create])}
+          "Create my team"]]]))
 
 (rum/defc invitee-lander < rum/static
   [email]
@@ -402,14 +432,20 @@
                      (set! (.-marginTop (.-style el)) (str (* -1 (/ (.-clientHeight el) 2)) "px")))
                    s)})
 
-(rum/defc email-wall < rum/static
+(rum/defcs email-wall < rum/reactive
+                        (drv/drv :query-params)
                         (vertical-center-mixin ".email-wall")
-  [email]
-  [:div.email-wall
-    "Please verify your email address"
-    [:div.email-wall-sent-link "We have sent a link to " [:span.email-address email]]
-    [:button.mlb-reset.resend-email
-      "Resend email"]])
+  [s]
+  (let [email (:e (drv/react s :query-params))]
+    [:div.email-wall
+      "Please verify your email address"
+      [:div.email-wall-sent-link "We have sent a link to "
+        (if (not (empty? email))
+          [:span.email-address email]
+          (str "your email address"))
+        "."]
+      [:button.mlb-reset.resend-email
+        "Resend email"]]))
 
 (rum/defc email-verified < rum/static
                             (vertical-center-mixin ".email-wall")

@@ -63,6 +63,12 @@
   (if success
     (let [orgs (:items collection)]
       (cond
+        (and (:slack-lander-check-team-redirect db)
+             (zero? (count orgs)))
+        (router/nav! oc-urls/slack-lander-team)
+        (and (:email-lander-check-team-redirect db)
+             (zero? (count orgs)))
+        (router/nav! oc-urls/sign-up-team)
         ; If I have the secure-id i need to load the story only
         (router/current-secure-story-id)
         (api/get-secure-story (router/current-org-slug) (router/current-secure-story-id))
@@ -102,7 +108,8 @@
       (-> db
           (dissoc :loading)
           (assoc :orgs orgs)
-          (assoc-in dispatcher/api-entry-point-key (:links collection))))
+          (assoc-in dispatcher/api-entry-point-key (:links collection))
+          (dissoc :slack-lander-check-team-redirect :email-lander-check-team-redirect)))
     (-> db
       (assoc :error-banner-message utils/generic-network-error)
       (assoc :error-banner-time 0))))
@@ -191,11 +198,13 @@
       (api/get-current-user body)
       (cond
         ; if showing the create organization UI load the list of teams
+        ; if a link for it is present
         ; to use the team name as suggestion and to PATCH the name back
         ; if it doesn't has one yet
         (or (utils/in? (:route @router/path) "create-org")
             (utils/in? (:route @router/path) "sign-up"))
-        (utils/after 100 #(api/get-teams))
+        (utils/after 100 #(when (utils/link-for (:links (:auth-settings db)) "collection")
+                            (api/get-teams (:auth-settings db))))
         ; confirm email invitation
         (and (utils/in? (:route @router/path) "confirm-invitation")
              (contains? (:query-params @router/path) :token)
@@ -263,7 +272,7 @@
   [db [_]]
   (let [current (router/get-token)
         auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})
-        auth-url-with-redirect (utils/slack-link-with-state (:href auth-url) nil "open-company-auth" oc-urls/login)]
+        auth-url-with-redirect (utils/slack-link-with-state (:href auth-url) nil "open-company-auth" oc-urls/slack-lander-check)]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
@@ -330,11 +339,25 @@
   (assoc-in db [:signup-with-email :error] status))
 
 (defmethod dispatcher/action :signup-with-email/success
-  [db [_ jwt]]
-  (if (empty? jwt)
+  [db [_ status jwt]]
+  (cond
+    (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
-      (utils/after 200 #(router/nav! oc-urls/email-wall))
+      (utils/after 200 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
       (assoc db :signup-with-email-error :verify-email))
+    (= status 200) ;; Valid login, not signup, redirect to home
+    (do
+      (if (or (and (empty? (:first-name jwt))
+                   (empty? (:last-name jwt)))
+              (empty? (:avatar-url jwt)))
+        (do
+          (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
+          (api/get-entry-point)
+          db)
+        (do
+          (api/get-entry-point)
+          (assoc db :email-lander-check-team-redirect true))))
+    :else ;; Valid signup let's collect user data
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
@@ -346,11 +369,18 @@
   (api/get-auth-settings)
   db)
 
+(defmethod dispatcher/action :entry-point-get
+  [db [_ flags]]
+  (utils/after 100 #(api/get-entry-point))
+  (if (map? flags)
+    (merge db flags)
+    db))
+
 (defmethod dispatcher/action :teams-get
   [db [_]]
   (if (utils/link-for (:links (:auth-settings db)) "collection")
     (do
-      (api/get-teams)
+      (api/get-teams (:auth-settings db))
       (assoc db :teams-data-requested true))
     db))
 
@@ -466,7 +496,7 @@
 (defmethod dispatcher/action :invite-user/success
   [db [_ user]]
   ; refresh the users list once the invitation succeded
-  (api/get-teams)
+  (api/get-teams (:auth-settings db))
   (let [inviting-users (:invite-users db)
         next-inviting-users (utils/vec-dissoc inviting-users user)]
     (assoc db :invite-users next-inviting-users)))
@@ -488,7 +518,7 @@
 (defmethod dispatcher/action :user-action/complete
   [db [_]]
   ; refresh the list of users once the invitation action complete
-  (api/get-teams)
+  (api/get-teams (:auth-settings db))
   db)
 
 (defmethod dispatcher/action :invitation-confirmed
@@ -553,7 +583,7 @@
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
   (-> db
-    (assoc :edit-user-profile (assoc (:current-user-data db) :password ""))
+    (assoc :edit-user-profile (merge {:avatar-url (utils/cdn ls/default-user-avatar-url true)} (:current-user-data db) {:password ""}))
     (dissoc :edit-user-profile-failed)))
 
 (defmethod dispatcher/action :user-data
@@ -581,14 +611,14 @@
 (defmethod dispatcher/action :email-domain-team-add
   [db [_]]
   (let [domain (:domain (:um-domain-invite db))]
-    (when (utils/valid-domain? domain))
-      (api/add-email-domain (if (.startsWith domain "@") (subs domain 1) domain)))
+    (when (utils/valid-domain? domain)
+      (api/add-email-domain (if (.startsWith domain "@") (subs domain 1) domain))))
   (assoc db :add-email-domain-team-error false))
 
 (defmethod dispatcher/action :email-domain-team-add/finish
   [db [_ success]]
   (when success
-    (api/get-teams))
+    (api/get-teams (:auth-settings db)))
   (-> db
       (assoc-in [:um-domain-invite :domain] (if success "" (:domain (:um-domain-invite db))))
       (assoc :add-email-domain-team-error (if success false true))))
