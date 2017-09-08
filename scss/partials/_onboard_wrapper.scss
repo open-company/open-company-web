@@ -88,28 +88,48 @@ div.email-wall {
   }
 }
 
-div.invitee-lander {
+div.onboard-lander {
   text-align: center;
   margin-top: 62px;
 
-  &.collect {
+  &.second-step {
     div.steps {
       div.step-2 {
         background-image: cdnUrl("/img/ML/about_principle_2_oval_red.svg");
         color: $oc_gray_7;
       }
 
-      div.step-progress-bar {
+      div.step-progress-bar:nth-child(2) {
+        background-color: $carrot_orange;
+      }
+    }
+  }
+
+  &.third-step {
+    div.steps {
+      div.step-3 {
+        background-image: cdnUrl("/img/ML/about_principle_3_oval_red.svg");
+        color: $oc_gray_7;
+      }
+
+      div.step-progress-bar:nth-child(4) {
         background-color: $carrot_orange;
       }
     }
   }
 
   div.steps {
-    width: 278px;
     height: 58px;
     position: relative;
     margin: 0 auto;
+
+    &.two-steps {
+      width: 278px;
+    }
+
+    &.three-steps {
+      width: 464px;
+    }
 
     div.step-1 {
       width: 92px;
@@ -121,7 +141,9 @@ div.invitee-lander {
       @include avenir_R();
       font-size: 14px;
       color: $oc_gray_7;
-      float: left;
+      position: absolute;
+      top: 0px;
+      left: 0px;
       padding-top: 36px;
       text-align: center;
     }
@@ -136,7 +158,26 @@ div.invitee-lander {
       @include avenir_R();
       font-size: 14px;
       color: rgba($oc_gray_7, 0.5);
-      float: right;
+      position: absolute;
+      top: 0px;
+      left: 186px;
+      padding-top: 36px;
+      text-align: center;
+    }
+
+    div.step-3 {
+      width: 92px;
+      height: 53px;
+      background-image: cdnUrl("/img/ML/about_principle_3_oval_gray.svg");
+      background-size: 34px;
+      background-repeat: no-repeat;
+      background-position: 50% -4px;
+      @include avenir_R();
+      font-size: 14px;
+      color: rgba($oc_gray_7, 0.5);
+      position: absolute;
+      left: 374px;
+      top: 0px;
       padding-top: 36px;
       text-align: center;
     }
@@ -146,8 +187,15 @@ div.invitee-lander {
       width: 156px;
       background-color: $carrot_light_gray_2;
       position: absolute;
-      left: 61px;
       top: 12px;
+    }
+
+    div.step-progress-bar:nth-child(2) {
+      left: 61px;
+    }
+
+    div.step-progress-bar:nth-child(4) {
+      left: 248px;
     }
   }
 
@@ -173,7 +221,7 @@ div.invitee-lander {
     }
   }
 
-  div.invitee-form {
+  div.onboard-form {
     width: 340px;
     margin: 0 auto 32px;
     text-align: left;
@@ -228,6 +276,34 @@ div.invitee-lander {
       font-size: 15px;
       color: $carrot_gray;
       margin-top: 32px;
+    }
+
+    div.field-description {
+      @include avenir_BOOK();
+      font-size: 14px;
+      margin-top: 16px;
+      color: $carrot_light_gray;
+
+      a {
+        text-decoration: underline;
+        color: rgba($oc_gray_7, 0.5);
+      }
+    }
+
+    div.footer-link {
+      margin-top: 60px;
+      @include avenir_R();
+      font-size: 16px;
+      color: $oc_gray_7;
+      text-align: center;
+
+      a {
+        display: block;
+        @include avenir_H();
+        font-size: 16px;
+        color: $oc_gray_7;
+        text-decoration: underline;
+      }
     }
 
     input.field {
