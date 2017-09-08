@@ -73,6 +73,8 @@
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
    :loading             [[:base] (fn [base] (:loading base))]
+   :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
+   :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :teams-load          [[:base]
                           (fn [base]
                             {:teams-data-requested (:teams-data-requested base)
