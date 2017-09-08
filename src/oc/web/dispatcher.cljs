@@ -74,16 +74,17 @@
    :board-filters       [[:base] (fn [base] (:board-filters base))]
    :loading             [[:base] (fn [base] (:loading base))]
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
+   :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :teams-load          [[:base]
                           (fn [base]
                             {:teams-data-requested (:teams-data-requested base)
                              :auth-settings (:auth-settings base)})]
-   :team-management     [[:base :route]
-                          (fn [base route]
+   :team-management     [[:base :query-params]
+                          (fn [base query-params]
                             {:um-invite (:um-invite base)
                              :private-board-invite (:private-board-invite base)
-                             :query-params (:query-params route)
+                             :query-params query-params
                              :teams-data (:teams-data base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
@@ -114,14 +115,14 @@
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
-                        [[:base :route :org-data :team-data]
-                          (fn [base route org-data team-data]
+                        [[:base :query-params :org-data :team-data]
+                          (fn [base query-params org-data team-data]
                             {:auth-settings (:auth-settings base)
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :teams-data-requested (:teams-data-requested base)
                              :team-data team-data
-                             :query-params (:query-params route)})]
+                             :query-params query-params})]
    :all-activity        [[:base :org-slug]
                           (fn [base org-slug]
                             (when (and base org-slug)
