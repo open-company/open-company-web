@@ -232,6 +232,7 @@ provided in the table below:
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
+|  :entry-point-get | UI | Load the storage entry point passing some flags to add to the app-state. |
 |  :entry-save | UI | Save the edited entry. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
