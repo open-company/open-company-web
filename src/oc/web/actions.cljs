@@ -335,7 +335,7 @@
   (api/get-entry-point)
   (when (= (:auth-with-token-type db) :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
-  (assoc db :first-org-redirect true))
+  (assoc db :email-verification-success true))
 
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
