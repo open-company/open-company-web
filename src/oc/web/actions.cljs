@@ -99,11 +99,14 @@
           (cond
             ; redirect to create-company if the user has no companies
             (zero? (count orgs))
-            (if (or (and (empty? (jwt/get-key :first-name))
-                         (empty? (jwt/get-key :last-name)))
-                    (empty? (jwt/get-key :avatar-url)))
-              (router/nav! oc-urls/sign-up-profile)
-              (router/nav! oc-urls/sign-up-team))
+            (let [user-data (if (contains? db :current-user-data)
+                              (:current-user-data db)
+                              (jwt/get-contents))]
+              (if (or (and (empty? (:first-name user-data))
+                           (empty? (:last-name user-data)))
+                      (empty? (:avatar-url user-data)))
+                (router/nav! oc-urls/sign-up-profile)
+                (router/nav! oc-urls/sign-up-team)))
             ; if there is a login-redirect use it
             (and (jwt/jwt) login-redirect)  (do
                                               (cook/remove-cookie! :login-redirect)
