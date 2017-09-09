@@ -49,4 +49,4 @@
 (def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
 
 ;; Default user avatar
-(def default-user-avatar-url "/img/ML/happy_face_red.png")
+(def default-user-avatar-url "/img/ML/happy_face_red.svg")
