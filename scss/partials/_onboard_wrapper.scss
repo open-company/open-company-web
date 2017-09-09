@@ -52,7 +52,7 @@ div.onboard-wrapper-container {
   }
 }
 
-div.email-wall {
+div.onboard-email-container {
   width: 339px;
   @include avenir_M;
   color: $carrot_gray;
@@ -60,6 +60,19 @@ div.email-wall {
   margin: 0 auto;
   position: relative;
   top: 50%;
+
+  &.small {
+    font-size: 24px;
+  }
+
+  &.dot-animation {
+    text-align: left;
+    width: 260px;
+  }
+
+  &.error {
+    color: $carrot_orange;
+  }
 
   div.email-wall-sent-link {
     color: $carrot_light_gray;
@@ -74,7 +87,7 @@ div.email-wall {
     }
   }
 
-  button.resend-email {
+  button.continue {
     margin-top: 16px;
     width: 170px;
     height: 42px;

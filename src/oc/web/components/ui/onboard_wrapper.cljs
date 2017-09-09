@@ -432,10 +432,10 @@
 
 (rum/defcs email-wall < rum/reactive
                         (drv/drv :query-params)
-                        (vertical-center-mixin ".email-wall")
+                        (vertical-center-mixin ".onboard-email-container")
   [s]
   (let [email (:e (drv/react s :query-params))]
-    [:div.email-wall
+    [:div.onboard-email-container
       "Please verify your email address"
       [:div.email-wall-sent-link "We have sent a link to "
         (if (not (empty? email))
@@ -443,13 +443,57 @@
           (str "your email address"))
         "."]]))
 
-(rum/defc email-verified < rum/static
-                            (vertical-center-mixin ".email-wall")
-  [email]
-  [:div.email-wall
-    "Thanks for verifying"
-    [:button.mlb-reset.resend-email
-      "Get Started"]])
+(defn exchange-token-when-ready [s]
+  (when-let [auth-settings (:auth-settings @(drv/get-ref s :email-verification))]
+    (when (and (not @(::exchange-started s))
+               (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"}))
+      (reset! (::exchange-started s) true)
+      (dis/dispatch! [:auth-with-token :email-verification]))))
+
+(defn dots-animation [s]
+  (when-let [dots-node (rum/ref-node s :dots)]
+    (let [dots (.-innerText dots-node)
+          next-dots (case dots
+                      "." ".."
+                      ".." "..."
+                      ".")]
+      (set! (.-innerText dots-node) next-dots)
+      (utils/after 800 #(dots-animation s)))))
+
+(rum/defcs email-verified < rum/reactive
+                            (drv/drv :email-verification)
+                            (rum/local false ::exchange-started)
+                            (vertical-center-mixin ".onboard-email-container")
+                            {:will-mount (fn [s]
+                                           (js/console.log "email-verified/will-mount" s)
+                                           (exchange-token-when-ready s)
+                                           s)
+                             :did-mount (fn [s]
+                                          (js/console.log "email-verified/did-mount" s)
+                                          (dots-animation s)
+                                          (exchange-token-when-ready s)
+                                          s)
+                             :did-update (fn [s]
+                                          (exchange-token-when-ready s)
+                                          s)}
+  [s]
+  (let [email-verification (drv/react s :email-verification)]
+    (cond
+      (= (:error email-verification) 401)
+      [:div.onboard-email-container.error
+        "This link is not valid, please try again."]
+      (:error email-verification)
+      [:div.onboard-email-container.error
+        "An error occurred, please try again."]
+      (:success email-verification)
+      [:div.onboard-email-container
+        "Thanks for verifying"
+        [:button.mlb-reset.continue
+          {:on-click #(router/nav! oc-urls/login)}
+          "Get Started"]]
+      :else
+      [:div.onboard-email-container.small.dot-animation
+        "Verifying, please wait" [:span.dots {:ref :dots} "."]])))
 
 (defn get-component [c]
   (case c
@@ -461,6 +505,7 @@
     :invitee-lander (invitee-lander)
     :invitee-lander-profile (invitee-lander-profile)
     :email-wall (email-wall)
+    :email-verified (email-verified)
     [:div]))
 
 (rum/defc onboard-wrapper < rum/static
