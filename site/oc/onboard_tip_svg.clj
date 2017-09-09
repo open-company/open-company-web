@@ -2,6 +2,7 @@
 
 ;; top,left: 55,167
 ;; example: /img/ML/onboard_tip.svg?w=width&h=height&c=55,167
+;; starting SVG image /img/ML/tip_circle.svg
 
 (def onboard-tip-image
   (str
