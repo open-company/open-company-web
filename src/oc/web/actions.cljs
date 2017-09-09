@@ -98,7 +98,12 @@
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
-            (zero? (count orgs)) (router/nav! oc-urls/sign-up-profile)
+            (zero? (count orgs))
+            (if (or (and (empty? (jwt/get-key :first-name))
+                         (empty? (jwt/get-key :last-name)))
+                    (empty? (jwt/get-key :avatar-url)))
+              (router/nav! oc-urls/sign-up-profile)
+              (router/nav! oc-urls/sign-up-team))
             ; if there is a login-redirect use it
             (and (jwt/jwt) login-redirect)  (do
                                               (cook/remove-cookie! :login-redirect)
@@ -534,10 +539,14 @@
   db)
 
 (defn update-user-data [db user-data]
-  (-> db
-      (assoc :current-user-data user-data)
-      (assoc :edit-user-profile user-data)
-      (dissoc :edit-user-profile-failed)))
+  (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
+                            (assoc user-data :avatar-url (utils/cdn ls/default-user-avatar-url true))
+                            user-data)
+        with-empty-password (assoc with-fixed-avatar :password "")]
+    (-> db
+        (assoc :current-user-data with-fixed-avatar)
+        (assoc :edit-user-profile with-empty-password)
+        (dissoc :edit-user-profile-failed))))
 
 (defmethod dispatcher/action :name-pswd-collect/finish
   [db [_ status user-data]]
@@ -582,9 +591,7 @@
 
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
-  (-> db
-    (assoc :edit-user-profile (merge {:avatar-url (utils/cdn ls/default-user-avatar-url true)} (:current-user-data db) {:password ""}))
-    (dissoc :edit-user-profile-failed)))
+  (update-user-data db (:current-user-data db)))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]

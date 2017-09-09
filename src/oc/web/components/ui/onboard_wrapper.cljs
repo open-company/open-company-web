@@ -69,7 +69,7 @@
                                   (drv/drv :edit-user-profile)
                                   (rum/local false ::saving)
                                   {:will-mount (fn [s]
-                                                 (dis/dispatch! [:reset-user-profile])
+                                                 (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                                  s)
                                    :will-update (fn [s]
                                                  (when (and @(::saving s)
@@ -214,7 +214,7 @@
                           (drv/drv :edit-user-profile)
                           (rum/local false ::saving)
                           {:will-mount (fn [s]
-                                         (dis/dispatch! [:reset-user-profile])
+                                         (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                          s)
                            :will-update (fn [s]
                                          (when (and @(::saving s)
