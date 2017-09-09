@@ -15,7 +15,7 @@
           org-name (if has-name
                       (:name org-data)
                       (utils/camel-case-str org-slug))
-          org-logo (or (:logo-url org-data) (utils/cdn "/img/ML/user_avatar_red.svg"))
+          org-logo (or (:logo-url org-data) (utils/cdn "/img/ML/happy_face_red.svg"))
           img-load-failed @(::img-load-failed s)
           show-org-avatar? (and (not img-load-failed)
                                 (not (clojure.string/blank? org-logo)))

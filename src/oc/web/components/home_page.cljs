@@ -87,7 +87,7 @@
         (comment
           [:div.customers
             [:div.customers-title
-              [:img {:src (utils/cdn "/img/ML/user_avatar_yellow.svg")}]
+              [:img {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
               "Our happy clients"]
             [:div.customers-cards.group
               [:div.left-arrow

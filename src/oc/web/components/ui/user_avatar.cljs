@@ -8,12 +8,12 @@
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
-(def default-user-image "/img/ML/user_avatar_red.svg")
+(def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
- ["/img/ML/user_avatar_blue.svg"
-  "/img/ML/user_avatar_green.svg"
-  "/img/ML/user_avatar_purple.svg"
-  "/img/ML/user_avatar_yellow.svg"])
+ ["/img/ML/happy_face_blue.svg"
+  "/img/ML/happy_face_green.svg"
+  "/img/ML/happy_face_purple.svg"
+  "/img/ML/happy_face_yellow.svg"])
 
 (defn- user-icon [user-id]
   (if (= user-id (jwt/get-key :user-id))
