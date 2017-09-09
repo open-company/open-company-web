@@ -38,13 +38,13 @@
       div.small-links {
         margin-top: 15px;
         color: white;
-        font-family: $oc_main_font;
+        @include avenir_M();
         font-size: 13px;
 
         a {          
           margin: 5px;
           color: white;
-          font-family: $oc_main_font;
+          @include avenir_M();
           font-size: 13px;
           text-decoration: underline;
           opacity: 0.9;
@@ -141,9 +141,8 @@
         }
 
         div.column-title {
-          font-family: $oc_main_font;
+          @include avenir_B();
           color: white;
-          font-weight: 900;
           font-size: 13px;
           opacity: 0.5;
           text-transform: uppercase;
@@ -172,7 +171,7 @@
           }
 
           a {
-            font-family: $oc_main_font;
+            @include avenir_M();
             color: white;
             opacity: 0.9;
             font-size: 13px;

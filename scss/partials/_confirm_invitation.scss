@@ -6,10 +6,8 @@ div.confirm-invitation {
     min-height: calc(100vh - #{$footer_small_height}px);
 
     h1.confirm-invitation-cta {
-      font-family: $oc_main_font;
-      font-weight: 400;
+      @include avenir_M();
       font-size: 20px;
-      line-height: 1.2;
       color: $oc_gray_5;
       margin-top: 100px;
     }

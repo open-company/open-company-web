@@ -26,9 +26,8 @@ div.user-type-picker {
     }
 
     span.user-type-disc {
-      font-family: $oc_main_font;
+      @include avenir_H();
       font-size: 14px;
-      font-weight: 700;
       line-height: 1.5;
       letter-spacing: 1.2px;
       color: rgba(78, 90, 107, 1);

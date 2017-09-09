@@ -132,11 +132,9 @@ nav.oc-navbar {
           &.btn-link {
             font-size: 14px;
             color: $oc_blue_dark;
-            font-family: $oc_main_font;
+            @include avenir_M();
             outline: none;
-            font-weight: 400;
             text-transform: none;
-            font-style: normal;
             text-decoration: none;
             opacity: 1;
             padding: .2rem 0px .3rem .5rem;
@@ -184,8 +182,7 @@ nav.oc-navbar {
         margin-left: 10px;
         height: 33px;
         font-size: 0.75rem;
-        font-weight: 700;
-        font-family: $oc_main_font;
+        @include avenir_H();
       }
 
       button.share-button {
@@ -198,7 +195,7 @@ nav.oc-navbar {
       font-size: 14px;
       color: rgba(78,90,107,0.6);
       margin-right: 20px;
-      font-family: $oc_main_font;
+      @include avenir_M();
       margin-top: 2px;
       outline: none;
 

@@ -614,9 +614,8 @@ div.about-footer {
 
     div.block-description {
       opacity: 0.8;
-      font-family: $oc_main_font;
+      @include avenir_M();
       font-size: 20px;
-      line-height: 1.7;
       color: #3a3d40;
       margin-top: 39px;
       max-width: 417px;
@@ -647,9 +646,8 @@ div.about-footer {
 
 
 div.container p {
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 18px;
-  line-height: 1.4;
   color: $oc_gray_5;
 }
 

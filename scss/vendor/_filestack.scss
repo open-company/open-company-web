@@ -215,8 +215,7 @@ div.fsp-picker {
                 opacity: 0.9;
                 background-color: transparent;
                 color: $carrot_dark_gray;
-                font-family: $oc_main_font;
-                font-weight: 900;
+                @include avenir_B();
 
                 &:disabled {
                   cursor: not-allowed;

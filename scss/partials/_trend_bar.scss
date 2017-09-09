@@ -69,9 +69,8 @@ div.trend-bar {
     button.toggle-trend-bt {
       float: right;
       opacity: 0.8;
-      font-family: $oc_main_font;
+      @include avenir_B();
       font-size: 16px;
-      font-weight: 900;
       color: #ffffff;
       margin-top: 0px;
       transition: all $animation_duration ease 0s;
@@ -84,9 +83,8 @@ div.trend-bar {
 
     div.trending-org {
       float: left;
-      font-family: $oc_main_font;
+      @include avenir_B();
       font-size: 16px;
-      font-weight: 900;
       color: #ffffff;
       margin-top: 0px;
       transition: all $animation_duration ease 0s;

@@ -21,8 +21,7 @@ div.main-board-settings {
       }
 
       div.settings-form-input-label {
-        font-family: $oc_main_font;
-        font-weight: 700;
+        @include avenir_B();
         font-size: 14px;
         line-height: 1.5;
         letter-spacing: 1px;
@@ -54,8 +53,7 @@ div.main-board-settings {
 
           h3 {
             font-size: 14px;
-            font-weight: 800;
-            font-family: $oc_main_font;
+            @include avenir_B();
             color: rgba(78,90,107,1);
             margin-bottom: 0px;
             margin-top: 0px;
@@ -67,13 +65,12 @@ div.main-board-settings {
 
           p {
             font-size: 14px;
-            font-weight: 400;
-            font-family: $oc_main_font;
+            @include avenir_M();
             color: rgba(78,90,107,1);
             margin-bottom: 0px;
 
             &.bold {
-              font-weight: 700;
+              @include avenir_H();
             }
           }
         }
@@ -113,9 +110,8 @@ div.main-board-settings {
 
                 th {
                   font-size: 14px;
-                  font-family: $oc_main_font;
+                  @include avenir_H();
                   color: rgba(78, 90, 107, 0.5);
-                  font-weight: 700;
                 }
 
                 tr td:first-child {
@@ -124,9 +120,8 @@ div.main-board-settings {
                 }
 
                 tr td {
-                  font-family: $oc_main_font;
+                  @include avenir_B();
                   font-size: 14px;
-                  font-weight: 300;
                   letter-spacing: 1.2px;
                 }
               }
@@ -204,8 +199,7 @@ div.main-board-settings {
 
       div.dashboard-slug {
         font-size: 14px;
-        font-weight: 400;
-        font-family: $oc_main_font;
+        @include avenir_M();
         color: rgba(78,90,107,1);
         margin-bottom: 2rem;
       }
