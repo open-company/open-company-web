@@ -7,7 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [goog.object :as gobj]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (rum/defc comment-row < rum/static
   [c]
@@ -21,36 +24,47 @@
         [:div.comment-timestamp.left
           (utils/time-since (:created-at c))]]
       [:p.comment-body.group
-        (:body c)]
+        {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
       [:div.comment-footer.group]]))
 
-(rum/defcs add-comment < (rum/local "" ::v)
-                         (rum/local false ::show-footer)
+(defn add-comment-content [add-comment-div]
+  (let [inner-html (.-innerHTML add-comment-div)
+        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))]
+    with-emojis-html))
+
+(rum/defcs add-comment < (rum/local false ::show-footer)
+                         (rum/local false ::input)
+                         (rum/local false ::dom-node-add)
+                         (rum/local false ::dom-node-remove)
+                         (rum/local false ::dom-char-modified)
                          rum/reactive
                          (drv/drv :current-user-data)
                          rum/static
+                         {:did-mount (fn [s]
+                                       (js/emojiAutocomplete)
+                                       s)}
   [s activity-data did-expand-cb]
-  (let [v (::v s)
-        show-footer (::show-footer s)
-        fixed-show-footer (or @show-footer (not (empty? @v)))
+  (let [show-footer (::show-footer s)
+        fixed-show-footer @show-footer
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box
       {:class (if fixed-show-footer "expanded" "")}
       (user-avatar-image current-user-data)
       [:div.add-comment-internal
-        [:textarea.add-comment
-          {:value @v
+        [:div.add-comment.emoji-autocomplete
+          {:ref "add-comment"
+           :content-editable true
+           :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
            :on-focus (fn [_] (reset! show-footer true) (when (fn? did-expand-cb) (did-expand-cb true)))
-           :on-blur (fn [_] (reset! show-footer false) (when (fn? did-expand-cb) (did-expand-cb false)))
-           :on-change #(reset! v (.. % -target -value))
+           :on-blur #(utils/after 100 (fn [] (reset! show-footer false) (when (fn? did-expand-cb) (did-expand-cb false))))
            :placeholder "Add a comment..."}]
         [:div.add-comment-footer.group
           {:style {:display (if fixed-show-footer "block" "none")}}
           [:div.reply-button-container
             [:button.btn-reset.reply-btn
-              {:on-click (fn [_]
-                            (dis/dispatch! [:comment-add activity-data @v])
-                            (reset! v ""))}
+              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
+                            (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
+                            (set! (.-innerHTML add-comment-div) ""))}
               "Add"]]]]]))
 
 (defn scroll-to-bottom [s]
