@@ -418,11 +418,11 @@
 
     (defroute all-activity-route (urls/all-activity ":org") {:as params}
       (timbre/info "Routing all-activity-route" (urls/all-activity ":org"))
-      (org-handler "all-activity" target org-dashboard params))
+      (org-handler "all-activity" target org-dashboard (assoc-in params [:params :board] "all-activity")))
 
     (defroute all-activity-slash-route (str (urls/all-activity ":org") "/") {:as params}
       (timbre/info "Routing all-activity-slash-route" (str (urls/all-activity ":org") "/"))
-      (org-handler "all-activity" target org-dashboard params))
+      (org-handler "all-activity" target org-dashboard (assoc-in params [:params :board] "all-activity")))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
@@ -459,11 +459,11 @@
 
     (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
-      (story-handler #(om/component (story)) "secure-story" target params))
+      (story-handler #(om/component (story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute secure-story-slash-route (str (urls/secure-story ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-story-slash-route" (str (urls/secure-story ":org" ":secure-id") "/"))
-      (story-handler #(om/component (story)) "secure-story" target params))
+      (story-handler #(om/component (story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
