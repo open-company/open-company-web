@@ -113,9 +113,7 @@
                         (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
           (user-avatar-image user-data)
           [:div.add-picture-link
-            (if (empty? (:avatar-url user-data))
-              "Upload profile photo"
-              "Delete profile photo")]
+            "Change profile photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
