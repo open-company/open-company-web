@@ -41,8 +41,7 @@
    #js {:height (* 24 (if is-all-activity 6 3))
         :wrap "word"
         :watch true
-        :ellipsis "... "
-        :after (when-not is-all-activity "a.read-more")}))
+        :ellipsis "... "}))
 
 (defn get-first-body-thumbnail [body]
   (let [$body (js/$ (str "<div>" body "</div>"))
@@ -75,12 +74,9 @@
                                          (let [activity-data (first (:rum/args s))
                                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                                body-a-sel (str body-sel " a")
-                                               read-more-sel (str body-a-sel ".read-more")
                                                is-all-activity (get (:rum/args s) 3)]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
-                                           ; Prevent read more link to change directly the url
-                                           (.click (js/$ read-more-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
                                            (when (compare-and-set! (::truncated s) false true)
                                              (truncate-body body-sel is-all-activity)
@@ -174,16 +170,12 @@
             activity-url (if (= (:type activity-data) "story")
                            (oc-urls/story (:board-slug activity-data) (:uuid activity-data))
                            (oc-urls/entry (:board-slug activity-data) (:uuid activity-data)))
-            read-more-html (str "<a class=\"read-more\" href=\"" activity-url "\">Read more</a>")
-            emojied-body (utils/emojify (str body-without-preview (if is-all-activity "" read-more-html)))]
+            emojied-body (utils/emojify body-without-preview)]
         [:div.activity-card-body
           {:dangerouslySetInnerHTML emojied-body
            :class (utils/class-set {:has-body has-body
                                     :has-headline has-headline
                                     :has-media-preview @(::first-body-image s)})}])
-      (when (and is-all-activity
-                 has-body)
-        [:div.read-more "Read Full Update"])
       ; Body preview
       (when @(::first-body-image s)
         [:div.activity-card-media-preview
