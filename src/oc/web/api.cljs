@@ -751,7 +751,7 @@
           (fn [{:keys [status success body]}]
             (dispatcher/dispatch! [:story-create/finish (:slug board-data) (if success (json->cljs body) nil)])))))))
 
-(defn autosave-draft [story-data]
+(defn autosave-draft [story-data share-data]
   (when story-data
     (let [autosave-link (utils/link-for (:links story-data) "partial-update")
           fixed-story-data (clojure.set/rename-keys (select-keys story-data [:title :body :board-slug :banner-url :banner-width :banner-height]) {:board-slug :storyboard-slug})]
@@ -759,7 +759,7 @@
         {:headers (headers-for-link autosave-link)
          :json-params (cljs->json fixed-story-data)}
         (fn [{:keys [success status body]}]
-          (dispatcher/dispatch! [:draft-autosave/finish]))))))
+          (dispatcher/dispatch! [:draft-autosave/finish share-data]))))))
 
 (defn share-story [story-data share-data]
   (when story-data
