@@ -116,7 +116,7 @@
 
 (defn create-new-topic [s]
   (when-not (empty? @(::new-topic s))
-    (let [topics (:topics @(drv/get-ref s :board-data))
+    (let [topics @(drv/get-ref s :entry-edit-topics)
           topic-name (s/trim @(::new-topic s))
           topic-slug (unique-slug topics topic-name)]
       (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
@@ -130,7 +130,7 @@
        (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))
 
 (rum/defcs entry-edit < rum/reactive
-                        (drv/drv :board-data)
+                        (drv/drv :entry-edit-topics)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
@@ -148,11 +148,14 @@
                                              board-filters @(drv/get-ref s :board-filters)
                                              initial-body (utils/emojify (if (contains? entry-editing :links) (:body entry-editing) ""))
                                              initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
+                                         ;; Load board if it's not already
+                                         (when-not @(drv/get-ref s :entry-edit-topics)
+                                           (dis/dispatch! [:board-get (utils/link-for (:links entry-editing) "up")]))
                                          (reset! (::initial-body s) initial-body)
                                          (reset! (::initial-headline s) initial-headline)
                                          (when (and (string? board-filters)
                                                     (nil? (:topic-slug entry-editing)))
-                                            (let [topics (:topics @(drv/get-ref s :board-data))
+                                            (let [topics @(drv/get-ref s :entry-edit-topics)
                                                   topic (first (filter #(= (:slug %) board-filters) topics))]
                                               (when topic
                                                 (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
@@ -177,8 +180,7 @@
                                           (dommy/remove-class! (sel1 [:body]) :no-scroll))
                                          s)}
   [s]
-  (let [board-data        (drv/react s :board-data)
-        topics            (distinct (:topics board-data))
+  (let [topics            (distinct (drv/react s :entry-edit-topics))
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
         new-entry?        (empty? (:uuid entry-editing))
@@ -193,7 +195,7 @@
       [:div.entry-edit-modal.group
         [:div.entry-edit-modal-header.group
           (user-avatar-image current-user-data)
-          [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:name board-data)]]
+          [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
           [:div.arrow " · "]
           [:div.entry-card-dd-container
             [:button.mlb-reset.dropdown-toggle
