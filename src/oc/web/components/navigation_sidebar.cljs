@@ -148,7 +148,8 @@
             {:on-click #(router/nav! (oc-urls/org-settings-invite))}
             [:div.invite-people-icon]
             [:span "Invite People"]])
-        [:button.mlb-reset.about-carrot-btn
-          {:on-click #(router/nav! oc-urls/about)}
-          [:div.about-carrot-icon]
-          [:span "About Carrot"]]]]))
+        ; [:button.mlb-reset.about-carrot-btn
+        ;   {:on-click #(router/nav! oc-urls/about)}
+        ;   [:div.about-carrot-icon]
+        ;   [:span "About Carrot"]]
+          ]]))
