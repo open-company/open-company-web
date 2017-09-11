@@ -84,7 +84,8 @@
           [:span.story-title
             {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]]
         [:div.story-header-right
-          (reactions story-data)
+          (when (pos? (count (:reactions story-data)))
+            (reactions story-data))
           (when (utils/link-for (:links story-data) "comments")
             [:div.comments-summary-container.group
               {:on-click #(reset! (::comments-expanded s) (not @(::comments-expanded s)))}
