@@ -32,14 +32,16 @@
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
 
-(defn activity-key [org-slug board-slug activity-uuid]
-  (let [board-key (if (= board-slug :all-activity)
-                    (all-activity-key org-slug)
-                    (board-data-key org-slug board-slug))]
-    (vec (concat board-key [:fixed-items activity-uuid]))))
-
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-stories secure-id])))
+
+(defn activity-key [org-slug board-slug activity-uuid]
+  (if board-slug
+    (let [board-key (if (= board-slug :all-activity)
+                      (all-activity-key org-slug)
+                      (board-data-key org-slug board-slug))]
+      (vec (concat board-key [:fixed-items activity-uuid])))
+    (secure-activity-key org-slug activity-uuid)))
 
 (defn comments-key [org-slug board-slug]
  (vec (conj (board-key org-slug board-slug) :comments-data)))
@@ -148,9 +150,7 @@
    :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
                           (fn [base org-slug board-slug activity-uuid secure-id]
                             (when (and org-slug (or (and board-slug activity-uuid) secure-id))
-                              (if (and board-slug activity-uuid)
-                                (get-in base (activity-key org-slug board-slug activity-uuid))
-                                (get-in base (secure-activity-key org-slug secure-id)))))]
+                              (get-in base (activity-key org-slug board-slug (or activity-uuid secure-id)))))]
    :comments-data       [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
