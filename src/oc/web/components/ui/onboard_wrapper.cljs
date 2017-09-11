@@ -465,11 +465,9 @@
                             (rum/local false ::exchange-started)
                             (vertical-center-mixin ".onboard-email-container")
                             {:will-mount (fn [s]
-                                           (js/console.log "email-verified/will-mount" s)
                                            (exchange-token-when-ready s)
                                            s)
                              :did-mount (fn [s]
-                                          (js/console.log "email-verified/did-mount" s)
                                           (dots-animation s)
                                           (exchange-token-when-ready s)
                                           s)
