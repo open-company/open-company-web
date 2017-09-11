@@ -132,6 +132,11 @@
   [user-id]
   (str "slack-profile-filled-" user-id))
 
+(defn dashboard-tooltips-shown
+  "Cookie to remember if the boards and journals tooltips where shown."
+  [user-id]
+  (str "dashboard-tooltips-show-" user-id))
+
 (defn print-router-path []
   (js/console.log @path))
 
