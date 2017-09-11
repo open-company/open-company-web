@@ -127,6 +127,7 @@
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org (:params params))
+        board (:board (:params params))
         query-params (:query-params params)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
@@ -134,7 +135,7 @@
       (cook/set-cookie! (router/last-board-cookie org) "all-activity" (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save route
-    (router/set-route! [org route] {:org org :query-params (:query-params params)})
+    (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
     ;; load data from api
     (when-not (dis/org-data)
       (swap! dis/app-state merge {:loading true}))
