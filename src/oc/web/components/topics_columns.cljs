@@ -1,14 +1,18 @@
 (ns oc.web.components.topics-columns
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [rum.core :as rum]
             [cuerdas.core :as s]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -32,6 +36,10 @@
                                       is-stakeholder-update
                                       board-filters] :as data} owner options]
 
+  (init-state [_]
+    {:show-boards-tooltip (not (cook/get-cookie (router/dashboard-tooltips-shown (jwt/get-key :user-id))))
+     :show-journals-tooltip false})
+
   (will-mount [_]
     (when (and (not (utils/is-test-env?))
                is-all-activity)
@@ -41,7 +49,7 @@
     (when-not (utils/is-test-env?)
       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
 
-  (render-state [_ {:keys [show-storyboards-dropdown]}]
+  (render-state [_ {:keys [show-storyboards-dropdown show-boards-tooltip show-journals-tooltip]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -64,6 +72,30 @@
                                          :overflow-visible true
                                          :group true
                                          :content-loaded content-loaded})}
+        (when show-boards-tooltip
+          (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
+                      offset (.offset nav-boards)
+                      boards-left (aget offset "left")]
+            (carrot-tip {:x (+ boards-left 105 30)
+                         :y (- (aget offset "top") 160)
+                         :title "Welcome to Carrot"
+                         :message "Boards keep team updates organized. You can create boards for different areas of your company like Sales, Marketing and Products."
+                         :footer "1 of 2"
+                         :on-next-click (fn []
+                                          (om/update-state! owner #(merge % {:show-journals-tooltip true
+                                                                             :show-boards-tooltip false})))})))
+        (when show-journals-tooltip
+          (when-let* [nav-journals (js/$ "h3#navigation-sidebar-journals")
+                      offset (.offset nav-journals)
+                      journals-left (aget offset "left")]
+            (carrot-tip {:x (+ journals-left 105 30)
+                         :y (- (aget offset "top") 160)
+                         :title "Welcome to Carrot"
+                         :message "Journals are great for summary updates, like monthly all-hands, weekly kickoffs, and investor updates."
+                         :footer "2 of 2"
+                         :on-next-click (fn []
+                                          (om/set-state! owner :show-journals-tooltip false)
+                                          (cook/set-cookie! (router/dashboard-tooltips-shown (jwt/get-key :user-id)) true (* 60 60 24 365)))})))
         (cond
           ;; render 2 or 3 column layout
           (> columns-num 1)
