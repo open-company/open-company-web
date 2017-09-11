@@ -79,7 +79,7 @@
             (carrot-tip {:x (+ boards-left 105 30)
                          :y (- (aget offset "top") 160)
                          :title "Welcome to Carrot"
-                         :message "Boards keep team updates organized. You can create boards for different areas of your company like Sales, Marketing and Products."
+                         :message "Boards make it easy to find the latest news and key updates from across the company. You can create boards for different areas of your company, like Sales, Marketing and Products."
                          :footer "1 of 2"
                          :on-next-click (fn []
                                           (om/update-state! owner #(merge % {:show-journals-tooltip true
@@ -91,7 +91,7 @@
             (carrot-tip {:x (+ journals-left 105 30)
                          :y (- (aget offset "top") 160)
                          :title "Welcome to Carrot"
-                         :message "Journals are great for summary updates, like monthly all-hands, weekly kickoffs, and investor updates."
+                         :message "Journals are the easiest way to share longer updates and ideas with your stakeholders, like monthly all-hands, weekly kickoffs, and investor updates."
                          :footer "2 of 2"
                          :on-next-click (fn []
                                           (om/set-state! owner :show-journals-tooltip false)
