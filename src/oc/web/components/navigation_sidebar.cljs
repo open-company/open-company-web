@@ -59,6 +59,7 @@
       [:div.left-navigation-sidebar-top.group
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
+          {:id "navigation-sidebar-boards"}
           [:div.boards-icon]
           [:span
             "BOARDS"]]
@@ -93,6 +94,7 @@
       [:div.left-navigation-sidebar-top.group
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
+          {:id "navigation-sidebar-journals"}
           [:div.stories-icon]
           [:span
             "JOURNALS"]]
