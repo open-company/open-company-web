@@ -208,6 +208,7 @@ provided in the table below:
 |  :auth-with-token/failed | API | Token exchange failed, cleanup the app-state of the token exchange stuff. |
 |  :auth-with-token/success | API | Token exchange succeeded. Show the collect name and password overlay if it was an invitation token, load the orgs associated with the user and redirect. |
 |  :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
+|  :board-get | UI | Load a board passing in directly the board link. |
 |  :board-create | UI | Start the request to create a new board for the current org. |
 |  :board-delete | UI | Delete a board of the current org. |
 |  :board-edit | UI | Start the board edit for existing board and new board. |

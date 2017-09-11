@@ -141,7 +141,7 @@
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
         (when (not (utils/in? (:route @router/path) "story"))
-          (api/get-board board-data))
+          (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
@@ -171,7 +171,12 @@
 (defmethod dispatcher/action :boards-load-other [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
         :when (not= (:slug board) (router/current-board-slug))]
-    (api/get-board board))
+    (api/get-board (utils/link-for (:links board) ["item" "self"] "GET")))
+  db)
+
+(defmethod dispatcher/action :board-get
+  [db [_ link]]
+  (api/get-board link)
   db)
 
 (defmethod dispatcher/action :board [db [_ board-data]]
@@ -857,7 +862,7 @@
         ;; the entry is not present, refresh the full topic
         (do
           ;; force refresh of topic
-          (api/get-board (dispatcher/board-data))
+          (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
           db)))))
 
 (defn- update-reaction
@@ -907,7 +912,7 @@
         ;; the entry is not present, refresh the full topic
         (do
           ;; force refresh of topic
-          (api/get-board (dispatcher/board-data))
+          (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
           db)))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
@@ -1021,7 +1026,7 @@
   (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
     ;; FIXME: refresh the last loaded all-activity link
     (when-not is-all-activity
-      (api/get-board (dispatcher/board-data))))
+      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
   db)
 
 (defmethod dispatcher/action :board-nav
@@ -1090,7 +1095,7 @@
   [db [_]]
   (if (utils/in? (:route @router/path) "story-edit")
     (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
-    (api/get-board (dispatcher/board-data)))
+    (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
   db)
 
 (defmethod dispatcher/action :alert-modal-show

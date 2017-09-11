@@ -196,8 +196,8 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org (json->cljs body)])))))
 
-(defn get-board [board-data]
-  (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+(defn get-board [board-link]
+  (when board-link
     (storage-http (method-for-link board-link) (relative-href board-link)
       {:headers (headers-for-link board-link)}
       (fn [{:keys [status body success]}]
