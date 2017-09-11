@@ -37,6 +37,7 @@
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (defn truncate-body [body-sel is-all-activity]
+  (js/console.log "truncate-body height" (if is-all-activity 6 3) " * 24" (* 24 (if is-all-activity 6 3)))
   (.dotdotdot (js/$ body-sel)
    #js {:height (* 24 (if is-all-activity 6 3))
         :wrap "word"
@@ -74,7 +75,8 @@
                                          (let [activity-data (first (:rum/args s))
                                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                                body-a-sel (str body-sel " a")
-                                               is-all-activity (get (:rum/args s) 3)]
+                                               is-all-activity (nth (:rum/args s) 3)]
+                                           (js/console.log "activity-card/after-render is-all-activity" is-all-activity (:rum/args s))
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.preventDefault %))
                                            ; Truncate body text with dotdotdot
