@@ -103,7 +103,7 @@
         [:table.org-settings-table
           [:thead
             [:tr
-              [:th "Email Addresses"]
+              [:th "Invitee"]
               [:th.role "Role "
                 [:i.mdi.mdi-information-outline
                   {:title "Roles describe access levels. Viewers can only view; Contributors and Admins can edit, too."
