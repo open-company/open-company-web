@@ -9,7 +9,7 @@
 (defn animate-reaction [e s]
   (when-let* [target (.-currentTarget e)
               span-reaction (sel1 target :span.reaction)]
-    (doseq [i (range 8)]
+    (doseq [i (range 5)]
       (let [cloned-el (.cloneNode span-reaction true)
             translate-y {:transform ["translateY(0px)" "translateY(-80px)"]
                          :opacity [1 0]}
@@ -20,7 +20,7 @@
         (set! (.-top (.-style cloned-el)) "2px")
         (.appendChild (.-parentElement span-reaction) cloned-el)
         (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
-        (utils/after (+ 800 200 (* 7 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
+        (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (rum/defcs reactions
   [s entry-data]
