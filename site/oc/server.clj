@@ -2,10 +2,10 @@
   "Development-time server. This role is played by an nginx proxy in production."
   (:require [ring.util.response :as res]
             [ring.middleware.params :refer (wrap-params)]
-            [ring.middleware.keyword-params :refer (wrap-keyword-params)]
             [ring.middleware.resource :refer (wrap-resource)]
             [ring.middleware.file :refer (wrap-file)]
             [ring.middleware.reload :refer (wrap-reload)]
+            [cuerdas.core :as s]
             [org.httpkit.client :as http]
             [compojure.core :refer (defroutes GET)]
             [compojure.route :as route]
@@ -39,6 +39,12 @@
 (defn- sheets-proxy [path params]
   (sheets-chart/proxy-sheets-pass-through path params))
 
+(defn- onboard-tip-response [params]
+  (let [qparams (:query-params params)
+        [px py] (s/split (get qparams "p") ",")
+        svg (get-onboard-image (get qparams "w") (get qparams "h") px py)]
+    {:status 200 :body svg :headers {"Content-Type" "image/svg+xml"}}))
+
 (defroutes resources
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
@@ -48,7 +54,7 @@
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))
   (GET ["/:path" :path #"[^\.]+"] [path] (app-shell))
-  (GET "/img/ML/onboard_tip.svg" {:as params} (do (println "params" params) (not-found))))
+  (GET "/img/ML/onboard_tip.svg" {:as params} (onboard-tip-response params)))
 
 ;; Some routes like /, /404 and similar can't have their content-type
 ;; derived automatically, because of that we set it with the middleware below
@@ -69,7 +75,6 @@
 (def handler
   (-> resources
       (wrap-params)
-      (wrap-keyword-params)
       (wrap-resource "public")
       (wrap-reload {:dirs "site"})
       (wrap-default-content-type)))
