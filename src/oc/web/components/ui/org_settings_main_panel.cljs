@@ -11,11 +11,18 @@
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
-(defn reset-form [s]
-  (let [org-data (first (:rum/args s))]
-    (dis/dispatch! [:org-edit org-data false])
-    (dis/dispatch! [:input [:um-domain-invite :domain] ""])
-    (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
+(defn reset-form [s keep?]
+  (let [org-data (first (:rum/args s))
+        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))
+        domain (if (and keep?
+                        um-domain-invite
+                        (:domain um-domain-invite))
+                  (:domain um-domain-invite)
+                  "")]
+    (dis/dispatch! [:org-edit org-data keep?])
+    (dis/dispatch! [:input [:um-domain-invite :domain] domain])
+    (when-not keep?
+      (dis/dispatch! [:input [:add-email-domain-team-error] nil]))))
 
 (defn logo-on-load [org-data url img]
   (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
@@ -40,7 +47,7 @@
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
     {:will-mount (fn [s]
-                   (reset-form s)
+                   (reset-form s true)
                    s)
      :before-render (fn [s]
                      (let [team-management-data @(drv/get-ref s :org-settings-team-management)
@@ -83,10 +90,7 @@
         ;; Org logo row
         [:div.org-settings-panel-row.org-logo-row.group
           {:on-click (fn [_]
-                      (iu/upload! {:accept "image/*"
-                                   :transformations {
-                                     :crop {
-                                       :aspectRatio 1}}}
+                      (iu/upload! {:accept "image/*"}
                       (fn [res]
                         (let [url (gobj/get res "url")
                               img (gdom/createDom "img")]
@@ -112,9 +116,9 @@
           [:div.org-logo-label
             [:div.cta
               (if (empty? (:logo-url org-editing))
-                "Add a logo"
+                "Upload logo"
                 "Change logo")]
-            [:div.description "A 160x160 transparent PNG works best"]]]
+            [:div.description "A transparent background PNG works best"]]]
         ;; Slack teams row
         [:div.org-settings-panel-row.slack-teams-row.group
           [:div.org-settings-label
@@ -217,5 +221,5 @@
            :on-click #(dis/dispatch! [:org-edit-save])}
           "Save"]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(reset-form s)}
+          {:on-click #(reset-form s false)}
           "Cancel"]]]))

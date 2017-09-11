@@ -158,7 +158,8 @@
 (defn did-select-storyboard-cb [s storyboard]
   (let [story-data @(drv/get-ref s :story-editing)]
     (when (not= (:value storyboard) (:board-slug story-data))
-      (update-story-editing s {:board-slug (:value storyboard) :redirect true}))))
+      (update-story-editing s {:board-slug (:value storyboard) :storyboard-name (:label storyboard) :redirect true})
+      (reset! (::show-storyboards-list s) false))))
 
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
@@ -249,9 +250,10 @@
             {:class (when-not (empty? @(::central-message s)) "showing")}
             @(::central-message s)]]
         [:div.story-edit-header-right
-          [:button.mlb-reset.mlb-default.post-button
-            {:on-click #(reset! (::show-publish-modal s) true)}
-            "Post"]]]
+          (when (= "draft" (:status story-data))
+            [:button.mlb-reset.mlb-default.post-button
+              {:on-click #(reset! (::show-publish-modal s) true)}
+              "Post"])]]
       [:div.story-edit-content
         [:div.story-edit-author.group
           (user-avatar-image story-author)
