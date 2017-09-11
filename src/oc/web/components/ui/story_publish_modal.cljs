@@ -71,7 +71,10 @@
             (when shared?
               [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}])
             (when shared?
-              [:div.published-headline (str "Your journal has been " (when (not published?) "posted and ") "shared!")])
+              (let [show-posted? (not published?)
+                    show-shared? (or (:slack publish-data) (:email publish-data))
+                    headline (str "Your journal has been " (when show-posted? "posted") (when (and show-posted? show-shared?) " and ") (when show-shared? "shared") "!")]
+                [:div.published-headline headline]))
             (let [publish-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/secure-story (router/current-org-slug) secure-uuid))]
               [:div.published-url-container.group
                 [:input
