@@ -42,6 +42,7 @@
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
+                                      (utils/after 100 #(utils/remove-tooltips))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
