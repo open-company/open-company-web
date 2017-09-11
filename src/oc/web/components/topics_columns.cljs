@@ -47,7 +47,9 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+    (when (om/get-state owner :show-boards-tooltip)
+      (utils/after 1000 #(om/set-state! owner :update true))))
 
   (render-state [_ {:keys [show-storyboards-dropdown show-boards-tooltip show-journals-tooltip]}]
     (let [current-activity-id (router/current-activity-id)
