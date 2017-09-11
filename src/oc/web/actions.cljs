@@ -799,11 +799,12 @@
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         is-all-activity (:from-all-activity @router/path)
-        activity-uuid (:activity-uuid interaction-data)
+        activity-uuid (or (:activity-uuid interaction-data) (router/current-activity-id))
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        entry-data (get (get board-data :fixed-items) activity-uuid)]
+        entry-key (dispatcher/activity-key org-slug board-slug (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid))
+        entry-data (get-in db entry-key)]
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
@@ -1202,6 +1203,9 @@
         board-slug (router/current-board-slug)
         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
         fixed-story-data (utils/fix-story story-data (or (:storyboard-slug story-data) board-slug))]
+    (when (jwt/jwt)
+      (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
+        (wsc/reconnect ws-link (jwt/get-key :user-id))))
     (-> db
       (dissoc :story-loading)
       (assoc-in story-key fixed-story-data))))
