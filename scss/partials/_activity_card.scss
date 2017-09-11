@@ -174,6 +174,7 @@ div.activity-card {
     div.activity-card-title {
       @include activity-title();
       margin-bottom: 16px;
+      margin-top: 24px;
     }
 
     div.activity-card-headline {

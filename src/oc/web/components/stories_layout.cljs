@@ -33,6 +33,7 @@
                     {:date-time (:published-at story)
                      :data-toggle "tooltip"
                      :data-placement "top"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :title (utils/activity-date-tooltip story)}
                     (utils/time-since (:published-at story))]]])
             (activity-card story has-headline has-body)])
