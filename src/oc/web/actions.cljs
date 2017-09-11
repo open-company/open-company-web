@@ -125,6 +125,10 @@
 (defmethod dispatcher/action :org [db [_ org-data]]
   (let [boards (:boards org-data)]
     (cond
+      ;; If it's all activity page, loads all activity for the current org
+      (and (router/current-board-slug)
+           (= (router/current-board-slug) "all-activity"))
+      (api/get-all-activity org-data)
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -135,9 +139,6 @@
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
           (router/redirect-404!)))
-      ;; If it's all activity page, loads all activity for the current org
-      (utils/in? (:route @router/path) "all-activity")
-      (api/get-all-activity org-data)
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -225,7 +226,7 @@
       (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
-  (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
+  (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
         board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
         new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
@@ -729,13 +730,14 @@
   (api/get-comments activity-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (router/current-activity-id)
+        activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
-  (let [comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) activity-uuid)
+  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
+        comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) fixed-activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
@@ -799,50 +801,57 @@
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         is-all-activity (:from-all-activity @router/path)
-        activity-uuid (or (:activity-uuid interaction-data) (router/current-activity-id))
+        activity-uuid (:resource-uuid interaction-data)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        entry-key (dispatcher/activity-key org-slug board-slug (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid))
+        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
+        is-secure-story (router/current-secure-story-id)
+        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug nil fixed-activity-uuid))
+        entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
-    (if entry-data
-      ; If the entry is present in the local state
-      (let [; get the comment data from the ws message
-            comment-data (:interaction interaction-data)
-            created-at (:created-at comment-data)
-            all-old-comments-data (dispatcher/activity-comments-data activity-uuid)
-            old-comments-data (vec (filter :links all-old-comments-data))
-            ; Add the new comment to the comments list, make sure it's not present already
-            new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-            sorted-comments-data (vec (sort-by :created-at new-comments-data))
-            comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
-            current-user-id (jwt/get-key :user-id)
-            is-current-user (= current-user-id (:user-id (:author comment-data)))
-            ; update the comments link of the entry
-            comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
-            with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
-            old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
-            new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
-            new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
-                          old-authors
-                          (conj old-authors new-author))
-            with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
-        ;; Refresh the topic data if the action coming in is from the current user
-        ;; to get the new links to interact with
-        (when is-current-user
-          (api/get-entry entry-data))
-        ;; Animate the comments count if we don't have already the same number of comments locally
-        (when (not= (count all-old-comments-data) (count new-comments-data))
-          (utils/pulse-comments-count activity-uuid))
-        ; Update the local state with the new comments list
-        (-> db
-            (assoc-in comments-key sorted-comments-data)
-            (assoc-in (concat board-key [:fixed-items activity-uuid]) with-authors)))
-      ;; the entry is not present, refresh the full topic
-      (do
-        ;; force refresh of topic
-        (api/get-board (dispatcher/board-data))
-        db))))
+    ;; If looking at a secure story discard all events for other activities
+    (if (and is-secure-story
+             (not= (:uuid secure-story-data) activity-uuid))
+      db
+      (if entry-data
+        ; If the entry is present in the local state
+        (let [; get the comment data from the ws message
+              comment-data (:interaction interaction-data)
+              created-at (:created-at comment-data)
+              all-old-comments-data (dispatcher/activity-comments-data fixed-activity-uuid)
+              old-comments-data (vec (filter :links all-old-comments-data))
+              ; Add the new comment to the comments list, make sure it's not present already
+              new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
+              sorted-comments-data (vec (sort-by :created-at new-comments-data))
+              comments-key (dispatcher/activity-comments-key org-slug board-slug fixed-activity-uuid)
+              current-user-id (jwt/get-key :user-id)
+              is-current-user (= current-user-id (:user-id (:author comment-data)))
+              ; update the comments link of the entry
+              comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
+              with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
+              old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
+              new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
+              new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
+                            old-authors
+                            (conj old-authors new-author))
+              with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
+          ;; Refresh the topic data if the action coming in is from the current user
+          ;; to get the new links to interact with
+          (when is-current-user
+            (api/get-entry entry-data))
+          ; ;; Animate the comments count if we don't have already the same number of comments locally
+          ; (when (not= (count all-old-comments-data) (count new-comments-data))
+          ;   (utils/pulse-comments-count fixed-activity-uuid))
+          ; Update the local state with the new comments list
+          (-> db
+              (assoc-in comments-key sorted-comments-data)
+              (assoc-in (vec (concat board-key [:fixed-items fixed-activity-uuid])) with-authors)))
+        ;; the entry is not present, refresh the full topic
+        (do
+          ;; force refresh of topic
+          (api/get-board (dispatcher/board-data))
+          db)))))
 
 (defn- update-reaction
   "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
@@ -852,41 +861,47 @@
         org-slug (router/current-org-slug)
         is-all-activity (:from-all-activity @router/path)
         board-slug (router/current-board-slug)
-        activity-uuid (:entry-uuid interaction-data)
-        ; Entry data
-        entry-data (dispatcher/activity-data activity-uuid)
+        activity-uuid (:resource-uuid interaction-data)
         ; Board data
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
-        ; Entry idx
-        entry-key (concat board-key [:fixed-items activity-uuid])]
-    (if (and entry-data (not (empty? (:reactions entry-data))))
-      ; If the entry is present in the local state and it has reactions
-      (let [reaction-data (:interaction interaction-data)
-            old-reactions-data (:reactions entry-data)
-            reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
-            new-reaction-data {:count (:count interaction-data)}
-            is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
-            with-reacted (if is-current-user
-                            (assoc new-reaction-data :reacted add-event?)
-                            new-reaction-data)
-            ; Update the reactions data with the new reaction
-            new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
-            ; Update the entry with the new reaction
-            updated-entry-data (assoc entry-data :reactions new-reactions-data)]
-        ;; Refresh the topic data if the action coming in is from the current user
-        ;; to get the new links to interact with
-        (when is-current-user
-          (api/get-entry entry-data))
-        (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
-          (utils/pulse-reaction-count activity-uuid (:reaction reaction-data)))
-        ; Update the entry in the local state with the new reaction
-        (assoc-in db entry-key updated-entry-data))
-      ;; the entry is not present, refresh the full topic
-      (do
-        ;; force refresh of topic
-        (api/get-board (dispatcher/board-data))
-        db))))
+        ; Entry data
+        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
+        is-secure-story (router/current-secure-story-id)
+        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug nil fixed-activity-uuid))
+        entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
+        entry-data (get-in db entry-key)]
+    (if (and is-secure-story
+             (not= (:uuid secure-story-data) activity-uuid))
+      db
+      (if (and entry-data (not (empty? (:reactions entry-data))))
+        ; If the entry is present in the local state and it has reactions
+        (let [reaction-data (:interaction interaction-data)
+              old-reactions-data (:reactions entry-data)
+              reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
+              new-reaction-data {:count (:count interaction-data)}
+              is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+              with-reacted (if is-current-user
+                              (assoc new-reaction-data :reacted add-event?)
+                              new-reaction-data)
+              ; Update the reactions data with the new reaction
+              new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+              ; Update the entry with the new reaction
+              updated-entry-data (assoc entry-data :reactions new-reactions-data)]
+          ;; Refresh the topic data if the action coming in is from the current user
+          ;; to get the new links to interact with
+          (when is-current-user
+            (api/get-entry entry-data))
+          ; ;; Animate the interaction count
+          ; (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
+          ;   (utils/pulse-reaction-count fixed-activity-uuid (:reaction reaction-data)))
+          ; Update the entry in the local state with the new reaction
+          (assoc-in db entry-key updated-entry-data))
+        ;; the entry is not present, refresh the full topic
+        (do
+          ;; force refresh of topic
+          (api/get-board (dispatcher/board-data))
+          db)))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
   [db [_ interaction-data]]
@@ -903,7 +918,7 @@
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
-   #(let [from-all-activity (not (router/current-board-slug))
+   #(let [from-all-activity (= (router/current-board-slug) "all-activity")
           new-route (if from-all-activity
                       [(router/current-org-slug) "all-activity" board-slug activity-uuid "activity"]
                       [(router/current-org-slug) board-slug activity-uuid "activity"])
@@ -966,7 +981,7 @@
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)
-        is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
+        is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
         org-slug (router/current-org-slug)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
@@ -996,7 +1011,7 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_]]
-  (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))]
+  (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
     ;; FIXME: refresh the last loaded all-activity link
     (when-not is-all-activity
       (api/get-board (dispatcher/board-data))))
@@ -1046,7 +1061,7 @@
     (utils/after 10
       #(if (:activity-pushed db)
          (let [route [(router/current-org-slug) "all-activity"]
-               parts (dissoc @router/path :route :board :activity)]
+               parts (-> @router/path (dissoc :route :board :activity :from-all-activity) (merge {:board "all-activity"}))]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
             (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
