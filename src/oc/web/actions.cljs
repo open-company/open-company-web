@@ -52,12 +52,19 @@
 ;; Get the board to show counting the last accessed and the last created
 
 (defn get-default-board [org-data]
-  (when-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (when-not (= last-board-slug "all-activity")
-      (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
-        (when board
+  (let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+    (if (= last-board-slug "all-activity")
+      {:slug "all-activity"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (if board
           ; Get the last accessed board from the saved cookie
-          board)))))
+          board
+          (let [sorted-boards (vec (sort-by :name (vec (filter #(= (:type %) "entry") boards))))
+                sorted-stories (vec (sort-by :name (vec (filter #(= (:type %) "story") boards))))]
+            (if (pos? (count sorted-boards))
+              (first sorted-boards)
+              (first sorted-stories))))))))
 
 (defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
   (if success
