@@ -8,7 +8,7 @@
 
 (rum/defcs org-avatar < rum/static
                         (rum/local false ::img-load-failed)
-  [s org-data should-show-link & [show-avatar-and-name]]
+  [s org-data should-show-link & [show-avatar-and-name hide-name]]
   (when org-data
     (let [org-slug (:slug org-data)
           has-name (not (empty? (:name org-data)))
@@ -39,10 +39,10 @@
                 [:span.helper]
                 [:img.org-avatar-img
                   {:src org-logo
-                   :title org-name
                    :on-error #(reset! (::img-load-failed s) true)}]])
-            (when (or (not show-org-avatar?)
-                      show-avatar-and-name)
+            (when (and (not hide-name)
+                       (or (not show-org-avatar?)
+                           show-avatar-and-name))
               [:span.org-name
                 {:class (when-not show-org-avatar? "no-logo")}
                 org-name])]]])))
