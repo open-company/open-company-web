@@ -47,7 +47,6 @@
                                   :will-unmount (fn [s]
                                                   ;; Remove no-scroll class from the body tag
                                                   (dommy/remove-class! (sel1 [:body]) :no-scroll)
-                                                  (utils/after 100 #(dis/dispatch! [:input [:story-editing-share] nil]))
                                                   (utils/after 100 #(dis/dispatch! [:input [:story-editing-published-url] nil]))
                                                   s)}
   [s story-data close-cb]
