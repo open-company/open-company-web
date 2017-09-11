@@ -12,7 +12,7 @@
             [goog.object :as gobj]))
 
 (rum/defc activity-card-empty
-  [read-only?]
+  [topic read-only?]
   [:div.activity-card.empty-state.group
     (when-not read-only?
       [:div.empty-state-content
@@ -20,7 +20,7 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit {}])}
+            {:on-click #(dis/dispatch! [:entry-edit topic])}
             "Add an update?"]]])])
 
 (defn delete-clicked [e activity-data]

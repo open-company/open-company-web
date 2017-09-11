@@ -80,7 +80,9 @@
                   (rum/with-key (activity-card entry has-headline has-body) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
                 ; If there is only one entry add the empty card placeholder
                 (if (= (count sorted-entries) 1)
-                  (activity-card-empty (:read-only board-data))
+                  (let [entry-data (select-keys (first entries) [:board-name :topic-slug :topic-name])
+                        with-board (merge entry-data {:board-slug (:slug board-data) :board-name (:name board-data)})]
+                    (activity-card-empty with-board (:read-only board-data)))
                   ; If there is only one entry in this row, but it's not the first add the placheolder
                   (when (= (count entries) 1)
                     [:div.entry-card.entry-card-placeholder]))]))])

@@ -138,7 +138,15 @@
                            (not (responsive/is-tablet-or-mobile?))
                            (= (:type board-data) "entry"))
                   (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
-                               :on-click #(dis/dispatch! [:entry-edit {}])}
+                               :on-click (fn [_]
+                                          (let [entry-data {:board-slug (:slug board-data)
+                                                            :board-name (:name board-data)}
+                                                topic-data (when (string? board-filters)
+                                                             (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                                with-topic (if (string? board-filters)
+                                                            (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
+                                                            entry-data)]
+                                            (dis/dispatch! [:entry-edit with-topic])))}
                     (dom/div {:class "add-to-board-pencil"})
                     "New"))
                 (let [;; All the boards that are of story type, that are not drafts and that are not read-only
