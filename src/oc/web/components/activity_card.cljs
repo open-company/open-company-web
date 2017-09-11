@@ -38,7 +38,7 @@
 
 (defn truncate-body [body-sel is-all-activity]
   (.dotdotdot (js/$ body-sel)
-   #js {:height (* 24 (if is-all-activity 4 3))
+   #js {:height (* 24 (if is-all-activity 6 3))
         :wrap "word"
         :watch true
         :ellipsis "... "
