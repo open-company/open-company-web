@@ -44,9 +44,7 @@
                 (rum/with-key (activity-card entry first-has-headline first-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
               ; If there is only 1 add the empty placeholder
               (when (= (count entries-group) 1)
-                (if (not (empty? topic-slug))
-                  (activity-card-empty (:read-only board-data))
-                  [:div.entry-card.entry-card-placeholder]))]
+                [:div.entry-card.entry-card-placeholder])]
             ; If there are more than 2 entries, render the second row
             (when (> (count entries-group) 2)
               [:div.entries-cards-container-row.group
