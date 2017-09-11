@@ -50,6 +50,7 @@
                          (rum/local false ::showing-dropdown)
                          (rum/local nil ::column-height)
                          (rum/local nil ::window-resize-listener)
+                         (rum/local nil ::esc-key-listener)
                          rum/reactive
                          (drv/drv :activity-modal-fade-in)
                          {:before-render (fn [s]
@@ -60,6 +61,8 @@
                           :will-mount (fn [s]
                                         (reset! (::window-resize-listener s)
                                          (events/listen js/window EventType/RESIZE #(reset! (::column-height s) nil)))
+                                        (reset! (::esc-key-listener s)
+                                         (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
                                         s)
                           :did-mount (fn [s]
                                        ;; Add no-scroll to the body to avoid scrolling while showing this modal
@@ -95,12 +98,17 @@
                                           (when @(::window-resize-listener s)
                                             (events/unlistenByKey @(::window-resize-listener s))
                                             (reset! (::window-resize-listener s) nil))
+                                          (when @(::esc-key-listener s)
+                                            (events/unlistenByKey @(::esc-key-listener s))
+                                            (reset! (::esc-key-listener s) nil))
                                           s)}
   [s activity-data]
   (let [column-height @(::column-height s)]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})
+       :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
+                    (close-clicked s))}
       [:div.activity-modal.group
         {:class (str "activity-modal-" (:uuid activity-data))}
         (carrot-close-bt {:on-click #(close-clicked s)})
