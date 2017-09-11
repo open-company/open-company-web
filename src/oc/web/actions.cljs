@@ -819,7 +819,7 @@
         ; Entry data
         fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
         is-secure-story (router/current-secure-story-id)
-        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug nil fixed-activity-uuid))
+        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
     ;; If looking at a secure story discard all events for other activities
@@ -880,7 +880,7 @@
         ; Entry data
         fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
         is-secure-story (router/current-secure-story-id)
-        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug nil fixed-activity-uuid))
+        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
     (if (and is-secure-story
