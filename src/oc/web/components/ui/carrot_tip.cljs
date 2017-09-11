@@ -5,8 +5,9 @@
 (rum/defc carrot-tip < rum/static
   [{:keys [x y title message footer on-next-click]}]
   [:div.carrot-tip-container
+    {:style {:background-image (str "url(\"/img/ML/onboard_tip.svg?w=" (.-innerWidth js/window) "&h=" (.-innerHeight js/window) "&p=" (- x 170) "," (+ y 60) "\")")}}
     [:div.carrot-tip
-      {:style {:left (str x "px") :top (str y "px")}}
+      {:style {:left (str (+ x 50) "px") :top (str y "px")}}
       [:div.triangle]
       [:div.carrot-tip-inner
         [:div.carrot-tip-title
