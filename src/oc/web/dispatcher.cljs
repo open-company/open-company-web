@@ -26,8 +26,7 @@
   (vec (conj (org-key org-slug) :calendar)))
 
 (defn board-key [org-slug board-slug]
-  (let [board-key (if board-slug (keyword board-slug) :all-activity)]
-    (vec (concat (org-key org-slug) [:boards board-key]))))
+  (vec (concat (org-key org-slug) [:boards (keyword board-slug)])))
 
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
@@ -36,18 +35,16 @@
   (vec (concat (org-key org-slug) [:secure-stories secure-id])))
 
 (defn activity-key [org-slug board-slug activity-uuid]
-  (if board-slug
-    (let [board-key (if (= board-slug :all-activity)
-                      (all-activity-key org-slug)
-                      (board-data-key org-slug board-slug))]
-      (vec (concat board-key [:fixed-items activity-uuid])))
-    (secure-activity-key org-slug activity-uuid)))
+  (let [board-key (if (= board-slug :all-activity)
+                    (all-activity-key org-slug)
+                    (board-data-key org-slug board-slug))]
+    (vec (concat board-key [:fixed-items activity-uuid]))))
 
 (defn comments-key [org-slug board-slug]
- (vec (conj (board-key org-slug board-slug) :comments-data)))
+  (vec (conj (board-key org-slug board-slug) :comments-data)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
- (vec (conj (comments-key org-slug board-slug) activity-uuid)))
+  (vec (conj (comments-key org-slug board-slug) activity-uuid)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -149,20 +146,13 @@
                               (get-in base (board-data-key org-slug board-slug))))]
    :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
                           (fn [base org-slug board-slug activity-uuid secure-id]
-                            (when (and org-slug (or (and board-slug activity-uuid) secure-id))
-                              (get-in base (activity-key org-slug board-slug (or activity-uuid secure-id)))))]
+                            (get-in base (activity-key org-slug board-slug (or activity-uuid secure-id))))]
    :comments-data       [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (let [comments-key (comments-key org-slug board-slug)
-                                    comments-data (get-in base comments-key)]
-                                comments-data)))]
-   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid]
-                          (fn [base org-slug board-slug activity-uuid]
-                            (when (and org-slug board-slug activity-uuid)
-                              (let [comments-key (activity-comments-key org-slug board-slug activity-uuid)
-                                    comments-data (get-in base comments-key)]
-                                comments-data)))]
+                        (fn [base org-slug board-slug]
+                          (get-in base (comments-key org-slug board-slug)))]
+   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid :secure-id]
+                           (fn [base org-slug board-slug activity-uuid secure-id]
+                              (get-in base (activity-comments-key org-slug board-slug (or activity-uuid secure-id))))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
