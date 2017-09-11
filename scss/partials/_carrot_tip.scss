@@ -1,0 +1,68 @@
+div.carrot-tip-container {
+  position: absolute;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: #{$navbar_zindex + 1501};
+
+  div.carrot-tip {
+    position: absolute;
+    
+    div.triangle {
+      position: absolute;
+      top: 160px;
+      left: 3px;
+      background-color: white;
+      border-bottom: 1px solid rgba(177,184,192,0.50);
+      border-left: 1px solid rgba(177,184,192,0.50);
+      transform: rotate(-315deg);
+      width: 13px;
+      height: 13px;
+    }
+
+    div.carrot-tip-inner {
+      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+      background-color: white;
+      border: 1px solid rgba(177,184,192,0.50);
+      border-radius: 5px;
+      margin: 0px 0px 0px 9px;
+      padding: 32px 16px 16px;
+      width: 346px;
+      // height: 265px;
+
+
+      div.carrot-tip-title {
+        @include avenir_H();
+        font-size: 20px;
+        color: $carrot_dark_gray;
+      }
+
+      div.carrot-tip-description {
+        margin-top: 16px;
+        @include avenir_R();
+        font-size: 18px;
+        color: $carrot_dark_gray;
+      }
+
+      div.carrot-tip-footer {
+        margin-top: 16px;
+
+        div.carrot-tip-num{
+          @include avenir_H();
+          font-size: 16px;
+          color: rgba($oc_gray_7, 0.5);
+          float: left;
+          padding-top: 10px;
+        }
+
+        button.next-button {
+          width: 159px;
+          height: 40px;
+          float: right;
+        }
+      }
+    }
+  }
+}
