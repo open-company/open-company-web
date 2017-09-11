@@ -1065,7 +1065,13 @@
       (pulse-animation el))))
 
 (defn cdn [img-src & [no-deploy-folder]]
-  (str (when-not (empty? ls/cdn-url) (str ls/cdn-url (when no-deploy-folder (str "/" ls/deploy-key)))) img-src))
+  (let [use-cdn? (empty? ls/cdn-url)
+        cdn (if use-cdn? "" (str "/" ls/cdn-url))
+        deploy-key (if (empty? ls/deploy-key) "" (str "/" ls/deploy-key))
+        with-deploy-folder (if no-deploy-folder
+                             cdn
+                             (str cdn deploy-key))]
+    (str (when use-cdn? with-deploy-folder) img-src)))
 
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
