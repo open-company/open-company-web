@@ -59,27 +59,27 @@
                (first ens))
         en))))
 
-(defn element-is-visible
-  "Check if the element is in the visible portion of the page, considered the page scroll."
-  [el]
-  (let [el-offset-top (.-top (.offset (js/$ el))) ; plus parent top offset
-        body-scroll (.-scrollTop (.-body js/document))]
-    (>= (- el-offset-top body-scroll) 0)))
+; (defn element-is-visible
+;   "Check if the element is in the visible portion of the page, considered the page scroll."
+;   [el]
+;   (let [el-offset-top (.-top (.offset (js/$ el))) ; plus parent top offset
+;         body-scroll (.-scrollTop (.-body js/document))]
+;     (>= (- el-offset-top body-scroll) 0)))
 
-(defn get-first-visible-entry
-  "Given the list of items rendered, get the first visible entry counting the page scroll."
-  [items]
-  (when (pos? (count items))
-    (loop [ens items
-           en (first items)]
-      (let [el (sel1 [(str "div.activity-card-" (:uuid en))])]
-        ;; Do not loop if there are no more items or if found the first visible entry
-        (if (or (zero? (count ens))
-                (and el
-                     (element-is-visible el)))
-          en
-          (recur (vec (rest ens))
-                 (first (vec (rest ens)))))))))
+; (defn get-first-visible-entry
+;   "Given the list of items rendered, get the first visible entry counting the page scroll."
+;   [items]
+;   (when (pos? (count items))
+;     (loop [ens items
+;            en (first items)]
+;       (let [el (sel1 [(str "div.activity-card-" (:uuid en))])]
+;         ;; Do not loop if there are no more items or if found the first visible entry
+;         (if (or (zero? (count ens))
+;                 (and el
+;                      (element-is-visible el)))
+;           en
+;           (recur (vec (rest ens))
+;                  (first (vec (rest ens)))))))))
 
 (defn compare-activities [act-1 act-2]
   (let [time-1 (get-activity-date act-1)
@@ -89,17 +89,17 @@
 (defn get-sorted-items [all-activity-data]
   (vec (sort compare-activities (vals (:fixed-items all-activity-data)))))
 
-(defn highlight-calendar
-  "Highlight the current visible entry year and month in the calendar."
-  [s]
-  ;; When we are not retrieving calendar and not waiting to scroll to an entry
-  (when (and (not @(::retrieving-calendar s))
-             (not @(::scroll-to-entry s)))
-    (let [items-batch (get-sorted-items (first (:rum/args s)))
-          first-visible-entry (get-first-visible-entry items-batch)
-          js-date (utils/js-date (get-activity-date first-visible-entry))]
-      (reset! (::selected-year s) (.getFullYear js-date))
-      (reset! (::selected-month s) (inc (.getMonth js-date))))))
+; (defn highlight-calendar
+;   "Highlight the current visible entry year and month in the calendar."
+;   [s]
+;   ;; When we are not retrieving calendar and not waiting to scroll to an entry
+;   (when (and (not @(::retrieving-calendar s))
+;              (not @(::scroll-to-entry s)))
+;     (let [items-batch (get-sorted-items (first (:rum/args s)))
+;           first-visible-entry (get-first-visible-entry items-batch)
+;           js-date (utils/js-date (get-activity-date first-visible-entry))]
+;       (reset! (::selected-year s) (.getFullYear js-date))
+;       (reset! (::selected-month s) (inc (.getMonth js-date))))))
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -131,9 +131,9 @@
       ;; if the user is close to the bottom margin, load more results if there is a link
       (dis/dispatch! [:all-activity-more @(::has-prev s) :down])
       (reset! (::has-prev s) false)))
-  ;; Highlight the right year/month
-  (when @(::first-render-done s)
-    (highlight-calendar s))
+  ; ;; Highlight the right year/month
+  ; (when @(::first-render-done s)
+  ;   (highlight-calendar s))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
@@ -284,35 +284,36 @@
         (when @(::show-all-caught-up-message s)
           (all-caught-up))]
       [:div.all-activity-nav
-        [:div.all-activity-nav-inner
-          (for [year (vec (reverse (sort-by :year calendar-data)))
-                :let [selected (= @(::selected-year s) (:year year))]]
-            [:div.group
-              {:key (str "calendar-" (:year year))}
-              [:div.nav-year
-                {:on-click #(let [link (utils/link-for (:links year) "self")
-                                  month (:month (first (:months year)))]
-                              (reset! (::selected-year s) (:year year))
-                              (reset! (::selected-month s) month)
-                              (reset! (::scroll-to-entry s) false)
-                              (reset! (::retrieving-calendar s) (str (:year year)))
-                              (dis/dispatch! [:all-activity-calendar {:link link :year (:year year) :month month}]))
-                 :class (when selected "selected")}
-                [:span.calendar-label (:year year)]
-                (when (= @(::retrieving-calendar s) (str (:year year)))
-                  [:span.retrieving "Retrieving..."])]
-              (when selected
-                (for [month (vec (reverse (sort-by :month (:months year))))]
-                  [:div.nav-month
-                    {:key (str "year-" (:year month) "-month-" (:month month))
-                     :class (utils/class-set {:selected (and (= @(::selected-year s) (:year month))
-                                                             (= @(::selected-month s) (:month month)))})
-                     :on-click #(let [link (utils/link-for (:links month) "self")]
-                                  (reset! (::selected-year s) (:year month))
-                                  (reset! (::selected-month s) (:month month))
-                                  (reset! (::scroll-to-entry s) false)
-                                  (reset! (::retrieving-calendar s) (str (:year month) (:month month)))
-                                  (dis/dispatch! [:all-activity-calendar {:link link :year (:year month) :month (:month month)}]))}
-                    [:span.calendar-label (utils/full-month-string (:month month))]
-                    (when (= @(::retrieving-calendar s) (str (:year month) (:month month)))
-                      [:span.retrieving "Retrieving..."])]))])]]]))
+        ; [:div.all-activity-nav-inner
+        ;   (for [year (vec (reverse (sort-by :year calendar-data)))
+        ;         :let [selected (= @(::selected-year s) (:year year))]]
+        ;     [:div.group
+        ;       {:key (str "calendar-" (:year year))}
+        ;       [:div.nav-year
+        ;         {:on-click #(let [link (utils/link-for (:links year) "self")
+        ;                           month (:month (first (:months year)))]
+        ;                       (reset! (::selected-year s) (:year year))
+        ;                       (reset! (::selected-month s) month)
+        ;                       (reset! (::scroll-to-entry s) false)
+        ;                       (reset! (::retrieving-calendar s) (str (:year year)))
+        ;                       (dis/dispatch! [:all-activity-calendar {:link link :year (:year year) :month month}]))
+        ;          :class (when selected "selected")}
+        ;         [:span.calendar-label (:year year)]
+        ;         (when (= @(::retrieving-calendar s) (str (:year year)))
+        ;           [:span.retrieving "Retrieving..."])]
+        ;       (when selected
+        ;         (for [month (vec (reverse (sort-by :month (:months year))))]
+        ;           [:div.nav-month
+        ;             {:key (str "year-" (:year month) "-month-" (:month month))
+        ;              :class (utils/class-set {:selected (and (= @(::selected-year s) (:year month))
+        ;                                                      (= @(::selected-month s) (:month month)))})
+        ;              :on-click #(let [link (utils/link-for (:links month) "self")]
+        ;                           (reset! (::selected-year s) (:year month))
+        ;                           (reset! (::selected-month s) (:month month))
+        ;                           (reset! (::scroll-to-entry s) false)
+        ;                           (reset! (::retrieving-calendar s) (str (:year month) (:month month)))
+        ;                           (dis/dispatch! [:all-activity-calendar {:link link :year (:year month) :month (:month month)}]))}
+        ;             [:span.calendar-label (utils/full-month-string (:month month))]
+        ;             (when (= @(::retrieving-calendar s) (str (:year month) (:month month)))
+        ;               [:span.retrieving "Retrieving..."])]))])]
+          ]]))

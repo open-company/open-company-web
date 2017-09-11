@@ -40,10 +40,10 @@
     {:show-boards-tooltip (not (cook/get-cookie (router/dashboard-tooltips-shown (jwt/get-key :user-id))))
      :show-journals-tooltip false})
 
-  (will-mount [_]
-    (when (and (not (utils/is-test-env?))
-               is-all-activity)
-      (utils/after 100 #(dis/dispatch! [:calendar-get]))))
+  ; (will-mount [_]
+  ;   (when (and (not (utils/is-test-env?))
+  ;              is-all-activity)
+  ;     (utils/after 100 #(dis/dispatch! [:calendar-get]))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
