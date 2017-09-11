@@ -92,3 +92,5 @@ moment.tz = {};
 moment.tz.guess = function(){};
 
 var mailchimpApiSubmit = function(){};
+
+var OnPaste_StripFormatting = function(){};
