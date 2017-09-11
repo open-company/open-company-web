@@ -33,7 +33,7 @@
 
 (defn refresh-board-data []
   (when (not (router/current-activity-id))
-    (api/get-board (dis/board-data))))
+    (dis/dispatch! [:board-get (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")])))
 
 (defcomponent org-dashboard [data owner]
 
