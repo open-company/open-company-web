@@ -260,3 +260,11 @@ div.not-found, div.server-error{
     }
   }
 }
+
+// Textcomplete dropdown for emojis
+
+.dropdown-menu.textcomplete-dropdown {
+  max-height: calc(100vh - 10px);
+  top: 0px;
+  overflow: scroll;
+}
