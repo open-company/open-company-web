@@ -182,6 +182,12 @@
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
+   :entry-edit-topics   [[:base :org-slug :board-slug :board-data :entry-editing]
+                          (fn [base org-slug board-slug board-data entry-editing]
+                            (if (:topics board-data)
+                              (:topics board-data)
+                              (let [edit-board-slug (:board-slug entry-editing)]
+                                (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]
