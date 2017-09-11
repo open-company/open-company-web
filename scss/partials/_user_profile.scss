@@ -110,7 +110,7 @@ div.user-profile {
 
             span.user-avatar-upload-description {
               color: #a3a6ab;
-              font-family: $oc_main_font;
+              @include avenir_BOOK();
               font-size: 14px;
               line-height: 1.29;
               letter-spacing: 0.2px;
@@ -119,7 +119,6 @@ div.user-profile {
               margin-top: 31px;
               float: left;
               text-align: left;
-              font-weight: 300;
               margin-left: -100px;
             }
           }
@@ -130,10 +129,8 @@ div.user-profile {
         text-align: left;
 
         div.user-profile-field-label {
-          font-family: $oc_main_font;
+          @include avenir_B();
           font-size: 14px;
-          font-weight: 900;
-          font-style: normal;
           font-stretch: normal;
           line-height: 1.33;
           letter-spacing: 0.5px;
@@ -141,7 +138,7 @@ div.user-profile {
         }
 
         div.user-profile-field {
-          font-family: $oc_main_font;
+          @include avenir_M();
           font-size: 16px;
           color: $carrot_dark_gray;
           margin: 8px 0 24px 0;

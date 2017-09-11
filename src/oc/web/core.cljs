@@ -338,10 +338,7 @@
       (cook/remove-cookie! :login-redirect)
       (cook/remove-cookie! :show-login-overlay)
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
-      (pre-routing (:query-params params))
-      (router/set-route! ["email-verification"] {:query-params (:query-params params)})
-      (post-routing)
-      (drv-root email-confirmation target))
+      (simple-handler #(onboard-wrapper :email-verified) "email-verification" target params))
 
     (defroute password-reset-route urls/password-reset {:as params}
       (timbre/info "Routing password-reset-route" urls/password-reset)

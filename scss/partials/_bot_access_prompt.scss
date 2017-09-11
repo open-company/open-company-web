@@ -13,9 +13,8 @@ div.fullscreen-page.bot-access-prompt {
     div.slack-disclaimer {
       margin-bottom: 23px;
       text-align: center;
-      font-family: $oc_main_font;
+      @include avenir_M();
       font-size: 14px;
-      font-weight: normal;
       letter-spacing: 0.4px;
       color: $oc_gray_5;
     }

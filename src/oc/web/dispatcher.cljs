@@ -76,10 +76,16 @@
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
-   :teams-load          [[:base]
-                          (fn [base]
+   :auth-settings       [[:base] (fn [base] (:auth-settings base))]
+   :email-verification  [[:base :auth-settings]
+                          (fn [base auth-settings]
+                            {:auth-settings auth-settings
+                             :error (:email-verification-error base)
+                             :success (:email-verification-success base)})]
+   :teams-load          [[:base :auth-settings]
+                          (fn [base auth-settings]
                             {:teams-data-requested (:teams-data-requested base)
-                             :auth-settings (:auth-settings base)})]
+                             :auth-settings auth-settings})]
    :team-management     [[:base :query-params]
                           (fn [base query-params]
                             {:um-invite (:um-invite base)
@@ -106,18 +112,18 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :invite-users        [[:base :team-data :current-user-data :team-roster]
-                          (fn [base team-data current-user-data team-roster]
+   :invite-users        [[:base :team-data :current-user-data :team-roster :auth-settings]
+                          (fn [base team-data current-user-data team-roster auth-settings]
                             {:team-data team-data
                              :teams-data-requested (:teams-data-requested base)
-                             :auth-settings (:auth-settings base)
+                             :auth-settings auth-settings
                              :invite-users (:invite-users base)
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
-                        [[:base :query-params :org-data :team-data]
-                          (fn [base query-params org-data team-data]
-                            {:auth-settings (:auth-settings base)
+                        [[:base :query-params :org-data :team-data :auth-settings]
+                          (fn [base query-params org-data team-data auth-settings]
+                            {:auth-settings auth-settings
                              :um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :teams-data-requested (:teams-data-requested base)

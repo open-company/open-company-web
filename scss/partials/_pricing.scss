@@ -45,7 +45,7 @@ div.price-box {
 }
 
 div.container.pricing h1 {
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 24px;
   line-height: 1.1;
   color: $oc_gray_5;
@@ -53,11 +53,10 @@ div.container.pricing h1 {
 }
 
 div.container.pricing span.cost {
-  font-family: $oc_main_font;
+  @include avenir_H();
   font-size: 24px;
   line-height: 1.1;
   color: $oc_gray_5;
-  font-weight: bold;  
 }
 
 @media (min-width: 768px) { /* not mobile */

@@ -52,7 +52,6 @@
                    s)})
 
 (rum/defcs login-signup-with-slack < rum/reactive
-                                     (rum/local false ::sign-up-slack-clicked)
                                      dont-scroll
   [state]
   (let [action-title (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) "Sign Up" "Sign In")
@@ -65,24 +64,17 @@
         [:div.login-overlay-cta.pl2.pr2.group
           [:div.sign-in-cta.left action-title]]
         [:div.login-overlay-content.pt2.pl3.pr3.group.center
-          (if @(::sign-up-slack-clicked state)
-            [:div
-              [:div.slack-disclaimer "If you’re not signed in to Slack " [:span.bold "on the Web"] ", Slack will prompt you to " [:span.bold "sign in first"] "."]
-              [:button.mlb-reset.mlb-default.login-button
-                {:on-click #(do
-                              (.preventDefault %)
-                              (when (:auth-settings @dis/app-state)
-                                (dis/dispatch! [:login-with-slack])))
-                 :disabled (not (:auth-settings (rum/react dis/app-state)))}
-                "Got It"]]
-            [:div
-              (when (:access (:query-params @router/path)) slack-error)
-              [:button.mlb-reset.mt2.login-button.slack-button
-                {:on-click #(reset! (::sign-up-slack-clicked state) true)}
-                (str action-title " with ")
-                [:span.slack "Slack"]
-                (when-not (:auth-settings (rum/react dis/app-state))
-                  (small-loading))]])
+          [:div
+            (when (:access (:query-params @router/path)) slack-error)
+            [:button.mlb-reset.mt2.login-button.slack-button
+              {:on-click #(do
+                            (.preventDefault %)
+                            (when (:auth-settings @dis/app-state)
+                              (dis/dispatch! [:login-with-slack])))}
+              (str action-title " with ")
+              [:span.slack "Slack"]
+              (when-not (:auth-settings (rum/react dis/app-state))
+                (small-loading))]]
           [:div.login-with-email.domine.underline.bold
             [:a {:on-click #(do (utils/event-stop %)
                                 (dis/dispatch! [:login-overlay-show (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}

@@ -28,9 +28,8 @@ div.um-users-box {
       }
 
       th {
-        font-family: $oc_main_font;
+        @include avenir_H();
         font-size: 14px;
-        font-weight: 700;
         line-height: 1.5;
         letter-spacing: 1.2px;
         color: rgba(78, 90, 107, 0.5);
@@ -48,9 +47,8 @@ div.um-users-box {
       }
 
       td {
-        font-family: $oc_main_font;
+        @include avenir_M();
         font-size: 14px;
-        font-weight: 400;
         letter-spacing: 1px;
         color: $oc_gray_5;
         padding: 1px;
