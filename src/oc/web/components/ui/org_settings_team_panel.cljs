@@ -68,7 +68,7 @@
                         author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)
                         remove-fn (fn []
                                     (let [alert-data {:icon "/img/ML/trash.svg"
-                                                      :message "Cancel invitation?"
+                                                      :message (if (= "pending" (:status user)) "Cancel invitation?" "Remove user?")
                                                       :link-button-title "No"
                                                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                                       :solid-button-title "Yes"
