@@ -348,10 +348,9 @@
                           "Access-Control-Allow-Headers" "Content-Type, Authorization"
                           "Authorization" (str "Bearer " token)})}
         (fn [{:keys [status body success]}]
-          (dispatcher/dispatch! [:invitation-confirmed status])
-          (utils/after 1000
-           #(when success
-             (update-jwt-cookie! body))))))))
+          (utils/after 100 #(dispatcher/dispatch! [:invitation-confirmed status]))
+          (when success
+            (update-jwt-cookie! body)))))))
 
 (defn collect-password [pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
