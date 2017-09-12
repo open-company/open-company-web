@@ -350,12 +350,16 @@
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
-      (when (jwt/jwt)
+      (when (or (jwt/jwt)
+                (empty? (:token query-params)))
         (router/redirect! urls/home))
-      (pre-routing query-params)
-      (router/set-route! ["confirm-invitation"] {:query-params query-params})
-      (post-routing)
-      (drv-root confirm-invitation target))
+      (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
+
+    (defroute confirm-invitation-profile-route urls/confirm-invitation-profile {:as params}
+      (timbre/info "Routing confirm-invitation-profile-route" urls/confirm-invitation-profile)
+      (when (not (jwt/jwt))
+        (router/redirect! urls/home))
+      (simple-handler #(onboard-wrapper :invitee-lander-profile) "confirm-invitation-profile" target params))
 
     ; (defroute subscription-callback-route urls/subscription-callback {}
     ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
@@ -568,6 +572,7 @@
                                  org-create-route
                                  email-confirmation-route
                                  confirm-invitation-route
+                                 confirm-invitation-profile-route
                                  password-reset-route
                                  ;  ; subscription-callback-route
                                  ;; Home page
