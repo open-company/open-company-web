@@ -100,7 +100,7 @@
             "An error occurred while saving your data, please try again"])]
       [:div.onboard-form
         [:div.logo-upload-container
-          {:on-click #(if (empty? (:avatar-url user-data))
+          {:on-click #(if (= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
                         (iu/upload! {:accept "image/*"
                                      :transformations {
                                        :crop {
