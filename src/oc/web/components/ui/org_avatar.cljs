@@ -26,6 +26,7 @@
                           (oc-urls/org org-slug))
                         "")]
       [:div.org-avatar
+        {:class (when (empty? org-logo) "missing-logo")}
         [:a
           {:href avatar-link
            :style {:curstor (if should-show-link "pointer" "default")}
