@@ -543,6 +543,7 @@
   [component]
   [:div.onboard-wrapper-container
     [:div.onboard-wrapper
+      {:class (str "onboard-" (name component))}
       [:div.onboard-wrapper-left
         [:div.onboard-wrapper-logo]
         [:div.onboard-wrapper-box]]
