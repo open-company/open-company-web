@@ -109,7 +109,7 @@ div.comments {
         margin: 0 0 0 #{$comment-avatar-size + 20}px;
 
         .emojione {
-          @include emoji-size(11);
+          @include emoji-size(12);
         }
       }
 
