@@ -28,7 +28,7 @@ div.org-settings-panel {
       }
     }
 
-    td {
+    td.user-name {
       div.user-avatar-img-container {
         margin-right: 16px;
         float: left;
@@ -39,7 +39,16 @@ div.org-settings-panel {
           border-radius: 16px;
         }
       }
+      div.user-name-label {
+        float: left;
+        max-width: calc(100% - 78px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 4px;
+      }
+    }
 
+    td {
       &:last-child {
         text-align: right;
       }

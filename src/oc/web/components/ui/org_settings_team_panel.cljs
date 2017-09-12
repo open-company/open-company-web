@@ -79,9 +79,9 @@
                                       (dis/dispatch! [:alert-modal-show alert-data])))]]
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
-                [:td
+                [:td.user-name
                   (user-avatar-image user)
-                  (utils/name-or-email user)]
+                  [:div.user-name-label (utils/name-or-email user)]]
                 [:td.status-column
                   [:div.status-column-inner.group
                     [:div.status-label (s/capital (:status user))]
