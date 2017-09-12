@@ -347,76 +347,115 @@
            :on-click #(dis/dispatch! [:org-create])}
           "Create my team"]]]))
 
-(rum/defc invitee-lander < rum/static
-  [email]
-  [:div.onboard-lander
-    [:div.steps.two-steps
-      [:div.step-1
-        "Get Started"]
-      [:div.step-progress-bar]
-      [:div.step-2
-        "Your Profile"]]
-    [:div.main-cta
-      [:div.title
-        "Join your team on Carrot"]
-      [:div.subtitle
-        "Signing up as " [:span.email-address email]]]
-    [:div.onboard-form
-      [:div.field-label
-        "Password"]
-      [:input.field
-        {:type "password"
-         :pattern ".{5,}"}]
-      [:div.description
-        "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
-      [:button.continue
-        "Continue"]]])
-
-(rum/defcs invitee-lander-profile < rum/static
-                                    (rum/local nil ::user-data)
+(rum/defcs invitee-lander < rum/reactive
+                            (drv/drv :confirm-invitation)
   [s]
-  [:div.onboard-lander.second-step
-    [:div.steps.two-steps
-      [:div.step-1
-        "Get Started"]
-      [:div.step-progress-bar]
-      [:div.step-2
-        "Your Profile"]]
-    [:div.main-cta
-      [:div.title
-        "Tell us about yourself"]
-      [:div.subtitle
-        "This information will be visible to your team"]]
-    [:div.invitee-form
-      [:div.logo-upload-container
-        {:on-click #(iu/upload! {:accept "image/*" ; :imageMin [840 200]
-                                 :transformations {
-                                   :crop {
-                                     :aspectRatio 1}}}
-                      (fn [res]
-                        (reset! (::user-data s) (assoc @(::user-data s) :avatar-url (gobj/get res "url"))))
-                      nil
-                      (fn [_])
-                      nil)}
-        (user-avatar-image @(::user-data s))
-        [:div.add-picture-link
-          "Upload profile photo"]
-        [:div.add-picture-link-subtitle
-          "A 160x160 PNG or JPG works best"]]
-      [:div.field-label
-        "First name"]
-      [:input.field
-        {:type "text"
-         :value (:first-name @(::user-data s))
-         :on-change #(reset! (::user-data s) (assoc @(::user-data s) :first-name (.. % -target -value)))}]
-      [:div.field-label
-        "Last name"]
-      [:input.field
-        {:type "text"
-         :value (:last-name @(::user-data s))
-         :on-change #(reset! (::user-data s) (assoc @(::user-data s) :last-name (.. % -target -value)))}]
-      [:button.continue
-        "Sign Up"]]])
+  (let [confirm-invitation (drv/react s :confirm-invitation)
+        jwt (:jwt confirm-invitation)
+        collect-pswd (:collect-pswd confirm-invitation)
+        collect-pswd-error (:collect-pswd-error confirm-invitation)
+        invitation-confirmed (:invitation-confirmed confirm-invitation)]
+    [:div.onboard-lander
+      [:div.steps.two-steps
+        [:div.step-1
+          "Get Started"]
+        [:div.step-progress-bar]
+        [:div.step-2
+          "Your Profile"]]
+      [:div.main-cta
+        [:div.title
+          "Join your team on Carrot"]
+        [:div.subtitle
+          "Signing up as " [:span.email-address (:email jwt)]]]
+      [:div.onboard-form
+        [:div.field-label
+          "Password"
+          (when collect-pswd-error
+            [:span.error "An error occurred, please try again."])]
+        [:input.field
+          {:type "password"
+           :class (when collect-pswd-error "error")
+           :value (or (:pswd collect-pswd) "")
+           :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)])
+           :pattern ".{5,}"}]
+        [:div.description
+          "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
+        [:button.continue
+          {:disabled (< (count (:pswd collect-pswd)) 5)
+           :on-click #(dis/dispatch! [:pswd-collect])}
+          "Continue"]]]))
+
+(rum/defcs invitee-lander-profile < rum/reactive
+                                    (drv/drv :edit-user-profile)
+                                    (drv/drv :orgs)
+                                    (rum/local false ::saving)
+                                    {:will-mount (fn [s]
+                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                                  s)
+                                     :will-update (fn [s]
+                                                    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+                                                          orgs @(drv/get-ref s :orgs)]
+                                                      (when (and @(::saving s)
+                                                                 (not (:loading (:user-data edit-user-profile)))
+                                                                 (not (:error edit-user-profile)))
+                                                        (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))))
+                                                    s)}
+  [s]
+  (let [edit-user-profile (drv/react s :edit-user-profile)
+        user-data (:user-data edit-user-profile)]
+    [:div.onboard-lander.second-step
+      [:div.steps.two-steps
+        [:div.step-1
+          "Get Started"]
+        [:div.step-progress-bar]
+        [:div.step-2
+          "Your Profile"]]
+      [:div.main-cta
+        [:div.title
+          "Tell us about yourself"]
+        [:div.subtitle
+          "This information will be visible to your team"]
+        (when (:error edit-user-profile)
+            [:div.subtitle.error
+              "An error occurred while saving your data, please try again"])]
+      [:div.onboard-form
+        [:div.logo-upload-container
+          {:on-click #(if (= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
+                        (iu/upload! {:accept "image/*"
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}}
+                          (fn [res]
+                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                          nil
+                          (fn [_])
+                          nil)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
+          (user-avatar-image user-data)
+          [:div.add-picture-link
+            "Change profile photo"]
+          [:div.add-picture-link-subtitle
+            "A 160x160 PNG or JPG works best"]]
+        [:div.field-label
+          "First name"]
+        [:input.field
+          {:type "text"
+           :value (:first-name user-data)
+           :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+        [:div.field-label
+          "Last name"]
+        [:input.field
+          {:type "text"
+           :value (:last-name user-data)
+           :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+        [:button.continue
+          {:disabled (or (and (empty? (:first-name user-data))
+                              (empty? (:last-name user-data)))
+                         (empty? (:avatar-url user-data)))
+           :on-click #(do
+                        (reset! (::saving s) true)
+                        (dis/dispatch! [:user-profile-save]))}
+          "Continue"]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]
