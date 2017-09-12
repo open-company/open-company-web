@@ -50,6 +50,7 @@
 (def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")
+(def confirm-invitation-profile "/invite/profile")
 
 (def password-reset "/reset")
 
