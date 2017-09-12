@@ -132,7 +132,7 @@ div.org-settings-panel {
     width: 164px !important;
     @include avenir_H();
 
-    &.no-disable[disabled] {
+    &.no-disable, &.no-disable[disabled] {
       opacity: 1 !important;
     }
   }
