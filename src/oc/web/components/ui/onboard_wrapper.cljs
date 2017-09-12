@@ -100,20 +100,21 @@
             "An error occurred while saving your data, please try again"])]
       [:div.onboard-form
         [:div.logo-upload-container
-          {:on-click #(if (= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
-                          (fn [res]
-                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                          nil
-                          (fn [_])
-                          nil)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
+          {:on-click (fn []
+                      (when (not= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))
+                      (iu/upload! {:accept "image/*"
+                                   :transformations {
+                                     :crop {
+                                       :aspectRatio 1}}}
+                        (fn [res]
+                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                        nil
+                        (fn [_])
+                        nil))}
           (user-avatar-image user-data)
           [:div.add-picture-link
-            "Change profile photo"]
+            "Upload profile photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -235,22 +236,21 @@
           "This information will be visible to your team"]]
       [:div.onboard-form
         [:div.logo-upload-container
-          {:on-click #(if (empty? (:avatar-url user-data))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
-                          (fn [res]
-                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                          nil
-                          (fn [_])
-                          nil)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
+          {:on-click (fn []
+                      (when (not= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))
+                      (iu/upload! {:accept "image/*"
+                                   :transformations {
+                                     :crop {
+                                       :aspectRatio 1}}}
+                        (fn [res]
+                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                        nil
+                        (fn [_])
+                        nil))}
           (user-avatar-image user-data)
           [:div.add-picture-link
-            (if (empty? (:avatar-url user-data))
-              "Upload profile photo"
-              "Delete profile photo")]
+            "Upload profile photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -420,20 +420,21 @@
               "An error occurred while saving your data, please try again"])]
       [:div.onboard-form
         [:div.logo-upload-container
-          {:on-click #(if (= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
-                          (fn [res]
-                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                          nil
-                          (fn [_])
-                          nil)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))}
+          {:on-click (fn []
+                      (when (not= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))
+                      (iu/upload! {:accept "image/*"
+                                   :transformations {
+                                     :crop {
+                                       :aspectRatio 1}}}
+                        (fn [res]
+                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                        nil
+                        (fn [_])
+                        nil))}
           (user-avatar-image user-data)
           [:div.add-picture-link
-            "Change profile photo"]
+            "Upload profile photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
