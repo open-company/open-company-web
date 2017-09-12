@@ -178,7 +178,7 @@
                         (reset! (::sending s) (count (vec (filter valid-user? invite-users))))
                         (reset! (::send-bt-cta s) "Sending")
                         (dis/dispatch! [:invite-users]))
-           :class (when (not= "Send" @(::send-bt-cta s)) "no-disable")
+           :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}
           (let [valid-users-count (count (vec (filter valid-user? invite-users)))
