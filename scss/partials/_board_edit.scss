@@ -67,6 +67,10 @@ div.board-edit-container {
         span.board-name {
           color: $oc_gray_7;
           @include avenir_H();
+
+          .emojione {
+            @include emoji-size(14);
+          }
         }
       }
     }
@@ -107,7 +111,7 @@ div.board-edit-container {
         }
       }
 
-      input.board-edit-name-field {
+      div.board-edit-name-field {
         border-radius: 2px;
         background-color: white;
         border: 1px solid rgba($carrot_light_gray_1, 0.5);
@@ -117,13 +121,18 @@ div.board-edit-container {
         @include avenir_M();
         font-size: 14px;
         color: $oc_gray_7;
-        padding: 0.4rem 0.8rem;
+        padding: 10px 16px;
         outline: none;
 
-        @include placeholder() {
+        .emojione {
+          @include emoji-size(13);
+        }
+
+        &:empty:before {
           @include avenir_M();
           font-size: 14px;
           color: $carrot_light_gray_1;
+          content: attr(placeholder);
         }
 
         &.board-name-error {

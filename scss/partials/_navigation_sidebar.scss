@@ -165,6 +165,10 @@ div.left-navigation-sidebar {
           @include avenir_M();
           cursor: pointer;
 
+          .emojione {
+            @include emoji-size(12);
+          }
+
           &:hover {
             text-decoration: underline;
           }

@@ -89,8 +89,8 @@
                                         :private-board (= (:access board) "private")
                                         :team-board (= (:access board) "team")})}
               [:div.internal
-                {:key (str "board-list-" (name (:slug board)) "-internal")}
-                (or (:name board) (:slug board))]]])]
+                {:key (str "board-list-" (name (:slug board)) "-internal")
+                 :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])]
       [:div.left-navigation-sidebar-top.group
         ;; Boards header
         [:h3.left-navigation-sidebar-top-title
@@ -139,8 +139,8 @@
                                         :private-board (= (:access storyboard) "private")
                                         :team-board (= (:access storyboard) "team")})}
               [:div.internal
-                {:key (str "board-list-" (name (:slug storyboard)) "-internal")}
-                (or (:name storyboard) (:slug storyboard))]]])]
+                {:key (str "board-list-" (name (:slug storyboard)) "-internal")
+                 :dangerouslySetInnerHTML (utils/emojify (or (:name storyboard) (:slug storyboard)))}]]])]
       [:div.left-navigation-sidebar-footer
         (when (and (router/current-org-slug)
                    (jwt/is-admin? (:team-id org-data)))
