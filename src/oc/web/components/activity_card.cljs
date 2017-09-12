@@ -43,7 +43,7 @@
         :watch true
         :ellipsis "... "}))
 
-(defn get-first-body-thumbnail [body]
+(defn get-first-body-thumbnail [body is-aa]
   (let [$body (js/$ (str "<div>" body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
@@ -59,7 +59,7 @@
                              (<= height (* width 2))))
                 (reset! found
                   {:type "image"
-                   :thumbnail (if (.data $el "thumbnail")
+                   :thumbnail (if (and (not is-aa) (.data $el "thumbnail"))
                                 (.data $el "thumbnail")
                                 (.attr $el "src"))})))
             (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
@@ -85,16 +85,18 @@
                                                                 (truncate-body body-sel is-all-activity)))))
                                          s)
                          :will-mount (fn [s]
-                                       (let [activity-data (first (:rum/args s))]
+                                       (let [activity-data (first (:rum/args s))
+                                             is-all-activity (nth (:rum/args s) 3 false)]
                                          (when (= (:type activity-data) "entry")
-                                          (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data)))))
+                                          (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-activity))))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-activity-data (first (:rum/args o))
-                                              new-activity-data (first (:rum/args s))]
+                                              new-activity-data (first (:rum/args s))
+                                              is-all-activity (nth (:rum/args s) 3 false)]
                                           (when (not= (:body old-activity-data) (:body new-activity-data))
                                             (when (= (:type new-activity-data) "entry")
-                                              (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data))))
+                                              (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-activity)))
                                             (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
                                             (reset! (::truncated s) false)))
                                         s)
