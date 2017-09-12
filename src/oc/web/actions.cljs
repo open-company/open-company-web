@@ -66,7 +66,8 @@
               (first sorted-boards)
               (first sorted-stories))))))))
 
-(defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
+(defmethod dispatcher/action :entry-point
+  [db [_ {:keys [success collection]}]]
   (if success
     (let [orgs (:items collection)]
       (cond
@@ -101,7 +102,9 @@
              (not (utils/in? (:route @router/path) "about"))
              (not (utils/in? (:route @router/path) "features"))
              (not (utils/in? (:route @router/path) "email-wall"))
-             (not (utils/in? (:route @router/path) "sign-up")))
+             (not (utils/in? (:route @router/path) "sign-up"))
+             (not (utils/in? (:route @router/path) "confirm-invitation"))
+             (not (utils/in? (:route @router/path) "confirm-invitation-profile")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
@@ -154,7 +157,8 @@
            (not (utils/in? (:route @router/path) "email-verification"))
            (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
-           (not (utils/in? (:route @router/path) "email-wall")))
+           (not (utils/in? (:route @router/path) "email-wall"))
+           (not (utils/in? (:route @router/path) "confirm-invitation-profile")))
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
@@ -346,6 +350,7 @@
 (defmethod dispatcher/action :auth-with-token/success
   [db [_ jwt]]
   (api/get-entry-point)
+  (api/get-auth-settings)
   (when (= (:auth-with-token-type db) :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (assoc db :email-verification-success true))
@@ -545,7 +550,8 @@
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
   (when (= status 201)
-    (cook/set-cookie! :show-login-overlay "collect-name-password"))
+    (api/get-entry-point)
+    (api/get-auth-settings))
   (assoc db :email-confirmed (= status 201)))
 
 (defmethod dispatcher/action :name-pswd-collect
@@ -585,9 +591,7 @@
   [db [_ status]]
   (if (and (>= status 200)
            (<= status 299))
-    (do
-      (cook/remove-cookie! :show-login-overlay)
-      (dissoc db :show-login-overlay))
+    (router/nav! oc-urls/confirm-invitation-profile)
     (assoc db :collect-password-error status)))
 
 (defmethod dispatcher/action :mobile-menu-toggle
