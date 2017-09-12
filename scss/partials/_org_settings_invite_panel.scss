@@ -131,5 +131,9 @@ div.org-settings-panel {
   button.save-btn {
     width: 164px !important;
     @include avenir_H();
+
+    &.no-disable[disabled] {
+      opacity: 1 !important;
+    }
   }
 }
