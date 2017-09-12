@@ -169,7 +169,7 @@
         [:div.subtitle
           "How your company will appear on Carrot"]]
       [:div.onboard-form
-        [:div.logo-upload-container
+        [:div.logo-upload-container.org-logo
           {:on-click (fn [_]
                       (if (empty? (:logo-url org-editing))
                         (iu/upload! {:accept "image/*"} ; :imageMin [840 200]
@@ -189,7 +189,6 @@
                                                                                   :logo-width 0
                                                                                   :logo-height 0})])))}
           (org-avatar org-editing false false true)
-          [:img.org-logo]
           [:div.add-picture-link
             (if (empty? (:logo-url org-editing))
               "Upload logo"
@@ -310,7 +309,7 @@
         [:div.subtitle
           "How your company will appear on Carrot"]]
       [:div.onboard-form
-        [:div.logo-upload-container
+        [:div.logo-upload-container.org-logo
           {:on-click (fn [_]
                       (if (empty? (:logo-url org-editing))
                         (iu/upload! {:accept "image/*"} ; :imageMin [840 200]

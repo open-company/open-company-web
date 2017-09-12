@@ -255,6 +255,13 @@ div.onboard-lander {
         }
       }
 
+      &.org-logo {
+        div.org-avatar.missing-logo {
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          border-radius: 8px;
+        }
+      }
+
       div.user-avatar-img-container, div.org-avatar {
         width: 82px;
         height: 82px;
@@ -285,7 +292,7 @@ div.onboard-lander {
         color: rgba($oc_gray_7, 0.5);
         float: left;
         margin-left: 16px;
-        margin-top: 8px;
+        margin-top: 12px;
       }
     }
 
