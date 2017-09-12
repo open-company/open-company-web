@@ -159,8 +159,8 @@
     (post-routing)
     (drv-root #(om/component (login)) target)))
 
-(defn simple-handler [component route-name target params]
-  (pre-routing (:query-params params))
+(defn simple-handler [component route-name target params & [rewrite-url]]
+  (pre-routing (:query-params params) rewrite-url)
   ;; save route
   (router/set-route! [route-name] {:query-params (:query-params params)})
   (post-routing)
@@ -367,22 +367,16 @@
 
     (defroute email-wall-route urls/email-wall {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-route" urls/email-wall)
-      ;; Email wall is shown only to not logged in users
+      ; Email wall is shown only to not logged in users
       (when (jwt/jwt)
         (router/redirect! urls/home))
-      (pre-routing query-params true)
-      (router/set-route! ["email-wall"] {:query-params query-params})
-      (post-routing)
-      (drv-root #(om/component (onboard-wrapper :email-wall)) target))
+      (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
     (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
       (when (jwt/jwt)
         (router/redirect! urls/home))
-      (pre-routing query-params true)
-      (router/set-route! ["email-wall"] {:query-params query-params})
-      (post-routing)
-      (drv-root #(om/component (onboard-wrapper :email-wall)) target))
+      (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
