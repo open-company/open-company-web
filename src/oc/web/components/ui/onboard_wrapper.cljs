@@ -145,6 +145,7 @@
                                                (let [org-editing @(drv/get-ref s :org-editing)
                                                      teams-data @(drv/get-ref s :teams-data)]
                                                  (when (and (empty? (:name org-editing))
+                                                            (empty? (:logo-url org-editing))
                                                             (not (empty? teams-data)))
                                                    (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
                                                s)}
@@ -174,7 +175,7 @@
                           (fn [res]
                             (let [url (gobj/get res "url")
                                   img (gdom/createDom "img")]
-                              (set! (.-onload img) #(do
+                              (set! (.-onload img) (fn []
                                                       (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
                                                       (gdom/removeNode img)))
                               (set! (.-className img) "hidden")
@@ -289,6 +290,7 @@
                                                    (dis/dispatch! [:teams-get]))
                                                  ;; If the team is loaded setup the form
                                                  (when (and (nil? (:name org-editing))
+                                                            (nil? (:logo-url org-editing))
                                                             (not (empty? teams-data)))
                                                    (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
                                                s)}
@@ -315,7 +317,7 @@
                           (fn [res]
                             (let [url (gobj/get res "url")
                                   img (gdom/createDom "img")]
-                              (set! (.-onload img) #(do
+                              (set! (.-onload img) (fn []
                                                       (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
                                                       (gdom/removeNode img)))
                               (set! (.-className img) "hidden")
