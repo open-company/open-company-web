@@ -132,13 +132,6 @@
   ([org-slug board-slug topic-slug]
     (str (board org-slug board-slug) "/topic/" (name topic-slug))))
 
-(defn board-settings
-  "Board settings url"
-  ([]
-    (board-settings (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug board-slug]
-    (str (board org-slug board-slug) "/settings")))
-
 ;; Storyboards
 
 (defn drafts

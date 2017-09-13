@@ -38,7 +38,6 @@
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
-            [oc.web.components.board-settings :refer (board-settings)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.story :refer (story)]
             [oc.web.components.story-edit :refer (story-edit)]
@@ -483,12 +482,6 @@
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
 
-    (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
-      (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
-      (if (jwt/jwt)
-        (board-handler "board-settings" target board-settings params)
-        (oc-wall-handler "Please sign in to access this board." target params)))
-
     (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
       (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
       (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
@@ -591,8 +584,6 @@
                                  boards-list-route
                                  board-route
                                  board-slash-route
-                                 ; Board settings
-                                 board-settings-route
                                  ; ;; Board sorting
                                  board-sort-by-topic-route
                                  board-sort-by-topic-slash-route
