@@ -37,8 +37,9 @@
         comments-count (if has-comments-data
                          (count comments-data)
                          (:count comments-link))]
-    (when (or show-zero-comments?
-              (not (zero? comments-count)))
+    (when (and comments-count
+               (or show-zero-comments?
+                   (not (zero? comments-count))))
       [:div.is-comments
         ; Comments authors heads
         [:div.is-comments-authors.group
