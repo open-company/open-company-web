@@ -15,7 +15,7 @@
         {:on-click #(do (utils/event-stop %) (router/nav! (oc-urls/org (:slug org))))
          :href (oc-urls/org (:slug org))}
         (when-not missing-logo?
-          (org-avatar org true false true))
+          (org-avatar org false false true))
         [:span.org-name
           {:class (when missing-logo? "no-logo")}
           (:name org)]]]))
