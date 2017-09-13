@@ -9,9 +9,11 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
+
+(def default-avatar-url (random-user-image))
 
 (rum/defcs email-lander < rum/static
                           rum/reactive
@@ -105,8 +107,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -244,8 +246,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -429,8 +431,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn ls/default-user-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn ls/default-user-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {

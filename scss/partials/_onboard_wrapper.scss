@@ -281,7 +281,9 @@ div.onboard-lander {
             height: 82px;
 
             div.org-avatar-border {
+              width: 82px;
               height: 82px;
+              float: left;
               padding: 0px;
 
               img {
@@ -294,13 +296,13 @@ div.onboard-lander {
         }
       }
 
-      div.user-avatar-img-container, div.org-avatar {
+      div.user-avatar-img-container {
         width: 82px;
         height: 82px;
         float: left;
 
         img {
-          max-width: 82px;
+          width: 82px;
           max-height: 82px;
           text-align: center;
         }
