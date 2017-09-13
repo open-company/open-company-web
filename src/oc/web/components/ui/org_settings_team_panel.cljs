@@ -81,7 +81,12 @@
                 {:key (str "org-settings-team-" (:user-id user))}
                 [:td.user-name
                   (user-avatar-image user)
-                  [:div.user-name-label (utils/name-or-email user)]]
+                  (let [display-name (utils/name-or-email user)]
+                    [:div.user-name-label
+                      {:title (if (not= display-name (:email user)) (:email user) "")
+                       :data-toggle "tooltip"
+                       :data-placement "top"}
+                      display-name])]
                 [:td.status-column
                   [:div.status-column-inner.group
                     [:div.status-label (s/capital (:status user))]
