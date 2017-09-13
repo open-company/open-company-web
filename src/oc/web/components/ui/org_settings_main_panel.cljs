@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
@@ -82,29 +83,26 @@
         ;; Org logo row
         [:div.org-settings-panel-row.org-logo-row.group
           {:on-click (fn [_]
+                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0})])
                       (iu/upload! {:accept "image/*"}
-                      (fn [res]
-                        (let [url (gobj/get res "url")
-                              img (gdom/createDom "img")]
-                          (set! (.-onload img) #(logo-on-load org-editing url img))
-                          (set! (.-className img) "hidden")
-                          (gdom/append (.-body js/document) img)
-                          (set! (.-src img) url)))
-                      nil
-                      (fn [err]
-                        (logo-add-error))))}
+                        (fn [res]
+                          (let [url (gobj/get res "url")
+                                img (gdom/createDom "img")]
+                            (set! (.-onload img) #(logo-on-load org-editing url img))
+                            (set! (.-className img) "hidden")
+                            (gdom/append (.-body js/document) img)
+                            (set! (.-src img) url)))
+                        nil
+                        (fn [err]
+                          (logo-add-error))))}
           [:div.org-logo-container
             {:title (if (empty? (:logo-url org-editing))
                       "Add a logo"
                       "Change logo")
              :data-toggle "tooltip"
              :data-container "body"
-             :data-position "top"
-             :class (when (empty? (:logo-url org-editing)) "no-logo")}
-            [:img.org-logo
-              {:src (if (empty? (:logo-url org-editing))
-                      (utils/cdn "/img/ML/carrot_grey.svg")
-                      (:logo-url org-editing))}]]
+             :data-position "top"}
+            (org-avatar org-editing false false true)]
           [:div.org-logo-label
             [:div.cta
               (if (empty? (:logo-url org-editing))
