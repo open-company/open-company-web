@@ -26,6 +26,7 @@
                          rum/reactive
                          (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
+                         (rum/local false ::dismissing)
                          (rum/local false ::remove-no-scroll)
                          {:did-mount (fn [s]
                                        ;; Add no-scroll to the body if it doesn't has it already
@@ -39,7 +40,9 @@
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
                                           (let [alert-modal @(drv/get-ref s :alert-modal)]
-                                            (when (:dismiss alert-modal)
+                                            (when (and (:dismiss alert-modal)
+                                                       (not @(::dismissing s)))
+                                              (reset! (::dismissing s) true)
                                               (close-clicked s)))
                                           s)
                           :will-unmount (fn [s]
