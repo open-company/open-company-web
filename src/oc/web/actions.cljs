@@ -537,8 +537,11 @@
   [db [_ team-id invitation action method other-link-params payload]]
   (let [team-data (dispatcher/team-data team-id)
         idx (.indexOf (:users team-data) invitation)]
-    (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload)
-    (assoc-in db (concat (dispatcher/team-data-key team-id) [:users idx :loading]) true)))
+    (if (> idx -1)
+      (do
+        (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload)
+        (assoc-in db (concat (dispatcher/team-data-key team-id) [:users idx :loading]) true))
+      db)))
 
 (defmethod dispatcher/action :user-action/complete
   [db [_]]
