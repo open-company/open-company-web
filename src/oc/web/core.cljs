@@ -249,12 +249,9 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (let [jwt (jwt/get-contents)
-        slack-profile-cookie (router/slack-profile-filled-cookie (jwt/get-key :user-id))
-        slack-profile-cookie-value (cook/get-cookie slack-profile-cookie)]
-    (if slack-profile-cookie-value
-      (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])
-      (utils/after 100 #(router/nav! urls/slack-lander)))))
+  (if (:new (:query-params params))
+    (utils/after 100 #(router/nav! urls/slack-lander))
+    (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
