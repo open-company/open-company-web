@@ -81,16 +81,17 @@ nav.oc-navbar {
       div.navbar-center {
         text-align: center;
         width: 320px;
+        height: 56px;
         position: absolute;
         left: 50%;
+        top: 8px;
         margin-left: -160px;
         @include avenir_H();
         font-size: 26px;
 
         img.org-avatar-img {
-          max-width: 35px;
+          max-width: 105px;
           max-height: 35px;
-          margin-left: 132px;
         }
       }
     }
