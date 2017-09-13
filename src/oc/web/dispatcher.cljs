@@ -111,21 +111,17 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :invite-users        [[:base :team-data :current-user-data :team-roster :auth-settings]
-                          (fn [base team-data current-user-data team-roster auth-settings]
+   :invite-users        [[:base :team-data :current-user-data :team-roster]
+                          (fn [base team-data current-user-data team-roster]
                             {:team-data team-data
-                             :teams-data-requested (:teams-data-requested base)
-                             :auth-settings auth-settings
                              :invite-users (:invite-users base)
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
                         [[:base :query-params :org-data :team-data :auth-settings]
-                          (fn [base query-params org-data team-data auth-settings]
-                            {:auth-settings auth-settings
-                             :um-domain-invite (:um-domain-invite base)
+                          (fn [base query-params org-data team-data]
+                            {:um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
-                             :teams-data-requested (:teams-data-requested base)
                              :team-data team-data
                              :query-params query-params})]
    :all-activity        [[:base :org-slug]
