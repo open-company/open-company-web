@@ -169,6 +169,7 @@
                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
                                       (setup-body-editor s)
                                       (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
+                                      (utils/after 10 #(.focus (sel1 [:div.entry-edit-headline])))
                                       s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
@@ -265,12 +266,13 @@
            :on-key-down #(headline-on-change s)
            :on-focus    #(headline-on-change s)
            :on-blur     #(headline-on-change s)
+           :auto-focus true
            :dangerouslySetInnerHTML @(::initial-headline s)}]
         ; Body element
         [:div.entry-edit-body.emoji-autocomplete.emojiable
           {:role "textbox"
            :aria-multiline true
-           :contentEditable true
+           :content-editable true
            :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
            :dangerouslySetInnerHTML @(::initial-body s)}]
         ; Media handling

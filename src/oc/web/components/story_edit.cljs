@@ -194,7 +194,8 @@
                                            (reset! (::activity-uuid s) (:uuid story-editing))))
                                        s)
                          :did-mount (fn [s]
-                                      (utils/after 1000 #(setup-body-editor s))
+                                      (setup-body-editor s)
+                                      (utils/after 10 #(.focus (sel1 [:div.story-edit-title])))
                                       s)
                          :did-remount (fn [o s]
                                         (when-let [story-editing @(drv/get-ref s :story-editing)]
