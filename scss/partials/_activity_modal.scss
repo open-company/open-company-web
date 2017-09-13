@@ -16,6 +16,12 @@ div.activity-modal-container {
     opacity: 1;
   }
 
+  &.no-comments {
+    div.activity-modal {
+      width: 649px;
+    }
+  }
+
   div.activity-modal {
     width: 950px;
     max-height: calc(100vh - 150px);
@@ -31,7 +37,7 @@ div.activity-modal-container {
     }
 
     div.activity-modal-inner {
-      width: 918px;
+      width: 100%;
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
@@ -88,7 +94,7 @@ div.activity-modal-container {
             div.activity-modal-content-body {
               margin-top: 24px;
               @include activity-body();
-              min-height: 114px;
+              min-height: 112px;
 
               &.no-headline {
                 min-height: 166px;

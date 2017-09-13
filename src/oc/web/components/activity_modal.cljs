@@ -103,10 +103,12 @@
                                             (reset! (::esc-key-listener s) nil))
                                           s)}
   [s activity-data]
-  (let [column-height @(::column-height s)]
+  (let [column-height @(::column-height s)
+        show-comments? (utils/link-for (:links activity-data) "comments")]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})
+                                :appear (and (not @(::dismiss s)) @(::first-render-done s))
+                                :no-comments (not show-comments?)})
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
                     (close-clicked s))}
       [:div.activity-modal.group
@@ -165,7 +167,8 @@
                             [:li
                               {:on-click #(delete-clicked % activity-data)}
                               "Delete"]]]])]]]]]
-          [:div.activity-right-column
-            {:style (when column-height {:minHeight (str column-height "px")})}
-            [:div.activity-right-column-content
-              (comments activity-data)]]]]]))
+          (when show-comments?
+            [:div.activity-right-column
+              {:style (when column-height {:minHeight (str column-height "px")})}
+              [:div.activity-right-column-content
+                (comments activity-data)]])]]]))
