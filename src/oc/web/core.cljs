@@ -249,7 +249,7 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (if (:new (:query-params params))
+  (if (= (:new (:query-params params)) "true")
     (utils/after 100 #(router/nav! urls/slack-lander))
     (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])))
 
