@@ -15,6 +15,9 @@
   "/img/ML/happy_face_purple.svg"
   "/img/ML/happy_face_yellow.svg"])
 
+(defn random-user-image []
+  (first (shuffle (vec (conj other-user-images default-user-image)))))
+
 (defn- user-icon [user-id]
   (if (= user-id (jwt/get-key :user-id))
     ;; If the user id is the same of the current JWT use the red icon
