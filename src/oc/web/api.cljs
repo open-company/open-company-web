@@ -392,7 +392,6 @@
                           (if (:success res)
                             (update-jwt-cookie! (:body res))
                             (dispatcher/dispatch! [:logout])))))))
-                (cook/set-cookie! (router/slack-profile-filled-cookie (:user-id old-user-data)) true (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                 (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn collect-name-password [firstname lastname pswd]
