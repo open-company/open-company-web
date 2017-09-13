@@ -11,7 +11,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.wsclient :as wsc]))
+            [oc.web.lib.wsclient :as wsc]
+            [oc.web.components.ui.user-avatar :refer (random-user-image)]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -566,7 +567,7 @@
 
 (defn update-user-data [db user-data]
   (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
-                            (assoc user-data :avatar-url (utils/cdn ls/default-user-avatar-url true))
+                            (assoc user-data :avatar-url (utils/cdn (random-user-image) true))
                             user-data)
         with-empty-password (assoc with-fixed-avatar :password "")]
     (-> db
