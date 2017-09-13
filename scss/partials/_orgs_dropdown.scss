@@ -6,7 +6,7 @@ div.orgs-dropdown {
     outline: none;
     background-color: transparent;
     position: relative;
-    height: 56px;
+    height: 62px;
     padding: 0;
     margin: 0;
 
@@ -18,7 +18,7 @@ div.orgs-dropdown {
 
     &.dropdown-toggle:after {
       position: absolute;
-      top: 15px;
+      top: 22px;
       right: -15px;
       font-family: FontAwesome;
       content: "\f078";
@@ -74,31 +74,25 @@ div.orgs-dropdown {
 
       div.org-avatar {
         float: left;
-        width: 24px;
-        height: 24px;
+        width: 24px !important;
+        height: 24px !important;
 
-        a {
+        div.org-avatar-container {
+          height: 24px !important;
+          width: 24px !important;
           margin: 0;
           padding: 0;
-          cursor: pointer;
 
-          div.org-avatar-container {
-            height: 24px;
-            width: 24px;
-            margin: 0;
-            padding: 0;
+          div.org-avatar-border {
+            height: 24px !important;
+            width: 24px !important;
+            padding: 0px !important;
+            margin-top: -10px !important;
 
-            div.org-avatar-border {
-              height: 24px;
-              width: 24px;
-              padding: 0px;
-              margin-top: -10px !important;
-
-              img {
-                max-width: 24px;
-                max-height: 24px;
-                text-align: center;
-              }
+            img.org-avatar-img {
+              max-width: 24px !important;
+              max-height: 24px !important;
+              text-align: center;
             }
           }
         }
