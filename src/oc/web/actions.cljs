@@ -103,8 +103,7 @@
              (not (utils/in? (:route @router/path) "features"))
              (not (utils/in? (:route @router/path) "email-wall"))
              (not (utils/in? (:route @router/path) "sign-up"))
-             (not (utils/in? (:route @router/path) "confirm-invitation"))
-             (not (utils/in? (:route @router/path) "confirm-invitation-profile")))
+             (not (utils/in? (:route @router/path) "confirm-invitation")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
@@ -158,7 +157,7 @@
            (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
-           (not (utils/in? (:route @router/path) "confirm-invitation-profile")))
+           (not (utils/in? (:route @router/path) "confirm-invitation")))
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)

@@ -359,7 +359,7 @@
       (timbre/info "Routing confirm-invitation-profile-route" urls/confirm-invitation-profile)
       (when (not (jwt/jwt))
         (router/redirect! urls/home))
-      (simple-handler #(onboard-wrapper :invitee-lander-profile) "confirm-invitation-profile" target params))
+      (simple-handler #(onboard-wrapper :invitee-lander-profile) "confirm-invitation" target params))
 
     ; (defroute subscription-callback-route urls/subscription-callback {}
     ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
