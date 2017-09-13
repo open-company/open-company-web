@@ -67,6 +67,7 @@
 
 (rum/defcs email-lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
+                                  (drv/drv :orgs)
                                   (rum/local false ::saving)
                                   {:will-mount (fn [s]
                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
@@ -75,7 +76,10 @@
                                                  (when (and @(::saving s)
                                                             (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
                                                             (not (:error @(drv/get-ref s :edit-user-profile))))
-                                                    (utils/after 100 #(router/nav! oc-urls/sign-up-team)))
+                                                    (let [orgs @(drv/get-ref s :orgs)]
+                                                      (if (pos? (count orgs))
+                                                        (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
+                                                        (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
                                                  s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
@@ -208,6 +212,7 @@
 
 (rum/defcs slack-lander < rum/reactive
                           (drv/drv :edit-user-profile)
+                          (drv/drv :orgs)
                           (rum/local false ::saving)
                           {:will-mount (fn [s]
                                          (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
@@ -216,7 +221,10 @@
                                          (when (and @(::saving s)
                                                     (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
                                                     (not (:error @(drv/get-ref s :edit-user-profile))))
-                                            (utils/after 100 #(router/nav! oc-urls/sign-up-team)))
+                                            (let [orgs @(drv/get-ref s :orgs)]
+                                              (if (pos? (count orgs))
+                                                (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
+                                                (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
                                          s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
