@@ -31,13 +31,7 @@
   < rum/reactive
     (drv/drv :invite-users)
     (rum/local false ::resending-invite)
-    {:before-render (fn [s]
-                     (let [teams-load-data @(drv/get-ref s :invite-users)]
-                       (when (and (:auth-settings teams-load-data)
-                                  (not (:teams-data-requested teams-load-data)))
-                         (dis/dispatch! [:teams-get])))
-                     s)
-     :after-render (fn [s]
+    {:after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
                         (.tooltip "hide"))

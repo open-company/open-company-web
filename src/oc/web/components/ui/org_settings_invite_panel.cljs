@@ -52,12 +52,6 @@
     {:will-mount (fn [s]
                    (setup-initial-rows s)
                    s)
-     :before-render (fn [s]
-                     (let [invite-users-data @(drv/get-ref s :invite-users)]
-                       (when (and (:auth-settings invite-users-data)
-                                  (not (:teams-data-requested invite-users-data)))
-                         (dis/dispatch! [:teams-get])))
-                     s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")

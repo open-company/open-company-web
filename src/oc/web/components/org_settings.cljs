@@ -43,6 +43,13 @@
     rum/reactive
     (drv/drv :org-data)
     (drv/drv :alert-modal)
+    (drv/drv :teams-load)
+    {:before-render (fn [s]
+                      (let [teams-load @(drv/get-ref s :teams-load)]
+                        (when (and (:auth-settings teams-load)
+                                   (not (:teams-data-requested teams-load)))
+                          (dis/dispatch! [:teams-get])))
+                      s)}
   [s]
   (let [settings-tab (cond
                       (utils/in? (:route @router/path) "org-settings-team") :org-settings-team

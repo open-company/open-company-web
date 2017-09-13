@@ -49,14 +49,6 @@
     {:will-mount (fn [s]
                    (reset-form s true)
                    s)
-     :before-render (fn [s]
-                     (let [team-management-data @(drv/get-ref s :org-settings-team-management)
-                           auth-settings (:auth-settings team-management-data)
-                           teams-data-requested (:teams-data-requested team-management-data)]
-                       (when (and auth-settings
-                                  (not teams-data-requested))
-                         (dis/dispatch! [:teams-get])))
-                     s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
