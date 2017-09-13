@@ -303,6 +303,7 @@
                                                s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
+        _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)]
     [:div.onboard-lander.second-step
       [:div.steps.two-steps
