@@ -6,6 +6,22 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
+(defn internal-org-avatar
+  [s org-logo org-name show-org-avatar? hide-name show-avatar-and-name]
+  [:div.org-avatar-container.group
+    (when show-org-avatar?
+      [:div.org-avatar-border
+        [:span.helper]
+        [:img.org-avatar-img
+          {:src org-logo
+           :on-error #(reset! (::img-load-failed s) true)}]])
+    (when (and (not hide-name)
+               (or (not show-org-avatar?)
+                   show-avatar-and-name))
+      [:span.org-name
+        {:class (when-not show-org-avatar? "no-logo")}
+        org-name])])
+
 (rum/defcs org-avatar < rum/static
                         (rum/local false ::img-load-failed)
   [s org-data should-show-link & [show-avatar-and-name hide-name]]
@@ -27,23 +43,12 @@
                               (oc-urls/board org-slug (router/current-board-slug))
                               (oc-urls/org org-slug))
                             "")]
-          [:a
-            {:href avatar-link
-             :style {:curstor (if should-show-link "pointer" "default")}
-             :on-click (fn [e]
-                         (.preventDefault e)
-                         (when should-show-link
-                           (router/redirect! avatar-link)))}
-            [:div.org-avatar-container.group
-              (when show-org-avatar?
-                [:div.org-avatar-border
-                  [:span.helper]
-                  [:img.org-avatar-img
-                    {:src org-logo
-                     :on-error #(reset! (::img-load-failed s) true)}]])
-              (when (and (not hide-name)
-                         (or (not show-org-avatar?)
-                             show-avatar-and-name))
-                [:span.org-name
-                  {:class (when-not show-org-avatar? "no-logo")}
-                  org-name])]]))]))
+          (if should-show-link
+            [:a
+              {:href avatar-link
+               :on-click (fn [e]
+                           (.preventDefault e)
+                           (when should-show-link
+                             (router/redirect! avatar-link)))}
+              (internal-org-avatar s org-logo org-name show-org-avatar? hide-name show-avatar-and-name)]
+            (internal-org-avatar s org-logo org-name show-org-avatar? hide-name show-avatar-and-name))))]))
