@@ -329,7 +329,9 @@
 (defmethod dispatcher/action :login-with-email/success
   [db [_ jwt]]
   (if (empty? jwt)
-    (assoc db :login-with-email-error :verify-email)
+    (do
+      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
+      db)
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
       (api/get-entry-point)
@@ -368,8 +370,8 @@
   (cond
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
-      (utils/after 200 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
-      (assoc db :signup-with-email-error :verify-email))
+      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
+      db)
     (= status 200) ;; Valid login, not signup, redirect to home
     (do
       (if (or (and (empty? (:first-name jwt))
