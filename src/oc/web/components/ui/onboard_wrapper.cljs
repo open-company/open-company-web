@@ -529,7 +529,7 @@
       [:div.onboard-email-container
         "Thanks for verifying"
         [:button.mlb-reset.continue
-          {:on-click #(router/nav! oc-urls/login)}
+          {:on-click #(router/nav! oc-urls/confirm-invitation-profile)}
           "Get Started"]]
       :else
       [:div.onboard-email-container.small.dot-animation
