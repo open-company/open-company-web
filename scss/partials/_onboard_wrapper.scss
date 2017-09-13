@@ -275,6 +275,23 @@ div.onboard-lander {
             left: 0px;
           }
         }
+
+        div.org-avatar {
+          div.org-avatar-container {
+            height: 82px;
+
+            div.org-avatar-border {
+              height: 82px;
+              padding: 0px;
+
+              img {
+                max-width: 82px;
+                max-height: 82px;
+                text-align: center;
+              }
+            }
+          }
+        }
       }
 
       div.user-avatar-img-container, div.org-avatar {
@@ -285,10 +302,7 @@ div.onboard-lander {
         img {
           max-width: 82px;
           max-height: 82px;
-          min-width: 82px;
-          min-height: 82px;
           text-align: center;
-          border-radius: 41px;
         }
       }
 

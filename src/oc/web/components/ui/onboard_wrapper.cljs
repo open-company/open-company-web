@@ -176,7 +176,7 @@
         [:div.logo-upload-container.org-logo
           {:on-click (fn [_]
                       (if (empty? (:logo-url org-editing))
-                        (iu/upload! {:accept "image/*"} ; :imageMin [840 200]
+                        (iu/upload! {:accept "image/*"}
                           (fn [res]
                             (let [url (gobj/get res "url")
                                   img (gdom/createDom "img")]
@@ -321,7 +321,7 @@
         [:div.logo-upload-container.org-logo
           {:on-click (fn [_]
                       (if (empty? (:logo-url org-editing))
-                        (iu/upload! {:accept "image/*"} ; :imageMin [840 200]
+                        (iu/upload! {:accept "image/*"}
                           (fn [res]
                             (let [url (gobj/get res "url")
                                   img (gdom/createDom "img")]
