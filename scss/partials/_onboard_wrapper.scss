@@ -257,8 +257,23 @@ div.onboard-lander {
 
       &.org-logo {
         div.org-avatar.missing-logo {
-          border: 1px solid rgba($carrot_light_gray_1, 0.5);
-          border-radius: 8px;
+          border: 1px solid $carrot_light_gray;
+          border-radius: 4px;
+          opacity: 0.2;
+          position: relative;
+
+          &:after {
+            content: "";
+            background-image: cdnUrl("/img/ML/carrot_grey.svg");
+            background-position: 50%;
+            background-size: 30px 62px;
+            background-repeat: no-repeat;
+            width: 82px;
+            height: 82px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
         }
       }
 
