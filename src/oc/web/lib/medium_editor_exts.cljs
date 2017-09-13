@@ -73,5 +73,4 @@
              (this-as this
                (doseq [el (.getEditorElements this)]
                  (.on (.-base this) el "click" (.bind show-btn this))
-                 (.on (.-base this) el "keyup" (.bind show-btn this)))
-               (utils/after 1000 #(show-btn nil))))}))
+                 (.on (.-base this) el "keyup" (.bind show-btn this)))))}))
