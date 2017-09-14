@@ -229,7 +229,7 @@
         {:json-params json-data
          :headers (headers-for-link org-patch-link)}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:org (json->cljs body)]))))))
+          (dispatcher/dispatch! [:org (json->cljs body) true]))))))
 
 (defn get-auth-settings []
   (auth-http http/get "/"
