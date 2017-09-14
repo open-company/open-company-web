@@ -162,7 +162,7 @@
               [:div.user-profile-field-label
                 "Current Password"
                 (when @(::current-password-error s)
-                  [:span.error "Current password required."])]
+                  [:span.error "Current password required"])]
               [:div.user-profile-field
                 [:input
                   {:type "password"
