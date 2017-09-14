@@ -37,6 +37,34 @@
          :on-click #(do (utils/event-stop %) (on-click (oc-urls/org-settings-invite org-slug)))}
         "Invite People"]]])
 
+(defn settings-tab []
+  (cond
+    (utils/in? (:route @router/path) "org-settings-team") :org-settings-team
+    (utils/in? (:route @router/path) "org-settings-invite") :org-settings-invite
+    :else :org-settings))
+
+(defn close-clicked [s]
+  (let [org-data @(drv/get-ref s :org-data)
+        org-editing @(drv/get-ref s :org-editing)
+        invite-users (vec (filter #(not (:error %)) (:invite-users @(drv/get-ref s :invite-users))))
+        has-unsent-invites (and (pos? (count invite-users))
+                                (some #(not (empty? (:user %))) invite-users))
+        active-tab (settings-tab)]
+    (if (or (and (= :org-settings active-tab)
+                 (:has-changes org-editing))
+            (and (= :org-settings-invite active-tab)
+                 has-unsent-invites))
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :message "There are unsaved edits. OK to delete them?"
+                        :link-button-title "Cancel"
+                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :solid-button-title "Yes"
+                        :solid-button-cb #(do
+                                            (dis/dispatch! [:alert-modal-hide])
+                                            (router/nav! (oc-urls/org (:slug org-data))))}]
+        (dis/dispatch! [:alert-modal-show alert-data]))
+      (router/nav! (oc-urls/org (:slug org-data))))))
+
 (rum/defcs org-settings
   "Org settings main component. It handles the data loading/reset and the tab logic."
   < rum/static
@@ -44,6 +72,8 @@
     (drv/drv :org-data)
     (drv/drv :alert-modal)
     (drv/drv :teams-load)
+    (drv/drv :org-editing)
+    (drv/drv :invite-users)
     {:before-render (fn [s]
                       (let [teams-load @(drv/get-ref s :teams-load)]
                         (when (and (:auth-settings teams-load)
@@ -51,17 +81,14 @@
                           (dis/dispatch! [:teams-get])))
                       s)}
   [s]
-  (let [settings-tab (cond
-                      (utils/in? (:route @router/path) "org-settings-team") :org-settings-team
-                      (utils/in? (:route @router/path) "org-settings-invite") :org-settings-invite
-                      :else :org-settings)
+  (let [settings-tab (settings-tab)
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)]
     (when (:read-only org-data)
       (utils/after 100 #(router/nav! (oc-urls/org (:slug org-data)))))
     (if org-data
       [:div.org-settings.fullscreen-page
-        (carrot-close-bt {:on-click #(router/nav! (oc-urls/org (:slug org-data)))})
+        (carrot-close-bt {:on-click #(close-clicked s)})
         (when alert-modal-data
           (alert-modal))
         [:div.org-settings-inner
