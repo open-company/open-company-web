@@ -25,7 +25,7 @@ nav.oc-navbar {
   width: 100%;
   background-color: white;
   transition: height 230ms;
-  border-bottom: 10px solid $carrot_orange;
+  border-bottom: 4px solid rgba($carrot_orange, 0.3);
 
   @include mobile(){
     &.show-login-overlay {
