@@ -641,7 +641,7 @@
   (let [new-password (:password (:edit-user-profile db))
         password-did-change (pos? (count new-password))
         with-pswd (if (and password-did-change
-                           (>= (count new-password) 5))
+                           (>= (count new-password) 8))
                     (:edit-user-profile db)
                     (dissoc (:edit-user-profile db) :password))
         new-email (:email (:edit-user-profile db))

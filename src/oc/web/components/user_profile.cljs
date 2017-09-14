@@ -101,7 +101,7 @@
       (reset! (::current-password-error s) true)
 
       (and (not (empty? (:password user-data)))
-           (< (count (:password user-data)) 5))
+           (< (count (:password user-data)) 8))
       (reset! (::password-error s) true)
 
       :else
