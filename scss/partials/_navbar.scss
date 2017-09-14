@@ -76,29 +76,29 @@ nav.oc-navbar {
     }
 
     div.oc-navbar-header-container{
-      height: 50px;
+      height: 40px;
 
       div.navbar-center {
         text-align: center;
         width: 320px;
-        height: 50px;
+        height: 40px;
         position: absolute;
         left: 50%;
-        top: 11px;
+        top: 16px;
         margin-left: -160px;
         @include avenir_H();
         font-size: 26px;
 
         div.org-avatar {
-          height: 50px;
+          height: 40px;
           div.org-avatar-container {
-            height: 50px;
+            height: 40px;
             div.org-avatar-border {
-              height: 50px;
+              height: 40px;
 
               img.org-avatar-img {
-                max-width: 150px;
-                max-height: 50px;
+                max-width: 120px;
+                max-height: 40px;
               }
             }
           }
