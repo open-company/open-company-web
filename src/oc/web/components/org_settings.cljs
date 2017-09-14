@@ -73,5 +73,5 @@
             (org-settings-team-panel org-data)
             :org-settings-invite
             (org-settings-invite-panel org-data)
-            (rum/with-key (org-settings-main-panel org-data) (str "org-settings-main-panel-" (:updated-at org-data))))]]
+            (org-settings-main-panel org-data))]]
       (rloading {:loading true}))))
