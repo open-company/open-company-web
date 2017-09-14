@@ -7,9 +7,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
             ; [cljsjs.moment-timezone]
             [goog.object :as googobj]
             [goog.dom :as gdom]))
@@ -46,7 +47,7 @@
   (dis/dispatch! [:input [:edit-user-profile k] v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
-(defn close-cb [orgs current-user-data]
+(defn real-close-cb [orgs current-user-data]
   (let [last-org-slug (cook/get-cookie (router/last-org-cookie))
         first-org-slug (:slug (first orgs))
         to-url (if last-org-slug
@@ -57,6 +58,19 @@
     (when (:has-changes current-user-data)
       (dis/dispatch! [:user-profile-reset]))
     (router/nav! to-url)))
+
+(defn close-cb [orgs current-user-data]
+  (if (:has-changes current-user-data)
+    (let [alert-data {:icon "/img/ML/trash.svg"
+                      :message "There are unsaved edits. OK to delete them?"
+                      :link-button-title "Cancel"
+                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                          (dis/dispatch! [:alert-modal-hide])
+                                          (real-close-cb orgs current-user-data))}]
+      (dis/dispatch! [:alert-modal-show alert-data]))
+    (real-close-cb orgs current-user-data)))
 
 (def default-user-profile-image-key {:accept "image/*"
                                      :transformations {
@@ -98,6 +112,7 @@
                           (rum/local false ::show-success)
                           (drv/drv :edit-user-profile)
                           (drv/drv :orgs)
+                          (drv/drv :alert-modal)
                           (rum/local false ::name-error)
                           (rum/local false ::email-error)
                           (rum/local false ::password-error)
@@ -124,6 +139,8 @@
         ; timezones (.names (.-tz js/moment))
         orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
+      (when (drv/react s :alert-modal)
+        (alert-modal))
       (carrot-close-bt {:on-click #(close-cb orgs current-user-data)})
       [:div.user-profile-header {} "Your Profile"]
       [:div.user-profile-internal
