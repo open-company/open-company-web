@@ -495,7 +495,7 @@
           (api/switch-user-type invite-data old-user-type user-type user (utils/get-author (:user-id user) (:authors org-data))))
         (api/send-invitation invite-data (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
         {:success true})
-      {:error "User already active." :success false})))
+      {:error "User already active" :success false})))
 
 (defn valid-inviting-user? [user]
   (or (and (= "email" (:type user))
@@ -505,26 +505,34 @@
            (contains? (:user user) :slack-org-id)
            (contains? (:user user) :slack-id))))
 
+(defn duplicated-user [user team-data]
+  (let [is-email (= (:type user) "email")]
+    (when is-email
+      (let [parsed-email (utils/parse-input-email (:user user))
+            duplicated-user (first (filter #(= (:email %) (:address parsed-email)) (:users team-data)))]
+        (and duplicated-user
+             (not= (string/lower-case (:status duplicated-user)) "pending"))))))
+
 (defmethod dispatcher/action :invite-users
   [db [_]]
   (let [org-data (dispatcher/org-data)
         team-data (dispatcher/team-data (:team-id org-data))
-        invite-users (:invite-users db)]
-    (if (count invite-users)
-      (let [next-invite-users (loop [i 0
-                                     next-invite-users []]
-                                (let [inviting-user (get invite-users i)
-                                      resp (if (valid-inviting-user? inviting-user)
-                                             (invite-user org-data team-data inviting-user)
-                                             (assoc inviting-user :error true))
-                                      next-invite-users (if (:success resp)
-                                                          next-invite-users
-                                                          (conj next-invite-users (assoc inviting-user :error (:error resp))))]
-                                  (if (< i (dec (count invite-users)))
-                                    (recur (inc i) next-invite-users)
-                                    next-invite-users)))]
-        (assoc db :invite-users next-invite-users))
-      db)))
+        invite-users (:invite-users db)
+        checked-users (for [user invite-users]
+                        (let [valid? (valid-inviting-user? user)
+                              duplicated? (duplicated-user user team-data)]
+                          (cond
+                            (not valid?)
+                            (merge user {:error true :success false})
+                            duplicated?
+                            (merge user {:error "User already active" :success false})
+                            :else
+                            (dissoc user :error))))
+        cleaned-invite-users (vec (filter #(not (:error %)) checked-users))]
+    (when (= (count cleaned-invite-users) (count invite-users))
+      (doseq [user cleaned-invite-users]
+        (invite-user org-data team-data user)))
+    (assoc db :invite-users (vec checked-users))))
 
 (defmethod dispatcher/action :invite-user/success
   [db [_ user]]

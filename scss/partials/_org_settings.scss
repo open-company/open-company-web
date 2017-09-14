@@ -134,6 +134,13 @@ div.org-settings {
               font-size: 14px;
               color: $oc_gray_7;
 
+              span.error {
+                @include avenir_H();
+                font-size: 14px;
+                margin-left: 16px;
+                color: $carrot_orange;
+              }
+
             }
 
             td {
