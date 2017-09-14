@@ -132,7 +132,8 @@
       (assoc :error-banner-message utils/generic-network-error)
       (assoc :error-banner-time 0))))
 
-(defmethod dispatcher/action :org [db [_ org-data]]
+(defmethod dispatcher/action :org
+  [db [_ org-data saved?]]
   (let [boards (:boards org-data)]
     (cond
       ;; If it's all activity page, loads all activity for the current org
@@ -170,7 +171,11 @@
                 (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
                 (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
               (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
-  (assoc-in db (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data)))
+  (-> db
+    (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
+    (assoc :org-editing (-> (:org-editing db)
+                            (assoc :saved saved?)
+                            (dissoc :has-changes)))))
 
 (defmethod dispatcher/action :boards-load-other [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
