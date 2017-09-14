@@ -1,4 +1,5 @@
 language: clojure
+group: deprecated-2017Q3
 dist: precise
 jdk:
   - oraclejdk8
