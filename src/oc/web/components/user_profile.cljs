@@ -10,7 +10,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [cljsjs.moment-timezone]
+            ; [cljsjs.moment-timezone]
             [goog.object :as googobj]
             [goog.dom :as gdom]))
 
@@ -105,10 +105,10 @@
                           {:will-mount (fn [s]
                                          (dis/dispatch! [:user-profile-reset])
                                          s)
-                           :after-render (fn [s]
-                                           (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
-                                             (dis/dispatch! [:input [:edit-user-profile :timezone] (.. js/moment -tz guess)]))
-                                           s)
+                           ; :after-render (fn [s]
+                           ;                 (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
+                           ;                   (dis/dispatch! [:input [:edit-user-profile :timezone] (.. js/moment -tz guess)]))
+                           ;                 s)
                            :did-remount (fn [old-state new-state]
                                           (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
                                             (when (and @(::loading new-state)
@@ -121,7 +121,7 @@
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
-        timezones (.names (.-tz js/moment))
+        ; timezones (.names (.-tz js/moment))
         orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
       (carrot-close-bt {:on-click #(close-cb orgs current-user-data)})
@@ -142,7 +142,7 @@
               [:span.error
                 {:style {:margin-left "0px"}}
                 (when error
-                  "An error occurred while saving, please try again")]]]
+                  "An error occurred while saving, please try again.")]]]
           ; Left column
           [:div.user-profile-column-left
             ; First name
@@ -150,7 +150,7 @@
               [:div.user-profile-field-label
                 "First Name"
                 (when @(::name-error s)
-                  [:span.error "Please provide your name"])]
+                  [:span.error "Please provide your name."])]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -162,7 +162,7 @@
               [:div.user-profile-field-label
                 "Current Password"
                 (when @(::current-password-error s)
-                  [:span.error "Current password required"])]
+                  [:span.error "Current password required."])]
               [:div.user-profile-field
                 [:input
                   {:type "password"
@@ -174,7 +174,7 @@
               [:div.user-profile-field-label
                 "Email"
                 (when @(::email-error s)
-                  [:span.error "This email address is not valid"])]
+                  [:span.error "This email isn't valid."])]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -198,7 +198,7 @@
               [:div.user-profile-field-label
                 "New Password"
                 (when @(::password-error s)
-                  [:span.error "Minimum 5 characters"])]
+                  [:span.error "Minimum 5 characters."])]
               [:div.user-profile-field
                 [:input
                   {:type "password"
