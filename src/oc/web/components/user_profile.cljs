@@ -198,7 +198,7 @@
               [:div.user-profile-field-label
                 "New Password"
                 (when @(::password-error s)
-                  [:span.error "Minimum 5 characters."])]
+                  [:span.error "Minimum 5 characters"])]
               [:div.user-profile-field
                 [:input
                   {:type "password"
