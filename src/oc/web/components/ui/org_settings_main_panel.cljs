@@ -44,12 +44,20 @@
 
 (rum/defcs org-settings-main-panel
   < rum/reactive
+    (rum/local false ::saving)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
     {:will-mount (fn [s]
                    (reset-form s true)
                    s)
+     :will-update (fn [s]
+                    (let [org-editing @(drv/get-ref s :org-editing)]
+                      (when (and @(::saving s)
+                                 (:saved org-editing))
+                        (reset! (::saving s) false)
+                        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))))
+                    s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
@@ -207,9 +215,18 @@
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
-          {:disabled (not (:has-changes org-editing))
-           :on-click #(dis/dispatch! [:org-edit-save])}
-          "Save"]
+          {:disabled (or @(::saving s)
+                         (:saved org-editing)
+                         (not (:has-changes org-editing)))
+           :class (when (:saved org-editing) "no-disable")
+           :on-click #(do
+                        (reset! (::saving s) true)
+                        (dis/dispatch! [:org-edit-save]))}
+          (if (:saved org-editing)
+            "Saved!"
+            (if @(::saving s)
+              "Saving..."
+              "Save"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
           {:on-click #(reset-form s false)}
           "Cancel"]]]))

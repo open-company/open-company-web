@@ -119,6 +119,12 @@ div.org-settings-main {
     }
   }
 
+  button.save-btn {
+    &.no-disable {
+      opacity: 1 !important;
+    }
+  }
+
   button.remove-team-btn {
     @include avenir_R();
     font-size: 14px;
