@@ -25,6 +25,7 @@ nav.oc-navbar {
   width: 100%;
   background-color: white;
   transition: height 230ms;
+  border-bottom: 10px solid $carrot_orange;
 
   @include mobile(){
     &.show-login-overlay {
@@ -33,20 +34,21 @@ nav.oc-navbar {
   }
 
   @include big_web(){
-    height: #{$navbar_height + $carrot_trend_collapsed_height}px;
+    height: #{$navbar_height}px;
   }
 
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
+
+    &:not(.mobile-menu-open) {
+      height: #{$mobile_navbar_height}px;
+    }
   }
+
   z-index: $navbar_zindex;
   background-color: white;
   margin: 0px;
-
-  &:not(.mobile-menu-open) {
-    height: #{$mobile_navbar_height}px;
-  }
 
   div.oc-navbar-header {
     padding-top: 10px;
