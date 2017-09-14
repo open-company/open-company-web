@@ -574,10 +574,11 @@
   (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
                             (assoc user-data :avatar-url (utils/cdn (random-user-image) true))
                             user-data)
-        with-empty-password (assoc with-fixed-avatar :password "")]
+        with-empty-password (assoc with-fixed-avatar :password "")
+        with-has-changes (assoc with-empty-password :has-changes false)]
     (-> db
         (assoc :current-user-data with-fixed-avatar)
-        (assoc :edit-user-profile with-empty-password)
+        (assoc :edit-user-profile with-has-changes)
         (dissoc :edit-user-profile-failed))))
 
 (defmethod dispatcher/action :name-pswd-collect/finish
