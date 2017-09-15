@@ -289,7 +289,6 @@ provided in the table below:
 |  :user-profile-reset | UI | Reset the user profile data edited by the user but not yet saved. |
 |  :user-profile-save | UI | Save the edited user data. |
 |  :user-profile-update/failed | API | User profile update request failed. |
-|  :welcome-screen-hide | UI | Remove the welcome screen shown the first time the first org user open the dashboard. |
 |  :ws-interaction/comment-add | WS | Websocket message for an added comment. |
 |  :ws-interaction/reaction-add | WS | Websocket message for an added reaction. |
 |  :ws-interaction/reaction-delete | WS | Websocket message for a removed reaction. |

@@ -630,10 +630,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :welcome-screen-hide
-  [db [_]]
-  (dissoc db :show-welcome-screen))
-
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
   (update-user-data db (:current-user-data db)))
