@@ -400,7 +400,8 @@
                                               ; initialise the keys to string to avoid jumps in UI focus
                                               (utils/after 500
                                                  #(dis/dispatch! [:input [:collect-pswd] {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
-                                             (utils/after 100 #(.focus (sel1 [:input.pswd])))
+                                             (utils/after 1000 #(when-let [pswd-el (sel1 [:input.sign-in-field.pswd])]
+                                                                  (.focus pswd-el)))
                                              s)})
   [state]
   [:div.login-overlay-container.group
@@ -437,7 +438,7 @@
                 {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                  :on-click #(do
                               (utils/event-stop %)
-                              (dis/dispatch! [:pswd-collect]))}
+                              (dis/dispatch! [:pswd-collect true]))}
                 "Let Me In"]]]]]]])
 
 (rum/defcs login-overlays-handler < rum/static
