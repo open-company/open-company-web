@@ -101,7 +101,7 @@
       (reset! (::current-password-error s) true)
 
       (and (not (empty? (:password user-data)))
-           (< (count (:password user-data)) 5))
+           (< (count (:password user-data)) 8))
       (reset! (::password-error s) true)
 
       :else
@@ -215,7 +215,7 @@
               [:div.user-profile-field-label
                 "New Password"
                 (when @(::password-error s)
-                  [:span.error "Minimum 5 characters"])]
+                  [:span.error "Minimum 8 characters"])]
               [:div.user-profile-field
                 [:input
                   {:type "password"

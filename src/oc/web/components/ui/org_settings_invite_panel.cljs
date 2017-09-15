@@ -112,7 +112,14 @@
         [:table.org-settings-table
           [:thead
             [:tr
-              [:th "Invitee"]
+              [:th "Invitee"
+                [:span.error
+                  (when-let [first-error-user (first (filter #(:error %) invite-users))]
+                    (cond
+                      (string? (:error first-error-user))
+                      (:error first-error-user)
+                      :else
+                      "Invalid user"))]]
               [:th.role "Role "
                 [:i.mdi.mdi-information-outline
                   {:title "Contributors and admins can view and edit. Admins manage the team, invites and billing."

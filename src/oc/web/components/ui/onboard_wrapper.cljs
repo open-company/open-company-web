@@ -60,7 +60,7 @@
           "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
         [:button.continue
           {:disabled (or (not (utils/valid-email? (:email signup-with-email)))
-                         (<= (count (:pswd signup-with-email)) 4))
+                         (<= (count (:pswd signup-with-email)) 7))
            :on-click #(dis/dispatch! [:signup-with-email])}
           "Continue"]
         [:div.footer-link
@@ -391,7 +391,7 @@
         [:div.description
           "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
         [:button.continue
-          {:disabled (< (count (:pswd collect-pswd)) 5)
+          {:disabled (< (count (:pswd collect-pswd)) 8)
            :on-click #(dis/dispatch! [:pswd-collect])}
           "Continue"]]]))
 

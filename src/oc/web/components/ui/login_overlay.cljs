@@ -262,7 +262,7 @@
 ;                                (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
 ;                                     (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
 ;                                (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
-;                                (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
+;                                (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 8))
 ;                  :on-click #(do
 ;                               (utils/event-stop %)
 ;                               (dis/dispatch! [:signup-with-email]))}
@@ -387,7 +387,7 @@
               [:button.mlb-reset.mlb-default
                 {:disabled (or (and (s/blank? (:firstname (:collect-name-pswd (rum/react dis/app-state))))
                                     (s/blank? (:lastname (:collect-name-pswd (rum/react dis/app-state)))))
-                               (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 5))
+                               (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 8))
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:name-pswd-collect]))}
@@ -434,7 +434,7 @@
           [:div.group.my3
             [:div.right
               [:button.mlb-reset.mlb-defautl
-                {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 5)
+                {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:pswd-collect]))}
