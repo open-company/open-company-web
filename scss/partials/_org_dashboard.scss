@@ -27,6 +27,10 @@ div.org-dashboard {
     div.dashboard-container {
       background-color: $oc_gray_8;
 
+      @include big_web() {
+        min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}
+      }
+
       div.empty-dashboard {
         min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 30px);
         padding: 80px 20px;
