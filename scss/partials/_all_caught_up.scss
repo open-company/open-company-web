@@ -16,7 +16,7 @@ div.all-caught-up {
     div.message {
       @include avenir_R();
       font-size: 14px;
-      color: #C8C4BB;
+      color: $carrot_light_gray_1;
       padding-top: 33px;
     }
   }
