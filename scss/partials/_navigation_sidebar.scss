@@ -1,11 +1,36 @@
 div.left-navigation-sidebar {
-  float: left;
+  position: absolute;
   position: fixed;
-  margin-right: 20px;
   max-height: calc(100vh - 122px);
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: visible;
   padding-bottom: 20px;
+  width: #{$left_navigation_sidebar_width}px;
+  top: 138px;
+  left: 0px;
+  height: calc(100vh - 138px);
+
+  .hover-item{
+    * {
+      cursor: pointer;
+    }
+
+    &:not(.item-selected):hover {
+      background-color: rgba($carrot_light_gray_1, 0.2);
+      color: $carrot_dark_gray;
+      @include avenir_H();
+      font-size: 14px;
+      line-height: 1.71;
+    }
+  }
+
+  .item-selected {
+    background-color: rgba($carrot_orange_1, 0.1);
+    color: #3E4547;
+    @include avenir_H();
+    font-size: 14px;
+    line-height: 1.71;
+  }
 
   a.all-activity {
     display: block;
@@ -13,13 +38,9 @@ div.left-navigation-sidebar {
     border: none;
     outline: none;
     margin-bottom: 44px;
-    border-radius: 3px;
-    padding-left: 5px;
-
-    &.selected {
-      background-color: $carrot_light_blue;
-      color: #3E4547;
-    }
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    padding-left: 25px;
 
     &:hover {
       text-decoration: underline;
@@ -30,10 +51,12 @@ div.left-navigation-sidebar {
       font-size: 14px;
       color: $oc_gray_7;
       @include avenir_M();
+      line-height: 1.71;
       padding: 0.2rem 0.4rem;
       width: 135px;
       margin-left: 19px;
       text-align: left;
+      margin-left: 20px;
     }
 
     div.all-activity-icon {
@@ -51,10 +74,8 @@ div.left-navigation-sidebar {
     border-radius: 4px;
 
     .left-navigation-sidebar-top-title {
-      padding: 0 0 0 5px;
+      padding: 0 0 0 25px;
       margin: 0;
-      float: left;
-      width: #{$left_boards_list_width - 20 - 48}px;
       margin-bottom: 12px;
 
       span {
@@ -86,12 +107,13 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 28px;
-      margin-top: -6px;
+      margin-right: 0px;
+      margin-top: -5px;
+      float: right;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
-      background-color: rgba(82,222,149,0.25);
+      background-color: #F0EFEA;
       background-image: cdnUrl("/img/ML/plus_button_icon.svg");
       background-repeat: no-repeat;
       background-position: 50%;
@@ -114,7 +136,7 @@ div.left-navigation-sidebar {
       width: 96px;
       height: 2px;
       background-color: rgba($carrot_light_gray, 0.3);
-      margin: 4px 30px;
+      margin: 4px 30px 4px 50px;
     }
 
     a.left-navigation-sidebar-item {
@@ -122,15 +144,9 @@ div.left-navigation-sidebar {
       cursor: default;
       color: $oc_gray_7;
       margin-top: 10px;
-      border-radius: 3px;
-
-      &.selected {
-        background-color: $carrot_light_blue;
-        color: #3E4547;
-        @include avenir_H();
-        font-size: 14px;
-        line-height: 1.71;
-      }
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      padding-left: 20px;
 
       img.public {
         float: left;
@@ -178,6 +194,7 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
+    margin-left: 20px;
 
     button.about-carrot-btn {
       @include avenir_M();
