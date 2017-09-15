@@ -1,5 +1,5 @@
 language: clojure
-dist: trusty
+dist: precise
 jdk:
   - oraclejdk8
 sudo: true
