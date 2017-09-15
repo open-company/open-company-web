@@ -433,7 +433,7 @@
                :name "pswd"}]]
           [:div.group.my3
             [:div.right
-              [:button.mlb-reset.mlb-defautl
+              [:button.mlb-reset.mlb-default
                 {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                  :on-click #(do
                               (utils/event-stop %)
