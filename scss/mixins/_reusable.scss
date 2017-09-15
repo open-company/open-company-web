@@ -93,7 +93,7 @@
     color: rgba(78, 90, 107, 0.5);
     cursor: pointer;
     text-transform: uppercase;
-    font-family: $oc_main_font;
+    @include avenir_M();
 
     &.active {
       background-color: #ffffff;
@@ -145,8 +145,7 @@
     font-size: $font_size;
     line-height: 1.8;
     color: $text_color;
-    font-family: $oc_main_font;
-    font-weight: 400;
+    @include avenir_M();
 
     a {
       cursor: pointer;
@@ -160,9 +159,8 @@
   }
 
   h1, h2, h3, h4, h5 {
-    font-weight: 700;
-    font-family: $oc_main_font;
     text-size: 19px;
+    @include avenir_M();
   }
 
   ul {

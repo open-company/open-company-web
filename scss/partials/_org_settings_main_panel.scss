@@ -1,0 +1,173 @@
+div.org-settings-main {
+  div.org-settings-panel-row.org-logo-row {
+    cursor: pointer;
+
+    div.org-logo-container {
+      float: left;
+      width: 64px;
+      height: 64px;
+      text-align: center;
+      margin-right: 16px;
+
+      &.no-logo {
+        border: 1px solid $carrot_light_gray;
+        border-radius: 4px;
+        opacity: 0.2;
+
+        img.org-logo {
+          margin-top: 8px;
+          height: 48px;
+        }
+      }
+
+      img.org-logo {
+        max-width: 64px;
+        max-height: 64px;
+        cursor: pointer;
+      }
+    }
+
+    div.org-logo-label {
+      div.cta {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_text_blue;
+      }
+
+      div.description {
+        @include avenir_BOOK();
+        font-size: 14px;
+        color: $carrot_light_gray;
+        margin-top: 12px;
+      }
+    }
+  }
+
+  div.org-settings-panel-row.email-domains-row {
+    div.org-settings-label {
+      i.mdi.mdi-information-outline {
+        margin-left: 8px;
+
+        &:before {
+          font-size: 14px;
+        }
+      }
+
+      div.tooltip {
+        width: 160px;
+      }
+    }
+
+    div.org-settings-list {
+      margin-bottom: 16px;
+
+      div.org-settings-list-item {
+        div.org-settings-list-item-name {
+          @include avenir_R();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+        }
+      }
+
+    }
+
+    div.org-settings-field {
+      float: left;
+      width: 307px !important;
+      margin-right: 26px;
+      height: 40px;
+
+      input {
+        @include placeholder(){
+          @include avenir_R();
+          color: $carrot_light_gray;
+          font-size: 16px;
+        }
+      }
+    }
+
+    button.add-email-domain-bt {
+      float: left;
+      width: 61px;
+      height: 40px;
+    }
+  }
+
+  button.remove-team-btn {
+    @include avenir_R();
+    font-size: 14px;
+    color: $carrot_light_gray;
+    margin-left: 16px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  div.org-settings-panel-row.slack-teams-row {
+    div.org-settings-label {
+      i.mdi.mdi-information-outline {
+        margin-left: 8px;
+
+        &:before {
+          font-size: 14px;
+        }
+      }
+
+      div.tooltip {
+        width: 160px;
+      }
+    }
+
+    button.add-slack-team-bt {
+      @include avenir_R();
+      font-size: 16px;
+      color: $carrot_light_gray;
+      margin-top: 16px;
+      position: relative;
+      padding-right: 28px;
+
+      &:after {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        background-color: rgba(#52DE95, 0.25);
+        color: $carrot_green;
+        content: "+";
+        font-size: 16px;
+        text-decoration: none;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+      }
+
+      &:hover{
+        text-decoration: underline;
+        &:after {
+          color: white;
+          background-color: $carrot_green_1;
+          text-decoration: none;
+        }
+      }
+    }
+
+    div.org-settings-list {
+      div.org-settings-list-item {
+        label.org-settings-list-item-name{
+          @include avenir_R();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+
+          img.slack-logo {
+            width: 16px;
+            height: 16px;
+            margin-top: 3px;
+            margin-right: 8px;
+            float: left;
+          }
+        }
+      }
+    }
+  }
+}

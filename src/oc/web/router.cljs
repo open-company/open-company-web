@@ -103,8 +103,11 @@
 (defn current-board-slug []
   (:board @path))
 
-(defn current-entry-uuid []
-  (:entry @path))
+(defn current-activity-id []
+  (:activity @path))
+
+(defn current-secure-story-id []
+  (:secure-id @path))
 
 (defn query-params []
   (:query-params @path))
@@ -123,6 +126,16 @@
   "Cookie to save the last order the user visualized a board."
   [org-slug board-slug]
   (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
+
+(defn slack-profile-filled-cookie
+  "Cookie used to save if a user has already filled in his data when signing up with Slack."
+  [user-id]
+  (str "slack-profile-filled-" user-id))
+
+(defn dashboard-tooltips-shown
+  "Cookie to remember if the boards and journals tooltips where shown."
+  [user-id]
+  (str "dashboard-tooltips-show-" user-id))
 
 (defn print-router-path []
   (js/console.log @path))

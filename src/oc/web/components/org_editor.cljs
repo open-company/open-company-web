@@ -58,26 +58,25 @@
 
   (render-state [_ {:keys [loading message]}]
     (dom/div {:class "org-editor"}
-      (dom/div {:class "fullscreen-page group"}
-        (om/build navbar {:show-navigation-bar true})
-        (dom/div {:class "org-editor-box group navbar-offset"}
-          (dom/form {:on-submit (partial create-org-clicked owner)}
-            (dom/div {:class "form-group"}
-              (when (and (jwt/jwt) (jwt/get-key :first-name))
-                (dom/label {:class "org-editor-message"} (str "Hi " (s/capital (jwt/get-key :first-name)) "!")))
-              (dom/label {:class "org-editor-message"} message)
-              (dom/input {:type "text"
-                          :class "org-editor-input domine h4"
-                          :style #js {:width "100%"}
-                          :placeholder "Simple name without the Inc., LLC, etc."
-                          :value (or (:name (:create-org data)) "")
-                          :on-change #(do
-                                        (om/set-state! owner :name-did-change true)
-                                        (dis/dispatch! [:input [:create-org :name] (.. % -target -value)]))})))
-            (dom/div {:class "center"}
-              (dom/button {:class "btn-reset btn-solid get-started-button"
-                           :disabled (not (pos? (count (:name (:create-org data)))))
-                           :on-click (partial create-org-clicked owner)}
-                          (when loading
-                            (loading/small-loading {:class "left mt1"}))
-                          (dom/label {:class (str "pointer mt1" (when loading " ml2"))} "OK, LET’S GO"))))))))
+      (dom/div {:class "fullscreen-page"}
+        (navbar true)
+        (dom/div {:class "org-editor-container"}
+          (dom/div {:class "org-editor-box"}
+            (dom/form {:on-submit (partial create-org-clicked owner)}
+              (dom/div {:class "form-group"}
+                (when (and (jwt/jwt) (jwt/get-key :first-name))
+                  (dom/label {:class "org-editor-message"} (str "Hi " (s/capital (jwt/get-key :first-name)) "!")))
+                (dom/label {:class "org-editor-message"} message)
+                (dom/input {:type "text"
+                            :class "org-editor-input domine h4"
+                            :style #js {:width "100%"}
+                            :placeholder "Simple name without the Inc., LLC, etc."
+                            :value (or (:name (:create-org data)) "")
+                            :on-change #(do
+                                          (om/set-state! owner :name-did-change true)
+                                          (dis/dispatch! [:input [:create-org :name] (.. % -target -value)]))})))
+              (dom/div {:class "center"}
+                (dom/button {:class "mlb-reset mlb-default"
+                             :disabled (not (pos? (count (:name (:create-org data)))))
+                             :on-click (partial create-org-clicked owner)}
+                            "Ok, Let’s Go"))))))))

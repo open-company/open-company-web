@@ -1,11 +1,15 @@
 (ns oc.web.components.user-profile
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [cljsjs.moment-timezone]
             [goog.object :as googobj]
             [goog.dom :as gdom]))
@@ -36,10 +40,28 @@
   (dis/dispatch! [:input [:edit-user-profile k] v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
+(defn close-cb [orgs current-user-data]
+  (let [last-org-slug (cook/get-cookie (router/last-org-cookie))
+        first-org-slug (:slug (first orgs))
+        to-url (if last-org-slug
+                (oc-urls/org last-org-slug)
+                (if first-org-slug
+                  (oc-urls/org first-org-slug)
+                  oc-urls/orgs))]
+    (when (:has-changes current-user-data)
+      (dis/dispatch! [:user-profile-reset]))
+    (router/nav! to-url)))
+
+(def default-user-profile-image-key {:accept "image/*"
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}})
+
 (rum/defcs user-profile < rum/reactive
                           (rum/local false ::loading)
                           (rum/local false ::show-success)
                           (drv/drv :edit-user-profile)
+                          (drv/drv :orgs)
                           {:init (fn [s _]
                                    (dis/dispatch! [:user-profile-reset])
                                    s)
@@ -57,18 +79,20 @@
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
-        timezones (.names (.-tz js/moment))]
+        timezones (.names (.-tz js/moment))
+        orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
+      (carrot-close-bt {:on-click #(close-cb orgs current-user-data)})
       [:div.user-profile-header {} "Your Profile"]
       [:div.user-profile-internal
         [:div.user-profile-content.group
           [:div.user-profile-avatar-box.group
             [:button.user-profile-avatar.mlb-reset
-              {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
+              {:on-click #(iu/upload! default-user-profile-image-key success-cb progress-cb error-cb)}
               (user-avatar-image current-user-data)]
             [:div.user-profile-avatar-change
               [:button.mlb-reset.mlb-link.upload-photo
-                {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
+                {:on-click #(iu/upload! default-user-profile-image-key success-cb progress-cb error-cb)}
                 [:span.user-avatar-upload-cta "Upload Photo"]
                 [:span.user-avatar-upload-description
                   "A 160x160 transparent Gif or PNG works best"]]]]
@@ -77,7 +101,7 @@
             ; First name
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "FIRST NAME"]
+                "First Name"]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -86,7 +110,7 @@
             ; Current password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "CURRENT PASSWORD"]
+                "Current Password"]
               [:div.user-profile-field
                 [:input
                   {:type "password"
@@ -95,7 +119,7 @@
             ; Email
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "EMAIL"]
+                "Email"]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -106,7 +130,7 @@
             ; Last name
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "LAST NAME"]
+                "Last Name"]
               [:div.user-profile-field
                 [:input
                   {:type "text"
@@ -115,7 +139,7 @@
             ; New password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "NEW PASSWORD"]
+                "New Password"]
               [:div.user-profile-field
                 [:input
                   {:type "password"
@@ -124,7 +148,7 @@
             ; Time zone
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "TIME ZONE"]
+                "Time Zone"]
               [:div.user-profile-field
                 [:select
                   {:value (:timezone current-user-data)
@@ -148,7 +172,7 @@
           ; Digest frequency
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "DIGEST FREQUENCY " [:i.fa.fa-info-circle]]
+              "Digest Frequency " [:i.fa.fa-info-circle]]
             [:div.user-profile-field.digest-frequency-field.digest-frequency
               [:select
                 {:value (:digest-frequency current-user-data)
@@ -205,6 +229,6 @@
                 (small-loading))
             "Save"]
           [:button.mlb-reset.mlb-link-black
-            {:on-click #(dis/dispatch! [:user-profile-reset])
-             :disabled (not (:has-changes current-user-data))}
+            {:on-click #(when (:has-changes current-user-data)
+                          (dis/dispatch! [:user-profile-reset]))}
             "Cancel"]]]))

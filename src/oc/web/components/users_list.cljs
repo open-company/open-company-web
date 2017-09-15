@@ -28,7 +28,7 @@
         visualized-name (utils/name-or-email user)]
     [:tr
       [:td
-        (user-type-dropdown (:user-id user) user-type #(api/switch-user-type user-type % user author))]
+        (user-type-dropdown {:user-id (:user-id user) :user-type user-type :on-change #(api/switch-user-type user user-type % user author)})]
       [:td [:div.value
              {:title (if (pos? (count (:email user))) (:email user) "")
               :data-toggle "tooltip"

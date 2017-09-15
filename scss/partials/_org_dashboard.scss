@@ -1,13 +1,3 @@
-div.org-dashboard.editing-topic {
-  nav > *, div.left-topics-list, div.footer{
-    opacity: 0.2 !important;
-  }
-
-  div.topic.topic-edit, div.topic-topic-with-menu-open {
-    opacity: 1 !important;
-  }
-}
-
 div.org-dashboard {
   background-color: $oc_gray_8;
 
@@ -15,7 +5,7 @@ div.org-dashboard {
     min-height: calc(100vh - #{$footer_small_height}px - 44px);
   }
 
-  &.selected-topic-view.mobile-or-tablet {
+  &.modal-activity-view.mobile-or-tablet {
     div.page{
       padding-top: 0px;
     }
@@ -43,9 +33,8 @@ div.org-dashboard {
         margin-top: -20px;
 
         h3.empty-dashboard-title {
-          font-family: $oc_main_font;
+          @include avenir_H();
           font-size: 16px;
-          font-weight: 700;
           line-height: 1.5;
         }
       }
@@ -69,8 +58,7 @@ div.org-dashboard {
           background-color: transparent;
           color: $oc_gray_5;
           font-size: 18px;
-          font-weight: 700;
-          font-family: $oc_main_font;
+          @include avenir_H();
           line-height: 1.5;
           margin-left: 200px;
         }

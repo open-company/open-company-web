@@ -3,8 +3,7 @@ div.email-confirmation {
   position: relative;
 
   h1.email-confirmation-cta {
-    font-family: $oc_main_font;
-    font-weight: 400;
+    @include avenir_M();
     font-size: 20px;
     line-height: 1.2;
     color: $oc_gray_5;

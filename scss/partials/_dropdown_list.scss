@@ -1,0 +1,59 @@
+div.dropdown-list-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 140px;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background-color: transparent;
+  z-index: 2;
+
+  div.triangle {
+    position: absolute;
+    top: -2px;
+    left: calc(50% - 10px);
+    background-color: white;
+    border-top: 1px solid rgba(177,184,192,0.50);
+    border-left: 1px solid rgba(177,184,192,0.50);
+    transform: rotate(45deg);
+    width: 20px;
+    height: 20px;
+  }
+
+  div.dropdown-list-content {
+    background-color: white;
+    border: 1px solid rgba(177,184,192,0.50);
+    box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+    border-radius: 5px;
+    margin: 8px 0;
+    padding: 10px 16px 6px;
+    min-height: 50px;
+
+    ul.dropdown-list {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+
+      li.dropdown-list-item {
+        margin: 6px 0;
+        cursor: pointer;
+        @include avenir_M();
+        font-size: 14px;
+        color: $oc_gray_7;
+        cursor: pointer;
+
+        &:hover {
+          background-color: transparent;
+          text-decoration: underline;
+          color: $carrot_dark_gray;
+        }
+
+        &.select {
+          @include avenir_H();
+          color: $carrot_dark_gray;
+        }
+      }
+    }
+  }
+}

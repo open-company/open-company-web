@@ -53,26 +53,26 @@
   }
 }
 
-.mlb-link {
+@mixin mlb-link($btcolor: $carrot_text_blue){
   background-color: transparent;
-  color: $carrot_text_blue;
-  font-family: $oc_main_font;
-  font-weight: 900;
+  color: $btcolor;
+  @include avenir_M();
 
   &:hover {
     text-decoration: underline;
   }
 }
 
-.mlb-link-black {
-  background-color: transparent;
-  color: $carrot_dark_gray;
-  font-family: $oc_main_font;
-  font-weight: 900;
+.mlb-link {
+  @include mlb-link();
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.mlb-link-black {
+  @include mlb-link($carrot_dark_gray);
+}
+
+.mlb-link-red {
+  @include mlb-link($carrot_orange);
 }
 
 .btn-reset {
@@ -89,8 +89,7 @@
 .btn-outline {
   padding: .3rem 2rem;
   border: solid 1px rgba(78, 90, 107, 0.5);
-  font-weight: 700;
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;
@@ -112,8 +111,7 @@
 
 .btn-link {
   padding: .3rem 2rem;
-  font-weight: 700;
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;
@@ -131,8 +129,7 @@
 .btn-solid {
   background-color: $oc_yellow;
   border: solid 1px $oc_yellow;
-  font-weight: 700;
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 0.75rem;
   letter-spacing: .1em;
   color: $oc_gray_5;

@@ -31,9 +31,8 @@ div.login-required {
     button.logout {
       opacity: 0.4;
       color: $oc_gray_5;
-      font-family: $oc_main_font;
+      @include avenir_H();
       font-size: 14px;
-      font-weight: bold;
       line-height: 1.5;
       letter-spacing: 1px;
       text-transform: uppercase;

@@ -8,6 +8,10 @@ button.user-avatar-button{
   height: #{$avatar_size}px;
   border-radius: #{$avatar-size / 2}px;
 
+  &.disabled-user-menu {
+    cursor: default;
+  }
+
   &:active, &:focus {
     outline: none;
     border: 0px solid tranparent;

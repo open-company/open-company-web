@@ -15,8 +15,7 @@
           org-name (if has-name
                       (:name org-data)
                       (utils/camel-case-str org-slug))
-          first-letter (first (clojure.string/upper-case org-name))
-          org-logo (:logo-url org-data)
+          org-logo (or (:logo-url org-data) (utils/cdn "/img/ML/happy_face_red.svg"))
           img-load-failed @(::img-load-failed s)
           show-org-avatar? (and (not img-load-failed)
                                 (not (clojure.string/blank? org-logo)))
@@ -40,7 +39,6 @@
                 [:span.helper]
                 [:img.org-avatar-img
                   {:src org-logo
-                   ; :style {:margin-top (str (max 0 (/ (- 35 (:logo-height org-data)) 2)) "px")}
                    :title org-name
                    :on-error #(reset! (::img-load-failed s) true)}]])
             (when (or (not show-org-avatar?)

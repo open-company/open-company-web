@@ -1,29 +1,26 @@
-$oc_main_font: AvenirLTStd-Medium, 'Muli', sans-serif;
-$oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
-
 .AvenirLTStd-Book {
-  font-family: AvenirLTStd-Book;
+  font-family: AvenirLTStd-Book, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 .AvenirLTStd-BookOblique {
-  font-family: AvenirLTStd-BookOblique;
+  font-family: AvenirLTStd-BookOblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 .AvenirLTStd-MediumOblique {
-  font-family: AvenirLTStd-MediumOblique;
+  font-family: AvenirLTStd-MediumOblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 .AvenirLTStd-Medium {
-  font-family: AvenirLTStd-Medium;
+  font-family: AvenirLTStd-Medium, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -31,7 +28,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 .AvenirLTStd-BlackOblique {
-  font-family: AvenirLTStd-BlackOblique;
+  font-family: AvenirLTStd-BlackOblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -39,7 +36,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 .AvenirLTStd-Oblique {
-  font-family: AvenirLTStd-Oblique;
+  font-family: AvenirLTStd-Oblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -47,7 +44,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 .AvenirLTStd-Roman {
-  font-family: AvenirLTStd-Roman;
+  font-family: AvenirLTStd-Roman, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -55,7 +52,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 .AvenirLTStd-Heavy {
-  font-family: AvenirLTStd-Heavy;
+  font-family: AvenirLTStd-Heavy, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -63,7 +60,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 .AvenirLTStd-HeavyOblique {
-  font-family: AvenirLTStd-HeavyOblique;
+  font-family: AvenirLTStd-HeavyOblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -71,7 +68,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 .AvenirLTStd-Black {
-  font-family: AvenirLTStd-Black;
+  font-family: AvenirLTStd-Black, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -79,7 +76,7 @@ $oc_main_bold_font: AvenirLTStd-Black, 'Muli Black', sans-serif;
 }
 
 @mixin avenir($avenir_variant: Black){
-  font-family: AvenirLTStd-#{$avenir_variant};
+  font-family: AvenirLTStd-#{$avenir_variant}, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;

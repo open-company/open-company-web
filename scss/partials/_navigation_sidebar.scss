@@ -1,0 +1,228 @@
+div.left-navigation-sidebar {
+  float: left;
+  position: fixed;
+  margin-right: 20px;
+  max-height: calc(100vh - 122px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 20px;
+
+  a.all-activity {
+    display: block;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    margin-bottom: 44px;
+    border-radius: 3px;
+    padding-left: 5px;
+
+    &.selected {
+      background-color: $carrot_light_blue;
+      color: #3E4547;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    div.all-activity-label {
+      border-radius: 3px;
+      font-size: 14px;
+      color: $oc_gray_7;
+      @include avenir_M();
+      padding: 0.2rem 0.4rem;
+      width: 135px;
+      margin-left: 19px;
+      text-align: left;
+    }
+
+    div.all-activity-icon {
+      background-image: cdnUrl("/img/ML/activity_hamburger.svg");
+      background-size: 12px 12px;
+      width: 12px;
+      height: 12px;
+      float: left;
+      margin-left: 4px;
+      margin-top: 5px;
+    }
+  }
+
+  div.left-navigation-sidebar-top{
+    border-radius: 4px;
+
+    .left-navigation-sidebar-top-title {
+      padding: 0 0 0 5px;
+      margin: 0;
+      float: left;
+      width: #{$left_boards_list_width - 20 - 48}px;
+      margin-bottom: 12px;
+
+      span {
+        @include avenir_B();
+        font-size: 13px;
+        color: $oc_gray_7;
+        float: left;
+        margin-left: 5px;
+        cursor: default;
+      }
+
+      div.boards-icon, div.stories-icon {
+        background-size: 16px 16px;
+        width: 16px;
+        height: 16px;
+        float: left;
+        margin-right: 5px;
+        margin-top: -3px;
+      }
+
+      div.boards-icon {
+        background-image: cdnUrl("/img/ML/boards_icon.svg");
+      }
+      div.stories-icon {
+        background-image: cdnUrl("/img/ML/stories_icon.svg");
+      }
+    }
+
+    button.left-navigation-sidebar-top-title-button {
+      width: 20px;
+      height: 20px;
+      margin-right: 28px;
+      margin-top: -6px;
+      padding: 0;
+      cursor: pointer;
+      transition: 230ms;
+      background-color: rgba(82,222,149,0.25);
+      background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+      background-repeat: no-repeat;
+      background-position: 50%;
+      background-size: 8px 8px;
+      border-radius: 2px;
+      @include avenir_H();
+
+      &:hover {
+        background-color: #3FBD7C;
+        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
+      }
+    }
+  }
+
+  div.left-navigation-sidebar-items{
+    cursor: pointer;
+    margin-bottom: 44px;
+
+    div.left-navigation-sidebar-draft-divider {
+      width: 96px;
+      height: 2px;
+      background-color: rgba($carrot_light_gray, 0.3);
+      margin: 4px 30px;
+    }
+
+    a.left-navigation-sidebar-item {
+      display: block;
+      cursor: default;
+      color: $oc_gray_7;
+      margin-top: 10px;
+      border-radius: 3px;
+
+      &.selected {
+        background-color: $carrot_light_blue;
+        color: #3E4547;
+        @include avenir_H();
+        font-size: 14px;
+        line-height: 1.71;
+      }
+
+      img.public {
+        float: left;
+        margin-left: 6px;
+        margin-top: 2px;
+        width: 16px;
+        height: 16px;
+      }
+
+      img.private{
+        float: left;
+        margin-left: 8px;
+        margin-top: 3px;
+        width: 10px;
+        height: 14px;
+      }
+
+      div.board-name {
+        margin-left: 25px;
+
+        div.internal {
+          border-radius: 3px;
+          padding: 0.1rem 5px 0 5px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          width: 133px;
+          float: left;
+          font-size: 14px;
+          line-height: 1.71;
+          color: $oc_gray_7;
+          @include avenir_M();
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  div.left-navigation-sidebar-footer {
+
+    button.about-carrot-btn {
+      @include avenir_M();
+      margin-top: 10px;
+      &:hover {
+        text-decoration: underline;
+      }
+
+      div.about-carrot-icon {
+        background-image: cdnUrl("/img/ML/carrot_grey.svg");
+        background-size: 16px 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        float: left;
+        margin-top: 1px;
+      }
+
+      span {
+        font-size: 14px;
+        line-height: 1.71;
+        color: $oc_gray_7;
+        margin-left: 5px;
+      }
+    }
+
+    button.invite-people-btn {
+      @include avenir_M();
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      div.invite-people-icon {
+        background-image: cdnUrl("/img/ML/invite_people.svg");
+        background-size: 16px 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        float: left;
+        margin-top: 1px;
+      }
+
+      span {
+        font-size: 14px;
+        line-height: 1.71;
+        color: $oc_gray_7;
+        margin-left: 5px;
+      }
+    }
+  }
+}
