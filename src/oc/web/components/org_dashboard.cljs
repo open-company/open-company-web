@@ -13,7 +13,6 @@
             [oc.web.router :as router]
             [oc.web.lib.cookies :as cook]
             [oc.web.components.topics-columns :refer (topics-columns)]
-            [oc.web.components.welcome-screen :refer (welcome-screen)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
@@ -38,19 +37,10 @@
 
 (defcomponent org-dashboard [data owner]
 
-  (init-state [_]
-    {:card-width (if (responsive/is-mobile-size?)
-                   (responsive/mobile-dashboard-card-width)
-                   responsive/card-width)
-     :columns-num (responsive/dashboard-columns-num)})
+  (init-state [_])
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-    (om/set-state! owner :resize-listener
-      (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
-                                                                                           :card-width (if (responsive/is-mobile-size?)
-                                                                                                         (responsive/mobile-dashboard-card-width)
-                                                                                                         responsive/card-width)})))))
     (refresh-board-data)
     (om/set-state! owner :board-refresh-interval
       (js/setInterval #(refresh-board-data) (* 60 1000))))
@@ -66,12 +56,7 @@
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
-          all-activity-data (dis/all-activity-data data)
-          ww (responsive/ww)
-          total-width   (if (and (= columns-num 1)
-                                (< ww responsive/c1-min-win-width))
-                          "auto"
-                          (str (responsive/total-layout-width-int card-width columns-num) "px"))]
+          all-activity-data (dis/all-activity-data data)]
       (if (or (not org-data)
               (and (not board-data)
                    (not all-activity-data)))
@@ -105,23 +90,20 @@
             (when-not (and (responsive/is-tablet-or-mobile?)
                            (router/current-activity-id))
               (navbar))
-            (if (:show-welcome-screen data)
-              (welcome-screen)
-              (dom/div {:class "dashboard-container"}
-                (dom/div {:class "topic-list"}
-                  (om/build topics-columns
-                    {:loading (:loading data)
-                     :content-loaded (or (:loading board-data) (:loading data))
-                     :org-data org-data
-                     :board-data board-data
-                     :all-activity-data all-activity-data
-                     :force-edit-topic (:force-edit-topic data)
-                     :card-width card-width
-                     :columns-num columns-num
-                     :show-login-overlay (:show-login-overlay data)
-                     :entry-editing (:entry-editing data)
-                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                     :is-dashboard true
-                     :board-filters (:board-filters data)
-                     :total-width total-width
-                     :is-all-activity (utils/in? (:route @router/path) "all-activity")}))))))))))
+            (dom/div {:class "dashboard-container"}
+              (dom/div {:class "topic-list"}
+                (om/build topics-columns
+                  {:loading (:loading data)
+                   :content-loaded (or (:loading board-data) (:loading data))
+                   :org-data org-data
+                   :board-data board-data
+                   :all-activity-data all-activity-data
+                   :force-edit-topic (:force-edit-topic data)
+                   :card-width card-width
+                   :columns-num columns-num
+                   :show-login-overlay (:show-login-overlay data)
+                   :entry-editing (:entry-editing data)
+                   :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                   :is-dashboard true
+                   :board-filters (:board-filters data)
+                   :is-all-activity (utils/in? (:route @router/path) "all-activity")})))))))))
