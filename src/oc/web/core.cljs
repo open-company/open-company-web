@@ -134,7 +134,8 @@
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing (:query-params params) rewrite-url)
   ;; save route
-  (router/set-route! [route-name] {:query-params (:query-params params)})
+  (let [org (:org (:params params))]
+    (router/set-route! (vec (remove nil? [route-name org])) {:org org :query-params (:query-params params)}))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     (when (contains? (:query-params params) :login-redirect)
@@ -430,11 +431,7 @@
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
       (if (responsive/is-mobile-size?)
-        (do
-          (pre-routing (:query-params params))
-          (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
-          (post-routing)
-          (drv-root #(om/component (mobile-boards-list)) target))
+        (simple-handler mobile-boards-list "boards-list" target params)
         (org-handler "boards-list" target #(om/component) params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
