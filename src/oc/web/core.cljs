@@ -27,16 +27,13 @@
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
-            [oc.web.components.login :refer (login)]
             [oc.web.components.oc-wall :refer (oc-wall)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
-            [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
-            [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.story :refer (story)]
@@ -146,17 +143,6 @@
   (pre-routing (:query-params params))
   (post-routing)
   (drv-root #(om/component (oc-wall message :login)) target))
-
-;; Handle successful and unsuccessful logins
-(defn login-handler [target params]
-  (pre-routing (:query-params params))
-  (when-not (contains? (:query-params params) :jwt)
-    (router/set-route! ["login"] {:query-params (:query-params params)})
-    (when (contains? (:query-params params) :login-redirect)
-      (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    ;; render component
-    (post-routing)
-    (drv-root #(om/component (login)) target)))
 
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing (:query-params params) rewrite-url)
