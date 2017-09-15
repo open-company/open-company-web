@@ -969,7 +969,7 @@
                          (oc-urls/entry board-slug activity-uuid))]
       (router/set-route! new-route parts)
       (.pushState (.-history js/window) #js {} (.-title js/document) activity-url)
-      (reset! dispatcher/app-state (assoc @dispatcher/app-state :activity-pushed activity-uuid))))
+      (dispatcher/dispatch! [:input [:activity-pushed] activity-uuid])))
   (assoc db :activity-modal-fade-in activity-uuid))
 
 (defmethod dispatcher/action :entry-edit
@@ -1075,7 +1075,7 @@
                parts (dissoc @router/path :route :activity)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
          (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
 
@@ -1088,7 +1088,7 @@
                parts (dissoc @router/path :route :activity)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
          (router/nav! next-board-url)))
     db))
 
@@ -1101,7 +1101,7 @@
                parts (-> @router/path (dissoc :route :board :activity :from-all-activity) (merge {:board "all-activity"}))]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
          (router/nav! all-activity-url)))
     db))
 
