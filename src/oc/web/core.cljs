@@ -105,7 +105,7 @@
     (swap! dis/app-state assoc :loading true))
   (post-routing)
   ;; render component
-  (drv-root home target))
+  (drv-root #(om/component (home)) target))
 
 ;; Company list
 (defn org-handler [route target component params]
