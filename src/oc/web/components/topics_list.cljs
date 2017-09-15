@@ -66,6 +66,7 @@
                          :content-loaded (:content-loaded data)
                          :loading (:loading data)
                          :topics board-topics
+                         :show-login-overlay (:show-login-overlay data)
                          :org-data (:org-data data)
                          :board-data board-data
                          :all-activity-data (:all-activity-data data)

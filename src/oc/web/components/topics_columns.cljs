@@ -37,7 +37,7 @@
                                       board-filters] :as data} owner options]
 
   (init-state [_]
-    {:show-boards-tooltip (and (jwt/jwt) (not (cook/get-cookie (router/dashboard-tooltips-shown (jwt/get-key :user-id)))))
+    {:show-boards-tooltip (and (not (:show-login-overlay data)) (jwt/jwt) (not (cook/get-cookie (router/dashboard-tooltips-shown (jwt/get-key :user-id)))))
      :show-journals-tooltip false})
 
   ; (will-mount [_]

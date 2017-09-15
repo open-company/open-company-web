@@ -198,7 +198,11 @@
                               {:invitation-confirmed (:email-confirmed base)
                                :collect-pswd (:collect-pswd base)
                                :collect-pswd-error (:collect-password-error base)
-                               :jwt jwt})]})
+                               :jwt jwt})]
+   :password-reset        [[:base :auth-settings]
+                            (fn [base auth-settings]
+                              {:auth-settings auth-settings
+                               :error (:collect-pswd-error base)})]})
 
 ;; Action Loop =================================================================
 
