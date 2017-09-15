@@ -107,7 +107,13 @@ div.fsp-picker {
           span.fsp-icon--local_file_system {
             background-image: cdnUrl("/img/ML/laptop-mac.png");
             background-position: 50%;
-            background-size: 22px 19px;
+            background-size: 22px 22px;
+          }
+
+          span.fsp-icon--imagesearch {
+            background-image: cdnUrl("/img/ML/imagesearch.png");
+            background-position: 50%;
+            background-size: 22px 22px;
           }
 
           span.fsp-source-list__icon:hover {
@@ -118,25 +124,25 @@ div.fsp-picker {
           span.fsp-icon--googledrive {
             background-image: cdnUrl("/img/ML/google-drive.png");
             background-position: 50%;
-            background-size: 22px 19px;
+            background-size: 22px 22px;
           }
 
           span.fsp-icon--dropbox {
             background-image: cdnUrl("/img/ML/dropbox.png");
             background-position: 50%;
-            background-size: 22px 19px;
+            background-size: 22px 22px;
           }
 
           span.fsp-icon--onedrive {
             background-image: cdnUrl("/img/ML/onedrive.png");
             background-position: 50%;
-            background-size: 22px 19px;
+            background-size: 22px 22px;
           }
 
           span.fsp-icon--box {
             background-image: cdnUrl("/img/ML/box.png");
             background-position: 50%;
-            background-size: 22px 19px;
+            background-size: 22px 22px;
           }
         }
       }

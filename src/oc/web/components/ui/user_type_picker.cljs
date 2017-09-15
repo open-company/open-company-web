@@ -8,7 +8,7 @@
                                                               hide-popover)]))
 
 (rum/defc user-type-dropdown < rum/static
-  [user-id user-type click-cb & [hide-admin?]]
+  [{:keys [user-id user-type on-change hide-admin on-remove]}]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
       [:button.btn-reset.user-type-btn.dropdown-toggle
@@ -18,25 +18,29 @@
          :aria-expanded false}
         (case user-type
           :admin
-          [:i.fa.fa-gear]
+          "Admin"
           :author
-          [:i.fa.fa-pencil]
-          [:i.fa.fa-user])]
+          "Contributor"
+          "Viewer")]
       [:ul.dropdown-menu.user-type-dropdown-menu
         {:aria-labelledby user-dropdown-id}
         [:li
-          {:class (when (= user-type :viewer) "active")
-           :on-click #(click-cb :viewer)}
-          [:i.fa.fa-user] " View"]
+          {:on-click #(when (fn? on-change)
+                        (on-change :viewer))}
+          "Viewer"]
         [:li
-          {:class (when (= user-type :author) "active")
-           :on-click #(click-cb :author)}
-          [:i.fa.fa-pencil] " Edit"]
-        (when-not hide-admin?
+          {:on-click #(when (fn? on-change)
+                        (on-change :author))}
+          "Contributor"]
+        (when-not hide-admin
           [:li
-            {:class (when (= user-type :admin) "active")
-             :on-click #(click-cb :admin)}
-            [:i.fa.fa-gear] " Admin"])]]))
+            {:on-click #(when (fn? on-change)
+                        (on-change :admin))}
+            "Admin"])
+        (when (fn? on-remove)
+          [:li.remove-li
+            {:on-click #(on-remove)}
+            "Remove User"])]]))
 
 (defn show-role-explainer-popover [e & [hide-admin]]
   (.stopPropagation e)
@@ -51,15 +55,10 @@
 (rum/defcs user-type-picker < (rum/local nil ::last-user-type)
   [s user-type enabled? did-select-cb show-admins?]
   [:div.user-type-picker
-    {:on-mouse-out #(let [el (or (.-toElement %) (.-relatedTarget %))]
-                      ; mouseOut event is triggerend also when the mouse enter a child so we need to
-                      ; check that it's not entering a child of this
-                      (when (not (utils/is-parent? (sel1 [:div.user-type-picker]) el))
-                        ; reset the user-type to what was before the user enter this div with the mouse
-                        (did-select-cb @(::last-user-type s))))}
+    {:on-mouse-leave #(did-select-cb @(::last-user-type s))}
     [:button.user-type-picker-btn.btn-reset.viewer
       {:class (str "" (when-not enabled? "disabled") (when (= user-type :viewer) " active"))
-       :on-mouse-over #(did-select-cb :viewer)
+       :on-mouse-enter #(did-select-cb :viewer)
        :on-click #(do (reset! (::last-user-type s) :viewer) (did-select-cb :viewer))}
       (when (= user-type :viewer)
         [:span.user-type-disc.viewer
@@ -68,7 +67,7 @@
       [:i.fa.fa-user]]
     [:button.user-type-picker-btn.btn-reset.author
       {:class (str "" (when-not enabled? "disabled") (when (= user-type :author) " active"))
-       :on-mouse-over #(did-select-cb :author)
+       :on-mouse-enter #(did-select-cb :author)
        :on-click #(do (reset! (::last-user-type s) :author) (did-select-cb :author))}
       (when (= user-type :author)
         [:span.user-type-disc.author
@@ -78,7 +77,7 @@
     (when show-admins?
       [:button.user-type-picker-btn.btn-reset.admin
         {:class (str "" (when-not enabled? "disabled") (when (= user-type :admin) " active"))
-         :on-mouse-over #(did-select-cb :admin)
+         :on-mouse-enter #(did-select-cb :admin)
          :on-click #(do (reset! (::last-user-type s) :admin) (did-select-cb :admin))}
         (when (= user-type :admin)
           [:span.user-type-disc.admin

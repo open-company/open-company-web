@@ -19,6 +19,26 @@ div.topics-columns {
     div.board-container {
       margin-right: 36px;
 
+      div.all-activity-icon, div.boards-icon, div.stories-icon {
+        background-size: 26px 26px;
+        width: 26px;
+        height: 26px;
+        float: left;
+        margin-right: 10px;
+        margin-top: 5px;
+      }
+
+      div.boards-icon {
+        background-image: cdnUrl("/img/ML/boards_icon.svg");
+      }
+      div.stories-icon {
+        background-image: cdnUrl("/img/ML/stories_icon.svg");
+      }
+      div.all-activity-icon {
+        margin-top: 4px;
+        background-image: cdnUrl("/img/ML/activity_hamburger.svg");
+      }
+
       div.board-name {
         @include avenir_M();
         font-size: 32px;
@@ -45,9 +65,23 @@ div.topics-columns {
         }
       }
 
+      div.new-story-container {
+        position: relative;
+        float: right;
+        div.dropdown-list-container {
+          left: -35px;
+          top: 47px;
+          width: 170px;
+        }
+      }
+
       button.add-to-board-btn {
         float: right;
         margin-right: 16px;
+
+        &.is-draft {
+          margin-right: 24px;
+        }
 
         div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");

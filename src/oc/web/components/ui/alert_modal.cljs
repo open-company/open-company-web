@@ -57,11 +57,16 @@
    :solid-button-title The title for the second button, it's green solid styled.
    :solid-button-cb The function to execute when the second button is clicked."
   [s]
-  (let [alert-modal (drv/react s :alert-modal)]
+  (let [alert-modal (drv/react s :alert-modal)
+        has-buttons (or (:link-button-title alert-modal)
+                        (:solid-button-title alert-modal))]
     [:div.alert-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})
+       :on-click #(when-not has-buttons
+                    (dis/dispatch! [:alert-modal-hide]))}
       [:div.alert-modal
+        {:class (when has-buttons "has-buttons")}
         (when (:icon alert-modal)
           [:img.alert-modal-icon {:src (utils/cdn (:icon alert-modal))}])
         (when (:title alert-modal)
@@ -70,8 +75,7 @@
         (when (:message alert-modal)
           [:div.alert-modal-message
             (:message alert-modal)])
-        (when (or (:link-button-title alert-modal)
-                  (:solid-button-title alert-modal))
+        (when has-buttons
           [:div.alert-modal-buttons.group
             {:class (when (or (not (:link-button-title alert-modal))
                               (not (:solid-button-title alert-modal))) "single-button")}

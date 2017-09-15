@@ -31,6 +31,7 @@
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
+                    read-only-reaction (not (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"]))
                     r (if is-loading
                         (merge reaction-data {:count (if (:reacted reaction-data) (dec (:count reaction-data)) (inc (:count reaction-data)))
                                               :reacted (not (:reacted reaction-data))})
@@ -38,9 +39,10 @@
           [:button.reaction-btn.btn-reset
             {:key (str "-entry-" (:uuid entry-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
+                                      :can-react (not read-only-reaction)
                                       :has-reactions (pos? (:count r))})
              :on-click (fn [e]
-                         (when-not is-loading
+                         (when (and (not is-loading) (not read-only-reaction))
                            (when-not (:reacted r)
                              (animate-reaction e s))
                            (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}

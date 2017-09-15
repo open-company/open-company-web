@@ -24,7 +24,6 @@
             [oc.web.components.home :refer (home)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.list-orgs :refer (list-orgs)]
-            [oc.web.components.team-management :refer (team-management-wrapper)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
@@ -36,12 +35,13 @@
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.confirm-invitation :refer (confirm-invitation)]
             [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.org-logo-setup :refer (org-logo-setup)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.board-settings :refer (board-settings)]
-            [oc.web.components.error-banner :refer (error-banner)]))
+            [oc.web.components.error-banner :refer (error-banner)]
+            [oc.web.components.story :refer (story)]
+            [oc.web.components.story-edit :refer (story-edit)]))
 
 (enable-console-print!)
 
@@ -170,7 +170,7 @@
     ;; render component
     (drv-root #(om/component (component)) target)))
 
-;; Component specific to a company
+;; Component specific to a board
 (defn board-handler [route target component params & [board-sort-or-filter]]
   (let [org (:org (:params params))
         board (:board (:params params))
@@ -182,7 +182,7 @@
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :entry entry :query-params query-params})
+    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params})
     (when board-sort-or-filter
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
@@ -190,6 +190,45 @@
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
               (not (:entries (dis/board-data)))) ;; or the entries key is missing that means we have only
+                                                    ;; a subset of the company data loaded with a SU
+      (swap! dis/app-state merge {:loading true}))
+    (post-routing)
+    ;; render component
+    (drv-root component target)))
+
+;; Component specific to a storyboard
+(defn storyboard-handler [route target component params]
+  (let [org (:org (:params params))
+        storyboard (:storyboard (:params params))
+        story (:story (:params params))
+        query-params (:query-params params)]
+    (when org
+      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
+    (pre-routing query-params)
+    ;; save the route
+    (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
+    ;; do we have the company data already?
+    (when (or (not (dis/board-data))              ;; if the company data are not present
+              (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
+                                                    ;; a subset of the company data loaded with a SU
+      (swap! dis/app-state merge {:loading true}))
+    (post-routing)
+    ;; render component
+    (drv-root component target)))
+
+;; Component specific to a storyboard
+(defn story-handler [component route target params]
+  (let [org (:org (:params params))
+        storyboard (:storyboard (:params params))
+        story (:story (:params params))
+        secure-id (:secure-id (:params params))
+        query-params (:query-params params)]
+    (pre-routing query-params)
+    ;; save the route
+    (router/set-route! (vec (remove nil? [org storyboard route (when story story) secure-id])) {:org org :board storyboard :activity story :secure-id secure-id :query-params query-params})
+    ;; do we have the company data already?
+    (when (or (not (dis/board-data))              ;; if the company data are not present
+              (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
     (post-routing)
@@ -323,39 +362,37 @@
         (drv-root #(om/component (user-profile)) target)
         (oc-wall-handler "Please sign in to access this page." target params)))
 
-    (defroute org-logo-setup-route (urls/org-logo-setup ":org") {:as params}
-      (timbre/info "Routing org-logo-setup-route" (urls/org-logo-setup ":org"))
-      (let [org (:org (:params params))
-            query-params (:query-params params)]
-        (pre-routing query-params)
-        ;; save the route
-        (router/set-route! [org "org-settings" "logo"] {:org org :query-params query-params})
-        ;; load org data
-        (post-routing)
-        ;; do we have the company data already?
-        (when-not (dis/org-data)
-          (swap! dis/app-state assoc :loading true))
-      (if (jwt/jwt)
-        (drv-root org-logo-setup target)
-        (oc-wall-handler "Please sign in to access this organization." target params))))
-
     (defroute org-settings-route (urls/org-settings ":org") {:as params}
       (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
-      ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no entries and the user is looking at company profile
-      (swap! dis/app-state assoc :force-remove-loading true)
-      (if (jwt/jwt)
-        (org-handler "org-settings" target org-settings params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+      (org-handler "org-settings" target #(om/component (org-settings)) params))
 
-    (defroute org-team-settings-route (urls/org-team-settings ":org") {:as params}
-      (timbre/info "Routing org-team-settings-route" (urls/org-team-settings ":org"))
-      ; add force-remove-loading to avoid inifinte spinner if the company
-      ; has no entries and the user is looking at company profile
-      (swap! dis/app-state assoc :force-remove-loading true)
-      (if (jwt/jwt)
-        (team-handler "org-team-settings" target team-management-wrapper params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
+    (defroute org-settings-slash-route (str (urls/org-settings ":org") "/") {:as params}
+      (timbre/info "Routing org-settings-slash-route" (str (urls/org-settings ":org") "/"))
+      (org-handler "org-settings" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-team-route (urls/org-settings-team ":org") {:as params}
+      (timbre/info "Routing org-settings-team-route" (urls/org-settings-team ":org"))
+      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-team-slash-route (str (urls/org-settings-team ":org") "/") {:as params}
+      (timbre/info "Routing org-settings-team-slash-route" (str (urls/org-settings-team ":org") "/"))
+      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-invite-route (urls/org-settings-invite ":org") {:as params}
+      (timbre/info "Routing org-settings-invite-route" (urls/org-settings-invite ":org"))
+      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+
+    (defroute org-settings-invite-slash-route (str (urls/org-settings-invite ":org") "/") {:as params}
+      (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
+      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+
+    (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
+      (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
+      (story-handler #(om/component (story)) "secure-story" target params))
+
+    (defroute secure-story-slash-route (str (urls/secure-story ":org" ":secure-id") "/") {:as params}
+      (timbre/info "Routing secure-story-slash-route" (str (urls/secure-story ":org" ":secure-id") "/"))
+      (story-handler #(om/component (story)) "secure-story" target params))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
@@ -365,7 +402,7 @@
           (pre-routing (:query-params params))
           (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
           (post-routing)
-          (drv-root mobile-boards-list target))
+          (drv-root #(om/component (mobile-boards-list)) target))
         (org-handler "boards-list" target #(om/component) params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
@@ -378,8 +415,6 @@
 
     (defroute board-settings-route (urls/board-settings ":org" ":board") {:as params}
       (timbre/info "Routing board-settings-route" (urls/board-settings ":org" ":board"))
-      ; add force-remove-loading to avoid inifinte spinner
-      (swap! dis/app-state assoc :force-remove-loading true)
       (if (jwt/jwt)
         (board-handler "board-settings" target board-settings params)
         (oc-wall-handler "Please sign in to access this board." target params)))
@@ -406,11 +441,27 @@
 
     (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
-      (board-handler "entry" target org-dashboard params))
+      (board-handler "activity" target org-dashboard params))
 
     (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
-      (board-handler "entry" target org-dashboard params))
+      (board-handler "activity" target org-dashboard params))
+
+    (defroute story-route (urls/story ":org" ":storyboard" ":story") {:as params}
+      (timbre/info "Routing story-route" (urls/story ":org" ":storyboard" ":story"))
+      (story-handler #(om/component (story)) "story" target params))
+
+    (defroute story-slash-route (str (urls/story ":org" ":storyboard" ":story") "/") {:as params}
+      (timbre/info "Routing story-slash-route" (str (urls/story ":org" ":storyboard" ":story") "/"))
+      (story-handler #(om/component (story)) "story" target params))
+
+    (defroute story-edit-route (urls/story-edit ":org" ":storyboard" ":story") {:as params}
+      (timbre/info "Routing story-edit-route" (urls/story-edit ":org" ":storyboard" ":story"))
+      (story-handler #(om/component (story-edit)) "story-edit" target params))
+
+    (defroute story-edit-slash-route (str (urls/story-edit ":org" ":storyboard" ":story") "/") {:as params}
+      (timbre/info "Routing story-edit-slash-route" (str (urls/story-edit ":org" ":storyboard" ":story") "/"))
+      (story-handler #(om/component (story-edit)) "story-edit" target params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
@@ -438,9 +489,15 @@
                                  org-slash-route
                                  all-activity-route
                                  all-activity-slash-route
-                                 org-logo-setup-route
                                  org-settings-route
-                                 org-team-settings-route
+                                 org-settings-slash-route
+                                 org-settings-team-route
+                                 org-settings-team-slash-route
+                                 org-settings-invite-route
+                                 org-settings-invite-slash-route
+                                 ; Secure story route
+                                 secure-story-route
+                                 secure-story-slash-route
                                  ;; Boards
                                  boards-list-route
                                  board-route
@@ -453,6 +510,12 @@
                                  ; Entry route
                                  entry-route
                                  entry-slash-route
+                                 ; Story route
+                                 story-route
+                                 story-slash-route
+                                 ; Story edit
+                                 story-edit-route
+                                 story-edit-slash-route
                                  ; ;; Board filter
                                  board-filter-by-topic-route
                                  board-filter-by-topic-slash-route

@@ -28,7 +28,7 @@
               [:div.title
                 "Simplicity"]
               [:div.subtitle
-                "Whether you’re adding a quick update about one topic, or writing a story that covers many, getting started is fast and simple."]]]
+                "Whether you’re adding a quick team update about one topic, or writing a regular stakeholder update that covers many, getting started is fast and simple."]]]
 
           [:div.illustration.illustration-2.group
             [:img {:src (utils/cdn "/img/ML/features_il_2_465_408.svg")}]
@@ -50,7 +50,7 @@
             [:img {:src (utils/cdn "/img/ML/features_il_4_346_321.svg")}]
             [:div.description.group
               [:div.title
-                "Integrate with Slack"]
+                "Works with Slack"]
               [:div.subtitle
                 "With Slack single sign-on and our Slack bot, updates are automatically shared to the right channels. Discussions about updates can happen within Slack or Carrot - everything is kept in sync."]]]
 
@@ -58,7 +58,7 @@
             [:img {:src (utils/cdn "/img/ML/features_il_5_333_274.svg")}]
             [:div.description.group
               [:div.title
-                "Share news more broadly"]
+                "Go public"]
               [:div.subtitle
                 "Updates can also be made public - ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]
 

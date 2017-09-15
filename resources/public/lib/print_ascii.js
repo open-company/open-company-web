@@ -6,14 +6,16 @@ OCWebPrintOrgData(): to print the current org data,
 OCWebPrintTeamData(): to print the current team data,
 OCWebPrintTeamRoster(): to print the current team roster of users,
 OCWebPrintBoardData(): to print the current board data,
-OCWebPrintEntriesData(): to print all the entries loaded,
-OCWebPrintTopicEntriesData(): to print all the entries of the currently selected topic,
+OCWebPrintActivitiesData(): to print all the activities loaded for the current board,
+OCWebPrintActivityData(): to print the current activity data,
+OCWebPrintSecureStoryData(): to print the current story in a secure link,
+OCWebPrintReactionsData(): to print the current activity reactions data,
+OCWebPrintCommentsData(): to print the current activity comments data,
+OCWebPrintActivityCommentsData(): to print the current activity comments data,
 OCWebPrintJWTContents(): to print the content of the JWT.
 OCWebHelp(): print this help,
 OCWebPrintAsciiArt(): print beautiful ASCII art,
 OCWebConfigLogLevel("debug"): to change log level.
-OCWebPrintUpdatesListData(): to print the current loaded list of updates,
-OCWebPrintUpdateData(): to print the current update data,
 OCWebPrintRouterPath(): to print the current router setup,
 OCWebForceRefreshToken(): force a JWT token refresh with our auth server.
 `)}
