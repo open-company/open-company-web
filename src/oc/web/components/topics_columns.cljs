@@ -28,9 +28,7 @@
 (defn did-select-storyboard-cb [storyboard]
   (dis/dispatch! [:story-create (clojure.set/rename-keys storyboard {:value :slug :label :name :links :links})]))
 
-(defcomponent topics-columns [{:keys [columns-num
-                                      content-loaded
-                                      total-width
+(defcomponent topics-columns [{:keys [content-loaded
                                       board-data
                                       all-activity-data
                                       is-dashboard
@@ -69,13 +67,8 @@
           org-data (dis/org-data)
           sidebar-width (+ responsive/left-navigation-sidebar-width
                            responsive/left-navigation-sidebar-minimum-right-margin)
-          total-width (+ sidebar-width
-                         (/ responsive/board-container-width 2))
-          board-container-style (if (< (/ ww 2) total-width)
-                                  ; {:margin-left (str )}
-                                  {:margin-left (str sidebar-width "px")
-                                   :left "50%"}
-                                  {:margin "0 auto"})]
+          board-container-style {:margin-left (str (max sidebar-width (+ (/ (- ww responsive/board-container-width sidebar-width) 2) sidebar-width)) "px")
+                                 :left "50%"}]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :group true
@@ -104,12 +97,7 @@
                          :on-next-click (fn []
                                           (om/set-state! owner :show-journals-tooltip false)
                                           (cook/set-cookie! (router/dashboard-tooltips-shown (jwt/get-key :user-id)) true (* 60 60 24 365)))})))
-        (dom/div {:class (utils/class-set {:topics-column-container true
-                                           :group true
-                                           :tot-col-3 (and is-dashboard
-                                                           (= columns-num 3))
-                                           :tot-col-2 (and is-dashboard
-                                                           (= columns-num 2))})
+        (dom/div "topics-column-container group")
                   :key columns-container-key}
           (when-not (responsive/is-mobile-size?)
             (navigation-sidebar))
