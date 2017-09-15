@@ -62,8 +62,6 @@
 
 ;; Organizations
 
-(def orgs "/orgs")
-
 (def create-org "/create-org")
 
 (defn org

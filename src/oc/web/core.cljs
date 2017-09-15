@@ -23,7 +23,6 @@
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.components.home :refer (home)]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.list-orgs :refer (list-orgs)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
@@ -108,17 +107,6 @@
   (post-routing)
   ;; render component
   (drv-root home target))
-
-; ;; Orgs list
-(defn list-orgs-handler [target params]
-  (pre-routing (:query-params params))
-  ;; save route
-  (router/set-route! ["orgs"] {:query-params (:query-params params)})
-  ;; load data from api
-  (swap! dis/app-state assoc :loading true)
-  (post-routing)
-  ;; render component
-  (drv-root list-orgs target))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -364,12 +352,6 @@
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
 
-    (defroute org-list-route urls/orgs {:as params}
-      (timbre/info "Routing org-list-route" urls/orgs)
-      (if (jwt/jwt)
-        (list-orgs-handler target params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
-
     (defroute org-create-route urls/create-org {:as params}
       (timbre/info "Routing org-create-route" urls/create-org)
       (if (jwt/jwt)
@@ -549,7 +531,6 @@
                                  home-page-route
                                  user-profile-route
                                  ;; Org routes
-                                 org-list-route
                                  org-route
                                  org-slash-route
                                  all-activity-route
