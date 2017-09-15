@@ -97,7 +97,7 @@
                          :on-next-click (fn []
                                           (om/set-state! owner :show-journals-tooltip false)
                                           (cook/set-cookie! (router/dashboard-tooltips-shown (jwt/get-key :user-id)) true (* 60 60 24 365)))})))
-        (dom/div "topics-column-container group")
+        (dom/div "topics-column-container group"
                   :key columns-container-key}
           (when-not (responsive/is-mobile-size?)
             (navigation-sidebar))
