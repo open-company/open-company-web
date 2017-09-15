@@ -1,3 +1,36 @@
+@mixin default-item(){
+  background-color: transparent;
+  .internal, div.all-activity-label {
+    @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    color: $carrot_light_gray_3;
+    text-decoration: none;
+  }
+}
+
+@mixin item-selected(){
+  background-color: rgba($carrot_orange_1, 0.1);
+  .internal, div.all-activity-label {
+    color: $carrot_orange;
+    @include avenir_H();
+    font-size: 14px;
+    line-height: 1.71;
+    text-decoration: none;
+  }
+}
+
+@mixin item-selected-hover(){
+  background-color: rgba($carrot_light_gray_4, 0.2);
+  .internal, div.all-activity-label {
+    color: $carrot_dark_gray;
+    @include avenir_H();
+    font-size: 14px;
+    line-height: 1.71;
+    text-decoration: none;
+  }
+}
+
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
@@ -10,28 +43,6 @@ div.left-navigation-sidebar {
   left: 0px;
   height: calc(100vh - 138px);
 
-  .hover-item{
-    * {
-      cursor: pointer;
-    }
-
-    &:not(.item-selected):hover {
-      background-color: rgba($carrot_light_gray_1, 0.2);
-      color: $carrot_dark_gray;
-      @include avenir_H();
-      font-size: 14px;
-      line-height: 1.71;
-    }
-  }
-
-  .item-selected {
-    background-color: rgba($carrot_orange_1, 0.1);
-    color: #3E4547;
-    @include avenir_H();
-    font-size: 14px;
-    line-height: 1.71;
-  }
-
   a.all-activity {
     display: block;
     background-color: transparent;
@@ -42,17 +53,24 @@ div.left-navigation-sidebar {
     border-bottom-right-radius: 3px;
     padding-left: 25px;
 
-    &:hover {
-      text-decoration: underline;
+    &.hover-item{
+      @include default-item();
+
+      * {
+        cursor: pointer;
+      }
+
+      &:not(.item-selected):hover {
+        @include item-selected-hover();
+      }
+
+      &.item-selected {
+        @include item-selected();
+      }
     }
 
     div.all-activity-label {
-      border-radius: 3px;
-      font-size: 14px;
-      color: $oc_gray_7;
-      @include avenir_M();
-      line-height: 1.71;
-      padding: 0.2rem 0.4rem;
+      padding: 5px 5px 0 5px;
       width: 135px;
       margin-left: 19px;
       text-align: left;
@@ -66,12 +84,11 @@ div.left-navigation-sidebar {
       height: 12px;
       float: left;
       margin-left: 4px;
-      margin-top: 5px;
+      margin-top: 8px;
     }
   }
 
   div.left-navigation-sidebar-top{
-    border-radius: 4px;
 
     .left-navigation-sidebar-top-title {
       padding: 0 0 0 25px;
@@ -142,16 +159,30 @@ div.left-navigation-sidebar {
     a.left-navigation-sidebar-item {
       display: block;
       cursor: default;
-      color: $oc_gray_7;
       margin-top: 10px;
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
       padding-left: 20px;
 
+      &.hover-item {
+        @include default-item();
+        * {
+          cursor: pointer;
+        }
+
+        &:not(.item-selected):hover {
+          @include item-selected-hover();
+        }
+
+        &.item-selected {
+          @include item-selected();
+        }
+      }
+
       img.public {
         float: left;
         margin-left: 6px;
-        margin-top: 3px;
+        margin-top: 6px;
         width: 16px;
         height: 16px;
       }
@@ -159,7 +190,7 @@ div.left-navigation-sidebar {
       img.private{
         float: left;
         margin-left: 8px;
-        margin-top: 4px;
+        margin-top: 7px;
         width: 10px;
         height: 14px;
       }
@@ -168,25 +199,16 @@ div.left-navigation-sidebar {
         margin-left: 25px;
 
         div.internal {
-          border-radius: 3px;
-          padding: 0.1rem 5px 0 5px;
+          padding: 5px 5px 0 5px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
           width: 133px;
           float: left;
-          font-size: 14px;
-          line-height: 1.71;
-          color: $oc_gray_7;
-          @include avenir_M();
           cursor: pointer;
 
           .emojione {
             @include emoji-size(12);
-          }
-
-          &:hover {
-            text-decoration: underline;
           }
         }
       }
@@ -214,9 +236,6 @@ div.left-navigation-sidebar {
       }
 
       span {
-        font-size: 14px;
-        line-height: 1.71;
-        color: $oc_gray_7;
         margin-left: 5px;
       }
     }

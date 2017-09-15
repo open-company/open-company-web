@@ -30,7 +30,6 @@ div.drafts-layout {
         div.draft-card-tag {
           @include activity-tag();
           padding: 16px 16px 0;
-          pointer-events: none;
         }
 
         div.draft-card-title {
