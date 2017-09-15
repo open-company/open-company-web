@@ -76,7 +76,7 @@ function isSafari(){
 
 function isIE(){
   if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/)) ||
+      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)) ||
       (typeof $.browser !== "undefined" && $.browser.msie == 1))
   {
     return true;
