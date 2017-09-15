@@ -62,3 +62,25 @@ function getParameterByName(name, url) {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+function isSafari(){
+  var ua = navigator.userAgent.toLowerCase(); 
+  if (ua.indexOf('safari') != -1) { 
+    if (ua.indexOf('chrome') > -1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
+
+function isIE(){
+  if (navigator.appName == 'Microsoft Internet Explorer' ||
+      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/)) ||
+      (typeof $.browser !== "undefined" && $.browser.msie == 1))
+  {
+    return true;
+  }else{
+    return false;
+  }
+}
