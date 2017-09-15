@@ -537,6 +537,40 @@
       [:div.onboard-email-container.small.dot-animation
         "Verifying, please wait" [:span.dots {:ref :dots} "."]])))
 
+(defn exchange-pswd-reset-token-when-ready [s]
+  (when-let [auth-settings (:auth-settings @(drv/get-ref s :password-reset))]
+    (when (and (not @(::exchange-started s))
+               (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"}))
+      (reset! (::exchange-started s) true)
+      (dis/dispatch! [:auth-with-token :password-reset]))))
+
+(rum/defcs password-reset-lander < rum/reactive
+                                   (drv/drv :password-reset)
+                                   (rum/local false ::exchange-started)
+                                   (vertical-center-mixin ".onboard-email-container")
+                                   {:will-mount (fn [s]
+                                                  (exchange-pswd-reset-token-when-ready s)
+                                                  s)
+                                    :did-mount (fn [s]
+                                                 (dots-animation s)
+                                                 (exchange-pswd-reset-token-when-ready s)
+                                                 s)
+                                    :did-update (fn [s]
+                                                 (exchange-pswd-reset-token-when-ready s)
+                                                 s)}
+  [s]
+  (let [password-reset (drv/react s :password-reset)]
+    (cond
+      (= (:error password-reset) 401)
+      [:div.onboard-email-container.error
+        "This link is not valid, please try again."]
+      (:error password-reset)
+      [:div.onboard-email-container.error
+        "An error occurred, please try again."]
+      :else
+      [:div.onboard-email-container.small.dot-animation
+        "Verifying, please wait" [:span.dots {:ref :dots} "."]])))
+
 (defn get-component [c]
   (case c
     :email-lander (email-lander)
@@ -548,6 +582,7 @@
     :invitee-lander-profile (invitee-lander-profile)
     :email-wall (email-wall)
     :email-verified (email-verified)
+    :password-reset-lander (password-reset-lander)
     [:div]))
 
 (rum/defc onboard-wrapper < rum/static

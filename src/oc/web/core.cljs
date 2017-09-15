@@ -33,7 +33,6 @@
             [oc.web.components.org-editor :refer (org-editor)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
-            [oc.web.components.password-reset :refer (password-reset)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.story :refer (story)]
             [oc.web.components.story-edit :refer (story-edit)]
@@ -313,10 +312,9 @@
 
     (defroute password-reset-route urls/password-reset {:as params}
       (timbre/info "Routing password-reset-route" urls/password-reset)
-      (pre-routing (:query-params params))
-      (router/set-route! ["password-reset"] {:query-params (:query-params params)})
-      (post-routing)
-      (drv-root password-reset target))
+      (when (jwt/jwt)
+        (router/redirect! urls/home))
+      (simple-handler #(onboard-wrapper :password-reset-lander) "password-reset" target params))
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
