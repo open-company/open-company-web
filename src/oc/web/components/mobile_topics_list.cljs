@@ -17,7 +17,6 @@
                                           topics
                                           org-data
                                           board-data
-                                          topics-data
                                           is-dashboard
                                           is-stakeholder-update
                                           prevent-topic-not-found-navigation] :as data} owner options]

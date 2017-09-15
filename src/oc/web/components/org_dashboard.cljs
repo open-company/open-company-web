@@ -12,7 +12,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.topics-list :refer (topics-list)]
+            [oc.web.components.topics-columns :refer (topics-columns)]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.entry-edit :refer (entry-edit)]
@@ -67,7 +67,11 @@
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
           all-activity-data (dis/all-activity-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)]
+          ww (responsive/ww)
+          total-width   (if (and (= columns-num 1)
+                                (< ww responsive/c1-min-win-width))
+                          "auto"
+                          (str (responsive/total-layout-width-int card-width columns-num) "px"))]
       (if (or (not org-data)
               (and (not board-data)
                    (not all-activity-data)))
@@ -104,17 +108,20 @@
             (if (:show-welcome-screen data)
               (welcome-screen)
               (dom/div {:class "dashboard-container"}
-                (om/build topics-list
-                  {:loading (:loading data)
-                   :content-loaded (or (:loading board-data) (:loading data))
-                   :org-data org-data
-                   :board-data board-data
-                   :all-activity-data all-activity-data
-                   :force-edit-topic (:force-edit-topic data)
-                   :card-width card-width
-                   :columns-num columns-num
-                   :show-login-overlay (:show-login-overlay data)
-                   :entry-editing (:entry-editing data)
-                   :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                   :is-dashboard true
-                   :board-filters (:board-filters data)})))))))))
+                (dom/div {:class "topic-list"}
+                  (om/build topics-columns
+                    {:loading (:loading data)
+                     :content-loaded (or (:loading board-data) (:loading data))
+                     :org-data org-data
+                     :board-data board-data
+                     :all-activity-data all-activity-data
+                     :force-edit-topic (:force-edit-topic data)
+                     :card-width card-width
+                     :columns-num columns-num
+                     :show-login-overlay (:show-login-overlay data)
+                     :entry-editing (:entry-editing data)
+                     :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
+                     :is-dashboard true
+                     :board-filters (:board-filters data)
+                     :total-width total-width
+                     :is-all-activity (utils/in? (:route @router/path) "all-activity")}))))))))))
