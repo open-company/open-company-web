@@ -601,16 +601,22 @@
     (assoc db :collect-name-password-error status)))
 
 (defmethod dispatcher/action :pswd-collect
-  [db [_]]
+  [db [_ password-reset?]]
   (let [form-data (:collect-pswd db)]
     (api/collect-password (:pswd form-data)))
-  db)
+  (assoc db :is-password-reset password-reset?))
 
 (defmethod dispatcher/action :pswd-collect/finish
   [db [_ status]]
   (if (and (>= status 200)
            (<= status 299))
-    (router/nav! oc-urls/confirm-invitation-profile)
+    (do
+      (if (:is-password-reset db)
+        (do
+          (cook/remove-cookie! :show-login-overlay)
+          (router/nav! oc-urls/login))
+        (router/nav! oc-urls/confirm-invitation-profile))
+      (dissoc db :show-login-overlay))
     (assoc db :collect-password-error status)))
 
 (defmethod dispatcher/action :mobile-menu-toggle
