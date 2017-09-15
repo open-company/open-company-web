@@ -18,7 +18,7 @@ div.all-activity {
     div.all-activity-cards-inner {
       position: relative;
 
-      div.entries-overlay {
+      div.activities-overlay {
         position: fixed;
         top: 82px;
         left: 50%;
@@ -27,7 +27,6 @@ div.all-activity {
         width: 667px;
         margin-left: -400px;
         background-color: $oc_gray_8;
-        background-image: cdnUrl("/img/ML/");
         text-align: center;
 
         div.oc-loading {
@@ -49,14 +48,14 @@ div.all-activity {
         }
       }
 
-      div.entry-card.all-activity-card {
+      div.activity-card.all-activity-card {
         width: 617px;
         max-height: initial;
         margin: 0px 0px 20px 0px;
 
-        div.entry-card-content {
+        div.activity-card-content {
 
-          div.entry-card-body {
+          div.activity-card-body {
             max-height: #{24*4}px;
 
             &.has-body {

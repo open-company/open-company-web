@@ -103,8 +103,8 @@
   "Board url"
   ([]
     (board (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug]
-    (board org-slug (router/current-board-slug)))
+  ([board-slug]
+    (board (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
 
@@ -129,35 +129,41 @@
   ([org-slug board-slug]
     (str (board org-slug board-slug) "/settings")))
 
+;; Storyboards
+
+(defn drafts
+  ([]
+    (drafts (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/drafts")))
+
 ;; Entries
 
 (defn entry
   "Entry url"
-  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid)))
-  ([entry-uuid] (entry (router/current-org-slug) (router/current-board-slug) entry-uuid))
+  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([entry-uuid] ( (router/current-org-slug) (router/current-board-slug) entry-uuid))
   ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
   ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/update/" (name entry-uuid))))
 
-;; Stakeholder update
+;; Stories
 
-; (defn updates-list
-;   ([]
-;     (updates-list (router/current-org-slug)))
-;   ([org-slug]
-;     (str (org org-slug) "/updates"))
-;   ([org-slug update-slug]
-;     (str (updates-list org-slug) "/" (name update-slug))))
+(defn story
+  "Story url"
+  ([] (story (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([story-uuid] (story (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([board-slug story-uuid] (story (router/current-org-slug) board-slug story-uuid))
+  ([org-slug board-slug story-uuid] (str (board org-slug board-slug) "/story/" (name story-uuid))))
 
-; (defn update-preview
-;   ([]
-;     (update-preview (router/current-org-slug)))
-;   ([org-slug]
-;     (str (updates-list org-slug) "/preview")))
+(defn story-edit
+  "Edit an already created story."
+  ([] (story-edit (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([board-slug story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([org-slug board-slug story-uuid] (str (story org-slug board-slug story-uuid) "/edit")))
 
-; (defn update-link
-;   ([]
-;     (update (router/current-org-slug) (router/current-update-date) (router/current-update-slug)))
-;   ([update-date update-slug]
-;     (update (router/current-org-slug) update-date update-slug))
-;   ([org-slug update-date update-slug]
-;     (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))
+(defn secure-story
+  "Secure url for story to show readonly view."
+  ([] (secure-story (router/current-org-slug) (router/current-activity-id)))
+  ([secure-id] (secure-story (router/current-org-slug) secure-id))
+  ([org-slug secure-id] (str (org org-slug) "/story/" secure-id)))

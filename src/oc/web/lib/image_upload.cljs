@@ -19,8 +19,8 @@
    :location "s3"})
 
 (defn upload!
-  [type success-cb progress-cb error-cb & [close-cb finished-cb selected-cb started-cb]]
-  (let [from-sources (if (= type "image/*")
+  [config success-cb progress-cb error-cb & [close-cb finished-cb selected-cb started-cb]]
+  (let [from-sources (if (= (:accept config) "image/*")
                         ["local_file_system" "imagesearch" "googledrive" "dropbox" "onedrive" "box"]
                         ["local_file_system" "googledrive" "dropbox" "onedrive" "box"])
         base-config   {:maxFiles 1
@@ -52,9 +52,7 @@
                        :onClose (fn []
                           (when (fn? close-cb)
                             (close-cb)))}
-        config        (if type
-                        (merge base-config {:accept type})
-                        base-config)
+        config        (merge base-config config)
         fs (init-filestack)]
     (.then
       (.pick fs

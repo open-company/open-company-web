@@ -192,11 +192,16 @@ provided in the table below:
 
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
+|  :activity-delete | UI | Delete the selected entry. |
+|  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |
+|  :all-activity-calendar | UI | Load activities from a calendar link. |
 |  :all-activity-get | UI | Start loading all activity. |
 |  :all-activity-get/finish | API | All activity data loaded, dispatch them. |
+|  :all-activity-more | UI | Load more activities automatically when the user scrolls. |
+|  :all-activity-more/finish | API | More activities loaded, concatenate the new results with the old ones. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
@@ -207,10 +212,13 @@ provided in the table below:
 |  :board-delete | UI | Delete a board of the current org. |
 |  :board-edit | UI | Start the board edit for existing board and new board. |
 |  :board-edit-save | UI | Save the board edited data. |
+|  :board-edit-save/finish | API | Board created or updated. |
 |  :board-edit/dismiss | UI | Starts the dismiss process of the board editing modal. |
 |  :board-nav | UI | Navigate to another board: it needs an action because it reset the board filters before navigating away. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |
+|  :calendar-get | UI | Load the calendar data to show the AA sidebar. |
+|  :calendar-get/finish | API | Calendar data finished loading. |
 |  :channels-enumerate | UI | Start the request to load the Slack channels give a Slack team. |
 |  :channels-enumerate/success | API | Slack channels loaded, it saves them in the proper place of the app-state. |
 |  :comment-add | UI | Add a comment to an entry. |
@@ -221,18 +229,12 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
-|  :entry-delete | UI | Delete the selected entry. |
-|  :entry-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
 |  :entry-save | UI | Save the edited entry. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
-|  :foce-data-editing-start | UI | Start the data edit for growth and finances topics. |
-|  :foce-input | UI | Save a new data for the current edited entry. |
-|  :foce-save | UI | Call the proper API function to save the topic data collected during FoCE. |
-|  :foce-start | UI | Setup the app-state for FoCE initializing the data with the given entry data (empty if new entry). |
 |  :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
 |  :invitation-confirmed | API | Confirm invitation request succeeded. |
 |  :invite-by-email | UI | Start the request to invite a user, check if the email is already present and use the resend link if possible. No-op if the user is already an active user of the team. |
@@ -248,7 +250,6 @@ provided in the table below:
 |  :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
 |  :name-pswd-collect | UI | Start the request to save the user name and password. |
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
-|  :new-topics-load/finish | API | Read the available new topics and save them in the app-state for later use. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
 |  :password-reset | UI | Start the request to reset the user password. |
@@ -258,27 +259,23 @@ provided in the table below:
 |  :pswd-collect | UI | Start the request to save the new user password on password request. |
 |  :pswd-collect/finish | API | Collect password request finished. |
 |  :reaction-toggle | UI | Toggle a reaction, temporarily change it in the local state then starts the request to save it server side. |
-|  :set-board-cache! | UI | Save some data of the current board, used for example by the growth topic to remember the last focused metric in the UI. |
 |  :signup-with-email | UI | Show the signup with email overlay. |
 |  :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
 |  :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |
 |  :slack-team-add | UI | Start the request to add a Slack team to the current team. |
 |  :slack-token-refresh | UI | Refresh the data of the user signed in with Slack. |
+|  :story-get | UI | Load a story. |
+|  :story-get/finish | API | Story loaded. |
 |  :subscription | API | Save the new subscription data in the app-state. |
 |  :team-loaded | API | Save the team loaded data in the app-state. |
 |  :team-roster-loaded | API | Save the roster in the team data. |
 |  :teams-get | UI | Start the request to load the list of teams. |
 |  :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
-|  :top-menu-show | UI | Toggle the dropdown menu of the topic in the dashboard. |
 |  :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
 |  :topic-add | UI | Add a new topic to the topics list of the current board. |
-|  :topic-archive | UI | Start the archive topic action. Call the API function to archive. |
-|  :topic-archive/success | API | Archive succesfully done, navigate to the board to reload the data without the topic. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
 |  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
-|  :udpates-list-get | UI | Start the request to load the list of the prior updates for a certain org. |
 |  :update-loaded | API | Read and save the data of certain update in the app-state |
-|  :updates-list | API | Read and save the list of the prior updates in the app-state given an org. |
 |  :user-action | UI | Start a user action: given a team-id, a user data object, the action and a method make a request to complete the action. Can pass optional payload (if it's not a GET request). |
 |  :user-action/complete | API | Refresh the team data to show the completed user action. |
 |  :user-data | API | Current user data loaded, save them in the app-state. |

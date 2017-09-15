@@ -1,14 +1,20 @@
-div.left-boards-list {
+div.left-navigation-sidebar {
   float: left;
   position: fixed;
   margin-right: 20px;
+  max-height: calc(100vh - 122px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 20px;
 
-  button.all-activity {
+  a.all-activity {
+    display: block;
     background-color: transparent;
     border: none;
     outline: none;
     margin-bottom: 44px;
     border-radius: 3px;
+    padding-left: 5px;
 
     &.selected {
       background-color: $carrot_light_blue;
@@ -21,9 +27,9 @@ div.left-boards-list {
 
     div.all-activity-label {
       border-radius: 3px;
-      font-size: 16px;
+      font-size: 14px;
       color: $oc_gray_7;
-      @include avenir_H();
+      @include avenir_M();
       padding: 0.2rem 0.4rem;
       width: 135px;
       margin-left: 19px;
@@ -32,19 +38,19 @@ div.left-boards-list {
 
     div.all-activity-icon {
       background-image: cdnUrl("/img/ML/activity_hamburger.svg");
-      background-size: 16px 16px;
-      width: 16px;
-      height: 16px;
+      background-size: 12px 12px;
+      width: 12px;
+      height: 12px;
       float: left;
-      margin-right: 5px;
+      margin-left: 4px;
       margin-top: 5px;
     }
   }
 
-  div.left-boards-list-top{
+  div.left-navigation-sidebar-top{
     border-radius: 4px;
 
-    .left-boards-list-top-title {
+    .left-navigation-sidebar-top-title {
       padding: 0 0 0 5px;
       margin: 0;
       float: left;
@@ -57,6 +63,7 @@ div.left-boards-list {
         color: $oc_gray_7;
         float: left;
         margin-left: 5px;
+        cursor: default;
       }
 
       div.boards-icon, div.stories-icon {
@@ -76,7 +83,7 @@ div.left-boards-list {
       }
     }
 
-    button.left-boards-list-top-title-button {
+    button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
       margin-right: 28px;
@@ -99,10 +106,19 @@ div.left-boards-list {
     }
   }
 
-  div.left-boards-list-items{
+  div.left-navigation-sidebar-items{
     cursor: pointer;
+    margin-bottom: 44px;
 
-    div.left-boards-list-item {
+    div.left-navigation-sidebar-draft-divider {
+      width: 96px;
+      height: 2px;
+      background-color: rgba($carrot_light_gray, 0.3);
+      margin: 4px 30px;
+    }
+
+    a.left-navigation-sidebar-item {
+      display: block;
       cursor: default;
       color: $oc_gray_7;
       margin-top: 10px;
@@ -141,7 +157,7 @@ div.left-boards-list {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-          width: 120px;
+          width: 133px;
           float: left;
           font-size: 14px;
           line-height: 1.71;
@@ -157,10 +173,10 @@ div.left-boards-list {
     }
   }
 
-  div.left-boards-list-footer {
-    margin-top: 44px;
+  div.left-navigation-sidebar-footer {
 
     button.about-carrot-btn {
+      @include avenir_M();
       margin-top: 10px;
       &:hover {
         text-decoration: underline;
@@ -185,6 +201,8 @@ div.left-boards-list {
     }
 
     button.invite-people-btn {
+      @include avenir_M();
+
       &:hover {
         text-decoration: underline;
       }

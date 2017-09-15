@@ -35,7 +35,7 @@
         [:div.cta
           [:h1.headline "The Company Newsboard"]
           [:div.subheadline#thank-you-top
-            "Share the news and stories that keep everyone informed and aligned."]
+            "News and company updates that create greater transparency and alignment"]
           (when (and (not @(::confirm s))
                      (not @(::thanks-box-top s)))
             (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -72,7 +72,7 @@
             [:img {:src (utils/cdn "/img/ML/home_page_il_2_444_414.svg")}]
             [:div.description.group
               [:div.title
-                "Simplify all-hands and investor updates"]
+                "Simplify stakeholder updates"]
               [:div.subtitle
                 "Create beautiful updates for your company, investors, and advisors in less time. It’s never been easier to keep all stakeholders in the loop."]]]
 

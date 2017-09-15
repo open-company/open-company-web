@@ -36,7 +36,7 @@
          :data-toggle (if tooltip? "tooltip" "")
          :data-placement "top"
          :data-container "body"
-         :title (:name user-data)}]]))
+         :title (if tooltip? (:name user-data) "")}]]))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive

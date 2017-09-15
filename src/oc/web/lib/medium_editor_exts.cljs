@@ -42,32 +42,33 @@
        (or (= "BR" (some-> el .-childNodes (aget 0) .-tagName))
            (empty? (some-> el .-childNodes (aget 0) .-nodeValue)))))
 
-(def file-upload
+(defn media-upload [upload-ui-id bt-offset & [scrolling-el]]
   (let [hide-btn (fn []
-                    (when-let [el (js/document.getElementById "file-upload-ui")]
+                    (when-let [el (js/document.getElementById upload-ui-id)]
                       (gstyle/setStyle el #js {:opacity 0})
                       (.remove (.-classList el) "expanded")
                       (utils/after 250 #(gstyle/setStyle el #js {:display "none"}))))
         pos-btn (fn [top-v]
-                  (when-let [el (js/document.getElementById "file-upload-ui")]
+                  (when-let [el (js/document.getElementById upload-ui-id)]
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (if (< top-v 135) (+ top-v 135) (- top-v 1)) "px")
-                                             :left "6px"})))
+                                             :top (str (+ top-v (:top bt-offset) (when scrolling-el (.-scrollTop scrolling-el))) "px")
+                                             :left (str (+ 6 (:left bt-offset)) "px")})))
         show-btn (fn [_]
                    (utils/after 100
                     (fn []
                       (let [sel (js/window.getSelection)
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))
-                            offset-top (gobj/get el "offsetTop" 0)]
+                            offset (when el (.offset (js/$ el)))
+                            offset-top (int (when offset (.-top offset)))]
                         (when (and sel el)
                           (if (and (empty-paragraph? el) offset-top)
                             (pos-btn offset-top)
                             (hide-btn))))))
                    true)]
-    {:name "file-upload"
+    {:name "media-upload"
      :init (fn []
              (this-as this
                (doseq [el (.getEditorElements this)]

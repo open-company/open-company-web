@@ -49,7 +49,7 @@ div.comments {
 
     div.comments-internal-scroll {
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: auto;
       height: 100%;
       padding: 10px;
     }
@@ -68,6 +68,10 @@ div.comments {
 
       div {
         margin-top: 24px;
+
+        &:last-child {
+          margin-top: 0px;
+        }
       }
     }
 

@@ -16,6 +16,7 @@ div.reactions {
     opacity: 0.6;
     position: relative;
     height: 26px;
+    cursor: default;
 
     &.has-reactions {
       opacity: 1;
@@ -27,11 +28,14 @@ div.reactions {
       display: inline-block;
     }
 
-    &:hover {
-      opacity: 1;
+    &.can-react {
+      cursor: pointer;
+      &:hover {
+        opacity: 1;
 
-      div.count {
-        color: rgba(78,90,107,1);
+        div.count {
+          color: rgba(78,90,107,1);
+        }
       }
     }
 

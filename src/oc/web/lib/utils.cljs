@@ -14,7 +14,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.iso4217 :refer (iso4217)]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
@@ -39,18 +38,6 @@
   (if show
     #js {}
     #js {:display "none"}))
-
-(defn get-currency [currency-code]
-  (let [kw (keyword currency-code)]
-    (when (contains? iso4217 kw) (kw iso4217))))
-
-(defn get-symbol-for-currency-code [currency-code]
-  (let [currency (get-currency currency-code)
-        sym (if (and (contains? currency :symbol)
-                     (not (clojure.string/blank? (:symbol currency))))
-              (:symbol currency)
-              currency-code)]
-    (or sym (:code currency))))
 
 (def channel-coll (atom {}))
 
@@ -282,6 +269,14 @@
          (nil? update-link)
          (nil? delete-link))))
 
+(defn readonly-storyboard? [links]
+  (let [new-link (link-for links "new")
+        update-link (link-for links "partial-update")
+        delete-link (link-for links "delete")]
+    (and (nil? new-link)
+         (nil? update-link)
+         (nil? delete-link))))
+
 (defn readonly-topic? [links]
   (let [create (link-for links "create")
         partial-update (link-for links "partial-update")
@@ -289,6 +284,12 @@
     (and (nil? create) (nil? partial-update) (nil? delete))))
 
 (defn readonly-entry? [links]
+  (let [create (link-for links "create")
+        partial-update (link-for links "partial-update")
+        delete (link-for links "delete")]
+    (and (nil? create) (nil? partial-update) (nil? delete))))
+
+(defn readonly-story? [links]
   (let [create (link-for links "create")
         partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
@@ -334,23 +335,54 @@
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
       (assoc :board-slug board-slug)
+      (assoc :type "entry")
       (assoc :topic-name topic-name))))
+
+(defn fix-story
+  "Add `:read-only`, :board-slug and :uuid keys to the story map."
+  [story-body storyboard-slug]
+  (-> story-body
+    (assoc :read-only (readonly-story? (:links story-body)))
+    (assoc :type "story")
+    (assoc :related (when (:related story-body) (map #(fix-story % (:storyboard-slug %)) (:related story-body))))
+    (assoc :board-slug storyboard-slug)))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
   [board-data]
   (let [links (:links board-data)
-        read-only (readonly-board? links)
+        read-only (readonly-storyboard? links)
         with-read-only (assoc board-data :read-only read-only)
-        with-fixed-topics (assoc with-read-only :entries (vec (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data))))]
-    with-fixed-topics))
+        fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data)))
+        without-entries (dissoc with-read-only :entries)
+        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+    with-fixed-entries))
+
+(defn fix-storyboard
+  "Add topic name in each topic and a topic sorter"
+  [storyboard-data]
+  (let [links (:links storyboard-data)
+        read-only (readonly-board? links)
+        with-read-only (assoc storyboard-data :read-only read-only)
+        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % (or (:storyboard-slug %) (:slug storyboard-data))) (:stories storyboard-data)))
+        without-stories (dissoc with-read-only :stories)
+        with-fixed-stories (assoc without-stories :fixed-items fixed-stories)]
+    with-fixed-stories))
+
+(defn fix-activity [activity collection-slug]
+  (if (:board-slug activity)
+    (fix-entry activity collection-slug nil)
+    (fix-story activity collection-slug)))
 
 (defn fix-all-activity
   "Fix org data coming from the API."
   [all-activity-data]
-  (-> all-activity-data
-    (dissoc :items)
-    (assoc :entries (vec (map #(fix-entry % (:board-slug %) nil) (:items all-activity-data))))))
+  (assoc all-activity-data :items (vec (map #(fix-activity % (or (:board-slug %) (:storyboard-slug %))) (:items all-activity-data))))
+  (let [fixed-activities-list (map #(fix-activity % (or (:board-slug %) (:storyboard-slug %))) (:items all-activity-data))
+        without-items (dissoc all-activity-data :items)
+        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
+        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
+    with-fixed-activities))
 
 (defn fix-org
   "Fix org data coming from the API."
@@ -653,8 +685,8 @@
              (+ top (gobj/get el "offsetTop" 0))
              (.-offsetParent el)))))
 
-(defn medium-editor-options [placeholder hide-on-click]
-  {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
+(defn medium-editor-options [placeholder hide-on-click & [show-subtitle]]
+  {:toolbar #js {:buttons (clj->js (remove nil? ["bold" "italic" (when show-subtitle "h2") "unorderedlist" "anchor"]))}
    :buttonLabels "fontawesome"
    :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
    :extensions {:autolist (js/AutoList.)}
@@ -716,7 +748,7 @@
 
 (defn strip-empty-tags [text]
   (when text
-    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</p[ ]{0,}>" "ig")]
+    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
 
 (defn disable-scroll []
@@ -745,7 +777,7 @@
   []
   (str (my-uuid) (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) "-" (my-uuid) (my-uuid) (my-uuid)))
 
-(defn entry-uuid
+(defn activity-uuid
   "Generate a UUID for an entry"
  []
  (str (my-uuid) "-" (my-uuid) "-" (my-uuid)))
@@ -886,9 +918,6 @@
                        with-data)]
     with-metrics))
 
-(def before-archive-message "Archiving removes this topic from the dashboard, but it's saved so you can add it back later. Are you sure you want to archive?")
-(def before-removing-entry-message "Are you sure you want to delete this entry?")
-
 (defn sum-revenues [finances-data]
   (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
         filtered-revenues (filter number? cleaned-revenues)]
@@ -993,6 +1022,9 @@
     ;; Archives
     "application/gzip" "fa-file-archive-o",
     "application/zip" "fa-file-archive-o",
+    ;; Code
+    "text/css" "fa-file-code-o"
+    "text/php" "fa-file-code-o"
     ;; Generic case
     "fa-file"))
 
@@ -1021,14 +1053,14 @@
          :iterations 3}))
 
 (defn pulse-reaction-count
-  [entry-uuid reaction]
-  (let [selector (str "div.reaction-" entry-uuid "-" reaction)]
+  [activity-uuid reaction]
+  (let [selector (str "div.reaction-" activity-uuid "-" reaction)]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
 (defn pulse-comments-count
-  [entry-uuid]
-  (let [selector (str "div.comments-count-" entry-uuid )]
+  [activity-uuid]
+  (let [selector (str "div.comments-count-" activity-uuid )]
     (when-let [el (sel1 [(keyword selector)])]
       (pulse-animation el))))
 
@@ -1047,24 +1079,90 @@
   [js-date]
   (let [hours (.getHours js-date)
         minutes (add-zero (.getMinutes js-date))
-        ampm (if (>= hours 12) "pm" "am")
+        ampm (if (>= hours 12) " p.m." " a.m.")
         hours (mod hours 12)
         hours (if (= hours 0) 12 hours)]
     (str hours ":" minutes ampm)))
 
-(defn entry-date [js-date]
+(defn format-time-string [js-date]
   (let [r (js/RegExp "am|pm" "i")
-        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))
-        time-string (if-not h12
-                      (get-ampm-time js-date)
-                      (get-24h-time js-date))]
+        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))]
+    (if h12
+      (get-ampm-time js-date)
+      (get-24h-time js-date))))
+
+(defn activity-date [js-date]
+  (let [time-string (format-time-string js-date)]
     (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
 
-(defn entry-tooltip [entry-data]
+(defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
         updated-at (js-date (:updated-at entry-data))
-        created-str (entry-date created-at)
-        updated-str (entry-date updated-at)]
+        created-str (activity-date created-at)
+        updated-str (activity-date updated-at)]
     (if (= (:created-at entry-data) (:updated-at entry-data))
-      created-str
-      (str "Created on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+      (str "Posted on " created-str)
+      (str "Posted on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+
+(defn story-date-tooltip [story-data]
+  (let [published-at (js-date (:published-at story-data))
+        updated-at (js-date (:updated-at story-data))
+        edited-later? (> (.getTime updated-at) (.getTime published-at))
+        published-str (activity-date published-at)
+        updated-str (activity-date updated-at)]
+    (if (not edited-later?)
+      (str "Posted on " published-str)
+      (str "Posted on " published-str "\nEdited on " updated-str " by " (:name (last (:author story-data)))))))
+
+(defn activity-date-tooltip [activity-data]
+  (if (= (:type activity-data) "entry")
+    (entry-date-tooltip activity-data)
+    (story-date-tooltip activity-data)))
+
+(defn copy-to-clipboard []
+  (try
+    (.execCommand js/document "copy")
+    (catch :default e)))
+
+(defn ordinal-suffix [i]
+  (let [j (mod i 10)
+        k (mod i 100)]
+    (cond
+      (and (= j 1) (not= k 11)) "st"
+      (and (= j 2) (not= k 12)) "nd"
+      (and (= j 3) (not= k 13)) "rd"
+      :else "th")))
+
+(defn draft-complete-date [jd]
+  (let [month (full-month-string (inc (.getMonth jd)))
+        day (.getDate jd)]
+   (str month " " day (ordinal-suffix day))))
+
+(defn draft-date [date]
+  (let [jd (js-date date)
+        now (js-date)
+        yesterday (js-date (- (.getTime now) (* 24 60 60 1000)))
+        is-today? (= (.getDate jd) (.getDate now))
+        is-yesterday? (= (.getDate jd) (.getDate yesterday))
+        same-year? (= (.getYear jd) (.getYear now))
+        partial-d (draft-complete-date jd)
+        t (format-time-string jd)]
+    (str "Edited "
+      (cond
+        is-today? (str "today, " t)
+        is-yesterday? (str "yesterday, " t)
+        same-year? partial-d
+        :else (str partial-d ", " (.getYear jd))))))
+
+(defn body-without-preview [body]
+  (let [body-without-tags (-> body strip-img-tags strip-br-tags strip-empty-tags)
+        hidden-class (str "activity-body-" (int (rand 10000)))
+        $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
+        appened-body (.append (js/$ (.-body js/document)) $body-content)
+        _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
+                                                                        (let [$this (js/$ this)]
+                                                                          (.remove $this))))
+        $hidden-div (js/$ (str "." hidden-class))
+        body-without-preview (.html $hidden-div)
+        _ (.remove $hidden-div)]
+    body-without-preview))

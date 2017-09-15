@@ -1,0 +1,319 @@
+div.story-edit-container {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: $oc_gray_8;
+  min-height: 100vh;
+
+  div.story-edit-header {
+    height: 72px;
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    padding: 24px 32px;
+    box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
+    z-index: 1;
+
+    div.story-edit-header-left{
+      float: left;
+
+      a.board-name {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_light_gray_1;
+        float: left;
+      }
+
+      span.arrow {
+        margin-left: 10px;
+        @include avenir_H();
+        font-size: 20px;
+        color: $carrot_light_gray_1;
+        margin-top: -3px;
+        float: left;
+      }
+
+      span.story-edit-top-title {
+        margin-left: 10px;
+        @include avenir_H();
+        font-size: 16px;
+        color: black;
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 400px;
+
+        .emojione {
+          @include emoji-size(14);
+        }
+      }
+
+      button.delete-link {
+        margin-left: 24px;
+        @include avenir_H();
+        font-size: 11px;
+        color: $oc_gray_7;
+        opacity: 0.6;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    div.story-edit-header-center {
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      margin-left: -100px;
+      text-align: center;
+      width: 200px;
+
+      span.story-edit-header-left-save {
+        height: 25px;
+        @include avenir_R();
+        font-size: 15px;
+        color: $carrot_light_gray_1;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 230ms;
+        margin-top: 4px;
+
+        &.showing {
+          opacity: 1;
+        }
+      }
+    }
+
+    div.story-edit-header-right {
+      float: right;
+      margin-top: -6px;
+
+      div.share-draft-container {
+        position: absolute;
+        width: 400px;
+        height: 186px;
+        background-color: white;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+        border: solid 0.5px rgba(177, 184, 192, 0.24);
+        z-index: 2;
+        top: 60px;
+        right: 40px;
+        border-radius: 4px;
+        padding: 24px;
+
+        div.share-draft-triangle {
+          position: absolute;
+          top: -11px;
+          left: 50%;
+          margin-left: -10px;
+          width: 20px;
+          height: 20px;
+          transform: rotate(45deg);
+          background-color: white;
+          border-top: solid 0.5px rgba(177, 184, 192, 0.24);
+          border-left: solid 0.5px rgba(177, 184, 192, 0.24);
+        }
+
+        div.share-draft-title {
+          @include avenir_H();
+          font-size: 15px;
+          color: $carrot_dark_gray;
+        }
+
+        div.share-draft-description {
+          @include avenir_R();
+          font-size: 15px;
+          color: $carrot_gray;
+          margin-top: 8px;
+        }
+
+        div.share-draft-link-box {
+          margin-top: 24px;
+          border-radius: 4px;
+          border: solid 0.5px rgba(177, 184, 192, 0.5);
+          padding: 8px 16px;
+          position: relative;
+          width: 351px;
+          height: 40px;
+
+          input {
+            @include avenir_R();
+            font-size: 14px;
+            color: $carrot_dark_gray;
+            padding: 0;
+            width: 264px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            outline: none;
+            border: none;
+          }
+
+          button.share-draft-copy-btn {
+            position: absolute;
+            right: 8px;
+            top: 7px;
+            width: 56px;
+            height: 26px;
+            font-size: 12px;
+            padding: 0;
+            text-align: center;
+          }
+        }
+      }
+
+      button.share-button {
+        margin-right: 22px;
+        @include avenir_M();
+        font-size: 15px;
+        padding: .2em 1.5em;
+        background-color: rgba($carrot_text_blue, 0.25);
+        color: $carrot_text_blue;
+        transition: background-color 230ms, color 230ms;
+
+        &:hover {
+          background-color: $carrot_text_blue;
+          color: white;
+          &:before {
+            background-image: cdnUrl("/img/ML/story_share_icon_white.svg");
+          }
+        }
+
+        &:before {
+          width: 22px;
+          height: 14px;
+          display: inline-block;
+          content: "";
+          background-image: cdnUrl("/img/ML/story_share_icon.svg");
+          background-size: 14px 14px;
+          background-position: 0px;
+          background-repeat: no-repeat;
+          font-size: 14px;
+        }
+      }
+
+      button.post-button {
+        padding: .2em 2.5em;
+      }
+    }
+  }
+
+  div.story-edit-content {
+    min-height: calc(100vh - 104px);
+    padding: 40px 80px 32px;
+    background-color: white;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    width: 840px;
+    margin: 104px auto 0px;
+    position: relative;
+
+    div.story-edit-author {
+      @include activity-author();
+    }
+
+    div.story-edit-add-banner {
+      margin-left: -80px;
+      margin-top: 40px;
+      width: 840px;
+      height: 100px;
+      @include avenir_H();
+      font-size: 18px;
+      color: $oc_gray_7;
+      text-align: center;
+      padding-top: 40px;
+      cursor: pointer;
+      background-color: rgba($carrot_light_gray_2, 0.3);
+
+      span.blue {
+        color: $carrot_text_blue;
+      }
+
+      &:hover {
+        span.blue {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    div.story-edit-banner {
+      margin-left: -80px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      width: 840px;
+      max-height: 200px;
+      background-position: 50%;
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: relative;
+
+      button.remove-banner {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+      }
+    }
+
+    div.story-edit-tags {
+      margin-top: 21px;
+      position: relative;
+      @include activity-tag();
+      div.dropdown-list-container {
+        left: -60px;
+        top: 30px;
+        width: 170px;
+      }
+    }
+
+    div.story-edit-title {
+      margin-top: 21px;
+      @include activity-title();
+      @include avenir_M();
+      font-size: 32px;
+      outline: none;
+      cursor: text;
+
+      &:empty:before {
+        content: attr(placeholder);
+        display: block;
+        font-style: none;
+      }
+    }
+
+    div.story-edit-body {
+      margin-top: 8px;
+      @include activity-body();
+      @include avenir_M();
+      font-size: 20px;
+      color: $oc_gray_7;
+      outline: none;
+      cursor: text;
+
+      h2 {
+        font-size: 26px;
+      }
+
+      * {
+        color: $oc_gray_7;
+      }
+
+      @include activity-attachment();
+
+      a.media-attachment {
+        display: inline-block;
+
+        label.media-attachment-title {
+          font-size: 16px;
+          margin-top: 4px;
+        }
+
+        label.media-attachment-subtitle {
+          display: none;
+        }
+      }
+    }
+  }
+}

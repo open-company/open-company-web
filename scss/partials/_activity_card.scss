@@ -1,6 +1,5 @@
-div.entry-card {
+div.activity-card {
   width: 432px;
-  max-height: 295px;
   float: left;
   background-color: white;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
@@ -9,7 +8,7 @@ div.entry-card {
   margin: 10px 16px;
   position: relative;
 
-  &.entry-card-placeholder {
+  &.activity-card-placeholder {
     background-color: transparent;
     box-shadow: none;
     border: none;
@@ -35,7 +34,7 @@ div.entry-card {
         height: 120px;
       }
 
-      div.entry-card-title {
+      div.activity-card-title {
         font-size: 14px;
         color: $carrot_light_gray;
         @include avenir_H();
@@ -58,9 +57,9 @@ div.entry-card {
   }
 
   &.all-activity-card {
-    div.entry-card-content{
+    div.activity-card-content{
 
-      div.entry-card-body {
+      div.activity-card-body {
 
         &.has-media-preview {
           width: 100%;
@@ -78,7 +77,7 @@ div.entry-card {
         font-size: 16px;
       }
 
-      div.entry-card-media-preview {
+      div.activity-card-media-preview {
         width: 100%;
         float: initial;
         margin-top: 16px;
@@ -91,7 +90,49 @@ div.entry-card {
     }
   }
 
-  div.entry-card-breadcrumb {
+  &.story-card {
+    width: 667px;
+    float: right;
+
+    div.triangle {
+      background-color: white;
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+      width: 24px;
+      height: 24px;
+      transform: rotate(45deg);
+      position: absolute;
+      left: -10px;
+      top: 25px;
+
+      &:after {
+        content: "";
+        width: 14px;
+        height: 20px;
+        background-color: white;
+        box-shadow: none;
+        top: 9px;
+        left: 20px;
+        position: absolute;
+        transform: rotate(-45deg);
+      }
+    }
+
+    div.activity-card-content {
+      div.activity-card-headline.has-headline {
+        margin-top: 0px;
+      }
+
+      div.activity-card-body.has-body {
+        margin-top: 0px;
+
+        &.has-headline {
+          margin-top: 16px;
+        }
+      }
+    }
+  }
+
+  div.activity-card-breadcrumb {
     margin-bottom: 24px;
     @include avenir_R();
     font-size: 14px;
@@ -102,36 +143,41 @@ div.entry-card {
     }
   }
 
-  div.entry-card-head {
+  div.activity-card-head {
     width: 100%;
 
-    div.entry-card-head-author {
+    div.activity-card-head-author {
       float: left;
       min-width: 60%;
       padding-right: 20px;
       overflow: hidden;
 
-      @include entry-author();
+      @include activity-author();
     }
 
-    div.entry-card-head-right {
+    div.activity-card-head-right {
       float: right;
       position: relative;
 
-      div.topic-tag {
+      div.activity-tag {
         margin-top: 0;
         float: right;
       }
 
-      @include entry-topic-tag();
+      @include activity-tag();
     }
   }
 
-  div.entry-card-content {
+  div.activity-card-content {
     width: 100%;
 
-    div.entry-card-headline {
-      @include entry-headline();
+    div.activity-card-title {
+      @include activity-title();
+      margin-bottom: 16px;
+    }
+
+    div.activity-card-headline {
+      @include activity-headline();
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
@@ -143,7 +189,7 @@ div.entry-card {
       }
     }
 
-    div.entry-card-media-preview {
+    div.activity-card-media-preview {
       width: 72px;
       height: 72px;
       float: right;
@@ -185,8 +231,17 @@ div.entry-card {
       }
     }
 
-    div.entry-card-body {
-      @include entry-body();
+    div.story-banner {
+      margin-top: 16px;
+      width: 100%;
+      min-height: 200px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    div.activity-card-body {
+      @include activity-body();
       display: block;
       line-height: 24px;
       max-height: #{24*3}px;
@@ -236,7 +291,7 @@ div.entry-card {
       // div:last-child, p:last-child {
       //   &:after {
       //     content: "Read Full Update";
-      //     @include entry-body;
+      //     @include activity-body;
       //     color: $carrot_text_blue;
       //     cursor: pointer;
       //     margin-left: 5px;
@@ -246,7 +301,7 @@ div.entry-card {
       // &:empty {
       //   &:after {
       //     content: "Read Full Update";
-      //     @include entry-body;
+      //     @include activity-body;
       //     color: $carrot_text_blue;
       //     cursor: pointer;
       //   } 
@@ -254,7 +309,7 @@ div.entry-card {
     }
   }
 
-  div.entry-card-footer {
+  div.activity-card-footer {
     position: absolute;
     width: calc(100% - 48px);
     bottom: 10px;
@@ -303,7 +358,7 @@ div.entry-card {
           height: 20px;
         }
 
-        ul.entry-card-more-menu {
+        ul.activity-card-more-menu {
           background-color: white;
           border: 1px solid rgba(177,184,192,0.50);
           box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);

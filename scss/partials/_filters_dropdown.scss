@@ -9,15 +9,12 @@ div.filters-dropdown-name {
     height: 24px;
     background-color: $carrot_light_blue;
     border-radius: 4px;
-    background-image: cdnUrl("/img/ML/board_remove_filter.png");
-    background-position: 50%;
-    background-repeat: no-repeat;
     margin-right: 10px;
+    padding-top: 1px;
     transition: 230ms;
     float: left;
 
     &:hover {
-      background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
       background-color: $carrot_text_blue;
     }
   }
@@ -72,61 +69,9 @@ div.filters-dropdown-name {
       }
     }
 
-    div.filters-dropdown-list {
-      position: absolute;
+    div.dropdown-list-container {
       top: 30px;
-      left: calc(50% - 80px);
-      width: 140px;
-      border: none;
-      outline: none;
-      box-shadow: none;
-      background-color: transparent;
-
-      div.triangle {
-        position: absolute;
-        top: 3px;
-        left: 70px;
-        background-color: white;
-        border-top: 1px solid rgba(177,184,192,0.50);
-        border-left: 1px solid rgba(177,184,192,0.50);
-        transform: rotate(45deg);
-        width: 20px;
-        height: 20px;
-      }
-
-      div.filters-dropdown-list-content {
-        background-color: white;
-        border: 1px solid rgba(177,184,192,0.50);
-        box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-        border-radius: 5px;
-        margin: 8px 0;
-        padding: 10px 16px 6px;
-        min-height: 50px;
-
-        ul {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-
-          li {
-            margin: 6px 0;
-            cursor: pointer;
-
-            &:hover {
-              background-color: transparent;
-              text-decoration: underline;
-              color: $carrot_dark_gray;
-            }
-
-            &.divider {
-              border-top: $carrot_dark_bg_gray;
-              width: calc(100% + 32px);
-              cursor: default;
-              margin: 12px 0 12px -17px;
-            }
-          }
-        }
-      }
+      left: calc(50% - 70px);
     }
   }
 }

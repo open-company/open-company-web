@@ -19,7 +19,6 @@
             [oc.web.api :as api]
             [oc.web.dispatcher :as dis]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.iso4217 :as iso4217]
             [oc.web.lib.image-upload :as iu]
             [goog.events :as events]
             [goog.fx.dom :refer (Fade)]
@@ -72,13 +71,12 @@
         fixed-logo-height (or logo-height 0)]
     (api/patch-org {:name (:name org-data)
                     :slug slug
-                    :currency (:currency org-data)
                     :logo-width (js/parseInt fixed-logo-width)
                     :logo-height (js/parseInt fixed-logo-height)
                     :logo-url fixed-logo-url})))
 
 (defn- check-img-cb [owner data img result]
- (if-not result
+  (if-not result
     ; there was an error loading the logo, could be an invalid URL
     ; or the link doesn't contain an image
     (do
@@ -96,8 +94,7 @@
 (defn save-org-clicked [owner]
   (let [logo-url     (om/get-state owner :logo-url)
         old-org-data (dis/org-data (om/get-props owner))
-        new-org-data {:name (om/get-state owner :org-name)
-                      :currency (om/get-state owner :currency)}]
+        new-org-data {:name (om/get-state owner :org-name)}]
     (om/set-state! owner :loading true)
     ; if the log has changed
     (if (not= logo-url (om/get-state owner :initial-logo))
@@ -109,12 +106,6 @@
         (check-image logo-url owner new-org-data))
       ; else save the org datas
       (save-org-data new-org-data (:logo-url old-org-data) (:logo-width old-org-data) (:logo-height old-org-data)))))
-
-(defcomponent currency-option [data owner]
-  (render [_]
-    (dom/option {:value (or (:value data) (:text data))
-                 :disabled (and (contains? :value data) (= (count (:value data)) 0))}
-      (:text data))))
 
 (defn- success-cb [owner res]
   (let [url (.-url res)]
@@ -177,7 +168,7 @@
                      :data-placement "bottom"
                      :style {:display (if (nil? file-upload-state) "block" "none")}
                      :on-click #(iu/upload!
-                                 "image/*"
+                                 {:accept "image/*"}
                                  (partial success-cb owner)
                                  (partial progress-cb owner)
                                  (partial error-cb owner))}
@@ -199,10 +190,9 @@
 (defn get-state [data current-state]
   (let [org-data (dis/org-data data)]
     {:slug (:slug org-data)
-     :initial-logo (:logo-url data)
+     :initial-logo (:logo-url org-data)
      :logo-url (or (:logo-url current-state) (:logo-url org-data))
      :org-name (or (:org-name current-state) (:name org-data))
-     :currency (or (:currency current-state) (:currency org-data))
      :loading false
      :has-changes (or (:has-changes current-state) false)
      :show-save-successful (or (:show-save-successful current-state) false)}))
@@ -223,15 +213,16 @@
                               (doto fade-animation
                                 (.listen AnimationEventType/FINISH #(om/set-state! owner :show-save-successful false))
                                 (.play))))))
-      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)}))))
+      (om/set-state! owner (get-state next-props {:show-save-successful (om/get-state owner :loading)})))
+    (when-not (om/get-state owner :loading)
+      (om/set-state! owner (get-state next-props (om/get-state owner)))))
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
       (when-not (responsive/is-tablet-or-mobile?)
         (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))))
 
-  (render-state [_ {org-slug :slug org-name :org-name logo-url :logo-url
-                    currency :currency loading :loading
+  (render-state [_ {org-slug :slug org-name :org-name logo-url :logo-url loading :loading
                     file-upload-state :file-upload-state upload-remote-url :upload-remote-url
                     file-upload-progress :file-upload-progress
                     show-save-successful :show-save-successful
@@ -242,7 +233,7 @@
 
       (dom/div {:class "mx-auto my4 settings-container group"}
         
-        (when-not org-name
+        (when-not org-slug
           (dom/div {:class "settings-form-label org-settings"}
             (loading/small-loading)))
         
@@ -268,22 +259,6 @@
                                     :logo-did-load-cb #(do
                                                         (om/set-state! owner :has-changes true)
                                                         (om/set-state! owner :logo-url %))})
-
-          ;; Currency
-          (dom/div {:class "settings-form-input-label"} "DISPLAY CURRENCY IN CHARTS AS")
-          (dom/select {:id "currency"
-                       :value (or currency "")
-                       :on-change #(do
-                                    (om/set-state! owner :has-changes true)
-                                    (om/set-state! owner :currency (.. % -target -value)))
-                       :class "npt col-8 p1 mb3 org-currency"}
-            (for [currency (iso4217/sorted-iso4217)]
-              (let [symbol (:symbol currency)
-                    display-symbol (or symbol (:code currency))
-                    label (str (:text currency) " " display-symbol)]
-                (om/build currency-option
-                          {:value (:code currency) :text label}
-                          {:react-key (:code currency)}))))
 
           ;; Save button
           (dom/div {:class "mt2 right-align group"}

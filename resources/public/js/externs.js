@@ -67,7 +67,12 @@ var OCWebPrintAllActivityData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
 var OCWebPrintBoardData = function(){};
-var OCWebPrintEntriesData = function(){};
+var OCWebPrintActivitiesData = function(){};
+var OCWebPrintActivityData = function(){};
+var OCWebPrintSecureStoryData = function(){};
+var OCWebPrintCommentsData = function(){};
+var OCWebPrintActivityCommentsData = function(){};
+var OCWebPrintReactionsData = function(){};
 var OCWebPrintJWTContents = function(){};
 var OCWebHelp = function(){};
 var OCWebPrintAsciiArt = function(){};
@@ -81,5 +86,9 @@ filestack.pick = function(){};
 filestack.then = function(){};
 filestack.transform = function(){};
 filestack.storeURL = function(){};
+// Moment
+var moment = {};
+moment.tz = {};
+moment.tz.guess = function(){};
 
 var mailchimpApiSubmit = function(){};

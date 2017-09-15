@@ -17,11 +17,7 @@
                                           topics
                                           org-data
                                           board-data
-                                          entries-data
                                           topics-data
-                                          foce-key
-                                          foce-data
-                                          foce-data-editing?
                                           is-dashboard
                                           is-stakeholder-update
                                           prevent-topic-not-found-navigation] :as data} owner options]
@@ -34,12 +30,7 @@
                               :org-data org-data
                               :board-data board-data
                               :topic-data (get board-data (keyword (router/current-topic-slug)))
-                              :entries-data entries-data
                               :read-only-board (:read-only board-data)
-                              :currency (:currency org-data)
-                              :foce-key foce-key
-                              :foce-data foce-data
-                              :foce-data-editing? foce-data-editing?
                               :prevent-topic-not-found-navigation prevent-topic-not-found-navigation})
         (for [idx (range (count topics))
               :let [topic-kw (get topics idx)
@@ -49,15 +40,10 @@
                                 :topic topic-kw
                                 :org-data org-data
                                 :board-data board-data
-                                :entries-data (get entries-data topic-kw [])
                                 :is-stakeholder-update is-stakeholder-update
                                 :topic-data sd
                                 :card-width card-width
-                                :foce-data-editing? (:foce-data-editing? data)
                                 :read-only-board (:read-only board-data)
-                                :currency (:currency (dis/org-data))
-                                :foce-key foce-key
-                                :foce-data foce-data
                                 :is-dashboard is-dashboard
                                 :topic-flex-num idx}]]
           (when-not (:placeholder sd)

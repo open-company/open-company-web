@@ -1,0 +1,117 @@
+div.drafts-layout {
+  margin-left: 16px;
+
+  div.draft-cards-container {
+    div.draft-card-row {
+      display: flex;
+      margin-top: 24px;
+      width: 888px;
+
+      &:first-child {
+        margin-top: 0px;
+      }
+
+      div.draft-card {
+        flex: 1;
+        width: 432px;
+        max-height: 438px;
+        background-color: white;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+        border: solid 0.5px rgba(177, 184, 192, 0.24);
+        border-radius: 8px;
+        min-height: 100px;
+        padding-bottom: 48px;
+        position: relative;
+
+        &:first-child {
+          margin-right: 24px;
+        }
+
+        div.draft-card-tag {
+          @include activity-tag();
+          padding: 16px 16px 0;
+          pointer-events: none;
+        }
+
+        div.draft-card-title {
+          @include activity-title();
+          font-size: 24px;
+          color: $carrot_dark_gray;
+          padding: 16px;
+          border-bottom: 1px solid rgba($carrot_light_gray_1, 0.5);
+        }
+
+        div.draft-card-body {
+          @include activity-body();
+          @include avenir_M();
+          font-size: 16px;
+          color: $oc_gray_7;
+          outline: none;
+          cursor: text;
+          padding: 16px;
+          position: relative;
+
+          * {
+            color: $oc_gray_7;
+          }
+
+          &.empty-body {
+            opacity: 0.3;
+            font-size: 16px;
+            line-height: 32px;
+          }
+        }
+
+        div.bottom-gradient {
+          position: absolute;
+          bottom: 64px;
+          left: 0px;
+          right: 0px;
+          height: 40px;
+          z-index: 10;
+          pointer-events: none;
+          background: -moz-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255,0) 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba(255, 255, 255,0)), color-stop(100%,rgba(255, 255, 255,1))); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(bottom,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* IE10+ */
+          background: linear-gradient(to top,  rgba(255, 255, 255, 1) 0%,rgba(255, 255, 255,0) 100%); /* W3C */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+        }
+
+        div.draft-card-footer {
+          background-color: $carrot_light_gray_2;
+          padding: 8px 16px;
+          margin-top: 4px;
+          position: absolute;
+          left: 0px;
+          bottom: 0px;
+          width: 432px;
+          height: 48px;
+
+          div.draft-card-footer-left {
+            margin-top: 8px;
+            font-size: 14px;
+            color: rgba($oc_gray_7, 0.5);
+            @include avenir_R();
+            float: left;
+          }
+
+          div.draft-card-footer-right {
+            margin-top: 8px;
+            font-size: 14px;
+            color: rgba($oc_gray_7, 0.5);
+            @include avenir_R();
+            float: right;
+          }
+        }
+
+        &.empty-draft {
+          background-color: transparent;
+          box-shadow: none;
+          border: none;
+        }
+      }
+    }
+  }
+}

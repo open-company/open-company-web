@@ -85,7 +85,7 @@
 (def topic-list-x-padding 20)
 (def topic-total-x-padding 32)
 (def topic-list-right-margin 36)
-(def left-boards-list-width 178)
+(def left-navigation-sidebar-width 178)
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies
@@ -108,7 +108,7 @@
     (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
        (* topic-list-x-padding 2)
        topic-list-right-margin
-       (if (is-tablet-or-mobile?) 0 left-boards-list-width)))) ; the left side panel with the topics list
+       (if (is-tablet-or-mobile?) 0 left-navigation-sidebar-width)))) ; the left side panel with the topics list
 
 (when (not (.-_phantom js/window))
   (events/listen js/window EventType/RESIZE #(set-browser-type!)))

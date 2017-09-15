@@ -37,12 +37,7 @@
           (when-not (utils/is-test-env?)
             (login-overlays-handler))
           (dom/div {:class "page"}
-            (om/build navbar {:card-width card-width
-                              :columns-num columns-num
-                              :header-width (responsive/total-layout-width-int card-width columns-num)
-                              :mobile-menu-open mobile-menu-open
-                              :show-share-su-button false
-                              :auth-settings (:auth-settings data)})
+            (navbar)
             (dom/div {:class "navbar-offset group"}
               (if (:loading data)
                 (dom/h4 "Loading Organizations...")

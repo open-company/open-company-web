@@ -14,7 +14,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.components.topics-list :refer (topics-list)]
             [oc.web.components.welcome-screen :refer (welcome-screen)]
-            [oc.web.components.entry-modal :refer (entry-modal)]
+            [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.ui.login-required :refer (login-required)]
@@ -22,8 +22,8 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.ui.entry-video-modal :refer (entry-video-modal)]
-            [oc.web.components.ui.entry-chart-modal :refer (entry-chart-modal)]
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
+            [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -31,50 +31,25 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-(defn- get-new-topics-if-needed [owner]
-  (when-not (om/get-state owner :new-topics-requested)
-    (let [org-slug (keyword (router/current-org-slug))
-          board-slug (keyword (router/current-board-slug))
-          board-data (dis/board-data)]
-      (when (and (not (get-in (om/get-props owner) (dis/board-new-topics-key org-slug board-slug)))
-                 (seq board-data))
-        (om/update-state! owner :new-topics-requested not)
-        (utils/after 1000 #(api/get-new-topics))))))
-
-(def add-second-topic-tt-prefix "add-second-topic-")
-
 (defn refresh-board-data []
-  (when (not (router/current-entry-uuid))
+  (when (not (router/current-activity-id))
     (api/get-board (dis/board-data))))
 
 (defcomponent org-dashboard [data owner]
 
   (init-state [_]
-    {:navbar-editing false
-     :editing-topic false
-     :save-bt-active false
-     :add-second-topic-tt-shown false
-     :new-topics-requested false
-     :card-width (if (responsive/is-mobile-size?)
+    {:card-width (if (responsive/is-mobile-size?)
                    (responsive/mobile-dashboard-card-width)
                    responsive/card-width)
      :columns-num (responsive/dashboard-columns-num)})
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-    (when-not (:read-only (dis/board-data data))
-      (get-new-topics-if-needed owner))
     (om/set-state! owner :resize-listener
       (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
                                                                                            :card-width (if (responsive/is-mobile-size?)
                                                                                                          (responsive/mobile-dashboard-card-width)
                                                                                                          responsive/card-width)})))))
-    (om/set-state! owner :window-click-listener
-      (events/listen js/window EventType/CLICK (fn[e]
-                                                 (when (and (:show-top-menu @dis/app-state)
-                                                            (not (utils/event-inside? e (sel1 [(str "div.topic[data-topic=" (name (:show-top-menu @dis/app-state)) "]")]))))
-                                                   (utils/event-stop e)
-                                                   (dis/dispatch! [:top-menu-show nil])))))
     (refresh-board-data)
     (om/set-state! owner :board-refresh-interval
       (js/setInterval #(refresh-board-data) (* 60 1000))))
@@ -82,22 +57,15 @@
   (will-unmount [_]
     (when (om/get-state owner :board-refresh-interval)
       (js/clearInterval (om/get-state owner :board-refresh-interval)))
-    (when (om/get-state owner :window-click-listener)
-      (events/unlistenByKey (om/get-state owner :window-click-listener)))
     (when (om/get-state owner :resize-listener)
       (events/unlistenByKey (om/get-state owner :resize-listener))))
 
-  (will-receive-props [_ next-props]
-    (when-not (:read-only (dis/board-data next-props))
-      (get-new-topics-if-needed owner)))
-
-  (render-state [_ {:keys [editing-topic navbar-editing save-bt-active columns-num card-width] :as state}]
+  (render-state [_ {:keys [columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
           all-activity-data (dis/all-activity-data data)
-          entries-data (dis/entries-data data)
           total-width-int (responsive/total-layout-width-int card-width columns-num)]
       (if (or (not org-data)
               (and (not board-data)
@@ -107,14 +75,14 @@
           (om/build loading {:loading true}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
-                                           :selected-topic-view (router/current-entry-uuid)
+                                           :modal-activity-view (router/current-activity-id)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
-                                           :editing-topic (or (not (nil? (:foce-key data)))
-                                                              (not (nil? (:show-top-menu data))))
                                            :main-scroll true
-                                           :no-scroll (router/current-entry-uuid)})}
-          (when (router/current-entry-uuid)
-            (entry-modal (dis/entry-data)))
+                                           :no-scroll (router/current-activity-id)})}
+          (when (router/current-activity-id)
+            (let [from-aa (:from-all-activity @router/path)
+                  board-slug (if from-aa :all-activity (router/current-board-slug))]
+              (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
           (when (:entry-editing data)
             (entry-edit))
           (when (:board-editing data)
@@ -123,28 +91,15 @@
             (alert-modal))
           (when (and (:entry-editing data)
                      (:media-video (:entry-editing data)))
-            (entry-video-modal))
+            (media-video-modal :entry-editing))
           (when (and (:entry-editing data)
                      (:media-chart (:entry-editing data)))
-            (entry-chart-modal))
+            (media-chart-modal :entry-editing))
           (dom/div {:class "page"}
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
-                           (router/current-entry-uuid))
-              (om/build navbar {:save-bt-active save-bt-active
-                                :org-data org-data
-                                :board-data board-data
-                                :card-width card-width
-                                :header-width total-width-int
-                                :columns-num columns-num
-                                :foce-key (:foce-key data)
-                                :show-share-su-button (utils/can-edit-topics? board-data)
-                                :show-login-overlay (:show-login-overlay data)
-                                :mobile-menu-open (:mobile-menu-open data)
-                                :auth-settings (:auth-settings data)
-                                :active :dashboard
-                                :show-navigation-bar (utils/company-has-topics? board-data)
-                                :is-dashboard (not (router/current-entry-uuid))}))
+                           (router/current-activity-id))
+              (navbar))
             (if (:show-welcome-screen data)
               (welcome-screen)
               (dom/div {:class "dashboard-container"}
@@ -161,17 +116,11 @@
                      :org-data org-data
                      :board-data board-data
                      :all-activity-data all-activity-data
-                     :entries-data entries-data
-                     :new-topics (get-in data (dis/board-new-topics-key (router/current-org-slug) (router/current-board-slug)))
                      :force-edit-topic (:force-edit-topic data)
-                     :foce-data-editing? (:foce-data-editing? data)
                      :card-width card-width
                      :columns-num columns-num
                      :show-login-overlay (:show-login-overlay data)
-                     :foce-key (:foce-key data)
-                     :foce-data (:foce-data data)
                      :entry-editing (:entry-editing data)
                      :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                      :is-dashboard true
-                     :show-top-menu (:show-top-menu data)
                      :board-filters (:board-filters data)}))))))))))

@@ -13,41 +13,39 @@
 
 (def api-entry-point-key [:api-entry-point])
 
+(defn org-key [org-slug]
+  [(keyword org-slug)])
+
 (defn org-data-key [org-slug]
-  [(keyword org-slug) :org-data])
+  (vec (conj (org-key org-slug) :org-data)))
 
 (defn all-activity-key [org-slug]
-  [(keyword org-slug) :all-activity])
+  (vec (concat (org-key org-slug) [:boards :all-activity])))
 
 (defn calendar-key [org-slug]
-  [(keyword org-slug) :calendar])
+  (vec (conj (org-key org-slug) :calendar)))
+
+(defn board-key [org-slug board-slug]
+  (let [board-key (if board-slug (keyword board-slug) :all-activity)]
+    (vec (concat (org-key org-slug) [:boards board-key]))))
 
 (defn board-data-key [org-slug board-slug]
-  [(keyword org-slug) :boards (keyword board-slug) :board-data])
+  (conj (board-key org-slug board-slug) :board-data))
 
-(defn board-cache-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :cache])
+(defn activity-key [org-slug board-slug activity-uuid]
+  (let [board-key (if (= board-slug :all-activity)
+                    (all-activity-key org-slug)
+                    (board-data-key org-slug board-slug))]
+    (vec (concat board-key [:fixed-items activity-uuid]))))
 
-(defn board-new-topics-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :new-topics])
+(defn secure-activity-key [org-slug secure-id]
+  (vec (concat (org-key org-slug) [:secure-stories secure-id])))
 
-(defn board-new-categories-key [org-slug board-slug]
-  [(keyword org-slug) (keyword board-slug) :new-categories])
+(defn comments-key [org-slug board-slug]
+ (vec (conj (board-key org-slug board-slug) :comments-data)))
 
-(defn updates-list-key [org-slug]
-  [(keyword org-slug) :updates-list])
-
-(defn latest-update-key [org-slug]
-  [(keyword org-slug) :latest-su])
-
-(defn update-key [org-slug update-slug]
-  [(keyword org-slug) :updates (keyword update-slug)])
-
-(defn entries-key [org-slug board-slug]
-  [(keyword org-slug) :boards (keyword board-slug) :entries-data])
-
-(defn comments-key [org-slug board-slug entry-uuid]
- (vec (conj (entries-key org-slug board-slug) entry-uuid :comments-data)))
+(defn activity-comments-key [org-slug board-slug activity-uuid]
+ (vec (conj (comments-key org-slug board-slug) activity-uuid)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -69,13 +67,12 @@
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :topic-slug          [[:route] (fn [route] (:topic route))]
-   :entry-uuid          [[:route] (fn [route] (:entry route))]
+   :activity-uuid       [[:route] (fn [route] (:activity route))]
+   :secure-id           [[:route] (fn [route] (:secure-id route))]
+   :story-uuid          [[:route] (fn [route] (:activity route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
    :board-filters       [[:base] (fn [base] (:board-filters base))]
-   :updates-list        [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when org-slug
-                              (:items (get-in base (updates-list-key org-slug)))))]
+   :loading             [[:base] (fn [base] (:loading base))]
    :team-management     [[:base :route]
                           (fn [base route]
                             {:um-invite (:um-invite base)
@@ -90,7 +87,6 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
-   :foce-data           [[:base] (fn [base] (:foce-data base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -115,27 +111,26 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-channels-key (:team-id org-data)))))]
-   :board-new-topics    [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (get-in base (board-new-topics-key org-slug board-slug))))]
-   :board-new-categories [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (get-in base (board-new-categories-key org-slug board-slug))))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :entry-data          [[:base :org-slug :board-slug :entry-uuid]
-                          (fn [base org-slug board-slug entry-uuid]
-                            (when (and org-slug board-slug entry-uuid)
-                              (let [board-data (get-in base (board-data-key org-slug board-slug))]
-                                (first (filter #(= (:uuid %) entry-uuid) (:entries board-data))))))]
-   :comments-data       [[:base :org-slug :board-slug :entry-uuid]
-                          (fn [base org-slug board-slug entry-uuid]
-                            (when (and org-slug board-slug entry-uuid)
-                              (let [comments-key (comments-key org-slug board-slug entry-uuid)
+   :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
+                          (fn [base org-slug board-slug activity-uuid secure-id]
+                            (when (and org-slug (or (and board-slug activity-uuid) secure-id))
+                              (if (and board-slug activity-uuid)
+                                (get-in base (activity-key org-slug board-slug activity-uuid))
+                                (get-in base (secure-activity-key org-slug secure-id)))))]
+   :comments-data       [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (let [comments-key (comments-key org-slug board-slug)
+                                    comments-data (get-in base comments-key)]
+                                comments-data)))]
+   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid]
+                          (fn [base org-slug board-slug activity-uuid]
+                            (when (and org-slug board-slug activity-uuid)
+                              (let [comments-key (activity-comments-key org-slug board-slug activity-uuid)
                                     comments-data (get-in base comments-key)]
                                 comments-data)))]
    :trend-bar-status    [[:base]
@@ -145,9 +140,9 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
-   :entry-modal-fade-in  [[:base]
-                          (fn [base]
-                            (:entry-modal-fade-in base))]
+   :activity-modal-fade-in [[:base]
+                             (fn [base]
+                               (:activity-modal-fade-in base))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
@@ -158,15 +153,26 @@
    :board-editing       [[:base]
                           (fn [base]
                             (:board-editing base))]
+   :story-editing       [[:base]
+                          (fn [base]
+                            (:story-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
-                            (:alert-modal base))]})
+                            (:alert-modal base))]
+   :navbar-data         [[:base :org-data :board-data]
+                          (fn [base org-data board-data]
+                            (let [navbar-data (select-keys base [:mobile-menu-open :header-width :show-login-overlay])]
+                              (-> navbar-data
+                                (assoc :org-data org-data)
+                                (assoc :board-data board-data))))]
+   :story-editing-publish [[:base]
+                           (fn [base]
+                              (:story-editing-published-url base))]})
 
 ;; Action Loop =================================================================
 
 (defmulti action (fn [db [action-type & _]]
-                   (when (and (not= action-type :input)
-                              (not= action-type :foce-input))
+                   (when (not= action-type :input)
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 
@@ -227,47 +233,37 @@
   ([data org-slug board-slug]
     (get-in data (board-data-key org-slug board-slug))))
 
-(defn board-cache
+(defn activity-data
+  "Get activity data."
   ([]
-    (board-cache @app-state))
-  ([data]
-    (board-cache data (router/current-org-slug) (router/current-board-slug)))
-  ([data org-slug]
-    (board-cache data org-slug (router/current-board-slug)))
-  ([data org-slug board-slug]
-    (get-in data (board-cache-key org-slug board-slug)))
-  ([data org-slug board-slug k]
-    (get-in data (conj (board-cache-key org-slug board-slug) k))))
-
-(defn entry-data
-  "Get entry data."
-  ([]
-    (entry-data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid) @app-state))
-  ([entry-uuid]
-    (entry-data (router/current-org-slug) (router/current-board-slug) entry-uuid @app-state))
-  ([board-slug entry-uuid]
-    (entry-data (router/current-org-slug) board-slug entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid]
-    (entry-data org-slug board-slug entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid data]
-    (let [data-key (if (:from-all-activity @router/path) (all-activity-key org-slug) (board-data-key org-slug board-slug))
-          entries-data (:entries (get-in data data-key))]
-      (first (filter #(= (:uuid %) entry-uuid) entries-data)))))
+    (activity-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
+  ([activity-id]
+    (activity-data (router/current-org-slug) (router/current-board-slug) activity-id @app-state))
+  ([board-slug activity-id]
+    (activity-data (router/current-org-slug) board-slug activity-id @app-state))
+  ([org-slug board-slug activity-id]
+    (activity-data org-slug board-slug activity-id @app-state))
+  ([org-slug board-slug activity-id data]
+    (let [activity-key (activity-key org-slug board-slug activity-id)]
+      (get-in data activity-key))))
 
 (defn comments-data
   ([]
-    (comments-data (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid) @app-state))
-  ([entry-uuid]
-    (comments-data (router/current-org-slug) (router/current-board-slug) entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid]
-    (comments-data org-slug board-slug entry-uuid @app-state))
-  ([org-slug board-slug entry-uuid data]
-    (get-in data (comments-key org-slug board-slug entry-uuid))))
+    (comments-data (router/current-org-slug) (router/current-board-slug) @app-state))
+  ([org-slug board-slug]
+    (comments-data org-slug board-slug @app-state))
+  ([org-slug board-slug data]
+    (get-in data (comments-key org-slug board-slug))))
 
-(defn entries-data
-  ([] (entries-data @app-state (router/current-org-slug) (router/current-board-slug)))
-  ([data] (entries-data data (router/current-org-slug) (router/current-board-slug)))
-  ([data org-slug board-slug] (get-in data (entries-key org-slug board-slug))))
+(defn activity-comments-data
+  ([]
+    (activity-comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
+  ([activity-uuid]
+    (activity-comments-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
+  ([org-slug board-slug activity-uuid]
+    (activity-comments-data org-slug board-slug activity-uuid @app-state))
+  ([org-slug board-slug activity-uuid data]
+    (get-in data (activity-comments-key org-slug board-slug activity-uuid))))
 
 (defn teams-data
   ([] (teams-data @app-state))
@@ -308,8 +304,23 @@
 (defn print-board-data []
   (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
-(defn print-entries-data []
-  (js/console.log (get-in @app-state (entries-key (router/current-org-slug) (router/current-board-slug)))))
+(defn print-activities-data []
+  (js/console.log (get-in @app-state (conj (board-data-key (router/current-org-slug) (router/current-board-slug)) :fixed-items))))
+
+(defn print-activity-data []
+  (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+
+(defn print-secure-story-data []
+  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-story-id)))))
+
+(defn print-reactions-data []
+  (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
+
+(defn print-comments-data []
+  (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug)))))
+
+(defn print-activity-comments-data []
+  (js/console.log (get-in @app-state (activity-comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
@@ -317,4 +328,9 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
-(set! (.-OCWebPrintEntriesData js/window) print-entries-data)
+(set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
+(set! (.-OCWebPrintActivityData js/window) print-activity-data)
+(set! (.-OCWebPrintSecureStoryData js/window) print-secure-story-data)
+(set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
+(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)

@@ -1,0 +1,100 @@
+div.slack-channels-dropdown {
+  width: 100%;
+  position: relative;
+
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    i.fa {
+      cursor: not-allowed;
+    }
+  }
+
+  input.board-edit-slack-channel {
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+    background-color: white;
+    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    @include avenir_M();
+    font-size: 14px;
+    color: $oc_gray_7;
+    padding: 0.4rem 0.8rem;
+    outline: none;
+
+    &[disabled]{
+      cursor: not-allowed;
+    }
+
+    @include placeholder() {
+      @include avenir_M();
+      font-size: 14px;
+      color: $carrot_light_gray_1;
+    }
+  }
+
+  i.fa {
+    display: block;
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 24px;
+    color: $oc_gray_7;
+    width: 24px;
+    height: 24px;
+    z-index: #{$navbar_zindex + 102};
+    cursor: pointer;
+  }
+
+  div.slack-channels-dropdown-list {
+    position: absolute;
+    z-index: #{$navbar_zindex + 103};
+    width: 100%;
+    max-height: 184px;
+    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    background-color: white;
+    margin-left: -260px;
+    top: 39px;
+    left: 260px;
+    overflow-y: scroll;
+
+    div.slack-team{
+
+      &.show-slack-name {
+        div.channel {
+          padding: 0.4rem 1rem;
+        }
+      }
+
+      div.slack-team-name {
+        @include avenir_M();
+        font-size: 14px;
+        color: $carrot_light_gray;
+        padding: 0.4rem 0.8rem;
+      }
+
+      div.channel {
+        width: 100%;
+        padding: 0.4rem 0.8rem;
+        color: $carrot_dark_gray;
+        @include avenir_M();
+        font-size: 14px;
+        cursor: pointer;
+
+        &:hover {
+          span.ch {
+            text-decoration: underline;
+          }
+        }
+
+        span.ch-prefix {
+          @include avenir_R()
+          font-size: 16px;
+          color: $carrot_light_gray_1;
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+}

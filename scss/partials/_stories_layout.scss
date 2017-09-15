@@ -1,0 +1,33 @@
+div.stories-layout {
+  div.story-cards-container {
+    max-width: 928px;
+    position: relative;
+
+    div.stories-vertical-line {
+      width: 1px;
+      position: absolute;
+      top: 30px;
+      left: 22px;
+      background-color: rgba($carrot_light_gray_1, 0.24);
+    }
+
+    div.story-card-row {
+      div.story-card-row-left {
+        float: left;
+        width: 220px;
+        margin-top: 24px;
+        z-index: 2;
+        @include activity-author(43);
+        position: relative;
+
+        div.user-avatar-img-container {
+          margin-top: 0px;
+        }
+
+        div.time-since {
+          width: auto;
+        }
+      }
+    }
+  }
+}

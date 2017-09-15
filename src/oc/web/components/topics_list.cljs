@@ -39,15 +39,11 @@
     (get-state owner data nil))
 
   (will-receive-props [_ next-props]
-    (when-let* [new-topic-foce (om/get-state owner :new-topic-foce)
-                new-topic-data (-> next-props :board-data new-topic-foce)]
-      (dispatcher/dispatch! [:foce-start new-topic-foce new-topic-data]))
     (when-not (= (:board-data next-props) (:board-data data))
       (om/set-state! owner (get-state owner next-props (om/get-state owner)))))
 
   (render-state [_ {:keys [active-topics
-                           redirect-to-preview
-                           rerender]}]
+                           redirect-to-preview]}]
     (let [board-slug    (router/current-board-slug)
           board-data    (:board-data data)
           board-topics  (vec (filter #(contains? board-data %) (vec (map keyword (:topics board-data)))))
@@ -62,9 +58,7 @@
       (dom/div {:class (utils/class-set {:topic-list true
                                          :not-first-board (not= (:slug (first (:boards (dispatcher/org-data)))) (:slug board-data))
                                          :group true
-                                         :editable can-edit-secs})
-                :data-rerender rerender
-                :key (str "topic-list-" rerender)}
+                                         :editable can-edit-secs})}
         ;; Topics list columns
         (let [comp-data {:columns-num columns-num
                          :card-width card-width
@@ -72,19 +66,13 @@
                          :content-loaded (:content-loaded data)
                          :loading (:loading data)
                          :topics board-topics
-                         :foce-data-editing? (:foce-data-editing? data)
-                         :new-topics (:new-topics data)
                          :org-data (:org-data data)
                          :board-data board-data
                          :all-activity-data (:all-activity-data data)
-                         :entries-data (:entries-data data)
                          :topics-data board-data
-                         :foce-key (:foce-key data)
-                         :foce-data (:foce-data data)
                          :entry-editing (:entry-editing data)
                          :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                          :is-dashboard (:is-dashboard data)
                          :is-all-activity (utils/in? (:route @router/path) "all-activity")
-                         :show-top-menu (:show-top-menu data)
                          :board-filters (:board-filters data)}]
           (om/build topics-columns comp-data))))))

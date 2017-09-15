@@ -1,8 +1,11 @@
 (ns oc.web.components.user-profile
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -40,6 +43,7 @@
                           (rum/local false ::loading)
                           (rum/local false ::show-success)
                           (drv/drv :edit-user-profile)
+                          (drv/drv :orgs)
                           {:init (fn [s _]
                                    (dis/dispatch! [:user-profile-reset])
                                    s)
@@ -57,18 +61,19 @@
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
-        timezones (.names (.-tz js/moment))]
+        timezones (.names (.-tz js/moment))
+        orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
       [:div.user-profile-header {} "Your Profile"]
       [:div.user-profile-internal
         [:div.user-profile-content.group
           [:div.user-profile-avatar-box.group
             [:button.user-profile-avatar.mlb-reset
-              {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
+              {:on-click #(iu/upload! {:accept "image/*"} success-cb progress-cb error-cb)}
               (user-avatar-image current-user-data)]
             [:div.user-profile-avatar-change
               [:button.mlb-reset.mlb-link.upload-photo
-                {:on-click #(iu/upload! "image/*" success-cb progress-cb error-cb)}
+                {:on-click #(iu/upload! {:accept "image/*"} success-cb progress-cb error-cb)}
                 [:span.user-avatar-upload-cta "Upload Photo"]
                 [:span.user-avatar-upload-description
                   "A 160x160 transparent Gif or PNG works best"]]]]
@@ -205,6 +210,14 @@
                 (small-loading))
             "Save"]
           [:button.mlb-reset.mlb-link-black
-            {:on-click #(dis/dispatch! [:user-profile-reset])
-             :disabled (not (:has-changes current-user-data))}
+            {:on-click #(let [last-org-slug (cook/get-cookie (router/last-org-cookie))
+                              first-org-slug (:slug (first orgs))
+                              to-url (if last-org-slug
+                                      (oc-urls/org last-org-slug)
+                                      (if first-org-slug
+                                        (oc-urls/org first-org-slug)
+                                        oc-urls/orgs))]
+                          (when (:has-changes current-user-data)
+                            (dis/dispatch! [:user-profile-reset]))
+                          (router/nav! to-url))}
             "Cancel"]]]))
