@@ -65,6 +65,13 @@ div.dropdown-list-container {
           @include avenir_H();
           color: $carrot_dark_gray;
         }
+
+        img.dropdown-list-item-icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+          margin-top: -3px;
+        }
       }
     }
   }

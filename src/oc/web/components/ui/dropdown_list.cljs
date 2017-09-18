@@ -17,14 +17,14 @@
                    (reset! (::window-click-listener s)
                     (events/listen js/window EventType/CLICK
                      #(when (not (utils/event-inside? % (sel1 :div.dropdown-list-container)))
-                        (let [on-click-out (nth (:rum/args s) 3)]
-                          (when (fn? on-click-out)
-                            (on-click-out))))))
+                        (let [on-blur (:on-blur (first (:rum/args s)))]
+                          (when (fn? on-blur)
+                            (on-blur))))))
                    s)
      :will-unmount (fn [s]
                      (events/unlistenByKey @(::window-click-listener s))
                     s)}
-  [items selected-item did-select-cb did-click-out]
+  [{:keys [items value on-change on-blur selected-icon unselected-icon]}]
   [:div.dropdown-list-container
     [:div.triangle]
     [:div.dropdown-list-content
@@ -32,8 +32,13 @@
         (for [item items]
           [:li.dropdown-list-item
             {:key (str "dropdown-list-item-" (if (= (:label item) :divider-line) "divider" (:value item)))
-             :on-click #(when (and (:value item) (fn? did-select-cb)) (did-select-cb item))
-             :class (utils/class-set {:select (and (:value item) (= selected-item (:value item)))
+             :on-click #(when (and (:value item) (fn? on-change)) (on-change item))
+             :class (utils/class-set {:select (and (:value item) (= value (:value item)))
                                       :divider-line (= (:label item) :divider-line)})}
+            (when (string? (:label item))
+              (if (and selected-icon (= (:value item) value))
+                [:img.dropdown-list-item-icon {:src selected-icon}]
+                (when unselected-icon
+                  [:img.dropdown-list-item-icon {:src unselected-icon}])))
             (when (string? (:label item))
               (:label item))])]]])

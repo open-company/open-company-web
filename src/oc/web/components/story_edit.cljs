@@ -306,7 +306,10 @@
                   storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts")) (:boards org-data))
                   storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
                   fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
-              (dropdown-list fixed-storyboards (:board-slug story-data) (partial did-select-storyboard-cb s) #(reset! (::show-storyboards-list s) false))))]
+              (dropdown-list {:items fixed-storyboards
+                              :value (:board-slug story-data)
+                              :on-change (partial did-select-storyboard-cb s)
+                              :on-blur #(reset! (::show-storyboards-list s) false)})))]
         [:div.story-edit-title.emoji-autocomplete
           {:content-editable true
            :placeholder default-story-title

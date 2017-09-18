@@ -42,19 +42,23 @@
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
             final-topics (vec (concat [{:label "Most recent" :value :latest} {:label "By topic" :value :by-topic} {:label :divider-line :value nil}] topics))]
         (when @(::show-filters-dropdown s)
-          (dropdown-list final-topics board-filters
-           (fn [t]
-             (reset! (::show-filters-dropdown s) false)
-             (cond
-               (= (:value t) :latest)
-               (do
-                 (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-                 (router/nav! (oc-urls/board)))
-               (= (:value t) :by-topic)
-               (do
-                 (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-                 (router/nav! (oc-urls/board-sort-by-topic)))
-               :else
-               (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized")))))
-           (fn []
-             (reset! (::show-filters-dropdown s) false)))))]))
+          (dropdown-list
+            {:items final-topics
+             :value board-filters
+             :unselected-icon (utils/cdn "/img/ML/carrot_radio_empty.svg")
+             :selected-icon (utils/cdn "/img/ML/carrot_radio_selected.svg")
+             :on-change (fn [t]
+                          (reset! (::show-filters-dropdown s) false)
+                          (cond
+                            (= (:value t) :latest)
+                            (do
+                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (router/nav! (oc-urls/board)))
+                            (= (:value t) :by-topic)
+                            (do
+                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (router/nav! (oc-urls/board-sort-by-topic)))
+                            :else
+                            (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized")))))
+             :on-blur (fn []
+                        (reset! (::show-filters-dropdown s) false))})))]))

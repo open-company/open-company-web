@@ -26,11 +26,9 @@ div.filters-dropdown-name {
   }
 
   div.dropdown-list-container{
-    // position: relative;
-    // display: inline-block;
     top: 30px;
-    width: 160px;
-    left: calc(50% - 80px);
+    width: 176px;
+    left: calc(50% - 88px);
 
     .choice {
       @include avenir_M();

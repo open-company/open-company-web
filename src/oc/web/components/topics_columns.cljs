@@ -172,7 +172,10 @@
                                                   (dis/dispatch! [:story-create board-data]))}
                           (dom/div {:class "add-to-board-pencil"})))
                       (when show-storyboards-dropdown
-                        (dropdown-list fixed-storyboards nil did-select-storyboard-cb #(om/set-state! owner :show-storyboards-dropdown false)))))))
+                        (dropdown-list {:items fixed-storyboards
+                                        :value nil
+                                        :on-change did-select-storyboard-cb
+                                        :on-blur #(om/set-state! owner :show-storyboards-dropdown false)}))))))
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?)
