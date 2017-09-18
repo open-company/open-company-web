@@ -37,7 +37,9 @@
                                       board-filters] :as data} owner options]
 
   (init-state [_]
-    {:show-boards-tooltip (and (not (:show-login-overlay data)) (jwt/jwt) (not (cook/get-cookie (router/dashboard-tooltips-shown (jwt/get-key :user-id)))))
+    {:show-boards-tooltip (and (not (:show-login-overlay data))
+                               (jwt/jwt)
+                               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
      :show-journals-tooltip false})
 
   ; (will-mount [_]
@@ -97,7 +99,7 @@
                          :footer "2 of 2"
                          :on-next-click (fn []
                                           (om/set-state! owner :show-journals-tooltip false)
-                                          (cook/set-cookie! (router/dashboard-tooltips-shown (jwt/get-key :user-id)) true (* 60 60 24 365)))})))
+                                          (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
         (cond
           ;; render 2 or 3 column layout
           (> columns-num 1)
