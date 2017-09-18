@@ -133,6 +133,9 @@
                          (not (responsive/is-tablet-or-mobile?))
                          (= (:type board-data) "entry"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
+                             :data-placement "left"
+                             :data-toggle "tooltip"
+                             :title (str "Create new update")
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
@@ -142,8 +145,7 @@
                                                           (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
-                  (dom/div {:class "add-to-board-pencil"})
-                  "New"))
+                  (dom/div {:class "add-to-board-pencil"})))
               (let [;; All the boards that are of story type, that are not drafts and that are not read-only
                     storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
                     ;; Select only the needed keys
@@ -160,13 +162,15 @@
                                (or (utils/link-for (:links board-data) "create")
                                    (= (:slug board-data) "drafts")))
                       (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn" (when (= (:slug board-data) "drafts") " is-draft"))
+                                   :data-placement "left"
+                                   :data-toggle "tooltip"
+                                   :title (str "Create new journal entry")
                                    :on-click #(if (= (router/current-board-slug) "drafts")
                                                 (if (= (count fixed-storyboards) 1)
                                                   (dis/dispatch! [:story-create (first storyboards)])
                                                   (om/set-state! owner :show-storyboards-dropdown (not show-storyboards-dropdown)))
                                                 (dis/dispatch! [:story-create board-data]))}
-                        (dom/div {:class "add-to-board-pencil"})
-                        "New"))
+                        (dom/div {:class "add-to-board-pencil"})))
                     (when show-storyboards-dropdown
                       (dropdown-list fixed-storyboards nil did-select-storyboard-cb #(om/set-state! owner :show-storyboards-dropdown false))))))
               ;; Board filters dropdown

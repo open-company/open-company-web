@@ -78,36 +78,61 @@ div.topics-columns {
         }
       }
 
-      div.new-story-container {
-        position: relative;
-        float: right;
-        div.dropdown-list-container {
-          left: -35px;
-          top: 47px;
-          width: 170px;
+      button.add-to-board-btn {
+        position: absolute;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 66px;
+        height: 66px;
+        border-radius: 33px;
+        background-color: $carrot_orange;
+
+        div.add-to-board-pencil {
+          background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+          background-size: 24px 24px;
+          width: 24px;
+          height: 24px;
+          margin-left: 6px;
+          margin-top: 2px;
         }
       }
 
-      button.add-to-board-btn {
-        float: right;
-        margin-right: 16px;
+      div.new-story-container {
+        position: absolute;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 66px;
+        height: 66px;
+        z-index: 10000;
 
-        &.is-draft {
-          margin-right: 24px;
+        button.add-to-board-btn {
+          position: relative;
+          top: 0px;
+          left: 0px;
         }
 
-        div.add-to-board-pencil {
-          background-image: cdnUrl("/img/ML/add_to_board_pencil.svg");
-          background-size: 16px 16px;
-          width: 16px;
-          height: 16px;
-          margin-right: 8px;
-          margin-top: 3px;
-          float: left;
+        div.tooltip {
+          width: 168px;
         }
 
-        &:hover div.add-to-board-pencil, &:focus div.add-to-board-pencil, &:active div.add-to-board-pencil {
-          background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+        div.dropdown-list-container {
+          left: -100px;
+          top: unset;
+          bottom: 76px;
+          width: 170px;
+
+          div.triangle {
+            top: unset;
+            left: unset;
+            right: 30px;
+            bottom: -2px;
+            border-top: unset;
+            border-left: unset;
+            border-bottom: 1px solid rgba(177,184,192,0.50);
+            border-right: 1px solid rgba(177,184,192,0.50);
+          }
         }
       }
 
