@@ -5,20 +5,25 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events.EventType :as EventType]))
 
-(rum/defc dropdown-list < rum/static
-                          (rum/local nil ::window-click-listener)
-                          (rum/local nil ::window-click-listener)
-                          {:will-mount (fn [s]
-                                         (reset! (::window-click-listener s)
-                                          (events/listen js/window EventType/CLICK
-                                           #(when (not (utils/event-inside? % (sel1 :div.dropdown-list-container)))
-                                              (let [on-click-out (nth (:rum/args s) 3)]
-                                                (when (fn? on-click-out)
-                                                  (on-click-out))))))
-                                         s)
-                           :will-unmount (fn [s]
-                                           (events/unlistenByKey @(::window-click-listener s))
-                                           s)}
+(rum/defc dropdown-list
+  "Component to create a dropdown list. Elements should be passed in a vector with this format:
+  {:value \"the value\" :label \"The label to show\"}.
+  Elements with this format will be transfomed into a divider line:
+  {:value nil :label :divider-line}."
+  < rum/static
+    (rum/local nil ::window-click-listener)
+    (rum/local nil ::window-click-listener)
+    {:will-mount (fn [s]
+                   (reset! (::window-click-listener s)
+                    (events/listen js/window EventType/CLICK
+                     #(when (not (utils/event-inside? % (sel1 :div.dropdown-list-container)))
+                        (let [on-click-out (nth (:rum/args s) 3)]
+                          (when (fn? on-click-out)
+                            (on-click-out))))))
+                   s)
+     :will-unmount (fn [s]
+                     (events/unlistenByKey @(::window-click-listener s))
+                    s)}
   [items selected-item did-select-cb did-click-out]
   [:div.dropdown-list-container
     [:div.triangle]
