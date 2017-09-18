@@ -299,16 +299,10 @@ div.onboard-lander {
       }
 
       div.user-avatar-img-container {
-        width: 82px;
-        height: 82px;
         float: left;
-
-        img {
-          width: 82px;
-          max-height: 82px;
-          text-align: center;
-        }
       }
+
+      @include user-profile(82);
 
       div.add-picture-link {
         @include avenir_H();

@@ -36,13 +36,9 @@ div.entry-edit-modal-container {
       div.user-avatar-img-container{
         margin-right: 16px;
         float: left;
-
-        img {
-          max-width: 32px;
-          max-height: 32px;
-          border-radius: 16px;
-        }
       }
+
+      @include user-profile(32);
 
       div.posting-in {
         @include avenir_M();
