@@ -26,7 +26,9 @@
       [:ul.dropdown-list
         (for [item items]
           [:li.dropdown-list-item
-            {:key (str "dropdown-list-item-" (:value item))
-             :on-click #(when (fn? did-select-cb) (did-select-cb item))
-             :class (when (= selected-item (:value item)) "select")}
-            (:label item)])]]])
+            {:key (str "dropdown-list-item-" (if (= (:label item) :divider-line) "divider" (:value item)))
+             :on-click #(when (and (:value item) (fn? did-select-cb)) (did-select-cb item))
+             :class (utils/class-set {:select (and (:value item) (= selected-item (:value item)))
+                                      :divider-line (= (:label item) :divider-line)})}
+            (when (string? (:label item))
+              (:label item))])]]])

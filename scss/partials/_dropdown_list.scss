@@ -43,6 +43,18 @@ div.dropdown-list-container {
         color: $oc_gray_7;
         cursor: pointer;
 
+        &.divider-line {
+          display: block;
+          height: 1px;
+          width: calc(100% + 32px);
+          margin-left: -16px;
+          background-color: rgba(177,184,192,0.50);
+
+          &:hover {
+            background-color: rgba(177,184,192,0.50);
+          }
+        }
+
         &:hover {
           background-color: transparent;
           text-decoration: underline;
