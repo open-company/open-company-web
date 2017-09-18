@@ -74,6 +74,7 @@
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
                 [:td.user-name
+                  {:class (when (some #(= (:status %) "pending") (:users team-data)) "has-pending")}
                   (user-avatar-image user)
                   (let [display-name (utils/name-or-email user)]
                     [:div.user-name-label

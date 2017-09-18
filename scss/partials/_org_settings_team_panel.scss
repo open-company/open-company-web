@@ -14,6 +14,7 @@ div.org-settings-panel {
 
       div.status-column-inner {
         max-width: 220px;
+        height: 25px;
 
         div.status-label {
           float: left;
@@ -29,16 +30,18 @@ div.org-settings-panel {
     }
 
     td.user-name {
+      &.has-pending {
+        max-width: 306px;
+      }
+
       div.user-avatar-img-container {
         margin-right: 16px;
         float: left;
-
-        img {
-          max-width: 32px;
-          max-height: 32px;
-          border-radius: 16px;
-        }
       }
+
+      @include user-profile(32);
+
+
       div.user-name-label {
         float: left;
         max-width: calc(100% - 78px);

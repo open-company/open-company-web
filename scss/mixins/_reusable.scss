@@ -209,3 +209,25 @@
     background-image: url( #{ $cdn_url + "/" + $deploy_key + $path } );
   }
 }
+
+@mixin user-profile($size) {
+  div.user-avatar-img-container {
+    width: #{$size}px;
+    height: #{$size}px;
+    white-space: nowrap;
+    text-align: center;
+
+    div.user-avatar-img-helper {
+      display: inline-block;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+    img.user-avatar-img {
+      width: #{$size}px;
+      height: #{$size}px;
+      border-radius: #{$size / 2}px;
+      vertical-align: middle;
+    }
+  }
+}

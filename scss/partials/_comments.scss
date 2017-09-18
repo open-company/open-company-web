@@ -141,16 +141,10 @@ div.comments {
       }
 
       div.user-avatar-img-container {
-        width: 23px;
-        height: 23px;
         float: left;
-
-        img.user-avatar-img {
-          max-width: 23px;
-          max-height: 23px;
-          border-radius: 11.5px;
-        }
       }
+
+      @include user-profile(23);
 
       div.add-comment-internal{
         margin-left: 35px;

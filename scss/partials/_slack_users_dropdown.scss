@@ -67,17 +67,7 @@ div.slack-users-dropdown {
       text-overflow: ellipsis;
       overflow: hidden;
 
-      div.user-avatar-img-container {
-        width: 24px;
-        height: 24px;
-        float: left;
-        margin-top: -6px;
-
-        img {
-          max-width: 24px;
-          max-height: 24px;
-        }
-      }
+      @include user-profile(24);
 
       div.user-name {
         @include avenir_M();

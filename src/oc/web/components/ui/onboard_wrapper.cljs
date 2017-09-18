@@ -2,10 +2,12 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -72,6 +74,7 @@
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
                                   {:will-mount (fn [s]
+                                                 (cook/set-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)) true (* 60 60 24 7))
                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                                  s)
                                    :will-update (fn [s]
@@ -279,6 +282,7 @@
                               (empty? (:last-name user-data)))
                          (empty? (:avatar-url user-data)))
            :on-click #(do
+                        (cook/set-cookie! (router/should-show-dashboard-tooltips (:user-id user-data)) true (* 60 60 24 7))
                         (reset! (::saving s) true)
                         (dis/dispatch! [:user-profile-save true]))}
           "Sign Up"]]]))
