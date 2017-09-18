@@ -48,7 +48,7 @@ div.left-navigation-sidebar {
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 44px;
+    margin-bottom: 24px;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     padding-left: 25px;
@@ -93,7 +93,7 @@ div.left-navigation-sidebar {
     .left-navigation-sidebar-top-title {
       padding: 0 0 0 25px;
       margin: 0;
-      margin-bottom: 12px;
+      margin-bottom: 24px;
 
       span {
         @include avenir_B();
@@ -146,20 +146,16 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-items{
-    cursor: pointer;
-    margin-bottom: 44px;
+    margin-bottom: 24px;
 
-    div.left-navigation-sidebar-draft-divider {
-      width: 96px;
-      height: 2px;
-      background-color: rgba($carrot_light_gray, 0.3);
-      margin: 4px 30px 4px 50px;
+    div.left-navigation-sidebar-draft {
+      margin-top: 24px;
     }
 
     a.left-navigation-sidebar-item {
       display: block;
       cursor: default;
-      margin-top: 10px;
+      margin-top: 4px;
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
       padding-left: 20px;
@@ -220,7 +216,7 @@ div.left-navigation-sidebar {
 
     button.about-carrot-btn {
       @include avenir_M();
-      margin-top: 10px;
+      margin-top: 4px;
       &:hover {
         text-decoration: underline;
       }
