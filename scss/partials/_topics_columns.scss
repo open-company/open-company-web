@@ -87,6 +87,7 @@ div.topics-columns {
         height: 66px;
         border-radius: 33px;
         background-color: $carrot_orange;
+        z-index: 1000;
 
         div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
