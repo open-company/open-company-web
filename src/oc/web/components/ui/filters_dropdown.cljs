@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.filters-dropdown
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
+            [medley.core :as med]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -25,50 +26,35 @@
         board-filters (drv/react s :board-filters)
         topic-groups (group-by :topic-slug (:entries board-data))]
     [:div.filters-dropdown-name.group
-      (when-not (string? board-filters)
-        [:button.mlb-reset.filters-dropdown-button.choice
-            {:type "button"
-             :class (when (or (nil? board-filters) (= board-filters :latest)) "select")
-             :on-click (fn []
-                         (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-                         (router/nav! (oc-urls/board)))}
-            "Latest"])
-      (when-not (string? board-filters)
-        [:button.mlb-reset.filters-dropdown-button.filters-dropdown-by-topic.choice
-            {:type "button"
-             :class (when (= board-filters :by-topic) "select")
-             :on-click (fn []
-                         (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-                         (router/nav! (oc-urls/board-sort-by-topic)))}
-            "By Topic"])
-      (when (string? board-filters)
-        (carrot-close-bt {:on-click #(let [org-slug (router/current-org-slug)
-                                           board-slug (router/current-board-slug)
-                                           last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                                       (if (= last-filter :by-topic)
-                                         (router/nav! (oc-urls/board-sort-by-topic))
-                                         (router/nav! (oc-urls/board))))
-                          :width 24
-                          :height 24}))
-      (when (string? board-filters)
-        [:button.mlb-reset.filters-dropdown-button.choice
-          {:class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
-           :on-click #(when (pos? (count topic-groups))
-                        (reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s))))}
-          (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters))])
-      [:div.filters-dropdown-container
-        [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle.choice
-          {:class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
-           :on-click #(when (pos? (count topic-groups))
-                        (reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s))))}
-          (when (pos? (count topic-groups)) [:i.fa.fa-caret-down])]
-        (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
-              selected-topics (filter #(utils/in? sorted-topics (:slug %)) (:topics board-data))
-              topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))]
-          (when @(::show-filters-dropdown s)
-            (dropdown-list topics board-filters
-             (fn [t]
-               (reset! (::show-filters-dropdown s) false)
-               (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized"))))
-             (fn []
-               (reset! (::show-filters-dropdown s) false)))))]]))
+      [:button.mlb-reset.filters-dropdown-button.choice
+        {:type "button"
+         :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}
+        (cond
+          (= board-filters :by-topic)
+          "View by topic "
+          (string? board-filters)
+          (str "View " (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters)) " ")
+          :else
+          "View by most recent ")
+        [:i.fa.fa-caret-down]]
+      (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
+            selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
+            topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
+            final-topics (vec (concat [{:label "Most recent" :value :latest} {:label "By topic" :value :by-topic} {:label :divider-line :value nil}] topics))]
+        (when @(::show-filters-dropdown s)
+          (dropdown-list final-topics board-filters
+           (fn [t]
+             (reset! (::show-filters-dropdown s) false)
+             (cond
+               (= (:value t) :latest)
+               (do
+                 (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                 (router/nav! (oc-urls/board)))
+               (= (:value t) :by-topic)
+               (do
+                 (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                 (router/nav! (oc-urls/board-sort-by-topic)))
+               :else
+               (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized")))))
+           (fn []
+             (reset! (::show-filters-dropdown s) false)))))]))
