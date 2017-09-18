@@ -24,8 +24,16 @@
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
-        topic-groups (group-by :topic-slug (:entries board-data))]
+        topic-groups (group-by :topic-slug (:entries board-data))
+        org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)]
     [:div.filters-dropdown-name.group
+      (when (string? board-filters)
+        (carrot-close-bt {:width 24
+                          :height 24
+                          :on-click #(if (= (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)) "by-topic")
+                                       (router/nav! (oc-urls/board-sort-by-topic))
+                                       (router/nav! (oc-urls/board)))}))
       [:button.mlb-reset.filters-dropdown-button.choice
         {:type "button"
          :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}
@@ -33,7 +41,7 @@
           (= board-filters :by-topic)
           "View by topic "
           (string? board-filters)
-          (str "View " (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters)) " ")
+          (str (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters)) " ")
           :else
           "View by most recent ")
         [:i.fa.fa-caret-down]]
@@ -52,11 +60,11 @@
                           (cond
                             (= (:value t) :latest)
                             (do
-                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (cook/set-cookie! (router/last-board-filter-cookie org-slug board-slug) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board)))
                             (= (:value t) :by-topic)
                             (do
-                              (cook/set-cookie! (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (cook/set-cookie! (router/last-board-filter-cookie org-slug board-slug) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board-sort-by-topic)))
                             :else
                             (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized")))))
