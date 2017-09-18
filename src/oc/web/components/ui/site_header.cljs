@@ -60,7 +60,12 @@
               "About"]]
           [:li
             [:a.navbar-item {:href oc-urls/blog :target "_blank"} "Blog"]]
+          (when-not (jwt/jwt)
+            [:li
+              [:a.navbar-item {:href oc-urls/login
+                               :on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))} "Login"]])
           [:li.get-started-item
-            (if (jwt/jwt)
-              [:a {:href "" :on-click #(do (utils/event-stop %) (dis/dispatch! [:logout]))} "Log Out"]
-              (get-started-button {:button-classes "navbar-item"}))]]]]])
+            [:div.get-started-button.navbar-item
+              (if (jwt/jwt)
+                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Newsboard"]
+                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/sign-up)} "Sign Up"])]]]]]])
