@@ -104,13 +104,22 @@ div.left-navigation-sidebar {
         cursor: default;
       }
 
-      div.boards-icon, div.stories-icon {
+      div.boards-icon {
         background-size: 16px 16px;
         width: 16px;
         height: 16px;
         float: left;
         margin-right: 5px;
         margin-top: -3px;
+      }
+
+      div.stories-icon {
+        background-size: 15px 12px;
+        width: 15px;
+        height: 12px;
+        float: left;
+        margin-right: 4px;
+        margin-top: -2px;
       }
 
       div.boards-icon {

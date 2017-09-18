@@ -23,13 +23,22 @@ div.topics-columns {
       width: #{$board_container_width}px;
       background-color: $oc_gray_8;
 
-      div.all-activity-icon, div.boards-icon, div.stories-icon {
+      div.all-activity-icon, div.boards-icon {
         background-size: 26px 26px;
         width: 26px;
         height: 26px;
         float: left;
         margin-right: 10px;
         margin-top: 5px;
+      }
+
+      div.stories-icon {
+        background-size: 25px 22px;
+        width: 25px;
+        height: 22px;
+        float: left;
+        margin-right: 11px;
+        margin-top: 7px;
       }
 
       div.boards-icon {
