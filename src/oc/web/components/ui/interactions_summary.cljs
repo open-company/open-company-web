@@ -34,9 +34,7 @@
         comments-authors (if has-comments-data
                            (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (vec (sort-by :created-at (:authors comments-link))))
-        comments-count (if has-comments-data
-                         (count comments-data)
-                         (:count comments-link))]
+        comments-count (max (count comments-data) (:count comments-link))]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
