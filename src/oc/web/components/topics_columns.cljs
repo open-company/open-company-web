@@ -127,6 +127,7 @@
                     (:name board-data))
                   ;; Settings button
                   (when (and (router/current-board-slug)
+                             (not is-all-activity)
                              (not (:read-only board-data)))
                     (dom/button {:class "mlb-reset board-settings-bt"
                                  :data-toggle "tooltip"
