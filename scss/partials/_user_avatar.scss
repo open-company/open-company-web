@@ -7,6 +7,7 @@ button.user-avatar-button{
   width: #{$avatar_size}px;
   height: #{$avatar_size}px;
   border-radius: #{$avatar-size / 2}px;
+  padding: 0;
 
   &.disabled-user-menu {
     cursor: default;
