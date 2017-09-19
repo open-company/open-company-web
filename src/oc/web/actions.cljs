@@ -1309,11 +1309,8 @@
   (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
 
 (defmethod dispatcher/action :org-edit
-  [db [_ org-data keep-edits?]]
-  (let [next-org-editing (if keep-edits?
-                            (merge org-data (:org-editing db))
-                            org-data)]
-    (assoc db :org-editing next-org-editing)))
+  [db [_ org-data]]
+  (assoc db :org-editing org-data))
 
 (defmethod dispatcher/action :org-edit-save
   [db [_]]
