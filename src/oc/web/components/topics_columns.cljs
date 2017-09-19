@@ -214,5 +214,5 @@
                     :style topics-column-conatiner-style
                     :key columns-container-key}
             (dom/div {:class "topics-column"}
-              (for [activity-data (if (= (:type board-data) "story") (:stories board-data) (:entries board-data))]
+              (for [activity-data (get (:fixed-items board-data) current-activity-id)]
                 (activity-card activity-data)))))))))
