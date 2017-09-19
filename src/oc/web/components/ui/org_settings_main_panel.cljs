@@ -12,18 +12,12 @@
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
-(defn reset-form [s keep?]
+(defn reset-form [s]
   (let [org-data (first (:rum/args s))
-        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))
-        domain (if (and keep?
-                        um-domain-invite
-                        (:domain um-domain-invite))
-                  (:domain um-domain-invite)
-                  "")]
-    (dis/dispatch! [:org-edit org-data keep?])
-    (dis/dispatch! [:input [:um-domain-invite :domain] domain])
-    (when-not keep?
-      (dis/dispatch! [:input [:add-email-domain-team-error] nil]))))
+        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
+    (dis/dispatch! [:org-edit org-data])
+    (dis/dispatch! [:input [:um-domain-invite :domain] ""])
+    (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
 (defn logo-on-load [org-data url img]
   (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
@@ -49,7 +43,7 @@
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
     {:will-mount (fn [s]
-                   (reset-form s true)
+                   (reset-form s)
                    s)
      :will-update (fn [s]
                     (let [org-editing @(drv/get-ref s :org-editing)]
@@ -228,5 +222,5 @@
               "Saving..."
               "Save"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(reset-form s false)}
+          {:on-click #(reset-form s)}
           "Cancel"]]]))

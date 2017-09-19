@@ -66,6 +66,9 @@ div.orgs-dropdown {
         float: left;
         margin-top: 4px;
         margin-left: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 122px;
 
         &.no-logo {
           margin-left: 40px;
