@@ -250,7 +250,7 @@
   (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
         board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
-        new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
+        new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body board-data (:topics board-data)))
         new-board-data (assoc board-data :fixed-items new-entries)]
   (assoc db board-key new-board-data)))
 
@@ -1005,7 +1005,7 @@
                                       :updated-at as-of
                                       :reactions []
                                       :uuid (utils/activity-uuid)})
-                   (:slug board-data)
+                   board-data
                    (:topics board-data)))
 
 (defn entry-fixed-data [entry-data current-user-data as-of]
