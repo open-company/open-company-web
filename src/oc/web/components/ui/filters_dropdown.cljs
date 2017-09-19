@@ -24,7 +24,7 @@
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
-        topic-groups (group-by :topic-slug (:entries board-data))
+        topic-groups (group-by :topic-slug (vals (:fixed-items board-data)))
         org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
     [:div.filters-dropdown-name.group
