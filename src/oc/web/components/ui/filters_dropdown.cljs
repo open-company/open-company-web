@@ -23,7 +23,7 @@
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
-        topic-groups (group-by :topic-slug (:entries board-data))]
+        topic-groups (group-by :topic-slug (vals (:fixed-items board-data)))]
     [:div.filters-dropdown-name.group
       (when-not (string? board-filters)
         [:button.mlb-reset.filters-dropdown-button.choice
