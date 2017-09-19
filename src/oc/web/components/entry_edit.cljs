@@ -3,6 +3,7 @@
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -143,6 +144,7 @@
                         (rum/local false ::focusing-create-topic)
                         (rum/local false ::remove-no-scroll)
                         (rum/local "entry-edit-media-picker" ::media-picker-id)
+                        (rum/local 330 ::entry-edit-modal-height)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -171,6 +173,11 @@
                                       (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
                                       (utils/after 10 #(.focus (sel1 [:div.entry-edit-headline])))
                                       s)
+                         :before-render (fn [s]
+                                          (when-let [entry-edit-modal (sel1 [:div.entry-edit-modal])]
+                                            (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
+                                              (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))
+                                          s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
                                            (reset! (::first-render-done s) true))
@@ -185,7 +192,9 @@
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
         new-entry?        (empty? (:uuid entry-editing))
-        attachments       (:attachments entry-editing)]
+        attachments       (:attachments entry-editing)
+        fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
+        wh (.-innerHeight js/window)]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
@@ -194,20 +203,27 @@
                              (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
                     (close-clicked s))}
       [:div.entry-edit-modal.group
+        {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
         [:div.entry-edit-modal-header.group
           (user-avatar-image current-user-data)
           [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
-          [:div.arrow " · "]
           [:div.entry-card-dd-container
-            [:button.mlb-reset.dropdown-toggle
-              {:class (when-not (:topic-name entry-editing) "select-a-topic")
-               :type "button"
-               :id "entry-edit-dd-btn"
-               :data-toggle "dropdown"
-               :aria-haspopup true
-               :aria-expanded false}
-              (if (:topic-name entry-editing) (:topic-name entry-editing) "Add a topic")
-              [:i.fa.fa-caret-down]]
+            (if (:topic-name entry-editing)
+              [:button.mlb-reset.dropdown-toggle.has-topic
+                {:type "button"
+                 :id "entry-edit-dd-btn"
+                 :data-toggle "dropdown"
+                 :aria-haspopup true
+                 :aria-expanded false}
+                [:div.activity-tag
+                  (:topic-name entry-editing)]]
+              [:button.mlb-reset.dropdown-toggle
+                {:type "button"
+                 :id "entry-edit-dd-btn"
+                 :data-toggle "dropdown"
+                 :aria-haspopup true
+                 :aria-expanded false}
+                "+ Add a topic"])
             [:div.entry-edit-topics-dd.dropdown-menu
               {:aria-labelledby "entry-edit-dd-btn"}
               [:div.triangle]
@@ -255,7 +271,6 @@
                                      (create-new-topic s))
                          :disabled (empty? (s/trim @(::new-topic s)))}
                         "Create"])]]]]]]
-      [:div.entry-edit-modal-divider]
       [:div.entry-edit-modal-body
         ; Headline element
         [:div.entry-edit-headline.emoji-autocomplete.emojiable
