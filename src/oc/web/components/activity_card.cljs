@@ -191,7 +191,8 @@
                        :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
     [:div.activity-card-footer.group
       (interactions-summary activity-data)
-      (when-not (:read-only activity-data)
+      (when (or (utils/link-for (:links activity-data) "partial-update")
+                (utils/link-for (:links activity-data) "delete"))
         [:div.more-button.dropdown
           [:button.mlb-reset.more-ellipsis.dropdown-toggle
             {:type "button"
@@ -206,13 +207,15 @@
             {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
             [:div.triangle]
             [:ul.activity-card-more-menu
-              [:li
-                {:on-click (fn [e]
-                             (utils/event-stop e)
-                             (if (= (:type activity-data) "story")
-                               (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
-                               (dis/dispatch! [:entry-edit activity-data])))}
-                "Edit"]
-              [:li
-                {:on-click #(delete-clicked % activity-data)}
-                "Delete"]]]])]])
+              (when (utils/link-for (:links activity-data) "partial-update")
+                [:li
+                  {:on-click (fn [e]
+                               (utils/event-stop e)
+                               (if (= (:type activity-data) "story")
+                                 (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
+                                 (dis/dispatch! [:entry-edit activity-data])))}
+                  "Edit"])
+              (when (utils/link-for (:links activity-data) "delete")
+                [:li
+                  {:on-click #(delete-clicked % activity-data)}
+                  "Delete"])]]])]])
