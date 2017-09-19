@@ -189,7 +189,7 @@
         (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:entries (dis/board-data)))) ;; or the entries key is missing that means we have only
+              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
     (post-routing)
@@ -209,7 +209,7 @@
     (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
+              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
     (post-routing)
@@ -228,7 +228,7 @@
     (router/set-route! (vec (remove nil? [org storyboard route (when story story) secure-id])) {:org org :board storyboard :activity story :secure-id secure-id :query-params query-params})
     ;; do we have the company data already?
     (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:stories (dis/board-data)))) ;; or the entries key is missing that means we have only
+              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
     (post-routing)
