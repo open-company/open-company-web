@@ -277,23 +277,15 @@
          (nil? update-link)
          (nil? delete-link))))
 
-(defn readonly-topic? [links]
-  (let [create (link-for links "create")
-        partial-update (link-for links "partial-update")
-        delete (link-for links "delete")]
-    (and (nil? create) (nil? partial-update) (nil? delete))))
-
 (defn readonly-entry? [links]
-  (let [create (link-for links "create")
-        partial-update (link-for links "partial-update")
+  (let [partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
-    (and (nil? create) (nil? partial-update) (nil? delete))))
+    (and (nil? partial-update) (nil? delete))))
 
 (defn readonly-story? [links]
-  (let [create (link-for links "create")
-        partial-update (link-for links "partial-update")
+  (let [partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
-    (and (nil? create) (nil? partial-update) (nil? delete))))
+    (and (nil? partial-update) (nil? delete))))
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -306,17 +298,6 @@
         sorted-finances (sort sort-pred fixed-finances)
         fixed-topic (assoc topic-body :data sorted-finances)]
     fixed-topic))
-
-(defn fix-topic
-  "Add `:topic` name and `:as-of` keys to the topic map"
-  [topic-body topic-name & [read-only force-write]]
-  (let [with-keys (-> topic-body
-                      (assoc :topic (name topic-name))
-                      (assoc :as-of (:created-at topic-body))
-                      (assoc :read-only (readonly-topic? (:links topic-body))))]
-    (if (= topic-name :finances)
-      (fix-finances with-keys)
-      with-keys)))
 
 (defn css-color [color]
   (let [colors (subvec (clojure.string/split color #"") 2)
