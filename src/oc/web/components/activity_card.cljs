@@ -128,13 +128,13 @@
       [:div.activity-card-breadcrumb
         "In " [:span.bold (if (= (:type activity-data) "entry") (:board-name activity-data) (:storyboard-name activity-data))]
         (when (:topic-slug activity-data)
-          " → ")
-        (when (:topic-slug activity-data)
-          [:span.bold (:topic-name activity-data)])])
+          [:div.topic
+            [:div.activity-tag (:topic-name activity-data)]])])
     ; Card header
     (when (or is-all-activity
               (= (:type activity-data) "entry"))
       [:div.activity-card-head.group
+        {:class (when (and (not is-all-activity) (= (:type activity-data) "entry")) "entry-card")}
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (first (:author activity-data)))
