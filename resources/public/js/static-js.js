@@ -41,7 +41,16 @@ function getCookie(name) {
 
 function cookieName(){
   var h = window.location.hostname.split(".")[0];
-  return h + "-jwt";
+  var prefix = "";
+  switch(h) {
+    case "localhost":
+      prefix = "localhost-";
+      break;
+    case "staging":
+      prefix = "staging-";
+      break;
+  }
+  return prefix + "jwt";
 }
 
 $(document).ready(function(){
