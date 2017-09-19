@@ -53,10 +53,14 @@
                          (rum/local nil ::esc-key-listener)
                          rum/reactive
                          (drv/drv :activity-modal-fade-in)
+                         (rum/local 330 ::activity-modal-height)
                          {:before-render (fn [s]
                                            (when (and (not @(::animate s))
                                                     (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
                                              (reset! (::animate s) true))
+                                           (when-let [activity-modal (sel1 [:div.activity-modal])]
+                                             (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
+                                               (reset! (::activity-modal-height s) (.-clientHeight activity-modal))))
                                            s)
                           :will-mount (fn [s]
                                         (reset! (::window-resize-listener s)
@@ -104,7 +108,9 @@
                                           s)}
   [s activity-data]
   (let [column-height @(::column-height s)
-        show-comments? (utils/link-for (:links activity-data) "comments")]
+        show-comments? (utils/link-for (:links activity-data) "comments")
+        fixed-activity-modal-height (max @(::activity-modal-height s) 330)
+        wh (.-innerHeight js/window)]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))
@@ -112,63 +118,62 @@
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
                     (close-clicked s))}
       [:div.activity-modal.group
-        {:class (str "activity-modal-" (:uuid activity-data))}
-        (carrot-close-bt {:on-click #(close-clicked s)})
-        [:div.activity-modal-inner.group
-          [:div.activity-left-column
-            {:style (when column-height {:minHeight (str column-height "px")})}
-            [:div.activity-left-column-content
-              {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
-              [:div.activity-modal-head.group
-                [:div.activity-modal-head-left
-                  (user-avatar-image (first (:author activity-data)))
-                  [:div.name (:name (first (:author activity-data)))]
-                  [:div.time-since
-                    [:time
-                      {:date-time (:created-at activity-data)
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :title (utils/activity-date-tooltip activity-data)}
-                      (utils/time-since (:created-at activity-data))]]]
-                [:div.activity-modal-head-right
-                  (when (:topic-slug activity-data)
-                    (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                      [:div.activity-tag
-                        {:on-click #(close-clicked s (:topic-slug activity-data))}
-                        topic-name]))]]
-              [:div.activity-modal-content
-                [:div.activity-modal-content-headline
-                  {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-                [:div.activity-modal-content-body
-                  {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                   :class (when (empty? (:headline activity-data)) "no-headline")}]
-                (media-attachments (:attachments activity-data))
-                [:div.activity-modal-footer.group
-                  (reactions activity-data)
-                  [:div.activity-modal-footer-right
-                    (when-not (:read-only activity-data)
-                      [:div.more-dropdown.dropdown
-                        [:button.mlb-reset.activity-modal-more.dropdown-toggle
-                          {:type "button"
-                           :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
-                           :data-toggle "dropdown"
-                           :aria-haspopup true
-                           :aria-expanded false
-                           :title "More"}]
-                        [:div.dropdown-menu
-                          {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
-                          [:div.triangle]
-                          [:ul.activity-modal-more-menu
-                            [:li
-                              {:on-click (fn [e]
-                                           (utils/event-stop e)
-                                           (dis/dispatch! [:entry-edit activity-data]))}
-                              "Edit"]
-                            [:li
-                              {:on-click #(delete-clicked % activity-data)}
-                              "Delete"]]]])]]]]]
-          (when show-comments?
-            [:div.activity-right-column
-              {:style (when column-height {:minHeight (str column-height "px")})}
-              [:div.activity-right-column-content
-                (comments activity-data)]])]]]))
+        {:class (str "activity-modal-" (:uuid activity-data))
+         :style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
+        [:div.activity-left-column
+          {:style (when column-height {:min-height (str column-height "px")})}
+          [:div.activity-left-column-content
+            {:style (when column-height {:min-height (str (- column-height 40) "px")})}
+            [:div.activity-modal-head.group
+              [:div.activity-modal-head-left
+                (user-avatar-image (first (:author activity-data)))
+                [:div.name (:name (first (:author activity-data)))]
+                [:div.time-since
+                  [:time
+                    {:date-time (:created-at activity-data)
+                     :data-toggle "tooltip"
+                     :data-placement "top"
+                     :title (utils/activity-date-tooltip activity-data)}
+                    (utils/time-since (:created-at activity-data))]]]
+              [:div.activity-modal-head-right
+                (when (:topic-slug activity-data)
+                  (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
+                    [:div.activity-tag
+                      {:on-click #(close-clicked s (:topic-slug activity-data))}
+                      topic-name]))]]
+            [:div.activity-modal-content
+              [:div.activity-modal-content-headline
+                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+              [:div.activity-modal-content-body
+                {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
+                 :class (when (empty? (:headline activity-data)) "no-headline")}]
+              (media-attachments (:attachments activity-data))]
+            [:div.activity-modal-footer.group
+              (reactions activity-data)
+              [:div.activity-modal-footer-right
+                (when-not (:read-only activity-data)
+                  [:div.more-dropdown.dropdown
+                    [:button.mlb-reset.activity-modal-more.dropdown-toggle
+                      {:type "button"
+                       :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
+                       :data-toggle "dropdown"
+                       :aria-haspopup true
+                       :aria-expanded false
+                       :title "More"}]
+                    [:div.dropdown-menu
+                      {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
+                      [:div.triangle]
+                      [:ul.activity-modal-more-menu
+                        [:li
+                          {:on-click (fn [e]
+                                       (utils/event-stop e)
+                                       (dis/dispatch! [:entry-edit activity-data]))}
+                          "Edit"]
+                        [:li
+                          {:on-click #(delete-clicked % activity-data)}
+                          "Delete"]]]])]]]]
+        (when show-comments?
+          [:div.activity-right-column
+            {:style (when column-height {:min-height (str column-height "px")})}
+            [:div.activity-right-column-content
+              (comments activity-data)]])]]))

@@ -23,164 +23,142 @@ div.activity-modal-container {
   }
 
   div.activity-modal {
-    width: 950px;
-    max-height: calc(100vh - 150px);
-    margin: 100px auto 50px;
-    padding-left: 32px;
+    width: 918px;
+    max-height: 100vh;
+    min-height: 330px;
+    margin: 0px auto;
     position: relative;
     overflow: visible;
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+    border-radius: 8px;
+    background-color: white;
 
-    button.carrot-close-bt {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-    }
+    div.activity-left-column {
+      float: left;
+      width: 617px;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
 
-    div.activity-modal-inner {
-      width: 100%;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-      max-height: calc(100vh - 150px);
+      div.activity-left-column-content {
 
-      div.activity-left-column {
-        // display:table-cell;
-        float: left;
-        width: 617px;
-        // padding: 24px 0;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
+        div.activity-modal-head{
+          padding: 24px 16px 0px 32px;
 
-        div.activity-left-column-content {
-          padding: 24px 16px 30px 32px;
-          max-height: calc(100vh - 150px - 48px);
-          overflow-x: hidden;
-          overflow-y: auto;
-
-          div.activity-modal-head{
-            div.activity-modal-head-left {
-              float: left;
-              min-width: 300px;
-              @include activity-author();
-            }
-
-            div.activity-modal-head-right {
-              float: right;
-              div.activity-tag {
-                float: right;
-                margin-top: 7px;
-              }
-
-              @include activity-tag();
-            }
+          div.activity-modal-head-left {
+            float: left;
+            min-width: 300px;
+            @include activity-author();
           }
 
-          div.activity-modal-content {
-            float: none;
-            width: 100%;
-            position: relative;
-            padding-bottom: 64px;
-
-            div.activity-modal-content-title {
-              margin-top: 24px;
-              @include activity-title();
+          div.activity-modal-head-right {
+            float: right;
+            div.activity-tag {
+              float: right;
+              margin-top: 7px;
             }
 
-            div.activity-modal-content-headline {
-              margin-top: 24px;
-              @include activity-headline();
-            }
+            @include activity-tag();
+          }
+        }
 
-            div.activity-modal-content-body {
-              margin-top: 24px;
-              @include activity-body();
-              min-height: 112px;
+        div.activity-modal-content {
+          padding: 0px 16px 40px 32px;
+          float: none;
+          width: 100%;
+          position: relative;
+          overflow-y: auto;
+          max-height: calc(100vh - 143px);
 
-              &.no-headline {
-                min-height: 166px;
+          div.activity-modal-content-title {
+            margin-top: 24px;
+            @include activity-title();
+          }
+
+          div.activity-modal-content-headline {
+            margin-top: 24px;
+            @include activity-headline();
+          }
+
+          div.activity-modal-content-body {
+            margin-top: 24px;
+            @include activity-body();
+          }
+        }
+
+        div.activity-modal-footer {
+          padding: 24px 20px 26px 32px;
+          height: 90px;
+
+          div.reactions {
+            margin-top: 7px;
+          }
+
+          div.activity-modal-footer-right {
+            float: right;
+
+            div.more-dropdown {
+              float: right;
+              margin-top: 7px;
+              margin-left: 10px;
+              width: 32px;
+              height: 32px;
+
+              button.activity-modal-more {
+                width: 32px;
+                height: 32px;
+                padding: 8px 0px 8px 16px;
+                display: block;
+                background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+                background-position: right center;
+                background-size: 6px 16px;
+                background-repeat: no-repeat;
+                margin-left: 6px;
               }
-            }
-            div.activity-modal-footer {
-              width: 569px;
-              height: 40px;
-              position: absolute;
-              bottom: 0px;
-              background-color: white;
-              margin: 24px 16px 0 0;
-              padding-right: 4px;
 
-              div.reactions {
-                margin-top: 7px;
-              }
+              div.dropdown-menu {
+                position: absolute;
+                top: -44px;
+                left: -91px;
+                border: none;
+                outline: none;
+                box-shadow: none;
+                background-color: transparent;
+                padding: 0 0 .3em;
 
-              div.activity-modal-footer-right {
-                float: right;
+                div.triangle {
+                  position: absolute;
+                  top: 50px;
+                  left: 90px;
+                  background-color: white;
+                  border-top: 1px solid rgba(177,184,192,0.50);
+                  border-left: 1px solid rgba(177,184,192,0.50);
+                  transform: rotate(135deg);
+                  width: 20px;
+                  height: 20px;
+                }
 
-                div.more-dropdown {
-                  float: right;
-                  margin-top: 7px;
-                  margin-left: 10px;
-                  width: 32px;
-                  height: 32px;
+                ul.activity-modal-more-menu {
+                  background-color: white;
+                  border: 1px solid rgba(177,184,192,0.50);
+                  box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                  border-radius: 5px;
+                  margin: 8px 0;
+                  padding: 10px 16px 6px;
+                  min-height: 50px;
+                  list-style-type: none;
+                  width: 100px;
 
-                  button.activity-modal-more {
-                    width: 32px;
-                    height: 32px;
-                    padding: 8px 0px 8px 16px;
-                    display: block;
-                    background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-                    background-position: right center;
-                    background-size: 6px 16px;
-                    background-repeat: no-repeat;
-                    margin-left: 6px;
-                  }
-
-                  div.dropdown-menu {
-                    position: absolute;
-                    top: -44px;
-                    left: -91px;
-                    border: none;
-                    outline: none;
-                    box-shadow: none;
+                  li {
+                    margin: 6px 0;
+                    @include avenir_M();
+                    font-size: 14px;
+                    color: $oc_gray_7;
+                    cursor: pointer;
                     background-color: transparent;
-                    padding: 0 0 .3em;
 
-                    div.triangle {
-                      position: absolute;
-                      top: 50px;
-                      left: 90px;
-                      background-color: white;
-                      border-top: 1px solid rgba(177,184,192,0.50);
-                      border-left: 1px solid rgba(177,184,192,0.50);
-                      transform: rotate(135deg);
-                      width: 20px;
-                      height: 20px;
-                    }
-
-                    ul.activity-modal-more-menu {
-                      background-color: white;
-                      border: 1px solid rgba(177,184,192,0.50);
-                      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-                      border-radius: 5px;
-                      margin: 8px 0;
-                      padding: 10px 16px 6px;
-                      min-height: 50px;
-                      list-style-type: none;
-                      width: 100px;
-
-                      li {
-                        margin: 6px 0;
-                        @include avenir_M();
-                        font-size: 14px;
-                        color: $oc_gray_7;
-                        cursor: pointer;
-                        background-color: transparent;
-
-                        &:hover {
-                          text-decoration: underline;
-                          background-color: transparent;
-                        }
-                      }
+                    &:hover {
+                      text-decoration: underline;
+                      background-color: transparent;
                     }
                   }
                 }
@@ -189,27 +167,27 @@ div.activity-modal-container {
           }
         }
       }
+    }
 
-      div.activity-right-column {
-        float: right;
-        width: 301px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        background-color: $carrot_light_gray_2;
+    div.activity-right-column {
+      float: right;
+      width: 301px;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      background-color: $carrot_light_gray_2;
+      max-height: calc(100vh - 150px - 48px);
+      min-height: 200px;
+      position: relative;
+
+      div.activity-right-column-content {
+        padding: 14px 32px 24px 16px;
         max-height: calc(100vh - 150px - 48px);
-        min-height: 200px;
-        position: relative;
-
-        div.activity-right-column-content {
-          padding: 14px 32px 24px 16px;
-          max-height: calc(100vh - 150px - 48px);
-          overflow-x: hidden;
-          overflow-y: auto;
-          position: absolute;
-          bottom: 0px;
-          width: 100%;
-          height: 100%;
-        }
+        overflow-x: hidden;
+        overflow-y: auto;
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        height: 100%;
       }
     }
   }
