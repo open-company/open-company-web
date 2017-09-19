@@ -131,7 +131,8 @@
               (when (and (not is-all-activity)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
-                         (= (:type board-data) "entry"))
+                         (= (:type board-data) "entry")
+                         (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
                              :data-placement "left"
                              :data-toggle "tooltip"
