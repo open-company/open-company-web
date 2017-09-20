@@ -150,14 +150,16 @@ div.topics-columns {
           }
         }
 
-        div.dropdown-top div.dropdown-list-container {
-          left: -8.5px;
-          top: 52px;
-          width: 170px;
-        }
-
         div.tooltip {
           width: 168px;
+        }
+
+        div.dropdown-top {
+          div.dropdown-list-container {
+            left: -8.5px;
+            top: 52px;
+            width: 170px;
+          }
         }
 
         div.dropdown-floating {
@@ -168,6 +170,10 @@ div.topics-columns {
           width: 66px;
           height: 66px;
           z-index: 10000;
+
+          div.tooltip {
+            width: 178px;
+          }
 
           button.add-to-board-btn.floating-button {
             position: relative;
