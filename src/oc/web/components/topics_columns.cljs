@@ -165,6 +165,7 @@
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
                   (dom/label {:class "add-to-board-label"}) "New"))
+              ;; Add entry floating button
               (when (and (not is-all-activity)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
@@ -186,6 +187,7 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
+              ;; Add story buttons container
               (when (= (:type board-data) "story")
                 (let [;; All the boards that are of story type, that are not drafts and that are not read-only
                       storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
@@ -197,7 +199,7 @@
                             (and (= (:slug board-data) "drafts")
                                  (pos? (count storyboards))))
                     (dom/div {:class "new-story-container group"}
-                      ;; Add entry button
+                      ;; Add story button
                       (when (and (not is-all-activity)
                                  (not (responsive/is-tablet-or-mobile?))
                                  (or (utils/link-for (:links board-data) "create")
@@ -210,12 +212,14 @@
                                                   (dis/dispatch! [:story-create board-data]))}
                           (dom/div {:class "add-to-board-pencil"})
                           (dom/label {:class "add-to-board-label"}) "New"))
+                      ;; Add story dropdown
                       (when show-storyboards-top-dropdown
                         (dom/div {:class "dropdown-top"}
                           (dropdown-list {:items fixed-storyboards
                                           :value nil
                                           :on-change did-select-storyboard-cb
                                           :on-blur #(om/set-state! owner :show-storyboards-top-dropdown false)})))
+                      ;; Add story flaoting button
                       (dom/div {:class "dropdown-floating"
                                 :id "new-story-floating-btn"
                                 :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}}
@@ -233,6 +237,7 @@
                                                       (om/set-state! owner :show-storyboards-floating-dropdown (not show-storyboards-floating-dropdown)))
                                                     (dis/dispatch! [:story-create board-data]))}
                             (dom/div {:class "add-to-board-pencil"})))
+                        ;; Add story floating dropdown
                         (when show-storyboards-floating-dropdown
                           (dropdown-list {:items fixed-storyboards
                                           :value nil
