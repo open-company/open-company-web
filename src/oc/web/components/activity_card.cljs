@@ -76,7 +76,7 @@
                                                body-a-sel (str body-sel " a")
                                                is-all-activity (nth (:rum/args s) 3 false)]
                                            ; Prevent body links in FoC
-                                           (.click (js/$ body-a-sel) #(.preventDefault %))
+                                           (.click (js/$ body-a-sel) #(.stopPropagation %))
                                            ; Truncate body text with dotdotdot
                                            (when (compare-and-set! (::truncated s) false true)
                                              (truncate-body body-sel is-all-activity)
@@ -116,9 +116,6 @@
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-activity-card is-all-activity
                               :story-card (= (:type activity-data) "story")})
-     :on-click #(if (= (:type activity-data) "story")
-                  (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                  (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
     (when (and (not is-all-activity)
@@ -134,7 +131,11 @@
     (when (or is-all-activity
               (= (:type activity-data) "entry"))
       [:div.activity-card-head.group
-        {:class (when (and (not is-all-activity) (= (:type activity-data) "entry")) "entry-card")}
+        {:class (when (and (not is-all-activity) (= (:type activity-data) "entry")) "entry-card")
+         :on-click #(when-not (and (not is-all-activity) (= (:type activity-data) "entry"))
+                      (if (= (:type activity-data) "story")
+                        (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
+                        (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))}
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (first (:author activity-data)))
@@ -160,6 +161,9 @@
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
                 topic-name]))]])
     [:div.activity-card-content.group
+      {:on-click #(if (= (:type activity-data) "story")
+                    (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
+                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))}
       (when (= (:type activity-data) "story")
         [:div.activity-card-title
           {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
@@ -190,6 +194,9 @@
           {:style #js {:backgroundImage (str "url(\"" (:banner-url activity-data) "\")")
                        :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
     [:div.activity-card-footer.group
+      {:on-click #(if (= (:type activity-data) "story")
+                    (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
+                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))}
       (interactions-summary activity-data)
       (when (or (utils/link-for (:links activity-data) "partial-update")
                 (utils/link-for (:links activity-data) "delete"))
