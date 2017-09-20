@@ -1254,7 +1254,7 @@
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
-        fixed-story-data (utils/fix-story story-data (or (:storyboard-slug story-data) board-slug))]
+        fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})]
     (when (jwt/jwt)
       (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
         (wsc/reconnect ws-link (jwt/get-key :user-id))))
