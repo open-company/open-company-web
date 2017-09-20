@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Boards" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Master---Boards-" transform="translate(-1065.000000, -130.000000)" fill="#FA6654">
+            <g id="Group-12" transform="translate(295.000000, 115.000000)">
+                <g id="Components-/-Buttons-/-Primary" transform="translate(746.000000, 1.000000)">
+                    <g id="Group-9" transform="translate(24.000000, 10.000000)">
+                        <g id="Group" transform="translate(0.000000, 4.000000)">
+                            <g>
+                                <path d="M12.0686667,5.0596 L12.548,4.58026667 C13.5953333,3.53493333 13.5946667,1.83093333 12.548,0.784933333 C11.502,-0.261733333 9.79866667,-0.261066667 8.75333333,0.784933333 L8.274,1.26493333 L12.0686667,5.0596 Z" id="Fill-31"></path>
+                                <polygon id="Fill-32" points="7.33106667 2.20733333 1.39506667 8.14333333 3.77573333 8.61533333 8.75706667 3.63333333"></polygon>
+                                <path d="M0.1966,13.1374 C0.361266667,13.3027333 0.601933333,13.3687333 0.829266667,13.3127333 L3.9486,12.5327333 L3.42793333,9.9054 L0.8006,9.3854 L0.0206,12.5034 C-0.0354,12.7320667 0.0306,12.9714 0.1966,13.1374" id="Fill-33"></path>
+                                <polygon id="Fill-34" points="9.69986667 4.57586667 4.71853333 9.55853333 5.18986667 11.9385333 11.1265333 6.00253333"></polygon>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
