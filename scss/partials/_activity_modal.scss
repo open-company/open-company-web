@@ -174,13 +174,12 @@ div.activity-modal-container {
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
       background-color: $carrot_light_gray_2;
-      max-height: calc(100vh - 150px - 48px);
+      max-height: 100vh;
       min-height: 200px;
       position: relative;
 
       div.activity-right-column-content {
         padding: 14px 32px 24px 16px;
-        max-height: calc(100vh - 150px - 48px);
         overflow-x: hidden;
         overflow-y: auto;
         position: absolute;
