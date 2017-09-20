@@ -44,20 +44,10 @@
   (let [entry-floating (js/$ "#new-entry-floating-btn")]
     (when (pos? (.-length entry-floating))
       (let [scroll-top (document-scroll-top)]
-        (js/console.log "SCROLL: entry floating:" entry-floating "scroll-top" scroll-top)
-        (js/console.log "   window.pageYOffset" (.-pageYOffset js/window))
-        (js/console.log "   documentElement.scrollTop" (.-scrollTop (.-documentElement js/document)))
-        (js/console.log "   body.scrollTop" (.-scrollTop (.-body js/document)))
-        (js/console.log "   calc:" (calc-opacity scroll-top))
         (.css entry-floating #js {:opacity (calc-opacity scroll-top)}))))
   (let [story-floating (js/$ "#new-story-floating-btn")]
     (when (pos? (.-length story-floating))
       (let [scroll-top (document-scroll-top)]
-        (js/console.log "SCROLL: story floating:" story-floating "scroll-top" scroll-top)
-        (js/console.log "   window.pageYOffset" (.-pageYOffset js/window))
-        (js/console.log "   documentElement.scrollTop" (.-scrollTop (.-documentElement js/document)))
-        (js/console.log "   body.scrollTop" (.-scrollTop (.-body js/document)))
-        (js/console.log "   calc:" (calc-opacity scroll-top))
         (.css story-floating #js {:opacity (calc-opacity scroll-top)})))))
 
 (defcomponent topics-columns [{:keys [content-loaded

@@ -143,22 +143,21 @@ div.activity-modal-container {
                   box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
                   border-radius: 5px;
                   margin: 8px 0;
-                  padding: 10px 16px 6px;
+                  padding: 10px 13px 6px 8px;
                   min-height: 50px;
                   list-style-type: none;
                   width: 100px;
 
                   li {
-                    margin: 6px 0;
+                    padding: 3px 8px;
                     @include avenir_M();
                     font-size: 14px;
-                    color: $oc_gray_7;
+                    color: $carrot_light_gray_3;
                     cursor: pointer;
                     background-color: transparent;
 
                     &:hover {
-                      text-decoration: underline;
-                      background-color: transparent;
+                      background-color: rgba($carrot_light_gray_4, 0.2);
                     }
                   }
                 }

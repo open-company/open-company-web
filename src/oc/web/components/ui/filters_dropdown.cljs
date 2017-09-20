@@ -53,8 +53,6 @@
           (dropdown-list
             {:items final-topics
              :value board-filters
-             :unselected-icon (utils/cdn "/img/ML/carrot_radio_empty.svg")
-             :selected-icon (utils/cdn "/img/ML/carrot_radio_selected.svg")
              :on-change (fn [t]
                           (reset! (::show-filters-dropdown s) false)
                           (cond

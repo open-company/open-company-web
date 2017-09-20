@@ -77,7 +77,7 @@ div.entry-edit-modal-container {
         div.entry-edit-topics-dd {
           position: absolute;
           top: 25px;
-          left: -73px;
+          left: calc(50% - 130px);
           width: 260px;
           border: none;
           outline: none;
@@ -102,34 +102,31 @@ div.entry-edit-modal-container {
             box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
             border-radius: 5px;
             margin: 8px 0;
-            padding: 10px 0 6px 16px;
+            padding: 10px 0 6px 8px;
             min-height: 50px;
 
             ul {
               list-style-type: none;
               margin: 0;
               padding: 0;
-              padding-right: 16px;
+              padding-right: 8px;
               overflow-x: hidden;
               overflow-y: auto;
 
               li.selectable {
-                margin: 6px 0;
+                padding: 3px 8px;
                 cursor: pointer;
 
                 &:hover {
-                  button {
-                    color: $carrot_dark_gray;
-                    text-decoration: underline;
-                    background-color: transparent;
-                  }
+                  background-color: rgba($carrot_light_gray_4, 0.2);
                 }
 
                 &.select {
+                  background-color: rgba($carrot_orange, 0.1);
+
                   button {
                     @include avenir_H();
-                    color: $carrot_dark_gray;
-                    background-color: transparent;
+                    color: $carrot_orange;
                   }
                 }
 
@@ -143,10 +140,6 @@ div.entry-edit-modal-container {
                   max-width: 60%;
                   margin: 0;
                   padding: 0;
-                }
-
-                &:hover {
-                  background-color: transparent;
                 }
 
                 button.remove {

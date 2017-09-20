@@ -58,6 +58,7 @@ div.slack-channels-dropdown {
     top: 39px;
     left: 260px;
     overflow-y: auto;
+    border-radius: 4px;
 
     div.slack-team{
 
@@ -76,16 +77,14 @@ div.slack-channels-dropdown {
 
       div.channel {
         width: 100%;
-        padding: 0.4rem 0.8rem;
+        padding: 8px 16px;
         color: $carrot_dark_gray;
         @include avenir_M();
         font-size: 14px;
         cursor: pointer;
 
         &:hover {
-          span.ch {
-            text-decoration: underline;
-          }
+          background-color: rgba($carrot_light_gray_4, 0.2);
         }
 
         span.ch-prefix {
