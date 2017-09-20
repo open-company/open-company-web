@@ -44,7 +44,7 @@
           {:style {:width (str (if (pos? (count comments-authors)) (+ 9 (* 15 (count comments-authors))) 0) "px")}}
           (for [user-data (take 4 comments-authors)]
             [:div.is-comments-author
-              {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:created-at user-data))}
+              {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data true)])]
         ; Comments count
         [:div.is-comments-summary
