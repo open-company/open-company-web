@@ -69,19 +69,27 @@
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :main-scroll true
                                            :no-scroll (router/current-activity-id)})}
-          (when (router/current-activity-id)
+          ;; Use cond for the next components to exclud each other and avoid rendering all of them
+          (cond
+            ;; Entry editing
+            (:entry-editing data)
+            (entry-edit)
+            ;; Board editing
+            (:board-editing data)
+            (board-edit)
+            ;; Activity modal
+            (router/current-activity-id)
             (let [from-aa (:from-all-activity @router/path)
                   board-slug (if from-aa :all-activity (router/current-board-slug))]
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
-          (when (:entry-editing data)
-            (entry-edit))
-          (when (:board-editing data)
-            (board-edit))
+          ;; Alert modal
           (when (:alert-modal data)
             (alert-modal))
+          ;; Media video modal for entry editing
           (when (and (:entry-editing data)
                      (:media-video (:entry-editing data)))
             (media-video-modal :entry-editing))
+          ;; Media chart modal for entry editing
           (when (and (:entry-editing data)
                      (:media-chart (:entry-editing data)))
             (media-chart-modal :entry-editing))
