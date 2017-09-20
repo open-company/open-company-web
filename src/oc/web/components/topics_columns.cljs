@@ -32,9 +32,9 @@
 (def max-scroll 92)
 
 (defn document-scroll-top []
-  (or (.-pageYOffset js/window)
-      (.-scrollTop (.-documentElement js/document))
-      (.-scrollTop (.-body js/document))))
+  (max (.-pageYOffset js/window)
+       (.-scrollTop (.-documentElement js/document))
+       (.-scrollTop (.-body js/document))))
 
 (defn calc-opacity [scroll-top]
   (let [fixed-scroll-top (* (- (min scroll-top max-scroll) 50) 100 (/ 1 (- max-scroll min-scroll)))]
