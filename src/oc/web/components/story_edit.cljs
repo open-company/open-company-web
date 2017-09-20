@@ -78,7 +78,8 @@
     (reset! (::body-editor state) body-editor)
     (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
     (events/listen title-el EventType/INPUT #(title-on-change state))
-    (js/emojiAutocomplete)))
+    ;; Make sure the jss lib is loaded before calling it
+    (utils/after 2500 #(js/emojiAutocomplete))))
 
 ;; Title handling
 
