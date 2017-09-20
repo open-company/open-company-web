@@ -31,19 +31,34 @@
 (def min-scroll 50)
 (def max-scroll 92)
 
+(defn document-scroll-top []
+  (or (.-pageYOffset js/window)
+      (.-scrollTop (.-documentElement js/document))
+      (.-scrollTop (.-body js/document))))
+
 (defn calc-opacity [scroll-top]
   (let [fixed-scroll-top (* (- (min scroll-top max-scroll) 50) 100 (/ 1 (- max-scroll min-scroll)))]
     (max 0 (min (/ fixed-scroll-top 100) 1))))
 
 (defn did-scroll [e owner]
-  (when-let [entry-floating (js/$ "#new-entry-floating-btn")]
-    (let [scroll-top (.-scrollTop (.-body js/document))]
-      (js/console.log "SCROLL: entry floating:" entry-floating "scroll-top" scroll-top "calc:" (calc-opacity scroll-top))
-      (.css entry-floating #js {:opacity (calc-opacity scroll-top)})))
-  (when-let [story-floating (js/$ "#new-story-floating-btn")]
-    (let [scroll-top (.-scrollTop (.-body js/document))]
-      (js/console.log "SCROLL: story floating:" story-floating "scroll-top" scroll-top "calc:" (calc-opacity scroll-top))
-      (.css story-floating #js {:opacity (calc-opacity scroll-top)}))))
+  (let [entry-floating (js/$ "#new-entry-floating-btn")]
+    (when (pos? (.-length entry-floating))
+      (let [scroll-top (document-scroll-top)]
+        (js/console.log "SCROLL: entry floating:" entry-floating "scroll-top" scroll-top)
+        (js/console.log "   window.pageYOffset" (.-pageYOffset js/window))
+        (js/console.log "   documentElement.scrollTop" (.-scrollTop (.-documentElement js/document)))
+        (js/console.log "   body.scrollTop" (.-scrollTop (.-body js/document)))
+        (js/console.log "   calc:" (calc-opacity scroll-top))
+        (.css entry-floating #js {:opacity (calc-opacity scroll-top)}))))
+  (let [story-floating (js/$ "#new-story-floating-btn")]
+    (when (pos? (.-length story-floating))
+      (let [scroll-top (document-scroll-top)]
+        (js/console.log "SCROLL: story floating:" story-floating "scroll-top" scroll-top)
+        (js/console.log "   window.pageYOffset" (.-pageYOffset js/window))
+        (js/console.log "   documentElement.scrollTop" (.-scrollTop (.-documentElement js/document)))
+        (js/console.log "   body.scrollTop" (.-scrollTop (.-body js/document)))
+        (js/console.log "   calc:" (calc-opacity scroll-top))
+        (.css story-floating #js {:opacity (calc-opacity scroll-top)})))))
 
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
@@ -165,6 +180,7 @@
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
                   (dom/label {:class "add-to-board-label"}) "New"))
+              ;; Add entry floating button
               (when (and (not is-all-activity)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
@@ -172,7 +188,7 @@
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn floating-button"
                              :id "new-entry-floating-btn"
-                             :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}
+                             :style {:opacity (calc-opacity (document-scroll-top))}
                              :data-placement "left"
                              :data-toggle "tooltip"
                              :title (str "Create a new update")
@@ -186,6 +202,7 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
+              ;; Add story buttons container
               (when (= (:type board-data) "story")
                 (let [;; All the boards that are of story type, that are not drafts and that are not read-only
                       storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
@@ -197,7 +214,7 @@
                             (and (= (:slug board-data) "drafts")
                                  (pos? (count storyboards))))
                     (dom/div {:class "new-story-container group"}
-                      ;; Add entry button
+                      ;; Add story button
                       (when (and (not is-all-activity)
                                  (not (responsive/is-tablet-or-mobile?))
                                  (or (utils/link-for (:links board-data) "create")
@@ -210,15 +227,17 @@
                                                   (dis/dispatch! [:story-create board-data]))}
                           (dom/div {:class "add-to-board-pencil"})
                           (dom/label {:class "add-to-board-label"}) "New"))
+                      ;; Add story dropdown
                       (when show-storyboards-top-dropdown
                         (dom/div {:class "dropdown-top"}
                           (dropdown-list {:items fixed-storyboards
                                           :value nil
                                           :on-change did-select-storyboard-cb
                                           :on-blur #(om/set-state! owner :show-storyboards-top-dropdown false)})))
+                      ;; Add story flaoting button
                       (dom/div {:class "dropdown-floating"
                                 :id "new-story-floating-btn"
-                                :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}}
+                                :style {:opacity (calc-opacity (document-scroll-top))}}
                         (when (and (not is-all-activity)
                                    (not (responsive/is-tablet-or-mobile?))
                                    (or (utils/link-for (:links board-data) "create")
@@ -233,6 +252,7 @@
                                                       (om/set-state! owner :show-storyboards-floating-dropdown (not show-storyboards-floating-dropdown)))
                                                     (dis/dispatch! [:story-create board-data]))}
                             (dom/div {:class "add-to-board-pencil"})))
+                        ;; Add story floating dropdown
                         (when show-storyboards-floating-dropdown
                           (dropdown-list {:items fixed-storyboards
                                           :value nil
