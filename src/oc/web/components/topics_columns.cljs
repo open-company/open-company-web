@@ -152,9 +152,6 @@
                          (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                             :data-placement "left"
-                             :data-toggle "tooltip"
-                             :title (str "Create new update")
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
@@ -176,7 +173,7 @@
                              :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}
                              :data-placement "left"
                              :data-toggle "tooltip"
-                             :title (str "Create new update")
+                             :title (str "Create a new update")
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
@@ -204,9 +201,9 @@
                                  (or (utils/link-for (:links board-data) "create")
                                      (= (:slug board-data) "drafts")))
                         (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                                     :data-placement "left"
+                                     :data-placement "top"
                                      :data-toggle "tooltip"
-                                     :title (str "Create new journal entry")
+                                     :title (str "Create a new journal entry")
                                      :on-click #(if (= (router/current-board-slug) "drafts")
                                                   (if (= (count fixed-storyboards) 1)
                                                     (dis/dispatch! [:story-create (first storyboards)])
@@ -230,7 +227,7 @@
                           (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn floating-button" (when (= (:slug board-data) "drafts") " is-draft"))
                                        :data-placement "left"
                                        :data-toggle "tooltip"
-                                       :title (str "Create new journal entry")
+                                       :title (str "Create a new journal entry")
                                        :on-click #(if (= (router/current-board-slug) "drafts")
                                                     (if (= (count fixed-storyboards) 1)
                                                       (dis/dispatch! [:story-create (first storyboards)])
