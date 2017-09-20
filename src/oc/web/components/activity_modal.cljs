@@ -121,9 +121,9 @@
         {:class (str "activity-modal-" (:uuid activity-data))
          :style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
         [:div.activity-left-column
-          {:style (when column-height {:min-height (str column-height "px")})}
+          {:style (when column-height {:minHeight (str column-height "px")})}
           [:div.activity-left-column-content
-            {:style (when column-height {:min-height (str (- column-height 40) "px")})}
+            {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
             [:div.activity-modal-head.group
               [:div.activity-modal-head-left
                 (user-avatar-image (first (:author activity-data)))
@@ -174,6 +174,6 @@
                           "Delete"]]]])]]]]
         (when show-comments?
           [:div.activity-right-column
-            {:style (when column-height {:min-height (str column-height "px")})}
+            {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.activity-right-column-content
               (comments activity-data)]])]]))
