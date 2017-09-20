@@ -28,6 +28,21 @@
 (defn did-select-storyboard-cb [storyboard]
   (dis/dispatch! [:story-create (clojure.set/rename-keys storyboard {:value :slug :label :name :links :links})]))
 
+(def min-scroll 50)
+(def max-scroll 92)
+
+(defn calc-opacity [scroll-top]
+  (let [fixed-scroll-top (* (- (min scroll-top max-scroll) 50) 100 (/ 1 (- max-scroll min-scroll)))]
+    (max 0 (min (/ fixed-scroll-top 100) 1))))
+
+(defn did-scroll [e owner]
+  (when-let [floating (js/$ "#new-entry-floating-btn")]
+    (let [scroll-top (.-scrollTop (.-body js/document))]
+      (.css floating #js {:opacity (calc-opacity scroll-top)})))
+  (when-let [floating (js/$ "#new-story-floating-btn")]
+    (let [scroll-top (.-scrollTop (.-body js/document))]
+      (.css floating #js {:opacity (calc-opacity scroll-top)}))))
+
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
                                       all-activity-data
@@ -51,15 +66,18 @@
 
   (did-mount [_]
     (when-not (utils/is-test-env?)
-      (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+      (om/set-state! owner :scroll-listener
+       (events/listen js/window EventType/SCROLL #(did-scroll % owner))))
     (when (om/get-state owner :show-boards-tooltip)
       (utils/after 1000 #(om/set-state! owner :update true))))
 
   (will-unmount [_]
     (when-not (utils/is-test-env?)
-      (events/unlistenByKey (om/get-state owner :resize-listener))))
+      (events/unlistenByKey (om/get-state owner :resize-listener))
+      (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-storyboards-dropdown show-boards-tooltip show-journals-tooltip ww]}]
+  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip show-journals-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -133,7 +151,29 @@
                          (not (responsive/is-tablet-or-mobile?))
                          (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
-                (dom/button {:class "mlb-reset mlb-default add-to-board-btn"
+                (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
+                             :data-placement "left"
+                             :data-toggle "tooltip"
+                             :title (str "Create new update")
+                             :on-click (fn [_]
+                                        (let [entry-data {:board-slug (:slug board-data)
+                                                          :board-name (:name board-data)}
+                                              topic-data (when (string? board-filters)
+                                                           (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                              with-topic (if (string? board-filters)
+                                                          (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
+                                                          entry-data)]
+                                          (dis/dispatch! [:entry-edit with-topic])))}
+                  (dom/div {:class "add-to-board-pencil"})
+                  (dom/label {:class "add-to-board-label"}) "New Post"))
+              (when (and (not is-all-activity)
+                         (not (:read-only org-data))
+                         (not (responsive/is-tablet-or-mobile?))
+                         (= (:type board-data) "entry")
+                         (utils/link-for (:links board-data) "create"))
+                (dom/button {:class "mlb-reset mlb-default add-to-board-btn floating-button"
+                             :id "new-entry-floating-btn"
+                             :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}
                              :data-placement "left"
                              :data-toggle "tooltip"
                              :title (str "Create new update")
@@ -157,26 +197,51 @@
                   (when (or (not (:read-only board-data))
                             (and (= (:slug board-data) "drafts")
                                  (pos? (count storyboards))))
-                    (dom/div {:class "new-story-container"}
+                    (dom/div {:class "new-story-container group"}
+                      ;; Add entry button
                       (when (and (not is-all-activity)
                                  (not (responsive/is-tablet-or-mobile?))
                                  (or (utils/link-for (:links board-data) "create")
                                      (= (:slug board-data) "drafts")))
-                        (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn" (when (= (:slug board-data) "drafts") " is-draft"))
+                        (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
                                      :data-placement "left"
                                      :data-toggle "tooltip"
                                      :title (str "Create new journal entry")
                                      :on-click #(if (= (router/current-board-slug) "drafts")
                                                   (if (= (count fixed-storyboards) 1)
                                                     (dis/dispatch! [:story-create (first storyboards)])
-                                                    (om/set-state! owner :show-storyboards-dropdown (not show-storyboards-dropdown)))
+                                                    (om/set-state! owner :show-storyboards-top-dropdown (not show-storyboards-top-dropdown)))
                                                   (dis/dispatch! [:story-create board-data]))}
-                          (dom/div {:class "add-to-board-pencil"})))
-                      (when show-storyboards-dropdown
-                        (dropdown-list {:items fixed-storyboards
-                                        :value nil
-                                        :on-change did-select-storyboard-cb
-                                        :on-blur #(om/set-state! owner :show-storyboards-dropdown false)}))))))
+                          (dom/div {:class "add-to-board-pencil"})
+                          (dom/label {:class "add-to-board-label"}) "New Entry"))
+                      (when show-storyboards-top-dropdown
+                        (dom/div {:class "dropdown-top"}
+                          (dropdown-list {:items fixed-storyboards
+                                          :value nil
+                                          :on-change did-select-storyboard-cb
+                                          :on-blur #(om/set-state! owner :show-storyboards-top-dropdown false)})))
+                      (dom/div {:class "dropdown-floating"
+                                :id "new-story-floating-btn"
+                                :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}}
+                        (when (and (not is-all-activity)
+                                   (not (responsive/is-tablet-or-mobile?))
+                                   (or (utils/link-for (:links board-data) "create")
+                                       (= (:slug board-data) "drafts")))
+                          (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn floating-button" (when (= (:slug board-data) "drafts") " is-draft"))
+                                       :data-placement "left"
+                                       :data-toggle "tooltip"
+                                       :title (str "Create new journal entry")
+                                       :on-click #(if (= (router/current-board-slug) "drafts")
+                                                    (if (= (count fixed-storyboards) 1)
+                                                      (dis/dispatch! [:story-create (first storyboards)])
+                                                      (om/set-state! owner :show-storyboards-floating-dropdown (not show-storyboards-floating-dropdown)))
+                                                    (dis/dispatch! [:story-create board-data]))}
+                            (dom/div {:class "add-to-board-pencil"})))
+                        (when show-storyboards-floating-dropdown
+                          (dropdown-list {:items fixed-storyboards
+                                          :value nil
+                                          :on-change did-select-storyboard-cb
+                                          :on-blur #(om/set-state! owner :show-storyboards-floating-dropdown false)})))))))
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?)
