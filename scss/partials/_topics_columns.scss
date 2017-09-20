@@ -104,12 +104,13 @@ div.topics-columns {
 
         &.top-button {
           float: right;
-          width: 143px;
+          width: 103px;
           height: 42px;
           background-color: #FAEAE5;
           color: $carrot_orange;
           border-radius: 4px;
           padding: 10px 23.5px;
+          margin-right: 16px;
           @include avenir_H();
 
           div.add-to-board-pencil {

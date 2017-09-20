@@ -36,12 +36,14 @@
     (max 0 (min (/ fixed-scroll-top 100) 1))))
 
 (defn did-scroll [e owner]
-  (when-let [floating (js/$ "#new-entry-floating-btn")]
+  (when-let [entry-floating (js/$ "#new-entry-floating-btn")]
     (let [scroll-top (.-scrollTop (.-body js/document))]
-      (.css floating #js {:opacity (calc-opacity scroll-top)})))
-  (when-let [floating (js/$ "#new-story-floating-btn")]
+      (js/console.log "SCROLL: entry floating:" entry-floating "scroll-top" scroll-top "calc:" (calc-opacity scroll-top))
+      (.css entry-floating #js {:opacity (calc-opacity scroll-top)})))
+  (when-let [story-floating (js/$ "#new-story-floating-btn")]
     (let [scroll-top (.-scrollTop (.-body js/document))]
-      (.css floating #js {:opacity (calc-opacity scroll-top)}))))
+      (js/console.log "SCROLL: story floating:" story-floating "scroll-top" scroll-top "calc:" (calc-opacity scroll-top))
+      (.css story-floating #js {:opacity (calc-opacity scroll-top)}))))
 
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
@@ -162,7 +164,7 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
-                  (dom/label {:class "add-to-board-label"}) "New Post"))
+                  (dom/label {:class "add-to-board-label"}) "New"))
               (when (and (not is-all-activity)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
@@ -201,9 +203,6 @@
                                  (or (utils/link-for (:links board-data) "create")
                                      (= (:slug board-data) "drafts")))
                         (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                                     :data-placement "top"
-                                     :data-toggle "tooltip"
-                                     :title (str "Create a new journal entry")
                                      :on-click #(if (= (router/current-board-slug) "drafts")
                                                   (if (= (count fixed-storyboards) 1)
                                                     (dis/dispatch! [:story-create (first storyboards)])
