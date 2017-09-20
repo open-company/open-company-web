@@ -213,7 +213,7 @@
                                                     (om/set-state! owner :show-storyboards-top-dropdown (not show-storyboards-top-dropdown)))
                                                   (dis/dispatch! [:story-create board-data]))}
                           (dom/div {:class "add-to-board-pencil"})
-                          (dom/label {:class "add-to-board-label"}) "New Entry"))
+                          (dom/label {:class "add-to-board-label"}) "New"))
                       (when show-storyboards-top-dropdown
                         (dom/div {:class "dropdown-top"}
                           (dropdown-list {:items fixed-storyboards
