@@ -31,19 +31,34 @@
 (def min-scroll 50)
 (def max-scroll 92)
 
+(defn document-scroll-top []
+  (or (.-pageYOffset js/window)
+      (.-scrollTop (.-documentElement js/document))
+      (.-scrollTop (.-body js/document))))
+
 (defn calc-opacity [scroll-top]
   (let [fixed-scroll-top (* (- (min scroll-top max-scroll) 50) 100 (/ 1 (- max-scroll min-scroll)))]
     (max 0 (min (/ fixed-scroll-top 100) 1))))
 
 (defn did-scroll [e owner]
-  (when-let [entry-floating (js/$ "#new-entry-floating-btn")]
-    (let [scroll-top (.-scrollTop (.-body js/document))]
-      (js/console.log "SCROLL: entry floating:" entry-floating "scroll-top" scroll-top "calc:" (calc-opacity scroll-top))
-      (.css entry-floating #js {:opacity (calc-opacity scroll-top)})))
-  (when-let [story-floating (js/$ "#new-story-floating-btn")]
-    (let [scroll-top (.-scrollTop (.-body js/document))]
-      (js/console.log "SCROLL: story floating:" story-floating "scroll-top" scroll-top "calc:" (calc-opacity scroll-top))
-      (.css story-floating #js {:opacity (calc-opacity scroll-top)}))))
+  (let [entry-floating (js/$ "#new-entry-floating-btn")]
+    (when (pos? (.-length entry-floating))
+      (let [scroll-top (document-scroll-top)]
+        (js/console.log "SCROLL: entry floating:" entry-floating "scroll-top" scroll-top)
+        (js/console.log "   window.pageYOffset" (.-pageYOffset js/window))
+        (js/console.log "   documentElement.scrollTop" (.-scrollTop (.-documentElement js/document)))
+        (js/console.log "   body.scrollTop" (.-scrollTop (.-body js/document)))
+        (js/console.log "   calc:" (calc-opacity scroll-top))
+        (.css entry-floating #js {:opacity (calc-opacity scroll-top)}))))
+  (let [story-floating (js/$ "#new-story-floating-btn")]
+    (when (pos? (.-length story-floating))
+      (let [scroll-top (document-scroll-top)]
+        (js/console.log "SCROLL: story floating:" story-floating "scroll-top" scroll-top)
+        (js/console.log "   window.pageYOffset" (.-pageYOffset js/window))
+        (js/console.log "   documentElement.scrollTop" (.-scrollTop (.-documentElement js/document)))
+        (js/console.log "   body.scrollTop" (.-scrollTop (.-body js/document)))
+        (js/console.log "   calc:" (calc-opacity scroll-top))
+        (.css story-floating #js {:opacity (calc-opacity scroll-top)})))))
 
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
@@ -173,7 +188,7 @@
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn floating-button"
                              :id "new-entry-floating-btn"
-                             :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}
+                             :style {:opacity (calc-opacity (document-scroll-top))}
                              :data-placement "left"
                              :data-toggle "tooltip"
                              :title (str "Create a new update")
@@ -222,7 +237,7 @@
                       ;; Add story flaoting button
                       (dom/div {:class "dropdown-floating"
                                 :id "new-story-floating-btn"
-                                :style {:opacity (calc-opacity (.-scrollTop (.-body js/document)))}}
+                                :style {:opacity (calc-opacity (document-scroll-top))}}
                         (when (and (not is-all-activity)
                                    (not (responsive/is-tablet-or-mobile?))
                                    (or (utils/link-for (:links board-data) "create")
