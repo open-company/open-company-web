@@ -57,6 +57,7 @@
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
   (timbre/info "nav!" token)
+  (timbre/debug "history:" @history)
   (.setToken @history token))
 
 (defn redirect! [loc]
