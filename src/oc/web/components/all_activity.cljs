@@ -205,7 +205,7 @@
                                             (do
                                               (reset! (::has-prev s) prev-link)
                                               (reset! (::show-all-caught-up-message s) false))
-                                            (reset! (::show-all-caught-up-message s) true)))
+                                            (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10))))
                                         s)
                            :did-mount (fn [s]
                                         (reset! last-scroll (.-scrollTop (.-body js/document)))
@@ -248,7 +248,7 @@
                                                     (reset! (::show-all-caught-up-message s) false))
                                                   (do
                                                     (reset! (::has-prev s) nil)
-                                                    (reset! (::show-all-caught-up-message s) true)))
+                                                    (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10))))
                                                 (when first-available-entry
                                                   (reset! (::scroll-to-entry s) first-available-entry)))))
                                           s)
