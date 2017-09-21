@@ -8,8 +8,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.media-picker :refer (media-picker)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -23,7 +25,7 @@
 
 ;; Update story
 
-(def default-story-title "Untitled")
+(def default-story-title "Untitled story")
 (def default-save-wait 2000)
 (def default-save-message-show 2000)
 
@@ -35,7 +37,7 @@
    (utils/after default-save-wait
     (fn []
       (dis/dispatch! [:draft-autosave])
-      (reset! (::central-message s) "Saving")))))
+      (reset! (::central-message s) "saving...")))))
 
 (defn update-story-editing [s new-data]
   (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) new-data {:has-changes true})])
@@ -68,7 +70,7 @@
   (let [media-picker-id @(::media-picker-id state)
         title-el  (sel1 [:div.story-edit-title])
         body-el      (sel1 [:div.story-edit-body])
-        body-editor  (new js/MediumEditor body-el (clj->js (-> "Say something..."
+        body-editor  (new js/MediumEditor body-el (clj->js (-> "Start writing..."
                                                             (utils/medium-editor-options false true)
                                                             (editor/inject-extension (editor/media-upload media-picker-id {:left 36 :top -106})))))]
     (.subscribe body-editor
@@ -165,6 +167,7 @@
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
                         (drv/drv :story-editing)
+                        (drv/drv :current-user-data)
                         (drv/drv :alert-modal)
                         (drv/drv :org-data)
                         ;; Medium editor
@@ -206,9 +209,9 @@
                                             (reset! (::initial-body s) (:body story-editing))
                                             (reset! (::activity-uuid s) (:uuid story-editing)))
                                           ;; If it's saving and there is no autosaving key in the story-editing it means saving ended
-                                          (when (and (= @(::central-message s) "Saving")
+                                          (when (and (= @(::central-message s) "saving...")
                                                      (not (:autosaving story-editing)))
-                                            (reset! (::central-message s) "Saved")
+                                            (reset! (::central-message s) "saved")
                                             (reset! (::last-timeout s) nil)))
                                         s)
                          :after-render (fn [s]
@@ -221,9 +224,12 @@
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)
-        story-author (if (map? (:author story-data))
-                       (:author story-data)
-                       (first (:author story-data)))]
+        story-author (if (:author story-data)
+                       (if (map? (:author story-data))
+                         (:author story-data)
+                         (first (:author story-data)))
+                       (drv/react s :current-user-data))
+        ww (responsive/ww)]
     [:div.story-edit-container
       (when (drv/react s :alert-modal)
         (alert-modal))
@@ -235,83 +241,82 @@
         (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-edit-header.group
         [:div.story-edit-header-left
-          [:a.board-name
-            {:href (oc-urls/board (router/current-board-slug))
-             :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/board (router/current-org-slug) (if (= (:status story-data) "draft") "drafts" (:board-slug story-data)))))}
-            (if (= (:status story-data) "draft")
-              "Drafts"
-              (:storyboard-name story-data))]
-          [:span.arrow ">"]
-          [:span.story-edit-top-title
-            {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title story-data)) default-story-title (:title story-data))))}]
+          [:div.story-edit-header-back
+            {:on-click #(router/history-back!)}
+            [:span.back-arrow "<"]
+            "Back"]]
+        [:div.story-edit-header-center
+          (let [title (if (empty? (:title story-data)) default-story-title (gobj/get (utils/emojify (:title story-data)) "__html"))
+                with-save (str title "<span class=\"saving-message\">" @(::central-message s) "</span>")]
+            [:div.story-edit-header-center-title
+              {:dangerouslySetInnerHTML #js {"__html" with-save}}])]
+        [:div.story-edit-header-right
           [:button.mlb-reset.mlb-link-black.delete-link
             {:on-click #(delete-clicked % story-data)}
-            "Delete"]]
-        [:div.story-edit-header-center
-          [:span.story-edit-header-left-save
-            {:class (when-not (empty? @(::central-message s)) "showing")}
-            @(::central-message s)]]
-        [:div.story-edit-header-right
+            "Delete"]
           (when (= "draft" (:status story-data))
             [:button.mlb-reset.mlb-default.post-button
               {:on-click #(reset! (::show-publish-modal s) true)}
               "Post"])]]
       [:div.story-edit-content
-        [:div.story-edit-author.group
-          (user-avatar-image story-author)
-          [:div.name (or (:name story-author) (str (:first-name story-author) " " (:last-name story-author)))]
-          [:div.time-since
-            (if (:created-at story-data)
-              [:time
-                {:date-time (:created-at story-data)
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :title (utils/activity-date-tooltip story-data)}
-                (utils/time-since (:created-at story-data))]
-              "Draft")]]
-        (if (:banner-url story-data)
-          [:div.story-edit-banner
-            {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                         :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}
+        [:div.story-edit-content-authorship.group
+          [:div.story-edit-content-authorship-left.group
+            (user-avatar-image story-author)
+            [:div.name (or (:name story-author) (str (:first-name story-author) " " (:last-name story-author)))]
+            [:div.time-since
+              (if (:published-at story-data)
+                [:time
+                  {:date-time (:published-at story-data)
+                   :title (utils/activity-date-tooltip story-data)}
+                  (utils/time-since (:published-at story-data))]
+                "Draft")]]
+            [:div.story-edit-content-authorship-right.group
+              [:div.story-edit-tags
+                [:div.activity-tag.storyboard-tag
+                  {:on-click #(reset! (::show-storyboards-list s) (not @(::show-storyboards-list s)))}
+                  (:storyboard-name story-data)]
+                (when @(::show-storyboards-list s)
+                  (let [org-data (drv/react s :org-data)
+                        storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts")) (:boards org-data))
+                        storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
+                        fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
+                    (dropdown-list {:items fixed-storyboards
+                                    :value (:board-slug story-data)
+                                    :on-change (partial did-select-storyboard-cb s)
+                                    :on-blur #(reset! (::show-storyboards-list s) false)})))]
+              (when-not (:banner-url story-data)
+                [:div.story-edit-add-banner
+                  {:on-click (fn []
+                               (iu/upload! {:accept "image/*" ; :imageMin [840 200]
+                                            :transformations {
+                                              :crop {
+                                                :aspectRatio (/ ww 520)}}}
+                                 (fn [res]
+                                   (reset! (::banner-add-did-success s) true)
+                                   (let [url (gobj/get res "url")
+                                         img   (gdom/createDom "img")]
+                                     (set! (.-onload img) #(banner-on-load s url img))
+                                     (set! (.-className img) "hidden")
+                                     (gdom/append (.-body js/document) img)
+                                     (set! (.-src img) url)
+                                     (reset! (::banner-url s) {:res res :url url})))
+                                   nil
+                                   (fn [err]
+                                     (banner-add-error))
+                                   (fn []
+                                     ;; Delay the check because this is called on cancel but also on success
+                                     (utils/after 1000 #(banner-add-dismiss-picker s)))))}
+                  "+ Add cover image"])]]
+        [:div.story-edit-banner
+          {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
+                       :marginLeft (str "-" (/ (- ww 780) 2) "px")
+                       :width (str ww "px")
+                       :height (str (if (pos? (:banner-height story-data)) (min 520 (* (/ (:banner-height story-data) (:banner-width story-data)) ww)) "1") "px")}}
+          (when (:banner-url story-data)
             [:button.mlb-reset.mlb-default.remove-banner
               {:on-click #(update-story-editing s {:banner-url nil :banner-width 0 :banner-height 0})}
-              "Remove Image"]]
-          [:div.story-edit-add-banner
-            {:on-click (fn []
-                         (iu/upload! {:accept "image/*" ; :imageMin [840 200]
-                                      :transformations {
-                                        :crop {
-                                          :aspectRatio (/ 840 200)}}}
-                           (fn [res]
-                             (reset! (::banner-add-did-success s) true)
-                             (let [url (gobj/get res "url")
-                                   img   (gdom/createDom "img")]
-                               (set! (.-onload img) #(banner-on-load s url img))
-                               (set! (.-className img) "hidden")
-                               (gdom/append (.-body js/document) img)
-                               (set! (.-src img) url)
-                               (reset! (::banner-url s) {:res res :url url})))
-                             nil
-                             (fn [err]
-                               (banner-add-error))
-                             (fn []
-                               ;; Delay the check because this is called on cancel but also on success
-                               (utils/after 1000 #(banner-add-dismiss-picker s)))))}
-            [:span.blue "Click here to upload"] " your header image"])
-        [:div.story-edit-tags
-          [:div.activity-tag
-            {:on-click #(reset! (::show-storyboards-list s) (not @(::show-storyboards-list s)))}
-            (:storyboard-name story-data)]
-          (when @(::show-storyboards-list s)
-            (let [org-data (drv/react s :org-data)
-                  storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts")) (:boards org-data))
-                  storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
-                  fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
-              (dropdown-list {:items fixed-storyboards
-                              :value (:board-slug story-data)
-                              :on-change (partial did-select-storyboard-cb s)
-                              :on-blur #(reset! (::show-storyboards-list s) false)})))]
-        [:div.story-edit-title.emoji-autocomplete
+              "Remove Image"])]
+        [:div.story-edit-title.emoji-autocomplete.emojiable
           {:content-editable true
            :placeholder default-story-title
            :on-paste    #(title-on-paste s %)
@@ -320,7 +325,10 @@
            :on-focus    #(title-on-change s)
            :on-blur     #(title-on-change s)
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
-        [:div.story-edit-body.emoji-autocomplete
+        [:div.story-edit-body.emoji-autocomplete.emojiable
           {:class (utils/class-set {:medium-editor-placeholder-hidden (not (empty? @(::initial-body s)))})
            :dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
-        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]]))
+        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]
+      [:div.story-edit-footer.group
+        [:div.story-edit-footer-inner
+          (emoji-picker {:add-emoji-cb #(do (title-on-change s) (body-on-change s))})]]]))
