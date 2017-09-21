@@ -41,7 +41,7 @@
                          (drv/drv :current-user-data)
                          rum/static
                          {:did-mount (fn [s]
-                                       (js/emojiAutocomplete)
+                                       (utils/after 2500 #(js/emojiAutocomplete))
                                        s)}
   [s activity-data did-expand-cb]
   (let [show-footer (::show-footer s)

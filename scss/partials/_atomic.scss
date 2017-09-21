@@ -23,8 +23,8 @@
 }
 
 .mlb-default {
-  background-color: #D4F6E4;
-  color: #0E8749;
+  background-color: $carrot_green_3;
+  color: $carrot_green_1;
   border-radius: 4px;
   height: 40px;
   font-size: 16px;
@@ -33,12 +33,12 @@
   transition: opacity 230ms, color 230ms, background-color 230ms;
 
   &:hover, &:focus {
-    background-color: #3FBD7C;
+    background-color: $carrot_green_2;
     color: #FFFFFF;
   }
 
   &:active, &.active {
-    background-color: #0E8749;
+    background-color: $carrot_green_1;
     color: white;
   }
 
@@ -47,8 +47,8 @@
     cursor: not-allowed;
 
     &:hover {
-      background-color: #D4F6E4;
-      color: #0E8749;
+      background-color: $carrot_green_3;
+      color: $carrot_green_1;
     }
   }
 }

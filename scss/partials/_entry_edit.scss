@@ -195,7 +195,7 @@ div.entry-edit-modal-container {
                   float: left;
 
                   &:hover {
-                    background-color: #3FBD7C;
+                    background-color: $carrot_green_2;
                     background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
                   }
                 }
@@ -258,6 +258,11 @@ div.entry-edit-modal-container {
           color: $carrot_light_gray_1 !important;
           font-style: none;
         }
+      }
+
+      div.media-picker {
+        left: -22px !important;
+        margin-top: 42px;
       }
 
       div.entry-edit-body {

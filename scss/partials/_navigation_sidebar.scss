@@ -150,7 +150,7 @@ div.left-navigation-sidebar {
       @include avenir_H();
 
       &:hover {
-        background-color: #3FBD7C;
+        background-color: $carrot_green_2;
         background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
       }
     }
