@@ -40,7 +40,7 @@
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         boards (vec (filter #(= (:type %) "entry") (:boards org-data)))
         storyboards (vec (filter #(= (:type %) "story") (:boards org-data)))
-        is-all-activity (= (router/current-board-slug) "all-activity")
+        is-all-activity (or (= (router/current-board-slug) "all-activity") (:from-all-activity @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-storyboards (or create-link (pos? (count storyboards)))]
