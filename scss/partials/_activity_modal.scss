@@ -67,7 +67,7 @@ div.activity-modal-container {
           width: 100%;
           position: relative;
           overflow-y: auto;
-          max-height: calc(100vh - 143px);
+          max-height: calc(100vh - 65px - 74px);
 
           div.activity-modal-content-title {
             margin-top: 24px;
@@ -86,12 +86,11 @@ div.activity-modal-container {
         }
 
         div.activity-modal-footer {
-          padding: 24px 20px 26px 32px;
-          height: 90px;
-          border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
+          padding: 24px 20px 22px 32px;
+          height: 74px;
 
-          div.reactions {
-            margin-top: 7px;
+          &.scrolling-content {
+            border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
           }
 
           div.activity-modal-footer-right {
@@ -99,7 +98,6 @@ div.activity-modal-container {
 
             div.more-dropdown {
               float: right;
-              margin-top: 7px;
               margin-left: 10px;
               width: 32px;
               height: 32px;
