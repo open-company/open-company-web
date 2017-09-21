@@ -319,7 +319,7 @@
         [:button.mlb-reset.media.media-entry
           {:class (utils/class-set {:active @(::media-entry s)
                                     (str "media-" (.indexOf media-config :entry)) true})
-           :title "Add an update"
+           :title "Add update"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -330,7 +330,7 @@
         [:button.mlb-reset.media.media-photo
           {:class (utils/class-set {:active @(::media-photo s)
                                     (str "media-" (.indexOf media-config :photo)) true})
-           :title "Add a picture"
+           :title "Add picture"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -364,7 +364,7 @@
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
-           :title "Add a video"
+           :title "Add video"
            :on-click (fn []
                        (reset! (::media-video s) true)
                        (dis/dispatch! [:input [dispatch-input-key :media-video] true]))}])
@@ -373,7 +373,7 @@
         [:button.mlb-reset.media.media-chart
           {:class (utils/class-set {:active @(::media-chart s)
                                     (str "media-" (.indexOf media-config :chart)) true})
-           :title "Add a Google Sheet chart"
+           :title "Add Google Sheet chart"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -384,7 +384,7 @@
         [:button.mlb-reset.media.media-attachment
           {:class (utils/class-set {:active @(::media-attachment s)
                                     (str "media-" (.indexOf media-config :attachment)) true})
-           :title "Add an attachment"
+           :title "Add attachment"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -401,7 +401,7 @@
         [:button.mlb-reset.media.media-divider
           {:class (utils/class-set {:active @(::media-divider-line s)
                                     (str "media-" (.indexOf media-config :divider-line)) true})
-           :title "Add a divider line"
+           :title "Add divider line"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
