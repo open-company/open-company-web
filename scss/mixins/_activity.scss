@@ -45,25 +45,38 @@ $h2_top_margin: 20;
     border-radius: 4px;
     @include avenir_B();
     font-size: 12px;
-    color: $carrot_light_gray_3;
-    background-color: #E4E3DE;
+    // color: $carrot_light_gray_3;
+    // background-color: #E4E3DE;
+    background-color: rgba($carrot_text_blue, 0.1);
+    color: $carrot_text_blue;
     line-height: 14px;
     text-align: center;
     padding: 7px 11px;
     cursor: pointer;
 
+    &:hover {
+      background-color: $carrot_orange;
+      color: white;
+    }
+
     &.board-tag {
       margin-right: 2px;
+      background-color: rgba($carrot_orange, 0.1);
+      color: $carrot_orange;
 
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/boards_icon_white.png");
+      &:hover{
+        background-color: $carrot_orange;
+        color: white;
+        &:before {
+          background-image: cdnUrl("/img/ML/boards_icon_white.png");
+        }
       }
 
       &:before {
         display: inline-block;
         margin-right: 4px;
         content: "";
-        background-image: cdnUrl("/img/ML/boards_icon_gray.png");
+        background-image: cdnUrl("/img/ML/boards_icon_orange.png");
         background-size: 12px 10px;
         background-repeat: no-repeat;
         width: 12px;
@@ -73,16 +86,22 @@ $h2_top_margin: 20;
 
     &.storyboard-tag {
       margin-right: 2px;
+      background-color: rgba($carrot_orange, 0.1);
+      color: $carrot_orange;
 
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/storyboards_icon_white.png");
+      &:hover{
+        background-color: $carrot_orange;
+        color: white;
+        &:before {
+          background-image: cdnUrl("/img/ML/storyboards_icon_white.png");
+        }
       }
 
       &:before {
         display: inline-block;
         margin-right: 4px;
         content: "";
-        background-image: cdnUrl("/img/ML/storyboards_icon_gray.png");
+        background-image: cdnUrl("/img/ML/storyboards_icon_orange.png");
         background-size: 12px 10px;
         background-repeat: no-repeat;
         width: 12px;
