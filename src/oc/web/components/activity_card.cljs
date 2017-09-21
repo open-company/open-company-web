@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
@@ -156,7 +157,15 @@
           (when is-all-activity
             [:div.activity-tag
               {:class (utils/class-set {:board-tag (= (:type activity-data) "entry")
-                                        :storyboard-tag (= (:type activity-data) "story")})}
+                                        :storyboard-tag (= (:type activity-data) "story")})
+               :on-click #(do
+                            (utils/event-stop %)
+                            (router/nav!
+                              (if (= (:type activity-data) "story")
+                                (oc-urls/board (:board-slug activity-data))
+                                (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
+                                  (oc-urls/board-sort-by-topic (:board-slug activity-data))
+                                  (oc-urls/board (:board-slug activity-data))))))}
               (:board-name activity-data)])]])
     [:div.activity-card-content.group
       {:on-click #(if (= (:type activity-data) "story")

@@ -120,6 +120,8 @@
   "Board sorted by latest topic"
   ([]
     (board-sort-by-topic (router/current-org-slug) (router/current-board-slug)))
+  ([board-slug]
+   (board-sort-by-topic (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (board org-slug board-slug) "/by-topic")))
 
