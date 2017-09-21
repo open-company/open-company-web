@@ -121,17 +121,11 @@
     (when (and (not is-all-activity)
                (= (:type activity-data) "story"))
       [:div.triangle])
-    (when is-all-activity
-      [:div.activity-card-breadcrumb
-        "In " [:span.bold (if (= (:type activity-data) "entry") (:board-name activity-data) (:storyboard-name activity-data))]
-        (when (:topic-slug activity-data)
-          [:div.topic
-            [:div.activity-tag (:topic-name activity-data)]])])
     ; Card header
     (when (or is-all-activity
               (= (:type activity-data) "entry"))
       [:div.activity-card-head.group
-        {:class (when (and (not is-all-activity) (= (:type activity-data) "entry")) "entry-card")
+        {:class (when (or is-all-activity (= (:type activity-data) "entry")) "entry-card")
          :on-click #(when-not (and (not is-all-activity) (= (:type activity-data) "entry"))
                       (if (= (:type activity-data) "story")
                         (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
@@ -152,14 +146,18 @@
         ; Card labels
         [:div.activity-card-head-right
           ; Topic tag button
-          (when (and (not is-all-activity)
-                     (:topic-slug activity-data))
+          (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
               [:div.activity-tag
                 {:on-click #(do
                               (utils/event-stop %)
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
-                topic-name]))]])
+                topic-name]))
+          (when is-all-activity
+            [:div.activity-tag
+              {:class (utils/class-set {:board-tag (= (:type activity-data) "entry")
+                                        :storyboard-tag (= (:type activity-data) "story")})}
+              (:board-name activity-data)])]])
     [:div.activity-card-content.group
       {:on-click #(if (= (:type activity-data) "story")
                     (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
