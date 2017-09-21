@@ -43,6 +43,8 @@
   :carrot-dark-blue "#2e405a"
   :carrot-green "#0F8E4C"
   :carrot-green-1 "#0E8749"
+  :carrot-green-2 "#3FBD7C"
+  :carrot-green-3 "#D4F6E4"
   :carrot-text-blue-2 "#3B3D40"
   :carrot-light-blue "#DEE8FF"
   :carrot-light-gray-1 "#B1B8C0"
