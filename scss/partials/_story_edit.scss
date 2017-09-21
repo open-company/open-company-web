@@ -283,6 +283,10 @@ div.story-edit-container {
       }
     }
 
+    div.media-picker {
+      left: -22px !important;
+    }
+
     div.story-edit-body {
       margin-top: 8px;
       @include activity-body();
