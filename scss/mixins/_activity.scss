@@ -52,11 +52,20 @@ $h2_top_margin: 20;
     padding: 7px 11px;
     cursor: pointer;
 
+    &:hover {
+      background-color: $carrot_text_blue;
+      color: white;
+      cursor: pointer;
+    }
+
     &.board-tag {
       margin-right: 2px;
 
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/boards_icon_white.png");
+      &:hover {
+        background-color: $carrot_orange;
+        &:before {
+          background-image: cdnUrl("/img/ML/boards_icon_white.png");
+        }
       }
 
       &:before {
@@ -74,8 +83,11 @@ $h2_top_margin: 20;
     &.storyboard-tag {
       margin-right: 2px;
 
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/storyboards_icon_white.png");
+      &:hover {
+        background-color: $carrot_orange;
+        &:before {
+          background-image: cdnUrl("/img/ML/storyboards_icon_white.png");
+        }
       }
 
       &:before {
@@ -88,12 +100,6 @@ $h2_top_margin: 20;
         width: 12px;
         height: 10px;
       }
-    }
-
-    &:hover {
-      background-color: $carrot_text_blue;
-      color: white;
-      cursor: pointer;
     }
   }
 }
