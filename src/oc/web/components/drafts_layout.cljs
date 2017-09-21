@@ -14,7 +14,7 @@
     (when draft
       [:div.draft-card-inner
         [:div.draft-card-tag
-          [:div.activity-tag
+          [:div.activity-tag.storyboard-tag
             (:storyboard-name draft)]]
         [:div.draft-card-title
           {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title draft)) "Untitled Draft" (:title draft))))}]
