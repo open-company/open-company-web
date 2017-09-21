@@ -149,6 +149,8 @@
                  :class (when (empty? (:headline activity-data)) "no-headline")}]
               (media-attachments (:attachments activity-data))]
             [:div.activity-modal-footer.group
+              {:class (when (and @(::first-render-done s)
+                                 (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
               (reactions activity-data)
               [:div.activity-modal-footer-right
                 (when-not (:read-only activity-data)
