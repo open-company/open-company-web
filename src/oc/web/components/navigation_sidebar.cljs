@@ -144,14 +144,13 @@
                     [:div.internal
                       (str "Drafts (" (:count drafts-link) ")")]]]]))])
       [:div.left-navigation-sidebar-footer
-        ; (when (and (router/current-org-slug)
-        ;            (jwt/is-admin? (:team-id org-data)))
-        ;   [:button.mlb-reset.invite-people-btn
-        ;     {:on-click #(router/nav! (oc-urls/org-settings-invite))}
-        ;     [:div.invite-people-icon]
-        ;     [:span "Invite People"]])
-        ; [:button.mlb-reset.about-carrot-btn
-        ;   {:on-click #(router/nav! oc-urls/about)}
-        ;   [:div.about-carrot-icon]
-        ;   [:span "About Carrot"]]
-          ]]))
+        (when (and (router/current-org-slug)
+                   (jwt/is-admin? (:team-id org-data)))
+          [:button.mlb-reset.invite-people-btn
+            {:on-click #(router/nav! (oc-urls/org-settings-invite))}
+            [:div.invite-people-icon]
+            [:span "Invite People"]])
+        [:button.mlb-reset.about-carrot-btn
+          {:on-click #(router/nav! oc-urls/about)}
+          [:div.about-carrot-icon]
+          [:span "About Carrot"]]]]))

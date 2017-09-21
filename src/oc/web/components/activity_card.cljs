@@ -150,14 +150,16 @@
           (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
               [:div.activity-tag
-                {:on-click #(do
+                {:class (when is-all-activity "double-tag")
+                 :on-click #(do
                               (utils/event-stop %)
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
                 topic-name]))
           (when is-all-activity
             [:div.activity-tag
               {:class (utils/class-set {:board-tag (= (:type activity-data) "entry")
-                                        :storyboard-tag (= (:type activity-data) "story")})
+                                        :storyboard-tag (= (:type activity-data) "story")
+                                        :double-tag (:topic-slug activity-data)})
                :on-click #(do
                             (utils/event-stop %)
                             (router/nav!

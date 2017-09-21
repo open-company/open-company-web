@@ -159,7 +159,7 @@ div.activity-card {
 
     div.activity-card-head-author {
       float: left;
-      min-width: 60%;
+      width: 50%;
       padding-right: 20px;
       overflow: hidden;
 
@@ -169,10 +169,18 @@ div.activity-card {
     div.activity-card-head-right {
       float: right;
       position: relative;
+      width: 50%;
 
       div.activity-tag {
         margin-top: 0;
         float: right;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+
+        &.double-tag {
+          max-width: 50%;
+        }
       }
 
       @include activity-tag();

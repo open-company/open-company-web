@@ -51,6 +51,7 @@ $h2_top_margin: 20;
     text-align: center;
     padding: 7px 11px;
     cursor: pointer;
+    white-space: pre;
 
     &:hover {
       background-color: $carrot_text_blue;
