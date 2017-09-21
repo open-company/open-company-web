@@ -1,39 +1,41 @@
+$media_picker_size: 44;
+$medias: ("entry" "photo" "video" "chart" "attachment" "divider");
+
 div.media-picker {
-  background-color: white;
+  background-color: transparent;
 
   button.media {
-    width: 32px;
-    height: 32px;
+    width: #{$media_picker_size}px;
+    height: #{$media_picker_size}px;
     background-position: 50%;
-    background-size: 12px;
+    background-size: 14px;
     background-repeat: no-repeat;
-    border-radius: 32px;
-    border: 1px solid rgba($oc_gray_7, 0.2);
+    border-radius: #{$media_picker_size / 2}px;
     padding: 0;
     float: left;
-
-    &:hover, &.active {
-      border: 1px solid rgba($carrot_text_blue, 0.3);
-    }
+    opacity: 1;
   }
 
   button.add-media-bt {
     background-image: cdnUrl("/img/ML/add_media_plus_gray.svg");
+    background-size: 14px 14px;
+    background-color: $oc_gray_2;
     background-position: 50%;
     transition: transform $add_media_animation, margin-right $add_media_animation;
     float: left;
     margin-right: 0px;
-    border: none;
-    background-size: 32px;
-    border-radius: inherit;
+    border-radius: #{$media_picker_size / 2}px;
+    width: #{$media_picker_size}px;
+    height: #{$media_picker_size}px;
+    opacity: 1;
 
     &.disabled {
       opacity: 0.2;
     }
 
-    &:hover {
-      background-image: cdnUrl("/img/ML/add_media_plus_blue.svg");
-      border: none;
+    &:hover, &.expanded {
+      background-image: cdnUrl("/img/ML/add_media_plus_white.svg");
+      background-color: $carrot_green_2;
     }
 
     &.expanded {
@@ -44,13 +46,14 @@ div.media-picker {
 
   div.media-picker-container {
     width: 0px;
-    height: 32px;
+    height: #{$media_picker_size}px;
     transition: width $add_media_animation;
     float: left;
     position: relative;
     overflow: hidden;
 
     button.media {
+      background-color: $oc_gray_2;
       margin-left: 0px;
       transform: rotate(0deg);
       transition: transform $add_media_animation, margin-left $add_media_animation, opacity $add_media_animation;
@@ -59,62 +62,31 @@ div.media-picker {
       left: 0px;
       position: absolute;
       opacity: 0;
-    }
 
-    button.media-photo {
-      background-image: cdnUrl("/img/ML/media_photo.png");
-      background-size: 16px 16px;
+      &:hover, &.active {
+        background-color: $carrot_green_2;
+      }
 
-      &:hover {
-        background-image: cdnUrl("/img/ML/media_photo_blue.png");
+      &:not(.media-0) {
+        top: -15px;
       }
     }
 
-    button.media-video {
-      background-image: cdnUrl("/img/ML/media_video.png");
-      background-size: 16px 12px;
-      top: -15px;
+    @each $media in $medias {
+      button.media-#{$media} {
+        background-image: cdnUrl("/img/ML/media_#{$media}.png");
+        background-size: 14px;
 
-      &:hover {
-        background-image: cdnUrl("/img/ML/media_video_blue.png");
-      }
-    }
-
-    button.media-chart {
-      margin-right: 0px;
-      background-image: cdnUrl("/img/ML/media_chart.png");
-      background-size: 20px 12px;
-      top: -15px;
-
-      &:hover {
-        background-image: cdnUrl("/img/ML/media_chart_blue.png");
-      }
-    }
-
-    button.media-attachment {
-      background-image: cdnUrl("/img/ML/media_attachment.png");
-      background-size: 16px 12px;
-      top: -15px;
-
-      &:hover {
-        background-image: cdnUrl("/img/ML/media_attachment_blue.png");
-      }
-    }
-
-    button.media-divider-line {
-      background-image: cdnUrl("/img/ML/media_divider_line.png");
-      background-size: 16px 12px;
-      top: -15px;
-
-      &:hover {
-        background-image: cdnUrl("/img/ML/media_divider_line_blue.png");
+        &:hover {
+          background-image: cdnUrl("/img/ML/media_#{$media}_white.png");
+        }
       }
     }
 
     &.expanded {
       @for $i from 1 through 15 {
         &.media-#{$i} {
-          width: #{160 + ($i * 40)}px;
+          width: #{160 + ($i * ($media_picker_size + 8))}px;
         }
       }
 
@@ -123,7 +95,7 @@ div.media-picker {
 
         @for $i from 0 through 14 {
           &.media-#{$i} {
-            margin-left: #{$i * 40}px;
+            margin-left: #{$i * ($media_picker_size + 8)}px;
           }
         }
       }

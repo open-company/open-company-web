@@ -221,6 +221,7 @@
 
 (rum/defcs media-picker < rum/reactive
                           (rum/local false ::media-expanded)
+                          (rum/local false ::media-entry)
                           (rum/local false ::media-photo)
                           (rum/local false ::media-video)
                           (rum/local false ::media-chart)
@@ -248,7 +249,8 @@
                                                 (when-not (utils/event-inside? % body-el)
                                                   (reset! (::media-expanded s) false)
                                                   ; If there was a last selection saved
-                                                  (when (and (not @(::media-photo s))
+                                                  (when (and (not @(::media-entry s))
+                                                             (not @(::media-photo s))
                                                              (not @(::media-video s))
                                                              (not @(::media-chart s))
                                                              (not @(::media-attachment s))
@@ -312,6 +314,17 @@
     [:div.media-picker-container
       {:class (utils/class-set {:expanded @(::media-expanded s)
                                 (str "media-" (count media-config)) true})}
+      ; Add an entry button
+      (when (:entry (set media-config))
+        [:button.mlb-reset.media.media-entry
+          {:class (utils/class-set {:active @(::media-entry s)
+                                    (str "media-" (.indexOf media-config :entry)) true})
+           :title "Add an update"
+           :data-toggle "tooltip"
+           :data-placement "top"
+           :data-container "body"
+           :on-click (fn []
+                       (reset! (::media-entry s) (not @(::media-entry s))))}])
       ; Add a picture button
       (when (:photo (set media-config))
         [:button.mlb-reset.media.media-photo
@@ -385,7 +398,7 @@
                         (fn []
                           (utils/after 1000 #(media-attachment-dismiss-picker s)))))}])
       (when (:divider-line (set media-config))
-        [:button.mlb-reset.media.media-divider-line
+        [:button.mlb-reset.media.media-divider
           {:class (utils/class-set {:active @(::media-divider-line s)
                                     (str "media-" (.indexOf media-config :divider-line)) true})
            :title "Add a divider line"
