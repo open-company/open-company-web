@@ -1333,3 +1333,16 @@
 (defmethod dispatcher/action :org-settings-hide
   [db [_]]
   (dissoc db :org-settings))
+
+(defmethod dispatcher/action :activity-board-move
+  [db [_ activity-data board-data]]
+  (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
+    (api/update-entry fixed-activity-data)
+    (if (utils/in? (:route @router/path) "all-activity")
+      (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-activity (:uuid activity-data))]
+        (assoc-in db next-activity-data-key fixed-activity-data))
+      (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
+            next-activity-data-key (dispatcher/activity-key (router/current-org-slug) (:slug board-data) (:uuid activity-data))]
+        (-> db
+          (update-in (butlast activity-data-key) dissoc (last activity-data-key))
+          (assoc-in next-activity-data-key fixed-activity-data))))))
