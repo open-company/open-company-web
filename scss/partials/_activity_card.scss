@@ -93,7 +93,7 @@ div.activity-card {
     width: 667px;
     float: right;
 
-    div.triangle {
+    & > div.triangle {
       background-color: white;
       box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
       width: 24px;
@@ -109,10 +109,10 @@ div.activity-card {
         height: 20px;
         background-color: white;
         box-shadow: none;
-        top: 9px;
-        left: 20px;
+        top: 3px;
+        left: 12px;
         position: absolute;
-        transform: rotate(-45deg);
+        transform: rotate(0deg);
       }
     }
 

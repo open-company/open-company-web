@@ -1336,7 +1336,10 @@
 
 (defmethod dispatcher/action :activity-board-move
   [db [_ activity-data board-data]]
-  (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
+  (let [board-key (if (= (:type activity-data) "story") :storyboard-slug :board-slug)
+        fixed-activity-data (-> activity-data
+                              (assoc board-key (:slug board-data))
+                              (dissoc (if (= (:type activity-data) "entry") :storyboard-slug :board-slug)))]
     (api/update-entry fixed-activity-data)
     (if (utils/in? (:route @router/path) "all-activity")
       (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-activity (:uuid activity-data))]
