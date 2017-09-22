@@ -31,7 +31,7 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
-            [oc.web.components.org-settings :refer (org-settings)]
+            ; [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-story :refer (secure-story)]
@@ -396,29 +396,29 @@
         (drv-root #(om/component (user-profile)) target)
         (oc-wall-handler "Please sign in to access this page." target params)))
 
-    (defroute org-settings-route (urls/org-settings ":org") {:as params}
-      (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
-      (org-handler "org-settings" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-route (urls/org-settings ":org") {:as params}
+    ;   (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
+    ;   (org-handler "org-settings" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-slash-route (str (urls/org-settings ":org") "/") {:as params}
-      (timbre/info "Routing org-settings-slash-route" (str (urls/org-settings ":org") "/"))
-      (org-handler "org-settings" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-slash-route (str (urls/org-settings ":org") "/") {:as params}
+    ;   (timbre/info "Routing org-settings-slash-route" (str (urls/org-settings ":org") "/"))
+    ;   (org-handler "org-settings" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-team-route (urls/org-settings-team ":org") {:as params}
-      (timbre/info "Routing org-settings-team-route" (urls/org-settings-team ":org"))
-      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-team-route (urls/org-settings-team ":org") {:as params}
+    ;   (timbre/info "Routing org-settings-team-route" (urls/org-settings-team ":org"))
+    ;   (team-handler "org-settings-team" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-team-slash-route (str (urls/org-settings-team ":org") "/") {:as params}
-      (timbre/info "Routing org-settings-team-slash-route" (str (urls/org-settings-team ":org") "/"))
-      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-team-slash-route (str (urls/org-settings-team ":org") "/") {:as params}
+    ;   (timbre/info "Routing org-settings-team-slash-route" (str (urls/org-settings-team ":org") "/"))
+    ;   (team-handler "org-settings-team" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-invite-route (urls/org-settings-invite ":org") {:as params}
-      (timbre/info "Routing org-settings-invite-route" (urls/org-settings-invite ":org"))
-      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-invite-route (urls/org-settings-invite ":org") {:as params}
+    ;   (timbre/info "Routing org-settings-invite-route" (urls/org-settings-invite ":org"))
+    ;   (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-invite-slash-route (str (urls/org-settings-invite ":org") "/") {:as params}
-      (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
-      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-invite-slash-route (str (urls/org-settings-invite ":org") "/") {:as params}
+    ;   (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
+    ;   (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
 
     (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
@@ -531,12 +531,12 @@
                                  org-slash-route
                                  all-activity-route
                                  all-activity-slash-route
-                                 org-settings-route
-                                 org-settings-slash-route
-                                 org-settings-team-route
-                                 org-settings-team-slash-route
-                                 org-settings-invite-route
-                                 org-settings-invite-slash-route
+                                 ; org-settings-route
+                                 ; org-settings-slash-route
+                                 ; org-settings-team-route
+                                 ; org-settings-team-slash-route
+                                 ; org-settings-invite-route
+                                 ; org-settings-invite-slash-route
                                  ; Secure story route
                                  secure-story-route
                                  secure-story-slash-route

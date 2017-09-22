@@ -222,5 +222,5 @@
               "Saving..."
               "Save"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(reset-form s)}
+          {:on-click #(do (reset-form s) (dis/dispatch! [:org-settings-hide]))}
           "Cancel"]]]))

@@ -76,6 +76,7 @@
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
+   :org-settings        [[:base] (fn [base] (:org-settings base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings

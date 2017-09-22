@@ -1325,3 +1325,11 @@
 (defmethod dispatcher/action :about-carrot-modal-hide
   [db [_]]
   (dissoc db :about-carrot-modal))
+
+(defmethod dispatcher/action :org-settings-show
+  [db [_ panel]]
+  (assoc db :org-settings (or panel :main)))
+
+(defmethod dispatcher/action :org-settings-hide
+  [db [_]]
+  (dissoc db :org-settings))

@@ -19,6 +19,7 @@
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
@@ -72,6 +73,9 @@
                                            :no-scroll (router/current-activity-id)})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
+            ;; Org settings
+            (:org-settings data)
+            (org-settings)
             ;; About carrot
             (:about-carrot-modal data)
             (about-carrot-modal)
