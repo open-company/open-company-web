@@ -68,25 +68,28 @@
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
        :on-click #(when-not has-buttons
                     (dis/dispatch! [:alert-modal-hide]))}
-      [:div.alert-modal
-        {:class (when has-buttons "has-buttons")}
-        (when (:icon alert-modal)
-          [:img.alert-modal-icon {:src (utils/cdn (:icon alert-modal))}])
-        (when (:title alert-modal)
-          [:div.alert-modal-title
-            (:title alert-modal)])
-        (when (:message alert-modal)
-          [:div.alert-modal-message
-            (:message alert-modal)])
-        (when has-buttons
-          [:div.alert-modal-buttons.group
-            {:class (when (or (not (:link-button-title alert-modal))
-                              (not (:solid-button-title alert-modal))) "single-button")}
-            (when (:link-button-title alert-modal)
-              [:button.mlb-reset.mlb-link-black
-                {:on-click #(link-button-clicked alert-modal %)}
-                (:link-button-title alert-modal)])
-            (when (:solid-button-title alert-modal)
-              [:button.mlb-reset.mlb-default
-                {:on-click #(solid-button-clicked alert-modal %)}
-                (:solid-button-title alert-modal)])])]]))
+      [:div.modal-wrapper
+        [:button.carrot-modal-close.mlb-reset
+          {:on-click #(if (fn? (:link-button-cb alert-modal)) (link-button-clicked alert-modal %) (close-clicked s))}]
+        [:div.alert-modal
+          {:class (when has-buttons "has-buttons")}
+          (when (:icon alert-modal)
+            [:img.alert-modal-icon {:src (utils/cdn (:icon alert-modal))}])
+          (when (:title alert-modal)
+            [:div.alert-modal-title
+              (:title alert-modal)])
+          (when (:message alert-modal)
+            [:div.alert-modal-message
+              (:message alert-modal)])
+          (when has-buttons
+            [:div.alert-modal-buttons.group
+              {:class (when (or (not (:link-button-title alert-modal))
+                                (not (:solid-button-title alert-modal))) "single-button")}
+              (when (:link-button-title alert-modal)
+                [:button.mlb-reset.mlb-link-black
+                  {:on-click #(link-button-clicked alert-modal %)}
+                  (:link-button-title alert-modal)])
+              (when (:solid-button-title alert-modal)
+                [:button.mlb-reset.mlb-default
+                  {:on-click #(solid-button-clicked alert-modal %)}
+                  (:solid-button-title alert-modal)])])]]]))

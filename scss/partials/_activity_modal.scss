@@ -22,141 +22,149 @@ div.activity-modal-container {
     }
   }
 
-  div.activity-modal {
-    width: 918px;
+  div.modal-wrapper {
+    width: 946px;
     max-height: 100vh;
     min-height: 330px;
-    margin: 0px auto;
     position: relative;
-    overflow: visible;
-    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-    border-radius: 8px;
-    background-color: white;
+    margin: 0px auto;
 
-    div.activity-left-column {
-      float: left;
-      width: 617px;
-      border-top-left-radius: 8px;
-      border-bottom-left-radius: 8px;
+    div.activity-modal {
+      width: 918px;
+      margin: 0px 0px 0px 28px;
+      position: relative;
+      overflow: visible;
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+      border-radius: 8px;
+      background-color: white;
 
-      div.activity-left-column-content {
+      div.activity-left-column {
+        float: left;
+        width: 617px;
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
 
-        div.activity-modal-head{
-          padding: 24px 16px 0px 32px;
+        div.activity-left-column-content {
 
-          div.activity-modal-head-left {
-            float: left;
-            min-width: 300px;
-            @include activity-author();
-          }
+          div.activity-modal-head{
+            padding: 24px 16px 0px 32px;
 
-          div.activity-modal-head-right {
-            float: right;
-            div.activity-tag {
-              float: right;
-              margin-top: 7px;
+            div.activity-modal-head-left {
+              float: left;
+              max-width: 50%;
+              @include activity-author();
             }
 
-            @include activity-tag();
-          }
-        }
-
-        div.activity-modal-content {
-          padding: 0px 16px 40px 32px;
-          float: none;
-          width: 100%;
-          position: relative;
-          overflow-y: auto;
-          max-height: calc(100vh - 65px - 74px);
-
-          div.activity-modal-content-title {
-            margin-top: 24px;
-            @include activity-title();
-          }
-
-          div.activity-modal-content-headline {
-            margin-top: 24px;
-            @include activity-headline();
-          }
-
-          div.activity-modal-content-body {
-            margin-top: 24px;
-            @include activity-body();
-          }
-        }
-
-        div.activity-modal-footer {
-          padding: 24px 20px 22px 32px;
-          height: 74px;
-
-          &.scrolling-content {
-            border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
-          }
-
-          div.activity-modal-footer-right {
-            float: right;
-
-            div.more-dropdown {
+            div.activity-modal-head-right {
               float: right;
-              margin-left: 10px;
-              width: 32px;
-              height: 32px;
-
-              button.activity-modal-more {
-                width: 32px;
-                height: 32px;
-                padding: 8px 0px 8px 16px;
-                display: block;
-                background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-                background-position: right center;
-                background-size: 6px 16px;
-                background-repeat: no-repeat;
-                margin-left: 6px;
+              max-width: 50%;
+              div.activity-tag {
+                float: right;
+                margin-top: 7px;
+                max-width: 100%;
               }
 
-              div.dropdown-menu {
-                position: absolute;
-                top: -44px;
-                left: -91px;
-                border: none;
-                outline: none;
-                box-shadow: none;
-                background-color: transparent;
-                padding: 0 0 .3em;
+              @include activity-tag();
+            }
+          }
 
-                div.triangle {
-                  position: absolute;
-                  top: 50px;
-                  left: 90px;
-                  background-color: white;
-                  border-top: 1px solid rgba(177,184,192,0.50);
-                  border-left: 1px solid rgba(177,184,192,0.50);
-                  transform: rotate(135deg);
-                  width: 20px;
-                  height: 20px;
+          div.activity-modal-content {
+            padding: 0px 16px 40px 32px;
+            float: none;
+            width: 100%;
+            position: relative;
+            overflow-y: auto;
+            max-height: calc(100vh - 65px - 74px);
+
+            div.activity-modal-content-title {
+              margin-top: 24px;
+              @include activity-title();
+            }
+
+            div.activity-modal-content-headline {
+              margin-top: 24px;
+              @include activity-headline();
+            }
+
+            div.activity-modal-content-body {
+              margin-top: 24px;
+              @include activity-body();
+            }
+          }
+
+          div.activity-modal-footer {
+            padding: 24px 20px 22px 32px;
+            height: 74px;
+
+            &.scrolling-content {
+              border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
+            }
+
+            div.activity-modal-footer-right {
+              float: right;
+
+              div.more-dropdown {
+                float: right;
+                margin-left: 10px;
+                width: 32px;
+                height: 32px;
+
+                button.activity-modal-more {
+                  width: 32px;
+                  height: 32px;
+                  padding: 8px 0px 8px 16px;
+                  display: block;
+                  background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+                  background-position: right center;
+                  background-size: 6px 16px;
+                  background-repeat: no-repeat;
+                  margin-left: 6px;
                 }
 
-                ul.activity-modal-more-menu {
-                  background-color: white;
-                  border: 1px solid rgba(177,184,192,0.50);
-                  box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-                  border-radius: 5px;
-                  margin: 8px 0;
-                  padding: 10px 13px 6px 8px;
-                  min-height: 50px;
-                  list-style-type: none;
-                  width: 100px;
+                div.dropdown-menu {
+                  position: absolute;
+                  top: -44px;
+                  left: -91px;
+                  border: none;
+                  outline: none;
+                  box-shadow: none;
+                  background-color: transparent;
+                  padding: 0 0 .3em;
 
-                  li {
-                    padding: 3px 8px;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $carrot_light_gray_3;
-                    cursor: pointer;
-                    background-color: transparent;
+                  div.triangle {
+                    position: absolute;
+                    top: 50px;
+                    left: 90px;
+                    background-color: white;
+                    border-top: 1px solid rgba(177,184,192,0.50);
+                    border-left: 1px solid rgba(177,184,192,0.50);
+                    transform: rotate(135deg);
+                    width: 20px;
+                    height: 20px;
+                  }
 
-                    &:hover {
-                      background-color: rgba($carrot_light_gray_4, 0.2);
+                  ul.activity-modal-more-menu {
+                    background-color: white;
+                    border: 1px solid rgba(177,184,192,0.50);
+                    box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                    border-radius: 5px;
+                    margin: 8px 0;
+                    padding: 10px 13px 6px 8px;
+                    min-height: 50px;
+                    list-style-type: none;
+                    width: 100px;
+
+                    li {
+                      padding: 3px 8px;
+                      @include avenir_M();
+                      font-size: 14px;
+                      color: $carrot_light_gray_3;
+                      cursor: pointer;
+                      background-color: transparent;
+
+                      &:hover {
+                        background-color: rgba($carrot_light_gray_4, 0.2);
+                      }
                     }
                   }
                 }
@@ -165,26 +173,26 @@ div.activity-modal-container {
           }
         }
       }
-    }
 
-    div.activity-right-column {
-      float: right;
-      width: 301px;
-      border-top-right-radius: 8px;
-      border-bottom-right-radius: 8px;
-      background-color: $carrot_light_gray_2;
-      max-height: 100vh;
-      min-height: 200px;
-      position: relative;
+      div.activity-right-column {
+        float: right;
+        width: 301px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        background-color: $carrot_light_gray_2;
+        max-height: 100vh;
+        min-height: 200px;
+        position: relative;
 
-      div.activity-right-column-content {
-        padding: 14px 32px 24px 16px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        position: absolute;
-        bottom: 0px;
-        width: 100%;
-        height: 100%;
+        div.activity-right-column-content {
+          padding: 14px 32px 24px 16px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          position: absolute;
+          bottom: 0px;
+          width: 100%;
+          height: 100%;
+        }
       }
     }
   }

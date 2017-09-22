@@ -12,8 +12,7 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.icon :as i]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn close-overlay [e]
   (utils/event-stop e)
@@ -58,7 +57,8 @@
         slack-error [:span.block.red "There was an issue validating with Slack."]]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
-      (carrot-close-bt {:on-click close-overlay})
+      [:button.carrot-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
       [:div.login-overlay.login-with-slack
         {:on-click #(utils/event-stop %)}
         [:div.login-overlay-cta.pl2.pr2.group
@@ -100,7 +100,8 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (carrot-close-bt {:on-click close-overlay})
+    [:button.carrot-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
     [:div.login-overlay.login-with-email.group
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -173,7 +174,8 @@
 ;   [state]
 ;   [:div.login-overlay-container.group
 ;     {:on-click (partial close-overlay)}
-;     (carrot-close-bt {:on-click close-overlay})
+;     [:button.carrot-modal-close.mlb-reset
+;        {:on-click (partial close-overlay)}]
 ;     [:div.login-overlay.signup-with-email.group
 ;       {:on-click #(utils/event-stop %)}
 ;       [:div.login-overlay-cta.pl2.pr2.group
@@ -278,7 +280,8 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (carrot-close-bt {:on-click close-overlay})
+    [:button.carrot-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
     [:div.login-overlay.password-reset
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group

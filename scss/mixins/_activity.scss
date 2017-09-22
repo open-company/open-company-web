@@ -40,7 +40,7 @@ $h2_top_margin: 20;
 
 @mixin activity-tag(){
   div.activity-tag {
-    display: inline;
+    display: inline-block;
     height: 26px;
     border-radius: 4px;
     @include avenir_B();
@@ -52,6 +52,9 @@ $h2_top_margin: 20;
     padding: 7px 11px;
     cursor: pointer;
     white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 
     &:hover {
       background-color: $carrot_text_blue;

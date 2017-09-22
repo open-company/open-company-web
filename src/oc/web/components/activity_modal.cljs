@@ -117,65 +117,68 @@
                                 :no-comments (not show-comments?)})
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
                     (close-clicked s))}
-      [:div.activity-modal.group
-        {:class (str "activity-modal-" (:uuid activity-data))
-         :style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
-        [:div.activity-left-column
-          {:style (when column-height {:minHeight (str column-height "px")})}
-          [:div.activity-left-column-content
-            {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
-            [:div.activity-modal-head.group
-              [:div.activity-modal-head-left
-                (user-avatar-image (first (:author activity-data)))
-                [:div.name (:name (first (:author activity-data)))]
-                [:div.time-since
-                  [:time
-                    {:date-time (:created-at activity-data)
-                     :data-toggle "tooltip"
-                     :data-placement "top"
-                     :title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since (:created-at activity-data))]]]
-              [:div.activity-modal-head-right
-                (when (:topic-slug activity-data)
-                  (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                    [:div.activity-tag
-                      {:on-click #(close-clicked s (:topic-slug activity-data))}
-                      topic-name]))]]
-            [:div.activity-modal-content
-              [:div.activity-modal-content-headline
-                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-              [:div.activity-modal-content-body
-                {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                 :class (when (empty? (:headline activity-data)) "no-headline")}]
-              (media-attachments (:attachments activity-data))]
-            [:div.activity-modal-footer.group
-              {:class (when (and @(::first-render-done s)
-                                 (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
-              (reactions activity-data)
-              [:div.activity-modal-footer-right
-                (when-not (:read-only activity-data)
-                  [:div.more-dropdown.dropdown
-                    [:button.mlb-reset.activity-modal-more.dropdown-toggle
-                      {:type "button"
-                       :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
-                       :data-toggle "dropdown"
-                       :aria-haspopup true
-                       :aria-expanded false
-                       :title "More"}]
-                    [:div.dropdown-menu
-                      {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
-                      [:div.triangle]
-                      [:ul.activity-modal-more-menu
-                        [:li
-                          {:on-click (fn [e]
-                                       (utils/event-stop e)
-                                       (dis/dispatch! [:entry-edit activity-data]))}
-                          "Edit"]
-                        [:li
-                          {:on-click #(delete-clicked % activity-data)}
-                          "Delete"]]]])]]]]
-        (when show-comments?
-          [:div.activity-right-column
+      [:div.modal-wrapper
+        {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
+        [:button.carrot-modal-close.mlb-reset
+          {:on-click #(close-clicked s)}]
+        [:div.activity-modal.group
+          {:class (str "activity-modal-" (:uuid activity-data))}
+          [:div.activity-left-column
             {:style (when column-height {:minHeight (str column-height "px")})}
-            [:div.activity-right-column-content
-              (comments activity-data)]])]]))
+            [:div.activity-left-column-content
+              {:style (when column-height {:minHeight (str (- column-height 40) "px")})}
+              [:div.activity-modal-head.group
+                [:div.activity-modal-head-left
+                  (user-avatar-image (first (:author activity-data)))
+                  [:div.name (:name (first (:author activity-data)))]
+                  [:div.time-since
+                    [:time
+                      {:date-time (:created-at activity-data)
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :title (utils/activity-date-tooltip activity-data)}
+                      (utils/time-since (:created-at activity-data))]]]
+                [:div.activity-modal-head-right
+                  (when (:topic-slug activity-data)
+                    (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
+                      [:div.activity-tag
+                        {:on-click #(close-clicked s (:topic-slug activity-data))}
+                        topic-name]))]]
+              [:div.activity-modal-content
+                [:div.activity-modal-content-headline
+                  {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+                [:div.activity-modal-content-body
+                  {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
+                   :class (when (empty? (:headline activity-data)) "no-headline")}]
+                (media-attachments (:attachments activity-data))]
+              [:div.activity-modal-footer.group
+                {:class (when (and @(::first-render-done s)
+                                   (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
+                (reactions activity-data)
+                [:div.activity-modal-footer-right
+                  (when-not (:read-only activity-data)
+                    [:div.more-dropdown.dropdown
+                      [:button.mlb-reset.activity-modal-more.dropdown-toggle
+                        {:type "button"
+                         :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
+                         :data-toggle "dropdown"
+                         :aria-haspopup true
+                         :aria-expanded false
+                         :title "More"}]
+                      [:div.dropdown-menu
+                        {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
+                        [:div.triangle]
+                        [:ul.activity-modal-more-menu
+                          [:li
+                            {:on-click (fn [e]
+                                         (utils/event-stop e)
+                                         (dis/dispatch! [:entry-edit activity-data]))}
+                            "Edit"]
+                          [:li
+                            {:on-click #(delete-clicked % activity-data)}
+                            "Delete"]]]])]]]]
+          (when show-comments?
+            [:div.activity-right-column
+              {:style (when column-height {:minHeight (str column-height "px")})}
+              [:div.activity-right-column-content
+                (comments activity-data)]])]]]))

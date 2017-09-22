@@ -17,60 +17,66 @@ div.alert-modal-container {
     opacity: 1;
   }
 
-  div.alert-modal {
-    width: 337px;
-    min-height: 147px;
+  div.modal-wrapper {
+    width: #{337 + 20 + 8}px;
     margin: 100px auto 50px;
+    min-height: 147px;
     position: relative;
-    overflow: hidden;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
-    padding: 24px;
-    text-align: center;
 
-    &.has-buttons {
-      min-height: 197px;
-    }
+    div.alert-modal {
+      width: 337px;
+      margin: 0px 0px 0px 28px;
+      position: relative;
+      overflow: hidden;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      text-align: center;
 
-    img.alert-modal-icon {
-      max-width: 42px;
-      max-height: 42px;
-      margin-bottom: 12px;
-    }
-
-    div.alert-modal-title {
-      @include avenir_H();
-      font-size: 16px;
-      color: $carrot_dark_gray_1;
-      margin-top: 8px;
-    }
-
-    div.alert-modal-message {
-      @include avenir_R();
-      font-size: 16px;
-      color: $oc_gray_7;
-      margin-top: 8px;
-    }
-
-    div.alert-modal-buttons {
-      width: calc(100% - 24px);
-      margin: 24px 12px 0;
-
-      &.single-button {
-        button {
-          float: none;
-          margin: 0 auto;
-        }
+      &.has-buttons {
+        min-height: 197px;
       }
 
-      button {
-        width: calc(50% - 14px);
-        float: left;
-        height: 40px;
+      img.alert-modal-icon {
+        max-width: 42px;
+        max-height: 42px;
+        margin-bottom: 12px;
+      }
 
-        &:not(:first-child) {
-          margin-left: 14px;
+      div.alert-modal-title {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_dark_gray_1;
+        margin-top: 8px;
+      }
+
+      div.alert-modal-message {
+        @include avenir_R();
+        font-size: 16px;
+        color: $oc_gray_7;
+        margin-top: 8px;
+      }
+
+      div.alert-modal-buttons {
+        width: calc(100% - 24px);
+        margin: 24px 12px 0;
+
+        &.single-button {
+          button {
+            float: none;
+            margin: 0 auto;
+          }
+        }
+
+        button {
+          width: calc(50% - 14px);
+          float: left;
+          height: 40px;
+
+          &:not(:first-child) {
+            margin-left: 14px;
+          }
         }
       }
     }
