@@ -53,7 +53,7 @@
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (+ top-v (:top bt-offset) (when scrolling-el (.-scrollTop scrolling-el))) "px")
+                                             :top (str (- (+ top-v (:top bt-offset)) (when scrolling-el (.-top (.offset (js/$ scrolling-el))))) "px")
                                              :left (str (+ 6 (:left bt-offset)) "px")})))
         show-btn (fn [_]
                    (utils/after 100
@@ -61,7 +61,8 @@
                       (let [sel (js/window.getSelection)
                             el  (when (pos? (.-rangeCount sel))
                                   (.-commonAncestorContainer (.getRangeAt sel 0)))
-                            offset (when el (.offset (js/$ el)))
+                            $el (js/$ el)
+                            offset (when el (.offset $el))
                             offset-top (int (when offset (.-top offset)))]
                         (when (and sel el)
                           (if (and (empty-paragraph? el) offset-top)

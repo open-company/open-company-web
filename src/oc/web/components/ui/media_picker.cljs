@@ -275,12 +275,16 @@
                            :did-remount (fn [o s]
                                           (let [data-editing (nth (:rum/args s) 4)
                                                 dispatch-input-key (nth (:rum/args s) 5)]
-                                            (when (map? (:temp-video data-editing))
+                                            (when (contains? data-editing :temp-video)
                                               (dis/dispatch! [:input [dispatch-input-key :temp-video] nil])
-                                              (media-video-add s (:temp-video data-editing)))
-                                            (when-not (empty? (:temp-chart data-editing))
+                                              (reset! (::media-video s) false)
+                                              (when (map? (:temp-video data-editing))
+                                                (media-video-add s (:temp-video data-editing))))
+                                            (when (contains? data-editing :temp-chart)
                                               (dis/dispatch! [:input [dispatch-input-key :temp-chart] nil])
-                                              (media-chart-add s (:temp-chart data-editing))))
+                                              (reset! (::media-chart s) false)
+                                              (when-not (empty (:temp-chart data-editing))
+                                                (media-chart-add s (:temp-chart data-editing)))))
                                         s)
                            :will-unmount (fn [s]
                                            (events/unlistenByKey @(::window-click-listener s))

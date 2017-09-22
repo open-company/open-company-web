@@ -9,7 +9,7 @@
 
 (defn dismiss-modal [s]
   (let [dispatch-input-key (first (:rum/args s))]
-    (dis/dispatch! [:input [dispatch-input-key :media-chart] false])))
+    (dis/dispatch! [:input [dispatch-input-key :temp-chart] false])))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)

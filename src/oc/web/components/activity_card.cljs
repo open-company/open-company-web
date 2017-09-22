@@ -290,7 +290,7 @@
                           same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
                       (for [board same-type-boards]
                         [:div.board-item
-                          {:key (str "move-post-board-list-" (:slug board) "0" (rand 10000))
+                          {:key (str "move-post-board-list-" (:slug board))
                            :class (when (= (:board-slug activity-data) (:slug board)) "disabled")
                            :on-click #(when (not= (:board-slug activity-data) (:slug board))
                                         (reset! (::move-post-selected-board s) board)
