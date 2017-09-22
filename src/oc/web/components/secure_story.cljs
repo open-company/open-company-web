@@ -38,7 +38,7 @@
             [:div.story-author-inner.group
               (user-avatar-image story-author)
               [:div.posted-by
-                (str "Posted by " (:name story-author) " on " (utils/date-string (utils/js-date (:published-at story-data))))]]]
+                (str "Posted by " (:name story-author) " " (utils/activity-date (utils/js-date (:published-at story-data))))]]]
           (when (:body story-data)
             [:div.story-body
               {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])]]
