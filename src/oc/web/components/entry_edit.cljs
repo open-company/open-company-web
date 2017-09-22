@@ -90,7 +90,7 @@
         body-el      (sel1 [:div.entry-edit-body])
         body-editor  (new js/MediumEditor body-el (clj->js (-> (body-placeholder)
                                                             (utils/medium-editor-options false false)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {:top -104 :left -4} (.querySelector js/document ".entry-edit-modal-container"))))))]
+                                                            (editor/inject-extension (editor/media-upload media-picker-id {:top -10 :left -26} (sel1 [:div.entry-edit-modal]))))))]
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
