@@ -31,7 +31,7 @@
               [:div.by-topic-header-title
                 (or topic-name
                     (s/capital topic-slug)
-                    "No topic")]
+                    [:span.oblique "No topic"])]
               ; If there are more than 4 add the button to show all of them
               (when (> (count entries-group) 4)
                 [:button.view-all-updates.mlb-reset

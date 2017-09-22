@@ -41,7 +41,10 @@
           (= board-filters :by-topic)
           [:span "View by " [:span.bold "topic"] " "]
           (string? board-filters)
-          [:span.bold (str (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters)) " ")]
+          [:span.bold
+            (if (= board-filters "uncategorized")
+              "No topic "
+              (str (:name (utils/get-topic (:topics board-data) board-filters)) " "))]
           :else
           [:span "View by " [:span.bold "most recent"] " "])
         [:i.fa.fa-caret-down]]
