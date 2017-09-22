@@ -1079,9 +1079,40 @@
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
-(defn activity-date [js-date]
+(defn activity-date-string [js-date]
   (let [time-string (format-time-string js-date)]
     (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
+
+(defn activity-date
+  "Get a string representing the elapsed time from a date in the past"
+  [past-js-date]
+  (let [past (.getTime past-js-date)
+        now (.getTime (js-date))
+        seconds (.floor js/Math (/ (- now past) 1000))
+        years-interval (.floor js/Math (/ seconds 31536000))
+        months-interval (.floor js/Math (/ seconds 2592000))
+        days-interval (.floor js/Math (/ seconds 86400))
+        hours-interval (.floor js/Math (/ seconds 3600))
+        minutes-interval (.floor js/Math (/ seconds 60))]
+    (cond
+      (pos? years-interval)
+      (str "on " (activity-date-string past-js-date))
+
+      (or (pos? months-interval)
+          (> days-interval 7))
+      (str "on " (activity-date-string past-js-date))
+
+      (pos? days-interval)
+      (str days-interval " " (pluralize "day" days-interval) " ago")
+
+      (pos? hours-interval)
+      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+
+      (pos? minutes-interval)
+      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+
+      :else
+      "just now")))
 
 (defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
@@ -1089,8 +1120,8 @@
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]
     (if (= (:created-at entry-data) (:updated-at entry-data))
-      (str "Posted on " created-str)
-      (str "Posted on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+      (str "Posted " created-str)
+      (str "Posted " created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
 
 (defn story-date-tooltip [story-data]
   (let [published-at (js-date (:published-at story-data))
@@ -1099,8 +1130,8 @@
         published-str (activity-date published-at)
         updated-str (activity-date updated-at)]
     (if (not edited-later?)
-      (str "Posted on " published-str)
-      (str "Posted on " published-str "\nEdited on " updated-str " by " (:name (last (:author story-data)))))))
+      (str "Posted " published-str)
+      (str "Posted " published-str "\nEdited " updated-str " by " (:name (last (:author story-data)))))))
 
 (defn activity-date-tooltip [activity-data]
   (if (= (:type activity-data) "entry")

@@ -41,21 +41,28 @@ div.orgs-dropdown {
     li {
       height: 24px;
       width: 100%;
-      margin: 10px 0;
+      margin: 5px 0;
+      padding: 0px;
+      cursor: pointer;
+      display: inline-block;
 
-      &.active, &:hover {
+      // &.active {
+      //   background-color: rgba($carrot_orange, 0.1);
+      // }
+
+      // &:hover {
+      //   background-color: rgba($carrot_light_gray, 0.3);
+      // }
+
+      &.active {
         background-color: transparent;
       }
 
-      a{
-        display: initial;
-        height: initial;
-        line-height: initial;
-        padding: 0;
-        color: initial;
+      &:hover {
+        background-color: transparent;
 
-        &:hover {
-          background-color: initial;
+        span.org-name {
+          text-decoration: underline;
         }
       }
 
@@ -63,12 +70,13 @@ div.orgs-dropdown {
         @include avenir_M();
         font-size: 14px;
         color: $oc_gray_5;
-        float: left;
-        margin-top: 4px;
+        margin-top: -5px;
         margin-left: 16px;
         overflow: hidden;
         text-overflow: ellipsis;
         width: 122px;
+        display: inline-block;
+        white-space: pre;
 
         &.no-logo {
           margin-left: 40px;
@@ -76,7 +84,7 @@ div.orgs-dropdown {
       }
 
       div.org-avatar {
-        float: left;
+        margin-top: -7px;
         width: 24px !important;
         height: 24px !important;
 
@@ -89,8 +97,6 @@ div.orgs-dropdown {
           div.org-avatar-border {
             height: 24px !important;
             width: 24px !important;
-            padding: 0px !important;
-            margin-top: -10px !important;
 
             img.org-avatar-img {
               max-width: 24px !important;

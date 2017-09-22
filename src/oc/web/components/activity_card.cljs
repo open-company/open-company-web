@@ -1,5 +1,7 @@
 (ns oc.web.components.activity-card
   (:require [rum.core :as rum]
+            [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -10,7 +12,9 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
-            [goog.object :as gobj]))
+            [goog.object :as gobj]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (rum/defc activity-card-empty
   [topic read-only?]
@@ -66,11 +70,25 @@
             (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
     @found))
 
-(rum/defcs activity-card < rum/static
+(defn move-post [s]
+  ;; move the post
+  (let [activity-data (first (:rum/args s))
+        new-board @(::move-post-selected-board s)]
+    (dis/dispatch! [:activity-board-move activity-data new-board]))
+  (reset! (::move-post-boards-list s) false)
+  (reset! (::move-post-selected-board s) nil)
+  (reset! (::move-post s) false))
+
+(rum/defcs activity-card < rum/reactive
                         (rum/local false ::hovering-card)
                         (rum/local false ::showing-dropdown)
                         (rum/local false ::truncated)
                         (rum/local nil ::first-body-image)
+                        (rum/local false ::move-post)
+                        (rum/local false ::move-post-boards-list)
+                        (rum/local nil ::move-post-selected-board)
+                        (rum/local nil ::window-click)
+                        (drv/drv :org-data)
                         {:after-render (fn [s]
                                          (let [activity-data (first (:rum/args s))
                                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
@@ -111,7 +129,21 @@
                                          "hidden.bs.dropdown"
                                          (fn [e]
                                            (reset! (::showing-dropdown s) false))))
-                                      s)}
+                                      (reset! (::window-click s)
+                                       (events/listen js/window EventType/CLICK
+                                        #(when @(::move-post s)
+                                           (if (not (utils/event-inside? % (sel1 [:div.move-post])))
+                                             (if @(::move-post-boards-list s)
+                                                (reset! (::move-post-boards-list s) false)
+                                                (reset! (::move-post s) false))
+                                             (do
+                                               (utils/event-stop %)
+                                               (when @(::move-post-boards-list s)
+                                                (reset! (::move-post-boards-list s) false)))))))
+                                      s)
+                         :will-unmount (fn [s]
+                                         (events/unlistenByKey @(::window-click s))
+                                         s)}
   [s activity-data has-headline has-body is-all-activity]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
@@ -127,7 +159,7 @@
               (= (:type activity-data) "entry"))
       [:div.activity-card-head.group
         {:class (when (or is-all-activity (= (:type activity-data) "entry")) "entry-card")
-         :on-click #(when-not (and (not is-all-activity) (= (:type activity-data) "entry"))
+         :on-click #(when (or (not @(::move-post s)) (not (and (not is-all-activity) (= (:type activity-data) "entry"))))
                       (if (= (:type activity-data) "story")
                         (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
                         (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))}
@@ -170,9 +202,10 @@
                                   (oc-urls/board (:board-slug activity-data))))))}
               (:board-name activity-data)])]])
     [:div.activity-card-content.group
-      {:on-click #(if (= (:type activity-data) "story")
-                    (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))}
+      {:on-click #(when (not @(::move-post s))
+                   (if (= (:type activity-data) "story")
+                     (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
+                     (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))}
       (when (= (:type activity-data) "story")
         [:div.activity-card-title
           {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
@@ -203,16 +236,17 @@
           {:style #js {:backgroundImage (str "url(\"" (:banner-url activity-data) "\")")
                        :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
     [:div.activity-card-footer.group
-      {:on-click #(if (= (:type activity-data) "story")
-                    (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))}
+      {:on-click #(when (not @(::move-post s))
+                    (if (= (:type activity-data) "story")
+                      (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
+                      (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))}
       (interactions-summary activity-data)
       (when (or (utils/link-for (:links activity-data) "partial-update")
                 (utils/link-for (:links activity-data) "delete"))
         [:div.more-button.dropdown
           [:button.mlb-reset.more-ellipsis.dropdown-toggle
             {:type "button"
-             :class (utils/class-set {:hidden (and (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
+             :class (utils/class-set {:hidden (and (not @(::move-post s)) (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
              :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
              :on-click #(utils/event-stop %)
              :title "More"
@@ -234,4 +268,46 @@
               (when (utils/link-for (:links activity-data) "delete")
                 [:li
                   {:on-click #(delete-clicked % activity-data)}
-                  "Delete"])]]])]])
+                  "Delete"])
+              (when (utils/link-for (:links activity-data) "partial-update")
+                [:li
+                  {:on-click #(do (utils/event-stop %) (reset! (::move-post s) true))}
+                  "Move post"])]]
+          (when @(::move-post s)
+            [:div.move-post
+              [:div.triangle]
+              [:div.move-post-inner
+                [:div.move-post-title
+                  "Move Post"
+                  [:i.mdi.mdi-information-outline]]
+                [:div.select-new-board
+                  {:on-click #(do (utils/event-stop %) (reset! (::move-post-boards-list s) (not @(::move-post-boards-list s))))
+                   :class (when (nil? @(::move-post-selected-board s)) "placeholder")}
+                  (or (:name @(::move-post-selected-board s)) "Select a new board...")]
+                (when @(::move-post-boards-list s)
+                  [:div.boards-list
+                    (let [all-boards (:boards (drv/react s :org-data))
+                          same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
+                      (for [board same-type-boards]
+                        [:div.board-item
+                          {:key (str "move-post-board-list-" (:slug board) "0" (rand 10000))
+                           :class (when (= (:board-slug activity-data) (:slug board)) "disabled")
+                           :on-click #(when (not= (:board-slug activity-data) (:slug board))
+                                        (reset! (::move-post-selected-board s) board)
+                                        (reset! (::move-post-boards-list s) false))}
+                          (:name board)]))])
+                [:button.mlb-reset.mlb-default
+                  {:on-click #(do (utils/event-stop %) (move-post s))
+                   :disabled (not @(::move-post-selected-board s))}
+                  "Apply"]
+                [:button.mlb-reset.mlb-link-black
+                  {:on-click #(do
+                                (utils/event-stop %)
+                                (reset! (::move-post-boards-list s) false)
+                                (reset! (::move-post-selected-board s) nil)
+                                (reset! (::move-post s) false))}
+                  "Cancel"]]])])]])
+
+
+
+

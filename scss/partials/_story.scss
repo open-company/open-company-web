@@ -146,12 +146,7 @@ div.story-container {
           display: inline-block;
 
           label.media-attachment-title {
-            font-size: 16px;
-            margin-top: 4px;
-          }
-
-          label.media-attachment-subtitle {
-            display: none;
+            margin-top: -4px;
           }
         }
       }

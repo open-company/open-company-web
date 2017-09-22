@@ -28,17 +28,20 @@
 (defn team-settings-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings))))
+  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings)))
+  (utils/after (+ utils/oc-animation-duration 100) #(dis/dispatch! [:org-settings-show :main])))
 
 (defn um-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-team))))
+  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-team))))
+  (utils/after (+ utils/oc-animation-duration 100) #(dis/dispatch! [:org-settings-show :team])))
 
 (defn invite-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
+  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
+  (utils/after (+ utils/oc-animation-duration 100) #(dis/dispatch! [:org-settings-show :invite])))
 
 (defn sign-in-sign-up-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
