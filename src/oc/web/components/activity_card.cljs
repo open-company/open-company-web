@@ -286,7 +286,7 @@
                   (or (:name @(::move-post-selected-board s)) "Select a new board...")]
                 (when @(::move-post-boards-list s)
                   [:div.boards-list
-                    (let [all-boards (:boards (drv/react s :org-data))
+                    (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
                           same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
                       (for [board same-type-boards]
                         [:div.board-item
