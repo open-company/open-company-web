@@ -34,6 +34,7 @@
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
+            [oc.web.components.secure-story :refer (secure-story)]
             [oc.web.components.story :refer (story)]
             [oc.web.components.story-edit :refer (story-edit)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -421,11 +422,11 @@
 
     (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
-      (story-handler #(om/component (story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
+      (story-handler #(om/component (secure-story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute secure-story-slash-route (str (urls/secure-story ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-story-slash-route" (str (urls/secure-story ":org" ":secure-id") "/"))
-      (story-handler #(om/component (story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
+      (story-handler #(om/component (secure-story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))

@@ -39,11 +39,11 @@
          :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}
         (cond
           (= board-filters :by-topic)
-          "View by topic "
+          [:span "View by " [:span.bold "topic"] " "]
           (string? board-filters)
-          (str (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters)) " ")
+          [:span.bold (str (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters)) " ")]
           :else
-          "View by most recent ")
+          [:span "View by " [:span.bold "most recent"] " "])
         [:i.fa.fa-caret-down]]
       (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))

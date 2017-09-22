@@ -93,23 +93,26 @@
     [:div.media-video-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
        :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
-      [:div.media-video-modal
-        [:div.media-video-modal-header.group
-          (user-avatar-image current-user-data)
-          [:div.title "Adding a video"]]
-        [:div.media-video-modal-divider]
-        [:div.media-video-modal-content
-          [:div.content-title "VIDEO LINK"]
-          [:input.media-video-modal-input
-            {:type "text"
-             :value @(::video-url s)
-             :on-change #(reset! (::video-url s) (.. % -target -value))
-             :placeholder "Link from YouTube or Vimeo"}]]
-        [:div.media-video-modal-buttons.group
-          [:button.mlb-reset.mlb-default
-            {:on-click #(video-add-click s)
-             :disabled (not (valid-video-url? @(::video-url s)))}
-            "Add"]
-          [:button.mlb-reset.mlb-link-black
-            {:on-click #(close-clicked s)}
-            "Cancel"]]]]))
+      [:div.modal-wrapper
+        [:button.carrot-modal-close.mlb-reset
+            {:on-click #(close-clicked s)}]
+        [:div.media-video-modal
+          [:div.media-video-modal-header.group
+            (user-avatar-image current-user-data)
+            [:div.title "Adding a video"]]
+          [:div.media-video-modal-divider]
+          [:div.media-video-modal-content
+            [:div.content-title "VIDEO LINK"]
+            [:input.media-video-modal-input
+              {:type "text"
+               :value @(::video-url s)
+               :on-change #(reset! (::video-url s) (.. % -target -value))
+               :placeholder "Link from YouTube or Vimeo"}]]
+          [:div.media-video-modal-buttons.group
+            [:button.mlb-reset.mlb-default
+              {:on-click #(video-add-click s)
+               :disabled (not (valid-video-url? @(::video-url s)))}
+              "Add"]
+            [:button.mlb-reset.mlb-link-black
+              {:on-click #(close-clicked s)}
+              "Cancel"]]]]]))

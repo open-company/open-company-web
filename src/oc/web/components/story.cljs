@@ -76,13 +76,10 @@
         (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-header.group
         [:div.story-header-left
-          [:a.board-name
-            {:href (when story-data (oc-urls/board (:board-slug story-data)))
-             :on-click #(do (utils/event-stop %) (when story-data (router/nav! (oc-urls/board (:board-slug story-data)))))}
-            (:storyboard-name story-data)]
-          [:span.arrow ">"]
-          [:span.story-title
-            {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]]
+          [:div.story-header-back
+            {:on-click #(router/history-back!)}
+            [:span.back-arrow "<"]
+            "Back"]]
         [:div.story-header-right
           (when (pos? (count (:reactions story-data)))
             (reactions story-data))
@@ -97,16 +94,22 @@
       [:div.story-content-outer
         {:style #js {:marginLeft (str (int margin-left) "px")}}
         [:div.story-content
-          [:div.story-author.group
-            (user-avatar-image story-author)
-            [:div.name (:name story-author)]
-            [:div.time-since
-              [:time
-                {:date-time (:created-at story-data)
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :title (utils/activity-date-tooltip story-data)}
-                (utils/time-since (:created-at story-data))]]]
+          [:div.story-content-authorship.group
+            [:div.story-content-authorship-left.group
+              (user-avatar-image story-author)
+              [:div.name (or (:name story-author) (str (:first-name story-author) " " (:last-name story-author)))]
+              [:div.time-since
+                (if (:published-at story-data)
+                  [:time
+                    {:date-time (:published-at story-data)
+                     :title (utils/activity-date-tooltip story-data)}
+                    (utils/time-since (:published-at story-data))]
+                  "Draft")]]
+              [:div.story-content-authorship-right.group
+                [:div.story-tags
+                  [:div.activity-tag.storyboard-tag
+                    {:on-click #(router/nav! (oc-urls/board (:board-slug story-data)))}
+                    (:storyboard-name story-data)]]]]
           (when (:banner-url story-data)
             [:div.story-banner
               {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")

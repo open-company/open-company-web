@@ -202,124 +202,127 @@
                              (empty? (:headline entry-editing))
                              (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
                     (close-clicked s))}
-      [:div.entry-edit-modal.group
+      [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
-        [:div.entry-edit-modal-header.group
-          (user-avatar-image current-user-data)
-          [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
-          [:div.entry-card-dd-container
-            (if (:topic-name entry-editing)
-              [:button.mlb-reset.dropdown-toggle.has-topic
-                {:type "button"
-                 :id "entry-edit-dd-btn"
-                 :data-toggle "dropdown"
-                 :aria-haspopup true
-                 :aria-expanded false}
-                [:div.activity-tag
-                  (:topic-name entry-editing)]]
-              [:button.mlb-reset.dropdown-toggle
-                {:type "button"
-                 :id "entry-edit-dd-btn"
-                 :data-toggle "dropdown"
-                 :aria-haspopup true
-                 :aria-expanded false}
-                "+ Add a topic"])
-            [:div.entry-edit-topics-dd.dropdown-menu
-              {:aria-labelledby "entry-edit-dd-btn"}
-              [:div.triangle]
-              [:div.entry-dropdown-list-content
-                [:ul
-                  (for [t (sort #(compare (:name %1) (:name %2)) topics)
-                        :let [selected (= (:topic-name entry-editing) (:name t))]]
-                    [:li.selectable.group
-                      {:key (str "entry-edit-dd-" (:slug t))
-                       :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
-                       :class (when selected "select")}
-                      [:button.mlb-reset
-                        (:name t)]
-                      (when selected
-                        [:button.mlb-reset.mlb-link.remove
+        [:button.carrot-modal-close.mlb-reset
+          {:on-click #(close-clicked s)}]
+        [:div.entry-edit-modal.group
+          [:div.entry-edit-modal-header.group
+            (user-avatar-image current-user-data)
+            [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
+            [:div.entry-card-dd-container
+              (if (:topic-name entry-editing)
+                [:button.mlb-reset.dropdown-toggle.has-topic
+                  {:type "button"
+                   :id "entry-edit-dd-btn"
+                   :data-toggle "dropdown"
+                   :aria-haspopup true
+                   :aria-expanded false}
+                  [:div.activity-tag
+                    (:topic-name entry-editing)]]
+                [:button.mlb-reset.dropdown-toggle
+                  {:type "button"
+                   :id "entry-edit-dd-btn"
+                   :data-toggle "dropdown"
+                   :aria-haspopup true
+                   :aria-expanded false}
+                  "+ Add a topic"])
+              [:div.entry-edit-topics-dd.dropdown-menu
+                {:aria-labelledby "entry-edit-dd-btn"}
+                [:div.triangle]
+                [:div.entry-dropdown-list-content
+                  [:ul
+                    (for [t (sort #(compare (:name %1) (:name %2)) topics)
+                          :let [selected (= (:topic-name entry-editing) (:name t))]]
+                      [:li.selectable.group
+                        {:key (str "entry-edit-dd-" (:slug t))
+                         :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
+                         :class (when selected "select")}
+                        [:button.mlb-reset
+                          (:name t)]
+                        (when selected
+                          [:button.mlb-reset.mlb-link.remove
+                            {:on-click (fn [e]
+                                         (utils/event-stop e)
+                                         (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
+                            "Remove"])])
+                    [:li.divider]
+                    [:li.entry-edit-new-topic.group
+                      ; {:on-click #(do (utils/event-stop %) (toggle-topics-dd))}
+                      (when-not @(::focusing-create-topic s)
+                        [:button.mlb-reset.entry-edit-new-topic-plus
                           {:on-click (fn [e]
                                        (utils/event-stop e)
-                                       (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
-                          "Remove"])])
-                  [:li.divider]
-                  [:li.entry-edit-new-topic.group
-                    ; {:on-click #(do (utils/event-stop %) (toggle-topics-dd))}
-                    (when-not @(::focusing-create-topic s)
-                      [:button.mlb-reset.entry-edit-new-topic-plus
-                        {:on-click (fn [e]
-                                     (utils/event-stop e)
-                                     (toggle-topics-dd)
-                                     (.focus (js/$ "input.entry-edit-new-topic-field")))
-                         :title "Create a new topic"}])
-                    [:input.entry-edit-new-topic-field
-                      {:type "text"
-                       :value @(::new-topic s)
-                       :on-focus #(reset! (::focusing-create-topic s) true)
-                       :on-blur (fn [e] (utils/after 100 #(reset! (::focusing-create-topic s) false)))
-                       :on-key-up (fn [e]
-                                    (cond
-                                      (= "Enter" (.-key e))
-                                      (create-new-topic s)))
-                       :on-change #(reset! (::new-topic s) (.. % -target -value))
-                       :placeholder "Create New Topic"}]
-                    (when @(::focusing-create-topic s)
-                      [:button.mlb-reset.mlb-default.entry-edit-new-topic-create
-                        {:on-click (fn [e]
-                                     (utils/event-stop e)
-                                     (create-new-topic s))
-                         :disabled (empty? (s/trim @(::new-topic s)))}
-                        "Create"])]]]]]]
-      [:div.entry-edit-modal-body
-        ; Headline element
-        [:div.entry-edit-headline.emoji-autocomplete.emojiable
-          {:content-editable true
-           :placeholder "Title this (if you like)"
-           :on-paste    #(headline-on-paste s %)
-           :on-key-Up   #(headline-on-change s)
-           :on-key-down #(headline-on-change s)
-           :on-focus    #(headline-on-change s)
-           :on-blur     #(headline-on-change s)
-           :auto-focus true
-           :dangerouslySetInnerHTML @(::initial-headline s)}]
-        ; Body element
-        [:div.entry-edit-body.emoji-autocomplete.emojiable
-          {:role "textbox"
-           :aria-multiline true
-           :content-editable true
-           :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
-           :dangerouslySetInnerHTML @(::initial-body s)}]
-        ; Media handling
-        (media-picker [:photo :video :chart] @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing)
-        [:div.entry-edit-controls-right]]
-        ; Bottom controls
-        [:div.entry-edit-controls.group]
-      (media-attachments attachments #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
-      [:div.entry-edit-modal-divider]
-      [:div.entry-edit-modal-footer.group
-        ;; Attachments button
-        [:button.mlb-reset.attachment
-          {:title "Add an attachment"
-           :type "button"
-           :data-toggle "tooltip"
-           :data-container "body"
-           :data-placement "top"
-           :on-click (fn [e]
-                      (.blur (.-target e))
-                      (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
-                      (iu/upload!
-                       nil
-                       (partial attachment-upload-success-cb s)
-                       nil
-                       (partial attachment-upload-error-cb s)))}
-            [:i.mdi.mdi-paperclip]]
-        [:button.mlb-reset.mlb-default.form-action-bt
-          {:on-click #(do
-                        (dis/dispatch! [:entry-save])
-                        (close-clicked s))
-           :disabled (not (:has-changes entry-editing))}
-          (if new-entry? "Post" "Save")]
-        [:button.mlb-reset.mlb-link-black.form-action-bt
-          {:on-click #(close-clicked s)}
-          "Cancel"]]]]))
+                                       (toggle-topics-dd)
+                                       (.focus (js/$ "input.entry-edit-new-topic-field")))
+                           :title "Create a new topic"}])
+                      [:input.entry-edit-new-topic-field
+                        {:type "text"
+                         :value @(::new-topic s)
+                         :on-focus #(reset! (::focusing-create-topic s) true)
+                         :on-blur (fn [e] (utils/after 100 #(reset! (::focusing-create-topic s) false)))
+                         :on-key-up (fn [e]
+                                      (cond
+                                        (= "Enter" (.-key e))
+                                        (create-new-topic s)))
+                         :on-change #(reset! (::new-topic s) (.. % -target -value))
+                         :placeholder "Create New Topic"}]
+                      (when @(::focusing-create-topic s)
+                        [:button.mlb-reset.mlb-default.entry-edit-new-topic-create
+                          {:on-click (fn [e]
+                                       (utils/event-stop e)
+                                       (create-new-topic s))
+                           :disabled (empty? (s/trim @(::new-topic s)))}
+                          "Create"])]]]]]]
+        [:div.entry-edit-modal-body
+          ; Headline element
+          [:div.entry-edit-headline.emoji-autocomplete.emojiable
+            {:content-editable true
+             :placeholder "Title this (if you like)"
+             :on-paste    #(headline-on-paste s %)
+             :on-key-Up   #(headline-on-change s)
+             :on-key-down #(headline-on-change s)
+             :on-focus    #(headline-on-change s)
+             :on-blur     #(headline-on-change s)
+             :auto-focus true
+             :dangerouslySetInnerHTML @(::initial-headline s)}]
+          ; Body element
+          [:div.entry-edit-body.emoji-autocomplete.emojiable
+            {:role "textbox"
+             :aria-multiline true
+             :content-editable true
+             :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
+             :dangerouslySetInnerHTML @(::initial-body s)}]
+          ; Media handling
+          (media-picker [:photo :video :chart] @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing)
+          [:div.entry-edit-controls-right]]
+          ; Bottom controls
+          [:div.entry-edit-controls.group]
+        (media-attachments attachments #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
+        [:div.entry-edit-modal-divider]
+        [:div.entry-edit-modal-footer.group
+          ;; Attachments button
+          [:button.mlb-reset.attachment
+            {:title "Add an attachment"
+             :type "button"
+             :data-toggle "tooltip"
+             :data-container "body"
+             :data-placement "top"
+             :on-click (fn [e]
+                        (.blur (.-target e))
+                        (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
+                        (iu/upload!
+                         nil
+                         (partial attachment-upload-success-cb s)
+                         nil
+                         (partial attachment-upload-error-cb s)))}
+              [:i.mdi.mdi-paperclip]]
+          [:button.mlb-reset.mlb-default.form-action-bt
+            {:on-click #(do
+                          (dis/dispatch! [:entry-save])
+                          (close-clicked s))
+             :disabled (not (:has-changes entry-editing))}
+            (if new-entry? "Post" "Save")]
+          [:button.mlb-reset.mlb-link-black.form-action-bt
+            {:on-click #(close-clicked s)}
+            "Cancel"]]]]]))
