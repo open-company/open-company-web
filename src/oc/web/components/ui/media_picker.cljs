@@ -146,7 +146,7 @@
 ;; Attachment
 
 (defn get-attachment-html [s attachment]
-  (let [prefix (str (utils/date-string (utils/js-date) [:year]) " - ")
+  (let [prefix (str "Uploaded on " (utils/date-string (utils/js-date) [:year]) " - ")
         subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))]
     (str "<a "
           "target=\"_blank\" "
