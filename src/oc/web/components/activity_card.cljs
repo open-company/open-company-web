@@ -307,7 +307,3 @@
                                 (reset! (::move-post-selected-board s) nil)
                                 (reset! (::move-post s) false))}
                   "Cancel"]]])])]])
-
-
-
-
