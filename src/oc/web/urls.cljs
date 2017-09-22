@@ -18,6 +18,8 @@
 
 (def contact "/contact")
 
+(def help "https://help.carrot.io")
+
 (def home-try-it-focus (str home "?tif"))
 
 (def contact-email "hello@carrot.io")

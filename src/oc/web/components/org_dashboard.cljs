@@ -23,6 +23,7 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
+            [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -71,6 +72,9 @@
                                            :no-scroll (router/current-activity-id)})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
+            ;; About carrot
+            (:about-carrot-modal data)
+            (about-carrot-modal)
             ;; Entry editing
             (:entry-editing data)
             (entry-edit)

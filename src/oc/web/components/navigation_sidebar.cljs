@@ -151,6 +151,6 @@
             [:div.invite-people-icon]
             [:span "Invite People"]])
         [:button.mlb-reset.about-carrot-btn
-          {:on-click #(router/nav! oc-urls/about)}
+          {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
           [:div.about-carrot-icon]
           [:span "About Carrot"]]]]))

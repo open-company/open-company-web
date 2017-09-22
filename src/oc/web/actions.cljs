@@ -1317,3 +1317,11 @@
   (when (:org-editing db)
     (api/patch-org (:org-editing db)))
   db)
+
+(defmethod dispatcher/action :about-carrot-modal-show
+  [db [_]]
+  (assoc db :about-carrot-modal true))
+
+(defmethod dispatcher/action :about-carrot-modal-hide
+  [db [_]]
+  (dissoc db :about-carrot-modal))
