@@ -46,4 +46,4 @@
       {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
       [:div.story-content-footer-inner
         [:div.carrot-logo]
-        [:div.you-did-it "Published using carrot!"]]]]))
+        [:div.you-did-it "Made with Carrot"]]]]))

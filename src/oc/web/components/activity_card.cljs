@@ -272,13 +272,13 @@
               (when (utils/link-for (:links activity-data) "partial-update")
                 [:li
                   {:on-click #(do (utils/event-stop %) (reset! (::move-post s) true))}
-                  "Move post"])]]
+                  "Move"])]]
           (when @(::move-post s)
             [:div.move-post
               [:div.triangle]
               [:div.move-post-inner
                 [:div.move-post-title
-                  "Move Post"
+                  "Move"
                   [:i.mdi.mdi-information-outline]]
                 [:div.select-new-board
                   {:on-click #(do (utils/event-stop %) (reset! (::move-post-boards-list s) (not @(::move-post-boards-list s))))
