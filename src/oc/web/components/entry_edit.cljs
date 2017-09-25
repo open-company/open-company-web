@@ -310,7 +310,7 @@
           [:div.entry-edit-controls-right]]
           ; Bottom controls
           [:div.entry-edit-controls.group]
-        (media-attachments attachments #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
+        (media-attachments attachments :entry-editing #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
         [:div.entry-edit-modal-divider]
         [:div.entry-edit-modal-footer.group
           ;; Attachments button

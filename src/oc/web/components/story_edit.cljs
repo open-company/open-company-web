@@ -233,7 +233,7 @@
                          (:author story-data)
                          (first (:author story-data)))
                        (drv/react s :current-user-data))
-        ww (responsive/ww)]
+        ww (min (responsive/ww) 840)]
     [:div.story-edit-container
       (when (drv/react s :alert-modal)
         (alert-modal))

@@ -110,6 +110,12 @@ div.activity-modal-container {
                 width: 32px;
                 height: 32px;
 
+                div.activity-move {
+                  position: absolute;
+                  top: -104px;
+                  left: -301px;
+                }
+
                 button.activity-modal-more {
                   width: 32px;
                   height: 32px;
@@ -124,7 +130,7 @@ div.activity-modal-container {
 
                 div.dropdown-menu {
                   position: absolute;
-                  top: -44px;
+                  top: -69px;
                   left: -91px;
                   border: none;
                   outline: none;
@@ -134,8 +140,8 @@ div.activity-modal-container {
 
                   div.triangle {
                     position: absolute;
-                    top: 50px;
-                    left: 90px;
+                    top: 75px;
+                    left: 90px;;
                     background-color: white;
                     border-top: 1px solid rgba(177,184,192,0.50);
                     border-left: 1px solid rgba(177,184,192,0.50);

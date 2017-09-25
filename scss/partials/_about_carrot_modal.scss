@@ -20,8 +20,14 @@ div.about-carrot-modal-container {
   div.modal-wrapper {
     width: #{700 + 20 + 8}px;
     margin: 0px auto;
-    height: 100vh;
+    min-height: 100vh;
     position: relative;
+
+    button.carrot-modal-close {
+      position: fixed;
+      left: 50%;
+      margin-left: -378px;
+    }
 
     div.about-carrot-modal {
       width: 700px;
@@ -32,13 +38,12 @@ div.about-carrot-modal-container {
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
       padding: 24px;
       text-align: center;
-      height: 100%;
-      overflow: scroll;
       background-image: cdnUrl("/img/ML/about_carrot_modal_top_bg.svg");
       background-repeat: no-repeat;
       background-size: 837px 296px;
       background-position: -40px -79px;
       text-align: center;
+      border-radius: 4px;
 
       div.carrot-logo {
         position: relative;
@@ -95,7 +100,6 @@ div.about-carrot-modal-container {
       div.news-list-container {
         margin-top: 32px;
         overflow: auto;
-        max-height: calc(100vh - 292px);
         width: calc(100% + 48px);
         margin-left: -24px;
         padding: 0px 24px;

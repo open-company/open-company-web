@@ -34,14 +34,16 @@
                                                 (when-not (utils/is-test-env?)
                                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
                                                 s)}
-  [attachments remove-cb]
+  [attachments dispatch-input-key remove-cb]
   (when (pos? (count attachments))
     (let [sorted-attachments (vec (reverse (sort-by :created-at attachments)))]
       [:div.media-attachments
         (for [atc sorted-attachments
-              :let [remove-fn (when (fn? remove-cb)
-                                (fn [e]
-                                  (utils/event-stop e)
-                                  (dis/dispatch! [:input [:media-editing :attachments] (vec (filter #(not= (:file-url %) (:file-url atc)) attachments))])
-                                  (remove-cb (:file-url atc))))]]
+              :let [remove-fn (when (and dispatch-input-key
+                                         (fn? remove-cb))
+                               (fn [e]
+                                 (utils/event-stop e)
+                                 (dis/dispatch! [:input [dispatch-input-key :attachments] (vec (filter #(not= (:file-url %) (:file-url atc)) attachments))])
+                                 (when (fn? remove-cb)
+                                   (remove-cb (:file-url atc)))))]]
           (rum/with-key (media-attachment atc remove-fn) (str "media-attachment-" (:file-url atc))))])))
