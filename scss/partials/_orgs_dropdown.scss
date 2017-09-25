@@ -30,13 +30,28 @@ div.orgs-dropdown {
 
   ul.dropdown-menu {
     width: 200px;
-    margin-left: 50px;
+    margin-left: 60px;
     float: initial;
     padding: 10px 16px;
     background-color: white;
     border-radius: 5px;
     box-shadow: 0 4px 10px 1px rgba(0, 0, 0, 0.1);
     border: solid 1px rgba(177, 184, 192, 0.5);
+    overflow: visible;
+
+    &:before {
+      display: block;
+      content: "";
+      width: 20px;
+      height: 20px;
+      transform: rotate(45deg);
+      background-color: white;
+      border-top: 1px solid rgba(177, 184, 192, 0.5);
+      border-left: 1px solid rgba(177, 184, 192, 0.5);
+      position: absolute;
+      left: 90px;
+      top: -10px;
+    }
 
     li {
       height: 24px;
