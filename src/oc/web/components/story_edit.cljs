@@ -221,6 +221,9 @@
                                          s)
                          :will-unmount (fn [s]
                                         (utils/after 100 #(dis/dispatch! [:input [:story-editing] nil]))
+                                        (when @(::body-editor s)
+                                          (.destroy @(::body-editor s))
+                                          (reset! (::body-editor s) nil))
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)
