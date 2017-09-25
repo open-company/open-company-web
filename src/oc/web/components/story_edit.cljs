@@ -185,6 +185,7 @@
                         (rum/local false ::banner-add-did-success)
                         ;; Media picker
                         (rum/local "story-edit-media-picker" ::media-picker-id)
+                        (rum/local false ::media-picker-expanded)
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
                         ;; Publish dialog
@@ -221,6 +222,9 @@
                                          s)
                          :will-unmount (fn [s]
                                         (utils/after 100 #(dis/dispatch! [:input [:story-editing] nil]))
+                                        (when @(::body-editor s)
+                                          (.destroy @(::body-editor s))
+                                          (reset! (::body-editor s) nil))
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)
@@ -326,9 +330,17 @@
            :on-blur     #(title-on-change s)
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         [:div.story-edit-body.emoji-autocomplete.emojiable
-          {:class (utils/class-set {:medium-editor-placeholder-hidden (not (empty? @(::initial-body s)))})
+          {:class (utils/class-set {:medium-editor-placeholder-hidden (or (not (empty? @(::initial-body s)))
+                                                                          @(::media-picker-expanded s))})
            :dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
-        (media-picker [:photo :video :chart :attachment :divider-line] @(::media-picker-id s) #(media-picker-did-change s) "div.story-edit-body" story-data :story-editing)]
+        (media-picker {:media-config [:photo :video :chart :attachment :divider-line]
+                       :media-picker-id @(::media-picker-id s)
+                       :on-change #(media-picker-did-change s)
+                       :body-editor-sel "div.story-edit-body"
+                       :data-editing story-data
+                       :dispatch-input-key :story-editing
+                       :on-expand #(reset! (::media-picker-expanded s) true)
+                       :on-collapse #(reset! (::media-picker-expanded s) false)})]
       [:div.story-edit-footer.group
         [:div.story-edit-footer-inner
           (emoji-picker {:add-emoji-cb #(do (title-on-change s) (body-on-change s))})]]]))

@@ -75,6 +75,7 @@ div.activity-modal-container {
             position: relative;
             overflow-y: auto;
             max-height: calc(100vh - 65px - 74px);
+            min-height: 148px;
 
             div.activity-modal-content-title {
               margin-top: 24px;

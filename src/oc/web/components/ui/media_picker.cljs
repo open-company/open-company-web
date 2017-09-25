@@ -29,7 +29,7 @@
 
 (defn media-photo-add-if-finished [s]
   (let [image @(::media-photo s)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (when (and (contains? image :url)
                (contains? image :width)
                (contains? image :height)
@@ -96,7 +96,7 @@
 
 (defn media-video-add [s video-data]
   (let [video-html (get-video-html s video-data)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (when video-html
       (.restoreSelection js/rangy @(::last-selection s))
       (js/pasteHtmlAtCaret video-html (.getSelection js/rangy js/window) false)
@@ -135,7 +135,7 @@
 
 (defn media-chart-add [s chart-url]
   (let [chart-html (get-chart-html s chart-url)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (when chart-html
       (.restoreSelection js/rangy @(::last-selection s))
       (js/pasteHtmlAtCaret chart-html (.getSelection js/rangy js/window) false)
@@ -192,7 +192,7 @@
                              :file-size (gobj/get res "size")
                              :file-url url}
             attachment-html (get-attachment-html state attachment-data)
-            body-did-change-cb (nth (:rum/args state) 2)]
+            body-did-change-cb (:on-change (first (:rum/args state)))]
         (.restoreSelection js/rangy @(::last-selection state))
         (js/pasteHtmlAtCaret attachment-html (.getSelection js/rangy js/window) false)
         (reset! (::last-selection state) nil)
@@ -212,7 +212,7 @@
 
 (defn media-divider-line-add [s]
   (let [divider-line-html (get-divider-line-html s)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (.restoreSelection js/rangy @(::last-selection s))
     (js/pasteHtmlAtCaret divider-line-html (.getSelection js/rangy js/window) false)
     (reset! (::last-selection s) nil)
@@ -229,25 +229,21 @@
                           (rum/local false ::media-divider-line)
                           (rum/local false ::media-photo-did-success)
                           (rum/local false ::media-attachment-did-success)
-                          (rum/local false ::body-focused)
                           (rum/local nil ::last-selection)
                           (rum/local nil ::window-click-listener)
                           (rum/local nil ::document-focus-in)
                           {:will-mount (fn [s]
-                                         (let [body-sel (nth (:rum/args s) 3)]
-                                           ;; Document focus in
-                                           (reset! (::document-focus-in s)
-                                            (events/listen js/document EventType/FOCUSIN
-                                             #(let [body-el (sel1 [body-sel])]
-                                               (when (= (.-activeElement js/document) body-el)
-                                                  (reset! (::body-focused s) true)))))
+                                         (let [config (first (:rum/args s))
+                                               body-sel (:body-editor-sel config)
+                                               on-collapse (:on-collapse body-sel)]
                                            ;; Window click listener
                                            (reset! (::window-click-listener s)
                                             (events/listen js/window EventType/CLICK
-                                             #(let [body-el (sel1 [body-sel])]
-                                                (reset! (::body-focused s) (utils/event-inside? % body-el))
+                                             #(let [body-el (sel1 body-sel)]
                                                 (when-not (utils/event-inside? % body-el)
                                                   (reset! (::media-expanded s) false)
+                                                  (when (fn? on-collapse)
+                                                    (on-collapse))
                                                   ; If there was a last selection saved
                                                   (when (and (not @(::media-entry s))
                                                              (not @(::media-photo s))
@@ -264,17 +260,12 @@
                                                    (.tooltip "hide")
                                                    (.attr "data-original-title" "Insert media")
                                                    (.tooltip "fixTitle")
-                                                   (.tooltip "hide")))))))
+                                                   (.tooltip "hide"))))))
+                                           )
                                          s)
-                           :did-mount (fn [s]
-                                        (let [body-sel (nth (:rum/args s) 3)
-                                              body-el (sel1 [body-sel])]
-                                          (when (= (.-activeElement js/document) body-el)
-                                            (reset! (::body-focused s) true)))
-                                        s)
                            :did-remount (fn [o s]
-                                          (let [data-editing (nth (:rum/args s) 4)
-                                                dispatch-input-key (nth (:rum/args s) 5)]
+                                          (let [data-editing (:data-editing (first (:rum/args s)))
+                                                dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
                                             (when (contains? data-editing :temp-video)
                                               (dis/dispatch! [:input [dispatch-input-key :temp-video] nil])
                                               (reset! (::media-video s) false)
@@ -288,32 +279,42 @@
                                         s)
                            :will-unmount (fn [s]
                                            (events/unlistenByKey @(::window-click-listener s))
-                                           (events/unlistenByKey @(::document-focus-in s))
                                            s)}
-  [s media-config media-picker-id body-did-change-cb body-editor-sel data-editing dispatch-input-key]
+  [s {:keys [media-config media-picker-id on-change body-editor-sel data-editing dispatch-input-key on-expand on-collapse]}]
   [:div.media-picker
     {:id media-picker-id
      :style {:display "none"}}
     ; Add media button
     [:button.mlb-reset.media.add-media-bt
       {:title (if @(::media-expanded s) "Close" "Insert media")
-       :class (utils/class-set {:expanded @(::media-expanded s)
-                                :disabled (not @(::body-focused s))})
+       :class (utils/class-set {:expanded @(::media-expanded s)})
        :data-toggle "tooltip"
        :data-placement "top"
        :data-container "body"
        :on-click (fn [e]
-                   (when @(::body-focused s)
-                     (utils/event-stop e)
-                     (reset! (::last-selection s) (.saveSelection js/rangy js/window))
-                     (reset! (::media-expanded s) (not @(::media-expanded s)))
-                     (utils/after 1 #(utils/remove-tooltips))
-                     (utils/after 100 (fn []
-                                        (-> (js/$ "button.add-media-bt")
-                                          (.tooltip "hide")
-                                          (.attr "data-original-title" "Close")
-                                          (.tooltip "fixTitle")
-                                          (.tooltip "hide"))))))}]
+                   (utils/event-stop e)
+                   ;; Remove last selection if present
+                   (when @(::last-selection s)
+                     (.removeMarkers js/rangy @(::last-selection s))
+                     (reset! (::last-selection s) nil))
+                   ;; Save selection if it's not already expanded
+                   (when-not @(::media-expanded s)
+                     (reset! (::last-selection s) (.saveSelection js/rangy js/window)))
+                   ;; Toggle expanded
+                   (if @(::media-expanded s)
+                     (when (fn? on-collapse)
+                       (on-collapse))
+                     (when (fn? on-expand)
+                       (on-expand)))
+                   (reset! (::media-expanded s) (not @(::media-expanded s)))
+                   ;; Fix tooltips
+                   (utils/after 1 #(utils/remove-tooltips))
+                   (utils/after 100 (fn []
+                                      (-> (js/$ "button.add-media-bt")
+                                        (.tooltip "hide")
+                                        (.attr "data-original-title" "Close")
+                                        (.tooltip "fixTitle")
+                                        (.tooltip "hide")))))}]
 
     [:div.media-picker-container
       {:class (utils/class-set {:expanded @(::media-expanded s)
