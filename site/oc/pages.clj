@@ -444,7 +444,7 @@
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
           ;; MediumEditorAutolist
-          [:script {:type "text/javascript" :src "/lib/MediumEditorAutolist/autolist.js"}]
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; Static js files
           [:script {:src (cdn "/js/static-js.js")}]
           [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
