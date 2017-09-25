@@ -1250,7 +1250,9 @@
   (assoc db :story-loading true))
 
 (defmethod dispatcher/action :story-get/finish
-  [db [_ {:keys [story-uuid story-data]}]]
+  [db [_ status {:keys [story-uuid story-data]}]]
+  (when (= status 404)
+    (router/redirect-404!))
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
