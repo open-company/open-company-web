@@ -13,7 +13,7 @@
             [goog.events.EventType :as EventType]
             [clojure.contrib.humanize :refer (filesize)]))
 
-(def separator "<br /></p>")
+(def separator "<br />")
 
 ;; Photo
 
@@ -206,9 +206,9 @@
 ;; Divider line
 
 (defn get-divider-line-html [s]
-  (str "<p><hr "
+  (str "<hr "
         "class=\"carrot-no-preview media-divider-line\" "
-        "contentEditable=\"false\" /></p>" separator))
+        "contentEditable=\"false\" />" separator))
 
 (defn media-divider-line-add [s]
   (let [divider-line-html (get-divider-line-html s)
