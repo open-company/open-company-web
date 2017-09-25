@@ -38,8 +38,8 @@
 
 (defn empty-paragraph? [el]
   (and (<= (-> el .-childNodes .-length) 1)
-       (or (empty? (.-nodeValue el))
-           (= "BR" (some-> el .-childNodes (aget 0) .-tagName))
+       (empty? (.-nodeValue el))
+       (or (= "BR" (some-> el .-childNodes (aget 0) .-tagName))
            (empty? (some-> el .-childNodes (aget 0) .-nodeValue)))))
 
 (defn media-upload [upload-ui-id bt-offset & [scrolling-el]]
@@ -80,4 +80,8 @@
                (.on (.-base this) js/window "click" (.bind show-btn this))
                (doseq [el (.getEditorElements this)]
                  (.on (.-base this) el "keyup" (.bind show-btn this))
-                 (.subscribe (.-base this) "editableInput" (.bind show-btn this)))))}))
+                 (.subscribe (.-base this) "editableInput" (.bind show-btn this)))))
+     :destroy (fn []
+                (this-as this
+                  (doseq [el (.getEditorElements this)]
+                    (.unsubscribe (.-base this) "editableInput" (.bind show-btn this)))))}))
