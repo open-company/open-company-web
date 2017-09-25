@@ -185,7 +185,10 @@
                          :will-unmount (fn [s]
                                          ;; Remove no-scroll class from the body tag
                                          (when @(::remove-no-scroll s)
-                                          (dommy/remove-class! (sel1 [:body]) :no-scroll))
+                                           (dommy/remove-class! (sel1 [:body]) :no-scroll))
+                                         (when @(::body-editor s)
+                                           (.destroy @(::body-editor s))
+                                           (reset! (::body-editor s) nil))
                                          s)}
   [s]
   (let [topics            (distinct (drv/react s :entry-edit-topics))
