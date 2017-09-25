@@ -202,7 +202,7 @@ div.activity-card {
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
-      white-space: pre;
+      white-space: nowrap;
       max-height: 28px;
 
       &.has-headline {
