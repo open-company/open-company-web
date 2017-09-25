@@ -153,7 +153,7 @@
                 [:div.activity-modal-content-body
                   {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                    :class (when (empty? (:headline activity-data)) "no-headline")}]
-                (media-attachments (:attachments activity-data))]
+                (media-attachments (:attachments activity-data) nil nil)]
               [:div.activity-modal-footer.group
                 {:class (when (and @(::first-render-done s)
                                    (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
