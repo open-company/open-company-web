@@ -1079,13 +1079,13 @@
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
-(defn activity-date-string [js-date]
+(defn activity-date-string [js-date hide-time]
   (let [time-string (format-time-string js-date)]
-    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
+    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) (when-not hide-time (str " at " time-string)))))
 
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"
-  [past-js-date]
+  [past-js-date & [hide-time]]
   (let [past (.getTime past-js-date)
         now (.getTime (js-date))
         seconds (.floor js/Math (/ (- now past) 1000))
@@ -1096,11 +1096,11 @@
         minutes-interval (.floor js/Math (/ seconds 60))]
     (cond
       (pos? years-interval)
-      (str "on " (activity-date-string past-js-date))
+      (str "on " (activity-date-string past-js-date hide-time))
 
       (or (pos? months-interval)
           (> days-interval 7))
-      (str "on " (activity-date-string past-js-date))
+      (str "on " (activity-date-string past-js-date hide-time))
 
       (pos? days-interval)
       (str days-interval " " (pluralize "day" days-interval) " ago")
