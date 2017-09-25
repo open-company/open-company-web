@@ -145,6 +145,7 @@
                         (rum/local false ::remove-no-scroll)
                         (rum/local "entry-edit-media-picker" ::media-picker-id)
                         (rum/local 330 ::entry-edit-modal-height)
+                        (rum/local false ::media-picker-expanded)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -294,10 +295,18 @@
             {:role "textbox"
              :aria-multiline true
              :content-editable true
-             :class (when-not (empty? (gobj/get @(::initial-body s) "__html")) "hide-placeholder")
+             :class (utils/class-set {:medium-editor-placeholder-hidden (or (not (empty? (gobj/get @(::initial-body s) "__html")))
+                                                                            @(::media-picker-expanded s))})
              :dangerouslySetInnerHTML @(::initial-body s)}]
           ; Media handling
-          (media-picker [:photo :video :chart] @(::media-picker-id s) #(media-picker-did-change s) "div.entry-edit-body" entry-editing :entry-editing)
+          (media-picker {:media-config [:photo :video :chart]
+                         :media-picker-id @(::media-picker-id s)
+                         :on-change #(media-picker-did-change s)
+                         :body-editor-sel "div.entry-edit-body"
+                         :data-editing entry-editing
+                         :dispatch-input-key :entry-editing
+                         :on-expand #(reset! (::media-picker-expanded s) true)
+                         :on-collapse #(reset! (::media-picker-expanded s) false)})
           [:div.entry-edit-controls-right]]
           ; Bottom controls
           [:div.entry-edit-controls.group]
