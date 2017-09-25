@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.comments :refer (comments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -70,7 +71,8 @@
         offset (if (> left-space default-comments-total-width)
                   0
                   (min (- left-space 24) (- default-comments-total-width left-space)))
-        margin-left (- left-space (when @(::comments-expanded s) offset))]
+        margin-left (- left-space (when @(::comments-expanded s) offset))
+        ww (min (responsive/ww) 840)]
     [:div.story-container
       (when @(::show-publish-modal s)
         (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
@@ -113,7 +115,7 @@
           (when (:banner-url story-data)
             [:div.story-banner
               {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                           :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
+                           :height (str (if (pos? (:banner-height story-data)) (min 520 (* (/ (:banner-height story-data) (:banner-width story-data)) ww)) "1") "px")}}])
           (when (:title story-data)
             [:div.story-title
               {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])

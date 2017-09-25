@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
@@ -19,7 +20,8 @@
                                          s)}
   [s]
   (let [story-data (drv/react s :activity-data)
-        story-author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))]
+        story-author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))
+        ww (min (responsive/ww) 840)]
     [:div.secure-story-container
       (when (drv/react s :about-carrot-modal)
         (about-carrot-modal))
@@ -30,7 +32,7 @@
           (when (:banner-url story-data)
             [:div.story-banner
               {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                           :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
+                           :height (str (if (pos? (:banner-height story-data)) (min 520 (* (/ (:banner-height story-data) (:banner-width story-data)) ww)) "1") "px")}}])
           (when (:title story-data)
             [:div.story-title
               {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])
