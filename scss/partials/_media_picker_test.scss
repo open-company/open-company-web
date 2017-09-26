@@ -1,0 +1,22 @@
+div.media-picker-test {
+  width: 100vw;
+  height: 100vh;
+
+  div.media-picker-inner {
+    position: relative;
+    width: 500px;
+    left: 50%;
+    top: 50%;
+    margin-left: -250px;
+    margin-top: 0px;
+    border: 1px solid black;
+    border-radius: 4px;
+    outline: none;
+
+    div.media-picker-body {
+      min-height: 100px;
+      width: 100%;
+      padding: 16px;
+    }
+  }
+}

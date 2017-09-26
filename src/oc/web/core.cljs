@@ -31,6 +31,7 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
+            [oc.web.components.media-picker-test :refer (media-picker-test)]
             ; [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
@@ -235,6 +236,10 @@
     (defroute _loading_route "/__loading" {:as params}
       (timbre/info "Routing _loading_route __loading")
       (pre-routing (:query-params params)))
+
+    (defroute media-picker-test-route "/media-picker-test" {:as params}
+      (timbre/info "Routing media-picker-test")
+      (simple-handler media-picker-test "media-picker-test" target params))
 
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
@@ -495,6 +500,7 @@
     (def route-dispatch!
       (secretary/uri-dispatcher [_loading_route
                                  login-route
+                                 media-picker-test-route
                                  ;; Signup email
                                  signup-profile-route
                                  signup-profile-slash-route
