@@ -1,0 +1,189 @@
+div.medium-editor-media-picker {
+  background-color: transparent;
+  position: absolute;
+  top: 0px;
+  left: -22px;
+  overflow: visible;
+}
+
+div.medium-editor-media-picker button.media {
+  width: 44px;
+  height: 44px;
+  background-position: 50%;
+  background-size: 14px;
+  background-repeat: no-repeat;
+  border-radius: 22px;
+  padding: 0;
+  float: left;
+  opacity: 1;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  overflow: visible;
+}
+
+div.medium-editor-media-picker button.media.add-media-bt {
+  background-image: url("/img/ML/add_media_plus_gray.svg");
+  background-size: 14px 14px;
+  background-color: #D8D8D8;
+  background-position: 50%;
+  transition: transform 0ms, margin-right 0ms;
+  float: left;
+  margin-right: 0px;
+  border-radius: 22px;
+  width: 44px;
+  height: 44px;
+  opacity: 1;
+}
+
+div.medium-editor-media-picker button.media.add-media-bt.disabled {
+  opacity: 0.2;
+}
+
+div.medium-editor-media-picker button.media.add-media-bt:hover,
+div.medium-editor-media-picker button.media.add-media-bt.expanded {
+  background-image: url("/img/ML/add_media_plus_white.svg");
+  background-color: #3FBD7C;
+}
+
+div.medium-editor-media-picker button.media.add-media-bt.expanded {
+  transform: rotate(45deg);
+  margin-right: 10px;
+}
+
+div.medium-editor-media-picker div.media-picker-container {
+    width: 0px;
+    height: 44px;
+    transition: width 0ms;
+    float: left;
+    position: relative;
+    overflow: hidden;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media {
+  background-color: #D8D8D8;
+  margin-left: 0px;
+  transform: rotate(0deg);
+  transition: transform 0ms, margin-left 0ms, opacity 0ms;
+  float: left;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  opacity: 0;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media:hover,
+div.medium-editor-media-picker div.media-picker-container button.media.active {
+  background-color: #3FBD7C;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media:not(.media-0) {
+  top: -15px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-entry {
+  background-image: url("/img/ML/media_entry.png");
+  background-size: 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-entry:hover {
+  background-image: url("/img/ML/media_entry_white.png");
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-photo {
+  background-image: url("/img/ML/media_photo.png");
+  background-size: 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-photo:hover {
+  background-image: url("/img/ML/media_photo_white.png");
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-video {
+  background-image: url("/img/ML/media_video.png");
+  background-size: 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-video:hover {
+  background-image: url("/img/ML/media_video_white.png");
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-chart {
+  background-image: url("/img/ML/media_chart.png");
+  background-size: 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-chart:hover {
+  background-image: url("/img/ML/media_chart_white.png");
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-attachment {
+  background-image: url("/img/ML/media_attachment.png");
+  background-size: 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-attachment:hover {
+  background-image: url("/img/ML/media_attachment_white.png");
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-divider {
+  background-image: url("/img/ML/media_divider.png");
+  background-size: 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-divider:hover {
+  background-image: url("/img/ML/media_divider_white.png");
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded.media-1 {
+  width: 52px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded.media-2 {
+  width: 104px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded.media-3 {
+  width: 156px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded.media-4 {
+  width: 208px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded.media-5 {
+  width: 260px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded.media-6 {
+  width: 312px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media {
+  opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-0 {
+  margin-left: 0px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-1 {
+  margin-left: 52px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-2 {
+  margin-left: 104px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-3 {
+  margin-left: 156px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-4 {
+  margin-left: 208px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-5 {
+  margin-left: 260px;
+}

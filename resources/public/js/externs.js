@@ -58,6 +58,8 @@ var recursiveAttachPasteListener = function(){};
 var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
+// MediumEditorMediaPicker
+var MediaPicker = function(){};
 // Tooltip http://darsa.in/tooltip/
 var Tooltip = function(){};
 // Debug app state

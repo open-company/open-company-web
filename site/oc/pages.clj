@@ -411,6 +411,8 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css"}]
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
+          ;; MediumEditorMediaPicker
+          [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
@@ -445,6 +447,8 @@
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
+          ;; MediumEditorMediaPicker
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
           ;; Static js files
           [:script {:src (cdn "/js/static-js.js")}]
           [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
