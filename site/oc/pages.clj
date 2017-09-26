@@ -54,7 +54,7 @@
         [:h1.headline "The Company Newsboard"]
         [:div.subheadline
           "News and company updates that create greater transparency and alignment"]
-        (try-it-form "try-it-form-central" "try-it-combo-field-top")
+        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style #js {:display "none"}}
@@ -113,16 +113,17 @@
               [:button.mlb-reset.right-arrow-bt
                 {:disabled true}]]]])
 
-      [:div.try-it
-        {:id "mc_embed_signup"}
-        [:div.try-it-title
-          {:id "thank-you-bottom"}
-          "Request early access"]
-        [:div.try-it-subtitle
-          "Easy set-up • Free for small teams"]
-        [:div
-          (try-it-form "try-it-form-bottom" "try-it-combo-field-bottom")]
-        (carrot-box-thanks "carrot-box-thanks-bottom")]]])
+      ; [:div.try-it
+      ;   {:id "mc_embed_signup"}
+      ;   [:div.try-it-title
+      ;     {:id "thank-you-bottom"}
+      ;     "Request early access"]
+      ;   [:div.try-it-subtitle
+      ;     "Easy set-up • Free for small teams"]
+      ;   [:div
+      ;     (try-it-form "try-it-form-bottom" "try-it-combo-field-bottom")]
+      ;   (carrot-box-thanks "carrot-box-thanks-bottom")]
+        ]])
 
 (defn features [options]
   [:div.container.main.features
