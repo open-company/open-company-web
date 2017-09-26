@@ -1,6 +1,6 @@
 function log(){
   var args = Array.prototype.slice.call(arguments);
-  // console.log("MediaPicker", args);
+  console.log("MediaPicker", args);
 }
 
 (function (root, factory) {
@@ -36,7 +36,7 @@ function log(){
     _lastSelection: undefined,
 
     constructor: function (options) {
-      console.log("constructor", options);
+      log("constructor", options);
       if (options) {
         this.options = options;
       }
@@ -44,7 +44,7 @@ function log(){
     },
 
     init: function(){
-      console.log("init", this);
+      log("init", this);
       // Create picker
       this.pickerElement = this.createPicker();
       this.getEditorElements()[0].parentNode.appendChild(this.pickerElement);
@@ -54,17 +54,14 @@ function log(){
         that.on(element, 'click', that.togglePicker.bind(that));
         that.on(element, 'keyup', that.togglePicker.bind(that));
         // that.on(element, 'blur', that.hide.bind(that));
-        log("init", "window:", that.window);
         that.on(that.window, 'click', that.windowClick.bind(that));
-        that.on(element, 'focus', that.onFocus.bind(that));
-        that.subscribe('editableInput', that.togglePicker.bind(that));
+        // that.on(element, 'focus', that.onFocus.bind(that));
+        that.on(element, 'editableInput', that.togglePicker.bind(that));
       });
-      console.log("init/end", this);
       MediumEditor.Extension.prototype.init.apply(this, arguments);
     },
 
     delegate: function(event, arg) {
-      // console.log("DELEGATE", event, arg);
       if (typeof this.delegateMethods[event] === "function") {
         this.delegateMethods[event](this, arg);
       }
@@ -155,29 +152,48 @@ function log(){
       this.delegate("onPickerClick", "attachment");
     },
 
+    insertAfter: function(newNode, referenceNode) {
+      referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+    },
+
     dividerLineClick: function(event){
+      log("dividerLineClick", this, event);
+      event.stopPropagation();
       this.delegate("onPickerClick", "divider-line");
       if (this._lastSelection) {
         rangy.restoreSelection(this._lastSelection);
-
       }
+      // 2 cases: it's directly the div.medium-editor or it's a p already
+
       var sel = this.window.getSelection(),
           element = sel.getRangeAt(0).commonAncestorContainer,
-          parent = element;
-      console.log(element);
+          p;
+      // If element is the BR get the parent that will be the editor node itself or a p
       if (element.tagName == "BR") {
-        parent = element.parentNode;
-        elment.parentNode.removeChild(element);
+        element = element.parentNode;
       }
-      var p = this.document.createElement("p"),
-          hr = this.document.createElement("hr");
+      // if the selection is in a DIV means it's the main editor element
+      if (element.tagName == "DIV") {
+        // we need to add a p to insert the HR in
+        p = this.document.createElement("p");
+        element.appendChild(p);
+      // if it's a P already
+      } else if (element.tagName == "P"){
+        // if it has a BR inside
+        if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          // remove it
+          element.removeChild(element.childNodes[0]);
+        }
+        p = element;
+      }
+      var hr = this.document.createElement("hr");
       p.appendChild(hr);
-      element.appendChild(p);
 
       var nextP = this.document.createElement("p");
       var br = this.document.createElement("br");
       nextP.appendChild(br);
-      element.appendChild(nextP);
+      // element.appendChild(nextP);
+      this.insertAfter(nextP, p);
       this.moveCaret($(nextP), 0);
 
       this.base.checkContentChanged();
@@ -298,28 +314,37 @@ function log(){
       this.delegate("didHide");
     },
 
+    isRangySelectionBoundary: function(el) {
+      return (el.tagName == "SPAN" && el.classList.contains("rangySelectionBoundary"));
+    },
+
+    isBR: function(el) {
+      return (el.tagName == "BR");
+    },
+
     paragraphIsEmpty: function(element){
       // Empty body
       if (element.childNodes.length == 0 && $(element).html() == "") {
         return true;
       }
       // Empty body like: <p><br/><p/>
-      if (element.childNodes.length == 1) {
-        var firstChild = element.childNodes[0];
-        if (firstChild &&
-            (firstChild.tagName == "BR" ||
-             (firstChild.tagName == "SPAN" && firstChild.classList.contains("rangySelectionBoundary")))) {
-          return true;
-        }
+      if ((element.childNodes.length == 1 &&
+           this.isBR(element.childNodes[0])) ||
+          (element.childNodes.length == 2 &&
+            ((this.isBR(element.childNodes[0]) &&
+              this.isRangySelectionBoundary(element.childNodes[1])) ||
+             (this.isBR(element.childNodes[1]) &&
+              this.isRangySelectionBoundary(element.childNodes[0]))))) {
+        return true;
       }
       return false;
     },
 
     togglePicker: function(event, editable){
       if (event) {
-        log("togglePicker", event.type);
+        log("togglePicker 1", event, event.type);
       } else {
-        log("togglePicker", "no event");
+        log("togglePicker 2", "no event");
       }
       var sel = this.window.getSelection(),
           element;
