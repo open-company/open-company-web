@@ -112,6 +112,27 @@ function log(){
       return mButton;
     },
 
+    /* Caret helpers */
+
+    moveCaret: function($el, position){
+      var range, sel, el, textEl;
+
+      position = position || 0;
+      range = document.createRange();
+      sel = window.getSelection();
+      el = $el.get(0);
+
+      if (!el.childNodes.length) {
+          textEl = document.createTextNode(' ');
+          el.appendChild(textEl);
+      }
+
+      range.setStart(el.childNodes[0], position);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    },
+
     /* Picker buttons handlers */
 
     entryClick: function(event){
@@ -136,6 +157,32 @@ function log(){
 
     dividerLineClick: function(event){
       this.delegate("onPickerClick", "divider-line");
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+
+      }
+      var sel = this.window.getSelection(),
+          element = sel.getRangeAt(0).commonAncestorContainer,
+          parent = element;
+      console.log(element);
+      if (element.tagName == "BR") {
+        parent = element.parentNode;
+        elment.parentNode.removeChild(element);
+      }
+      var p = this.document.createElement("p"),
+          hr = this.document.createElement("hr");
+      p.appendChild(hr);
+      element.appendChild(p);
+
+      var nextP = this.document.createElement("p");
+      var br = this.document.createElement("br");
+      nextP.appendChild(br);
+      element.appendChild(nextP);
+      this.moveCaret($(nextP), 0);
+
+      this.base.checkContentChanged();
+      this.collapse();
+      setTimeout(this.togglePicker(), 100);
     },
 
     createPickerMediaButtons: function(){
