@@ -1,6 +1,8 @@
-(ns oc.web.components.media-picker-test
+(ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as string]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
@@ -174,12 +176,37 @@
     (= type "attachment")
     (add-attachment s editable)))
 
+(defn body-placeholder []
+  (let [first-name (jwt/get-key :first-name)]
+    (if-not (empty? first-name)
+      (str "What's new, " first-name "?")
+      "What's new?")))
+
+(defn body-on-change [state]
+  (reset! (::did-change state) true)
+  (when-let [body-el (rum/ref-node state "body")]
+    ; Attach paste listener to the body and all its children
+    ; (js/recursiveAttachPasteListener body-el #(body-on-change state))
+    (let [options (first (:rum/args state))
+          dispatch-input-key (:dispatch-input-key options)
+          on-change (:on-change options)
+          emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
+      (on-change emojied-body))))
+
 (defn- setup-editor [s]
-  (let [body-el (rum/ref-node s "body-el")
-        media-picker-opts {:buttons #js ["picture" "video" "chart" "attachment" "divider-line"];["picture" "video" "chart" "attachment" "divider-line"]
-                           :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
+  (let [options (first (:rum/args s))
+        show-subtitle (:show-h2 options)
+        media-config (:media-config options)
+        body-el (rum/ref-node s "body")
+        media-picker-opts {:buttons (clj->js media-config)
+                           :delegateMethods #js {:onPickerClick (partial on-picker-click s)
+                                                 :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
-        options {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
+        body-placeholder (body-placeholder)
+        buttons (if show-subtitle
+                  ["bold" "italic" "unorderedlist" "anchor"]
+                  ["bold" "italic" "h2" "unorderedlist" "anchor"])
+        options {:toolbar #js {:buttons (clj->js buttons)}
                  :buttonLabels "fontawesome"
                  :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
                  :extensions #js {:autolist (js/AutoList.)
@@ -193,17 +220,20 @@
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML false}
-                 :placeholder #js {:text "Placeholder text test"
+                 :placeholder #js {:text body-placeholder
                                    :hideOnClick true}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
     (reset! (::editable-ext s) media-picker-ext)
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
-                  (js/console.log "media-picker-test/editableInput")))
-    (reset! (::editor s) body-editor)))
+                  (body-on-change s)))
+    (reset! (::editor s) body-editor)
+    ; (js/recursiveAttachPasteListener body-el #(body-on-change s))
+    ))
 
-(rum/defcs media-picker-test < rum/reactive
+(rum/defcs rich-body-editor  < rum/reactive
+                               (rum/local false ::did-change)
                                (rum/local nil ::editor)
                                (rum/local nil ::editable-ext)
                                (rum/local nil ::media-photo)
@@ -212,36 +242,34 @@
                                (rum/local nil ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
-                               (drv/drv :alert-modal)
-                               (drv/drv :picker-data)
+                               (drv/drv :entry-editing)
+                               (drv/drv :story-editing)
                                {:did-mount (fn [s]
-                                             (utils/after 1000 #(setup-editor s))
+                                             (setup-editor s)
+                                             (let [classes (:classes (first (:rum/args s)))]
+                                               (js/console.log "rich-body-editor/did-mount" classes "match:" (string/includes? classes "emoji-autocomplete"))
+                                               (when (string/includes? classes "emoji-autocomplete")
+                                                 (js/emojiAutocomplete)))
                                              s)
                                 :will-update (fn [s]
-                                               (let [picker-data @(drv/get-ref s :picker-data)
-                                                     video-data (:media-video picker-data)
-                                                     chart-data (:media-chart picker-data)]
+                                               (let [dispatch-input-key (:dispatch-input-key (first (:rum/args s)))
+                                                     data @(drv/get-ref s dispatch-input-key)
+                                                     video-data (:media-video data)
+                                                     chart-data (:media-chart data)]
                                                   (when (and @(::media-video s)
                                                              (not (nil? video-data)))
                                                     (reset! (::media-video s) nil)
-                                                    (dis/dispatch! [:input [:picker-data :media-video] nil])
+                                                    (dis/dispatch! [:input [dispatch-input-key :media-video] nil])
                                                     (media-video-add s @(::editable-ext s) video-data))
                                                   (when (and @(::media-chart s)
                                                              (not (nil? chart-data)))
                                                     (reset! (::media-chart s) nil)
-                                                    (dis/dispatch! [:input [:picker-data :media-chart] nil])
+                                                    (dis/dispatch! [:input [ :media-chart] nil])
                                                     (media-chart-add s @(::editable-ext s) chart-data)))
                                                s)}
-  [s]
-  (let [_ (drv/react s :picker-data)]
-    [:div.media-picker-test
-      (when (drv/react s :alert-modal)
-        (alert-modal))
-      (when @(::media-video s)
-        (media-video-modal :picker-data))
-      (when @(::media-chart s)
-        (media-chart-modal :picker-data))
-      [:div.media-picker-inner
-        [:div.media-picker-body
-          {:ref "body-el"
-           :dangerouslySetInnerHTML #js {"__html" ""}}]]]))
+  [s {:keys [dispatch-input-key initial-body on-change classes] :as options}]
+  (let [_ (drv/react s dispatch-input-key)]
+    [:div.rich-body-editor
+      {:ref "body"
+       :class (str classes (when @(::did-change s) " medium-editor-placeholder-hidden"))
+       :dangerouslySetInnerHTML (utils/emojify initial-body)}]))
