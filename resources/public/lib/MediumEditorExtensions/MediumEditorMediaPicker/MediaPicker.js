@@ -647,10 +647,8 @@ function log(){
     console.log("MediaPicker.RemoveAnchor", arguments, window.event);
     if (window.event) {
       window.event.preventDefault();
-      window.event.stopPropagation();
     }
-    if (e.stopPropagation){
-      e.stopPropagation();
+    if (e.preventDefault){
       e.preventDefault();
     }
     var p = document.querySelector("#" + uniqueID).parentNode;
