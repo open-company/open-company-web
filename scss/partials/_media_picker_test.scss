@@ -34,6 +34,8 @@ div.media-picker-test {
         max-width: 100%;
         height: auto;
       }
+
+      @include activity-attachment();
     }
   }
 }

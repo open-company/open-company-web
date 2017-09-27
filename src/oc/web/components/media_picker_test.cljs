@@ -9,7 +9,62 @@
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
-            [goog.object :as gobj]))
+            [goog.object :as gobj]
+            [clojure.contrib.humanize :refer (filesize)]))
+
+;; Attachment
+
+(defn media-attachment-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s editable]
+  (when-not @(::media-attachment-did-success s)
+    (.addAttachment editable nil nil)
+    (reset! (::media-attachment s) false)))
+
+(defn attachment-upload-failed-cb [state editable]
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :title "Sorry!"
+                    :message "An error occurred with your file."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
+    (dis/dispatch! [:alert-modal-show alert-data])
+    (utils/after 10 #(do
+                       (reset! (::media-attachment-did-success state) false)
+                       (media-attachment-dismiss-picker state editable)))))
+
+(defn attachment-upload-success-cb [state editable res]
+  (reset! (::media-attachment-did-success state) true)
+  (let [url (gobj/get res "url")]
+    (if-not url
+      (attachment-upload-failed-cb state editable)
+      (let [size (gobj/get res "size")
+            mimetype (gobj/get res "mimetype")
+            filename (gobj/get res "filename")
+            prefix (str "Uploaded on " (utils/date-string (utils/js-date) [:year]) " - ")
+            subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+            icon (utils/icon-for-mimetype mimetype)
+            attachment-data {:fileName filename
+                             :fileType mimetype
+                             :fileSize size
+                             :title filename
+                             :subtitle subtitle
+                             :icon icon}]
+        (reset! (::media-attachment state) false)
+        (.addAttachment editable url (clj->js attachment-data))
+        (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
+
+(defn attachment-upload-error-cb [state editable res error]
+  (attachment-upload-failed-cb state editable))
+
+(defn add-attachment [s editable]
+  (reset! (::media-attachment s) true)
+  (iu/upload!
+   nil
+   (partial attachment-upload-success-cb s editable)
+   nil
+   (partial attachment-upload-error-cb s editable)
+   (fn []
+     (utils/after 400 #(media-attachment-dismiss-picker s editable)))))
 
 ;; Chart
 
@@ -115,11 +170,13 @@
     (= type "video")
     (reset! (::media-video s) true)
     (= type "chart")
-    (reset! (::media-chart s) true)))
+    (reset! (::media-chart s) true)
+    (= type "attachment")
+    (add-attachment s editable)))
 
 (defn- setup-editor [s]
   (let [body-el (rum/ref-node s "body-el")
-        media-picker-opts {:buttons #js ["picture" "video" "chart" "divider-line"];["picture" "video" "chart" "attachment" "divider-line"]
+        media-picker-opts {:buttons #js ["picture" "video" "chart" "attachment" "divider-line"];["picture" "video" "chart" "attachment" "divider-line"]
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
         options {:toolbar #js {:buttons #js ["bold" "italic" "unorderedlist" "anchor"]}
@@ -152,7 +209,9 @@
                                (rum/local nil ::media-photo)
                                (rum/local nil ::media-video)
                                (rum/local nil ::media-chart)
+                               (rum/local nil ::media-attachment)
                                (rum/local false ::media-photo-did-success)
+                               (rum/local false ::media-attachment-did-success)
                                (drv/drv :alert-modal)
                                (drv/drv :picker-data)
                                {:did-mount (fn [s]
