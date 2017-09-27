@@ -149,7 +149,7 @@ $h2_top_margin: 20;
     color: $carrot_dark_gray;
   }
 
-  p, img, h1, h2, h3, h4, h5 {
+  p {
     margin: 0 0 #{$bottom_margin}px;
   }
 
@@ -190,12 +190,14 @@ $h2_top_margin: 20;
 
   hr.media-divider-line {
     display: inline-block;
-    width: 90%;
-    margin-left: 5%;
+    position: relative;
+    width: 60px;
+    left: 50%;
+    margin-left: -30px;
     height: 1px;
-    background-color: rgba($oc_gray_7, 0.4);
-    margin-top: #{$bottom_margin}px;
-    margin-bottom: #{$bottom_margin}px;
+    background-color: $carrot_dark_gray;
+    margin-top: 0px;
+    margin-bottom: 0px;
   }
 }
 
