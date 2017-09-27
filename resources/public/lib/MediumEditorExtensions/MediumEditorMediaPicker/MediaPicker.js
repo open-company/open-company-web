@@ -324,7 +324,76 @@ function log(){
     },
 
     attachmentClick: function(event){
+      this._waitingCB = true;
       this.delegate("onPickerClick", "attachment");
+      this.togglePicker();
+    },
+
+    addAttachment: function(attachmentUrl, attachmentData){
+      log("addAttachment", attachmentUrl, attachmentData);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (attachmentUrl) {
+        // 2 cases: it's directly the div.medium-editor or it's a p already
+
+        var sel = this.window.getSelection(),
+            element = sel.getRangeAt(0).commonAncestorContainer,
+            p;
+        // If element is the BR get the parent that will be the editor node itself or a p
+        if (element.tagName == "BR") {
+          element = element.parentNode;
+        }
+        // if the selection is in a DIV means it's the main editor element
+        if (element.tagName == "DIV") {
+          // we need to add a p to insert the HR in
+          p = this.document.createElement("p");
+          element.appendChild(p);
+        // if it's a P already
+        } else if (element.tagName == "P"){
+          // if it has a BR inside
+          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+            // remove it
+            element.removeChild(element.childNodes[0]);
+          }
+          p = element;
+        }
+        var link = this.document.createElement("a");
+        link.className = "carrot-no-preview media-attachment";
+        link.setAttribute("contenteditable", false);
+        link.setAttribute("href", attachmentUrl);
+        link.setAttribute("target", "_blank");
+        link.dataset.name = attachmentData.fileName;
+        link.dataset.mimetype = attachmentData.fileType;
+        link.dataset.size = attachmentData.fileSize;
+        var icon = this.document.createElement("i");
+        icon.setAttribute("contenteditable", false);
+        icon.className = "file-mimetype fa " + attachmentData.icon;
+        link.appendChild(icon);
+        var title = this.document.createElement("label");
+        title.setAttribute("contenteditable", false);
+        title.className = "media-attachment-title";
+        title.innerHTML = attachmentData.title;
+        link.appendChild(title);
+        var subtitle = this.document.createElement("label");
+        subtitle.setAttribute("contenteditable", false);
+        subtitle.className = "media-attachment-subtitle";
+        subtitle.innerHTML = attachmentData.subtitle;
+        link.appendChild(subtitle);
+        p.appendChild(link);
+
+        var nextP = this.document.createElement("p");
+        var br = this.document.createElement("br");
+        nextP.appendChild(br);
+        // element.appendChild(nextP);
+        this.insertAfter(nextP, p);
+        this.moveCaret($(nextP), 0);
+      }
+      this._waitingCB = false;
+      this.base.checkContentChanged();
+      this.collapse();
+      setTimeout(this.togglePicker(), 100);
     },
 
     insertAfter: function(newNode, referenceNode) {
