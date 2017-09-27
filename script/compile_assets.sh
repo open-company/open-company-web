@@ -13,7 +13,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/js-utils/pasteHtmlAtCaret.js \
 --js lib/cleanHTML/cleanHTML.js \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
---js lib/MediumEditorExtensions/MediumEditorAutolist/MediaPicker.js \
+--js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
 --js lib/select2/js/select2.js \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"
