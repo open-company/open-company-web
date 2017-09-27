@@ -611,7 +611,7 @@ function log(){
         log("   sel.rangeCount > 0", element);
         if (sel !== undefined || element !== undefined) {
           if (this.paragraphIsEmpty(element)){
-            var top = Math.max(7, ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 10));
+            var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 10);
             log("   top:", $(element).offset().top, $(this.pickerElement.parentNode).offset().top, top + "px");
             this.pickerElement.style.top = top + "px";
             this.show();
