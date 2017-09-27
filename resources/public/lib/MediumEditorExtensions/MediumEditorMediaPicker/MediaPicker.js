@@ -69,6 +69,11 @@ function log(){
     },
 
     destroy: function(){
+      // Remove the previous saved selection markers if any
+      if (this._lastSelection) {
+        rangy.removeMarkers(this._lastSelection);
+        this._lastSelection = undefined;
+      }
       this.pickerElement.parentNode.removeChild(this.pickerElement);
       this.pickerElement = undefined;
       this.mainButton = undefined;
@@ -137,13 +142,15 @@ function log(){
     /* Picker buttons handlers */
 
     entryClick: function(event){
+      this.collapse();
+      this._waitingCB = true;
       this.delegate("onPickerClick", "entry");
     },
 
     photoClick: function(event){
+      this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "photo");
-      this.togglePicker();
     },
 
     addPhoto: function(photoUrl, photoThumbnail, width, height){
@@ -191,17 +198,16 @@ function log(){
         // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
+        this.base.checkContentChanged();
       }
       this._waitingCB = false;
-      this.base.checkContentChanged();
-      this.collapse();
       setTimeout(this.togglePicker(), 100);
     },
 
     videoClick: function(event){
+      this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "video");
-      this.togglePicker();
     },
 
     addVideo: function(videoUrl, videoType, videoId, videoThumbnail) {
@@ -254,17 +260,16 @@ function log(){
         // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
+        this.base.checkContentChanged();
       }
       this._waitingCB = false;
-      this.base.checkContentChanged();
-      this.collapse();
       setTimeout(this.togglePicker(), 100);
     },
 
     chartClick: function(event){
       this._waitingCB = true;
       this.delegate("onPickerClick", "chart");
-      this.togglePicker();
+      this.collapse();
     },
 
     addChart: function(chartUrl, chartId, chartThumbnail) {
@@ -316,17 +321,16 @@ function log(){
         // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
+        this.base.checkContentChanged();
       }
       this._waitingCB = false;
-      this.base.checkContentChanged();
-      this.collapse();
       setTimeout(this.togglePicker(), 100);
     },
 
     attachmentClick: function(event){
+      this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "attachment");
-      this.togglePicker();
     },
 
     addAttachment: function(attachmentUrl, attachmentData){
@@ -400,10 +404,9 @@ function log(){
         // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
+        this.base.checkContentChanged();
       }
       this._waitingCB = false;
-      this.base.checkContentChanged();
-      this.collapse();
       setTimeout(this.togglePicker(), 100);
     },
 
@@ -413,6 +416,7 @@ function log(){
 
     dividerLineClick: function(event){
       log("dividerLineClick", this, event);
+      this.collapse();
       event.stopPropagation();
       this.delegate("onPickerClick", "divider-line");
       if (this._lastSelection) {
@@ -442,6 +446,7 @@ function log(){
         p = element;
       }
       var hr = this.document.createElement("hr");
+      hr.className = "media-divider-line";
       p.appendChild(hr);
 
       var nextP = this.document.createElement("p");
@@ -452,7 +457,6 @@ function log(){
       this.moveCaret($(nextP), 0);
 
       this.base.checkContentChanged();
-      this.collapse();
       setTimeout(this.togglePicker(), 100);
     },
 
@@ -540,19 +544,14 @@ function log(){
         return;
       }
       this.delegate("willCollapse");
-      // Remove the previous saved selection markers if any
-      if (this._lastSelection) {
-        rangy.removeMarkers(this._lastSelection);
-        this._lastSelection = undefined;
-      }
       this.mainButton.classList.remove(this.expandedClass);
       this.mediaButtonsContainer.classList.remove(this.expandedClass);
       this.delegate("didCollapse");
     },
 
     toggleExpand: function(event){
-      if (this._waitingCB) {
-        return;
+      if (event) {
+        this._waitingCB = false;
       }
       if (this.isExpanded()) {
         this.collapse();
