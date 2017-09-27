@@ -267,9 +267,9 @@ function log(){
     },
 
     chartClick: function(event){
+      this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "chart");
-      this.collapse();
     },
 
     addChart: function(chartUrl, chartId, chartThumbnail) {
@@ -500,13 +500,6 @@ function log(){
       });
       return container;
     },
-
-    pickerMediaButtonsEvents: function(){
-      for (var button in this.pickerButtons) {
-        log("pickerMediaButtonsEvents", button);
-      }
-    },
-
     /* Expand, collapse and check current state*/
 
     hidePlaceholder: function(){
