@@ -359,11 +359,13 @@ function log(){
           }
           p = element;
         }
+        var uniqueID = "remove-bt-" + parseInt(Math.random() * 100000);
         var link = this.document.createElement("a");
         link.className = "carrot-no-preview media-attachment";
         link.setAttribute("contenteditable", false);
         link.setAttribute("href", attachmentUrl);
         link.setAttribute("target", "_blank");
+        link.setAttribute("id", uniqueID);
         link.dataset.name = attachmentData.fileName;
         link.dataset.mimetype = attachmentData.fileType;
         link.dataset.size = attachmentData.fileSize;
@@ -382,6 +384,14 @@ function log(){
         subtitle.className = "media-attachment-subtitle";
         subtitle.innerHTML = attachmentData.subtitle;
         link.appendChild(subtitle);
+        var removeBt = this.document.createElement("button");
+        removeBt.className = "mlb-reset remove-attachment";
+        removeBt.setAttribute("onclick", "javascript: MediaPicker.RemoveAnchor('" + uniqueID + "', this);");
+        removeBt.setAttribute("title", "Remove attachment");
+        var removeX = this.document.createElement("i");
+        removeX.className = "fa fa-times";
+        removeBt.appendChild(removeX);
+        link.appendChild(removeBt);
         p.appendChild(link);
 
         var nextP = this.document.createElement("p");
@@ -508,6 +518,9 @@ function log(){
         return;
       }
       this.delegate("willExpand");
+      this.getEditorElements().forEach(function(element){
+        element.classList.add("medium-editor-placeholder-hidden");
+      });
       // Hide the placeholder
       this.hidePlaceholder();
       // Save the current selection
@@ -629,6 +642,22 @@ function log(){
     },
     
   });
+
+  MediaPicker.RemoveAnchor = function(uniqueID, e){
+    console.log("MediaPicker.RemoveAnchor", arguments, window.event);
+    if (window.event) {
+      window.event.preventDefault();
+      window.event.stopPropagation();
+    }
+    if (e.stopPropagation){
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    var p = document.querySelector("#" + uniqueID).parentNode;
+    p.parentNode.removeChild(p);
+    $("div.media-picker-body").blur();
+    $("div.media-picker-body").focus();
+  };
 
   return MediaPicker;
 
