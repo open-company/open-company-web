@@ -104,7 +104,6 @@
              (not (utils/in? (:route @router/path) "features"))
              (not (utils/in? (:route @router/path) "email-wall"))
              (not (utils/in? (:route @router/path) "sign-up"))
-             (not (utils/in? (:route @router/path) "media-picker-test"))
              (not (utils/in? (:route @router/path) "confirm-invitation")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
@@ -159,7 +158,6 @@
            (not (utils/in? (:route @router/path) "email-verification"))
            (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
-           (not (utils/in? (:route @router/path) "media-picker-test"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
       (cond

@@ -204,10 +204,7 @@
    :password-reset        [[:base :auth-settings]
                             (fn [base auth-settings]
                               {:auth-settings auth-settings
-                               :error (:collect-pswd-error base)})]
-   :picker-data           [[:base]
-                            (fn [base]
-                              (:picker-data base))]})
+                               :error (:collect-pswd-error base)})]})
 
 ;; Action Loop =================================================================
 
