@@ -34,6 +34,7 @@ function log(){
               delegateMethods: {}},
     /* Internal private properties */
     _lastSelection: undefined,
+    _waitingCB: false,
 
     constructor: function (options) {
       log("constructor", options);
@@ -76,6 +77,9 @@ function log(){
     },
 
     windowClick: function(event){
+      if (this._waitingCB) {
+        return;
+      }
       log("windowClick", this.getEditorElements()[0], event.target);
       if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
          !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
@@ -137,15 +141,186 @@ function log(){
     },
 
     photoClick: function(event){
+      this._waitingCB = true;
       this.delegate("onPickerClick", "photo");
+      this.togglePicker();
+    },
+
+    addPhoto: function(photoUrl, photoThumbnail, width, height){
+      log("addPhoto", photoUrl, photoThumbnail, width, height);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (photoUrl) {
+        // 2 cases: it's directly the div.medium-editor or it's a p already
+
+        var sel = this.window.getSelection(),
+            element = sel.getRangeAt(0).commonAncestorContainer,
+            p;
+        // If element is the BR get the parent that will be the editor node itself or a p
+        if (element.tagName == "BR") {
+          element = element.parentNode;
+        }
+        // if the selection is in a DIV means it's the main editor element
+        if (element.tagName == "DIV") {
+          // we need to add a p to insert the HR in
+          p = this.document.createElement("p");
+          element.appendChild(p);
+        // if it's a P already
+        } else if (element.tagName == "P"){
+          // if it has a BR inside
+          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+            // remove it
+            element.removeChild(element.childNodes[0]);
+          }
+          p = element;
+        }
+        var img = this.document.createElement("img");
+        img.src = photoUrl;
+        img.className = "carrot-no-preview";
+        img.dataset.mediaType = "image";
+        img.dataset.thumbnail = photoThumbnail;
+        img.width = width;
+        img.height = height;
+        p.appendChild(img);
+
+        var nextP = this.document.createElement("p");
+        var br = this.document.createElement("br");
+        nextP.appendChild(br);
+        // element.appendChild(nextP);
+        this.insertAfter(nextP, p);
+        this.moveCaret($(nextP), 0);
+      }
+      this._waitingCB = false;
+      this.base.checkContentChanged();
+      this.collapse();
+      setTimeout(this.togglePicker(), 100);
     },
 
     videoClick: function(event){
+      this._waitingCB = true;
       this.delegate("onPickerClick", "video");
+      this.togglePicker();
+    },
+
+    addVideo: function(videoUrl, videoType, videoId, videoThumbnail) {
+      log("addVideo", videoUrl, videoType, videoId, videoThumbnail);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (videoUrl) {
+        // 2 cases: it's directly the div.medium-editor or it's a p already
+
+        var sel = this.window.getSelection(),
+            element = sel.getRangeAt(0).commonAncestorContainer,
+            p;
+        // If element is the BR get the parent that will be the editor node itself or a p
+        if (element.tagName == "BR") {
+          element = element.parentNode;
+        }
+        // if the selection is in a DIV means it's the main editor element
+        if (element.tagName == "DIV") {
+          // we need to add a p to insert the HR in
+          p = this.document.createElement("p");
+          element.appendChild(p);
+        // if it's a P already
+        } else if (element.tagName == "P"){
+          // if it has a BR inside
+          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+            // remove it
+            element.removeChild(element.childNodes[0]);
+          }
+          p = element;
+        }
+        var iframe = this.document.createElement("iframe");
+        iframe.className = "carrot-no-preview";
+        iframe.setAttribute("frameborder", 0);
+        iframe.setAttribute("webkitallowfullscreen", true);
+        iframe.setAttribute("mozallowfullscreen",true);
+        iframe.setAttribute("allowfullscreen", true);
+        iframe.dataset.thumbnail = videoThumbnail;
+        iframe.dataset.videoType = videoType;
+        iframe.dataset.videoId = videoId;
+        iframe.setAttribute("src", videoUrl);
+        iframe.setAttribute("width", 560);
+        iframe.setAttribute("height", 315);
+        p.appendChild(iframe);
+
+        var nextP = this.document.createElement("p");
+        var br = this.document.createElement("br");
+        nextP.appendChild(br);
+        // element.appendChild(nextP);
+        this.insertAfter(nextP, p);
+        this.moveCaret($(nextP), 0);
+      }
+      this._waitingCB = false;
+      this.base.checkContentChanged();
+      this.collapse();
+      setTimeout(this.togglePicker(), 100);
     },
 
     chartClick: function(event){
+      this._waitingCB = true;
       this.delegate("onPickerClick", "chart");
+      this.togglePicker();
+    },
+
+    addChart: function(chartUrl, chartId, chartThumbnail) {
+      log("addChart", chartUrl, chartId, chartThumbnail);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (chartUrl) {
+        // 2 cases: it's directly the div.medium-editor or it's a p already
+
+        var sel = this.window.getSelection(),
+            element = sel.getRangeAt(0).commonAncestorContainer,
+            p;
+        // If element is the BR get the parent that will be the editor node itself or a p
+        if (element.tagName == "BR") {
+          element = element.parentNode;
+        }
+        // if the selection is in a DIV means it's the main editor element
+        if (element.tagName == "DIV") {
+          // we need to add a p to insert the HR in
+          p = this.document.createElement("p");
+          element.appendChild(p);
+        // if it's a P already
+        } else if (element.tagName == "P"){
+          // if it has a BR inside
+          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+            // remove it
+            element.removeChild(element.childNodes[0]);
+          }
+          p = element;
+        }
+        var iframe = this.document.createElement("iframe");
+        iframe.className = "carrot-no-preview";
+        iframe.setAttribute("frameborder", 0);
+        iframe.setAttribute("webkitallowfullscreen", true);
+        iframe.setAttribute("mozallowfullscreen",true);
+        iframe.setAttribute("allowfullscreen", true);
+        iframe.dataset.thumbnail = chartThumbnail;
+        iframe.dataset.chartId = chartId;
+        iframe.setAttribute("src", chartUrl);
+        iframe.setAttribute("width", 550);
+        iframe.setAttribute("height", 430);
+        p.appendChild(iframe);
+
+        var nextP = this.document.createElement("p");
+        var br = this.document.createElement("br");
+        nextP.appendChild(br);
+        // element.appendChild(nextP);
+        this.insertAfter(nextP, p);
+        this.moveCaret($(nextP), 0);
+      }
+      this._waitingCB = false;
+      this.base.checkContentChanged();
+      this.collapse();
+      setTimeout(this.togglePicker(), 100);
     },
 
     attachmentClick: function(event){
@@ -259,6 +434,9 @@ function log(){
     },
 
     expand: function(){
+      if (this._waitingCB) {
+        return;
+      }
       this.delegate("willExpand");
       // Hide the placeholder
       this.hidePlaceholder();
@@ -271,6 +449,9 @@ function log(){
     },
 
     collapse: function(){
+      if (this._waitingCB) {
+        return;
+      }
       this.delegate("willCollapse");
       // Remove the previous saved selection markers if any
       if (this._lastSelection) {
@@ -283,6 +464,9 @@ function log(){
     },
 
     toggleExpand: function(event){
+      if (this._waitingCB) {
+        return;
+      }
       if (this.isExpanded()) {
         this.collapse();
       } else {
@@ -300,6 +484,9 @@ function log(){
     },
 
     show: function(){
+      if (this._waitingCB) {
+        return;
+      }
       log("show");
       this.delegate("willShow");
       this.pickerElement.style.display = 'block';
@@ -307,6 +494,9 @@ function log(){
     },
 
     hide: function(){
+      if (this._waitingCB) {
+        return;
+      }
       log("hide", this);
       this.delegate("willHide");
       this.collapse();
@@ -341,6 +531,9 @@ function log(){
     },
 
     togglePicker: function(event, editable){
+      if (this._waitingCB) {
+        return;
+      }
       if (event) {
         log("togglePicker 1", event, event.type);
       } else {
