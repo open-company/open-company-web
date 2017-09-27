@@ -8,5 +8,6 @@ cat $1/target/public//css/medium-editor/default.css >> $2.temp
 cat $1/target/public/css/emojione.css >> $2.temp
 cat $1/target/public/css/emojione-picker.css >> $2.temp
 cat $1/target/public/css/emojione.sprites.css >> $2.temp
+cat $1/target/public/lib/MediumEditorExtensions/MediumEditorAutolist/MediaPicker.css >> $2.temp
 
 cssnano --no-zindex < $2.temp > $2
