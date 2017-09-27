@@ -269,7 +269,8 @@
                                                s)}
   [s {:keys [dispatch-input-key initial-body on-change classes] :as options}]
   (let [_ (drv/react s dispatch-input-key)]
-    [:div.rich-body-editor
-      {:ref "body"
-       :class (str classes (when @(::did-change s) " medium-editor-placeholder-hidden"))
-       :dangerouslySetInnerHTML (utils/emojify initial-body)}]))
+    [:div.rich-body-editor-container
+      [:div.rich-body-editor
+        {:ref "body"
+         :class (str classes (when @(::did-change s) " medium-editor-placeholder-hidden"))
+         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]))

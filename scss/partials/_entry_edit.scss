@@ -245,10 +245,12 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-body {
         margin: 0px;
-        padding: 24px 36px;
+        padding: 24px 24px 24px 58px;
         overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: visible;
         max-height: calc(100vh - 64px - 72px);
+        width: calc(100% + 22px);
+        margin-left: -22px;
 
         div.entry-edit-headline {
           border: none;
@@ -267,27 +269,34 @@ div.entry-edit-modal-container {
           }
         }
 
-        div.medium-editor-media-picker {
-          margin-top: 62px;
-        }
+        div.rich-body-editor-container {
+          position: relative;
+          overflow: visible;
 
-        div.rich-body-editor {
-          border: none;
-          outline: none;
-          color: $carrot_dark_gray;
-          @include avenir_R();
-          font-size: 16px;
-          margin: 24px 0;
-          cursor: text;
-          min-height: 85px;
-          @include activity-body();
-
-          &.medium-editor-placeholder:after {
-            color: $oc_gray_7 !important;
+          div.medium-editor-media-picker {
+            margin-top: 0px;
+            margin-left: -36px;
+            top: 0px;
           }
 
-          &:after {
-            margin: 0;
+          div.rich-body-editor {
+            border: none;
+            outline: none;
+            color: $carrot_dark_gray;
+            @include avenir_R();
+            font-size: 16px;
+            margin: 24px 0;
+            cursor: text;
+            min-height: 85px;
+            @include activity-body();
+
+            &.medium-editor-placeholder:after {
+              color: $oc_gray_7 !important;
+            }
+
+            &:after {
+              margin: 0;
+            }
           }
         }
 
