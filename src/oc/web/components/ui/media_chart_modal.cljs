@@ -9,11 +9,12 @@
 
 (defn dismiss-modal [s]
   (let [dispatch-input-key (first (:rum/args s))]
-    (dis/dispatch! [:input [dispatch-input-key :temp-chart] false])))
+    (dis/dispatch! [:input [dispatch-input-key :media-chart] :dismiss])))
 
-(defn close-clicked [s]
+(defn close-clicked [s & [no-dismiss]]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal s)))
+  (when-not no-dismiss
+    (utils/after 180 #(dismiss-modal s))))
 
 (rum/defcs media-chart-modal < (rum/local false ::first-render-done)
                                (rum/local false ::dismiss)
@@ -57,8 +58,8 @@
             [:button.mlb-reset.mlb-default
               {:on-click #(when (utils/valid-google-chart-url? @(::chart-url s))
                             (let [chart-data (utils/clean-google-chart-url @(::chart-url s))]
-                              (dis/dispatch! [:input [dispatch-input-key :temp-chart] chart-data]))
-                            (close-clicked s))
+                              (dis/dispatch! [:input [dispatch-input-key :media-chart] chart-data]))
+                            (close-clicked s true))
                :disabled (not (utils/valid-google-chart-url? @(::chart-url s)))}
               "Add"]
             [:button.mlb-reset.mlb-link-black

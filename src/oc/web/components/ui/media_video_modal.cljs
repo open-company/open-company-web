@@ -9,11 +9,12 @@
 
 (defn dismiss-modal [s]
   (let [dispatch-input-key (first (:rum/args s))]
-    (dis/dispatch! [:input [dispatch-input-key :media-video] false])))
+    (dis/dispatch! [:input [dispatch-input-key :media-video] :dismiss])))
 
-(defn close-clicked [s]
+(defn close-clicked [s & [no-dismiss]]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal s)))
+  (when-not no-dismiss
+    (utils/after 180 #(dismiss-modal s))))
 
 (def youtube-regexp "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?v=([a-zA-Z0-9_-]{11}/?)")
 
@@ -33,8 +34,8 @@
         resp (aget res 0)
         thumbnail (aget resp "thumbnail_small")
         video-data (assoc video :thumbnail thumbnail)]
-    (dis/dispatch! [:input [dispatch-input-key :temp-video] video-data])
-    (close-clicked s)))
+    (dis/dispatch! [:input [dispatch-input-key :media-video] video-data])
+    (close-clicked s true)))
 
 (def _retry (atom 0))
 
@@ -47,8 +48,8 @@
     (get-vimeo-thumbnail s video)
     ;; Add the video without thumbnail
     (let [dispatch-input-key (nth (:rum/args s) 1)]
-      (dis/dispatch! [:input [dispatch-input-key :temp-video] video])
-      (close-clicked s))))
+      (dis/dispatch! [:input [dispatch-input-key :media-video] video])
+      (close-clicked s true))))
 
 (defn- get-vimeo-thumbnail [s video]
   (.ajax js/$
@@ -73,8 +74,8 @@
       (if (= :vimeo (:type video-data))
         (get-vimeo-thumbnail s video-data)
         (do
-          (dis/dispatch! [:input [dispatch-input-key :temp-video] video-data])
-          (close-clicked s))))))
+          (dis/dispatch! [:input [dispatch-input-key :media-video] video-data])
+          (close-clicked s true))))))
 
 (rum/defcs media-video-modal < (rum/local false ::first-render-done)
                                (rum/local false ::dismiss)
