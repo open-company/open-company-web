@@ -30,7 +30,7 @@ function log(){
     /* Contains the picker buttons */
     pickerButtons: [],
     /* Contains the picker buttons */
-    options: {buttons: ['entry', 'picture', 'video', 'chart', 'attachment', 'divider-line'],
+    options: {buttons: ['entry', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
               delegateMethods: {}},
     /* Internal private properties */
     _lastSelection: undefined,
@@ -139,6 +139,15 @@ function log(){
       sel.addRange(range);
     },
 
+    /**/
+    getAddableElement: function(element) {
+      // If the element is not a P or a DIV clib the tree back to the first P or DIV
+      while(element !== this.getEditorElements()[0] &&  element.tagName !== "DIV" && element.tagName !== "P") {
+        element = element.parentNode;
+      }
+      return element;
+    },
+
     /* Picker buttons handlers */
 
     entryClick: function(event){
@@ -165,10 +174,7 @@ function log(){
         var sel = this.window.getSelection(),
             element = sel.getRangeAt(0).commonAncestorContainer,
             p;
-        // If element is the BR get the parent that will be the editor node itself or a p
-        if (element.tagName == "BR") {
-          element = element.parentNode;
-        }
+        element = this.getAddableElement(element);
         // if the selection is in a DIV means it's the main editor element
         if (element.tagName == "DIV") {
           // we need to add a p to insert the HR in
@@ -177,7 +183,7 @@ function log(){
         // if it's a P already
         } else if (element.tagName == "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length == 1){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -195,7 +201,6 @@ function log(){
         var nextP = this.document.createElement("p");
         var br = this.document.createElement("br");
         nextP.appendChild(br);
-        // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
@@ -220,12 +225,8 @@ function log(){
         // 2 cases: it's directly the div.medium-editor or it's a p already
 
         var sel = this.window.getSelection(),
-            element = sel.getRangeAt(0).commonAncestorContainer,
+            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
-        // If element is the BR get the parent that will be the editor node itself or a p
-        if (element.tagName == "BR") {
-          element = element.parentNode;
-        }
         // if the selection is in a DIV means it's the main editor element
         if (element.tagName == "DIV") {
           // we need to add a p to insert the HR in
@@ -257,7 +258,6 @@ function log(){
         var nextP = this.document.createElement("p");
         var br = this.document.createElement("br");
         nextP.appendChild(br);
-        // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
@@ -282,12 +282,8 @@ function log(){
         // 2 cases: it's directly the div.medium-editor or it's a p already
 
         var sel = this.window.getSelection(),
-            element = sel.getRangeAt(0).commonAncestorContainer,
+            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
-        // If element is the BR get the parent that will be the editor node itself or a p
-        if (element.tagName == "BR") {
-          element = element.parentNode;
-        }
         // if the selection is in a DIV means it's the main editor element
         if (element.tagName == "DIV") {
           // we need to add a p to insert the HR in
@@ -318,7 +314,6 @@ function log(){
         var nextP = this.document.createElement("p");
         var br = this.document.createElement("br");
         nextP.appendChild(br);
-        // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
@@ -343,12 +338,8 @@ function log(){
         // 2 cases: it's directly the div.medium-editor or it's a p already
 
         var sel = this.window.getSelection(),
-            element = sel.getRangeAt(0).commonAncestorContainer,
+            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
-        // If element is the BR get the parent that will be the editor node itself or a p
-        if (element.tagName == "BR") {
-          element = element.parentNode;
-        }
         // if the selection is in a DIV means it's the main editor element
         if (element.tagName == "DIV") {
           // we need to add a p to insert the HR in
@@ -401,7 +392,6 @@ function log(){
         var nextP = this.document.createElement("p");
         var br = this.document.createElement("br");
         nextP.appendChild(br);
-        // element.appendChild(nextP);
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
@@ -425,12 +415,8 @@ function log(){
       // 2 cases: it's directly the div.medium-editor or it's a p already
 
       var sel = this.window.getSelection(),
-          element = sel.getRangeAt(0).commonAncestorContainer,
+          element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
           p;
-      // If element is the BR get the parent that will be the editor node itself or a p
-      if (element.tagName == "BR") {
-        element = element.parentNode;
-      }
       // if the selection is in a DIV means it's the main editor element
       if (element.tagName == "DIV") {
         // we need to add a p to insert the HR in
@@ -452,7 +438,6 @@ function log(){
       var nextP = this.document.createElement("p");
       var br = this.document.createElement("br");
       nextP.appendChild(br);
-      // element.appendChild(nextP);
       this.insertAfter(nextP, p);
       this.moveCaret($(nextP), 0);
 
@@ -475,7 +460,7 @@ function log(){
           button.classList.add('media-entry');
           button.classList.add('media-' + idx);
           that.on(button, 'click', that.entryClick.bind(that));
-        } else if (opt === 'picture') {
+        } else if (opt === 'photo') {
           button.classList.add('media-photo');
           button.classList.add('media-' + idx);
           that.on(button, 'click', that.photoClick.bind(that));
@@ -640,7 +625,7 @@ function log(){
   });
 
   MediaPicker.RemoveAnchor = function(uniqueID, e){
-    console.log("MediaPicker.RemoveAnchor", arguments, window.event);
+    log("RemoveAnchor", arguments, window.event);
     if (window.event) {
       window.event.preventDefault();
     }
