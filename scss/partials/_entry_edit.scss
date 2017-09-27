@@ -267,7 +267,11 @@ div.entry-edit-modal-container {
           }
         }
 
-        div.entry-edit-body {
+        div.medium-editor-media-picker {
+          margin-top: 62px;
+        }
+
+        div.rich-body-editor {
           border: none;
           outline: none;
           color: $carrot_dark_gray;

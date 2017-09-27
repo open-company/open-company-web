@@ -15,6 +15,7 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.media-attachments :refer (media-attachments)]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [cljsjs.medium-editor]
             [cljsjs.rangy-selectionsaverestore]
             [goog.object :as gobj]
@@ -55,22 +56,9 @@
 (defn toggle-topics-dd []
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
-(defn body-on-change [state]
-  (when-let [body-el (sel1 [:div.entry-edit-body])]
-    ; Hide/show placeholder capturing the situation medium-editor ignores:
-    ; multiple empty Ps, img or iframes
-    (utils/after 1000
-     #(when-let [$body-el (js/$ "div.entry-edit-body.medium-editor-placeholder")]
-        (if (and (empty? (.text $body-el))
-                 (<= (.-length (.find $body-el "div, p")) 1)
-                 (zero? (.-length (.find $body-el "img, iframe"))))
-          (.removeClass $body-el "hide-placeholder")
-          (.addClass $body-el "hide-placeholder"))))
-    ; Attach paste listener to the body and all its children
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
-    (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :body] emojied-body])
-      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+(defn body-on-change [body]
+  (dis/dispatch! [:input [:entry-editing :body] body])
+  (dis/dispatch! [:input [:entry-editing :has-changes] true]))
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
@@ -84,19 +72,8 @@
       (str "What's new, " first-name "?")
       "What's new?")))
 
-(defn- setup-body-editor [state]
-  (let [media-picker-id @(::media-picker-id state)
-        headline-el  (sel1 [:div.entry-edit-headline])
-        body-el      (sel1 [:div.entry-edit-body])
-        body-editor  (new js/MediumEditor body-el (clj->js (-> (body-placeholder)
-                                                            (utils/medium-editor-options false false)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {:top -10 :left -26} (sel1 [:div.entry-edit-modal]))))))]
-    (.subscribe body-editor
-                "editableInput"
-                (fn [event editable]
-                  (body-on-change state)))
-    (reset! (::body-editor state) body-editor)
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
+(defn- setup-headline [state]
+  (let [headline-el  (rum/ref-node state "headline")]
     (events/listen headline-el EventType/INPUT #(headline-on-change state))
     (js/emojiAutocomplete)))
 
@@ -149,7 +126,7 @@
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
-                                             initial-body (utils/emojify (if (contains? entry-editing :links) (:body entry-editing) ""))
+                                             initial-body (if (contains? entry-editing :links) (:body entry-editing) "<p><br/></p>")
                                              initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
                                          ;; Load board if it's not already
                                          (when-not @(drv/get-ref s :entry-edit-topics)
@@ -170,8 +147,7 @@
                                         (when-not (dommy/has-class? body :no-scroll)
                                           (reset! (::remove-no-scroll s) true)
                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                                      (setup-body-editor s)
-                                      (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
+                                      (setup-headline s)
                                       (utils/after 10 #(.focus (sel1 [:div.entry-edit-headline])))
                                       s)
                          :before-render (fn [s]
@@ -282,6 +258,7 @@
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable true
+             :ref "headline"
              :placeholder "Title this (if you like)"
              :on-paste    #(headline-on-paste s %)
              :on-key-Up   #(headline-on-change s)
@@ -290,23 +267,11 @@
              :on-blur     #(headline-on-change s)
              :auto-focus true
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          ; Body element
-          [:div.entry-edit-body.emoji-autocomplete.emojiable
-            {:role "textbox"
-             :aria-multiline true
-             :content-editable true
-             :class (utils/class-set {:medium-editor-placeholder-hidden (or (not (empty? (gobj/get @(::initial-body s) "__html")))
-                                                                            @(::media-picker-expanded s))})
-             :dangerouslySetInnerHTML @(::initial-body s)}]
-          ; Media handling
-          (media-picker {:media-config [:photo :video :chart]
-                         :media-picker-id @(::media-picker-id s)
-                         :on-change #(media-picker-did-change s)
-                         :body-editor-sel "div.entry-edit-body"
-                         :data-editing entry-editing
-                         :dispatch-input-key :entry-editing
-                         :on-expand #(reset! (::media-picker-expanded s) true)
-                         :on-collapse #(reset! (::media-picker-expanded s) false)})
+          (rich-body-editor {:on-change body-on-change
+                             :initial-body @(::initial-body s)
+                             :dispatch-input-key :entry-editing
+                             :media-config ["photo" "video" "chart" "divider-line"]
+                             :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
           ; Bottom controls
           [:div.entry-edit-controls.group]
