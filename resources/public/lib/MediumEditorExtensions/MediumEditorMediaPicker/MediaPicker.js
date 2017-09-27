@@ -367,6 +367,7 @@ function log(){
         link.dataset.name = attachmentData.fileName;
         link.dataset.mimetype = attachmentData.fileType;
         link.dataset.size = attachmentData.fileSize;
+        link.dataset.disablePreview = true;
         var icon = this.document.createElement("i");
         icon.setAttribute("contenteditable", false);
         icon.className = "file-mimetype fa " + attachmentData.icon;
