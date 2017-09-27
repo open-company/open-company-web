@@ -60,6 +60,11 @@ var replaceSelectedText = function(){};
 var AutoList = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
+MediaPicker.addEntry = function(){};
+MediaPicker.addPhoto = function(){};
+MediaPicker.addVideo = function(){};
+MediaPicker.addChart = function(){};
+MediaPicker.addAttachment = function(){};
 // Tooltip http://darsa.in/tooltip/
 var Tooltip = function(){};
 // Debug app state
