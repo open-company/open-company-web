@@ -525,6 +525,10 @@ function log(){
       this.hidePlaceholder();
       // Save the current selection
       this._lastSelection = rangy.saveSelection();
+      // Unfocus the field
+      this.getEditorElements().forEach(function(el){
+        el.blur();
+      });
       this.mainButton.classList.add(this.expandedClass);
       this.mediaButtonsContainer.classList.add(this.expandedClass);
 
