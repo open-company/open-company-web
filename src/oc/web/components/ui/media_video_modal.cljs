@@ -17,17 +17,20 @@
     (utils/after 180 #(dismiss-modal s))))
 
 (def youtube-regexp "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?v=([a-zA-Z0-9_-]{11}/?)")
+(def youtube-short-regexp "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/([a-zA-Z0-9_-]{11}/?)")
 
 ; https://vimeo.com/223518754 https://vimeo.com/groups/asd/223518754 https://vimeo.com/channels/asd/223518754
 (def vimeo-regexp "(?:http|https)?:\\/\\/(?:www\\.)?vimeo.com\\/(?:channels\\/(?:\\w+\\/)?|groups\\/(?:[?:^\\/]*)\\/videos\\/|)(\\d+)(?:|\\/\\?)")
 
 (defn get-video-data [url]
   (let [yr (js/RegExp youtube-regexp "ig")
+        yr2 (js/RegExp youtube-short-regexp "ig")
         vr (js/RegExp vimeo-regexp "ig")
         y-groups (.exec yr url)
+        y2-groups (.exec yr2 url)
         v-groups (.exec vr url)]
-    {:id (if (nth y-groups 1) (nth y-groups 1) (nth v-groups 1))
-     :type (if (nth y-groups 1) :youtube :vimeo)}))
+    {:id (if (nth y-groups 1) (nth y-groups 1) (if (nth y2-groups 1) (nth y2-groups 1) (nth v-groups 1)))
+     :type (if (or (nth y-groups 1) (nth y2-groups 1)) :youtube :vimeo)}))
 
 (defn- get-vimeo-thumbnail-success [s video res]
   (let [dispatch-input-key (first (:rum/args s))
@@ -62,9 +65,11 @@
 (defn valid-video-url? [url]
   (let [trimmed-url (string/trim url)
         yr (js/RegExp youtube-regexp "ig")
+        yr2 (js/RegExp youtube-short-regexp "ig")
         vr (js/RegExp vimeo-regexp "ig")]
     (when-not (empty? trimmed-url)
       (or (.match trimmed-url yr)
+          (.match trimmed-url yr2)
           (.match trimmed-url vr)))))
 
 (defn video-add-click [s]
