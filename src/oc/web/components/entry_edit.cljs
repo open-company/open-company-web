@@ -64,12 +64,6 @@
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
-(defn body-placeholder []
-  (let [first-name (jwt/get-key :first-name)]
-    (if-not (empty? first-name)
-      (str "What's new, " first-name "?")
-      "What's new?")))
-
 (defn- setup-headline [state]
   (let [headline-el  (rum/ref-node state "headline")]
     (events/listen headline-el EventType/INPUT #(headline-on-change state))
