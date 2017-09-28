@@ -123,7 +123,20 @@
                         "public/img/emojione.sprites.svg"]
                        ['cljsjs/emojione-picker
                         "cljsjs/emojione-picker/common/emojione-picker.css"
-                        "public/css/emojione-picker.css"]}})
+                        "public/css/emojione-picker.css"]
+                       ;; MediumEditor default theme
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/medium-editor.css"
+                        "public/css/medium-editor/medium-editor.css"]
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/medium-editor.min.css"
+                        "public/css/medium-editor/medium-editor.min.css"]
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/themes/default.css"
+                        "public/css/medium-editor/default.css"]
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/themes/default.min.css"
+                        "public/css/medium-editor/default.min.css"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such
