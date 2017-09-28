@@ -45,7 +45,7 @@
             [:div.story-body
               {:dangerouslySetInnerHTML (utils/emojify (:body story-data))}])]]
     [:div.story-content-footer
-      {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
+      ; {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
       [:div.story-content-footer-inner
         [:div.carrot-logo]
         [:div.you-did-it "Made with Carrot"]]]]))
