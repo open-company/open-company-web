@@ -60,6 +60,8 @@ function log(){
         that.on(element, 'editableInput', that.togglePicker.bind(that));
       });
       MediumEditor.Extension.prototype.init.apply(this, arguments);
+      // Initialize tooltips
+      $('[data-toggle=\"tooltip\"]').tooltip();
     },
 
     delegate: function(event, arg) {
@@ -111,9 +113,17 @@ function log(){
       return picker;
     },
 
+    addButtonTooltip: function(bt, msg){
+      bt.setAttribute("title", msg);
+      bt.dataset.toggle = "tooltip";
+      bt.dataset.placement = "top";
+      bt.dataset.container = "body";
+    },
+
     createPickerMainButton: function(){
       var mButton = this.document.createElement('button');
       mButton.className = 'media add-media-bt';
+      this.addButtonTooltip(mButton, "Insert media");
       this.on(mButton, 'click', this.toggleExpand.bind(this));
       return mButton;
     },
@@ -154,12 +164,14 @@ function log(){
       this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "entry");
+      $(event.target).tooltip("hide");
     },
 
     photoClick: function(event){
       this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "photo");
+      $(event.target).tooltip("hide");
     },
 
     addPhoto: function(photoUrl, photoThumbnail, width, height){
@@ -213,6 +225,7 @@ function log(){
       this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "video");
+      $(event.target).tooltip("hide");
     },
 
     addVideo: function(videoUrl, videoType, videoId, videoThumbnail) {
@@ -270,6 +283,7 @@ function log(){
       this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "chart");
+      $(event.target).tooltip("hide");
     },
 
     addChart: function(chartUrl, chartId, chartThumbnail) {
@@ -326,6 +340,7 @@ function log(){
       this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "attachment");
+      $(event.target).tooltip("hide");
     },
 
     addAttachment: function(attachmentUrl, attachmentData){
@@ -409,6 +424,8 @@ function log(){
       this.collapse();
       event.stopPropagation();
       this.delegate("onPickerClick", "divider-line");
+      $(event.target).tooltip("hide");
+
       if (this._lastSelection) {
         rangy.restoreSelection(this._lastSelection);
       }
@@ -459,26 +476,32 @@ function log(){
         if (opt === 'entry') {
           button.classList.add('media-entry');
           button.classList.add('media-' + idx);
+          this.addButtonTooltip(button, "Add update");
           that.on(button, 'click', that.entryClick.bind(that));
         } else if (opt === 'photo') {
           button.classList.add('media-photo');
           button.classList.add('media-' + idx);
+          that.addButtonTooltip(button, "Add picture");
           that.on(button, 'click', that.photoClick.bind(that));
         } else if (opt === 'video') {
           button.classList.add('media-video');
           button.classList.add('media-' + idx);
+          that.addButtonTooltip(button, "Add video");
           that.on(button, 'click', that.videoClick.bind(that));
         } else if (opt === 'chart') {
           button.classList.add('media-chart');
           button.classList.add('media-' + idx);
+          that.addButtonTooltip(button, "Add chart");
           that.on(button, 'click', that.chartClick.bind(that));
         } else if (opt === 'attachment') {
           button.classList.add('media-attachment');
           button.classList.add('media-' + idx);
+          that.addButtonTooltip(button, "Add attachment");
           that.on(button, 'click', that.attachmentClick.bind(that));
         } else if (opt === 'divider-line') {
           button.classList.add('media-divider');
           button.classList.add('media-' + idx);
+          that.addButtonTooltip(button, "Add divider line");
           that.on(button, 'click', that.dividerLineClick.bind(that));
         }
         that.pickerButtons.push(button);
@@ -514,6 +537,10 @@ function log(){
       this.mainButton.classList.add(this.expandedClass);
       this.mediaButtonsContainer.classList.add(this.expandedClass);
 
+      this.mainButton.setAttribute("title", "Close");
+      $(this.mainButton).tooltip("fixTitle");
+      $(this.mainButton).tooltip("hide");
+
       this.delegate("didExpand");
     },
 
@@ -524,6 +551,11 @@ function log(){
       this.delegate("willCollapse");
       this.mainButton.classList.remove(this.expandedClass);
       this.mediaButtonsContainer.classList.remove(this.expandedClass);
+
+      this.mainButton.setAttribute("title", "Insert media");
+      $(this.mainButton).tooltip("fixTitle");
+      $(this.mainButton).tooltip("hide");
+
       this.delegate("didCollapse");
     },
 
@@ -533,6 +565,11 @@ function log(){
       }
       if (this.isExpanded()) {
         this.collapse();
+        // Remove last selection only on direct click of the button
+        if (this._lastSelection) {
+          rangy.removeMarkers(this._lastSelection);
+          this._lastSelection = undefined;
+        }
       } else {
         this.expand();        
       }
