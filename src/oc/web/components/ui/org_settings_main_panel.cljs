@@ -146,14 +146,13 @@
                       "Remove Slack team"]]
                   (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
                     (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
-                      (let [fixed-add-bot-link (utils/slack-link-with-state (:href add-bot-link) (:user-id cur-user-data) (:team-id org-data) (oc-urls/org-settings (:slug org-data)))]
-                        [:button.org-settings-list-item-btn.btn-reset
-                          {:on-click #(router/redirect! fixed-add-bot-link)
-                           :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :data-container "body"}
-                          "Add Bot"])))]))]
+                      [:button.org-settings-list-item-btn.btn-reset
+                        {:on-click #(dis/dispatch! [:bot-auth])
+                         :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"}
+                        "Add Bot"]))]))]
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
                 {:on-click #(dis/dispatch! [:slack-team-add])}
