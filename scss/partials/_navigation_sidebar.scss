@@ -43,6 +43,10 @@ div.left-navigation-sidebar {
   left: 0px;
   height: calc(100vh - 138px);
 
+  div.left-navigation-sidebar-content {
+    padding-bottom: 32px; 
+  }
+
   a.all-activity {
     display: block;
     background-color: transparent;
@@ -224,7 +228,7 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-footer {
     margin-left: 20px;
-    position: absolute;
+    position: relative;
     bottom: 16px;
 
     button.about-carrot-btn {
