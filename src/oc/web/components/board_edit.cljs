@@ -59,6 +59,7 @@
                                       (utils/after 100 #(utils/remove-tooltips))
                                       (js/emojiAutocomplete)
                                       (let [board-name-node (rum/ref-node s "board-name")]
+                                        (utils/to-end-of-content-editable board-name-node)
                                         (reset! (::input-event s)
                                          (events/listen board-name-node EventType/INPUT
                                           #(board-name-on-change s board-name-node)))
