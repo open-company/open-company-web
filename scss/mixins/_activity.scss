@@ -18,6 +18,7 @@ $h2_top_margin: 20;
     @include avenir_H();
     color: $carrot_dark_gray;
     font-size: 15px;
+    white-space: nowrap;
   }
 
   div.time-since {
@@ -27,6 +28,7 @@ $h2_top_margin: 20;
     @include avenir_R();
     color: rgba($oc_gray_7, 0.5);
     font-size: 14px;
+    white-space: nowrap;
 
     div.tooltip {
       .tooltip-inner {
