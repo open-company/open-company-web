@@ -257,8 +257,6 @@
                     (dropdown-list {:items fixed-storyboards
                                     :value (:board-slug story-data)
                                     :on-change (partial did-select-storyboard-cb s)
-                                    :show-placeholder (or (empty? @(::initial-body s))
-                                                          (= @(::initial-body s) utils/default-body))
                                     :on-blur #(reset! (::show-storyboards-list s) false)})))]
               (when-not (:banner-url story-data)
                 [:div.story-edit-add-banner
@@ -304,6 +302,8 @@
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         (rich-body-editor {:on-change (partial body-on-change s)
                            :initial-body @(::initial-body s)
+                           :show-placeholder (or (empty? @(::initial-body s))
+                                                 (= @(::initial-body s) utils/default-body))
                            :dispatch-input-key :story-editing
                            :media-config ["photo" "video" "chart" "attachment" "divider-line"]
                            :classes "emoji-autocomplete emojiable"})]
