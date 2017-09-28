@@ -240,9 +240,10 @@ div.story-edit-container {
           position: relative;
           @include activity-tag();
           div.dropdown-list-container {
-            left: -60px;
-            top: 30px;
+            left: 50%;
+            margin-left: -85px;
             width: 170px;
+            top: 32px;
           }
         }
       }
