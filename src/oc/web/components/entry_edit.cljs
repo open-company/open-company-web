@@ -249,7 +249,7 @@
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           (rich-body-editor {:on-change body-on-change
                              :initial-body @(::initial-body s)
-                             :show-placeholder (contains? entry-editing :links)
+                             :show-placeholder (not (contains? entry-editing :links))
                              :dispatch-input-key :entry-editing
                              :media-config ["photo" "video" "chart" "attachment"]
                              :classes "emoji-autocomplete emojiable"})
