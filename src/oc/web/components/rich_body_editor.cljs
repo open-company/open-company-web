@@ -7,8 +7,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
-            [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
@@ -170,9 +168,9 @@
     (= type "photo")
     (add-photo s editable)
     (= type "video")
-    (reset! (::media-video s) true)
+    (do (dis/dispatch! [:input [(:dispatch-input-key (first (:rum/args s))) :media-video] true]) (reset! (::media-video s) true))
     (= type "chart")
-    (reset! (::media-chart s) true)
+    (do (dis/dispatch! [:input [(:dispatch-input-key (first (:rum/args s))) :media-chart] true]) (reset! (::media-chart s) true))
     (= type "attachment")
     (add-attachment s editable)))
 
@@ -236,10 +234,10 @@
                                (rum/local false ::did-change)
                                (rum/local nil ::editor)
                                (rum/local nil ::editable-ext)
-                               (rum/local nil ::media-photo)
-                               (rum/local nil ::media-video)
-                               (rum/local nil ::media-chart)
-                               (rum/local nil ::media-attachment)
+                               (rum/local false ::media-photo)
+                               (rum/local false ::media-video)
+                               (rum/local false ::media-chart)
+                               (rum/local false ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
                                (drv/drv :entry-editing)
@@ -256,17 +254,26 @@
                                                      data @(drv/get-ref s dispatch-input-key)
                                                      video-data (:media-video data)
                                                      chart-data (:media-chart data)]
-                                                  (when (and @(::media-video s)
-                                                             (not (nil? video-data)))
-                                                    (reset! (::media-video s) nil)
-                                                    (dis/dispatch! [:input [dispatch-input-key :media-video] nil])
-                                                    (media-video-add s @(::editable-ext s) video-data))
+                                                  (when @(::media-video s)
+                                                    (when (map? video-data)
+                                                      (media-video-add s @(::editable-ext s) video-data))
+                                                    (when (or (= video-data :dismiss)
+                                                              (map? video-data))
+                                                      (reset! (::media-video s) false)
+                                                      (dis/dispatch! [:input [dispatch-input-key :media-video] nil])))
                                                   (when (and @(::media-chart s)
-                                                             (not (nil? chart-data)))
-                                                    (reset! (::media-chart s) nil)
-                                                    (dis/dispatch! [:input [ :media-chart] nil])
-                                                    (media-chart-add s @(::editable-ext s) chart-data)))
-                                               s)}
+                                                             chart-data)
+                                                    (when (map? chart-data)
+                                                      (media-chart-add s @(::editable-ext s) chart-data))
+                                                    (when (or (= chart-data :dismiss)
+                                                              (string? chart-data))
+                                                      (reset! (::media-chart s) false)
+                                                      (dis/dispatch! [:input [dispatch-input-key :media-chart] nil]))))
+                                               s)
+                                :will-unmount (fn [s]
+                                                (when @(::editor s)
+                                                  (.destroy @(::editor s)))
+                                                s)}
   [s {:keys [dispatch-input-key initial-body on-change classes] :as options}]
   (let [_ (drv/react s dispatch-input-key)]
     [:div.rich-body-editor-container
