@@ -18,7 +18,7 @@
           [:button.mlb-reset
             {:on-click #(if storyboard?
                           (dis/dispatch! [:story-create board-data])
-                          (dis/dispatch! [:entry-edit {}]))}
+                          (dis/dispatch! [:entry-edit {:board-slug (:slug board-data) :board-name (:name board-data)}]))}
             "Add one?"]])
       [:div
         {:class (utils/class-set {:empty-board-image (not storyboard?)
