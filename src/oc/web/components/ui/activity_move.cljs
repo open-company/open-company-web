@@ -47,7 +47,8 @@
     [:div.move-post-inner
       [:div.move-post-title
         "Move"
-        [:i.mdi.mdi-information-outline]]
+        ; [:i.mdi.mdi-information-outline]
+        ]
       [:div.select-new-board
         {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
          :class (when (nil? @(::selected-board s)) "placeholder")}
