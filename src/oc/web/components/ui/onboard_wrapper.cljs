@@ -163,7 +163,7 @@
   [s]
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)]
-    [:div.onboard-lander.second-step.third-step
+    [:div.onboard-lander.third-step
       [:div.steps.three-steps
         [:div.step-1
           "Get Started"]
@@ -230,7 +230,7 @@
                                             (let [orgs @(drv/get-ref s :orgs)]
                                               (if (pos? (count orgs))
                                                 (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
-                                                (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
+                                                (utils/after 100 #(router/nav! oc-urls/slack-lander-team)))))
                                          s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
