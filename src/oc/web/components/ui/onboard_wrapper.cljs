@@ -55,8 +55,9 @@
           "Password"]
         [:input.field
           {:type "password"
-           :pattern ".{5,}"
+           :pattern ".{8,}"
            :value (:pswd signup-with-email)
+           :placeholder "Minimum 8 characters"
            :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)])}]
         [:div.field-description
           "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
@@ -391,7 +392,8 @@
            :class (when collect-pswd-error "error")
            :value (or (:pswd collect-pswd) "")
            :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)])
-           :pattern ".{5,}"}]
+           :placeholder "Minimum 8 characters"
+           :pattern ".{8,}"}]
         [:div.description
           "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
         [:button.continue

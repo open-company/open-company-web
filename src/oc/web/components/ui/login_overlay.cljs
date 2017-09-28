@@ -250,8 +250,8 @@
 ;               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
 ;                :id "sign-up-pswd"
 ;                :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.-value (sel1 [:input.pswd]))])
-;                :pattern ".{4,}"
-;                :placeholder "at least 5 characters"
+;                :pattern ".{8,}"
+;                :placeholder "Minimum 8 characters"
 ;                :type "password"
 ;                :tabIndex 4
 ;                :name "pswd"}]]
@@ -380,8 +380,8 @@
               {:value (:pswd (:collect-name-pswd (rum/react dis/app-state)))
                :id "collect-name-pswd-pswd"
                :on-change #(dis/dispatch! [:input [:collect-name-pswd :pswd] (.-value (sel1 [:input.pswd]))])
-               :pattern ".{4,}"
-               :placeholder "at least 5 characters"
+               :pattern ".{8,}"
+               :placeholder "Minimum 8 characters"
                :type "password"
                :tabIndex 4
                :name "pswd"}]]
@@ -430,8 +430,8 @@
               {:value (:pswd (:collect-pswd (rum/react dis/app-state)))
                :id "collect-pswd-pswd"
                :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.-value (sel1 [:input.pswd]))])
-               :pattern ".{4,}"
-               :placeholder "at least 5 characters"
+               :pattern ".{8,}"
+               :placeholder "Minimum 8 characters"
                :type "password"
                :tabIndex 4
                :name "pswd"}]]
