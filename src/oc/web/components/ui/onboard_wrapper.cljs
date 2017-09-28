@@ -60,7 +60,13 @@
            :placeholder "Minimum 8 characters"
            :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)])}]
         [:div.field-description
-          "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
+          "By signing up you are agreeing to our "
+          [:a
+            "terms of service"]
+          " and "
+          [:a
+            "privacy policy"]
+          "."]
         [:button.continue
           {:disabled (or (not (utils/valid-email? (:email signup-with-email)))
                          (<= (count (:pswd signup-with-email)) 7))
@@ -395,7 +401,13 @@
            :placeholder "Minimum 8 characters"
            :pattern ".{8,}"}]
         [:div.description
-          "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
+          "By signing up you are agreeing to our "
+          [:a
+            "terms of service"]
+          " and "
+          [:a
+            "privacy policy"]
+          "."]
         [:button.continue
           {:disabled (< (count (:pswd collect-pswd)) 8)
            :on-click #(dis/dispatch! [:pswd-collect])}
