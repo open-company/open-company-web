@@ -11,11 +11,9 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
-
-(def default-avatar-url (random-user-image))
 
 (rum/defcs email-lander < rum/static
                           rum/reactive
@@ -80,7 +78,9 @@
                                   (drv/drv :edit-user-profile)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
+                                  (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
+                                                 (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                                  (cook/set-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)) true (* 60 60 24 7))
                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                                  s)
@@ -95,7 +95,11 @@
                                                  s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        temp-user-avatar @(::temp-user-avatar s)
+        fixed-user-data (if (empty? (:avatar-url user-data))
+                          (assoc user-data :avatar-url temp-user-avatar)
+                          user-data)]
     [:div.onboard-lander.second-step
       [:div.steps.three-steps
         [:div.step-1
@@ -117,8 +121,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) temp-user-avatar)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -128,7 +132,7 @@
                         nil
                         (fn [_])
                         nil))}
-          (user-avatar-image user-data)
+          (user-avatar-image fixed-user-data)
           [:div.add-picture-link
             "Upload profile photo"]
           [:div.add-picture-link-subtitle
@@ -226,7 +230,9 @@
                           (drv/drv :edit-user-profile)
                           (drv/drv :orgs)
                           (rum/local false ::saving)
+                          (rum/local nil ::temp-user-avatar)
                           {:will-mount (fn [s]
+                                         (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                          (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                          s)
                            :will-update (fn [s]
@@ -240,7 +246,11 @@
                                          s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        temp-user-avatar @(::temp-user-avatar s)
+        fixed-user-data (if (empty? (:avatar-url user-data))
+                          (assoc user-data :avatar-url temp-user-avatar)
+                          user-data)]
     [:div.onboard-lander
       [:div.steps.two-steps
         [:div.step-1
@@ -256,8 +266,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) temp-user-avatar)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -267,7 +277,7 @@
                         nil
                         (fn [_])
                         nil))}
-          (user-avatar-image user-data)
+          (user-avatar-image fixed-user-data)
           [:div.add-picture-link
             "Upload profile photo"]
           [:div.add-picture-link-subtitle
@@ -417,8 +427,10 @@
                                     (drv/drv :edit-user-profile)
                                     (drv/drv :orgs)
                                     (rum/local false ::saving)
+                                    (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                                   (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
+                                                    (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                                   s)
                                      :will-update (fn [s]
                                                     (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
@@ -430,7 +442,11 @@
                                                     s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        temp-user-avatar @(::temp-user-avatar s)
+        fixed-user-data (if (empty? (:avatar-url user-data))
+                          (assoc user-data :avatar-url temp-user-avatar)
+                          user-data)]
     [:div.onboard-lander.second-step
       [:div.steps.two-steps
         [:div.step-1
@@ -449,8 +465,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) temp-user-avatar)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -460,7 +476,7 @@
                         nil
                         (fn [_])
                         nil))}
-          (user-avatar-image user-data)
+          (user-avatar-image fixed-user-data)
           [:div.add-picture-link
             "Upload profile photo"]
           [:div.add-picture-link-subtitle
