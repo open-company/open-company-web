@@ -72,7 +72,7 @@
   (str "https://docs.google.com/spreadsheets/d/" chart-id "/embed/oimg?id=" chart-id "&oid=" oid "&disposition=ATTACHMENT&bo=false&zx=sohupy30u1p"))
 
 (defn media-chart-add [s editable chart-url]
-  (if (= :dismiss chart-url)
+  (if (nil? chart-url)
     (.addChart editable nil nil nil)
     (let [url-fragment (last (clojure.string/split chart-url #"/spreadsheets/d/"))
           chart-proxy-uri (str "/_/sheets-proxy/spreadsheets/d/" url-fragment)
@@ -188,7 +188,13 @@
     (let [options (first (:rum/args state))
           dispatch-input-key (:dispatch-input-key options)
           on-change (:on-change options)
-          emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
+          inner-html (.-innerHTML body-el)
+          $container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
+          _ (.append (js/$ (.-body js/document)) $container)
+          _ (.remove (js/$ ".rangySelectionBoundary" $container))
+          cleaned-html (.html $container)
+          _ (.detach $container)
+          emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify cleaned-html) "__html"))]
       (on-change emojied-body))))
 
 (defn- setup-editor [s]
@@ -243,11 +249,11 @@
                                (drv/drv :entry-editing)
                                (drv/drv :story-editing)
                                {:did-mount (fn [s]
-                                             (setup-editor s)
-                                             (let [classes (:classes (first (:rum/args s)))]
-                                               (js/console.log "rich-body-editor/did-mount" classes "match:" (string/includes? classes "emoji-autocomplete"))
-                                               (when (string/includes? classes "emoji-autocomplete")
-                                                 (js/emojiAutocomplete)))
+                                             (utils/after 100 #(do
+                                              (setup-editor s)
+                                              (let [classes (:classes (first (:rum/args s)))]
+                                                (when (string/includes? classes "emoji-autocomplete")
+                                                  (js/emojiAutocomplete)))))
                                              s)
                                 :will-update (fn [s]
                                                (let [dispatch-input-key (:dispatch-input-key (first (:rum/args s)))
@@ -255,16 +261,18 @@
                                                      video-data (:media-video data)
                                                      chart-data (:media-chart data)]
                                                   (when @(::media-video s)
-                                                    (when (map? video-data)
-                                                      (media-video-add s @(::editable-ext s) video-data))
+                                                    (if (map? video-data)
+                                                      (media-video-add s @(::editable-ext s) video-data)
+                                                      (media-video-add s @(::editable-ext s) nil))
                                                     (when (or (= video-data :dismiss)
                                                               (map? video-data))
                                                       (reset! (::media-video s) false)
                                                       (dis/dispatch! [:input [dispatch-input-key :media-video] nil])))
                                                   (when (and @(::media-chart s)
                                                              chart-data)
-                                                    (when (map? chart-data)
-                                                      (media-chart-add s @(::editable-ext s) chart-data))
+                                                    (if (map? chart-data)
+                                                      (media-chart-add s @(::editable-ext s) chart-data)
+                                                      (media-chart-add s @(::editable-ext s) nil))
                                                     (when (or (= chart-data :dismiss)
                                                               (string? chart-data))
                                                       (reset! (::media-chart s) false)
@@ -274,10 +282,10 @@
                                                 (when @(::editor s)
                                                   (.destroy @(::editor s)))
                                                 s)}
-  [s {:keys [dispatch-input-key initial-body on-change classes] :as options}]
+  [s {:keys [dispatch-input-key initial-body on-change classes show-placeholder]}]
   (let [_ (drv/react s dispatch-input-key)]
     [:div.rich-body-editor-container
       [:div.rich-body-editor
         {:ref "body"
-         :class (str classes (when @(::did-change s) " medium-editor-placeholder-hidden"))
+         :class (str classes (when (or (not show-placeholder) @(::did-change s)) " medium-editor-placeholder-hidden"))
          :dangerouslySetInnerHTML (utils/emojify initial-body)}]]))
