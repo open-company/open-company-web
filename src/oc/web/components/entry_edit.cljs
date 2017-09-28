@@ -14,29 +14,12 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.media-attachments :refer (media-attachments)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [cljsjs.medium-editor]
             [cljsjs.rangy-selectionsaverestore]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
-
-(defn attachment-upload-success-cb [state res]
-  (let [url    (gobj/get res "url")]
-    (if-not url
-      (dis/dispatch! [:error-banner-show "An error has occurred while processing the file URL. Please try again." 5000])
-      (let [entry-editing   @(drv/get-ref state :entry-editing)
-            attachments (or (:attachments entry-editing) [])
-            attachment-data {:file-name (gobj/get res "filename")
-                             :file-type (gobj/get res "mimetype")
-                             :file-size (gobj/get res "size")
-                             :file-url url}]
-        (dis/dispatch! [:input [:entry-editing :attachments] (vec (conj attachments attachment-data))])
-        (dis/dispatch! [:input [:entry-editing :has-changes] true])))))
-
-(defn attachment-upload-error-cb [state res error]
-  (dis/dispatch! [:error-banner-show "An error has occurred while processing the file. Please try again." 5000]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:entry-edit/dismiss]))
@@ -166,7 +149,6 @@
         entry-editing     (drv/react s :entry-editing)
         alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
-        attachments       (:attachments entry-editing)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
         wh (.-innerHeight js/window)]
     [:div.entry-edit-modal-container
@@ -269,30 +251,13 @@
                              :initial-body @(::initial-body s)
                              :show-placeholder (contains? entry-editing :links)
                              :dispatch-input-key :entry-editing
-                             :media-config ["photo" "video" "chart"]
+                             :media-config ["photo" "video" "chart" "attachment"]
                              :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
           ; Bottom controls
           [:div.entry-edit-controls.group]
-        (media-attachments attachments :entry-editing #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
         [:div.entry-edit-modal-divider]
         [:div.entry-edit-modal-footer.group
-          ;; Attachments button
-          [:button.mlb-reset.attachment
-            {:title "Add an attachment"
-             :type "button"
-             :data-toggle "tooltip"
-             :data-container "body"
-             :data-placement "top"
-             :on-click (fn [e]
-                        (.blur (.-target e))
-                        (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
-                        (iu/upload!
-                         nil
-                         (partial attachment-upload-success-cb s)
-                         nil
-                         (partial attachment-upload-error-cb s)))}
-              [:i.mdi.mdi-paperclip]]
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (dis/dispatch! [:entry-save])
