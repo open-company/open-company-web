@@ -170,7 +170,7 @@
                                        s)
                          :did-mount (fn [s]
                                       (setup-headline s)
-                                      (.focus (rum/ref-node s "title"))
+                                      (utils/to-end-of-content-editable (rum/ref-node s "title"))
                                       s)
                          :did-remount (fn [o s]
                                         (when-let [story-editing @(drv/get-ref s :story-editing)]

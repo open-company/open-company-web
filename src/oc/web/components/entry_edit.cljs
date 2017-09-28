@@ -38,14 +38,12 @@
 (defn attachment-upload-error-cb [state res error]
   (dis/dispatch! [:error-banner-show "An error has occurred while processing the file. Please try again." 5000]))
 
-(defn dismiss-modal [saving?]
-  (dis/dispatch! [:entry-edit/dismiss])
-  (when-not saving?
-    (dis/dispatch! [:input [:entry-editing] nil])))
+(defn dismiss-modal []
+  (dis/dispatch! [:entry-edit/dismiss]))
 
-(defn close-clicked [s & [saving?]]
+(defn close-clicked [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal saving?)))
+  (utils/after 180 #(dismiss-modal)))
 
 (defn unique-slug [topics topic-name]
   (let [slug (atom (s/slug topic-name))]
@@ -149,7 +147,7 @@
                                           (reset! (::remove-no-scroll s) true)
                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
                                       (setup-headline s)
-                                      (utils/after 10 #(.focus (sel1 [:div.entry-edit-headline])))
+                                      (utils/to-end-of-content-editable (rum/ref-node s "headline"))
                                       s)
                          :before-render (fn [s]
                                           (when-let [entry-edit-modal (sel1 [:div.entry-edit-modal])]
