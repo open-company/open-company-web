@@ -287,5 +287,6 @@
     [:div.rich-body-editor-container
       [:div.rich-body-editor
         {:ref "body"
+         :content-editable true
          :class (str classes (when (or (not show-placeholder) @(::did-change s)) " medium-editor-placeholder-hidden"))
          :dangerouslySetInnerHTML (utils/emojify initial-body)}]]))
