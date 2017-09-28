@@ -81,6 +81,7 @@ div.drafts-layout {
           padding: 16px;
           position: relative;
           overflow: hidden;
+          max-height: 290px;
 
           * {
             color: $oc_gray_7;
