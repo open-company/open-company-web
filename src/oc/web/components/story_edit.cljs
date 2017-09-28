@@ -165,7 +165,7 @@
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (when (:uuid story-editing)
                                            (reset! (::initial-title s) (:title story-editing))
-                                           (reset! (::initial-body s) (:body story-editing))
+                                           (reset! (::initial-body s) (if (empty? (:body story-editing)) utils/default-body (:body story-editing)))
                                            (reset! (::activity-uuid s) (:uuid story-editing))))
                                        s)
                          :did-mount (fn [s]
@@ -257,6 +257,8 @@
                     (dropdown-list {:items fixed-storyboards
                                     :value (:board-slug story-data)
                                     :on-change (partial did-select-storyboard-cb s)
+                                    :show-placeholder (or (empty? @(::initial-body s))
+                                                          (= @(::initial-body s) utils/default-body))
                                     :on-blur #(reset! (::show-storyboards-list s) false)})))]
               (when-not (:banner-url story-data)
                 [:div.story-edit-add-banner

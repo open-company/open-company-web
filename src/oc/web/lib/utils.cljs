@@ -1185,3 +1185,5 @@
         body-without-preview (.html $hidden-div)
         _ (.remove $hidden-div)]
     body-without-preview))
+
+(def default-body "<p><br/></p>")

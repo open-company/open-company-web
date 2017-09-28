@@ -127,7 +127,7 @@
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
-                                             initial-body (if (contains? entry-editing :links) (:body entry-editing) "<p><br/></p>")
+                                             initial-body (if (contains? entry-editing :links) (:body entry-editing) utils/default-body)
                                              initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
                                          ;; Load board if it's not already
                                          (when-not @(drv/get-ref s :entry-edit-topics)
@@ -275,6 +275,7 @@
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           (rich-body-editor {:on-change body-on-change
                              :initial-body @(::initial-body s)
+                             :show-placeholder (contains? entry-editing :links)
                              :dispatch-input-key :entry-editing
                              :media-config ["photo" "video" "chart"]
                              :classes "emoji-autocomplete emojiable"})
