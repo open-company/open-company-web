@@ -976,7 +976,16 @@
   (assoc db :entry-editing initial-entry-data))
 
 (defmethod dispatcher/action :entry-edit/dismiss
-  [db [_ show?]]
+  [db [_]]
+  ;; If the user was looking at the modal, dismiss it too
+  (when (router/current-activity-id)
+    (let [current-path @router/path
+          org-slug (router/current-org-slug)
+          board-slug (router/current-board-slug)
+          next-route [org board "dashboard"]
+          next-path {:org org :board board :query-params (:query-params current-path)}]
+      (router/set-route! next-route next-path)
+      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/board org board))))
   (dissoc db :entry-editing))
 
 (defmethod dispatcher/action :topic-add
