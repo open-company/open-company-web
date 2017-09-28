@@ -1,7 +1,6 @@
 (ns oc.web.components.ui.media-video-modal
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -92,7 +91,7 @@
                                                   (reset! (::first-render-done s) true))
                                                 s)
                                 :did-mount (fn [s]
-                                            (utils/after 100 #(.focus (sel1 [:input.media-video-modal-input])))
+                                            (utils/after 100 #(.focus (rum/ref-node s "video-input")))
                                             s)}
   [s dispatch-input-key]
   (let [current-user-data (drv/react s :current-user-data)]
@@ -112,6 +111,7 @@
             [:input.media-video-modal-input
               {:type "text"
                :value @(::video-url s)
+               :ref "video-input"
                :on-change #(reset! (::video-url s) (.. % -target -value))
                :placeholder "Link from YouTube or Vimeo"}]]
           [:div.media-video-modal-buttons.group
