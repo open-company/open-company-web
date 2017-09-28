@@ -85,7 +85,7 @@ function log(){
       if (this._waitingCB) {
         return;
       }
-      log("windowClick", this.getEditorElements()[0], event.target);
+      log("windowClick", event.target, "isEditorDescendant:", MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true), "isPickerDescendant:", MediumEditor.util.isDescendant(this.pickerElement, event.target, true));
       if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
          !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
         this.hide();
