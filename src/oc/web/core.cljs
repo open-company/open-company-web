@@ -156,7 +156,7 @@
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
-    (pre-routing query-params)
+    (pre-routing query-params true)
     ;; save the route
     (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params})
     (when board-sort-or-filter
@@ -168,26 +168,11 @@
               (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
-    (post-routing)
-    ;; render component
-    (drv-root component target)))
-
-;; Component specific to a storyboard
-(defn storyboard-handler [route target component params]
-  (let [org (:org (:params params))
-        storyboard (:storyboard (:params params))
-        story (:story (:params params))
-        query-params (:query-params params)]
-    (when org
-      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
-    (pre-routing query-params)
-    ;; save the route
-    (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
-    ;; do we have the company data already?
-    (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
-                                                    ;; a subset of the company data loaded with a SU
-      (swap! dis/app-state merge {:loading true}))
+    (when (contains? query-params :access)
+      (swap! dis/app-state assoc :org-settings :main))
+    (when (and (contains? query-params :org-settings)
+               (#{:main :team :invite} (keyword (:org-settings query-params))))
+      (swap! dis/app-state assoc :org-settings (keyword (:org-settings query-params))))
     (post-routing)
     ;; render component
     (drv-root component target)))
