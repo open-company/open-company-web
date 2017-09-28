@@ -233,7 +233,7 @@
                                        (utils/event-stop e)
                                        (create-new-topic s))
                            :disabled (empty? (s/trim @(::new-topic s)))}
-                          "Create"])]]]]]]
+                          "Apply"])]]]]]]
         [:div.entry-edit-modal-body
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
