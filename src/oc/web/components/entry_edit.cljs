@@ -10,8 +10,6 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.medium-editor-exts :as editor]
-            [oc.web.components.ui.media-picker :refer (media-picker)]
-            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -37,7 +35,7 @@
 (defn toggle-topics-dd []
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
-(defn body-on-change [body]
+(defn body-on-change [s body]
   (dis/dispatch! [:input [:entry-editing :body] body])
   (dis/dispatch! [:input [:entry-editing :has-changes] true]))
 
@@ -75,12 +73,11 @@
       (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
       (reset! (::new-topic s) ""))))
 
-(defn media-picker-did-change [s]
-  (body-on-change s)
-  (utils/after 100 
-    #(do
-       (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
-       (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))
+(defn add-emoji-cb [s]
+  (headline-on-change s)
+  (let [body (sel1 [:div.rich-body-editor])
+        emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body)) "__html"))]
+    (body-on-change s emojied-body)))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :entry-edit-topics)
@@ -96,9 +93,7 @@
                         (rum/local "" ::new-topic)
                         (rum/local false ::focusing-create-topic)
                         (rum/local false ::remove-no-scroll)
-                        (rum/local "entry-edit-media-picker" ::media-picker-id)
                         (rum/local 330 ::entry-edit-modal-height)
-                        (rum/local false ::media-picker-expanded)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -247,7 +242,7 @@
              :on-blur     #(headline-on-change s)
              :auto-focus true
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (rich-body-editor {:on-change body-on-change
+          (rich-body-editor {:on-change (partial body-on-change s)
                              :initial-body @(::initial-body s)
                              :show-placeholder (not (contains? entry-editing :links))
                              :dispatch-input-key :entry-editing
@@ -258,6 +253,7 @@
           [:div.entry-edit-controls.group]
         [:div.entry-edit-modal-divider]
         [:div.entry-edit-modal-footer.group
+          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (dis/dispatch! [:entry-save])

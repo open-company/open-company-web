@@ -12,7 +12,6 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.media-picker :refer (media-picker)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -153,9 +152,6 @@
                         ;; Banner url
                         (rum/local nil ::banner-url)
                         (rum/local false ::banner-add-did-success)
-                        ;; Media picker
-                        (rum/local "story-edit-media-picker" ::media-picker-id)
-                        (rum/local false ::media-picker-expanded)
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
                         ;; Publish dialog

@@ -302,10 +302,6 @@ div.entry-edit-modal-container {
 
         div.entry-edit-controls {
           margin-bottom: 16px;
-
-          div.emoji-picker {
-            float: right;
-          }
         }
       }
 
@@ -316,6 +312,11 @@ div.entry-edit-modal-container {
       div.entry-edit-modal-footer {
         height: 40px;
         margin: 16px 36px;
+
+        div.emoji-picker {
+          float: left;
+          margin-top: 4px;
+        }
 
         button.attachment {
           float: left;
