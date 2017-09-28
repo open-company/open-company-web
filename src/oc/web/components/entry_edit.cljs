@@ -112,6 +112,7 @@
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
+                        (drv/drv :alert-modal)
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -171,6 +172,7 @@
   (let [topics            (distinct (drv/react s :entry-edit-topics))
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
+        alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
         attachments       (:attachments entry-editing)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
@@ -184,8 +186,12 @@
                     (close-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
-        [:button.carrot-modal-close.mlb-reset
-          {:on-click #(close-clicked s)}]
+        ;; Show the close button only when there are no modals shown
+        (when (and (not (:media-video entry-editing))
+                   (not (:media-chart entry-editing))
+                   (not alert-modal))
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(close-clicked s)}])
         [:div.entry-edit-modal.group
           [:div.entry-edit-modal-header.group
             (user-avatar-image current-user-data)
@@ -270,7 +276,7 @@
           (rich-body-editor {:on-change body-on-change
                              :initial-body @(::initial-body s)
                              :dispatch-input-key :entry-editing
-                             :media-config ["photo" "video" "chart" "divider-line"]
+                             :media-config ["photo" "video" "chart"]
                              :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
           ; Bottom controls
