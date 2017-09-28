@@ -318,8 +318,7 @@
         team-data (dispatcher/team-data team-id)
         auth-link (utils/link-for (:links team-data) "bot")
         user-data (:current-user-data db)
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (oc-urls/org (:slug org-data)))]
-    (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (router/get-token))]
     (router/redirect! fixed-auth-url))
   db)
 
