@@ -569,7 +569,7 @@ function log(){
     },
 
     isRangySelectionBoundary: function(el) {
-      return (el.tagName == "SPAN" && el.classList.contains("rangySelectionBoundary"));
+      return el.classList.contains("rangySelectionBoundary");
     },
 
     isBR: function(el) {
