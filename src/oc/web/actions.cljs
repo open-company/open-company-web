@@ -37,21 +37,6 @@
 
 ;; Get the board to show counting the last accessed and the last created
 
-(defn newest-org [orgs]
-  (first (sort-by :created-at orgs)))
-
-(defn get-default-org [orgs]
-  (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
-    (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
-      (if last-org
-        ; Get the last accessed board from the saved cookie
-        last-org
-        ; Fallback to the newest board if the saved board was not found
-        (newest-org orgs)))
-    (newest-org orgs)))
-
-;; Get the board to show counting the last accessed and the last created
-
 (defn get-default-board [org-data]
   (let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
     (if (= last-board-slug "all-activity")
@@ -93,7 +78,7 @@
         (and (or (utils/in? (:route @router/path) "password-reset")
                  (utils/in? (:route @router/path) "email-verification"))
              (:first-org-redirect db))
-        (let [to-org (get-default-org orgs)]
+        (let [to-org (utils/get-default-org orgs)]
           (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))
         ; If not redirect the user to the first useful org or to the create org UI
         (and (jwt/jwt)
@@ -122,7 +107,7 @@
                                               (cook/remove-cookie! :login-redirect)
                                               (router/redirect! login-redirect))
             ; if the user has only one company, send him to the company dashboard
-            (pos? (count orgs))        (router/nav! (oc-urls/org (:slug (get-default-org orgs)))))))
+            (pos? (count orgs))        (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))
       (-> db
           (dissoc :loading)
           (assoc :orgs orgs)

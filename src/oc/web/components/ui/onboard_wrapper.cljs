@@ -524,6 +524,7 @@
 
 (rum/defcs email-verified < rum/reactive
                             (drv/drv :email-verification)
+                            (drv/drv :orgs)
                             (rum/local false ::exchange-started)
                             (vertical-center-mixin ".onboard-email-container")
                             {:will-mount (fn [s]
@@ -537,7 +538,8 @@
                                           (exchange-token-when-ready s)
                                           s)}
   [s]
-  (let [email-verification (drv/react s :email-verification)]
+  (let [email-verification (drv/react s :email-verification)
+        orgs (drv/react s :orgs)]
     (cond
       (= (:error email-verification) 401)
       [:div.onboard-email-container.error
@@ -549,7 +551,11 @@
       [:div.onboard-email-container
         "Thanks for verifying"
         [:button.mlb-reset.continue
-          {:on-click #(router/nav! oc-urls/confirm-invitation-profile)}
+          {:on-click #(router/nav!
+                        (let [org (utils/get-default-org orgs)]
+                          (if org
+                            (oc-urls/org (:slug org))
+                            oc-urls/login)))}
           "Get Started"]]
       :else
       [:div.onboard-email-container.small.dot-animation

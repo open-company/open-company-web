@@ -1187,3 +1187,16 @@
     body-without-preview))
 
 (def default-body "<p><br/></p>")
+
+(defn newest-org [orgs]
+  (first (sort-by :created-at orgs)))
+
+(defn get-default-org [orgs]
+  (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
+    (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
+      (if last-org
+        ; Get the last accessed board from the saved cookie
+        last-org
+        ; Fallback to the newest board if the saved board was not found
+        (newest-org orgs)))
+    (newest-org orgs)))
