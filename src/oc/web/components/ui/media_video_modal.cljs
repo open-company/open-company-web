@@ -3,8 +3,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.lib.utils :as utils]))
 
 (defn dismiss-modal [s]
   (let [dispatch-input-key (first (:rum/args s))]
@@ -91,7 +90,9 @@
                                                   (reset! (::first-render-done s) true))
                                                 s)
                                 :did-mount (fn [s]
-                                            (utils/after 100 #(.focus (rum/ref-node s "video-input")))
+                                            (utils/after 100
+                                             #(when-let [input-field (rum/ref-node s "video-input")]
+                                                (.focus input-field)))
                                             s)}
   [s dispatch-input-key]
   (let [current-user-data (drv/react s :current-user-data)]
@@ -103,7 +104,6 @@
             {:on-click #(close-clicked s)}]
         [:div.media-video-modal
           [:div.media-video-modal-header.group
-            (user-avatar-image current-user-data)
             [:div.title "Adding a video"]]
           [:div.media-video-modal-divider]
           [:div.media-video-modal-content
