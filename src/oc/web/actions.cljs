@@ -979,13 +979,7 @@
   [db [_]]
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
-    (let [current-path @router/path
-          org-slug (router/current-org-slug)
-          board-slug (router/current-board-slug)
-          next-route [org board "dashboard"]
-          next-path {:org org :board board :query-params (:query-params current-path)}]
-      (router/set-route! next-route next-path)
-      (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/board org board))))
+    (utils/after 1 #(router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
   (dissoc db :entry-editing))
 
 (defmethod dispatcher/action :topic-add
