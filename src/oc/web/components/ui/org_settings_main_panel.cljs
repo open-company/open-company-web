@@ -168,7 +168,7 @@
               [:label
                 "Email Domains"
                 [:i.mdi.mdi-information-outline
-                  {:title "Anyone who signs up with email can contribute to team boards."
+                  {:title "Anyone who signs up with this email domain can contribute to team boards."
                    :data-toggle "tooltip"
                    :data-placement "top"}]]
               (when add-email-domain-team-error
