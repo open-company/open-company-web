@@ -89,7 +89,31 @@ div.activity-modal-container {
 
             div.activity-modal-content-body {
               margin-top: 24px;
+              border: none;
+              outline: none;
+              color: $carrot_dark_gray;
+              @include avenir_R();
+              font-size: 16px;
+              min-height: 85px;
               @include activity-body();
+
+              @include activity-attachment();
+
+              .emojione {
+                @include emoji-size(14);
+              }
+
+              &.medium-editor-placeholder:after {
+                color: $carrot_dark_gray !important;
+              }
+
+              * {
+                color: $carrot_dark_gray;
+              }
+
+              &:after {
+                margin: 0;
+              }
             }
           }
 
