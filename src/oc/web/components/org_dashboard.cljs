@@ -87,7 +87,7 @@
             (board-edit)
             ;; Activity modal
             (and (router/current-activity-id)
-                 (not (:entry-editing-board-loading data)))
+                 (not (:entry-edit-dissmissing data)))
             (let [from-aa (:from-all-activity @router/path)
                   board-slug (if from-aa :all-activity (router/current-board-slug))]
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))

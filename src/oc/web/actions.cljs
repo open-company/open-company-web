@@ -203,9 +203,7 @@
           with-story-editing (if story-editing
                                 (assoc next-db :story-editing story-editing)
                                 next-db)]
-      ;; dissoc a key used to avoid briefly showing the activity modal
-      ;; after edit took place from it
-      (dissoc with-story-editing :entry-editing-board-loading))))
+      with-story-editing)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
@@ -970,9 +968,11 @@
                       (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
                         (oc-urls/all-activity (router/current-org-slug))
                         (oc-urls/board (router/current-org-slug) (router/current-board-slug))))))
+  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed
+  (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
   (-> db
     (dissoc :entry-editing)
-    (assoc :entry-editing-board-loading true)))
+    (assoc :entry-edit-dissmissing true)))
 
 (defmethod dispatcher/action :topic-add
   [db [_ topic-map use-in-new-entry?]]
@@ -1054,9 +1054,7 @@
                       (dissoc (:fixed-items board-data) temp-uuid)
                       (:fixed-items board-data))
         next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
-    (-> db
-      (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-      (dissoc :entry-editing-board-loading))))
+    (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items))))
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug board-filters]]
@@ -1186,18 +1184,17 @@
 
 (defmethod dispatcher/action :all-activity-get/finish
   [db [_ {:keys [org year month body]}]]
-  (let [next-db (dissoc db :entry-editing-board-loading)]
-    (if body
-      (let [all-activity-key (dispatcher/all-activity-key org)
-            fixed-all-activity (utils/fix-all-activity (:collection body))
-            with-calendar-data (-> fixed-all-activity
-                                  (assoc :year year)
-                                  (assoc :month month)
-                                  ;; Force the component to trigger a did-remount
-                                  ;; or it won't see the finish of the loading
-                                  (assoc :rand (rand 1000)))]
-        (assoc-in next-db all-activity-key with-calendar-data))
-      next-db)))
+  (if body
+    (let [all-activity-key (dispatcher/all-activity-key org)
+          fixed-all-activity (utils/fix-all-activity (:collection body))
+          with-calendar-data (-> fixed-all-activity
+                                (assoc :year year)
+                                (assoc :month month)
+                                ;; Force the component to trigger a did-remount
+                                ;; or it won't see the finish of the loading
+                                (assoc :rand (rand 1000)))]
+      (assoc-in db all-activity-key with-calendar-data))
+    db))
 
 (defmethod dispatcher/action :calendar-get
   [db [_]]
