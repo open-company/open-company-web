@@ -118,7 +118,7 @@
                                         (when-not (dommy/has-class? body :no-scroll)
                                           (reset! (::remove-no-scroll s) true)
                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                                      (setup-headline s)
+                                      (utils/after 300 #(setup-headline s))
                                       (utils/to-end-of-content-editable (rum/ref-node s "headline"))
                                       s)
                          :before-render (fn [s]

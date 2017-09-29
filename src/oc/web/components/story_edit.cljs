@@ -53,7 +53,7 @@
     (let [emojied-title   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML title)) "__html"))]
       (update-story-editing state {:title emojied-title}))))
 
-(defn- setup-headline [state]
+(defn- setup-title [state]
   (let [title-el  (rum/ref-node state "title")]
     (events/listen title-el EventType/INPUT #(title-on-change state))
     ;; Make sure the jss lib is loaded before calling it
@@ -167,7 +167,7 @@
                                            (reset! (::activity-uuid s) (:uuid story-editing))))
                                        s)
                          :did-mount (fn [s]
-                                      (setup-headline s)
+                                      (utils/after 300 #(setup-title s))
                                       (utils/to-end-of-content-editable (rum/ref-node s "title"))
                                       s)
                          :did-remount (fn [o s]

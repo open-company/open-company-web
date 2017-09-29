@@ -251,7 +251,7 @@
                                (drv/drv :entry-editing)
                                (drv/drv :story-editing)
                                {:did-mount (fn [s]
-                                             (utils/after 100 #(do
+                                             (utils/after 300 #(do
                                               (setup-editor s)
                                               (let [classes (:classes (first (:rum/args s)))]
                                                 (when (string/includes? classes "emoji-autocomplete")
