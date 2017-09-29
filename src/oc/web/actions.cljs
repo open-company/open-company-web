@@ -203,7 +203,9 @@
           with-story-editing (if story-editing
                                 (assoc next-db :story-editing story-editing)
                                 next-db)]
-      with-story-editing)))
+      ;; dissoc a key used to avoid briefly showing the activity modal
+      ;; after edit took place from it
+      (dissoc with-story-editing :entry-editing-board-loading))))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
@@ -965,7 +967,9 @@
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
     (utils/after 1 #(router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
-  (dissoc db :entry-editing))
+  (-> db
+    (dissoc :entry-editing)
+    (assoc :entry-editing-board-loading true)))
 
 (defmethod dispatcher/action :topic-add
   [db [_ topic-map use-in-new-entry?]]
