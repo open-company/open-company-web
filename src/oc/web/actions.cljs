@@ -966,7 +966,10 @@
   [db [_]]
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
-    (utils/after 1 #(router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
+    (utils/after 1 #(router/nav!
+                      (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
+                        (oc-urls/board (router/current-org-slug) (router/current-board-slug))
+                        (oc-urls/all-activity (router/current-org-slug))))))
   (-> db
     (dissoc :entry-editing)
     (assoc :entry-editing-board-loading true)))
@@ -1183,17 +1186,18 @@
 
 (defmethod dispatcher/action :all-activity-get/finish
   [db [_ {:keys [org year month body]}]]
-  (if body
-    (let [all-activity-key (dispatcher/all-activity-key org)
-          fixed-all-activity (utils/fix-all-activity (:collection body))
-          with-calendar-data (-> fixed-all-activity
-                                (assoc :year year)
-                                (assoc :month month)
-                                ;; Force the component to trigger a did-remount
-                                ;; or it won't see the finish of the loading
-                                (assoc :rand (rand 1000)))]
-      (assoc-in db all-activity-key with-calendar-data))
-    db))
+  (let [next-db (dissoc db :entry-editing-board-loading)]
+    (if body
+      (let [all-activity-key (dispatcher/all-activity-key org)
+            fixed-all-activity (utils/fix-all-activity (:collection body))
+            with-calendar-data (-> fixed-all-activity
+                                  (assoc :year year)
+                                  (assoc :month month)
+                                  ;; Force the component to trigger a did-remount
+                                  ;; or it won't see the finish of the loading
+                                  (assoc :rand (rand 1000)))]
+        (assoc-in next-db all-activity-key with-calendar-data))
+      next-db)))
 
 (defmethod dispatcher/action :calendar-get
   [db [_]]
