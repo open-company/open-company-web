@@ -1037,33 +1037,23 @@
         (assoc-in board-key next-board-data)
         (assoc :board-filters next-board-filters))))
 
-(defn uuid-from-location [location]
-  (let [parts (clojure.string/split location #"/")]
-    (last parts)))
-
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ {:keys [temp-uuid location]}]]
+  [db [_ {:keys [temp-uuid activity-data]}]]
   (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
     ;; FIXME: refresh the last loaded all-activity link
     (when-not is-all-activity
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
-  ;; If i get a location response
-  (if (and (not (empty? location))
-           (not (empty? temp-uuid)))
-    (let [uuid (uuid-from-location location)]
-      ;; And the temp-uuid passed is different than the uuid in the location
-      (when (not= uuid temp-uuid)
-        ;; Move the new activity to the new ID so it won't 404
-        (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-              board-data (get-in db board-key)
-              activity-data (get (:fixed-items board-data) temp-uuid)
-              fixed-activity-data (assoc activity-data :uuid uuid)
-              next-fixed-items (-> board-data
-                                   :fixed-items
-                                   (dissoc temp-uuid)
-                                   (assoc uuid fixed-activity-data))]
-          (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items))))
-    db))
+  ; Add the new activity into the board
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+        board-data (get-in db board-key)
+        fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+        fixed-items (if (not (empty? temp-uuid))
+                      (dissoc (:fixed-items board-data) temp-uuid)
+                      (:fixed-items board-data))
+        next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
+    (-> db
+      (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
+      (dissoc :entry-editing-board-loading))))
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug board-filters]]

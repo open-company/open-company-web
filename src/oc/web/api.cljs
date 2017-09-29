@@ -687,7 +687,7 @@
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body headers] :as resp}]
-          (dispatcher/dispatch! [:entry-save/finish {:temp-uuid temp-uuid :location (get headers "location")}]))))))
+          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :temp-uuid temp-uuid}]))))))
 
 (defn update-entry
   [entry-data]
@@ -698,7 +698,7 @@
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-save/finish]))))))
+          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {})}]))))))
 
 (defn delete-activity [activity-data]
   (when activity-data
