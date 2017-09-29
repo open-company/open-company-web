@@ -1,6 +1,6 @@
 function log(){
   var args = Array.prototype.slice.call(arguments);
-  console.log("MediaPicker", args);
+  console.debug("MediaPicker", args);
 }
 
 (function (root, factory) {
