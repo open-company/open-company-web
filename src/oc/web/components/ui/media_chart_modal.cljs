@@ -45,7 +45,7 @@
               [:div.media-chart-modal-content-ps
                 [:div.content-description-p "1. Open the spreadsheet in Google Sheets"]
                 [:div.content-description-p "2. Click the chart you’d like to insert"]
-                [:div.content-description-p "3. In the top right of the chart, click the down arrow and Publish Chart"]
+                [:div.content-description-p "3. In the top right of the chart, click the ellipse and Publish Chart"]
                 [:div.content-description-p "4. Click the Publish button and copy and paste the link URL provided"]]]
             [:div.content-title "CHART LINK"]
             [:input.media-chart-modal-input
