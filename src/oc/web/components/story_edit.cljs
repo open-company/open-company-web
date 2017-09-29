@@ -294,7 +294,7 @@
            :placeholder default-story-title
            :on-paste    #(title-on-paste s %)
            :on-key-down #(title-on-change s)
-           :on-click #(title-on-change s)
+           :on-click    #(title-on-change s)
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         (rich-body-editor {:on-change (partial body-on-change s)
                            :initial-body @(::initial-body s)

@@ -236,10 +236,8 @@
              :ref "headline"
              :placeholder "Title this (if you like)"
              :on-paste    #(headline-on-paste s %)
-             :on-key-Up   #(headline-on-change s)
              :on-key-down #(headline-on-change s)
-             :on-focus    #(headline-on-change s)
-             :on-blur     #(headline-on-change s)
+             :on-click    #(headline-on-change s)
              :auto-focus true
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           (rich-body-editor {:on-change (partial body-on-change s)
