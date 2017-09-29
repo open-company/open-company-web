@@ -967,7 +967,12 @@
     (utils/after 1 #(router/nav!
                       (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
                         (oc-urls/all-activity (router/current-org-slug))
-                        (oc-urls/board (router/current-org-slug) (router/current-board-slug))))))
+                        (let [board-filters (:board-filters db)]
+                          (if (string? board-filters)
+                            (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
+                            (if (= :by-topic board-filters)
+                              (oc-urls/board-sort-by-topic (router/current-org-slug) (router/current-board-slug))
+                              (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
   (-> db
