@@ -203,7 +203,7 @@ $h2_top_margin: 20;
   }
 }
 
-@mixin activity-attachment(){
+@mixin activity-attachment($show-remove-button: true){
   a.media-attachment {
     display: inline-block;
     width: 100%;
@@ -226,9 +226,10 @@ $h2_top_margin: 20;
       label.media-attachment-title {
         text-decoration: underline;
       }
-
-      button.remove-attachment {
-        display: block;
+      @if $show-remove-button == true {
+        button.remove-attachment {
+          display: block;
+        }
       }
     }
 
