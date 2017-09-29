@@ -678,7 +678,7 @@
 (def entry-keys [:headline :body :topic-name :attachments :title :board-slug :storyboard-slug])
 
 (defn create-entry
-  [entry-data]
+  [entry-data temp-uuid]
   (when entry-data
     (let [board-data (dispatcher/board-data)
           create-entry-link (utils/link-for (:links board-data) "create")
@@ -686,8 +686,8 @@
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-save/finish]))))))
+        (fn [{:keys [status success body headers] :as resp}]
+          (dispatcher/dispatch! [:entry-save/finish {:temp-uuid temp-uuid :location (get headers "location")}]))))))
 
 (defn update-entry
   [entry-data]
