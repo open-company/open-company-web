@@ -61,11 +61,13 @@
    :solid-button-cb The function to execute when the second button is clicked."
   [s]
   (let [alert-modal (drv/react s :alert-modal)
+        action (if (empty? (:action alert-modal)) "no-action" (:action alert-modal))
         has-buttons (or (:link-button-title alert-modal)
                         (:solid-button-title alert-modal))]
     [:div.alert-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})
+                                :appear (and (not @(::dismiss s)) @(::first-render-done s))
+                                action true})
        :on-click #(when-not has-buttons
                     (dis/dispatch! [:alert-modal-hide]))}
       [:div.modal-wrapper

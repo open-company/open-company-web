@@ -30,6 +30,7 @@
   "Show an error alert view for failed uploads."
   []
   (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "org-settings-main-logo-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"

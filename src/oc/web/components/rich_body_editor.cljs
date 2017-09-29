@@ -23,6 +23,7 @@
 
 (defn attachment-upload-failed-cb [state editable]
   (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "attachment-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your file."
                     :solid-button-title "OK"
@@ -110,6 +111,7 @@
   "Show an error alert view for failed uploads."
   []
   (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "media-photo-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"

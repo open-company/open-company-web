@@ -49,6 +49,7 @@
             (and (= :invite active-tab)
                  has-unsent-invites))
       (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "org-settings-unsaved-edits"
                         :message "There are unsaved edits. OK to delete them?"
                         :link-button-title "Cancel"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])

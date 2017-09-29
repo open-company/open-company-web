@@ -97,6 +97,7 @@
   "Show an error alert view for failed uploads."
   []
   (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "banner-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
@@ -111,6 +112,7 @@
 (defn delete-clicked [e story-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-journal"
                     :message "Delete this journal entry?"
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])

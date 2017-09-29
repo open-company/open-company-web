@@ -62,6 +62,7 @@
 (defn close-cb [orgs current-user-data]
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
+                      :action "user-profile-unsaved-edits"
                       :message "There are unsaved edits. OK to delete them?"
                       :link-button-title "Cancel"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
