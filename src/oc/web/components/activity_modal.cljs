@@ -76,8 +76,8 @@
                                           ;; Add no-scroll to the body to avoid scrolling while showing this modal
                                           (dommy/add-class! (sel1 [:body]) :no-scroll)
                                           ;; Scroll to the bottom of the comments box
-                                          (let [el (sel1 [:div.activity-right-column-content])]
-                                           (set! (.-scrollTop el) (.-scrollHeight el)))
+                                          (when-let [el (rum/ref-node s "activity-right-column-content")]
+                                            (set! (.-scrollTop el) (.-scrollHeight el)))
                                           (let [activity-data (first (:rum/args s))]
                                             (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
                                              "show.bs.dropdown"
@@ -196,4 +196,5 @@
             [:div.activity-right-column
               {:style (when column-height {:minHeight (str column-height "px")})}
               [:div.activity-right-column-content
+                {:ref "activity-right-column-content"}
                 (comments activity-data)]])]]]))
