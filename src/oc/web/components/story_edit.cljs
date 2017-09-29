@@ -300,6 +300,7 @@
                            :initial-body @(::initial-body s)
                            :show-placeholder (or (empty? @(::initial-body s))
                                                  (= @(::initial-body s) utils/default-body))
+                           :show-h2 true
                            :dispatch-input-key :story-editing
                            :media-config ["photo" "video" "chart" "attachment" "divider-line"]
                            :classes "emoji-autocomplete emojiable"})]

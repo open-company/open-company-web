@@ -245,6 +245,7 @@
           (rich-body-editor {:on-change (partial body-on-change s)
                              :initial-body @(::initial-body s)
                              :show-placeholder (not (contains? entry-editing :links))
+                             :show-h2 false
                              :dispatch-input-key :entry-editing
                              :media-config ["photo" "video" "chart" "attachment"]
                              :classes "emoji-autocomplete emojiable"})

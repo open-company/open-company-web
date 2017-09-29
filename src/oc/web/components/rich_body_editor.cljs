@@ -210,8 +210,8 @@
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
         body-placeholder (body-placeholder)
         buttons (if show-subtitle
-                  ["bold" "italic" "unorderedlist" "anchor"]
-                  ["bold" "italic" "h2" "unorderedlist" "anchor"])
+                  ["bold" "italic" "h2" "unorderedlist" "anchor"]
+                  ["bold" "italic" "unorderedlist" "anchor"])
         options {:toolbar #js {:buttons (clj->js buttons)}
                  :buttonLabels "fontawesome"
                  :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
