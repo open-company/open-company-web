@@ -85,7 +85,6 @@ $(document).ready(function(){
   // }
 
   var jwt = getCookie(cookieName());
-  console.log("jwt", jwt, "cookies", document.cookie);
   if (jwt) {
     $("#site-header-login-item").hide();
   }
