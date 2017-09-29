@@ -968,8 +968,8 @@
   (when (router/current-activity-id)
     (utils/after 1 #(router/nav!
                       (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
-                        (oc-urls/board (router/current-org-slug) (router/current-board-slug))
-                        (oc-urls/all-activity (router/current-org-slug))))))
+                        (oc-urls/all-activity (router/current-org-slug))
+                        (oc-urls/board (router/current-org-slug) (router/current-board-slug))))))
   (-> db
     (dissoc :entry-editing)
     (assoc :entry-editing-board-loading true)))
