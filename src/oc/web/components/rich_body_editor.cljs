@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [cljsjs.medium-editor]
             [goog.dom :as gdom]
@@ -211,13 +212,14 @@
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
         body-placeholder (body-placeholder)
         buttons (if show-subtitle
-                  ["bold" "italic" "h2" "unorderedlist" "anchor"]
-                  ["bold" "italic" "unorderedlist" "anchor"])
+                  ["custombold" "italic" "h2" "unorderedlist" "anchor"]
+                  ["custombold" "italic" "unorderedlist" "anchor"])
         options {:toolbar #js {:buttons (clj->js buttons)}
                  :buttonLabels "fontawesome"
                  :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
-                 :extensions #js {:autolist (js/AutoList.)
-                                  :media-picker media-picker-ext}
+                 :extensions #js {"autolist" (js/AutoList.)
+                                  "media-picker" media-picker-ext
+                                  "custombold" (new js/CustomBold)}
                  :autoLink true
                  :anchor #js {:customClassOption nil
                               :customClassOptionText "Button"
@@ -228,8 +230,8 @@
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML false}
                  :placeholder #js {:text body-placeholder
-                                   :hideOnClick true}}
-        body-editor  (new js/MediumEditor body-el (clj->js options))]
+                                   :hideOnClick true}}]
+    (let [body-editor  (new js/MediumEditor body-el (clj->js options))]
     (reset! (::editable-ext s) media-picker-ext)
     (.subscribe body-editor
                 "editableInput"
@@ -237,7 +239,7 @@
                   (body-on-change s)))
     (reset! (::editor s) body-editor)
     ; (js/recursiveAttachPasteListener body-el #(body-on-change s))
-    ))
+    )))
 
 (rum/defcs rich-body-editor  < rum/reactive
                                (rum/local false ::did-change)
