@@ -7,7 +7,6 @@
             [goog.events.EventType :as EventType]
             [goog.object :as googobj]
             [cljsjs.emojione-picker]
-            [cljsjs.rangy-selectionsaverestore]
             [cljsjs.react]
             [cljsjs.react.dom]))
 
