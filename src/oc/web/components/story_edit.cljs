@@ -49,7 +49,7 @@
   (update-story-editing s {:body body}))
 
 (defn- title-on-change [state]
-  (when-let [title (sel1 [:div.story-edit-title])]
+  (when-let [title (rum/ref-node state "title")]
     (let [emojied-title   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML title)) "__html"))]
       (update-story-editing state {:title emojied-title}))))
 
@@ -129,7 +129,7 @@
       (update-story-editing s {:board-slug (:value storyboard) :storyboard-name (:label storyboard) :redirect true})
       (reset! (::show-storyboards-list s) false))))
 
-(defn add-emoji-cb [s]
+(defn add-emoji-cb [s _ _]
   (title-on-change s)
   (let [body (sel1 [:div.rich-body-editor])
         emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body)) "__html"))]
@@ -293,10 +293,8 @@
            :ref "title"
            :placeholder default-story-title
            :on-paste    #(title-on-paste s %)
-           :on-key-Up   #(title-on-change s)
            :on-key-down #(title-on-change s)
-           :on-focus    #(title-on-change s)
-           :on-blur     #(title-on-change s)
+           :on-click #(title-on-change s)
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         (rich-body-editor {:on-change (partial body-on-change s)
                            :initial-body @(::initial-body s)
