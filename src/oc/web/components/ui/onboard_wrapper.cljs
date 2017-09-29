@@ -173,7 +173,7 @@
   [s]
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)]
-    [:div.onboard-lander.third-step
+    [:div.onboard-lander.second-step.third-step
       [:div.steps.three-steps
         [:div.step-1
           "Get Started"]
