@@ -1097,9 +1097,8 @@
   (let [is-all-activity (utils/in? (:route @router/path) "all-activity")
         board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get-in db board-key)
-        filtered-entries (filter #(not= (:uuid %) (:uuid activity-data)) (get board-data :fixed-items))
-        sorted-entries (vec (sort-by :created-at filtered-entries))
-        next-board-data (assoc board-data :fixed-items sorted-entries)]
+        next-fixed-items (dissoc (:fixed-items board-data) (:uuid activity-data))
+        next-board-data (assoc board-data :fixed-items next-fixed-items)]
     (api/delete-activity activity-data)
     (assoc-in db board-key next-board-data)))
 
