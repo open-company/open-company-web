@@ -13,7 +13,6 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [cljsjs.medium-editor]
             [cljsjs.rangy-selectionsaverestore]
             [goog.object :as gobj]
             [goog.events :as events]

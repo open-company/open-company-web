@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [cljsjs.medium-editor]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
