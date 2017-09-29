@@ -238,7 +238,10 @@
              :on-paste    #(headline-on-paste s %)
              :on-key-down #(headline-on-change s)
              :on-click    #(headline-on-change s)
-             :auto-focus true
+             :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           (rich-body-editor {:on-change (partial body-on-change s)
                              :initial-body @(::initial-body s)

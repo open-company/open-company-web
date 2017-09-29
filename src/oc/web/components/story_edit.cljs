@@ -295,6 +295,10 @@
            :on-paste    #(title-on-paste s %)
            :on-key-down #(title-on-change s)
            :on-click    #(title-on-change s)
+           :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
         (rich-body-editor {:on-change (partial body-on-change s)
                            :initial-body @(::initial-body s)
