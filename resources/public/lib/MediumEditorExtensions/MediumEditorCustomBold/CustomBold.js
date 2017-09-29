@@ -20,5 +20,10 @@ var CustomBold = MediumEditor.extensions.button.extend({
   handleClick: function (event) {
     this.classApplier.toggleSelection();
     this.base.checkContentChanged();
+    if (this.isActive()){
+      this.setInactive();
+    } else {
+      this.setActive();
+    }
   }
 });
