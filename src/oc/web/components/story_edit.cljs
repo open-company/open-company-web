@@ -54,7 +54,8 @@
 
 (defn- setup-title [state]
   (let [title-el  (rum/ref-node state "title")]
-    (events/listen title-el EventType/INPUT #(title-on-change state))
+    (when title-el
+      (reset! (::title-input-listener state) (events/listen title-el EventType/INPUT #(title-on-change state))))
     ;; Make sure the jss lib is loaded before calling it
     (utils/after 2500 #(js/emojiAutocomplete))))
 
@@ -157,6 +158,8 @@
                         (rum/local nil ::show-storyboards-list)
                         ;; Publish dialog
                         (rum/local false ::show-publish-modal)
+                        ;; Title input listener
+                        (rum/local nil ::title-input-listener)
                         {:will-mount (fn [s]
                                        (utils/after 100 #(dis/dispatch! [:story-get]))
                                        (let [story-editing @(drv/get-ref s :story-editing)]
@@ -192,6 +195,9 @@
                                         (when @(::body-editor s)
                                           (.destroy @(::body-editor s))
                                           (reset! (::body-editor s) nil))
+                                        (when @(::title-input-listener s)
+                                          (events/unlistenByKey @(::title-input-listener s))
+                                          (reset! (::title-input-listener s) nil))
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)

@@ -13,7 +13,6 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [cljsjs.rangy-selectionsaverestore]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -46,7 +45,7 @@
 
 (defn- setup-headline [state]
   (let [headline-el  (rum/ref-node state "headline")]
-    (events/listen headline-el EventType/INPUT #(headline-on-change state))
+    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
     (js/emojiAutocomplete)))
 
 (defn headline-on-paste
@@ -93,6 +92,7 @@
                         (rum/local false ::focusing-create-topic)
                         (rum/local false ::remove-no-scroll)
                         (rum/local 330 ::entry-edit-modal-height)
+                        (rum/local nil ::headline-input-listener)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -136,6 +136,9 @@
                                          (when @(::body-editor s)
                                            (.destroy @(::body-editor s))
                                            (reset! (::body-editor s) nil))
+                                         (when @(::headline-input-listener s)
+                                           (events/unlistenByKey @(::headline-input-listener s))
+                                           (reset! (::headline-input-listener s) nil))
                                          s)}
   [s]
   (let [topics            (distinct (drv/react s :entry-edit-topics))
