@@ -968,7 +968,7 @@
                       (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
                         (oc-urls/all-activity (router/current-org-slug))
                         (oc-urls/board (router/current-org-slug) (router/current-board-slug))))))
-  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed
+  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
   (-> db
     (dissoc :entry-editing)
@@ -1054,7 +1054,7 @@
                       (dissoc (:fixed-items board-data) temp-uuid)
                       (:fixed-items board-data))
         next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
-    (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items))))
+    (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)))
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug board-filters]]
