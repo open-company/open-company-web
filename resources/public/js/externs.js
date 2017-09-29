@@ -65,6 +65,8 @@ MediaPicker.addPhoto = function(){};
 MediaPicker.addVideo = function(){};
 MediaPicker.addChart = function(){};
 MediaPicker.addAttachment = function(){};
+// MediumEditorCustomBold
+var CustomBold = function(){};
 // Tooltip http://darsa.in/tooltip/
 var Tooltip = function(){};
 // Debug app state
@@ -103,3 +105,11 @@ var mailchimpApiSubmit = function(){};
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};
 var isIE = function(){};
+// Rangy
+var rangy = function(){};
+rangy.createClassApplier = function(){};
+rangy.init = function(){};
+rangy.saveSelection = function(){};
+rangy.removeMarkers = function(){};
+rangy.restoreSelection = function(){};
+rangy.getSelection = function(){};
