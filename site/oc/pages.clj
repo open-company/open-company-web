@@ -425,6 +425,10 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
+          ;; Rangy
+          [:script {:type "text/javascript" :src "/lib/rangy/rangy-core.js"}]
+          [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]
+          [:script {:type "text/javascript" :src "/lib/rangy/rangy-selectionsaverestore.js"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
@@ -450,6 +454,8 @@
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorMediaPicker
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
+          ;; MediumEditorCustomBold
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorCustomBold/CustomBold.js"}]
           ;; Static js files
           [:script {:src (cdn "/js/static-js.js")}]
           [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
