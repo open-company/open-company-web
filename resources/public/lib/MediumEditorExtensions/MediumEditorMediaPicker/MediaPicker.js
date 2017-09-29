@@ -46,6 +46,7 @@ function log(){
 
     init: function(){
       log("init", this);
+      rangy.init();
       // Create picker
       this.pickerElement = this.createPicker();
       this.getEditorElements()[0].parentNode.appendChild(this.pickerElement);
