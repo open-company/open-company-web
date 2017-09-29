@@ -153,7 +153,7 @@ function log(){
     /**/
     getAddableElement: function(element) {
       // If the element is not a P or a DIV clib the tree back to the first P or DIV
-      while(element !== this.getEditorElements()[0] &&  element.tagName !== "DIV" && element.tagName !== "P") {
+      while(!MediumEditor.util.isMediumEditorElement(element) &&  element.tagName !== "DIV" && element.tagName !== "P") {
         element = element.parentNode;
       }
       return element;
