@@ -489,13 +489,16 @@
            (contains? (:user user) :slack-org-id)
            (contains? (:user user) :slack-id))))
 
-(defn duplicated-user [user team-data]
-  (let [is-email (= (:type user) "email")]
-    (when is-email
-      (let [parsed-email (utils/parse-input-email (:user user))
-            duplicated-user (first (filter #(= (:email %) (:address parsed-email)) (:users team-data)))]
-        (and duplicated-user
-             (not= (string/lower-case (:status duplicated-user)) "pending"))))))
+(defn duplicated-email-addresses [user users-list]
+  (when (= (:type user) "email")
+    (> (count (filter #(= (:user %) (:address (utils/parse-input-email (:user user)))) users-list)) 1)))
+
+(defn duplicated-team-user [user users-list]
+  (when (= (:type user) "email")
+    (let [parsed-email (utils/parse-input-email (:user user))
+          dup-user (first (filter #(= (:email %) (:address parsed-email)) users-list))]
+      (and dup-user
+           (not= (string/lower-case (:status dup-user)) "pending")))))
 
 (defmethod dispatcher/action :invite-users
   [db [_]]
@@ -504,12 +507,15 @@
         invite-users (:invite-users db)
         checked-users (for [user invite-users]
                         (let [valid? (valid-inviting-user? user)
-                              duplicated? (duplicated-user user team-data)]
+                              intive-duplicated? (duplicated-email-addresses user invite-users)
+                              team-duplicated? (duplicated-team-user user (:users team-data))]
                           (cond
                             (not valid?)
                             (merge user {:error true :success false})
-                            duplicated?
+                            team-duplicated?
                             (merge user {:error "User already active" :success false})
+                            intive-duplicated?
+                            (merge user {:error "Duplicated email address" :success false})
                             :else
                             (dissoc user :error))))
         cleaned-invite-users (vec (filter #(not (:error %)) checked-users))]
