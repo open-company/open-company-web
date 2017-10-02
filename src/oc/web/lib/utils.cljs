@@ -1200,3 +1200,11 @@
         ; Fallback to the newest board if the saved board was not found
         (newest-org orgs)))
     (newest-org orgs)))
+
+(defn clean-body-html [inner-html]
+  (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
+        _ (.append (js/$ (.-body js/document)) $container)
+        _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        cleaned-html (.html $container)
+        _ (.detach $container)]
+    (emoji-images-to-unicode (gobj/get (emojify cleaned-html) "__html"))))
