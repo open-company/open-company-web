@@ -89,7 +89,7 @@ $(document).ready(function(){
     $("#site-header-login-item").hide();
   }
   $("#site-header-signup-item").text( jwt? "Your Newsboard" : "Sign Up" );
-  $("#site-header-signup-item").attr("onClick", jwt? "window.location = \"/login\"" : "window.location = \"/sign-up\"");
+  $("#site-header-signup-item").attr("onClick", jwt? "window.location = \"/login\"" : "window.location = \"/login?slack\"");
 });
 
 function getParameterByName(name, url) {
