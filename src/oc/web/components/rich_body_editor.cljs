@@ -223,7 +223,7 @@
                  :placeholder #js {:text body-placeholder
                                    :hideOnClick true}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
-    (reset! (::media-picker-ext s) body-editor)
+    (reset! (::media-picker-ext s) media-picker-ext)
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
