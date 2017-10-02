@@ -35,9 +35,12 @@
   (reset! (::last-timeout s)
    (utils/after default-save-wait
     (fn []
-      (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html (.-innerHTML (sel1 [:div.rich-body-editor])))])
-      (dis/dispatch! [:draft-autosave])
-      (reset! (::central-message s) "saving...")))))
+      (let [story-editing @(drv/get-ref s :story-editing)
+            raw-body (:raw-body story-editing)
+            final-body (if (not (empty? raw-body)) raw-body (:body story-editing))]
+        (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html final-body)])
+        (dis/dispatch! [:draft-autosave])
+        (reset! (::central-message s) "saving..."))))))
 
 (defn update-story-editing [s new-data]
   (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) new-data {:has-changes true})])
@@ -46,7 +49,7 @@
 ;; Body change handling
 
 (defn body-on-change [s]
-  (update-story-editing s {}))
+  (update-story-editing s {:raw-body (.-innerHTML (sel1 [:div.rich-body-editor]))}))
 
 (defn- title-on-change [state]
   (when-let [title (rum/ref-node state "title")]
