@@ -35,6 +35,7 @@
   (reset! (::last-timeout s)
    (utils/after default-save-wait
     (fn []
+      (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html (.-innerHTML (sel1 [:div.rich-body-editor])))])
       (dis/dispatch! [:draft-autosave])
       (reset! (::central-message s) "saving...")))))
 
@@ -44,12 +45,8 @@
 
 ;; Body change handling
 
-(defn clean-body []
-  (let [raw-html (.-innerHTML (sel1 [:div.rich-body-editor]))]
-    (utils/clean-body-html raw-html)))
-
 (defn body-on-change [s]
-  (update-story-editing s {:body (clean-body)}))
+  (update-story-editing s {}))
 
 (defn- title-on-change [state]
   (when-let [title (rum/ref-node state "title")]
@@ -237,7 +234,9 @@
             "Delete"]
           (when (= "draft" (:status story-data))
             [:button.mlb-reset.mlb-default.post-button
-              {:on-click #(reset! (::show-publish-modal s) true)}
+              {:on-click #(do
+                            (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html (.-innerHTML (sel1 [:div.rich-body-editor])))])
+                            (reset! (::show-publish-modal s) true))}
               "Post"])]]
       [:div.story-edit-content
         [:div.story-edit-content-authorship.group
