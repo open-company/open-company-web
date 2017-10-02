@@ -6,8 +6,7 @@
             [oc.web.lib.utils :as utils]))
 
 (defn dismiss-modal [s]
-  (let [dispatch-input-key (first (:rum/args s))]
-    (dis/dispatch! [:input [dispatch-input-key :media-video] :dismiss])))
+  (dis/dispatch! [:input [:media-input :media-video] :dismiss]))
 
 (defn close-clicked [s & [no-dismiss]]
   (reset! (::dismiss s) true)
@@ -31,11 +30,10 @@
      :type (if (or (nth y-groups 1) (nth y2-groups 1)) :youtube :vimeo)}))
 
 (defn- get-vimeo-thumbnail-success [s video res]
-  (let [dispatch-input-key (first (:rum/args s))
-        resp (aget res 0)
+  (let [resp (aget res 0)
         thumbnail (aget resp "thumbnail_small")
         video-data (assoc video :thumbnail thumbnail)]
-    (dis/dispatch! [:input [dispatch-input-key :media-video] video-data])
+    (dis/dispatch! [:input [:media-input :media-video] video-data])
     (close-clicked s true)))
 
 (def _retry (atom 0))
@@ -48,8 +46,8 @@
     ; Retry at most 3 times to load the video details
     (get-vimeo-thumbnail s video)
     ;; Add the video without thumbnail
-    (let [dispatch-input-key (nth (:rum/args s) 1)]
-      (dis/dispatch! [:input [dispatch-input-key :media-video] video])
+    (do
+      (dis/dispatch! [:input [:media-input :media-video] video])
       (close-clicked s true))))
 
 (defn- get-vimeo-thumbnail [s video]
@@ -72,12 +70,11 @@
 
 (defn video-add-click [s]
   (when (valid-video-url? @(::video-url s))
-    (let [dispatch-input-key (first (:rum/args s))
-          video-data (get-video-data @(::video-url s))]
+    (let [video-data (get-video-data @(::video-url s))]
       (if (= :vimeo (:type video-data))
         (get-vimeo-thumbnail s video-data)
         (do
-          (dis/dispatch! [:input [dispatch-input-key :media-video] video-data])
+          (dis/dispatch! [:input [:media-input :media-video] video-data])
           (close-clicked s true))))))
 
 (rum/defcs media-video-modal < (rum/local false ::first-render-done)
@@ -94,7 +91,7 @@
                                              #(when-let [input-field (rum/ref-node s "video-input")]
                                                 (.focus input-field)))
                                             s)}
-  [s dispatch-input-key]
+  [s]
   (let [current-user-data (drv/react s :current-user-data)]
     [:div.media-video-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))

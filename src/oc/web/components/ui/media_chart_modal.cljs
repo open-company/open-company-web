@@ -6,8 +6,7 @@
             [oc.web.lib.utils :as utils]))
 
 (defn dismiss-modal [s]
-  (let [dispatch-input-key (first (:rum/args s))]
-    (dis/dispatch! [:input [dispatch-input-key :media-chart] :dismiss])))
+  (dis/dispatch! [:input [:media-input :media-chart] :dismiss]))
 
 (defn close-clicked [s & [no-dismiss]]
   (reset! (::dismiss s) true)
@@ -28,7 +27,7 @@
                                              #(when-let [input-field (rum/ref-node s "chart-input")]
                                                 (.focus input-field)))
                                             s)}
-  [s dispatch-input-key]
+  [s]
   (let [current-user-data (drv/react s :current-user-data)]
     [:div.media-chart-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
@@ -58,7 +57,7 @@
             [:button.mlb-reset.mlb-default
               {:on-click #(when (utils/valid-google-chart-url? @(::chart-url s))
                             (let [chart-data (utils/clean-google-chart-url @(::chart-url s))]
-                              (dis/dispatch! [:input [dispatch-input-key :media-chart] chart-data]))
+                              (dis/dispatch! [:input [:media-input :media-chart] chart-data]))
                             (close-clicked s true))
                :disabled (not (utils/valid-google-chart-url? @(::chart-url s)))}
               "Add"]

@@ -39,8 +39,6 @@
 
 (defcomponent org-dashboard [data owner]
 
-  (init-state [_])
-
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
     (refresh-board-data)
@@ -95,13 +93,13 @@
           (when (:alert-modal data)
             (alert-modal))
           ;; Media video modal for entry editing
-          (when (and (:entry-editing data)
-                     (:media-video (:entry-editing data)))
-            (media-video-modal :entry-editing))
+          (when (and (:media-input data)
+                     (:media-video (:media-input data)))
+            (media-video-modal))
           ;; Media chart modal for entry editing
-          (when (and (:entry-editing data)
-                     (:media-chart (:entry-editing data)))
-            (media-chart-modal :entry-editing))
+          (when (and (:media-input data)
+                     (:media-chart (:media-input data)))
+            (media-chart-modal))
           (dom/div {:class "page"}
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
@@ -119,7 +117,6 @@
                    :card-width card-width
                    :columns-num columns-num
                    :show-login-overlay (:show-login-overlay data)
-                   :entry-editing (:entry-editing data)
                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                    :is-dashboard true
                    :board-filters (:board-filters data)
