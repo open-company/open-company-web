@@ -130,7 +130,7 @@ $h2_top_margin: 20;
   }
 }
 
-@mixin activity-body(){
+@mixin activity-body($font-size: 16){
 
   &.medium-editor-placeholder-hidden:after {
     display: none !important;
@@ -138,13 +138,13 @@ $h2_top_margin: 20;
 
   &.medium-editor-placeholder:after {
     @include avenir_R();
-    font-size: 16px;
+    font-size: #{$font-size}px;
     color: $carrot_light_gray_1;
     font-style: none !important;
   }
 
   @include avenir_R();
-  font-size: 16px;
+  font-size: #{$font-size}px;
   color: $carrot_dark_gray;
 
   * {
@@ -163,7 +163,7 @@ $h2_top_margin: 20;
 
   h2 {
     margin-top: #{$bottom_margin + $h2_top_margin}px;
-    font-size: 19px;
+    font-size: #{$font-size + 1}px;
     @include avenir_H();
   }
 
@@ -182,7 +182,7 @@ $h2_top_margin: 20;
   }
 
   .emojione {
-    @include emoji-size(14);
+    @include emoji-size($font-size - 2);
   }
 
   p:last-child, & > div:last-child {

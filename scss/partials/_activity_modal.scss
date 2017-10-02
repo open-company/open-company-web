@@ -99,10 +99,6 @@ div.activity-modal-container {
 
               @include activity-attachment();
 
-              .emojione {
-                @include emoji-size(14);
-              }
-
               &.medium-editor-placeholder:after {
                 color: $carrot_dark_gray !important;
               }

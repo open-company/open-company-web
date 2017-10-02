@@ -105,9 +105,8 @@ div.secure-story-container {
 
       div.story-body {
         margin-top: 40px;
-        @include activity-body();
+        @include activity-body(20);
         @include avenir_M();
-        font-size: 20px;
         color: $oc_gray_7;
         padding-bottom: 50px;
         * {

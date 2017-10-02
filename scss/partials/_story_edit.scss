@@ -300,9 +300,8 @@ div.story-edit-container {
 
       div.rich-body-editor {
         margin-top: 8px;
-        @include activity-body();
+        @include activity-body(20);
         @include avenir_M();
-        font-size: 20px;
         color: $oc_gray_7;
         outline: none;
         cursor: text;
