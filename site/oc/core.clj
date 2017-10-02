@@ -87,7 +87,7 @@
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
-                {:href "/sign-up"
+                {:href "/login?slack"
                  :id "site-header-signup-item"}
                 "Sign Up"]
               ; [:div.mobile-already-account

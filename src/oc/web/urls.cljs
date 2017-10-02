@@ -26,6 +26,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
+(def sign-up-with-slack "/login?slack")
 (def sign-up "/sign-up")
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")

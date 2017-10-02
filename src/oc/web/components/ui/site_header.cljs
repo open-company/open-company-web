@@ -68,4 +68,4 @@
             [:div.get-started-button.navbar-item
               (if (jwt/jwt)
                 [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Newsboard"]
-                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/sign-up)} "Sign Up"])]]]]]])
+                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/sign-up-with-slack)} "Sign Up"])]]]]]])

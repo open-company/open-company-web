@@ -225,7 +225,9 @@
       (timbre/info "Routing login-route" urls/login)
       (when (and (not (contains? (:query-params params) :jwt))
                  (not (jwt/jwt)))
-        (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
+        (if (contains? (:query-params params) :slack)
+          (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
+          (swap! dis/app-state assoc :show-login-overlay :login-with-slack)))
       (simple-handler home-page "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
