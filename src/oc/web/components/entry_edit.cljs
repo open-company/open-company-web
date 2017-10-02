@@ -3,12 +3,11 @@
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -33,8 +32,7 @@
 (defn toggle-topics-dd []
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
-(defn body-on-change [s body]
-  (dis/dispatch! [:input [:entry-editing :body] body])
+(defn body-on-change []
   (dis/dispatch! [:input [:entry-editing :has-changes] true]))
 
 (defn- headline-on-change [state]
@@ -73,9 +71,12 @@
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
-  (let [body (sel1 [:div.rich-body-editor])
-        emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body)) "__html"))]
-    (body-on-change s emojied-body)))
+  (let [body (sel1 [:div.rich-body-editor])]
+    (body-on-change)))
+
+(defn clean-body []
+  (let [raw-html (.-innerHTML (sel1 [:div.rich-body-editor]))]
+    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)])))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :entry-edit-topics)
@@ -83,6 +84,7 @@
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
                         (drv/drv :alert-modal)
+                        (drv/drv :media-input)
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -147,7 +149,8 @@
         alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
-        wh (.-innerHeight js/window)]
+        wh (.-innerHeight js/window)
+        media-input (drv/react s :media-input)]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
@@ -158,8 +161,8 @@
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
         ;; Show the close button only when there are no modals shown
-        (when (and (not (:media-video entry-editing))
-                   (not (:media-chart entry-editing))
+        (when (and (not (:media-video media-input))
+                   (not (:media-chart media-input))
                    (not alert-modal))
           [:button.carrot-modal-close.mlb-reset
             {:on-click #(close-clicked s)}])
@@ -245,7 +248,7 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (rich-body-editor {:on-change (partial body-on-change s)
+          (rich-body-editor {:on-change (partial body-on-change)
                              :initial-body @(::initial-body s)
                              :show-placeholder (not (contains? entry-editing :links))
                              :show-h2 false
@@ -260,6 +263,7 @@
           (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
+                          (clean-body)
                           (dis/dispatch! [:entry-save])
                           (close-clicked s))
              :disabled (not (:has-changes entry-editing))}
