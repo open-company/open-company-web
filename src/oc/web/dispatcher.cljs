@@ -204,7 +204,10 @@
    :password-reset        [[:base :auth-settings]
                             (fn [base auth-settings]
                               {:auth-settings auth-settings
-                               :error (:collect-pswd-error base)})]})
+                               :error (:collect-pswd-error base)})]
+   :media-input           [[:base]
+                            (fn [base]
+                              (:media-input base))]})
 
 ;; Action Loop =================================================================
 
@@ -359,6 +362,12 @@
 (defn print-activity-comments-data []
   (js/console.log (get-in @app-state (activity-comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
+(defn print-entry-editing-data []
+  (js/console.log (get @app-state :entry-editing)))
+
+(defn print-story-editing-data []
+  (js/console.log (get @app-state :story-editing)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintAllActivityData js/window) print-all-activity-data)
@@ -371,3 +380,5 @@
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
+(set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)
