@@ -49,7 +49,8 @@
 ;; Body change handling
 
 (defn body-on-change [s]
-  (update-story-editing s {:raw-body (.-innerHTML (sel1 [:div.rich-body-editor]))}))
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (update-story-editing s {:raw-body (.-innerHTML body-el)})))
 
 (defn- title-on-change [state]
   (when-let [title (rum/ref-node state "title")]
