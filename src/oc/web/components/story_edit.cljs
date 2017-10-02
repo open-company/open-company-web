@@ -44,8 +44,12 @@
 
 ;; Body change handling
 
-(defn body-on-change [s body]
-  (update-story-editing s {:body body}))
+(defn clean-body []
+  (let [raw-html (.-innerHTML (sel1 [:div.rich-body-editor]))]
+    (utils/clean-body-html raw-html)))
+
+(defn body-on-change [s]
+  (update-story-editing s {:body (clean-body)}))
 
 (defn- title-on-change [state]
   (when-let [title (rum/ref-node state "title")]
@@ -131,9 +135,7 @@
 
 (defn add-emoji-cb [s _ _]
   (title-on-change s)
-  (let [body (sel1 [:div.rich-body-editor])
-        emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body)) "__html"))]
-    (body-on-change s emojied-body)))
+  (body-on-change s))
 
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
@@ -141,6 +143,7 @@
                         (drv/drv :current-user-data)
                         (drv/drv :alert-modal)
                         (drv/drv :org-data)
+                        (drv/drv :media-input)
                         ;; Medium editor
                         (rum/local nil ::body-editor)
                         ;; Initial data
@@ -201,6 +204,7 @@
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)
+        media-input (drv/react s :media-input)
         story-author (if (:author story-data)
                        (if (map? (:author story-data))
                          (:author story-data)
@@ -210,10 +214,10 @@
     [:div.story-edit-container
       (when (drv/react s :alert-modal)
         (alert-modal))
-      (when (:media-video story-data)
-        (media-video-modal :story-editing))
-      (when (:media-chart story-data)
-        (media-chart-modal :story-editing))
+      (when (:media-video media-input)
+        (media-video-modal))
+      (when (:media-chart media-input)
+        (media-chart-modal))
       (when @(::show-publish-modal s)
         (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-edit-header.group
@@ -305,7 +309,7 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
-        (rich-body-editor {:on-change (partial body-on-change s)
+        (rich-body-editor {:on-change #(body-on-change s)
                            :initial-body @(::initial-body s)
                            :show-placeholder (or (empty? @(::initial-body s))
                                                  (= @(::initial-body s) utils/default-body))
