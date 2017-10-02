@@ -71,12 +71,13 @@
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
-  (let [body (sel1 [:div.rich-body-editor])]
+  (when-let [body (sel1 [:div.rich-body-editor])]
     (body-on-change)))
 
 (defn clean-body []
-  (let [raw-html (.-innerHTML (sel1 [:div.rich-body-editor]))]
-    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)])))
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (let [raw-html (.-innerHTML body-el)]
+      (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :entry-edit-topics)
