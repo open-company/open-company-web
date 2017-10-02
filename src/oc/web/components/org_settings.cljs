@@ -3,7 +3,6 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
@@ -56,9 +55,8 @@
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
                                             (dis/dispatch! [:alert-modal-hide])
-                                            (router/nav! (oc-urls/org (:slug org-data))))}]
+                                            (dis/dispatch! [:org-settings-hide]))}]
         (dis/dispatch! [:alert-modal-show alert-data]))
-      ; (router/nav! (oc-urls/org (:slug org-data)))
       (dis/dispatch! [:org-settings-hide]))))
 
 (rum/defcs org-settings
@@ -97,7 +95,7 @@
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)]
     (when (:read-only org-data)
-      (utils/after 100 #(router/nav! (oc-urls/org (:slug org-data)))))
+      (utils/after 100 #(dis/dispatch! [:org-settings-hide])))
     (if org-data
       [:div.org-settings.fullscreen-page
         [:button.mlb-reset.carrot-modal-close
