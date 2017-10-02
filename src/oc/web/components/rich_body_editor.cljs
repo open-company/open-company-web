@@ -1,5 +1,6 @@
 (ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
+            [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
@@ -172,9 +173,9 @@
     (= type "photo")
     (add-photo s editable)
     (= type "video")
-    (do (dis/dispatch! [:input [(:dispatch-input-key (first (:rum/args s))) :media-video] true]) (reset! (::media-video s) true))
+    (do (dis/dispatch! [:input [:media-input :media-video] true]) (reset! (::media-video s) true))
     (= type "chart")
-    (do (dis/dispatch! [:input [(:dispatch-input-key (first (:rum/args s))) :media-chart] true]) (reset! (::media-chart s) true))
+    (do (dis/dispatch! [:input [:media-input :media-chart] true]) (reset! (::media-chart s) true))
     (= type "attachment")
     (add-attachment s editable)))
 
@@ -185,21 +186,11 @@
       "What's new?")))
 
 (defn body-on-change [state]
-  (reset! (::did-change state) true)
-  (when-let [body-el (rum/ref-node state "body")]
-    ; Attach paste listener to the body and all its children
-    ; (js/recursiveAttachPasteListener body-el #(body-on-change state))
-    (let [options (first (:rum/args state))
-          dispatch-input-key (:dispatch-input-key options)
-          on-change (:on-change options)
-          inner-html (.-innerHTML body-el)
-          $container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-          _ (.append (js/$ (.-body js/document)) $container)
-          _ (.remove (js/$ ".rangySelectionBoundary" $container))
-          cleaned-html (.html $container)
-          _ (.detach $container)
-          emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify cleaned-html) "__html"))]
-      (on-change emojied-body))))
+  (when (not @(::did-change state))
+    (reset! (::did-change state) true))
+  (let [options (first (:rum/args state))
+        on-change (:on-change options)]
+    (on-change)))
 
 (defn- setup-editor [s]
   (let [options (first (:rum/args s))
@@ -230,29 +221,28 @@
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML false}
                  :placeholder #js {:text body-placeholder
-                                   :hideOnClick true}}]
-    (let [body-editor  (new js/MediumEditor body-el (clj->js options))]
-    (reset! (::editable-ext s) media-picker-ext)
+                                   :hideOnClick true}}
+        body-editor  (new js/MediumEditor body-el (clj->js options))]
+    (reset! (::media-picker-ext s) body-editor)
     (.subscribe body-editor
                 "editableInput"
                 (fn [event editable]
                   (body-on-change s)))
     (reset! (::editor s) body-editor)
     ; (js/recursiveAttachPasteListener body-el #(body-on-change s))
-    )))
+    ))
 
 (rum/defcs rich-body-editor  < rum/reactive
                                (rum/local false ::did-change)
                                (rum/local nil ::editor)
-                               (rum/local nil ::editable-ext)
+                               (rum/local nil ::media-picker-ext)
                                (rum/local false ::media-photo)
                                (rum/local false ::media-video)
                                (rum/local false ::media-chart)
                                (rum/local false ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
-                               (drv/drv :entry-editing)
-                               (drv/drv :story-editing)
+                               (drv/drv :media-input)
                                {:did-mount (fn [s]
                                              (utils/after 300 #(do
                                               (setup-editor s)
@@ -261,8 +251,7 @@
                                                   (js/emojiAutocomplete)))))
                                              s)
                                 :will-update (fn [s]
-                                               (let [dispatch-input-key (:dispatch-input-key (first (:rum/args s)))
-                                                     data @(drv/get-ref s dispatch-input-key)
+                                               (let [data @(drv/get-ref s :media-input)
                                                      video-data (:media-video data)
                                                      chart-data (:media-chart data)]
                                                   (when (and @(::media-video s)
@@ -271,30 +260,29 @@
                                                     (when (or (= video-data :dismiss)
                                                               (map? video-data))
                                                       (reset! (::media-video s) false)
-                                                      (dis/dispatch! [:input [dispatch-input-key :media-video] nil]))
+                                                      (dis/dispatch! [:input [:media-input :media-video] nil]))
                                                     (if (map? video-data)
-                                                      (media-video-add s @(::editable-ext s) video-data)
-                                                      (media-video-add s @(::editable-ext s) nil)))
+                                                      (media-video-add s @(::media-picker-ext s) video-data)
+                                                      (media-video-add s @(::media-picker-ext s) nil)))
                                                   (when (and @(::media-chart s)
                                                              (or (= chart-data :dismiss)
                                                                  (string? chart-data)))
                                                     (when (or (= chart-data :dismiss)
                                                               (string? chart-data))
                                                       (reset! (::media-chart s) false)
-                                                      (dis/dispatch! [:input [dispatch-input-key :media-chart] nil]))
+                                                      (dis/dispatch! [:input [:media-input :media-chart] nil]))
                                                     (if (string? chart-data)
-                                                      (media-chart-add s @(::editable-ext s) chart-data)
-                                                      (media-chart-add s @(::editable-ext s) nil))))
+                                                      (media-chart-add s @(::media-picker-ext s) chart-data)
+                                                      (media-chart-add s @(::media-picker-ext s) nil))))
                                                s)
                                 :will-unmount (fn [s]
                                                 (when @(::editor s)
                                                   (.destroy @(::editor s)))
                                                 s)}
-  [s {:keys [dispatch-input-key initial-body on-change classes show-placeholder]}]
-  (let [_ (drv/react s dispatch-input-key)]
-    [:div.rich-body-editor-container
-      [:div.rich-body-editor
-        {:ref "body"
-         :content-editable true
-         :class (str classes (when (or (not show-placeholder) @(::did-change s)) " medium-editor-placeholder-hidden"))
-         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]))
+  [s {:keys [initial-body on-change classes show-placeholder]}]
+  [:div.rich-body-editor-container
+    [:div.rich-body-editor
+      {:ref "body"
+       :content-editable true
+       :class (str classes (when (or (not show-placeholder) @(::did-change s)) " medium-editor-placeholder-hidden"))
+       :dangerouslySetInnerHTML (utils/emojify initial-body)}]])
