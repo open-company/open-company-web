@@ -215,7 +215,6 @@ provided in the table below:
 |  :board-edit-save | UI | Save the board edited data. |
 |  :board-edit-save/finish | API | Board created or updated. |
 |  :board-edit/dismiss | UI | Starts the dismiss process of the board editing modal. |
-|  :board-nav | UI | Navigate to another board: it needs an action because it reset the board filters before navigating away. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |
 |  :calendar-get | UI | Load the calendar data to show the AA sidebar. |
