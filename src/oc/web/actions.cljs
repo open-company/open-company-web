@@ -960,15 +960,23 @@
   [db [_]]
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
-    (utils/after 1 #(router/nav!
-                      (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
-                        (oc-urls/all-activity (router/current-org-slug))
-                        (let [board-filters (:board-filters db)]
-                          (if (string? board-filters)
-                            (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
-                            (if (= :by-topic board-filters)
-                              (oc-urls/board-sort-by-topic (router/current-org-slug) (router/current-board-slug))
-                              (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))))
+    (utils/after 1 #(let [board-filters (:board-filters db)
+                          from-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
+                          last-cookie (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)))]
+                      (router/nav!
+                        (cond
+                          ; AA
+                          from-all-activity
+                          (oc-urls/all-activity (router/current-org-slug))
+                          ; Board with topic filter
+                          (string? board-filters)
+                          (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
+                          ;; Board sort by topic
+                          (or (= "by-topic" last-cookie) (= :by-topic board-filters))
+                          (oc-urls/board-sort-by-topic (router/current-org-slug) (router/current-board-slug))
+                          ;; Board most recent
+                          :else
+                          (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
   (-> db
