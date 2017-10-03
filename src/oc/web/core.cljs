@@ -93,8 +93,7 @@
   (inject-loading))
 
 (defn post-routing []
-  (api/get-entry-point)
-  (api/get-auth-settings))
+  (dis/dispatch! [:initial-loads]))
 
 ;; home
 (defn home-handler [target params]
