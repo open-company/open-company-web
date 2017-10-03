@@ -16,6 +16,12 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn calc-edit-entry-modal-height [s]
+  (when @(::first-render-done s)
+    (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
+      (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
+        (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
+
 (defn dismiss-modal []
   (dis/dispatch! [:entry-edit/dismiss]))
 
@@ -32,8 +38,9 @@
 (defn toggle-topics-dd []
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
-(defn body-on-change []
-  (dis/dispatch! [:input [:entry-editing :has-changes] true]))
+(defn body-on-change [s]
+  (dis/dispatch! [:input [:entry-editing :has-changes] true])
+  (calc-edit-entry-modal-height s))
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
@@ -72,7 +79,7 @@
 (defn add-emoji-cb [s]
   (headline-on-change s)
   (when-let [body (sel1 [:div.rich-body-editor])]
-    (body-on-change)))
+    (body-on-change s)))
 
 (defn clean-body []
   (when-let [body-el (sel1 [:div.rich-body-editor])]
@@ -124,9 +131,7 @@
                                       (utils/to-end-of-content-editable (rum/ref-node s "headline"))
                                       s)
                          :before-render (fn [s]
-                                          (when-let [entry-edit-modal (sel1 [:div.entry-edit-modal])]
-                                            (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
-                                              (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))
+                                          (calc-edit-entry-modal-height s)
                                           s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
@@ -168,6 +173,7 @@
           [:button.carrot-modal-close.mlb-reset
             {:on-click #(close-clicked s)}])
         [:div.entry-edit-modal.group
+          {:ref "entry-edit-modal"}
           [:div.entry-edit-modal-header.group
             (user-avatar-image current-user-data)
             [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
@@ -249,7 +255,7 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (rich-body-editor {:on-change (partial body-on-change)
+          (rich-body-editor {:on-change (partial body-on-change s)
                              :initial-body @(::initial-body s)
                              :show-placeholder (not (contains? entry-editing :links))
                              :show-h2 false
