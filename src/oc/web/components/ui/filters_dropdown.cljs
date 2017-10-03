@@ -51,7 +51,10 @@
       (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
-            final-topics (vec (concat [{:label "Most recent" :value :latest} {:label "By topic" :value :by-topic} {:label :divider-line :value nil}] topics))]
+            default-options [{:label "Most recent" :value :latest} {:label "By topic" :value :by-topic}]
+            divider-line-option {:label :divider-line :value nil}
+            start-options (if (pos? (count topics)) (vec (conj default-options divider-line-option)) default-options)
+            final-topics (vec (concat start-options topics))]
         (when @(::show-filters-dropdown s)
           (dropdown-list
             {:items final-topics
