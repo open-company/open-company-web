@@ -1,11 +1,12 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [goog.events :as events]
@@ -20,12 +21,6 @@
 (defn anchor-nav! [e url]
   (utils/event-stop e)
   (router/nav! url))
-
-(defn board-nav! [e board]
-  (utils/event-stop e)
-  (let [action-kw (if (= (:type board) "story") :storyboard-nav :board-nav)
-        board-slug (:slug board)]
-    (dis/dispatch! [action-kw board-slug])))
 
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
@@ -78,7 +73,12 @@
         show-drafts (pos? (:count drafts-link))
         show-invite-people (and (router/current-org-slug)
                                 (jwt/is-admin? (:team-id org-data)))
-        is-enough-tall (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))]
+        is-enough-tall (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))
+        org-slug (router/current-org-slug)
+        board-url-fn #(let [c-val (cook/get-cookie (router/last-board-filter-cookie org-slug %))]
+                        (if (= c-val "by-topic")
+                          (oc-urls/board-sort-by-topic org-slug %)
+                          (oc-urls/board org-slug %)))]
     [:div.left-navigation-sidebar.group
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -109,13 +109,14 @@
                    :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
-            (for [board (sort-boards boards)]
+            (for [board (sort-boards boards)
+                  :let [board-url (board-url-fn (:slug board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug board))) "item-selected")
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
-                 :href (oc-urls/board (router/current-org-slug) (:slug board))
-                 :on-click #(board-nav! % board)}
+                 :href board-url
+                 :on-click #(anchor-nav! % board-url)}
                 (when (or (= (:access board) "public")
                           (= (:access board) "private"))
                   [:img
@@ -145,14 +146,15 @@
                    :data-container "body"}])]])
         (when show-storyboards
           [:div.left-navigation-sidebar-items.group
-            (for [storyboard (sort-storyboards storyboards)]
+            (for [storyboard (sort-storyboards storyboards)
+                  :let [storyboard-url (oc-urls/board (:slug storyboard))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "item-selected")
                  :data-board (name (:slug storyboard))
                  :data-storyboard true
                  :key (str "board-list-" (name (:slug storyboard)))
-                 :href (oc-urls/board (router/current-org-slug) (:slug storyboard))
-                 :on-click #(board-nav! % storyboard)}
+                 :href storyboard-url
+                 :on-click #(anchor-nav! % storyboard-url)}
                 (when (or (= (:access storyboard) "public")
                           (= (:access storyboard) "private"))
                   [:img
