@@ -1403,7 +1403,7 @@
   (let [latest-entry-point (or (:latest-entry-point db) 0)
         latest-auth-settings (or (:latest-auth-settings db) 0)
         now (.getTime (js/Date.))
-        reload-time (* 60 1000)]
+        reload-time (* 60 60 1000)]
     (when (> (- now latest-entry-point) reload-time)
       (api/get-entry-point))
     (when (> (- now latest-auth-settings) reload-time)
