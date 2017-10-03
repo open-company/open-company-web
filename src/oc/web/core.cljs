@@ -158,7 +158,7 @@
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params true)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params})
+    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params :from-all-activity (contains? query-params :aa)})
     (when board-sort-or-filter
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
