@@ -204,11 +204,14 @@
                                      (:entry-editing db))
                               old-board-data
                               fixed-board-data)
+          with-current-change-status (-> with-current-edit
+                                        (assoc :seen-at (:seen-at old-board-data))
+                                        (assoc :change-at (:change-at old-board-data)))
           story-editing (when (and (utils/in? (:route @router/path) "story-edit")
                                    (router/current-activity-id)
                                    (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                           (get (:fixed-items fixed-board-data) (router/current-activity-id)))
-          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
+          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-change-status)
           with-story-editing (if story-editing
                                 (assoc next-db :story-editing story-editing)
                                 next-db)]
