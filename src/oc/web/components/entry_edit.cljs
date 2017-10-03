@@ -38,8 +38,8 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
-                                          (real-close s)
-                                          (dis/dispatch! [:alert-modal-hide]))
+                                          (dis/dispatch! [:alert-modal-hide])
+                                          (real-close s))
                       }]
       (dis/dispatch! [:alert-modal-show alert-data]))
     (real-close s)))
