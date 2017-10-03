@@ -1,0 +1,58 @@
+div.font-faces-test {
+  margin: 80px auto;
+  width: 600px;
+  padding: 16px;
+
+  div.font-faces-test-row {
+    margin-top: 16px;
+
+    &:first-child {
+      margin-bottom: 32px;
+    }
+
+    &:last-child {
+      margin-top: 32px;
+    }
+
+    div.title {
+      float: left;
+      width: 170px;
+    }
+
+    div.statement {
+      float: left;
+    }
+  }
+
+  .weight-100 {
+    font-weight: 100;
+  }
+
+  .weight-200 {
+    font-weight: 200;
+  }
+
+  .weight-300 {
+    font-weight: 300;
+  }
+
+  .weight-400 {
+    font-weight: 400;
+  }
+
+  .weight-500 {
+    font-weight: 500;
+  }
+
+  .weight-600 {
+    font-weight: 600;
+  }
+
+  .weight-800 {
+    font-weight: 800;
+  }
+
+  .weight-900 {
+    font-weight: 900;
+  }
+}

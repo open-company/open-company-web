@@ -1,3 +1,21 @@
+/*
+100 Thin (Hairline)
+200 Extra Light (Ultra Light)
+300 Light
+400 Normal
+500 Medium
+600 Semi Bold (Demi Bold)
+700 Bold 
+800 Extra Bold (Ultra Bold)
+900 Black (Heavy)
+
+450 Book
+550 Roman
+650 Medium
+850 Heavy
+950 Black
+*/
+
 .AvenirLTStd-Book {
   font-family: AvenirLTStd-Book, Muli, Arial, sans-serif;
   font-weight: normal;
@@ -5,38 +23,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 .AvenirLTStd-BookOblique {
   font-family: AvenirLTStd-BookOblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.AvenirLTStd-MediumOblique {
-  font-family: AvenirLTStd-MediumOblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.AvenirLTStd-Medium {
-  font-family: AvenirLTStd-Medium, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.AvenirLTStd-BlackOblique {
-  font-family: AvenirLTStd-BlackOblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.AvenirLTStd-Oblique {
-  font-family: AvenirLTStd-Oblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -45,6 +34,30 @@
 
 .AvenirLTStd-Roman {
   font-family: AvenirLTStd-Roman, Muli, Arial, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.AvenirLTStd-MediumOblique {
+  font-family: AvenirLTStd-MediumOblique, Muli, Arial, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.AvenirLTStd-Medium {
+  font-family: AvenirLTStd-Medium, Muli, Arial, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.AvenirLTStd-Oblique {
+  font-family: AvenirLTStd-Oblique, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -75,8 +88,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@mixin avenir($avenir_variant: Black){
-  font-family: AvenirLTStd-#{$avenir_variant}, Muli, Arial, sans-serif;
+.AvenirLTStd-BlackOblique {
+  font-family: AvenirLTStd-BlackOblique, Muli, Arial, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin avenir($avenir_variant){
+  font-family: #{$avenir_variant}, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -84,41 +105,41 @@
 }
 
 @mixin avenir_BOOK() {
-  @include avenir(Book);
+  @include avenir(AvenirLTStd-Book);
 }
 
 @mixin avenir_BOOKO() {
-  @include avenir(BookOblique);
-}
-
-@mixin avenir_MO(){
-  @include avenir(MediumOblique);
-}
-
-@mixin avenir_M(){
-  @include avenir(Medium);
-}
-
-@mixin avenir_BO(){
-  @include avenir(BlackOblique);
-}
-
-@mixin avenir_B(){
-  @include avenir(Black);
-}
-
-@mixin avenir_O(){
-  @include avenir(Oblique);
+  @include avenir(AvenirLTStd-BookOblique);
 }
 
 @mixin avenir_R(){
-  @include avenir(Roman);
+  @include avenir(AvenirLTStd-Roman);
+}
+
+@mixin avenir_O(){
+  @include avenir(AvenirLTStd-Oblique);
+}
+
+@mixin avenir_M(){
+  @include avenir(AvenirLTStd-Medium);
+}
+
+@mixin avenir_MO(){
+  @include avenir(AvenirLTStd-MediumOblique);
 }
 
 @mixin avenir_H(){
-  @include avenir(Heavy);
+  @include avenir(AvenirLTStd-Heavy);
 }
 
 @mixin avenir_HO(){
-  @include avenir(HeavyOblique);
+  @include avenir(AvenirLTStd-HeavyOblique);
+}
+
+@mixin avenir_B(){
+  @include avenir(AvenirLTStd-Black);
+}
+
+@mixin avenir_BO(){
+  @include avenir(AvenirLTStd-BlackOblique);
 }
