@@ -37,8 +37,7 @@
             [oc.web.components.secure-story :refer (secure-story)]
             [oc.web.components.story :refer (story)]
             [oc.web.components.story-edit :refer (story-edit)]
-            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
-            [oc.web.components.ui.font-faces-test :refer (font-faces-test)]))
+            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
 
 (enable-console-print!)
 
@@ -230,10 +229,6 @@
           (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
           (swap! dis/app-state assoc :show-login-overlay :login-with-slack)))
       (simple-handler home-page "login" target params))
-
-    (defroute font-faces-test-route "/__fonts" {:as params}
-      (timbre/info "Routing font-faces-test-route /__fonts")
-      (simple-handler font-faces-test "sign-up" target params))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
@@ -487,7 +482,6 @@
     (def route-dispatch!
       (secretary/uri-dispatcher [_loading_route
                                  login-route
-                                 font-faces-test-route
                                  ;; Signup email
                                  signup-profile-route
                                  signup-profile-slash-route
