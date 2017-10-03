@@ -946,20 +946,10 @@
   [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
    #(let [from-all-activity (= (router/current-board-slug) "all-activity")
-          new-route (if from-all-activity
-                      [(router/current-org-slug) "all-activity" board-slug activity-uuid "activity"]
-                      [(router/current-org-slug) board-slug activity-uuid "activity"])
-          parts {:org (router/current-org-slug)
-                 :board board-slug
-                 :activity activity-uuid
-                 :query-params (:query-params @router/path)
-                 :from-all-activity from-all-activity}
           activity-url (if (= activity-type "story")
                          (oc-urls/story board-slug activity-uuid)
                          (oc-urls/entry board-slug activity-uuid))]
-      (router/set-route! new-route parts)
-      (.pushState (.-history js/window) #js {} (.-title js/document) activity-url)
-      (dispatcher/dispatch! [:input [:activity-pushed] activity-uuid])))
+      (router/nav! (str activity-url (when from-all-activity "?aa")))))
   (assoc db :activity-modal-fade-in activity-uuid))
 
 (defmethod dispatcher/action :entry-edit
@@ -1066,57 +1056,6 @@
                       (:fixed-items board-data))
         next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
     (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)))
-
-(defmethod dispatcher/action :board-nav
-  [db [_ board-slug board-filters]]
-  (let [next-board-filter (if board-filters
-                            ; If a board filter is passed use it
-                            board-filters
-                            (if (:activity-pushed db)
-                              ; If the modal was open from the dashboard, restore the previous opened filter
-                              (:board-filters db)
-                              ; If it was open directly from a link restore the last opened dashboard sort
-                              (or (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) board-slug))) :latest)))
-        next-board-url (if (string? next-board-filter)
-                         (oc-urls/board-filter-by-topic next-board-filter)
-                         (if (= next-board-filter :by-topic)
-                           (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
-                           (oc-urls/board (router/current-org-slug) board-slug)))]
-    (utils/after 10
-      #(if (:activity-pushed db)
-         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-               parts (dissoc @router/path :route :activity)]
-            (router/set-route! route parts)
-            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-         (router/nav! next-board-url)))
-    (assoc db :board-filters next-board-filter)))
-
-(defmethod dispatcher/action :storyboard-nav
-  [db [_ storyboard-slug]]
-  (let [next-board-url (oc-urls/board (router/current-org-slug) storyboard-slug)]
-    (utils/after 10
-      #(if (:activity-pushed db)
-         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-               parts (dissoc @router/path :route :activity)]
-            (router/set-route! route parts)
-            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-         (router/nav! next-board-url)))
-    db))
-
-(defmethod dispatcher/action :all-activity-nav
-  [db [_]]
-  (let [all-activity-url (oc-urls/all-activity)]
-    (utils/after 10
-      #(if (:activity-pushed db)
-         (let [route [(router/current-org-slug) "all-activity"]
-               parts (-> @router/path (dissoc :route :board :activity :from-all-activity) (merge {:board "all-activity"}))]
-            (router/set-route! route parts)
-            (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
-            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-         (router/nav! all-activity-url)))
-    db))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
