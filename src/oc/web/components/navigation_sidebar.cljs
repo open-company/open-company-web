@@ -9,6 +9,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [goog.events :as events]
+            [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
 
 (defn sort-boards [boards]
@@ -26,6 +27,22 @@
   (let [action-kw (if (= (:type board) "story") :storyboard-nav :board-nav)
         board-slug (:slug board)]
     (dis/dispatch! [action-kw board-slug])))
+
+(defn new?
+  "
+  A board/journal is new if:
+  
+  change-at is newer than seen at
+   -or-
+  we have a change-at and no seen at
+  "
+  [board]
+  (timbre/debug "New test for:" (:slug board) "id:" (:uuid board) "ca:" (:change-at board) "sa:" (:seen-at board))
+  (let [change-at (:change-at board)
+        seen-at (:seen-at board)]
+
+    (or (and change-at seen-at (> change-at seen-at))
+        (and change-at (not seen-at)))))
 
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
@@ -79,6 +96,7 @@
         show-invite-people (and (router/current-org-slug)
                                 (jwt/is-admin? (:team-id org-data)))
         is-enough-tall (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))]
+    
     [:div.left-navigation-sidebar.group
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -110,7 +128,7 @@
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)]
-              [:a.left-navigation-sidebar-item.hover-item
+            [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug board))) "item-selected")
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
@@ -126,7 +144,8 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:key (str "board-list-" (name (:slug board)) "-internal")
+                    {:class (utils/class-set {:new (new? board)})
+                     :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])
         (when show-storyboards
           [:div.left-navigation-sidebar-top.group
@@ -163,7 +182,8 @@
                                             :private-board (= (:access storyboard) "private")
                                             :team-board (= (:access storyboard) "team")})}
                   [:div.internal
-                    {:key (str "board-list-" (name (:slug storyboard)) "-internal")
+                    {:class (utils/class-set {:new (new? storyboard)})
+                     :key (str "board-list-" (name (:slug storyboard)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name storyboard) (:slug storyboard)))}]]])
             (when show-drafts
               [:div.left-navigation-sidebar-draft

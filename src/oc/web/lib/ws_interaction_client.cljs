@@ -1,4 +1,4 @@
-(ns oc.web.lib.wsclient
+(ns oc.web.lib.ws-interaction-client
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
@@ -12,11 +12,9 @@
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
 
-(def ws-port 3002)
-
-(def ws-server "localhost")
-
 (def current-board-path (atom nil))
+
+;; Sente WebSocket atoms
 (def channelsk (atom nil))
 (def ch-chsk (atom nil))
 (def ch-state (atom nil))
@@ -130,7 +128,7 @@
                  (:open? @@ch-state))
         (timbre/info "Closing previous connection for" @current-board-path)
         (stop-router!))
-      (timbre/info "Attempting connection to" ws-domain "for board" ws-board-path)
+      (timbre/info "Attempting interaction service connection to" ws-domain "for board" ws-board-path)
       (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-board-path
                                                         {:type :auto
                                                          :host ws-domain

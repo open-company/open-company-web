@@ -218,6 +218,10 @@ div.left-navigation-sidebar {
           float: left;
           cursor: pointer;
 
+          &.new {
+            @include avenir_B();
+          }
+
           .emojione {
             @include emoji-size(12);
           }

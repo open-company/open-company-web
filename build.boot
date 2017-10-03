@@ -31,7 +31,6 @@
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [com.cognitect/transit-cljs "0.8.239"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
-    [com.andrewmcveigh/cljs-time "0.5.0"] ; A clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     [funcool/cuerdas "2.0.3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
@@ -51,14 +50,16 @@
 
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
-    [open-company/lib "0.12.21" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component]] ; Library for OC projects https://github.com/open-company/open-company-lib
-    ; In addition to common functions, brings in the following common dependencies used by this project:
-    ; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
-    ; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
-    ; Timbre - Pure Clojure/Script logging library https://github.com/ptaoussanis/timbre
-    ; environ - Get environment settings from different sources https://github.com/weavejester/environ
-    ; hickory - HTML as data https://github.com/davidsantiago/hickory
-    ; com.taoensso/sente - WebSocket client https://github.com/ptaoussanis/sente
+    ;; Library for OC projects https://github.com/open-company/open-company-lib
+    [open-company/lib "0.14.5" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component]] 
+    ;; In addition to common functions, brings in the following common dependencies used by this project:
+    ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
+    ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
+    ;; Timbre - Pure Clojure/Script logging library https://github.com/ptaoussanis/timbre
+    ;; environ - Get environment settings from different sources https://github.com/weavejester/environ
+    ;; hickory - HTML as data https://github.com/davidsantiago/hickory
+    ;; cljs-time - clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
+    ;; com.taoensso/sente - WebSocket client https://github.com/ptaoussanis/sente
 
     ;; ------- Deps for project repl ------------------
     ;; The following dependencies are from: https://github.com/adzerk-oss/boot-cljs-repl

@@ -11,7 +11,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.wsclient :as wsc]
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.components.ui.user-avatar :refer (default-avatar-url)]))
 
 ;; ---- Generic Actions Dispatch
@@ -120,6 +121,7 @@
 (defmethod dispatcher/action :org
   [db [_ org-data saved?]]
   (let [boards (:boards org-data)]
+    
     (cond
       ;; If it's all activity page, loads all activity for the current org
       (and (router/current-board-slug)
@@ -145,6 +147,7 @@
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
+      
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
@@ -156,6 +159,12 @@
                 (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
                 (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
               (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
+
+  ;; Change service connection 
+  (when (jwt/jwt) ; only for logged in users
+    (when-let [ws-link (utils/link-for (:links org-data) "changes")]
+      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))))
+
   (-> db
     (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
     (assoc :org-editing (-> (:org-editing db)
@@ -188,7 +197,7 @@
         (router/redirect-404!))
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
-          (wsc/reconnect ws-link (jwt/get-key :user-id))))
+          (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
     (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
@@ -1069,7 +1078,9 @@
 
 (defmethod dispatcher/action :board-nav
   [db [_ board-slug board-filters]]
-  (let [next-board-filter (if board-filters
+  (let [next-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
+        next-board-uuid (:uuid next-board-data)
+        next-board-filter (if board-filters
                             ; If a board filter is passed use it
                             board-filters
                             (if (:activity-pushed db)
@@ -1083,26 +1094,32 @@
                            (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
                            (oc-urls/board (router/current-org-slug) board-slug)))]
     (utils/after 10
-      #(if (:activity-pushed db)
-         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-               parts (dissoc @router/path :route :activity)]
-            (router/set-route! route parts)
-            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-         (router/nav! next-board-url)))
+      (do
+        (ws-cc/container-seen next-board-uuid) ; let change service know we've seen the board we're navigating to
+        #(if (:activity-pushed db)
+           (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+                 parts (dissoc @router/path :route :activity)]
+              (router/set-route! route parts)
+              (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+              (dispatcher/dispatch! [:input [:activity-pushed] nil]))
+           (router/nav! next-board-url))))
     (assoc db :board-filters next-board-filter)))
 
 (defmethod dispatcher/action :storyboard-nav
   [db [_ storyboard-slug]]
-  (let [next-board-url (oc-urls/board (router/current-org-slug) storyboard-slug)]
+  (let [next-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
+        next-board-uuid (:uuid next-board-data)
+        next-board-url (oc-urls/board (router/current-org-slug) storyboard-slug)]
     (utils/after 10
-      #(if (:activity-pushed db)
-         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-               parts (dissoc @router/path :route :activity)]
-            (router/set-route! route parts)
-            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-         (router/nav! next-board-url)))
+      (do
+        (ws-cc/container-seen next-board-uuid) ; let change service know we've seen the board we're navigating to
+        #(if (:activity-pushed db)
+           (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+                 parts (dissoc @router/path :route :activity)]
+              (router/set-route! route parts)
+              (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+              (dispatcher/dispatch! [:input [:activity-pushed] nil]))
+           (router/nav! next-board-url))))
     db))
 
 (defmethod dispatcher/action :all-activity-nav
@@ -1271,7 +1288,7 @@
         fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})]
     (when (jwt/jwt)
       (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
-        (wsc/reconnect ws-link (jwt/get-key :user-id))))
+        (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
     (-> db
       (dissoc :story-loading)
       (assoc-in story-key fixed-story-data))))
@@ -1363,3 +1380,15 @@
         (-> db
           (update-in (butlast activity-data-key) dissoc (last activity-data-key))
           (assoc-in next-activity-data-key fixed-activity-data))))))
+
+(defmethod dispatcher/action :container/status
+  [db [_ status-data]]
+  (timbre/info "Change status received:" status-data)
+  (let [org-data (dispatcher/org-data db)
+        status-by-uuid (group-by :container-id status-data)
+        board-data (:boards org-data)
+        boards-by-uuid (group-by :uuid board-data)
+        ;; merge in the status for each board
+        boards-with-status (map #(apply merge %) (vals (merge-with concat boards-by-uuid status-by-uuid)))]
+   (-> db
+    (assoc-in (dispatcher/org-data-key (:slug org-data)) (assoc org-data :boards boards-with-status)))))
