@@ -93,7 +93,7 @@
   (inject-loading))
 
 (defn post-routing []
-  (dis/dispatch! [:initial-loads]))
+  (utils/after 10 #(dis/dispatch! [:initial-loads])))
 
 ;; home
 (defn home-handler [target params]
