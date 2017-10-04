@@ -24,7 +24,6 @@ $h2_top_margin: 20;
   div.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
-    width: calc(100% - 52px);
     @include avenir_R();
     color: rgba($oc_gray_7, 0.5);
     font-size: 14px;

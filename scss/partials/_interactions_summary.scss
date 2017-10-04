@@ -1,19 +1,21 @@
 div.is-reactions{
   float: left;
-  margin-right: 24px;
-  height: 24px;
+  margin-right: 32px;
+  height: 26px;
 
   div.is-reactions-reaction {
     float: left;
     font-size: 16px;
+    margin-top: 3px;
   }
 
   div.is-reactions-summary {
     float: left;
-    margin-left: 7px;
+    margin-left: 8px;
     font-size: 14px;
     color: $oc_gray_7;
     @include avenir_R();
+    margin-top: 2px;
   }
 }
 
@@ -26,7 +28,7 @@ div.is-comments {
     float: left;
 
     &:not(:empty){
-      margin-right: 16px;
+      margin-right: 8px;
     }
 
     div.is-comments-author {
@@ -40,8 +42,8 @@ div.is-comments {
       img {
         max-width: 22px;
         max-height: 22px;
-        margin-top: -6px;
-        margin-left: -1px;
+        margin-top: -2px;
+        margin-left: 1px;
         border-radius: 11px;
       }
 
@@ -56,6 +58,7 @@ div.is-comments {
     font-size: 14px;
     color: $oc_gray_7;
     @include avenir_R();
+    margin-top: 2px;
   }
 }
 
