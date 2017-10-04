@@ -2,6 +2,7 @@
   (:require [medley.core :as med]
             [clojure.string :as string]
             [taoensso.timbre :as timbre]
+            [oc.lib.time :as oc-time]
             [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -183,27 +184,46 @@
   (api/get-board link)
   db)
 
+(defmethod dispatcher/action :board-seen
+  [db [_ {board-uuid :board-uuid}]]
+  (timbre/debug "Board seen:" board-uuid)
+  ;; Let the change service know we saw the board
+  (ws-cc/container-seen board-uuid)
+  ;; Update change-data state that we saw the board
+  (let [change-data-key (dispatcher/change-data-key (router/current-org-slug))
+        change-data (get-in db change-data-key)
+        change-map (or (get change-data board-uuid) {})
+        new-change-map (assoc change-map :seen-at (oc-time/current-timestamp))
+        new-change-data (assoc change-data board-uuid new-change-map)]
+    (assoc-in db change-data-key new-change-data)))
+
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
        fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))]
     (when is-currently-shown
+      
       (when (and (router/current-activity-id)
                  (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                  (or (not (utils/in? (:route @router/path) "story-edit"))
                      (= (:slug board-data) "drafts")))
         (router/redirect-404!))
+      
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
                  (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
         (router/redirect-404!))
+      
       ;; Follow the interactions link to connect to the Interaction service WebSocket to watch for comment/reaction
       ;; changes, this will also disconnect prior connection if we were watching another board already
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
           (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-      ;; Tell the container service that we saw this board
-      (when (:uuid fixed-board-data)
-        (ws-cc/container-seen (:uuid fixed-board-data))))
+      
+      ;; Tell the container service that we are seeing this board,
+      ;; and update change-data to reflect that we are seeing this board
+      (when-let [board-uuid (:uuid fixed-board-data)]
+        (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}]))))
+    
     (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
                                      (:entry-editing db))
@@ -1337,13 +1357,12 @@
   [db [_ status-data]]
   (timbre/debug "Change status received:" status-data)
   (let [org-data (dispatcher/org-data db)
+        old-status-data (dispatcher/change-data db)
         status-by-uuid (group-by :container-id status-data)
-        board-data (:boards org-data)
-        boards-by-uuid (group-by :uuid board-data)
-        ;; merge in the status for each board
-        boards-with-status (map #(apply merge %) (vals (merge-with concat boards-by-uuid status-by-uuid)))]
-   (-> db
-    (assoc-in (dispatcher/org-data-key (:slug org-data)) (assoc org-data :boards boards-with-status)))))
+        clean-status-data (zipmap (keys status-by-uuid) (map first (vals status-by-uuid))) ; drop the sequence value
+        new-status-data (merge old-status-data clean-status-data)]
+    (-> db
+      (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
 
 (defmethod dispatcher/action :initial-loads
   [db [_]]

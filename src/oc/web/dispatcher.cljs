@@ -25,6 +25,9 @@
 (defn calendar-key [org-slug]
   (vec (conj (org-key org-slug) :calendar)))
 
+(defn change-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-data)))
+
 (defn board-key [org-slug board-slug]
   (vec (concat (org-key org-slug) [:boards (keyword board-slug)])))
 
@@ -138,6 +141,10 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-channels-key (:team-id org-data)))))]
+   :change-data         [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (change-data-key org-slug))))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
@@ -262,6 +269,15 @@
   ([data org-slug]
     (get-in data (calendar-key org-slug))))
 
+(defn change-data
+  "Get chancge data."
+  ([]
+    (change-data @app-state))
+  ([data]
+    (change-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-data-key org-slug))))
+
 (defn board-data
   "Get board data."
   ([]
@@ -341,6 +357,9 @@
 (defn print-team-roster []
   (js/console.log (get-in @app-state (team-roster-key (:team-id (org-data))))))
 
+(defn print-change-data []
+  (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
+
 (defn print-board-data []
   (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
@@ -373,6 +392,7 @@
 (set! (.-OCWebPrintAllActivityData js/window) print-all-activity-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
+(set! (.-OCWebPrintChangeData js/window) print-change-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)

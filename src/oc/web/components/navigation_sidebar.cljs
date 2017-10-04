@@ -27,22 +27,28 @@
   "
   A board/journal is new if:
   
-  change-at is newer than seen at
-   -or-
-  we have a change-at and no seen at
+    change-at is newer than seen at
+      -or-
+    we have a change-at and no seen at
   "
-  [board]
-  (timbre/debug "New test for:" (:slug board) "id:" (:uuid board) "ca:" (:change-at board) "sa:" (:seen-at board))
-  (let [change-at (:change-at board)
-        seen-at (:seen-at board)]
-    (or (and change-at seen-at (> change-at seen-at))
-        (and change-at (not seen-at)))))
+  [change-data board]
+  (let [changes (get change-data (:uuid board))
+        change-at (:change-at changes)
+        seen-at (:seen-at changes)
+        new? (or (and change-at seen-at (> change-at seen-at))
+                 (and change-at (not seen-at)))]
+    (timbre/debug "New test for:" (:slug board)
+                  "change:" (:change-at changes)
+                  "seen:" (:seen-at changes)
+                  "new?:" new?)
+    new?))
 
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 (drv/drv :org-data)
+                                (drv/drv :change-data)
                                 (rum/local false ::first-render-done)
                                 (rum/local false ::content-height)
                                 (rum/local nil ::resize-listener)
@@ -71,6 +77,7 @@
                                                  s)}
   [s]
   (let [org-data (drv/react s :org-data)
+        change-data (drv/react s :change-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (vec (filter #(= (:type %) "entry") all-boards))
@@ -143,7 +150,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (new? board)})
+                    {:class (utils/class-set {:new (new? change-data board)})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])
         (when show-storyboards
@@ -182,7 +189,7 @@
                                             :private-board (= (:access storyboard) "private")
                                             :team-board (= (:access storyboard) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (new? storyboard)})
+                    {:class (utils/class-set {:new (new? change-data storyboard)})
                      :key (str "board-list-" (name (:slug storyboard)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name storyboard) (:slug storyboard)))}]]])
             (when show-drafts
