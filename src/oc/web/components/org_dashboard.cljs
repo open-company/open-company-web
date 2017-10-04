@@ -45,13 +45,9 @@
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-    (refresh-board-data)
-    (om/set-state! owner :board-refresh-interval
-      (js/setInterval #(refresh-board-data) (* 60 1000))))
+    (refresh-board-data))
 
   (will-unmount [_]
-    (when (om/get-state owner :board-refresh-interval)
-      (js/clearInterval (om/get-state owner :board-refresh-interval)))
     (when (om/get-state owner :resize-listener)
       (events/unlistenByKey (om/get-state owner :resize-listener))))
 
