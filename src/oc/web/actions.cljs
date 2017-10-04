@@ -196,6 +196,7 @@
                               old-board-data
                               fixed-board-data)
           story-editing (when (and (utils/in? (:route @router/path) "story-edit")
+                                   is-currently-shown
                                    (router/current-activity-id)
                                    (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                           (get (:fixed-items fixed-board-data) (router/current-activity-id)))
