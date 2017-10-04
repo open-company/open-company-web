@@ -1293,13 +1293,17 @@
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
-        fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})]
+        fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})
+        story-editing-data (if (utils/in? (:route @router/path) "story-edit")
+                              fixed-story-data
+                              nil)]
     (when (jwt/jwt)
       (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
         (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
     (-> db
       (dissoc :story-loading)
-      (assoc-in story-key fixed-story-data))))
+      (assoc-in story-key fixed-story-data)
+      (assoc :story-editing story-editing-data))))
 
 (defmethod dispatcher/action :story-create
   [db [_ board-data]]
