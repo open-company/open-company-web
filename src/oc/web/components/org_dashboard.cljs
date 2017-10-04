@@ -34,8 +34,12 @@
 
 (defn refresh-board-data []
   (when (not (router/current-activity-id))
-    (utils/after 100
-      #(dis/dispatch! [:board-get (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")]))))
+    (let [board-data (dis/board-data)
+          fixed-board-data (if board-data
+                              board-data
+                              (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards (dis/org-data))))]
+      (utils/after 100
+        #(dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))
 
 (defcomponent org-dashboard [data owner]
 

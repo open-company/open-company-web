@@ -153,13 +153,13 @@
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
         (if (responsive/is-tablet-or-mobile?)
-          (router/nav! (oc-urls/boards))
+          (utils/after 10 #(router/nav! (oc-urls/boards)))
           (let [board-to (get-default-board org-data)]
             (if board-to
               (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
                 (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-                (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
-              (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
+                (utils/after 10 #(router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))
+              (utils/after 10 #(router/nav! (oc-urls/all-activity (:slug org-data))))))))))
 
   ;; Change service connection 
   (when (jwt/jwt) ; only for logged in users
@@ -215,8 +215,11 @@
           next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-change-status)
           with-story-editing (if story-editing
                                 (assoc next-db :story-editing story-editing)
-                                next-db)]
-      with-story-editing)))
+                                next-db)
+          without-loading (if is-currently-shown
+                            (dissoc with-story-editing :loading)
+                            with-story-editing)]
+      without-loading)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
