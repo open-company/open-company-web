@@ -19,8 +19,8 @@
 (defn org-data-key [org-slug]
   (vec (conj (org-key org-slug) :org-data)))
 
-(defn all-activity-key [org-slug]
-  (vec (concat (org-key org-slug) [:boards :all-activity])))
+(defn all-posts-key [org-slug]
+  (vec (concat (org-key org-slug) [:boards :all-posts])))
 
 (defn calendar-key [org-slug]
   (vec (conj (org-key org-slug) :calendar)))
@@ -35,8 +35,8 @@
   (vec (concat (org-key org-slug) [:secure-stories secure-id])))
 
 (defn activity-key [org-slug board-slug activity-uuid]
-  (let [board-key (if (= board-slug :all-activity)
-                    (all-activity-key org-slug)
+  (let [board-key (if (= board-slug :all-posts)
+                    (all-posts-key org-slug)
                     (board-data-key org-slug board-slug))]
     (vec (concat board-key [:fixed-items activity-uuid]))))
 
@@ -126,10 +126,10 @@
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
                              :query-params query-params})]
-   :all-activity        [[:base :org-slug]
+   :all-posts        [[:base :org-slug]
                           (fn [base org-slug]
                             (when (and base org-slug)
-                              (get-in base (all-activity-key org-slug))))]
+                              (get-in base (all-posts-key org-slug))))]
    :calendar            [[:base :org-slug]
                           (fn [base org-slug]
                             (when (and base org-slug)
@@ -244,14 +244,14 @@
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
 
-(defn all-activity-data
-  "Get org all activity data."
+(defn all-posts-data
+  "Get org all posts data."
   ([]
-    (all-activity-data @app-state))
+    (all-posts-data @app-state))
   ([data]
-    (all-activity-data data (router/current-org-slug)))
+    (all-posts-data data (router/current-org-slug)))
   ([data org-slug]
-    (get-in data (all-activity-key org-slug))))
+    (get-in data (all-posts-key org-slug))))
 
 (defn calendar-data
   "Get org calendar data."
@@ -332,8 +332,8 @@
 (defn print-org-data []
   (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
-(defn print-all-activity-data []
-  (js/console.log (get-in @app-state (all-activity-key (router/current-org-slug)))))
+(defn print-all-posts-data []
+  (js/console.log (get-in @app-state (all-posts-key (router/current-org-slug)))))
 
 (defn print-team-data []
   (js/console.log (get-in @app-state (team-data-key (:team-id (org-data))))))
@@ -370,7 +370,7 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
-(set! (.-OCWebPrintAllActivityData js/window) print-all-activity-data)
+(set! (.-OCWebPrintAllActivityData js/window) print-all-posts-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)

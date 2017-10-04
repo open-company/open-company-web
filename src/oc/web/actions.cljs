@@ -39,8 +39,8 @@
 
 (defn get-default-board [org-data]
   (let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (if (= last-board-slug "all-activity")
-      {:slug "all-activity"}
+    (if (= last-board-slug "all-posts")
+      {:slug "all-posts"}
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
         (if board
@@ -121,10 +121,10 @@
   [db [_ org-data saved?]]
   (let [boards (:boards org-data)]
     (cond
-      ;; If it's all activity page, loads all activity for the current org
+      ;; If it's all posts page, loads all posts for the current org
       (and (router/current-board-slug)
-           (= (router/current-board-slug) "all-activity"))
-      (api/get-all-activity org-data)
+           (= (router/current-board-slug) "all-posts"))
+      (api/get-all-posts org-data)
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -155,7 +155,7 @@
               (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
                 (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
                 (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
-              (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
+              (router/nav! (oc-urls/all-posts (:slug org-data)))))))))
   (-> db
     (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
     (assoc :org-editing (-> (:org-editing db)
@@ -233,8 +233,8 @@
       (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
-  (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
-        board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+        board-key (if is-all-posts (dispatcher/all-posts-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
         new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body board-data (:topics board-data)))
         new-board-data (assoc board-data :fixed-items new-entries)]
@@ -790,9 +790,9 @@
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ activity-uuid reaction-data]]
-  (let [is-all-activity (:from-all-activity @router/path)
+  (let [is-all-posts (:from-all-posts @router/path)
         org-slug (router/current-org-slug)
-        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         entry-data (get (get board-data :fixed-items) activity-uuid)
         old-reactions-loading (or (:reactions-loading entry-data) [])
@@ -804,9 +804,9 @@
 
 (defmethod dispatcher/action :reaction-toggle/finish
   [db [_ activity-uuid reaction reaction-data]]
-  (let [is-all-activity (:from-all-activity @router/path)
+  (let [is-all-posts (:from-all-posts @router/path)
         org-slug (router/current-org-slug)
-        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         entry-data (get-in board-data [:fixed-items activity-uuid])
         next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
@@ -828,9 +828,9 @@
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
-        is-all-activity (:from-all-activity @router/path)
+        is-all-posts (:from-all-posts @router/path)
         activity-uuid (:resource-uuid interaction-data)
-        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
         fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
@@ -887,11 +887,11 @@
   [db interaction-data add-event?]
   (let [; Get the current router data
         org-slug (router/current-org-slug)
-        is-all-activity (:from-all-activity @router/path)
+        is-all-posts (:from-all-posts @router/path)
         board-slug (router/current-board-slug)
         activity-uuid (:resource-uuid interaction-data)
         ; Board data
-        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug board-slug))
+        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
         ; Entry data
         fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
@@ -946,11 +946,11 @@
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
-   #(let [from-all-activity (= (router/current-board-slug) "all-activity")
+   #(let [from-all-posts (= (router/current-board-slug) "all-posts")
           activity-url (if (= activity-type "story")
                          (oc-urls/story board-slug activity-uuid)
                          (oc-urls/entry board-slug activity-uuid))]
-      (router/nav! (str activity-url (when from-all-activity "?aa")))))
+      (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (assoc db :activity-modal-fade-in activity-uuid))
 
 (defmethod dispatcher/action :entry-edit
@@ -962,13 +962,13 @@
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
     (utils/after 1 #(let [board-filters (:board-filters db)
-                          from-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
+                          from-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
                           last-cookie (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)))]
                       (router/nav!
                         (cond
                           ; AA
-                          from-all-activity
-                          (oc-urls/all-activity (router/current-org-slug))
+                          from-all-posts
+                          (oc-urls/all-posts (router/current-org-slug))
                           ; Board with topic filter
                           (string? board-filters)
                           (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
@@ -1022,9 +1022,9 @@
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)
-        is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
+        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
         org-slug (router/current-org-slug)
-        board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         as-of (utils/as-of-now)
         new-entry? (empty? (:uuid entry-data))
@@ -1035,7 +1035,7 @@
         old-entries (:fixed-items board-data)
         new-entries (assoc old-entries (:uuid fixed-entry) fixed-entry)
         next-board-data (assoc board-data :fixed-items new-entries)
-        next-board-filters (if (or is-all-activity (= (:board-filters db) (:topic-slug entry-data)))
+        next-board-filters (if (or is-all-posts (= (:board-filters db) (:topic-slug entry-data)))
                               ; if it's filtering by the same topic of the new entry leave it be
                               (:board-filters db)
                               (if (keyword? (:board-filters db))
@@ -1052,9 +1052,9 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [temp-uuid activity-data]}]]
-  (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
-    ;; FIXME: refresh the last loaded all-activity link
-    (when-not is-all-activity
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+    ;; FIXME: refresh the last loaded all-posts link
+    (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
   ; Add the new activity into the board
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
@@ -1068,8 +1068,8 @@
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
-  (let [is-all-activity (utils/in? (:route @router/path) "all-activity")
-        board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
+  (let [is-all-posts (utils/in? (:route @router/path) "all-posts")
+        board-key (if is-all-posts (dispatcher/all-posts-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get-in db board-key)
         next-fixed-items (dissoc (:fixed-items board-data) (:uuid activity-data))
         next-board-data (assoc board-data :fixed-items next-fixed-items)]
@@ -1131,28 +1131,28 @@
   [db [_]]
   (dissoc db :board-editing))
 
-(defmethod dispatcher/action :all-activity-get
+(defmethod dispatcher/action :all-posts-get
   [db [_]]
-  (api/get-all-activity (dispatcher/org-data))
+  (api/get-all-posts (dispatcher/org-data))
   db)
 
-(defmethod dispatcher/action :all-activity-calendar
+(defmethod dispatcher/action :all-posts-calendar
   [db [_ {:keys [link year month]}]]
-  (api/get-all-activity (dispatcher/org-data) link year month)
+  (api/get-all-posts (dispatcher/org-data) link year month)
   db)
 
-(defmethod dispatcher/action :all-activity-get/finish
+(defmethod dispatcher/action :all-posts-get/finish
   [db [_ {:keys [org year month body]}]]
   (if body
-    (let [all-activity-key (dispatcher/all-activity-key org)
-          fixed-all-activity (utils/fix-all-activity (:collection body))
-          with-calendar-data (-> fixed-all-activity
+    (let [all-posts-key (dispatcher/all-posts-key org)
+          fixed-all-posts (utils/fix-all-posts (:collection body))
+          with-calendar-data (-> fixed-all-posts
                                 (assoc :year year)
                                 (assoc :month month)
                                 ;; Force the component to trigger a did-remount
                                 ;; or it won't see the finish of the loading
                                 (assoc :rand (rand 1000)))]
-      (assoc-in db all-activity-key with-calendar-data))
+      (assoc-in db all-posts-key with-calendar-data))
     db))
 
 (defmethod dispatcher/action :calendar-get
@@ -1165,37 +1165,37 @@
   (let [calendar-key (dispatcher/calendar-key org)]
     (assoc-in db calendar-key body)))
 
-(defmethod dispatcher/action :all-activity-more
+(defmethod dispatcher/action :all-posts-more
   [db [_ more-link direction]]
-  (api/load-more-all-activity more-link direction)
-  (let [all-activity-key (dispatcher/all-activity-key (router/current-org-slug))
-        all-activity-data (get-in db all-activity-key)
-        next-all-activity-data (assoc all-activity-data :loading-more true)]
-    (assoc-in db all-activity-key next-all-activity-data)))
+  (api/load-more-all-posts more-link direction)
+  (let [all-posts-key (dispatcher/all-posts-key (router/current-org-slug))
+        all-posts-data (get-in db all-posts-key)
+        next-all-posts-data (assoc all-posts-data :loading-more true)]
+    (assoc-in db all-posts-key next-all-posts-data)))
 
 ; (def default-activity-limit 50)
 
-(defmethod dispatcher/action :all-activity-more/finish
+(defmethod dispatcher/action :all-posts-more/finish
   [db [_ {:keys [org direction body]}]]
   (if body
-    (let [all-activity-key (dispatcher/all-activity-key org)
-          fixed-all-activity (utils/fix-all-activity (:collection body))
-          old-all-activity (get-in db all-activity-key)
-          next-links (vec (remove #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous")) (:links fixed-all-activity)))
+    (let [all-posts-key (dispatcher/all-posts-key org)
+          fixed-all-posts (utils/fix-all-posts (:collection body))
+          old-all-posts (get-in db all-posts-key)
+          next-links (vec (remove #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous")) (:links fixed-all-posts)))
           link-to-move (if (= direction :up)
-                          (utils/link-for (:links old-all-activity) "next")
-                          (utils/link-for (:links old-all-activity) "previous"))
+                          (utils/link-for (:links old-all-posts) "next")
+                          (utils/link-for (:links old-all-posts) "previous"))
           fixed-next-links (if link-to-move
                               (vec (conj next-links link-to-move))
                               next-links)
-          with-links (assoc fixed-all-activity :links fixed-next-links)
-          new-items (merge (:fixed-items old-all-activity) (:fixed-items with-links))
-          keeping-items (count (:fixed-items old-all-activity))
-          new-all-activity (-> with-links
+          with-links (assoc fixed-all-posts :links fixed-next-links)
+          new-items (merge (:fixed-items old-all-posts) (:fixed-items with-links))
+          keeping-items (count (:fixed-items old-all-posts))
+          new-all-posts (-> with-links
                               (assoc :fixed-items new-items)
                               (assoc :direction direction)
                               (assoc :saved-items keeping-items))]
-      (assoc-in db all-activity-key new-all-activity))
+      (assoc-in db all-posts-key new-all-posts))
     db))
 
 (defmethod dispatcher/action :story-get
@@ -1303,8 +1303,8 @@
                               (assoc board-key (:slug board-data))
                               (dissoc (if (= (:type activity-data) "entry") :storyboard-slug :board-slug)))]
     (api/update-entry fixed-activity-data)
-    (if (utils/in? (:route @router/path) "all-activity")
-      (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-activity (:uuid activity-data))]
+    (if (utils/in? (:route @router/path) "all-posts")
+      (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-posts (:uuid activity-data))]
         (assoc-in db next-activity-data-key fixed-activity-data))
       (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
             next-activity-data-key (dispatcher/activity-key (router/current-org-slug) (:slug board-data) (:uuid activity-data))]

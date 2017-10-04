@@ -1,8 +1,8 @@
-div.all-activity {
+div.all-posts {
   width: 895px;
   margin-left: 16px;
 
-  div.all-activity-cards {
+  div.all-posts-cards {
     float: left;
     width: 617px;
 
@@ -15,7 +15,7 @@ div.all-activity {
       @include avenir_BOOKO();
     }
 
-    div.all-activity-cards-inner {
+    div.all-posts-cards-inner {
       position: relative;
 
       div.activities-overlay {
@@ -48,7 +48,7 @@ div.all-activity {
         }
       }
 
-      div.activity-card.all-activity-card {
+      div.activity-card.all-posts-card {
         width: 617px;
         max-height: initial;
         margin: 0px 0px 20px 0px;
@@ -77,12 +77,12 @@ div.all-activity {
     }
   }
 
-  div.all-activity-nav {
+  div.all-posts-nav {
     float: right;
     width: 224px;
     position: relative;
 
-    div.all-activity-nav-inner {
+    div.all-posts-nav-inner {
       position: fixed;
       overflow-y: auto;
       min-width: 150px;

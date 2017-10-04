@@ -24,8 +24,8 @@
     (router/nav!
       (if (string? board-filters)
         (oc-urls/board-filter-by-topic org board board-filters)
-        (if (:from-all-activity @router/path)
-          (oc-urls/all-activity org)
+        (if (:from-all-posts @router/path)
+          (oc-urls/all-posts org)
           (if (string? current-board-filters)
             (oc-urls/board-filter-by-topic org board current-board-filters)
             (if (= current-board-filters :by-topic)

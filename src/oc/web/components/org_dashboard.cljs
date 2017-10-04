@@ -56,10 +56,10 @@
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
-          all-activity-data (dis/all-activity-data data)]
+          all-posts-data (dis/all-posts-data data)]
       (if (or (not org-data)
               (and (not board-data)
-                   (not all-activity-data)))
+                   (not all-posts-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
@@ -86,8 +86,8 @@
             ;; Activity modal
             (and (router/current-activity-id)
                  (not (:entry-edit-dissmissing data)))
-            (let [from-aa (:from-all-activity @router/path)
-                  board-slug (if from-aa :all-activity (router/current-board-slug))]
+            (let [from-ap (:from-all-posts @router/path)
+                  board-slug (if from-ap :all-posts (router/current-board-slug))]
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
           ;; Alert modal
           (when (:alert-modal data)
@@ -112,7 +112,7 @@
                    :content-loaded (or (:loading board-data) (:loading data))
                    :org-data org-data
                    :board-data board-data
-                   :all-activity-data all-activity-data
+                   :all-posts-data all-posts-data
                    :force-edit-topic (:force-edit-topic data)
                    :card-width card-width
                    :columns-num columns-num
@@ -120,4 +120,4 @@
                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                    :is-dashboard true
                    :board-filters (:board-filters data)
-                   :is-all-activity (utils/in? (:route @router/path) "all-activity")})))))))))
+                   :is-all-posts (utils/in? (:route @router/path) "all-posts")})))))))))

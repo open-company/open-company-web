@@ -357,12 +357,12 @@
     (fix-entry activity collection-data nil)
     (fix-story activity collection-data)))
 
-(defn fix-all-activity
+(defn fix-all-posts
   "Fix org data coming from the API."
-  [all-activity-data]
-  (assoc all-activity-data :items (vec (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-activity-data))))
-  (let [fixed-activities-list (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-activity-data))
-        without-items (dissoc all-activity-data :items)
+  [all-posts-data]
+  (assoc all-posts-data :items (vec (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-posts-data))))
+  (let [fixed-activities-list (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-posts-data))
+        without-items (dissoc all-posts-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
     with-fixed-activities))
