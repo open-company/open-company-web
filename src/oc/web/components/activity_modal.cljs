@@ -17,14 +17,24 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
 
-(defn dismiss-modal [board-filters]
-  (if (:from-all-activity @router/path)
-    (dis/dispatch! [:all-activity-nav])
-    (dis/dispatch! [:board-nav (router/current-board-slug) board-filters])))
+(defn dismiss-modal [s board-filters]
+  (let [org (router/current-org-slug)
+        board (router/current-board-slug)
+        current-board-filters @(drv/get-ref s :board-filters)]
+    (router/nav!
+      (if (string? board-filters)
+        (oc-urls/board-filter-by-topic org board board-filters)
+        (if (:from-all-activity @router/path)
+          (oc-urls/all-activity org)
+          (if (string? current-board-filters)
+            (oc-urls/board-filter-by-topic org board current-board-filters)
+            (if (= current-board-filters :by-topic)
+              (oc-urls/board-sort-by-topic org board)
+              (oc-urls/board org board))))))))
 
 (defn close-clicked [s & [board-filters]]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal board-filters)))
+  (utils/after 180 #(dismiss-modal s board-filters)))
 
 (defn delete-clicked [e activity-data]
   (utils/event-stop e)
@@ -49,6 +59,7 @@
 (rum/defcs activity-modal < rum/reactive
                             (drv/drv :activity-modal-fade-in)
                             (drv/drv :org-data)
+                            (drv/drv :board-filters)
                             (rum/local false ::first-render-done)
                             (rum/local false ::dismiss)
                             (rum/local false ::animate)

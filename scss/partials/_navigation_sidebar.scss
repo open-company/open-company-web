@@ -220,6 +220,10 @@ div.left-navigation-sidebar {
 
           &.new {
             @include avenir_B();
+
+            &:hover {
+              @include avenir_B();
+            }
           }
 
           .emojione {
