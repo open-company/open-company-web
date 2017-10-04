@@ -196,10 +196,14 @@
                  (not= (:board-filters db) "uncategorized")
                  (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
         (router/redirect-404!))
+      ;; Follow the interactions link to connect to the Interaction service WebSocket to watch for comment/reaction
+      ;; changes, this will also disconnect prior connection if we were watching another board already
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
           (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-      (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other])))
+      ;; Tell the container service that we saw this board
+      (when (:uuid fixed-board-data)
+        (ws-cc/container-seen (:uuid fixed-board-data))))
     (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
                                      (:entry-editing db))
@@ -1102,15 +1106,13 @@
                            (oc-urls/board-sort-by-topic (router/current-org-slug) board-slug)
                            (oc-urls/board (router/current-org-slug) board-slug)))]
     (utils/after 10
-      (do
-        (ws-cc/container-seen next-board-uuid) ; let change service know we've seen the board we're navigating to
-        #(if (:activity-pushed db)
-           (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-                 parts (dissoc @router/path :route :activity)]
-              (router/set-route! route parts)
-              (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-              (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-           (router/nav! next-board-url))))
+      #(if (:activity-pushed db)
+         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+               parts (dissoc @router/path :route :activity)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
+         (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
 
 (defmethod dispatcher/action :storyboard-nav
@@ -1119,15 +1121,13 @@
         next-board-uuid (:uuid next-board-data)
         next-board-url (oc-urls/board (router/current-org-slug) storyboard-slug)]
     (utils/after 10
-      (do
-        (ws-cc/container-seen next-board-uuid) ; let change service know we've seen the board we're navigating to
-        #(if (:activity-pushed db)
-           (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
-                 parts (dissoc @router/path :route :activity)]
-              (router/set-route! route parts)
-              (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-              (dispatcher/dispatch! [:input [:activity-pushed] nil]))
-           (router/nav! next-board-url))))
+      #(if (:activity-pushed db)
+         (let [route [(router/current-org-slug) (router/current-board-slug) "dashboard"]
+               parts (dissoc @router/path :route :activity)]
+            (router/set-route! route parts)
+            (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
+         (router/nav! next-board-url)))
     db))
 
 (defmethod dispatcher/action :all-activity-nav
