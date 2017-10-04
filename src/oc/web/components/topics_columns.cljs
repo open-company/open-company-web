@@ -159,9 +159,6 @@
                          (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                             :title "Create a new update"
-                             :data-toggle "tooltip"
-                             :data-placement "top"
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
@@ -172,7 +169,7 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
-                  (dom/label {:class "add-to-board-label"}) "New"))
+                  (dom/label {:class "add-to-board-label"}) "New Post"))
               ;; Add entry floating button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
@@ -195,65 +192,6 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
-              ;; Add story buttons container
-              (when (= (:type board-data) "story")
-                (let [;; All the boards that are of story type, that are not drafts and that are not read-only
-                      storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
-                      ;; Select only the needed keys
-                      storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
-                      ;; Rename the keys for the dropdown
-                      fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
-                  (when (or (not (:read-only board-data))
-                            (and (= (:slug board-data) "drafts")
-                                 (pos? (count storyboards))))
-                    (dom/div {:class "new-story-container group"}
-                      ;; Add story button
-                      (when (and (not is-all-posts)
-                                 (not (responsive/is-tablet-or-mobile?))
-                                 (or (utils/link-for (:links board-data) "create")
-                                     (= (:slug board-data) "drafts")))
-                        (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                                     :title "Create a new journal entry"
-                                     :data-toggle "tooltip"
-                                     :data-placement "top"
-                                     :on-click #(if (= (router/current-board-slug) "drafts")
-                                                  (if (= (count fixed-storyboards) 1)
-                                                    (dis/dispatch! [:story-create (first storyboards)])
-                                                    (om/set-state! owner :show-storyboards-top-dropdown (not show-storyboards-top-dropdown)))
-                                                  (dis/dispatch! [:story-create board-data]))}
-                          (dom/div {:class "add-to-board-pencil"})
-                          (dom/label {:class "add-to-board-label"}) "New"))
-                      ;; Add story dropdown
-                      (when show-storyboards-top-dropdown
-                        (dom/div {:class "dropdown-top"}
-                          (dropdown-list {:items fixed-storyboards
-                                          :value nil
-                                          :on-change did-select-storyboard-cb
-                                          :on-blur #(om/set-state! owner :show-storyboards-top-dropdown false)})))
-                      ;; Add story flaoting button
-                      (dom/div {:class "dropdown-floating"
-                                :id "new-story-floating-btn"
-                                :style {:opacity (calc-opacity (document-scroll-top))}}
-                        (when (and (not is-all-posts)
-                                   (not (responsive/is-tablet-or-mobile?))
-                                   (or (utils/link-for (:links board-data) "create")
-                                       (= (:slug board-data) "drafts")))
-                          (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn floating-button" (when (= (:slug board-data) "drafts") " is-draft"))
-                                       :data-placement "left"
-                                       :data-toggle "tooltip"
-                                       :title (str "Create a new journal entry")
-                                       :on-click #(if (= (router/current-board-slug) "drafts")
-                                                    (if (= (count fixed-storyboards) 1)
-                                                      (dis/dispatch! [:story-create (first storyboards)])
-                                                      (om/set-state! owner :show-storyboards-floating-dropdown (not show-storyboards-floating-dropdown)))
-                                                    (dis/dispatch! [:story-create board-data]))}
-                            (dom/div {:class "add-to-board-pencil"})))
-                        ;; Add story floating dropdown
-                        (when show-storyboards-floating-dropdown
-                          (dropdown-list {:items fixed-storyboards
-                                          :value nil
-                                          :on-change did-select-storyboard-cb
-                                          :on-blur #(om/set-state! owner :show-storyboards-floating-dropdown false)})))))))
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?)

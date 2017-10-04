@@ -115,7 +115,7 @@ div.topics-columns {
 
         &.top-button {
           float: right;
-          width: 113px;
+          width: auto;
           height: 42px;
           background-color: #FA6654;
           color: white;
@@ -151,69 +151,6 @@ div.topics-columns {
             font-size: 16px;
             color: $carrot_orange;
             float: left;
-          }
-        }
-      }
-
-      div.new-story-container {
-        float: right;
-        position: relative;
-
-        button.add-to-board-btn {
-          &.top-button {
-            width: 113px;
-          }
-        }
-
-        div.tooltip {
-          width: 168px;
-        }
-
-        div.dropdown-top {
-          div.dropdown-list-container {
-            left: -8.5px;
-            top: 52px;
-            width: 170px;
-          }
-        }
-
-        div.dropdown-floating {
-          position: absolute;
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          width: 66px;
-          height: 66px;
-          z-index: 10000;
-
-          div.tooltip {
-            width: 178px;
-          }
-
-          button.add-to-board-btn.floating-button {
-            position: relative;
-            top: 0px;
-            left: 0px;
-            width: 66px;
-            height: 66px;
-          }
-
-          div.dropdown-list-container {
-            left: -97px;
-            top: unset;
-            bottom: 76px;
-            width: 170px;
-
-            div.triangle {
-              top: unset;
-              left: unset;
-              right: 30px;
-              bottom: -2px;
-              border-top: unset;
-              border-left: unset;
-              border-bottom: 1px solid rgba(177,184,192,0.50);
-              border-right: 1px solid rgba(177,184,192,0.50);
-            }
           }
         }
       }
