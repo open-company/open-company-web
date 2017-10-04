@@ -28,7 +28,7 @@
     (timbre/debug "Sending container/seen for:" container-id)
     (@chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}] 1000)))
 
-;; ----- Event handler -----
+;; ----- Event handlers -----
 
 (defmulti event-handler
   "Multimethod to handle our internal events"
@@ -46,8 +46,13 @@
 
 (defmethod event-handler :container/status
   [_ body]
-  (timbre/debug "Change event:" body)
+  (timbre/debug "Status event:" body)
   (dis/dispatch! [:container/status body]))
+
+(defmethod event-handler :container/change
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (dis/dispatch! [:container/change body]))
 
 ;; ----- Sente event handlers -----
 

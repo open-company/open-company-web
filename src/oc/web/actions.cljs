@@ -184,18 +184,27 @@
   (api/get-board link)
   db)
 
+(defn- update-change-data [db board-uuid property timestamp]
+  (let [change-data-key (dispatcher/change-data-key (router/current-org-slug))
+        change-data (get-in db change-data-key)
+        change-map (or (get change-data board-uuid) {})
+        new-change-map (assoc change-map property timestamp)
+        new-change-data (assoc change-data board-uuid new-change-map)]
+    (assoc-in db change-data-key new-change-data)))
+
+(defmethod dispatcher/action :container/change
+  [db [_ {board-uuid :container-id change-at :change-at}]]
+  (timbre/info "Board change:" board-uuid "at:" change-at)
+  ;; Update change-data state that we saw the board
+  (update-change-data db board-uuid :change-at change-at))
+
 (defmethod dispatcher/action :board-seen
   [db [_ {board-uuid :board-uuid}]]
   (timbre/debug "Board seen:" board-uuid)
   ;; Let the change service know we saw the board
   (ws-cc/container-seen board-uuid)
   ;; Update change-data state that we saw the board
-  (let [change-data-key (dispatcher/change-data-key (router/current-org-slug))
-        change-data (get-in db change-data-key)
-        change-map (or (get change-data board-uuid) {})
-        new-change-map (assoc change-map :seen-at (oc-time/current-timestamp))
-        new-change-data (assoc change-data board-uuid new-change-map)]
-    (assoc-in db change-data-key new-change-data)))
+  (update-change-data db board-uuid :seen-at (oc-time/current-timestamp)))
 
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))

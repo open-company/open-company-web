@@ -226,6 +226,7 @@ provided in the table below:
 |  :comment-add/finish | API | Request to add a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
 |  :comments-get | UI | Starts the request to load the comments given an entry UUID. |
 |  :comments-get/finish | API | Request to load the comments for an entry finished, could be it failed though. |
+|  :container/change | WS | Notice from change service with change info for a board |
 |  :container/status | WS | Response from change service watch request with timestamp info for boards |
 |  :default | - | Default action, never used, it's only a fallback |
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
