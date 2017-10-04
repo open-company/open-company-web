@@ -7,6 +7,10 @@ div.activity-card {
   margin: 12px;
   position: relative;
 
+  &:hover {
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+  }
+
   &.activity-card-placeholder {
     background-color: transparent;
     box-shadow: none;
@@ -146,6 +150,12 @@ div.activity-card {
     }
   }
 
+  &:hover {
+    div.activity-card-head.entry-card {
+      background-color: $carrot_light_gray_5;
+    }
+  }
+
   div.activity-card-head {
     width: 100%;
     padding: 16px 24px;
@@ -185,6 +195,14 @@ div.activity-card {
       }
 
       @include activity-tag();
+    }
+  }
+
+  &:hover {
+    div.activity-card-head div.activity-card-head-right {
+      div.activity-tag {
+        background-color: $carrot_light_gray_6;
+      }
     }
   }
 
