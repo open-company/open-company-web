@@ -272,9 +272,9 @@
           (rich-body-editor {:on-change (partial body-on-change s)
                              :initial-body @(::initial-body s)
                              :show-placeholder (not (contains? entry-editing :links))
-                             :show-h2 false
+                             :show-h2 true
                              :dispatch-input-key :entry-editing
-                             :media-config ["photo" "video" "chart" "attachment"]
+                             :media-config ["photo" "video" "chart" "attachment" "divider-line"]
                              :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
           ; Bottom controls

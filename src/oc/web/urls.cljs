@@ -74,12 +74,12 @@
   ([org-slug]
     (str "/" (name org-slug))))
 
-(defn all-activity
-  "Org all activity url"
+(defn all-posts
+  "Org all posts url"
   ([]
-    (all-activity (router/current-org-slug)))
+    (all-posts (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/all-activity")))
+    (str (org org-slug) "/all-posts")))
 
 (defn org-settings
   "Org settings url"
