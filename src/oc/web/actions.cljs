@@ -209,14 +209,11 @@
                                      (:entry-editing db))
                               old-board-data
                               fixed-board-data)
-          with-current-change-status (-> with-current-edit
-                                        (assoc :seen-at (:seen-at old-board-data))
-                                        (assoc :change-at (:change-at old-board-data)))
           story-editing (when (and (utils/in? (:route @router/path) "story-edit")
                                    (router/current-activity-id)
                                    (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                           (get (:fixed-items fixed-board-data) (router/current-activity-id)))
-          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-change-status)
+          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
           with-story-editing (if story-editing
                                 (assoc next-db :story-editing story-editing)
                                 next-db)
@@ -1338,7 +1335,7 @@
 
 (defmethod dispatcher/action :container/status
   [db [_ status-data]]
-  (timbre/info "Change status received:" status-data)
+  (timbre/debug "Change status received:" status-data)
   (let [org-data (dispatcher/org-data db)
         status-by-uuid (group-by :container-id status-data)
         board-data (:boards org-data)
