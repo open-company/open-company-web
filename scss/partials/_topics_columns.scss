@@ -104,17 +104,18 @@ div.topics-columns {
 
         &.top-button {
           float: right;
-          width: 103px;
+          width: 113px;
           height: 42px;
-          background-color: #FAEAE5;
-          color: $carrot_orange;
+          background-color: $carrot_orange;
+          color: white;
           border-radius: 4px;
           padding: 10px 23.5px;
           margin-right: 16px;
           @include avenir_H();
+          border: 2px solid transparent;
 
           div.add-to-board-pencil {
-            background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
+            background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
             background-size: 14px 14px;
             width: 14px;
             height: 14px;
@@ -129,15 +130,6 @@ div.topics-columns {
             color: $carrot_orange;
             float: left;
           }
-
-          &:hover {
-            background-color: $carrot_orange;
-            color: white;
-
-            div.add-to-board-pencil {
-              background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-            }
-          }
         }
       }
 
@@ -147,7 +139,7 @@ div.topics-columns {
 
         button.add-to-board-btn {
           &.top-button {
-            width: 103px;
+            width: 113px;
           }
         }
 
