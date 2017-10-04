@@ -86,7 +86,7 @@
 (def topic-total-x-padding 32)
 (def topic-list-right-margin 36)
 (def left-navigation-sidebar-minimum-right-margin 40)
-(def left-navigation-sidebar-width 188)
+(def left-navigation-sidebar-width 200)
 (def board-container-width 912)
 
 (defn is-tablet-or-mobile? []
