@@ -1350,7 +1350,9 @@
         latest-auth-settings (or (:latest-auth-settings db) 0)
         now (.getTime (js/Date.))
         reload-time (* 60 60 1000)]
-    (when (> (- now latest-entry-point) reload-time)
+    (when (or (> (- now latest-entry-point) reload-time)
+              (and (router/current-org-slug)
+                   (nil? (dispatcher/org-data db (router/current-org-slug)))))
       (api/get-entry-point))
     (when (> (- now latest-auth-settings) reload-time)
       (api/get-auth-settings)))
