@@ -4,7 +4,7 @@ div.activity-card {
   background-color: white;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
   border-radius: 4px;
-  margin: 10px 16px;
+  margin: 12px;
   position: relative;
 
   &.activity-card-placeholder {
@@ -170,6 +170,7 @@ div.activity-card {
       float: right;
       position: relative;
       width: 50%;
+      margin-top: 8px;
 
       div.activity-tag {
         margin-top: 0;
@@ -330,8 +331,8 @@ div.activity-card {
 
   div.activity-card-footer {
     width: 100%;
-    height: 90px;
-    padding: 32px;
+    height: 72px;
+    padding: 24px 24px 24px 32px;
 
     div.more-button {
       float: right;
@@ -339,8 +340,8 @@ div.activity-card {
       margin-right: -6px;
 
       button.more-ellipsis {
-        width: 32px;
-        height: 32px;
+        width: 24px;
+        height: 24px;
         padding: 8px;
         display: block;
         background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
@@ -357,8 +358,8 @@ div.activity-card {
 
       div.dropdown-menu {
         position: absolute;
-        top: -69px;
-        left: -91px;
+        top: -73px;
+        left: -108px;
         border: none;
         outline: none;
         box-shadow: none;
