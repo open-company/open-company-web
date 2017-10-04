@@ -1405,7 +1405,7 @@
         now (.getTime (js/Date.))
         reload-time (* 60 60 1000)]
     (when (> (- now latest-entry-point) reload-time)
-      (api/get-entry-point))
+      (utils/after 1 #(api/get-entry-point)))
     (when (> (- now latest-auth-settings) reload-time)
-      (api/get-auth-settings)))
+      (utils/after 1 #(api/get-auth-settings))))
   db)
