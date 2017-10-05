@@ -163,9 +163,10 @@
       (when (keyword? board-sort-or-filter)
         (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
     ;; do we have the company data already?
-    (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
-                                                    ;; a subset of the company data loaded with a SU
+    (when (or (and (not (contains? query-params :aa))
+                   (not (:fixed-items (dis/board-data))))         ;; if the board data are not present
+              (and (contains? query-params :aa)                   ;; if the all-activity data are not preset
+                   (not (:fixed-items (dis/all-activity-data))))) ;; this latter is used when displaying modal over AA
       (swap! dis/app-state merge {:loading true}))
     (when (contains? query-params :access)
       (swap! dis/app-state assoc :org-settings :main))
