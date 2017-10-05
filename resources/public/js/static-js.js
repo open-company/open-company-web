@@ -88,7 +88,7 @@ $(document).ready(function(){
   if (jwt) {
     $("#site-header-login-item").hide();
   }
-  $("#site-header-signup-item").text( jwt? "Your Newsboard" : "Sign Up" );
+  $("#site-header-signup-item").text( jwt? "Your Carrot Boards" : "Sign Up" );
   $("#site-header-signup-item").attr("onClick", jwt? "window.location = \"/login\"" : "window.location = \"/login?slack\"");
 });
 
