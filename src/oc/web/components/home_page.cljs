@@ -36,9 +36,9 @@
           [:h1.headline "The Company Newsboard"]
           [:div.subheadline#thank-you-top
             "News and company updates that create greater transparency and alignment"]
-          (when (and (not @(::confirm s))
-                     (not @(::thanks-box-top s)))
-            (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
+          ; (when (and (not @(::confirm s))
+          ;            (not @(::thanks-box-top s)))
+          ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
           [:div.small-teams
             "Easy set-up • Free for small teams"]
           (when (and (not @(::confirm s))
@@ -101,18 +101,18 @@
                 [:button.mlb-reset.right-arrow-bt
                   {:disabled true}]]]])
 
-        [:div.try-it
-          {:id "mc_embed_signup"}
-          [:div.try-it-title
-            {:id "thank-you-bottom"}
-            "Request early access"]
-          [:div.try-it-subtitle
-            "Easy set-up • Free for small teams"]
-          (when-not @(::thanks-box-bottom s)
-            [:div
-              (try-it-form "try-it-form-bottom" #(reset! (::thanks-box-bottom s) true))])
-          (when @(::thanks-box-bottom s)
-            (carrot-box-thanks))]
+        ; [:div.try-it
+        ;   {:id "mc_embed_signup"}
+        ;   [:div.try-it-title
+        ;     {:id "thank-you-bottom"}
+        ;     "Request early access"]
+        ;   [:div.try-it-subtitle
+        ;     "Easy set-up • Free for small teams"]
+        ;   (when-not @(::thanks-box-bottom s)
+        ;     [:div
+        ;       (try-it-form "try-it-form-bottom" #(reset! (::thanks-box-bottom s) true))])
+        ;   (when @(::thanks-box-bottom s)
+        ;     (carrot-box-thanks))]
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
