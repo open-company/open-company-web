@@ -784,7 +784,7 @@
 (defmethod dispatcher/action :board-delete
   [db [_ board-slug]]
   (api/delete-board board-slug)
-  db)
+  (dissoc db :latest-entry-point))
 
 (defmethod dispatcher/action :error-banner-show
   [db [_ error-message error-time]]
