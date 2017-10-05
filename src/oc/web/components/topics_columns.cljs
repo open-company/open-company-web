@@ -195,6 +195,7 @@
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?)
+                         (not is-all-posts)
                          (= (:type board-data) "entry"))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
