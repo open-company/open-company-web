@@ -19,7 +19,7 @@ div.alert-modal-container {
 
   div.alert-modal {
     width: 337px;
-    min-height: 197px;
+    min-height: 147px;
     margin: 100px auto 50px;
     position: relative;
     overflow: hidden;
@@ -28,6 +28,10 @@ div.alert-modal-container {
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     padding: 24px;
     text-align: center;
+
+    &.has-buttons {
+      min-height: 197px;
+    }
 
     img.alert-modal-icon {
       max-width: 42px;
@@ -38,7 +42,7 @@ div.alert-modal-container {
     div.alert-modal-title {
       @include avenir_H();
       font-size: 16px;
-      color: #212830;
+      color: $carrot_dark_gray_1;
       margin-top: 8px;
     }
 

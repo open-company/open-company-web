@@ -7,7 +7,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]))
+            [oc.web.local-settings :as ls]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
 
 (defn compare-topic-names [topics topic-slug-1 topic-slug-2]
   (let [topic-name-1 (some #(when (= (:slug %) topic-slug-1) (:name %)) topics)
@@ -17,10 +19,11 @@
 (rum/defcs filters-dropdown < rum/reactive
                               (drv/drv :board-filters)
                               (drv/drv :board-data)
+                              (rum/local false ::show-filters-dropdown)
   [s]
   (let [board-data (drv/react s :board-data)
         board-filters (drv/react s :board-filters)
-        topic-groups (group-by :topic-slug (:entries board-data))]
+        topic-groups (group-by :topic-slug (vals (:fixed-items board-data)))]
     [:div.filters-dropdown-name.group
       (when-not (string? board-filters)
         [:button.mlb-reset.filters-dropdown-button.choice
@@ -39,42 +42,33 @@
                          (router/nav! (oc-urls/board-sort-by-topic)))}
             "By Topic"])
       (when (string? board-filters)
-        [:button.mlb-reset.board-remove-filter
-          {:on-click #(let [org-slug (router/current-org-slug)
-                            board-slug (router/current-board-slug)
-                            last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                        (if (= last-filter :by-topic)
-                          (router/nav! (oc-urls/board-sort-by-topic))
-                          (router/nav! (oc-urls/board))))}])
+        (carrot-close-bt {:on-click #(let [org-slug (router/current-org-slug)
+                                           board-slug (router/current-board-slug)
+                                           last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
+                                       (if (= last-filter :by-topic)
+                                         (router/nav! (oc-urls/board-sort-by-topic))
+                                         (router/nav! (oc-urls/board))))
+                          :width 24
+                          :height 24}))
       (when (string? board-filters)
         [:button.mlb-reset.filters-dropdown-button.choice
-          {:type "button"
-           :id "filters-dropdown-btn"
-           :class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
-           :data-toggle (if (pos? (count topic-groups)) "dropdown" "")}
+          {:class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
+           :on-click #(when (pos? (count topic-groups))
+                        (reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s))))}
           (or (:name (utils/get-topic (:topics board-data) board-filters)) (s/capital board-filters))])
       [:div.filters-dropdown-container
         [:button.mlb-reset.filters-dropdown-caret.dropdown-toggle.choice
-          {:type "button"
-           :id "filters-dropdown-btn"
-           :class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
-           :data-toggle (if (pos? (count topic-groups)) "dropdown" "")
-           :aria-haspopup true
-           :aria-expanded false}
+          {:class (when (or (= board-filters :by-topic) (string? board-filters)) "select")
+           :on-click #(when (pos? (count topic-groups))
+                        (reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s))))}
           (when (pos? (count topic-groups)) [:i.fa.fa-caret-down])]
-        [:div.filters-dropdown-list.dropdown-menu
-          {:aria-labelledby "filters-dropdown-btn"}
-          [:div.triangle]
-          [:div.filters-dropdown-list-content
-            [:ul
-              (for [topic-slug (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
-                    :let [t (some #(when (= (:slug %) topic-slug) %) (:topics board-data))]]
-                [:li.choice
-                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or (:slug t) "uncategorized")))
-                   :class (if (or (= board-filters (:slug t))
-                                  (and (= board-filters "uncategorized")
-                                       (nil? t))) "select" "")
-                   :key (str "board-filters-topic-" (or (:slug t) "uncategorized"))}
-                  (if t
-                    (s/capital (:name t))
-                    "Uncategorized")])]]]]]))
+        (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
+              selected-topics (filter #(utils/in? sorted-topics (:slug %)) (:topics board-data))
+              topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))]
+          (when @(::show-filters-dropdown s)
+            (dropdown-list topics board-filters
+             (fn [t]
+               (reset! (::show-filters-dropdown s) false)
+               (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized"))))
+             (fn []
+               (reset! (::show-filters-dropdown s) false)))))]]))

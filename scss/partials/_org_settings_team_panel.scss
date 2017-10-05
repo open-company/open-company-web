@@ -1,0 +1,65 @@
+div.org-settings-panel {
+  div.org-settings-team.org-settings-panel-row {
+    th.role {
+      padding-right: 16px;
+    }
+
+    th.role, td.role {
+      text-align: right;
+      width: 144px;
+    }
+
+    td.status-column{
+      max-width: 220px;
+
+      div.status-column-inner {
+        max-width: 220px;
+        height: 25px;
+
+        div.status-label {
+          float: left;
+        }
+
+        button {
+          float: left;
+          font-size: 14px;
+          @include avenir_H();
+          margin-left: 8px;
+        }
+      }
+    }
+
+    td.user-name {
+      &.has-pending {
+        max-width: 306px;
+      }
+
+      div.user-avatar-img-container {
+        margin-right: 16px;
+        float: left;
+      }
+
+      @include user-profile(32);
+
+
+      div.user-name-label {
+        float: left;
+        max-width: calc(100% - 78px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 4px;
+      }
+    }
+
+    td {
+      &:last-child {
+        text-align: right;
+      }
+
+      ul.user-type-dropdown-menu {
+        right: 0px;
+        left: unset;
+      }
+    }
+  }
+}

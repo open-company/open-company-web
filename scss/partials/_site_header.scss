@@ -130,11 +130,10 @@ button.navbar-toggle {
 
 ul.navbar-nav li a {
   opacity: 0.8;
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 14px;
-  font-weight: 500;
   text-align: center;
-  color: #6d645f;
+  color: #6E655F !important;
   background-color: transparent !important;
 
   &:hover {
@@ -174,7 +173,7 @@ ul.navbar-top {
       }
 
       a {
-        @include avenir_R();
+        @include avenir_M();
         font-size: 20px;
         color: #333333 !important;
         opacity: 0.6;

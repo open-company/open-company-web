@@ -9,7 +9,7 @@
 (defn animate-reaction [e s]
   (when-let* [target (.-currentTarget e)
               span-reaction (sel1 target :span.reaction)]
-    (doseq [i (range 8)]
+    (doseq [i (range 5)]
       (let [cloned-el (.cloneNode span-reaction true)
             translate-y {:transform ["translateY(0px)" "translateY(-80px)"]
                          :opacity [1 0]}
@@ -20,7 +20,7 @@
         (set! (.-top (.-style cloned-el)) "2px")
         (.appendChild (.-parentElement span-reaction) cloned-el)
         (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
-        (utils/after (+ 800 200 (* 7 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
+        (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (rum/defcs reactions
   [s entry-data]
@@ -31,6 +31,7 @@
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
+                    read-only-reaction (not (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"]))
                     r (if is-loading
                         (merge reaction-data {:count (if (:reacted reaction-data) (dec (:count reaction-data)) (inc (:count reaction-data)))
                                               :reacted (not (:reacted reaction-data))})
@@ -38,9 +39,10 @@
           [:button.reaction-btn.btn-reset
             {:key (str "-entry-" (:uuid entry-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
+                                      :can-react (not read-only-reaction)
                                       :has-reactions (pos? (:count r))})
              :on-click (fn [e]
-                         (when-not is-loading
+                         (when (and (not is-loading) (not read-only-reaction))
                            (when-not (:reacted r)
                              (animate-reaction e s))
                            (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}

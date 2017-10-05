@@ -1,11 +1,18 @@
-$user_profile_header_height: 124px;
-$user_profile_footer_height: 90px;
-$user_profile_content_width: 709;
+@import "vars/main";
 
 div.user-profile {
 
   &.fullscreen-page {
     background-color: $carrot_settings_background;
+  }
+
+  button.carrot-close-bt {
+    // Fallback for mobile that doesn't support fix positioning
+    position: absolute;
+    position: fixed;
+    left: 50%;
+    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
+    top: 0px;
   }
 
   div.user-profile-header {
@@ -14,24 +21,32 @@ div.user-profile {
     font-weight: 500;
     color: $carrot_gray;
     background-color: $carrot_dark_bg_gray;
-    height: $user_profile_header_height;
+    height: $settings_header_height;
     padding: 40px 32px;
-    width: #{$user_profile_content_width}px;
+    width: #{$settings_content_width}px;
     margin: 0 auto;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
   }
 
   div.user-profile-footer {
     height: $user_profile_footer_height;
-    box-shadow: inset 0 1px 0 0 $carrot_dark_bg_gray;
     background-color: white;
     position: relative;
-    width: #{$user_profile_content_width}px;
+    width: #{$settings_content_width}px;
     margin: 0 auto;
     padding: 32px 34px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
 
     button {
       float: right;
-      margin-left: 14px;
+      margin-left: 24px;
+    }
+
+    button.mlb-default {
+      width: 124px;
+      &.no-disable[disabled] {
+        opacity: 1 !important;
+      }
     }
 
     button.mlb-link-black {
@@ -42,9 +57,10 @@ div.user-profile {
   div.user-profile-internal {
     position: relative;
     background-color: white;
-    height: calc(100vh - $user_profile_header_height - $user_profile_footer_height);
+    height: calc(100vh - $settings_header_height - $user_profile_footer_height);
     padding: 40px 32px;
     margin: 0 auto;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
 
     @include big_web(){
       width: 709px;
@@ -63,52 +79,51 @@ div.user-profile {
       div.user-profile-avatar-box {
         height: 72px;
         margin-bottom: 40px;
+        width: 338px;
 
         button.user-profile-avatar {
           width: 72px;
           height: 72px;
           float: left;
-          margin-right: 25px;
           cursor: pointer;
+          margin: 0;
+          padding: 0;
+          opacity: 1;
 
           img.user-avatar-img {
-            max-width: 72px;
-            max-height: 72px;
+            width: 72px;
+            height: 72px;
           }
         }
 
-        div.user-profile-avatar-change {
-          button.upload-photo {
-            height: 67px;
-            margin: 0;
-            padding: 0;
+        button.upload-photo {
+          float: right;
+          width: 236px;
+          height: 72px;
+          text-align: left;
+          margin: 0;
+          padding: 0;
+          opacity: 1;
 
-            &:hover {
-              span.user-avatar-upload-cta {
-                text-decoration: underline;
-              }
-            }
-
+          &:hover {
             span.user-avatar-upload-cta {
-              float: left;
-              text-align: left;
-              height: 22px;
+              text-decoration: underline;
             }
+          }
 
-            span.user-avatar-upload-description {
-              color: #a3a6ab;
-              font-family: $oc_main_font;
-              font-size: 14px;
-              line-height: 1.29;
-              letter-spacing: 0.2px;
-              width: 210px;
-              height: 36px;
-              margin-top: 31px;
-              float: left;
-              text-align: left;
-              font-weight: 300;
-              margin-left: -100px;
-            }
+          span.user-avatar-upload-cta {
+            float: left;
+            width: 100%;
+            margin-top: 6px;
+          }
+
+          span.user-avatar-upload-description {
+            color: #a3a6ab;
+            @include avenir_BOOK();
+            font-size: 14px;
+            float: left;
+            width: 100%;
+            margin-top: 8px;
           }
         }
       }
@@ -117,45 +132,42 @@ div.user-profile {
         text-align: left;
 
         div.user-profile-field-label {
-          font-family: $oc_main_font;
-          font-size: 12px;
-          font-weight: 900;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 1.33;
-          letter-spacing: 0.5px;
-          color: $oc_gray_7;
-          text-transform: uppercase;
+          @include avenir_H();
+          font-size: 15px;
+          color: $carrot_gray;
+          margin-top: 32px;
+
+          span.error {
+            margin-left: 16px;
+            color: $carrot_orange;
+          }
         }
 
         div.user-profile-field {
-          font-family: $oc_main_font;
-          font-size: 16px;
-          color: $carrot_dark_gray;
           margin: 8px 0 24px 0;
           padding: 0;
 
-          input {
-            border-radius: 4px;
-            background-color: #ffffff;
-            border: solid 1px rgba(177, 184, 192, 0.5);
-            padding: 17px 11px;
-            height: 40px;
+          input, select {
             width: 100%;
-            outline: none;
-          }
-
-          select {
-            border-radius: 4px;
-            background-color: #ffffff;
-            border: solid 1px rgba(177, 184, 192, 0.5);
-            padding: 17px 11px;
             height: 40px;
-            width: 100%;
+            border-radius: 4px;
+            background-color: white;
+            border: 1px solid rgba($carrot_light_gray_1, 0.5);
             outline: none;
+            padding: 10px 16px;
+            position: relative;
+            @include avenir_R();
+            font-size: 16px;
+            color: $carrot_dark_gray;
 
             &:disabled {
               opacity: 0.5;
+            }
+
+            @include placeholder() {
+              @include avenir_R();
+              font-size: 16px;
+              color: $carrot_light_gray;
             }
           }
 

@@ -18,8 +18,7 @@ div.footer {
         border: solid 3px rgba(78, 90, 107, 0.2);
         background-color: white;
         text-decoration: none;
-        font-weight: 700;
-        font-family: $oc_main_font;
+        @include avenir_H();
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
@@ -64,8 +63,7 @@ div.footer {
 
       a.footer-link {
         opacity: 0.5;
-        font-weight: 700;
-        font-family: $oc_main_font;
+        @include avenir_H();
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;
@@ -82,8 +80,7 @@ div.footer {
 
       a.contact{
         opacity: 0.5;
-        font-weight: 700;
-        font-family: $oc_main_font;
+        @include avenir_H();
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 1px;

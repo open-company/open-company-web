@@ -16,8 +16,12 @@ Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/do
 900 Black (Heavy)
 */
 
+html {
+  height: 100vh;
+}
+
 html, body {
-  font-family: $oc_main_font;
+  @include avenir_M();
   font-size: 16px;
   width: 100%;
   color: $oc_gray_5;
@@ -96,9 +100,7 @@ div.fullscreen-page {
 }
 
 h1, h2, h3, h4, h5, h6, .oc-header {
-  font-family: $oc_main_font;
-  font-weight: normal;
-  font-style: normal;
+  @include avenir_M();
 }
 
 a {
@@ -177,9 +179,8 @@ div#wrap {
 button.slack-button {
   height: 40px;
   font-size: 15px;
-  font-weight: 400;
-  font-family: $oc_main_font;
-  padding: 5px;
+  @include avenir_M();
+  padding: 8px 5px 5px 5px;
   border-radius: 5px;
   border: 1px solid rgba(78,90,107,0.4);
   opacity: 0.8;
@@ -258,4 +259,12 @@ div.not-found, div.server-error{
       @include avenir_H();
     }
   }
+}
+
+// Textcomplete dropdown for emojis
+
+.dropdown-menu.textcomplete-dropdown {
+  max-height: calc(100vh - 10px);
+  top: 0px;
+  overflow: scroll;
 }

@@ -25,6 +25,12 @@
 
 (def login "/login")
 (def sign-up "/sign-up")
+(def sign-up-profile "/sign-up/profile")
+(def sign-up-team "/sign-up/team")
+
+(def slack-lander "/slack-lander")
+(def slack-lander-team "/slack-lander/team")
+(def slack-lander-check "/slack-lander/check")
 
 (def logout "/logout")
 
@@ -44,8 +50,11 @@
 (def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")
+(def confirm-invitation-profile "/invite/profile")
 
 (def password-reset "/reset")
+
+(def email-wall "/email-required")
 
 ;; User
 
@@ -78,18 +87,19 @@
   ([org-slug]
     (str (org org-slug) "/settings")))
 
-(defn org-logo-setup
-  ([]
-    (org-logo-setup (router/current-org-slug)))
-  ([org-slug]
-    (str (org-settings org-slug) "/logo")))
-
-(defn org-team-settings
+(defn org-settings-team
   "Team settings url"
   ([]
-    (org-team-settings (router/current-org-slug)))
+    (org-settings-team (router/current-org-slug)))
   ([org-slug]
-    (str (org-settings org-slug) "/team-management")))
+    (str (org-settings org-slug) "/team")))
+
+(defn org-settings-invite
+  "Invite people to team url"
+  ([]
+    (org-settings-invite (router/current-org-slug)))
+  ([org-slug]
+    (str (org-settings org-slug) "/invite")))
 
 ;; Boards
 
@@ -103,8 +113,8 @@
   "Board url"
   ([]
     (board (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug]
-    (board org-slug (router/current-board-slug)))
+  ([board-slug]
+    (board (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
 
@@ -122,42 +132,41 @@
   ([org-slug board-slug topic-slug]
     (str (board org-slug board-slug) "/topic/" (name topic-slug))))
 
-(defn board-settings
-  "Board settings url"
+;; Storyboards
+
+(defn drafts
   ([]
-    (board-settings (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug board-slug]
-    (str (board org-slug board-slug) "/settings")))
+    (drafts (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/drafts")))
 
 ;; Entries
 
 (defn entry
   "Entry url"
-  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-entry-uuid)))
-  ([entry-uuid] (entry (router/current-org-slug) (router/current-board-slug) entry-uuid))
+  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([entry-uuid] ( (router/current-org-slug) (router/current-board-slug) entry-uuid))
   ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
   ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/update/" (name entry-uuid))))
 
-;; Stakeholder update
+;; Stories
 
-; (defn updates-list
-;   ([]
-;     (updates-list (router/current-org-slug)))
-;   ([org-slug]
-;     (str (org org-slug) "/updates"))
-;   ([org-slug update-slug]
-;     (str (updates-list org-slug) "/" (name update-slug))))
+(defn story
+  "Story url"
+  ([] (story (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([story-uuid] (story (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([board-slug story-uuid] (story (router/current-org-slug) board-slug story-uuid))
+  ([org-slug board-slug story-uuid] (str (board org-slug board-slug) "/story/" (name story-uuid))))
 
-; (defn update-preview
-;   ([]
-;     (update-preview (router/current-org-slug)))
-;   ([org-slug]
-;     (str (updates-list org-slug) "/preview")))
+(defn story-edit
+  "Edit an already created story."
+  ([] (story-edit (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([board-slug story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
+  ([org-slug board-slug story-uuid] (str (story org-slug board-slug story-uuid) "/edit")))
 
-; (defn update-link
-;   ([]
-;     (update (router/current-org-slug) (router/current-update-date) (router/current-update-slug)))
-;   ([update-date update-slug]
-;     (update (router/current-org-slug) update-date update-slug))
-;   ([org-slug update-date update-slug]
-;     (str (updates-list org-slug) "/" (name update-date) "/" (name update-slug))))
+(defn secure-story
+  "Secure url for story to show readonly view."
+  ([] (secure-story (router/current-org-slug) (router/current-activity-id)))
+  ([secure-id] (secure-story (router/current-org-slug) secure-id))
+  ([org-slug secure-id] (str (org org-slug) "/story/" secure-id)))

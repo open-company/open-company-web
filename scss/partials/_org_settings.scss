@@ -1,119 +1,262 @@
-/* org settings */
+@import "vars/main";
+@import "./_atomic";
 
-body.small-footer {
-  div.main-org-settings {
-    div.org-settings-container {
-      /* 138px is the total height above and below the settings */
-      min-height: calc(100vh - #{$navbar_height}px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px + 1px);
+// FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
+
+div.org-settings {
+  background-color: $oc_gray_8;
+  position: relative;
+
+  button.carrot-close-bt {
+    // Fallback for mobile that doesn't support fix positioning
+    position: absolute;
+    position: fixed;
+    left: 50%;
+    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
+    top: 0px;
+  }
+
+  div.org-settings-inner {
+    width: #{$settings_content_width}px;
+    margin: 0 auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+    background-color: white;
+    min-height: 100vh;
+    overflow-x: visible;
+    overflow-y: auto;
+    position: relative;
+
+    & > div {
+      padding: 0 32px;
+    }
+
+    div.org-settings-header {
+      position: relative;
+      font-size: 32px;
+      font-weight: 500;
+      color: $carrot_gray;
+      background-color: $carrot_dark_bg_gray;
+      height: $settings_header_height;
+      padding: 40px 32px;
+    }
+
+    div.org-settings-footer {
+      margin-top: 64px;
+      height: 90px;
+      width: 100%;
+      padding: 0 32px;
+
+      button {
+        float: right;
+        margin-left: 24px;
+        height: 42px;
+        margin-top: 24px;
+
+        &.save-btn {
+          width: 124px;
+        }
+      }
+    }
+      
+
+    div.org-settings-panel {
+      padding-top: 40px;
+
+      .org-settings-panel-half-row {
+        width: calc(50% - 16px);;
+        float: left;
+
+        &:first-child {
+          margin-right: 16px;
+        }
+
+        &:last-child {
+          margin-left: 16px;
+        }
+      }
+
+      div.org-settings-panel-row {
+        width: 100%;
+        margin-bottom: 32px;
+
+        .org-settings-field {
+          width: 100%;
+          min-height: 40px;
+          border-radius: 4px;
+          background-color: white;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          outline: none;
+          padding: 10px 16px;
+          position: relative;
+          @include avenir_R();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+
+          &.error {
+            border: 1px solid rgba($carrot_orange, 0.5);
+
+            &:after {
+              font-family: "Material Design Icons";
+              position: absolute;
+              bottom: 8px;
+              right: 4px;
+              content: "\f5D6";
+              font-size: 20px;
+              color: $carrot_orange;
+            }
+          }
+
+          @include placeholder() {
+            @include avenir_R();
+            font-size: 16px;
+            color: $carrot_light_gray;
+          }
+
+          input, textarea {
+            border: none;
+            outline: none;
+            min-height: 20px;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+          }
+        }
+
+        table.org-settings-table {
+          width: 100%;
+          margin: 0;
+          padding: 0;
+
+          tr {
+
+            th {
+              @include avenir_H();
+              font-size: 14px;
+              color: $oc_gray_7;
+
+              span.error {
+                @include avenir_H();
+                font-size: 14px;
+                margin-left: 16px;
+                color: $carrot_orange;
+              }
+
+            }
+
+            td {
+              padding: 16px 0;
+              border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
+              @include avenir_R();
+              font-size: 16px;
+              color: $carrot_dark_gray;
+            }
+          }
+        }
+
+        .org-settings-list {
+          width: 100%;
+
+          .org-settings-list-item {
+            height: 48px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba($carrot_light_gray, 0.3);
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            .org-settings-list-item-name {
+              float: left;
+              @include avenir_R();
+              font-size: 16px;
+              color: $carrot_dark_gray;
+            }
+
+            .org-settings-list-item-btn {
+              @include mlb-link($carrot_text_blue);
+              @include avenir_H();
+              font-size: 14px;
+              float: right;
+            }
+
+            .org-settings-list-item-remove-btn {
+              @include mlb-link($carrot_orange);
+              @include avenir_H();
+              font-size: 14px;
+              float: right;
+            }
+          }
+        }
+
+        .org-settings-label {
+          width: 100%;
+          @include avenir_H();
+          font-size: 14px;
+          color: $oc_gray_7;
+
+          label {
+            @include avenir_H();
+            font-size: 14px;
+            color: $oc_gray_7;
+          }
+
+          .error {
+            margin-left: 16px;
+            color: $carrot_orange;
+          }
+
+          .success-message {
+            margin-left: 16px;
+            color: $carrot_green;
+          }
+        }
+      }
     }
   }
 }
 
-div.main-org-settings {
-  div.org-settings-container {
-    div.settings-container {
-      width: 580px;
+div.org-settings-tabs {
+  min-height: 24px;
+  background-color: $carrot_dark_bg_gray;
+  padding: 0 32px;
 
-      div.settings-form-input-label {
-        font-family: $oc_main_font;
-        font-weight: 700;
-        font-size: 14px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: $oc_gray_5;
-        margin-bottom: 0.6rem;
+  div.org-settings-tab {
+    height: 28px;
+    float: left;
+    width: auto;
+    margin: 0px 24px 0px 0px;
+    border-bottom: 4px solid transparent;
+
+    a.org-settings-tab-link {
+      display: block;
+      width: auto;
+      height: 24px;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      @include avenir_M();
+      font-size: 16px;
+      color: $carrot_light_gray;
+      text-decoration: none;
+      outline: none;
+
+      &:active, &:hover, &:focus {
+        text-decoration: none;
       }
+    }
 
-      div.settings-form-input.visibility {
-        margin-bottom: 2rem;
+    &:hover {
+      border-bottom: 4px solid $carrot_light_gray;
+    }
 
-        div.visibility-value {
-          cursor: pointer;
-          h3 {
-            font-size: 14px;
-            font-weight: 400;
-            font-family: $oc_main_font;
-            color: rgba(78,90,107,1);
-            margin-bottom: 5px;
-            margin-top: 0px;
+    &.active {
+      border-bottom: 4px solid $carrot_text_blue;
 
-            i.fa {
-              color: $oc_green;
-            }
-          }
-          p {
-            font-size: 14px;
-            font-weight: 400;
-            font-family: $oc_main_font;
-            color: rgba(78,90,107,1);
-          }
-
-          &:hover {
-            h3{
-              text-decoration: underline;
-            }
-          }
-        }
-      }
-
-      div.dashboard-slug {
-        font-size: 14px;
-        font-weight: 400;
-        font-family: $oc_main_font;
-        color: rgba(78,90,107,1);
-        margin-bottom: 2rem;
-      }
-
-      div.settings-form-label {
-        font-size: 26px;
-        line-height: 1.4;
-        color: $oc_gray_5;
-        height: 54px;
-
-          div.small-loading-container {
-            float: left;
-            margin-left: 20px;
-          }
-      }
-      
-      div.subscription-settings-label {
-        margin-top: 45px;
-      }
-
-      img.loading-spinner {
-        margin-left: 25px;
-        margin-bottom: 10px;
-        width: 50px;
-        opacity: 0;
-
-        &.loading {
-          opacity: 1;
-        }
-      }
-
-      div.settings-form{
-        background-color: rgba(78, 90, 107, 0.05);
-
-        select.org-currency {
-          -webkit-appearance: none;
-          align-items: center;
-          white-space: pre;
-          -webkit-rtl-ordering: logical;
-          cursor: default;
-        }
-
-        div.org-logo-container{
-          width: 50px;
-          height: 50px;
-          border: solid 1px rgba(78, 90, 107, 0.2);
-          padding: 5px;
-          margin-bottom: .5rem;
-
-          img.org-logo {
-            max-width: 40px;
-            max-height: 40px;
-          }
-        }
+      a.org-settings-tab-link {
+        padding: 0;
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_text_blue;
       }
     }
   }

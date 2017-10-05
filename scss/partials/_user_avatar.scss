@@ -7,29 +7,16 @@ button.user-avatar-button{
   width: #{$avatar_size}px;
   height: #{$avatar_size}px;
   border-radius: #{$avatar-size / 2}px;
+  padding: 0;
+
+  &.disabled-user-menu {
+    cursor: default;
+  }
 
   &:active, &:focus {
     outline: none;
     border: 0px solid tranparent;
   }
 
-  div.user-avatar-img-container {
-    width: #{$avatar_size}px;
-    height: #{$avatar_size}px;
-    white-space: nowrap;
-    text-align: center;
-
-    div.user-avatar-img-helper {
-      display: inline-block;
-      height: 100%;
-      vertical-align: middle;
-    }
-
-    img.user-avatar-img {
-      max-width: #{$avatar_size}px;
-      max-height: #{$avatar_size}px;
-      border-radius: #{$avatar-size / 2}px;
-      vertical-align: middle;
-    }
-  }
+  @include user-profile($avatar_size);
 }

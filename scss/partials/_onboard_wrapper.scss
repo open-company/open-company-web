@@ -1,0 +1,420 @@
+div.onboard-wrapper-container {
+  div.onboard-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+
+    div.onboard-wrapper-left {
+      background-color: $carrot_dark_bg_gray;
+      padding: 21px;
+      flex: 1;
+      position: absolute;
+      position: fixed;
+      top: 0px;
+      bottom: 0px;
+      left: 0px;
+      width: 50%;
+
+      div.onboard-wrapper-logo {
+        width: 82px;
+        height: 20px;
+        background-image: cdnUrl("/img/carrot_logo_with_copy.svg");
+        background-size: 82px 20px;
+        background-repeat: no-repeat;
+      }
+
+      div.onboard-wrapper-box {
+        position: absolute;
+        left: 50%;
+        top: 220px;
+        margin-left: -147px;
+        margin-top: 0px;
+        width: 294px;
+        height: 301px;
+        background-image: cdnUrl("/img/ML/carrot_box.svg");
+        background-size: 294px 301px;
+        background-repeat: no-repeat;
+      }
+    }
+
+    div.onboard-wrapper-right {
+      text-align: center;
+      flex: 1;
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      right: 0px;
+      width: 50%;
+    }
+  }
+}
+
+div.onboard-email-container {
+  width: 339px;
+  @include avenir_M;
+  color: $carrot_gray;
+  font-size: 32px;
+  margin: 0 auto;
+  position: relative;
+  top: 50%;
+
+  &.small {
+    font-size: 24px;
+  }
+
+  &.dot-animation {
+    text-align: left;
+    width: 260px;
+  }
+
+  &.error {
+    color: $carrot_orange;
+  }
+
+  div.email-wall-sent-link {
+    color: $carrot_light_gray;
+    @include avenir_R();
+    font-size: 16px;
+    color: $oc_gray_7;
+    margin-top: 16px;
+
+    span.email-address {
+      @include avenir_H();
+      color: $oc_gray_7;
+    }
+  }
+
+  button.continue {
+    margin-top: 16px;
+    width: 170px;
+    height: 42px;
+    background-color: #4D67FC;
+    color: white;
+    @include avenir_H();
+    font-size: 16px;
+    border-radius: 4px;
+    outline: none;
+    border: none;
+  }
+}
+
+div.onboard-lander {
+  text-align: center;
+  margin-top: 62px;
+
+  &.second-step {
+    div.steps {
+      div.step-2 {
+        background-image: cdnUrl("/img/ML/about_principle_2_oval_red.svg");
+        color: $oc_gray_7;
+      }
+
+      div.step-progress-bar:nth-child(2) {
+        background-color: $carrot_orange;
+      }
+    }
+  }
+
+  &.third-step {
+    div.steps {
+      div.step-3 {
+        background-image: cdnUrl("/img/ML/about_principle_3_oval_red.svg");
+        color: $oc_gray_7;
+      }
+
+      div.step-progress-bar:nth-child(4) {
+        background-color: $carrot_orange;
+      }
+    }
+  }
+
+  div.steps {
+    height: 58px;
+    position: relative;
+    margin: 0 auto;
+
+    &.two-steps {
+      width: 278px;
+    }
+
+    &.three-steps {
+      width: 464px;
+    }
+
+    div.step-1 {
+      width: 92px;
+      height: 53px;
+      background-image: cdnUrl("/img/ML/about_principle_1.svg");
+      background-size: 24px;
+      background-repeat: no-repeat;
+      background-position: 50% 0%;
+      @include avenir_R();
+      font-size: 14px;
+      color: $oc_gray_7;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      padding-top: 36px;
+      text-align: center;
+    }
+
+    div.step-2 {
+      width: 92px;
+      height: 53px;
+      background-image: cdnUrl("/img/ML/about_principle_2_oval_gray.svg");
+      background-size: 34px;
+      background-repeat: no-repeat;
+      background-position: 50% -4px;
+      @include avenir_R();
+      font-size: 14px;
+      color: rgba($oc_gray_7, 0.5);
+      position: absolute;
+      top: 0px;
+      left: 186px;
+      padding-top: 36px;
+      text-align: center;
+    }
+
+    div.step-3 {
+      width: 92px;
+      height: 53px;
+      background-image: cdnUrl("/img/ML/about_principle_3_oval_gray.svg");
+      background-size: 34px;
+      background-repeat: no-repeat;
+      background-position: 50% -4px;
+      @include avenir_R();
+      font-size: 14px;
+      color: rgba($oc_gray_7, 0.5);
+      position: absolute;
+      left: 374px;
+      top: 0px;
+      padding-top: 36px;
+      text-align: center;
+    }
+
+    div.step-progress-bar {
+      height: 2px;
+      width: 156px;
+      background-color: $carrot_light_gray_2;
+      position: absolute;
+      top: 12px;
+    }
+
+    div.step-progress-bar:nth-child(2) {
+      left: 61px;
+    }
+
+    div.step-progress-bar:nth-child(4) {
+      left: 248px;
+    }
+  }
+
+  div.main-cta {
+
+    div.title {
+      margin-top: 64px;
+      @include avenir_M();
+      font-size: 32px;
+      color: $carrot_gray;
+    }
+
+    div.subtitle {
+      @include avenir_R();
+      font-size: 16px;
+      color: $oc_gray_7;
+      margin-top: 16px;
+
+      &.error {
+        color: $carrot_orange;
+      }
+
+      span.email-address {
+        @include avenir_H();
+        color: $oc_gray_7;
+      }
+    }
+  }
+
+  div.onboard-form {
+    width: 340px;
+    margin: 0 auto 32px;
+    text-align: left;
+
+    div.logo-upload-container {
+      margin-top: 32px;
+      width: 400px;
+      height: 82px;
+      cursor: pointer;
+
+      &:hover {
+        div.add-picture-link {
+          text-decoration: underline;
+        }
+      }
+
+      &.org-logo {
+        div.org-avatar.missing-logo {
+          border: 1px solid $carrot_light_gray;
+          border-radius: 4px;
+          opacity: 0.2;
+          position: relative;
+          width: 82px;
+          height: 82px;
+
+          &:after {
+            content: "";
+            background-image: cdnUrl("/img/ML/carrot_grey.svg");
+            background-position: 50%;
+            background-size: 30px 62px;
+            background-repeat: no-repeat;
+            width: 82px;
+            height: 82px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
+        }
+
+        div.org-avatar {
+          div.org-avatar-container {
+            height: 82px;
+
+            div.org-avatar-border {
+              width: 82px;
+              height: 82px;
+              float: left;
+              padding: 0px;
+
+              img {
+                max-width: 82px;
+                max-height: 82px;
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
+
+      div.user-avatar-img-container {
+        float: left;
+      }
+
+      @include user-profile(82);
+
+      div.add-picture-link {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_text_blue;
+        float: left;
+        margin-left: 16px;
+        margin-top: 16px;
+      }
+
+      div.add-picture-link-subtitle {
+        @include avenir_BOOK();
+        font-size: 14px;
+        color: rgba($oc_gray_7, 0.5);
+        float: left;
+        margin-left: 16px;
+        margin-top: 12px;
+      }
+    }
+
+    div.field-label {
+      @include avenir_H();
+      font-size: 15px;
+      color: $carrot_gray;
+      margin-top: 32px;
+
+      span.error {
+        margin-left: 16px;
+        color: $carrot_orange;
+      }
+    }
+
+    div.field-description {
+      @include avenir_BOOK();
+      font-size: 14px;
+      margin-top: 16px;
+      color: $carrot_light_gray;
+
+      a {
+        text-decoration: underline;
+        color: rgba($oc_gray_7, 0.5);
+      }
+    }
+
+    div.footer-link {
+      margin-top: 60px;
+      @include avenir_R();
+      font-size: 16px;
+      color: $oc_gray_7;
+      text-align: center;
+
+      a {
+        display: block;
+        @include avenir_H();
+        font-size: 16px;
+        color: $oc_gray_7;
+        text-decoration: underline;
+      }
+    }
+
+    input.field {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 4px;
+      background-color: white;
+      border: 1px solid rgba($carrot_light_gray_1, 0.5);
+      outline: none;
+      padding: 10px 16px;
+      position: relative;
+      @include avenir_R();
+      font-size: 16px;
+      color: $carrot_dark_gray;      
+
+      @include placeholder() {
+        @include avenir_R();
+        font-size: 16px;
+        color: $carrot_light_gray;
+      }
+
+      &.error {
+        border: 1px solid rgba($carrot_orange, 0.5);
+      }
+    }
+
+    div.description {
+      @include avenir_R();
+      color: rgba($oc_gray_7, 0.5);
+      font-size: 14px;
+      margin-top: 24px;
+
+      a {
+        text-decoration: underline;
+        color: rgba($oc_gray_7, 0.5);
+      }
+    }
+
+    button.continue {
+      margin-top: 16px;
+      outline: none;
+      border: none;
+      width: 100%;
+      height: 42px;
+      background-color: #4D67FC;
+      color: white;
+      @include avenir_H();
+      font-size: 16px;
+      border-radius: 4px;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+      }
+    }
+  }
+}

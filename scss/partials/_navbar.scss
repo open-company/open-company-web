@@ -48,56 +48,6 @@ nav.oc-navbar {
     height: #{$mobile_navbar_height}px;
   }
 
-  div.su-snapshot-preview{
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    width: 100%;
-    background-color: #989EA6;
-
-    div.su-snapshot-preview-internal{
-      padding: 13.5px 30px;
-      text-align: center;
-
-      div.su-snapshot-buttons{
-        margin: 0 auto;
-
-        button.btn-solid {min-height: 38px}
-
-        button i.fa.fa-slack, button img.small-loading {
-          font-size: 19px;
-          color: rgba(78, 90, 107, 0.7);
-          width: 19px;
-          height: 19px;
-        }
-      }
-
-      div.preview-title {
-        width: 150px;
-        font-weight: 700;
-        font-family: $oc_main_font;
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 1px;
-        color: #ffffff;
-        margin: 0 auto;
-      }
-
-      button.close-preview {
-        float: right;
-        width: 30px;
-        height: 30px;
-        margin: 0;
-        padding: 0;
-        background-color: transparent;
-        border: none;
-        outline: none;
-        display: block;
-        color: white;
-        margin-top: -30px;
-      }
-    }
-  }
-
   div.oc-navbar-header {
     padding-top: 10px;
   }
@@ -107,6 +57,7 @@ nav.oc-navbar {
     margin: 0 auto;
     padding: 20px 28px 0;
     height: #{$navbar_height}px;
+    width: 100%;
 
     div.oc-navbar-separator {
       border-bottom: 1px solid rgba(78,90,107,0.1);
@@ -125,28 +76,39 @@ nav.oc-navbar {
     }
 
     div.oc-navbar-header-container{
-      height: 45px;
+      height: 40px;
 
       div.navbar-center {
         text-align: center;
         width: 320px;
+        height: 40px;
         position: absolute;
         left: 50%;
+        top: 16px;
         margin-left: -160px;
         @include avenir_H();
         font-size: 26px;
 
-        img.org-avatar-img {
-          max-width: 35px;
-          max-height: 35px;
-          margin-left: 132px;
+        div.org-avatar {
+          height: 40px;
+          div.org-avatar-container {
+            height: 40px;
+            div.org-avatar-border {
+              height: 40px;
+
+              img.org-avatar-img {
+                max-width: 120px;
+                max-height: 40px;
+              }
+            }
+          }
         }
       }
     }
 
     ul.navbar-right {
       float: right;
-      margin-right: 0px;
+      margin-right: 30px;
 
       div.alerts {
         float: right;
@@ -154,6 +116,11 @@ nav.oc-navbar {
 
       div.user-avatar {
         float: right;
+      }
+
+      div.notification-bell {
+        margin-right: 0.5rem;
+        margin-top: 5px;
       }
 
       button.invite-others {
@@ -176,11 +143,9 @@ nav.oc-navbar {
           &.btn-link {
             font-size: 14px;
             color: $oc_blue_dark;
-            font-family: $oc_main_font;
+            @include avenir_M();
             outline: none;
-            font-weight: 400;
             text-transform: none;
-            font-style: normal;
             text-decoration: none;
             opacity: 1;
             padding: .2rem 0px .3rem .5rem;
@@ -228,8 +193,7 @@ nav.oc-navbar {
         margin-left: 10px;
         height: 33px;
         font-size: 0.75rem;
-        font-weight: 700;
-        font-family: $oc_main_font;
+        @include avenir_H();
       }
 
       button.share-button {
@@ -242,7 +206,7 @@ nav.oc-navbar {
       font-size: 14px;
       color: rgba(78,90,107,0.6);
       margin-right: 20px;
-      font-family: $oc_main_font;
+      @include avenir_M();
       margin-top: 2px;
       outline: none;
 

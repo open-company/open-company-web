@@ -8,19 +8,22 @@
             [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
-(def default-user-image "/img/ML/user_avatar_red.svg")
+(def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
- ["/img/ML/user_avatar_blue.svg"
-  "/img/ML/user_avatar_green.svg"
-  "/img/ML/user_avatar_purple.svg"
-  "/img/ML/user_avatar_yellow.svg"])
+ ["/img/ML/happy_face_green.svg"
+  "/img/ML/happy_face_blue.svg"
+  "/img/ML/happy_face_purple.svg"
+  "/img/ML/happy_face_yellow.svg"])
+
+(defn random-user-image []
+  (first (shuffle (vec (conj other-user-images default-user-image)))))
 
 (defn- user-icon [user-id]
   (if (= user-id (jwt/get-key :user-id))
     ;; If the user id is the same of the current JWT use the red icon
     default-user-image
     ;; if not get a random icon from the rest of the images vector
-    (first (shuffle other-user-images))))
+    (first other-user-images)))
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
@@ -36,18 +39,18 @@
          :data-toggle (if tooltip? "tooltip" "")
          :data-placement "top"
          :data-container "body"
-         :title (:name user-data)}]]))
+         :title (if tooltip? (:name user-data) "")}]]))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive
                          (drv/drv :current-user-data)
-  [s {:keys [classes click-cb]}]
+  [s {:keys [classes click-cb disable-menu]}]
   (let [not-mobile? (not (responsive/is-mobile-size?))]
     [:button.user-avatar-button.group
       {:type "button"
        :class (str classes)
        :id "dropdown-toggle-menu"
-       :data-toggle (when not-mobile? "dropdown")
+       :data-toggle (when (or not-mobile? (not disable-menu)) "dropdown")
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}

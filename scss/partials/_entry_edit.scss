@@ -24,7 +24,7 @@ div.entry-edit-modal-container {
     min-height: 330px;
     margin: 100px auto 50px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
@@ -36,13 +36,9 @@ div.entry-edit-modal-container {
       div.user-avatar-img-container{
         margin-right: 16px;
         float: left;
-
-        img {
-          max-width: 32px;
-          max-height: 32px;
-          border-radius: 16px;
-        }
       }
+
+      @include user-profile(32);
 
       div.posting-in {
         @include avenir_M();
@@ -123,8 +119,8 @@ div.entry-edit-modal-container {
               margin: 0;
               padding: 0;
               padding-right: 16px;
-              overflow: scroll;
-              max-height: 250px;
+              overflow-x: hidden;
+              overflow-y: auto;
 
               li.selectable {
                 margin: 6px 0;
@@ -263,7 +259,7 @@ div.entry-edit-modal-container {
         border: none;
         outline: none;
         cursor: text;
-        @include entry-headline();
+        @include activity-headline();
         @include avenir_H();
         font-size: 18px;
         color: $carrot_dark_gray;
@@ -285,7 +281,7 @@ div.entry-edit-modal-container {
         margin: 24px 0;
         cursor: text;
         min-height: 85px;
-        @include entry-body();
+        @include activity-body();
 
         &.hide-placeholder:after {
           display: none !important;
@@ -297,123 +293,6 @@ div.entry-edit-modal-container {
 
         &:after {
           margin: 0;
-        }
-      }
-
-      div.entry-edit-controls-medias {
-        background-color: white;
-
-        button.media {
-          width: 25px;
-          height: 24px;
-          background-position: 50%;
-          background-size: 12px;
-          background-repeat: no-repeat;
-          border-radius: 12px;
-          border: 1px solid rgba($oc_gray_7, 0.2);
-          padding: 0;
-          float: left;
-
-          &:hover, &.active {
-            border: 1px solid rgba($carrot_text_blue, 0.3);
-          }
-        }
-
-        button.add-media-bt {
-          background-image: cdnUrl("/img/ML/add_media_plus_gray.svg");
-          background-position: 0px 0px;
-          transition: transform $add_media_animation, margin-right $add_media_animation;
-          float: left;
-          margin-right: 0px;
-          border: none;
-          background-size: 24px;
-          border-radius: inherit;
-
-          &.disabled {
-            opacity: 0.2;
-          }
-
-          &:hover {
-            background-image: cdnUrl("/img/ML/add_media_plus_blue.svg");
-            border: none;
-          }
-
-          &.expanded {
-            transform: rotate(45deg);
-            margin-right: 10px;
-          }
-        }
-
-        div.entry-edit-controls-medias-container {
-          width: 0px;
-          height: 32px;
-          transition: width $add_media_animation;
-          float: left;
-          position: relative;
-          overflow: hidden;
-
-          button.media {
-            margin-left: 0px;
-            transform: rotate(0deg);
-            transition: transform $add_media_animation, margin-left $add_media_animation, opacity $add_media_animation;
-            float: left;
-            top: 0px;
-            left: 0px;
-            position: absolute;
-            opacity: 0;
-          }
-
-          button.media-photo {
-            background-image: cdnUrl("/img/ML/media_photo.png");
-            background-size: 12px 12px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/media_photo_blue.png");
-            }
-          }
-
-          button.media-video {
-            background-image: cdnUrl("/img/ML/media_video.png");
-            background-size: 12px 8px;
-            top: -14px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/media_video_blue.png");
-            }
-          }
-
-          button.media-chart {
-            margin-right: 0px;
-            background-image: cdnUrl("/img/ML/media_chart.png");
-            background-size: 16px 8px;
-            top: -14px;
-
-            &:hover {
-              background-image: cdnUrl("/img/ML/media_chart_blue.png");
-            }
-          }
-
-          &.expanded {
-            width: 250px;
-
-            button.media {
-              opacity: 1;
-            }
-
-            button.media-photo {
-              transform: rotate(0deg);
-            }
-
-            button.media-video {
-              margin-left: 30px;
-              transform: rotate(360deg);
-            }
-
-            button.media-chart {
-              margin-left: 60px;
-              transform: rotate(720deg);
-            }
-          }
         }
       }
 

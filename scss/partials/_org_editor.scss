@@ -1,58 +1,74 @@
 div.org-editor {
-
   div.fullscreen-page {
-    background-color: $oc_gray_1;
+    background-color: $oc_gray_8;
+    min-height: calc(100vh - #{$navbar_height}px);
+
+    nav {
+      border-bottom: 10px solid $carrot_orange;
+      height: #{$navbar_height + $carrot_trend_collapsed_height}px;
+    }
 
     @include mobile(){
       background-color: white;
     }
 
-    div.org-editor-box {
-      width: 520px;
-      margin: #{$navbar_height + 20}px auto 20px;
-      background-color: white;
-      border: 2px solid $oc_yellow;
-      border-radius: 5px;
-      padding: 25px;
-      text-align: center;
+    div.org-editor-container {
+      background-color: $oc_gray_8;
+      min-height: 100vh;
+      padding-top: #{$navbar_height + 60}px;
 
-      div.slack-disclaimer {
-        margin-bottom: 23px;
+      div.org-editor-box {
+        width: 520px;
+        margin: 0px auto 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+        padding: 25px;
         text-align: center;
-        font-family: $oc_main_font;
-        font-size: 14px;
-        font-weight: normal;
-        letter-spacing: 0.4px;
-        color: $oc_gray_5;
-      }
 
-      @include mobile(){
-        width: auto;
-        border: 0px;
-        margin: 0;
-        padding: #{$navbar_height + 20}px 20px 20px;
-      }
+        div.slack-disclaimer {
+          margin-bottom: 23px;
+          text-align: center;
+          font-weight: normal;
+          color: $oc_gray_7;
+          font-size: 14px;
+          @include avenir_H();
+        }
 
-      label.org-editor-message {
-        display: block;
-        width: 100%;
-        font-weight: 400;
-        font-size: 18px;
-        font-family: $oc_main_font;
-        text-align: left;
-      } 
+        @include mobile(){
+          width: auto;
+          border: 0px;
+          margin: 0;
+          padding: #{$navbar_height + 20}px 20px 20px;
+        }
 
-      input.org-editor-input {
-        border: 1px solid rgba(78,90,107,0.4);
-        height: 42px;
-        width: 100%;
-        font-size: 14px;
-        font-family: $oc_main_font;
-        padding: 0.3rem;
-      }
+        label.org-editor-message {
+          display: block;
+          width: 100%;
+          font-size: 18px;
+          @include avenir_R();
+          text-align: left;
+        } 
 
-      button.get-started-button {
-        text-align: center;
+        input.org-editor-input {
+          width: 100%;
+          min-height: 40px;
+          border-radius: 4px;
+          background-color: white;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          outline: none;
+          padding: 10px 16px;
+          position: relative;
+          @include avenir_R();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+
+          @include placeholder() {
+            @include avenir_R();
+            font-size: 16px;
+            color: $carrot_light_gray;
+          }
+        }
       }
     }
   }

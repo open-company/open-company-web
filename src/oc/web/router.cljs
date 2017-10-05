@@ -103,8 +103,11 @@
 (defn current-board-slug []
   (:board @path))
 
-(defn current-entry-uuid []
-  (:entry @path))
+(defn current-activity-id []
+  (:activity @path))
+
+(defn current-secure-story-id []
+  (:secure-id @path))
 
 (defn query-params []
   (:query-params @path))
@@ -123,6 +126,11 @@
   "Cookie to save the last order the user visualized a board."
   [org-slug board-slug]
   (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
+
+(defn should-show-dashboard-tooltips
+  "Cookie to remember if the boards and journals tooltips where shown."
+  [user-id]
+  (str "should-show-dashboard-tooltips-" user-id))
 
 (defn print-router-path []
   (js/console.log @path))

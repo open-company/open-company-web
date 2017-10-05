@@ -1,0 +1,413 @@
+div.activity-card {
+  width: 432px;
+  float: left;
+  background-color: white;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+  border-radius: 8px;
+  padding: 24px 24px 72px;
+  margin: 10px 16px;
+  position: relative;
+
+  &.activity-card-placeholder {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+  }
+
+  &.empty-state {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    margin-top: 20px;
+    flex: 1;
+    text-align: center;
+    width: 100%;
+
+    div.empty-state-content {
+      height: 160px;
+      position: relative;
+      top: 50%;
+      margin-top: -80px;
+
+      img {
+        width: 168px;
+        height: 120px;
+      }
+
+      div.activity-card-title {
+        font-size: 14px;
+        color: $carrot_light_gray;
+        @include avenir_H();
+        margin-top: 20px;
+        text-align: center;
+
+        button {
+          color: $carrot_text_blue;
+          padding: 0;
+          margin: 0;
+
+          &:hover, &:avtive, &:focus {
+            border: none;
+            outline: none;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  &.all-activity-card {
+    div.activity-card-content{
+
+      div.activity-card-body {
+
+        &.has-media-preview {
+          width: 100%;
+          margin-right: 0px;
+          float: initial;
+        }
+      }
+
+      div.read-more {
+        width: 100%;
+        text-align: center;
+        margin-top: 24px;
+        color: $carrot_text_blue;
+        @include avenir_H();
+        font-size: 16px;
+      }
+
+      div.activity-card-media-preview {
+        width: 100%;
+        float: initial;
+        margin-top: 16px;
+        max-height: 200px;
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    }
+  }
+
+  &.story-card {
+    width: 667px;
+    float: right;
+
+    div.triangle {
+      background-color: white;
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+      width: 24px;
+      height: 24px;
+      transform: rotate(45deg);
+      position: absolute;
+      left: -10px;
+      top: 25px;
+
+      &:after {
+        content: "";
+        width: 14px;
+        height: 20px;
+        background-color: white;
+        box-shadow: none;
+        top: 9px;
+        left: 20px;
+        position: absolute;
+        transform: rotate(-45deg);
+      }
+    }
+
+    div.activity-card-content {
+      div.activity-card-headline.has-headline {
+        margin-top: 0px;
+      }
+
+      div.activity-card-body.has-body {
+        margin-top: 0px;
+
+        &.has-headline {
+          margin-top: 16px;
+        }
+      }
+    }
+  }
+
+  div.activity-card-breadcrumb {
+    margin-bottom: 24px;
+    @include avenir_R();
+    font-size: 14px;
+    color: $oc_gray_7;
+
+    span.bold {
+      @include avenir_H();
+    }
+  }
+
+  div.activity-card-head {
+    width: 100%;
+
+    div.activity-card-head-author {
+      float: left;
+      min-width: 60%;
+      padding-right: 20px;
+      overflow: hidden;
+
+      @include activity-author();
+    }
+
+    div.activity-card-head-right {
+      float: right;
+      position: relative;
+
+      div.activity-tag {
+        margin-top: 0;
+        float: right;
+      }
+
+      @include activity-tag();
+    }
+  }
+
+  div.activity-card-content {
+    width: 100%;
+
+    div.activity-card-title {
+      @include activity-title();
+      margin-bottom: 16px;
+      margin-top: 24px;
+    }
+
+    div.activity-card-headline {
+      @include activity-headline();
+      text-overflow: ellipsis;
+      width: 100%;
+      overflow: hidden;
+      white-space: pre;
+      max-height: 28px;
+
+      &.has-headline {
+        margin-top: 24px;
+        height: 28px;
+      }
+    }
+
+    div.activity-card-media-preview {
+      width: 72px;
+      height: 72px;
+      float: right;
+      text-align: center;
+      white-space: nowrap;
+      margin-top: 16px;
+      overflow: hidden;
+      background-position: 50%;
+      background-size: cover;
+      border-radius: 4px;
+      position: relative;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:after {
+        position: absolute;
+        font-family: FontAwesome;
+        font-size: 20px;
+        color: white;
+        opacity: 0.5;
+        top: 50%;
+        left: 50%;
+      }
+
+      &:hover {
+        &:after {
+          opacity: 0.8;
+        }
+      }
+
+      &.video {
+        &:after {
+          content: "\f04b";
+          margin-left: -8px;
+          margin-top: -14px;
+        }
+      }
+    }
+
+    div.story-banner {
+      margin-top: 16px;
+      width: 100%;
+      min-height: 200px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    div.activity-card-body {
+      @include activity-body();
+      display: block;
+      line-height: 24px;
+      max-height: #{24*3}px;
+
+      &.has-body {
+        margin-top: 16px;
+        height: #{24*3}px;
+      }
+
+      &.has-media-preview {
+        width: calc(100% - 72px - 16px);
+        margin-right: 16px;
+        float: left;
+      }
+
+      .carrot-no-preview {
+        display: none;
+      }
+
+      p {
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+
+      a:not(.read-more):hover {
+        text-decoration: none !important;
+      }
+
+      img:not(.emojione){
+        display: none;
+      }
+
+      a.read-more {
+        @include avenir_R();
+        font-size: 16px;
+        color: $carrot_text_blue;
+        cursor: pointer;
+        // margin-left: 0px;
+        display: inline-block !important;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      // // Uncomment this to programmatically add the read full update at the end of the last body tag
+      // div:last-child, p:last-child {
+      //   &:after {
+      //     content: "Read Full Update";
+      //     @include activity-body;
+      //     color: $carrot_text_blue;
+      //     cursor: pointer;
+      //     margin-left: 5px;
+      //   }
+      // }
+
+      // &:empty {
+      //   &:after {
+      //     content: "Read Full Update";
+      //     @include activity-body;
+      //     color: $carrot_text_blue;
+      //     cursor: pointer;
+      //   } 
+      // }
+    }
+  }
+
+  div.activity-card-footer {
+    position: absolute;
+    width: calc(100% - 48px);
+    bottom: 10px;
+    left: 0px;
+    margin: 15px 24px 16px;
+    height: 25px;
+
+    div.interactions-summary {
+      margin-top: 8px;
+    }
+
+    div.more-button {
+      float: right;
+      position: relative;
+      margin-right: -6px;
+
+      button.more-ellipsis {
+        width: 32px;
+        height: 32px;
+        padding: 8px 0px 8px 16px;
+        display: block;
+        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+        background-position: right center;
+        background-size: 6px 16px;
+        background-repeat: no-repeat;
+      }
+
+      div.dropdown-menu {
+        position: absolute;
+        top: -49px;
+        left: -91px;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        background-color: transparent;
+
+        div.triangle {
+          position: absolute;
+          top: 55px;
+          left: 90px;
+          background-color: white;
+          border-top: 1px solid rgba(177,184,192,0.50);
+          border-left: 1px solid rgba(177,184,192,0.50);
+          transform: rotate(135deg);
+          width: 20px;
+          height: 20px;
+        }
+
+        ul.activity-card-more-menu {
+          background-color: white;
+          border: 1px solid rgba(177,184,192,0.50);
+          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+          border-radius: 5px;
+          margin: 8px 0;
+          padding: 10px 16px 6px;
+          min-height: 50px;
+          list-style-type: none;
+          width: 100px;
+
+          li {
+            margin: 6px 0;
+            @include avenir_M();
+            font-size: 14px;
+            color: $oc_gray_7;
+            cursor: pointer;
+            background-color: transparent;
+
+            &:hover {
+              text-decoration: underline;
+              background-color: transparent;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+/* linkAnimation for card and modal links */
+@include keyframe(linkAnimation){
+  0% {
+    background-position: right bottom;
+    background-size: 100% .1rem;
+  }
+
+  50% {
+    background-position: right bottom;
+    background-size: 0 .1rem;
+  }
+
+  51% {
+    background-position: left bottom;
+    background-size: 0 .1rem;
+  }
+
+  100% {
+    background-position: left bottom;
+    background-size: 100% .1rem;
+  }
+}

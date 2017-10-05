@@ -1,7 +1,9 @@
 (ns oc.web.components.ui.interactions-summary
   (:require [rum.core :as rum]
-            [oc.web.dispatcher :as dis]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -21,11 +23,21 @@
           {:class (str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction))}
           (:count max-reaction)]])))
 
-(rum/defc comments-summary < rum/static
-  [entry-data]
-  (let [comments-link (utils/link-for (:links entry-data) "comments")
-        comments-authors (vec (sort-by :created-at (:authors comments-link)))]
-    (when-not (zero? (:count comments-link))
+(rum/defcs comments-summary < rum/static
+                              rum/reactive
+                              (drv/drv :comments-data)
+  [s entry-data show-zero-comments?]
+  (let [all-comments-data (drv/react s :comments-data)
+        comments-data (get all-comments-data (:uuid entry-data))
+        comments-link (utils/link-for (:links entry-data) "comments")
+        has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
+        comments-authors (if has-comments-data
+                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at comments-data))))))
+                           (vec (sort-by :created-at (:authors comments-link))))
+        comments-count (max (count comments-data) (:count comments-link))]
+    (when (and comments-count
+               (or show-zero-comments?
+                   (not (zero? comments-count))))
       [:div.is-comments
         ; Comments authors heads
         [:div.is-comments-authors.group
@@ -37,12 +49,12 @@
         ; Comments count
         [:div.is-comments-summary
           {:class (str "comments-count-" (:uuid entry-data))}
-          (str (:count comments-link) " comment" (when (> (:count comments-link) 1) "s"))]])))
+          (str comments-count " comment" (when (or (zero? comments-count) (> comments-count 1)) "s"))]])))
 
 (rum/defcs interactions-summary < rum/static
-  [s entry-data]
+  [s entry-data show-zero-comments?]
   [:div.interactions-summary.group
     ;; Reactions
     (reactions-summary entry-data)
     ; Comments
-    (comments-summary entry-data)])
+    (comments-summary entry-data show-zero-comments?)])
