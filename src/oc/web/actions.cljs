@@ -1180,7 +1180,7 @@
 
 (defmethod dispatcher/action :all-activity-get
   [db [_]]
-  (api/get-all-activity (dispatcher/org-data))
+  (api/get-all-activity (dispatcher/org-data db))
   db)
 
 (defmethod dispatcher/action :all-activity-calendar
