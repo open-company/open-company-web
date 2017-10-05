@@ -120,4 +120,5 @@
                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                    :is-dashboard true
                    :board-filters (:board-filters data)
-                   :is-all-posts (utils/in? (:route @router/path) "all-posts")})))))))))
+                   :is-all-posts (or (utils/in? (:route @router/path) "all-posts")
+                                     (:from-all-posts @router/path))})))))))))
