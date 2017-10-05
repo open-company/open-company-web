@@ -54,7 +54,7 @@
                 (oc-urls/org last-org-slug)
                 (if first-org-slug
                   (oc-urls/org first-org-slug)
-                  oc-urls/orgs))]
+                  oc-urls/login))]
     (when (:has-changes current-user-data)
       (dis/dispatch! [:user-profile-reset]))
     (router/nav! to-url)))

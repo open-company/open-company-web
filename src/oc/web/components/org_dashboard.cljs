@@ -12,18 +12,19 @@
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.topics-list :refer (topics-list)]
-            [oc.web.components.welcome-screen :refer (welcome-screen)]
+            [oc.web.components.topics-columns :refer (topics-columns)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.ui.login-required :refer (login-required)]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
+            [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -38,19 +39,10 @@
 
 (defcomponent org-dashboard [data owner]
 
-  (init-state [_]
-    {:card-width (if (responsive/is-mobile-size?)
-                   (responsive/mobile-dashboard-card-width)
-                   responsive/card-width)
-     :columns-num (responsive/dashboard-columns-num)})
+  (init-state [_])
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-    (om/set-state! owner :resize-listener
-      (events/listen js/window EventType/RESIZE (fn [_] (om/update-state! owner #(merge % {:columns-num (responsive/dashboard-columns-num)
-                                                                                           :card-width (if (responsive/is-mobile-size?)
-                                                                                                         (responsive/mobile-dashboard-card-width)
-                                                                                                         responsive/card-width)})))))
     (refresh-board-data)
     (om/set-state! owner :board-refresh-interval
       (js/setInterval #(refresh-board-data) (* 60 1000))))
@@ -66,8 +58,7 @@
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
-          all-activity-data (dis/all-activity-data data)
-          total-width-int (responsive/total-layout-width-int card-width columns-num)]
+          all-activity-data (dis/all-activity-data data)]
       (if (or (not org-data)
               (and (not board-data)
                    (not all-activity-data)))
@@ -80,19 +71,33 @@
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
                                            :main-scroll true
                                            :no-scroll (router/current-activity-id)})}
-          (when (router/current-activity-id)
+          ;; Use cond for the next components to exclud each other and avoid rendering all of them
+          (cond
+            ;; Org settings
+            (:org-settings data)
+            (org-settings)
+            ;; About carrot
+            (:about-carrot-modal data)
+            (about-carrot-modal)
+            ;; Entry editing
+            (:entry-editing data)
+            (entry-edit)
+            ;; Board editing
+            (:board-editing data)
+            (board-edit)
+            ;; Activity modal
+            (router/current-activity-id)
             (let [from-aa (:from-all-activity @router/path)
                   board-slug (if from-aa :all-activity (router/current-board-slug))]
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
-          (when (:entry-editing data)
-            (entry-edit))
-          (when (:board-editing data)
-            (board-edit))
+          ;; Alert modal
           (when (:alert-modal data)
             (alert-modal))
+          ;; Media video modal for entry editing
           (when (and (:entry-editing data)
                      (:media-video (:entry-editing data)))
             (media-video-modal :entry-editing))
+          ;; Media chart modal for entry editing
           (when (and (:entry-editing data)
                      (:media-chart (:entry-editing data)))
             (media-chart-modal :entry-editing))
@@ -101,10 +106,9 @@
             (when-not (and (responsive/is-tablet-or-mobile?)
                            (router/current-activity-id))
               (navbar))
-            (if (:show-welcome-screen data)
-              (welcome-screen)
-              (dom/div {:class "dashboard-container"}
-                (om/build topics-list
+            (dom/div {:class "dashboard-container"}
+              (dom/div {:class "topic-list"}
+                (om/build topics-columns
                   {:loading (:loading data)
                    :content-loaded (or (:loading board-data) (:loading data))
                    :org-data org-data
@@ -117,4 +121,5 @@
                    :entry-editing (:entry-editing data)
                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                    :is-dashboard true
-                   :board-filters (:board-filters data)})))))))))
+                   :board-filters (:board-filters data)
+                   :is-all-activity (utils/in? (:route @router/path) "all-activity")})))))))))

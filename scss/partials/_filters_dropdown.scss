@@ -3,6 +3,7 @@ div.filters-dropdown-name {
   color: $oc_gray_7;
   font-size: 16px;
   margin: 0 0 16px 20px;
+  position: relative;
 
   button.carrot-close-bt {
     width: 24px;
@@ -15,34 +16,42 @@ div.filters-dropdown-name {
   button.filters-dropdown-button {
     float: left;
     margin-top: 1px;
+    @include avenir_M();
+    font-size: 15px;
+    color: $carrot_light_gray_3;
 
     &.filters-dropdown-by-topic {
       margin-right: 0px;
     }
-  }
 
-  .choice {
-    @include avenir_M();
-    font-size: 14px;
-    color: $oc_gray_7;
-    cursor: pointer;
-
-    &:hover {
-      background-color: transparent;
-      text-decoration: underline;
-      color: $carrot_dark_gray;
-    }
-
-    &.select {
+    span.filter-highlight {
       @include avenir_H();
-      color: $carrot_dark_gray;
+      font-size: 15px;
+      color: $carrot_light_gray_3;
     }
   }
 
-  div.filters-dropdown-container{
-    position: relative;
-    display: inline-block;
-    float: right;
+  div.dropdown-list-container{
+    top: 30px;
+    width: 176px;
+    left: calc(50% - 88px);
+
+    .choice {
+      @include avenir_M();
+      font-size: 14px;
+      color: $carrot_light_gray_3;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba($carrot_light_gray_4, 0.2);
+      }
+
+      &.select {
+        @include avenir_H();
+        background-color: rgba($carrot_orange, 0.1);
+        color: $carrot_orange;
+      }
+    }
 
     button.filters-dropdown-caret {
       height: 20px;
@@ -60,11 +69,6 @@ div.filters-dropdown-name {
           transform: rotate(180deg);
         }
       }
-    }
-
-    div.dropdown-list-container {
-      top: 30px;
-      left: calc(50% - 70px);
     }
   }
 }

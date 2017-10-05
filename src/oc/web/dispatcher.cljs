@@ -76,6 +76,7 @@
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
+   :org-settings        [[:base] (fn [base] (:org-settings base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -99,6 +100,7 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
+   :about-carrot-modal  [[:base] (fn [base] (:about-carrot-modal base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

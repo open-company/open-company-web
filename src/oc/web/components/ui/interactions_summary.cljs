@@ -28,7 +28,8 @@
                               (drv/drv :comments-data)
   [s entry-data show-zero-comments?]
   (let [all-comments-data (drv/react s :comments-data)
-        comments-data (get all-comments-data (:uuid entry-data))
+        _comments-data (get all-comments-data (:uuid entry-data))
+        comments-data (if (sequential? _comments-data) _comments-data nil)
         comments-link (utils/link-for (:links entry-data) "comments")
         has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
         comments-authors (if has-comments-data
@@ -44,7 +45,7 @@
           {:style {:width (str (if (pos? (count comments-authors)) (+ 9 (* 15 (count comments-authors))) 0) "px")}}
           (for [user-data (take 4 comments-authors)]
             [:div.is-comments-author
-              {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:created-at user-data))}
+              {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data true)])]
         ; Comments count
         [:div.is-comments-summary

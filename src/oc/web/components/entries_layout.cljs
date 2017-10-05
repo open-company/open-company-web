@@ -31,12 +31,12 @@
               [:div.by-topic-header-title
                 (or topic-name
                     (s/capital topic-slug)
-                    "Uncategorized")]
+                    [:span.oblique "No topic"])]
               ; If there are more than 4 add the button to show all of them
               (when (> (count entries-group) 4)
                 [:button.view-all-updates.mlb-reset
-                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic topic-slug))}
-                  "VIEW " (count entries-group) " UPDATES"])]
+                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or topic-slug "uncategorized")))}
+                  "View " (count entries-group) " updates"])]
             ;; First row:
             [:div.entries-cards-container-row.group
               ; Render the first 2 entries

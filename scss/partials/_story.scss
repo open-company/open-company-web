@@ -17,35 +17,16 @@ div.story-container {
     div.story-header-left{
       float: left;
 
-      a.board-name {
+      div.story-header-back {
         @include avenir_H();
         font-size: 16px;
-        color: $carrot_light_gray_1;
-        float: left;
-      }
+        color: $carrot_dark_gray_1;
+        cursor: pointer;
 
-      span.arrow {
-        margin-left: 10px;
-        @include avenir_H();
-        font-size: 20px;
-        color: $carrot_light_gray_1;
-        margin-top: -3px;
-        float: left;
-      }
-
-      span.story-title {
-        margin-left: 10px;
-        @include avenir_H();
-        font-size: 16px;
-        color: black;
-        float: left;
-        max-width: 400px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-
-        .emojione {
-          @include emoji-size(14);
+        span.back-arrow {
+          color: $carrot_light_gray_1;
+          font-size: 20px;
+          margin-right: 8px;
         }
       }
     }
@@ -90,8 +71,32 @@ div.story-container {
       box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
       border-radius: 8px;
 
-      div.story-author {
-        @include activity-author();
+      div.story-content-authorship {
+        height: 41px;
+        margin-bottom: 32px;
+
+        div.story-content-authorship-left {
+          float: left;
+          width: 50%;
+          @include activity-author();
+        }
+
+        div.story-content-authorship-right {
+          float: right;
+          width: 50%;
+
+          div.story-tags {
+            float: right;
+            // margin-top: 21px;
+            position: relative;
+            @include activity-tag();
+            div.dropdown-list-container {
+              left: -60px;
+              top: 30px;
+              width: 170px;
+            }
+          }
+        }
       }
 
       div.story-banner {
@@ -99,18 +104,13 @@ div.story-container {
         margin-top: 50px;
         margin-bottom: 20px;
         width: 840px;
-        max-height: 200px;
+        max-height: 520px;
         background-position: 50%;
         background-size: cover;
         background-repeat: no-repeat;
         // border-radius: 8px;
         // border-top-left-radius: 8px;
         // border-top-right-radius: 8px;
-      }
-
-      div.story-tags {
-        margin-top: 21px;
-        @include activity-tag();
       }
 
       div.story-title {
@@ -146,12 +146,7 @@ div.story-container {
           display: inline-block;
 
           label.media-attachment-title {
-            font-size: 16px;
-            margin-top: 4px;
-          }
-
-          label.media-attachment-subtitle {
-            display: none;
+            margin-top: -4px;
           }
         }
       }

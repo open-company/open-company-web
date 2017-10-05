@@ -40,16 +40,15 @@
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         boards (vec (filter #(= (:type %) "entry") (:boards org-data)))
         storyboards (vec (filter #(= (:type %) "story") (:boards org-data)))
-        is-all-activity (utils/in? (:route @router/path) "all-activity")
+        is-all-activity (or (= (router/current-board-slug) "all-activity") (:from-all-activity @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-storyboards (or create-link (pos? (count storyboards)))]
     [:div.left-navigation-sidebar.group
-      {:style {:width (str left-navigation-sidebar-width "px")}}
       ;; All activity
       (when (jwt/user-is-part-of-the-team (:team-id org-data))
-        [:a.all-activity.group
-          {:class (when is-all-activity "selected")
+        [:a.all-activity.hover-item.group
+          {:class (when is-all-activity "item-selected")
            :href (oc-urls/all-activity)
            :on-click #(anchor-nav! % (oc-urls/all-activity))}
           [:div.all-activity-icon]
@@ -59,24 +58,24 @@
       (when show-boards
         [:div.left-navigation-sidebar-top.group
           ;; Boards header
-          [:h3.left-navigation-sidebar-top-title
+          [:h3.left-navigation-sidebar-top-title.group
             {:id "navigation-sidebar-boards"}
             [:div.boards-icon]
             [:span
-              "BOARDS"]]
-          (when (and (not (responsive/is-tablet-or-mobile?))
-                     create-link)
-            [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-              {:on-click #(dis/dispatch! [:board-edit nil "entry"])
-               :title "Create a new board"
-               :data-placement "top"
-               :data-toggle "tooltip"
-               :data-container "body"}])])
+              "BOARDS"]
+            (when (and (not (responsive/is-tablet-or-mobile?))
+                       create-link)
+              [:button.left-navigation-sidebar-top-title-button.btn-reset.right
+                {:on-click #(dis/dispatch! [:board-edit nil "entry"])
+                 :title "Create a new board"
+                 :data-placement "top"
+                 :data-toggle "tooltip"
+                 :data-container "body"}])]])
       (when show-boards
         [:div.left-navigation-sidebar-items.group
           (for [board (sort-boards boards)]
-            [:a.left-navigation-sidebar-item
-              {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug board))) "selected")
+            [:a.left-navigation-sidebar-item.hover-item
+              {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug board))) "item-selected")
                :data-board (name (:slug board))
                :key (str "board-list-" (name (:slug board)))
                :href (oc-urls/board (router/current-org-slug) (:slug board))
@@ -96,38 +95,24 @@
       (when show-storyboards
         [:div.left-navigation-sidebar-top.group
           ;; Boards header
-          [:h3.left-navigation-sidebar-top-title
+          [:h3.left-navigation-sidebar-top-title.group
             {:id "navigation-sidebar-journals"}
             [:div.stories-icon]
             [:span
-              "JOURNALS"]]
-          (when (and (not (responsive/is-tablet-or-mobile?))
-                     create-link)
-            [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-              {:on-click #(dis/dispatch! [:board-edit nil "story"])
-               :title "Create a new journal"
-               :data-placement "top"
-               :data-toggle "tooltip"
-               :data-container "body"}])])
+              "JOURNALS"]
+            (when (and (not (responsive/is-tablet-or-mobile?))
+                       create-link)
+              [:button.left-navigation-sidebar-top-title-button.btn-reset.right
+                {:on-click #(dis/dispatch! [:board-edit nil "story"])
+                 :title "Create a new journal"
+                 :data-placement "top"
+                 :data-toggle "tooltip"
+                 :data-container "body"}])]])
       (when show-storyboards
         [:div.left-navigation-sidebar-items.group
-          (let [drafts-board (first (filter #(= (:slug %) "drafts") (:boards org-data)))
-                drafts-link (utils/link-for (:links drafts-board) "self")]
-            (when (pos? (:count drafts-link))
-              [:div.left-navigation-sidebar-draft
-                [:a.left-navigation-sidebar-item
-                  {:class (when (= (router/current-board-slug) "drafts") "selected")
-                   :data-drafts true
-                   :key "board-list-draft"
-                   :href (oc-urls/drafts)
-                   :on-click #(anchor-nav! % (oc-urls/drafts))}
-                  [:div.board-name.team-board.group
-                    [:div.internal
-                      (str "Drafts (" (:count drafts-link) ")")]]]
-                [:div.left-navigation-sidebar-draft-divider]]))
           (for [storyboard (sort-storyboards storyboards)]
-            [:a.left-navigation-sidebar-item
-              {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "selected")
+            [:a.left-navigation-sidebar-item.hover-item
+              {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "item-selected")
                :data-board (name (:slug storyboard))
                :data-storyboard true
                :key (str "board-list-" (name (:slug storyboard)))
@@ -144,16 +129,28 @@
                                           :team-board (= (:access storyboard) "team")})}
                 [:div.internal
                   {:key (str "board-list-" (name (:slug storyboard)) "-internal")
-                   :dangerouslySetInnerHTML (utils/emojify (or (:name storyboard) (:slug storyboard)))}]]])])
+                   :dangerouslySetInnerHTML (utils/emojify (or (:name storyboard) (:slug storyboard)))}]]])
+          (let [drafts-board (first (filter #(= (:slug %) "drafts") (:boards org-data)))
+                drafts-link (utils/link-for (:links drafts-board) "self")]
+            (when (pos? (:count drafts-link))
+              [:div.left-navigation-sidebar-draft
+                [:a.left-navigation-sidebar-item.hover-item
+                  {:class (when (= (router/current-board-slug) "drafts") "item-selected")
+                   :data-drafts true
+                   :key "board-list-draft"
+                   :href (oc-urls/drafts)
+                   :on-click #(anchor-nav! % (oc-urls/drafts))}
+                  [:div.board-name.team-board.group
+                    [:div.internal
+                      (str "Drafts (" (:count drafts-link) ")")]]]]))])
       [:div.left-navigation-sidebar-footer
-        ; (when (and (router/current-org-slug)
-        ;            (jwt/is-admin? (:team-id org-data)))
-        ;   [:button.mlb-reset.invite-people-btn
-        ;     {:on-click #(router/nav! (oc-urls/org-settings-invite))}
-        ;     [:div.invite-people-icon]
-        ;     [:span "Invite People"]])
-        ; [:button.mlb-reset.about-carrot-btn
-        ;   {:on-click #(router/nav! oc-urls/about)}
-        ;   [:div.about-carrot-icon]
-        ;   [:span "About Carrot"]]
-          ]]))
+        (when (and (router/current-org-slug)
+                   (jwt/is-admin? (:team-id org-data)))
+          [:button.mlb-reset.invite-people-btn
+            {:on-click #(dis/dispatch! [:org-settings-show :invite])}
+            [:div.invite-people-icon]
+            [:span "Invite People"]])
+        [:button.mlb-reset.about-carrot-btn
+          {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
+          [:div.about-carrot-icon]
+          [:span "About Carrot"]]]]))

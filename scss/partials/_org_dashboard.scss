@@ -27,6 +27,10 @@ div.org-dashboard {
     div.dashboard-container {
       background-color: $oc_gray_8;
 
+      @include big_web() {
+        min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}
+      }
+
       div.empty-dashboard {
         min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 30px);
         padding: 80px 20px;
@@ -87,17 +91,26 @@ body.small-footer {
   }
 }
 
-body.fullscreen-topic {
-  @include mobile(){
-    div.org-dashboard {
-      overflow: hidden;
-      div.page {
-        overflow: hidden;
-      }
-    }
+div.add-more-tooltip {
+  margin-left: -15px;
+}
+
+div.org-dashboard.modal-activity-view.mobile-or-tablet {
+  div.topic-list{
+    padding-bottom: 0px;
+    padding-top: 0px;
   }
 }
 
-div.add-more-tooltip {
-  margin-left: -15px;
+div.org-dashboard div.topic-list{
+  padding-bottom: 20px;
+  background-color: $oc_gray_8;
+
+  @include big_web(){
+    min-height: 100vh;
+    padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
+  }
+  @include mobile(){
+    min-height: calc(100vh - #{$footer_small_height}px);
+  }
 }

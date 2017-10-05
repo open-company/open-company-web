@@ -3,8 +3,8 @@
   outline: none;
   border-width: 0;
   opacity: 0.9;
-  background-color: #D4F6E4;
-  color: #0E8749;
+  background-color: $carrot_green_3;
+  color: $carrot_green_1;
   font-weight: 900;
   border-radius: 4px;
   font-size: 16px;
@@ -19,13 +19,13 @@
   }
 
   &:hover, &:focus {
-    background-color: #3FBD7C;
+    background-color: $carrot_green_2;
     color: #FFFFFF;
     opacity: 1;
   }
 
   &:active, &.active {
-    background-color: #0E8749;
+    background-color: $carrot_green_1;
     color: white;
   }
 
@@ -34,8 +34,8 @@
     cursor: not-allowed;
 
     &:hover {
-      background-color: #D4F6E4;
-      color: #0E8749;
+      background-color: $carrot_green_3;
+      color: $carrot_green_1;
     }
   }
 }

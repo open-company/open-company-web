@@ -630,10 +630,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :welcome-screen-hide
-  [db [_]]
-  (dissoc db :show-welcome-screen))
-
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
   (update-user-data db (:current-user-data db)))
@@ -1254,11 +1250,13 @@
   (assoc db :story-loading true))
 
 (defmethod dispatcher/action :story-get/finish
-  [db [_ {:keys [story-uuid story-data]}]]
+  [db [_ status {:keys [story-uuid story-data]}]]
+  (when (= status 404)
+    (router/redirect-404!))
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
-        fixed-story-data (utils/fix-story story-data (or (:storyboard-slug story-data) board-slug))]
+        fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})]
     (when (jwt/jwt)
       (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
         (wsc/reconnect ws-link (jwt/get-key :user-id))))
@@ -1321,3 +1319,35 @@
   (when (:org-editing db)
     (api/patch-org (:org-editing db)))
   db)
+
+(defmethod dispatcher/action :about-carrot-modal-show
+  [db [_]]
+  (assoc db :about-carrot-modal true))
+
+(defmethod dispatcher/action :about-carrot-modal-hide
+  [db [_]]
+  (dissoc db :about-carrot-modal))
+
+(defmethod dispatcher/action :org-settings-show
+  [db [_ panel]]
+  (assoc db :org-settings (or panel :main)))
+
+(defmethod dispatcher/action :org-settings-hide
+  [db [_]]
+  (dissoc db :org-settings))
+
+(defmethod dispatcher/action :activity-board-move
+  [db [_ activity-data board-data]]
+  (let [board-key (if (= (:type activity-data) "story") :storyboard-slug :board-slug)
+        fixed-activity-data (-> activity-data
+                              (assoc board-key (:slug board-data))
+                              (dissoc (if (= (:type activity-data) "entry") :storyboard-slug :board-slug)))]
+    (api/update-entry fixed-activity-data)
+    (if (utils/in? (:route @router/path) "all-activity")
+      (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-activity (:uuid activity-data))]
+        (assoc-in db next-activity-data-key fixed-activity-data))
+      (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
+            next-activity-data-key (dispatcher/activity-key (router/current-org-slug) (:slug board-data) (:uuid activity-data))]
+        (-> db
+          (update-in (butlast activity-data-key) dissoc (last activity-data-key))
+          (assoc-in next-activity-data-key fixed-activity-data))))))

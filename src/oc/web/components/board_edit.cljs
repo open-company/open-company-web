@@ -114,96 +114,99 @@
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
-      [:div.board-edit
-        {:class (when show-slack-channels? "show-slack-channels")}
-        [:div.board-edit-header.group
-          (user-avatar-image current-user-data)
-          (if new-board?
-            [:div.title (str "Creating a new " title)]
-            [:div.title "Editing " [:span.board-name {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
-        [:div.board-edit-divider]
-        [:div.board-edit-body
-          [:div.board-edit-name-label-container.group
-            [:div.board-edit-label.board-edit-name-label (str (string/upper label) " NAME")]
-            (when (:board-name-error board-editing)
-              [:div.board-name-error (:board-name-error board-editing)])]
-          [:div.board-edit-name-field.emoji-autocomplete
-            {:class (when (:board-name-error board-editing) "board-name-error")
-             :content-editable true
-             :ref "board-name"
-             :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
-             :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
-             :placeholder (if (= (:type board-editing) "story") "All-hands, Investor Updates, Weekly Kickoffs, etc." "Product, Development, Finance, Operations, etc.")
-             :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
-          [:div.board-edit-label.board-edit-access-label (str (string/upper label) " PERMISSIONS")]
-          [:div.board-edit-access-field.group
-            [:div.board-edit-access-bt.board-edit-access-team-bt
-              {:class (when (= (:access board-editing) "team") "selected")
-               :on-click #(dis/dispatch! [:input [:board-editing :access] "team"])
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :title (str "Anyone on the team can see this " label ". Contributors can edit.")}
-              [:span.board-edit-access-title "Team"]]
-            [:div.board-edit-access-bt.board-edit-access-private-bt
-              {:class (when (= (:access board-editing) "private") "selected")
-               :on-click #(dis/dispatch! [:input [:board-editing :access] "private"])
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :title (str "Only team members you invite can see or edit this " label ".")}
-              [:span.board-edit-access-title "Private"]]
-            [:div.board-edit-access-bt.board-edit-access-public-bt
-              {:class (when (= (:access board-editing) "public") "selected")
-               :on-click #(dis/dispatch! [:input [:board-editing :access] "public"])
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :title (str "This " label " is open for the public to see. Contributors can edit.")}
-              [:span.board-edit-access-title "Public"]]]]
-        [:div.board-edit-divider]
-        (when show-slack-channels?
-          [:div.board-edit-slack-channels-container
-            [:div.board-edit-slack-channels-label.group
-              [:div.title
-                "Connect comments to Slack"
-                [:span.more-info]]
-              (carrot-checkbox {:selected @(::slack-enabled s)
-                                :did-change-cb #(do
-                                                  (reset! (::slack-enabled s) %)
-                                                  (when-not %
-                                                    (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
-            (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
-                                      :initial-value (or (str "#" (:channel-name (:slack-mirror (drv/react s :board-data)))) "")
-                                      :on-change (fn [team channel]
-                                                   (dis/dispatch! [:input [:board-editing :slack-mirror ] {:channel-id (:id channel)
-                                                                                                           :channel-name (:name channel)
-                                                                                                           :slack-org-id (:slack-org-id team)}]))})])
-        [:div.board-edit-footer
-          [:div.board-edit-footer-left
-            (when (and (not (empty? (:slug board-editing)))
-                       (utils/link-for (:links board-editing) "delete"))
-              [:button.mlb-reset.mlb-link-black.delete-board
-                {:on-click (fn []
-                            (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
-                                                               :message (str "Delete this " label "?")
-                                                               :link-button-title "No"
-                                                               :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                                               :solid-button-title "Yes"
-                                                               :solid-button-cb (fn []
-                                                                                  (dis/dispatch! [:board-delete (:slug board-editing)])
-                                                                                  (dis/dispatch! [:alert-modal-hide])
-                                                                                  (close-clicked s))}]))}
-                "Delete"])]
-          [:div.board-edit-footer-right.group
-            [:button.mlb-reset.mlb-default
-              {:type "button"
-               :disabled (or (empty? (:name board-editing))
-                             (empty? (:access board-editing)))
-               :on-click #(let [board-node (rum/ref-node s "board-name")
-                                inner-html (.-innerHTML board-node)
-                                board-name (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))]
-                            (dis/dispatch! [:input [:board-editing :name] board-name])
-                            (dis/dispatch! [:board-edit-save]))}
-              (if new-board? "Create" "Save")]
-            [:button.mlb-reset.mlb-link-black.cancel-btn
-              {:type "button"
-               :on-click #(close-clicked s)}
-              "Cancel"]]]]]))
+      [:div.modal-wrapper
+        [:button.carrot-modal-close.mlb-reset
+          {:on-click #(close-clicked s)}]
+        [:div.board-edit
+          {:class (when show-slack-channels? "show-slack-channels")}
+          [:div.board-edit-header.group
+            (user-avatar-image current-user-data)
+            (if new-board?
+              [:div.title (str "Creating a new " title)]
+              [:div.title "Editing " [:span.board-name {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
+          [:div.board-edit-divider]
+          [:div.board-edit-body
+            [:div.board-edit-name-label-container.group
+              [:div.board-edit-label.board-edit-name-label (str (string/upper label) " NAME")]
+              (when (:board-name-error board-editing)
+                [:div.board-name-error (:board-name-error board-editing)])]
+            [:div.board-edit-name-field.emoji-autocomplete
+              {:class (when (:board-name-error board-editing) "board-name-error")
+               :content-editable true
+               :ref "board-name"
+               :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
+               :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
+               :placeholder (if (= (:type board-editing) "story") "All-hands, Investor Updates, Weekly Kickoffs, etc." "Product, Development, Finance, Operations, etc.")
+               :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
+            [:div.board-edit-label.board-edit-access-label (str (string/upper label) " PERMISSIONS")]
+            [:div.board-edit-access-field.group
+              [:div.board-edit-access-bt.board-edit-access-team-bt
+                {:class (when (= (:access board-editing) "team") "selected")
+                 :on-click #(dis/dispatch! [:input [:board-editing :access] "team"])
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :title (str "Anyone on the team can see this " label ". Contributors can edit.")}
+                [:span.board-edit-access-title "Team"]]
+              [:div.board-edit-access-bt.board-edit-access-private-bt
+                {:class (when (= (:access board-editing) "private") "selected")
+                 :on-click #(dis/dispatch! [:input [:board-editing :access] "private"])
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :title (str "Only team members you invite can see or edit this " label ".")}
+                [:span.board-edit-access-title "Private"]]
+              [:div.board-edit-access-bt.board-edit-access-public-bt
+                {:class (when (= (:access board-editing) "public") "selected")
+                 :on-click #(dis/dispatch! [:input [:board-editing :access] "public"])
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :title (str "This " label " is open for the public to see. Contributors can edit.")}
+                [:span.board-edit-access-title "Public"]]]]
+          [:div.board-edit-divider]
+          (when show-slack-channels?
+            [:div.board-edit-slack-channels-container
+              [:div.board-edit-slack-channels-label.group
+                [:div.title
+                  "Connect comments to Slack"
+                  [:span.more-info]]
+                (carrot-checkbox {:selected @(::slack-enabled s)
+                                  :did-change-cb #(do
+                                                    (reset! (::slack-enabled s) %)
+                                                    (when-not %
+                                                      (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
+              (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
+                                        :initial-value (or (str "#" (:channel-name (:slack-mirror (drv/react s :board-data)))) "")
+                                        :on-change (fn [team channel]
+                                                     (dis/dispatch! [:input [:board-editing :slack-mirror ] {:channel-id (:id channel)
+                                                                                                             :channel-name (:name channel)
+                                                                                                             :slack-org-id (:slack-org-id team)}]))})])
+          [:div.board-edit-footer
+            [:div.board-edit-footer-left
+              (when (and (not (empty? (:slug board-editing)))
+                         (utils/link-for (:links board-editing) "delete"))
+                [:button.mlb-reset.mlb-link-black.delete-board
+                  {:on-click (fn []
+                              (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
+                                                                 :message (str "Delete this " label "?")
+                                                                 :link-button-title "No"
+                                                                 :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                                                 :solid-button-title "Yes"
+                                                                 :solid-button-cb (fn []
+                                                                                    (dis/dispatch! [:board-delete (:slug board-editing)])
+                                                                                    (dis/dispatch! [:alert-modal-hide])
+                                                                                    (close-clicked s))}]))}
+                  "Delete"])]
+            [:div.board-edit-footer-right.group
+              [:button.mlb-reset.mlb-default
+                {:type "button"
+                 :disabled (or (empty? (:name board-editing))
+                               (empty? (:access board-editing)))
+                 :on-click #(let [board-node (rum/ref-node s "board-name")
+                                  inner-html (.-innerHTML board-node)
+                                  board-name (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))]
+                              (dis/dispatch! [:input [:board-editing :name] board-name])
+                              (dis/dispatch! [:board-edit-save]))}
+                (if new-board? "Create" "Save")]
+              [:button.mlb-reset.mlb-link-black.cancel-btn
+                {:type "button"
+                 :on-click #(close-clicked s)}
+                "Cancel"]]]]]]))

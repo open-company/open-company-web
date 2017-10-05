@@ -10,15 +10,13 @@
   [current-slug org]
   (let [missing-logo? (empty? (:logo-url org))]
     [:li
-      {:class (when (= (:slug org) current-slug) "active")}
-      [:a
-        {:on-click #(do (utils/event-stop %) (router/nav! (oc-urls/org (:slug org))))
-         :href (oc-urls/org (:slug org))}
-        (when-not missing-logo?
-          (org-avatar org false false true))
-        [:span.org-name
-          {:class (when missing-logo? "no-logo")}
-          (:name org)]]]))
+      {:class (when (= (:slug org) current-slug) "active")
+       :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/org (:slug org))))}
+      (when-not missing-logo?
+        (org-avatar org false false true))
+      [:span.org-name
+        {:class (when missing-logo? "no-logo")}
+        (:name org)]]))
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive

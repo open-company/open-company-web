@@ -18,6 +18,8 @@
 
 (def contact "/contact")
 
+(def help "https://help.carrot.io")
+
 (def home-try-it-focus (str home "?tif"))
 
 (def contact-email "hello@carrot.io")
@@ -61,8 +63,6 @@
 (def user-profile "/profile")
 
 ;; Organizations
-
-(def orgs "/orgs")
 
 (def create-org "/create-org")
 
@@ -122,6 +122,8 @@
   "Board sorted by latest topic"
   ([]
     (board-sort-by-topic (router/current-org-slug) (router/current-board-slug)))
+  ([board-slug]
+   (board-sort-by-topic (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (board org-slug board-slug) "/by-topic")))
 

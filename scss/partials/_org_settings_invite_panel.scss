@@ -31,13 +31,13 @@ div.org-settings-panel {
       height: 32px;
       border-radius: 16px;
       color: $carrot_green_1;
-      background-color: #D4F6E4;
+      background-color: $carrot_green_3;
       @include avenir_H();
       font-size: 14px;
       padding: 0px;
 
       &:hover {
-        background-color: #3FBD7C;
+        background-color: $carrot_green_2;
         color: white;
       }
     }
@@ -67,6 +67,10 @@ div.org-settings-panel {
       }
 
       @include user-profile(32);
+
+      div.slack-users-dropdown div.slack-users-dropdown-list div.user {
+        @include user-profile(24);
+      }
     }
 
     td.user-type-field {

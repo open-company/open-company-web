@@ -23,21 +23,18 @@
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.components.home :refer (home)]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.list-orgs :refer (list-orgs)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
-            [oc.web.components.login :refer (login)]
             [oc.web.components.oc-wall :refer (oc-wall)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
             [oc.web.components.org-editor :refer (org-editor)]
-            [oc.web.components.confirm-invitation :refer (confirm-invitation)]
-            [oc.web.components.org-settings :refer (org-settings)]
+            ; [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
-            [oc.web.components.email-confirmation :refer (email-confirmation)]
             [oc.web.components.error-banner :refer (error-banner)]
+            [oc.web.components.secure-story :refer (secure-story)]
             [oc.web.components.story :refer (story)]
             [oc.web.components.story-edit :refer (story-edit)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -109,18 +106,7 @@
     (swap! dis/app-state assoc :loading true))
   (post-routing)
   ;; render component
-  (drv-root home target))
-
-; ;; Orgs list
-(defn list-orgs-handler [target params]
-  (pre-routing (:query-params params))
-  ;; save route
-  (router/set-route! ["orgs"] {:query-params (:query-params params)})
-  ;; load data from api
-  (swap! dis/app-state assoc :loading true)
-  (post-routing)
-  ;; render component
-  (drv-root list-orgs target))
+  (drv-root #(om/component (home)) target))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -146,21 +132,11 @@
   (post-routing)
   (drv-root #(om/component (oc-wall message :login)) target))
 
-;; Handle successful and unsuccessful logins
-(defn login-handler [target params]
-  (pre-routing (:query-params params))
-  (when-not (contains? (:query-params params) :jwt)
-    (router/set-route! ["login"] {:query-params (:query-params params)})
-    (when (contains? (:query-params params) :login-redirect)
-      (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    ;; render component
-    (post-routing)
-    (drv-root #(om/component (login)) target)))
-
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing (:query-params params) rewrite-url)
   ;; save route
-  (router/set-route! [route-name] {:query-params (:query-params params)})
+  (let [org (:org (:params params))]
+    (router/set-route! (vec (remove nil? [route-name org])) {:org org :query-params (:query-params params)}))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     (when (contains? (:query-params params) :login-redirect)
@@ -376,12 +352,6 @@
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
 
-    (defroute org-list-route urls/orgs {:as params}
-      (timbre/info "Routing org-list-route" urls/orgs)
-      (if (jwt/jwt)
-        (list-orgs-handler target params)
-        (oc-wall-handler "Please sign in to access this organization." target params)))
-
     (defroute org-create-route urls/create-org {:as params}
       (timbre/info "Routing org-create-route" urls/create-org)
       (if (jwt/jwt)
@@ -426,47 +396,43 @@
         (drv-root #(om/component (user-profile)) target)
         (oc-wall-handler "Please sign in to access this page." target params)))
 
-    (defroute org-settings-route (urls/org-settings ":org") {:as params}
-      (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
-      (org-handler "org-settings" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-route (urls/org-settings ":org") {:as params}
+    ;   (timbre/info "Routing org-settings-route" (urls/org-settings ":org"))
+    ;   (org-handler "org-settings" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-slash-route (str (urls/org-settings ":org") "/") {:as params}
-      (timbre/info "Routing org-settings-slash-route" (str (urls/org-settings ":org") "/"))
-      (org-handler "org-settings" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-slash-route (str (urls/org-settings ":org") "/") {:as params}
+    ;   (timbre/info "Routing org-settings-slash-route" (str (urls/org-settings ":org") "/"))
+    ;   (org-handler "org-settings" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-team-route (urls/org-settings-team ":org") {:as params}
-      (timbre/info "Routing org-settings-team-route" (urls/org-settings-team ":org"))
-      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-team-route (urls/org-settings-team ":org") {:as params}
+    ;   (timbre/info "Routing org-settings-team-route" (urls/org-settings-team ":org"))
+    ;   (team-handler "org-settings-team" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-team-slash-route (str (urls/org-settings-team ":org") "/") {:as params}
-      (timbre/info "Routing org-settings-team-slash-route" (str (urls/org-settings-team ":org") "/"))
-      (team-handler "org-settings-team" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-team-slash-route (str (urls/org-settings-team ":org") "/") {:as params}
+    ;   (timbre/info "Routing org-settings-team-slash-route" (str (urls/org-settings-team ":org") "/"))
+    ;   (team-handler "org-settings-team" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-invite-route (urls/org-settings-invite ":org") {:as params}
-      (timbre/info "Routing org-settings-invite-route" (urls/org-settings-invite ":org"))
-      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-invite-route (urls/org-settings-invite ":org") {:as params}
+    ;   (timbre/info "Routing org-settings-invite-route" (urls/org-settings-invite ":org"))
+    ;   (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
 
-    (defroute org-settings-invite-slash-route (str (urls/org-settings-invite ":org") "/") {:as params}
-      (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
-      (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
+    ; (defroute org-settings-invite-slash-route (str (urls/org-settings-invite ":org") "/") {:as params}
+    ;   (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
+    ;   (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
 
     (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
-      (story-handler #(om/component (story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
+      (story-handler #(om/component (secure-story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute secure-story-slash-route (str (urls/secure-story ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-story-slash-route" (str (urls/secure-story ":org" ":secure-id") "/"))
-      (story-handler #(om/component (story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
+      (story-handler #(om/component (secure-story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
       (if (responsive/is-mobile-size?)
-        (do
-          (pre-routing (:query-params params))
-          (router/set-route! [(:org (:params params)) "boards-list"] {:org (:org (:params params)) :query-params (:query-params params)})
-          (post-routing)
-          (drv-root #(om/component (mobile-boards-list)) target))
+        (simple-handler mobile-boards-list "boards-list" target params)
         (org-handler "boards-list" target #(om/component) params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
@@ -561,17 +527,16 @@
                                  home-page-route
                                  user-profile-route
                                  ;; Org routes
-                                 org-list-route
                                  org-route
                                  org-slash-route
                                  all-activity-route
                                  all-activity-slash-route
-                                 org-settings-route
-                                 org-settings-slash-route
-                                 org-settings-team-route
-                                 org-settings-team-slash-route
-                                 org-settings-invite-route
-                                 org-settings-invite-slash-route
+                                 ; org-settings-route
+                                 ; org-settings-slash-route
+                                 ; org-settings-team-route
+                                 ; org-settings-team-slash-route
+                                 ; org-settings-invite-route
+                                 ; org-settings-invite-slash-route
                                  ; Secure story route
                                  secure-story-route
                                  secure-story-slash-route
