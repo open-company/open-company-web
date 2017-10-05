@@ -16,7 +16,6 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            ; [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.stories-layout :refer (stories-layout)]

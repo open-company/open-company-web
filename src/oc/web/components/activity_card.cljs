@@ -29,7 +29,7 @@
             {:on-click #(dis/dispatch! [:entry-edit topic])}
             "Add an update?"]]])])
 
-(defn delete-clicked [e activity-data]
+(defn- delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action (str "delete-" (:type activity-data))
@@ -43,14 +43,14 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel is-all-posts]
+(defn- truncate-body [body-sel is-all-posts]
   (.dotdotdot (js/$ body-sel)
    #js {:height (* 24 (if is-all-posts 6 3))
         :wrap "word"
         :watch true
         :ellipsis "... "}))
 
-(defn get-first-body-thumbnail [body is-ap]
+(defn- get-first-body-thumbnail [body is-ap]
   (let [$body (js/$ (str "<div>" body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
@@ -124,7 +124,7 @@
                          :will-unmount (fn [s]
                                          (events/unlistenByKey @(::window-click s))
                                          s)}
-  [s activity-data has-headline has-body is-all-posts]
+  [s activity-data has-headline has-body is-new is-all-posts]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-posts-card is-all-posts
@@ -179,7 +179,8 @@
                                 (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
                                   (oc-urls/board-sort-by-topic (:board-slug activity-data))
                                   (oc-urls/board (:board-slug activity-data))))))}
-              (:board-name activity-data)])]])
+              (:board-name activity-data)])
+              (when is-new [:div.new-tag "New"])]])
     [:div.activity-card-content.group
       (when (= (:type activity-data) "story")
         [:div.activity-card-title

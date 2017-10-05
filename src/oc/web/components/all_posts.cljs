@@ -277,7 +277,7 @@
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
-            (rum/with-key (activity-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-posts-entry-" (:uuid e))))]
+            (rum/with-key (activity-card e (not (empty? (:headline e))) (not (empty? (:body e))) false true) (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])

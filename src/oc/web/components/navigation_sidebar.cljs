@@ -22,7 +22,7 @@
 
 (defn new?
   "
-  A board/journal is new if:
+  A board is new if:
   
     change-at is newer than seen at
       -or-
