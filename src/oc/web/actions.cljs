@@ -1179,7 +1179,7 @@
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
-  (api/get-all-posts (dispatcher/org-data))
+  (api/get-all-posts (dispatcher/org-data db))
   db)
 
 (defmethod dispatcher/action :all-posts-calendar
