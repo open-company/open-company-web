@@ -182,7 +182,8 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
-                         (= (:type board-data) "entry"))
+                         (= (:type board-data) "entry")
+                         (> (count (:fixed-items board-data)) 1))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
