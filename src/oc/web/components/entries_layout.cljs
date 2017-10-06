@@ -27,7 +27,7 @@
         new? (and (> created-at too-old)
                   (or (> created-at seen-at)
                       (nil? seen-at)))]
-    (timbre/debug "New test for:" (:uuid entry)
+    (timbre/debug "New'ness in board test for:" (:uuid entry)
                   "created:" created-at
                   "seen:" seen-at
                   "new?:" new?)
@@ -35,6 +35,10 @@
 
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
+                          {:will-unmount (fn [s]
+                            (timbre/info "UNMOUNT")
+                            s)}
+
   [s board-data layout-type]
   [:div.entries-layout
     (let [change-data (drv/react s :change-data)

@@ -193,7 +193,7 @@
 
 (defmethod dispatcher/action :container/change
   [db [_ {board-uuid :container-id change-at :change-at}]]
-  (timbre/info "Board change:" board-uuid "at:" change-at)
+  (timbre/debug "Board change:" board-uuid "at:" change-at)
   ;; Update change-data state that we saw the board
   (update-change-data db board-uuid :change-at change-at))
 
@@ -202,8 +202,8 @@
   (timbre/debug "Board seen:" board-uuid)
   ;; Let the change service know we saw the board
   (ws-cc/container-seen board-uuid)
-  ;; Update change-data state that we saw the board
-  (update-change-data db board-uuid :seen-at (oc-time/current-timestamp)))
+  ;; Update change-data state that we nav'd to the board
+  (update-change-data db board-uuid :nav-at (oc-time/current-timestamp)))
 
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
@@ -1368,8 +1368,12 @@
   (let [org-data (dispatcher/org-data db)
         old-status-data (dispatcher/change-data db)
         status-by-uuid (group-by :container-id status-data)
-        clean-status-data (zipmap (keys status-by-uuid) (map first (vals status-by-uuid))) ; drop the sequence value
+        clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
+                                                          vals
+                                                          (map first) ; remove the sequence of 1 from group-by
+                                                          (map #(assoc % :nav-at (:seen-at %))))) ; dup seen-at as nav-at
         new-status-data (merge old-status-data clean-status-data)]
+    (timbre/debug "Change status data:" new-status-data)
     (-> db
       (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
 

@@ -31,12 +31,12 @@
   [change-data board]
   (let [changes (get change-data (:uuid board))
         change-at (:change-at changes)
-        seen-at (:seen-at changes)
-        new? (or (and change-at seen-at (> change-at seen-at))
-                 (and change-at (not seen-at)))]
-    (timbre/debug "New test for:" (:slug board)
-                  "change:" (:change-at changes)
-                  "seen:" (:seen-at changes)
+        nav-at (:nav-at changes)
+        new? (or (and change-at nav-at (> change-at nav-at))
+                 (and change-at (not nav-at)))]
+    (timbre/debug "New'ness in nav. test for:" (:slug board)
+                  "change:" change-at
+                  "nav:" nav-at
                   "new?:" new?)
     new?))
 
