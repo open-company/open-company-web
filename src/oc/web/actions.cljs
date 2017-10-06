@@ -35,7 +35,7 @@
 (defmethod dispatcher/action :logout [db _]
   (cook/remove-cookie! :jwt)
   (router/redirect! "/")
-  (dissoc db :jwt))
+  (dissoc db :jwt :latest-entry-point :latest-auth-settings))
 
 ;; Get the board to show counting the last accessed and the last created
 
@@ -341,7 +341,7 @@
                (not (cook/get-cookie :login-redirect)))
         (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
     (router/redirect! auth-url-with-redirect))
-  db)
+  (dissoc db :latest-auth-settings :latest-entry-point))
 
 (defmethod dispatcher/action :bot-auth
   [db [_]]
@@ -358,7 +358,7 @@
 (defmethod dispatcher/action :login-with-email
   [db [_]]
   (api/auth-with-email (:email (:login-with-email db)) (:pswd (:login-with-email db)))
-  (dissoc db :login-with-email-error))
+  (dissoc db :login-with-email-error :latest-auth-settings :latest-entry-point))
 
 (defmethod dispatcher/action :login-with-email/failed
   [db [_ error]]
@@ -378,7 +378,9 @@
 (defmethod dispatcher/action :auth-with-token
   [db [ _ token-type]]
   (api/auth-with-token (:token (:query-params @router/path)))
-  (assoc db :auth-with-token-type token-type))
+  (-> db
+    (assoc :auth-with-token-type token-type)
+    (dissoc :latest-auth-settings :latest-entry-point)))
 
 (defmethod dispatcher/action :auth-with-token/failed
   [db [_ error]]
@@ -397,7 +399,7 @@
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
   (api/signup-with-email (or (:firstname (:signup-with-email db)) "") (or (:lastname (:signup-with-email db)) "") (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
-  (dissoc db :signup-with-email-error))
+  (dissoc db :signup-with-email-error :latest-auth-settings :latest-entry-point))
 
 (defmethod dispatcher/action :signup-with-email/failed
   [db [_ status]]
