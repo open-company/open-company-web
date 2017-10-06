@@ -1404,3 +1404,11 @@
     (when (> (- now latest-auth-settings) reload-time)
       (api/get-auth-settings)))
   db)
+
+(defmethod dispatcher/action :onboard-overlay-show
+  [db [_]]
+  (assoc db :show-onboard-overlay true))
+
+(defmethod dispatcher/action :onboard-overlay-hide
+  [db [_]]
+  (dissoc db :show-onboard-overlay))
