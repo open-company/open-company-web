@@ -16,11 +16,10 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            ; [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.stories-layout :refer (stories-layout)]
-            [oc.web.components.all-activity :refer (all-activity)]
+            [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -52,9 +51,9 @@
 
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
-                                      all-activity-data
+                                      all-posts-data
                                       is-dashboard
-                                      is-all-activity
+                                      is-all-posts
                                       is-stakeholder-update
                                       board-filters] :as data} owner options]
 
@@ -68,7 +67,7 @@
 
   ; (will-mount [_]
   ;   (when (and (not (utils/is-test-env?))
-  ;              is-all-activity)
+  ;              is-all-posts)
   ;     (utils/after 100 #(dis/dispatch! [:calendar-get]))))
 
   (did-mount [_]
@@ -134,17 +133,17 @@
             (dom/div {:class "group"}
               ;; Board name and settings button
               (dom/div {:class "board-name"}
-                (if is-all-activity
-                  (dom/div {:class "all-activity-icon"})
+                (if is-all-posts
+                  (dom/div {:class "all-posts-icon"})
                   (if (= (:type board-data) "story")
                     (dom/div {:class "stories-icon"})
                     (dom/div {:class "boards-icon"})))
-                (if is-all-activity
-                  "All Activity"
+                (if is-all-posts
+                  "All Posts"
                   (:name board-data))
                 ;; Settings button
                 (when (and (router/current-board-slug)
-                           (not is-all-activity)
+                           (not is-all-posts)
                            (not (:read-only board-data)))
                   (dom/button {:class "mlb-reset board-settings-bt"
                                :data-toggle "tooltip"
@@ -153,15 +152,12 @@
                                :title (str (:name board-data) " settings")
                                :on-click #(dis/dispatch! [:board-edit board-data])})))
               ;; Add entry button
-              (when (and (not is-all-activity)
+              (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
                          (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                             :title "Create a new update"
-                             :data-toggle "tooltip"
-                             :data-placement "top"
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
@@ -172,9 +168,9 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
-                  (dom/label {:class "add-to-board-label"}) "New"))
+                  (dom/label {:class "add-to-board-label"}) "New Post"))
               ;; Add entry floating button
-              (when (and (not is-all-activity)
+              (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
                          (= (:type board-data) "entry")
@@ -195,75 +191,17 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
-              ;; Add story buttons container
-              (when (= (:type board-data) "story")
-                (let [;; All the boards that are of story type, that are not drafts and that are not read-only
-                      storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
-                      ;; Select only the needed keys
-                      storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
-                      ;; Rename the keys for the dropdown
-                      fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
-                  (when (or (not (:read-only board-data))
-                            (and (= (:slug board-data) "drafts")
-                                 (pos? (count storyboards))))
-                    (dom/div {:class "new-story-container group"}
-                      ;; Add story button
-                      (when (and (not is-all-activity)
-                                 (not (responsive/is-tablet-or-mobile?))
-                                 (or (utils/link-for (:links board-data) "create")
-                                     (= (:slug board-data) "drafts")))
-                        (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                                     :title "Create a new journal entry"
-                                     :data-toggle "tooltip"
-                                     :data-placement "top"
-                                     :on-click #(if (= (router/current-board-slug) "drafts")
-                                                  (if (= (count fixed-storyboards) 1)
-                                                    (dis/dispatch! [:story-create (first storyboards)])
-                                                    (om/set-state! owner :show-storyboards-top-dropdown (not show-storyboards-top-dropdown)))
-                                                  (dis/dispatch! [:story-create board-data]))}
-                          (dom/div {:class "add-to-board-pencil"})
-                          (dom/label {:class "add-to-board-label"}) "New"))
-                      ;; Add story dropdown
-                      (when show-storyboards-top-dropdown
-                        (dom/div {:class "dropdown-top"}
-                          (dropdown-list {:items fixed-storyboards
-                                          :value nil
-                                          :on-change did-select-storyboard-cb
-                                          :on-blur #(om/set-state! owner :show-storyboards-top-dropdown false)})))
-                      ;; Add story flaoting button
-                      (dom/div {:class "dropdown-floating"
-                                :id "new-story-floating-btn"
-                                :style {:opacity (calc-opacity (document-scroll-top))}}
-                        (when (and (not is-all-activity)
-                                   (not (responsive/is-tablet-or-mobile?))
-                                   (or (utils/link-for (:links board-data) "create")
-                                       (= (:slug board-data) "drafts")))
-                          (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn floating-button" (when (= (:slug board-data) "drafts") " is-draft"))
-                                       :data-placement "left"
-                                       :data-toggle "tooltip"
-                                       :title (str "Create a new journal entry")
-                                       :on-click #(if (= (router/current-board-slug) "drafts")
-                                                    (if (= (count fixed-storyboards) 1)
-                                                      (dis/dispatch! [:story-create (first storyboards)])
-                                                      (om/set-state! owner :show-storyboards-floating-dropdown (not show-storyboards-floating-dropdown)))
-                                                    (dis/dispatch! [:story-create board-data]))}
-                            (dom/div {:class "add-to-board-pencil"})))
-                        ;; Add story floating dropdown
-                        (when show-storyboards-floating-dropdown
-                          (dropdown-list {:items fixed-storyboards
-                                          :value nil
-                                          :on-change did-select-storyboard-cb
-                                          :on-blur #(om/set-state! owner :show-storyboards-floating-dropdown false)})))))))
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?)
+                         (not is-all-posts)
                          (= (:type board-data) "entry"))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
               (and is-dashboard
-                   is-all-activity)
-              (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (keys (:fixed-items all-activity-data)))))
+                   is-all-posts)
+              (rum/with-key (all-posts all-posts-data) (str "all-posts-" (apply str (keys (:fixed-items all-posts-data)))))
               (and is-dashboard
                    (not is-mobile-size?)
                    (not current-activity-id)

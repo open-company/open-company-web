@@ -1,6 +1,6 @@
 @mixin default-item(){
   background-color: transparent;
-  .internal, div.all-activity-label {
+  .internal, div.all-posts-label {
     @include avenir_M();
     font-size: 14px;
     line-height: 1.71;
@@ -11,7 +11,7 @@
 
 @mixin item-selected(){
   background-color: rgba($carrot_orange_1, 0.1);
-  .internal, div.all-activity-label {
+  .internal, div.all-posts-label {
     color: $carrot_orange;
     @include avenir_H();
     font-size: 14px;
@@ -22,7 +22,7 @@
 
 @mixin item-selected-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
-  .internal, div.all-activity-label {
+  .internal, div.all-posts-label {
     color: $carrot_dark_gray;
     @include avenir_M();
     font-size: 14px;
@@ -48,7 +48,7 @@ div.left-navigation-sidebar {
     padding-bottom: 32px; 
   }
 
-  a.all-activity {
+  a.all-posts {
     display: block;
     background-color: transparent;
     border: none;
@@ -74,7 +74,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-activity-label {
+    div.all-posts-label {
       padding: 5px 5px 0 5px;
       width: 148px;
       margin-left: 19px;
@@ -82,7 +82,7 @@ div.left-navigation-sidebar {
       margin-left: 20px;
     }
 
-    div.all-activity-icon {
+    div.all-posts-icon {
       background-image: cdnUrl("/img/ML/activity_hamburger.svg");
       background-size: 12px 11px;
       width: 12px;
@@ -197,15 +197,15 @@ div.left-navigation-sidebar {
       img.public {
         float: left;
         margin-left: 6px;
-        margin-top: 6px;
+        margin-top: 5px;
         width: 16px;
         height: 16px;
       }
 
       img.private{
         float: left;
-        margin-left: 8px;
-        margin-top: 7px;
+        margin-left: 9px;
+        margin-top: 5px;
         width: 10px;
         height: 14px;
       }

@@ -16,16 +16,13 @@
 (defn sort-boards [boards]
   (into [] (sort-by :name boards)))
 
-(defn sort-storyboards [boards]
-  (into [] (sort-by :name (vec (filter #(not= (:slug %) "drafts") boards)))))
-
 (defn anchor-nav! [e url]
   (utils/event-stop e)
   (router/nav! url))
 
 (defn new?
   "
-  A board/journal is new if:
+  A board is new if:
   
     change-at is newer than seen at
       -or-
@@ -34,12 +31,12 @@
   [change-data board]
   (let [changes (get change-data (:uuid board))
         change-at (:change-at changes)
-        seen-at (:seen-at changes)
-        new? (or (and change-at seen-at (> change-at seen-at))
-                 (and change-at (not seen-at)))]
-    (timbre/debug "New test for:" (:slug board)
-                  "change:" (:change-at changes)
-                  "seen:" (:seen-at changes)
+        nav-at (:nav-at changes)
+        new? (or (and change-at nav-at (> change-at nav-at))
+                 (and change-at (not nav-at)))]
+    (timbre/debug "New'ness in nav. test for:" (:slug board)
+                  "change:" change-at
+                  "nav:" nav-at
                   "new?:" new?)
     new?))
 
@@ -80,17 +77,13 @@
         change-data (drv/react s :change-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        boards (vec (filter #(= (:type %) "entry") all-boards))
-        storyboards (vec (filter #(= (:type %) "story") all-boards))
-        is-all-activity (or (= (router/current-board-slug) "all-activity") (:from-all-activity @router/path))
+        boards (vec (filter #(not= (:slug %) "drafts") all-boards))
+        is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
-        show-storyboards (or create-link (pos? (count storyboards)))
-        show-all-activity (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-all-posts (jwt/user-is-part-of-the-team (:team-id org-data))
         show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
                                    create-link)
-        show-create-new-journal (and (not (responsive/is-tablet-or-mobile?))
-                                     create-link)
         drafts-board (first (filter #(= (:slug %) "drafts") all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
@@ -105,15 +98,15 @@
     [:div.left-navigation-sidebar.group
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
-        ;; All activity
-        (when show-all-activity
-          [:a.all-activity.hover-item.group
-            {:class (when is-all-activity "item-selected")
-             :href (oc-urls/all-activity)
-             :on-click #(anchor-nav! % (oc-urls/all-activity))}
-            [:div.all-activity-icon]
-            [:div.all-activity-label
-                "All Activity"]])
+        ;; All posts
+        (when show-all-posts
+          [:a.all-posts.hover-item.group
+            {:class (when is-all-posts "item-selected")
+             :href (oc-urls/all-posts)
+             :on-click #(anchor-nav! % (oc-urls/all-posts))}
+            [:div.all-posts-icon]
+            [:div.all-posts-label
+                "All Posts"]])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
@@ -135,7 +128,7 @@
             (for [board (sort-boards boards)
                   :let [board-url (board-url-fn (:slug board))]]
               [:a.left-navigation-sidebar-item.hover-item
-                {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug board))) "item-selected")
+                {:class (when (and (not is-all-posts) (= (router/current-board-slug) (:slug board))) "item-selected")
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
@@ -152,57 +145,27 @@
                   [:div.internal
                     {:class (utils/class-set {:new (new? change-data board)})
                      :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])
-        (when show-storyboards
-          [:div.left-navigation-sidebar-top.group
-            ;; Boards header
-            [:h3.left-navigation-sidebar-top-title.group
-              {:id "navigation-sidebar-journals"}
-              [:div.stories-icon]
-              [:span
-                "JOURNALS"]
-              (when show-create-new-journal
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-                  {:on-click #(dis/dispatch! [:board-edit nil "story"])
-                   :title "Create a new journal"
-                   :data-placement "top"
-                   :data-toggle "tooltip"
-                   :data-container "body"}])]])
-        (when show-storyboards
-          [:div.left-navigation-sidebar-items.group
-            (for [storyboard (sort-storyboards storyboards)
-                  :let [storyboard-url (oc-urls/board (:slug storyboard))]]
-              [:a.left-navigation-sidebar-item.hover-item
-                {:class (when (and (not is-all-activity) (= (router/current-board-slug) (:slug storyboard))) "item-selected")
-                 :data-board (name (:slug storyboard))
-                 :data-storyboard true
-                 :key (str "board-list-" (name (:slug storyboard)))
-                 :href storyboard-url
-                 :on-click #(anchor-nav! % storyboard-url)}
-                (when (or (= (:access storyboard) "public")
-                          (= (:access storyboard) "private"))
-                  [:img
-                    {:src (if (= (:access storyboard) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
-                     :class (if (= (:access storyboard) "public") "public" "private")}])
-                [:div.board-name.group
-                  {:class (utils/class-set {:public-board (= (:access storyboard) "public")
-                                            :private-board (= (:access storyboard) "private")
-                                            :team-board (= (:access storyboard) "team")})}
-                  [:div.internal
-                    {:class (utils/class-set {:new (new? change-data storyboard)})
-                     :key (str "board-list-" (name (:slug storyboard)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name storyboard) (:slug storyboard)))}]]])
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])
             (when show-drafts
-              [:div.left-navigation-sidebar-draft
+              (let [board-url (oc-urls/board (:slug drafts-board))]
                 [:a.left-navigation-sidebar-item.hover-item
-                  {:class (when (= (router/current-board-slug) "drafts") "item-selected")
-                   :data-drafts true
-                   :key "board-list-draft"
-                   :href (oc-urls/drafts)
-                   :on-click #(anchor-nav! % (oc-urls/drafts))}
-                  [:div.board-name.team-board.group
+                  {:class (when (and (not is-all-posts) (= (router/current-board-slug) (:slug drafts-board))) "item-selected")
+                   :data-board (name (:slug drafts-board))
+                   :key (str "board-list-" (name (:slug drafts-board)))
+                   :href board-url
+                   :on-click #(anchor-nav! % board-url)}
+                  (when (or (= (:access drafts-board) "public")
+                            (= (:access drafts-board) "private"))
+                    [:img
+                      {:src (if (= (:access drafts-board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                       :class (if (= (:access drafts-board) "public") "public" "private")}])
+                  [:div.board-name.group
+                    {:class (utils/class-set {:public-board (= (:access drafts-board) "public")
+                                              :private-board (= (:access drafts-board) "private")
+                                              :team-board (= (:access drafts-board) "team")})}
                     [:div.internal
-                      (str "Drafts (" (:count drafts-link) ")")]]]])])]
+                      {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
+                       :dangerouslySetInnerHTML (utils/emojify (or (:name drafts-board) (:slug drafts-board)))}]]]))])]
       [:div.left-navigation-sidebar-footer
         {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people
