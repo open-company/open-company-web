@@ -615,13 +615,15 @@
   (when (= status 201)
     (api/get-entry-point)
     (api/get-auth-settings))
-  (assoc db :email-confirmed (= status 201)))
+  (-> db
+    (assoc :email-confirmed (= status 201))
+    (dissoc :latest-entry-point :latest-auth-settings)))
 
 (defmethod dispatcher/action :name-pswd-collect
   [db [_]]
   (let [form-data (:collect-name-pswd db)]
     (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
-  db)
+  (dissoc db :latest-entry-point :latest-auth-settings))
 
 (defn update-user-data [db user-data]
   (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
@@ -649,7 +651,9 @@
   [db [_ password-reset?]]
   (let [form-data (:collect-pswd db)]
     (api/collect-password (:pswd form-data)))
-  (assoc db :is-password-reset password-reset?))
+  (-> db
+    (assoc :is-password-reset password-reset?)
+    (dissoc :latest-entry-point :latest-auth-settings)))
 
 (defmethod dispatcher/action :pswd-collect/finish
   [db [_ status]]
@@ -699,7 +703,9 @@
                      (assoc with-pswd :email (:email (:current-user-data db))))
         without-has-changes (dissoc with-email :has-changes :loading)]
     (api/patch-user-profile (:current-user-data db) without-has-changes))
-  (assoc-in db [:edit-user-profile :loading] true))
+  (-> db
+    (assoc-in [:edit-user-profile :loading] true)
+    (dissoc :latest-entry-point :latest-auth-settings)))
 
 (defmethod dispatcher/action :email-domain-team-add
   [db [_]]
@@ -738,7 +744,7 @@
   (let [org-data (:org-editing db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data))))
-  db)
+  (dissoc db :latest-entry-point :latest-auth-settings))
 
 (defmethod dispatcher/action :private-board-add
   [db [_]]
@@ -782,7 +788,7 @@
 (defmethod dispatcher/action :password-reset
   [db [_]]
   (api/password-reset (:email (:password-reset db)))
-  db)
+  (dissoc db :latest-entry-point :latest-auth-settings))
 
 (defmethod dispatcher/action :password-reset/finish
   [db [_ status]]
