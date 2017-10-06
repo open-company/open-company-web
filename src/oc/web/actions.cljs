@@ -194,7 +194,7 @@
 (defmethod dispatcher/action :container/change
   [db [_ {board-uuid :container-id change-at :change-at}]]
   (timbre/debug "Board change:" board-uuid "at:" change-at)
-  ;; Update change-data state that we saw the board
+  ;; Update change-data state that the board has a change
   (update-change-data db board-uuid :change-at change-at))
 
 (defmethod dispatcher/action :board-seen
@@ -204,6 +204,12 @@
   (ws-cc/container-seen board-uuid)
   ;; Update change-data state that we nav'd to the board
   (update-change-data db board-uuid :nav-at (oc-time/current-timestamp)))
+
+(defmethod dispatcher/action :board-nav-away
+  [db [_ {board-uuid :board-uuid}]]
+  (timbre/debug "Board nav away:" board-uuid)
+  ;; Update change-data state that we saw the board
+  (update-change-data db board-uuid :seen-at (oc-time/current-timestamp)))
 
 (defmethod dispatcher/action :board [db [_ board-data]]
  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))

@@ -5,6 +5,7 @@
             [cljs-time.core :as time]
             [cljs-time.format :as f]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.urls :as oc-urls]
             [taoensso.timbre :as timbre]
             [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
@@ -36,7 +37,7 @@
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           {:will-unmount (fn [s]
-                            (timbre/info "UNMOUNT")
+                            (dis/dispatch! [:board-nav-away {:board-uuid (:uuid (first (:rum/args s)))}])
                             s)}
 
   [s board-data layout-type]
