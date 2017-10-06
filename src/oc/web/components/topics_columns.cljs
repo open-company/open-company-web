@@ -94,7 +94,8 @@
           sidebar-width (+ responsive/left-navigation-sidebar-width
                            responsive/left-navigation-sidebar-minimum-right-margin)
           board-container-style {:margin-left (str (max sidebar-width (+ (/ (- ww responsive/board-container-width sidebar-width) 2) sidebar-width)) "px")
-                                 :left "50%"}]
+                                 :left "50%"}
+          entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :group true
@@ -184,7 +185,7 @@
                          (not empty-board?)
                          (not is-all-posts)
                          (= (:type board-data) "entry")
-                         (> (count (:fixed-items board-data)) 1))
+                         (> (count entry-topics) 1))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
