@@ -62,7 +62,6 @@
                                (jwt/jwt)
                                (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
      :ww (responsive/ww)
-     :show-journals-tooltip false
      :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
 
   ; (will-mount [_]
@@ -83,7 +82,7 @@
       (events/unlistenByKey (om/get-state owner :resize-listener))
       (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip show-journals-tooltip ww]}]
+  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -107,21 +106,9 @@
                          :y (- (aget offset "top") 160)
                          :title "Welcome to Carrot"
                          :message "Boards make it easy to find the latest news and key updates from across the company. You can create boards for different areas of your company, like Sales, Marketing and Products."
-                         :footer "1 of 2"
+                         :footer ""
                          :on-next-click (fn []
-                                          (om/update-state! owner #(merge % {:show-journals-tooltip true
-                                                                             :show-boards-tooltip false})))})))
-        (when show-journals-tooltip
-          (when-let* [nav-journals (js/$ "h3#navigation-sidebar-journals")
-                      offset (.offset nav-journals)
-                      journals-left (aget offset "left")]
-            (carrot-tip {:x (+ journals-left 105 30)
-                         :y (- (aget offset "top") 160)
-                         :title "Welcome to Carrot"
-                         :message "Journals are the easiest way to share longer updates and ideas with your stakeholders, like monthly all-hands, weekly kickoffs, and investor updates."
-                         :footer "2 of 2"
-                         :on-next-click (fn []
-                                          (om/set-state! owner :show-journals-tooltip false)
+                                          (om/update-state! owner #(merge % {:show-boards-tooltip false}))
                                           (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
         (dom/div {:class "topics-column-container group"
                   :key columns-container-key}

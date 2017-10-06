@@ -111,8 +111,8 @@
         [:div.step-3
           "Your Team"]]
       [:div.main-cta
-        [:div.title
-          "Tell us about yourself"]
+        [:div.title.about-yourself
+          "Tell us a bit about yourself..."]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -134,7 +134,7 @@
                         nil))}
           (user-avatar-image fixed-user-data)
           [:div.add-picture-link
-            "Upload profile photo"]
+            "Change photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -259,8 +259,8 @@
         [:div.step-2
           "Your Team"]]
       [:div.main-cta
-        [:div.title
-          "Tell us about yourself"]
+        [:div.title.about-yourself
+          "Tell us a bit about yourself..."]
         [:div.subtitle
           "This information will be visible to your team"]]
       [:div.onboard-form
@@ -279,7 +279,7 @@
                         nil))}
           (user-avatar-image fixed-user-data)
           [:div.add-picture-link
-            "Upload profile photo"]
+            "Change photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -455,8 +455,8 @@
         [:div.step-2
           "Your Profile"]]
       [:div.main-cta
-        [:div.title
-          "Tell us about yourself"]
+        [:div.title.about-yourself
+          "Tell us a bit about yourself..."]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -478,7 +478,7 @@
                         nil))}
           (user-avatar-image fixed-user-data)
           [:div.add-picture-link
-            "Upload profile photo"]
+            "Change photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
