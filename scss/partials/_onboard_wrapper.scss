@@ -218,7 +218,11 @@ div.onboard-lander {
       margin-top: 64px;
       @include avenir_M();
       font-size: 32px;
-      color: $carrot_gray;
+      color: $carrot_dark_gray;
+
+      &.about-yourself {
+        @include avenir_H();
+      }
     }
 
     div.subtitle {

@@ -21,4 +21,4 @@
                          (utils/event-stop e)
                          (when (fn? on-next-click)
                            (on-next-click)))}
-            "Next"]]]]])
+            "Got It!"]]]]])
