@@ -41,9 +41,8 @@
       (case @(::step s)
         1
         [:div.onboard-overlay-step.step-1
-          [:img.step-illustration
-            {:src (utils/cdn "/img/carrot_logo.png")
-             :height 101}]
+          [:div.step-illustration-container
+            ""]
           [:div.onboard-overlay-step-title
             "Welcome to Carrot"]
           ; [:div.onboard-overlay-step-description
