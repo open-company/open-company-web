@@ -207,7 +207,8 @@
                                :error (:collect-pswd-error base)})]
    :media-input           [[:base]
                             (fn [base]
-                              (:media-input base))]})
+                              (:media-input base))]
+   :comment-add-finish    [[:base] (fn [base] (:comment-add-finish base))]})
 
 ;; Action Loop =================================================================
 
