@@ -83,7 +83,7 @@ div.entry-edit-modal-container {
 
           div.entry-edit-topics-dd {
             position: absolute;
-            top: 25px;
+            top: 30px;
             left: calc(50% - 130px);
             width: 260px;
             border: none;
@@ -152,7 +152,7 @@ div.entry-edit-modal-container {
                   button.remove {
                     color: $carrot_light_gray;
                     @include avenir_R();
-                    font-size: 14px;
+                    font-size: 12px;
                     margin: 0;
                     padding: 0;
                     margin-left: 17px;
