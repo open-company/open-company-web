@@ -76,8 +76,13 @@
               (when-not (:auth-settings (rum/react dis/app-state))
                 (small-loading))]]
           [:div.login-with-email.domine.underline.bold
-            [:a {:on-click #(do (utils/event-stop %)
-                                (dis/dispatch! [:login-overlay-show (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
+            [:a {:on-click (fn [e]
+                              (utils/event-stop e)
+                              (if (= (:show-login-overlay @dis/app-state) :signup-with-slack)
+                                (do
+                                  (router/nav! oc-urls/sign-up)
+                                  (utils/after 100 #(dis/dispatch! [:login-overlay-show :signup-with-email])))
+                                (dis/dispatch! [:login-overlay-show :login-with-email])))}
               (cond
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
                 "or Sign Up via email"
