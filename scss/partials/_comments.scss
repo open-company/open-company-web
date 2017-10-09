@@ -107,6 +107,7 @@ div.comments {
         color: rgba(78,90,107,0.8);
         font-weight: 300;
         margin: 0 0 0 #{$comment-avatar-size + 20}px;
+        white-space: pre;
 
         .emojione {
           @include emoji-size(12);
@@ -123,7 +124,7 @@ div.comments {
       background-color: white;
       border-radius: 4px;
       border: 1px solid rgba(177, 184, 192, 0.5);
-      padding: 0.5rem;
+      padding: 8px;
       transition: 230ms;
       left: 0;
       right: 0;
@@ -131,12 +132,61 @@ div.comments {
       bottom: 0px;
       width: calc(100% + 16px);
 
+      div.successfully-posted {
+        width: 168px;
+        height: 55px;
+        background-color: $carrot_dark_gray;
+        border-radius: 4px;
+        position: absolute;
+        padding: 12px 24px;
+        text-align: center;
+        @include avenir_H();
+        color: white;
+        font-size: 12px;
+        top: -65px;
+        left: calc(50% - 84px);
+        @include no-user-select();
+
+        &:before {
+          display: block;
+          content: "";
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          transform: rotate(45deg);
+          background-color: $carrot_dark_gray;
+          left: calc(50% - 4px);
+          bottom: -4px;
+        }
+      }
+
       &.expanded{
         div.add-comment-internal {
+          width: calc(100% - 42px);
+          float: right;
+          position: relative;
+
+          &:after {
+            display: block;
+            width: calc(100% + 33px);
+            content: "";
+            height: 1px;
+            background-color: rgba($carrot_light_gray_1, 0.3);
+            position: absolute;
+            bottom: 28px;
+            left: -40px;
+          }
+
           div.add-comment {
             height: 70px;
+            margin-bottom: 4px;
             overflow: auto;
           }
+        }
+
+        div.emoji-picker {
+          right: unset;
+          left: 10px;
         }
       }
 
@@ -147,7 +197,9 @@ div.comments {
       @include user-profile(23);
 
       div.add-comment-internal{
-        margin-left: 35px;
+        margin-left: 16px;
+        width: calc(100% - 68px);
+        float: left;
 
         div.add-comment {
           resize: none;
@@ -164,7 +216,7 @@ div.comments {
           cursor: text;
 
           .emojione {
-            @include emoji-size(12);
+            @include emoji-size(13);
           }
 
           &:empty:before {
@@ -180,10 +232,11 @@ div.comments {
           transition: 230ms;
 
           div.reply-button-container {
+            float: right;
             button.reply-btn {
               float: left;
-              color: $carrot_text_blue;
-              @include avenir_R();
+              color: $carrot_green;
+              @include avenir_H();
               font-size: 14px;
 
               &:hover {
@@ -191,6 +244,28 @@ div.comments {
               }
             }
           }
+        }
+      }
+
+      div.emoji-picker {
+        transition: left 230ms;
+        bottom: 10px;
+        position: absolute;
+        right: 10px;
+
+        button.emoji-button {
+          width: 20px;
+          height: 20px;
+          background-size: 20px 20px;
+
+          img {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        div.picker-container {
+          right: -240px !important;
         }
       }
     }

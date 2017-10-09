@@ -846,7 +846,7 @@
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [activity-uuid]}]]
   (api/get-comments activity-uuid)
-  db)
+  (assoc db :comment-add-finish true))
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ activity-uuid reaction-data]]

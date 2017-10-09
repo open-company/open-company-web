@@ -63,7 +63,7 @@
                                  (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))]
       (when first-user-visit
         (dis/dispatch! [:onboard-overlay-show]))
-      {:show-boards-tooltip first-user-visit
+      {:show-boards-tooltip false ;; Disable the welcome tooltip for now
        :ww (responsive/ww)
        :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))}))
 

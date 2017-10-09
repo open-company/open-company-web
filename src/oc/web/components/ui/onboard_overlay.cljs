@@ -1,13 +1,17 @@
 (ns oc.web.components.ui.onboard-overlay
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:onboard-overlay-hide]))
 
 (defn close-clicked [s]
+  (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)))
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
@@ -41,25 +45,25 @@
       (case @(::step s)
         1
         [:div.onboard-overlay-step.step-1
-          [:img.step-illustration
-            {:src (utils/cdn "/img/carrot_logo.png")
-             :height 101}]
+          [:div.step-illustration-container
+            ""]
           [:div.onboard-overlay-step-title
-            "Wellcome to Carrot"]
-          [:div.onboard-overlay-step-description
-            "The big picture keeps everyone aligned."]]
+            "Welcome to Carrot"]
+          ; [:div.onboard-overlay-step-description
+          ;   "The big picture keeps everyone aligned."]
+            ]
         2
         [:div.onboard-overlay-step.step-2
           [:div.empty-line]
           [:div.onboard-overlay-step-title
-            "Get your team aligned"]
+            "Keep everyone on the same page"]
           [:div.step-illustration-container
             [:div.step-illustration-left
               "CEO Update"]
             [:div.step-illustration-right
               "Sales Update"]]
           [:div.onboard-overlay-step-description
-            "It’s simple to post announcements, team updates, ideas and stories to create transparency."]]
+            "It’s simple to post announcements, team updates, ideas and stories that bring everyone together."]]
         3
         [:div.onboard-overlay-step.step-3
           [:div.empty-line]
