@@ -103,7 +103,8 @@
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :group true
                                          :content-loaded content-loaded})}
-        (when show-boards-tooltip
+        (when (and show-boards-tooltip
+                   (not (:show-onboard-overlay data)))
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
