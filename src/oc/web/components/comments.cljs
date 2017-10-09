@@ -106,6 +106,7 @@
       (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
 
 (defn add-comment-expand-cb [s expanding?]
+  (reset! (::show-placeholder s) (not expanding?))
   (when expanding?
     (utils/after 200 #(scroll-to-bottom s)))
   (reset! (::add-comment-focus s) expanding?))
@@ -123,6 +124,7 @@
                       (rum/local false ::add-comment-focus)
                       (rum/local false ::needs-gradient)
                       (rum/local false ::comments-requested)
+                      (rum/local true ::show-placeholder)
                       {:will-mount (fn [s]
                                     (load-comments-if-needed s)
                                     s)
@@ -157,11 +159,11 @@
           (if (pos? (count comments-data))
             [:div.comments-internal-scroll
               (for [c comments-data]
-                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
-              ]
-            [:div.comments-internal-empty
-              [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
-              [:div "No comments yet"]
-              [:div "Jump in and let everybody know"]
-              [:div "what you think!"]])
+                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
+            (when @(::show-placeholder s)
+              [:div.comments-internal-empty
+                [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
+                [:div "No comments yet"]
+                [:div "Jump in and let everybody know"]
+                [:div "what you think!"]]))
           (add-comment activity-data (partial add-comment-expand-cb s))]])))
