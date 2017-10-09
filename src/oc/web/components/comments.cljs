@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.object :as gobj]
@@ -29,34 +30,59 @@
 
 (defn add-comment-content [add-comment-div]
   (let [inner-html (.-innerHTML add-comment-div)
-        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))]
-    with-emojis-html))
+        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
+        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
+        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
+        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
+        final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
+    final-text))
 
-(rum/defcs add-comment < (rum/local false ::show-footer)
-                         (rum/local false ::input)
-                         (rum/local false ::dom-node-add)
-                         (rum/local false ::dom-node-remove)
-                         (rum/local false ::dom-char-modified)
+(defn add-emoji-cb [s]
+  (reset! (::keep-expanded s) false))
+
+(rum/defcs add-comment < (rum/local false ::expanded)
+                         (rum/local false ::keep-expanded)
+                         (rum/local false ::show-successful)
                          rum/reactive
                          (drv/drv :current-user-data)
+                         (drv/drv :comment-add-finish)
                          rum/static
                          {:did-mount (fn [s]
                                        (utils/after 2500 #(js/emojiAutocomplete))
-                                       s)}
+                                       s)
+                          :after-render (fn [s]
+                                          (when (and (not @(::show-successful s))
+                                                     @(drv/get-ref s :comment-add-finish))
+                                            (utils/after 100 (fn []
+                                              (reset! (::show-successful s) true)
+                                              (utils/after 2500 (fn []
+                                               (dis/dispatch! [:input [:comment-add-finish] false])
+                                               (reset! (::show-successful s) false))))))
+                                          s)}
   [s activity-data did-expand-cb]
-  (let [show-footer (::show-footer s)
+  (let [show-footer (::expanded s)
         fixed-show-footer @show-footer
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box
       {:class (if fixed-show-footer "expanded" "")}
+      (when @(::show-successful s)
+        [:div.successfully-posted
+          "Comment was posted successfully!"])
       (user-avatar-image current-user-data)
       [:div.add-comment-internal
-        [:div.add-comment.emoji-autocomplete
+        [:div.add-comment.emoji-autocomplete.emojiable
           {:ref "add-comment"
            :content-editable true
            :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
-           :on-focus (fn [_] (reset! show-footer true) (when (fn? did-expand-cb) (did-expand-cb true)))
-           :on-blur #(utils/after 100 (fn [] (reset! show-footer false) (when (fn? did-expand-cb) (did-expand-cb false))))
+           :on-focus (fn [_]
+                       (reset! show-footer true)
+                       (when (fn? did-expand-cb) (did-expand-cb true)))
+           :on-blur #(utils/after 100
+                      (fn []
+                        (when-not @(::keep-expanded s)
+                          (reset! show-footer false)
+                          (when (fn? did-expand-cb)
+                            (did-expand-cb false)))))
            :placeholder "Add a comment..."}]
         [:div.add-comment-footer.group
           {:style {:display (if fixed-show-footer "block" "none")}}
@@ -65,7 +91,12 @@
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
                             (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
                             (set! (.-innerHTML add-comment-div) ""))}
-              "Add"]]]]]))
+              "Post"]]]]
+      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                     :width 20
+                     :height 20
+                     :will-show-picker #(reset! (::keep-expanded s) true)
+                     :will-hidepicker #(reset! (::keep-expanded s) false)})]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
