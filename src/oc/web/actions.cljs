@@ -760,7 +760,7 @@
         board-slug (router/current-board-slug)
         activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
-    (assoc-in db comments-key {:loading true})))
+    (assoc-in db (vec (conj (butlast comments-key) :loading)) true)))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]

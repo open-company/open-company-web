@@ -7,7 +7,7 @@ div.comments {
 
   div.top-gradient {
     position: absolute;
-    top: 10px;
+    top: 0px;
     left: 0px;
     right: 10px;
     height: 40px;
@@ -23,15 +23,14 @@ div.comments {
   }
 
   div.comments-internal {
-    padding-bottom: 55px;
+    padding-bottom: 51px;
+    min-height: 51px;
     max-height: 100%;
-    min-height: 55px;
     width: 100%;
     bottom: 0px;
     left: 0;
     right: 0;
     position: absolute;
-    transition: 230ms;
 
     &.empty {
       transition: 0ms !important;
@@ -39,11 +38,11 @@ div.comments {
     }
 
     &.add-comment-focus {
-      padding-bottom: 120px;
-      min-height: 120px;
+      padding-bottom: 127px;
+      min-height: 127px;
 
       div.comments-internal-scroll {
-        height: calc(100% - 65px);
+        height: calc(100% - 76px);
       }
     }
 
@@ -51,7 +50,7 @@ div.comments {
       overflow-x: hidden;
       overflow-y: auto;
       height: 100%;
-      padding: 10px;
+      padding: 10px 10px 0px;
     }
 
     div.comments-internal-empty {
@@ -85,19 +84,39 @@ div.comments {
           background-position: 50%;
           background-size: #{$comment_avatar_size}px #{$comment_avatar_size}px;
           border-radius: #{$comment_avatar_size / 2}px;
-        }
-        div.comment-author {
-          margin-left: 20px;
-          font-size: 14px;
-          color: $oc_gray_5;
-          font-weight: 700;
+          float: left;
         }
 
-        div.comment-timestamp {
-          margin-left: 5px;
-          margin-top: 4px;
-          font-size: 11px;
-          color: rgba(78,90,107,0.6);
+        div.comment-author-timestamp {
+          display: block;
+          float: left;
+          width: calc(100% - 23px);
+
+          div.comment-author {
+            max-width: calc(60% - 16px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 16px;
+            font-size: 14px;
+            color: $oc_gray_5;
+            @include avenir_H();
+            white-space: nowrap;
+            // display: block;
+            float: left;
+          }
+
+          div.comment-timestamp {
+            max-width: calc(40% - 5px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 5px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: rgba(78,90,107,0.6);
+            white-space: nowrap;
+            // display: block;
+            float: left;
+          }
         }
       }
 
@@ -106,7 +125,7 @@ div.comments {
         font-size: 13px;
         color: rgba(78,90,107,0.8);
         font-weight: 300;
-        margin: 0 0 0 #{$comment-avatar-size + 20}px;
+        margin: 0 0 0 #{$comment-avatar-size + 16}px;
         white-space: pre;
 
         .emojione {
@@ -130,7 +149,7 @@ div.comments {
       right: 0;
       position: absolute;
       bottom: 0px;
-      width: calc(100% + 16px);
+      width: 100%;
 
       div.successfully-posted {
         width: 168px;
