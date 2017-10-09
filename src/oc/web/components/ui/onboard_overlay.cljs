@@ -47,40 +47,37 @@
           [:div.onboard-overlay-step-title
             "Wellcome to Carrot"]
           [:div.onboard-overlay-step-description
-            "Where companies find alignment"]]
+            "The big picture keeps everyone aligned."]]
         2
         [:div.onboard-overlay-step.step-2
           [:div.empty-line]
           [:div.onboard-overlay-step-title
-            "Organize topics with boards"]
-          [:img.step-illustration
-            {:src (utils/cdn "/img/ML/onboard_overlay_il_2.png")
-             :width 389
-             :height 150}]
+            "Get your team aligned"]
+          [:div.step-illustration-container
+            [:div.step-illustration-left
+              "CEO Update"]
+            [:div.step-illustration-right
+              "Sales Update"]]
           [:div.onboard-overlay-step-description
-            "Boards keep everything organized: Boards keep everyone up to date on related topics."]]
+            "It’s simple to post announcements, team updates, ideas and stories to create transparency."]]
         3
         [:div.onboard-overlay-step.step-3
           [:div.empty-line]
           [:div.onboard-overlay-step-title
-            "See what's hot"]
-          [:img.step-illustration
-            {:src (utils/cdn "/img/ML/onboard_overlay_il_3.png")
-             :width 404
-             :height 181}]
+            "Encourage feedback"]
+          [:div.step-illustration-container
+            "2H Strategy"]
           [:div.onboard-overlay-step-description
-            "Check out what’s trending to get an at a glance view of the hottest topics in your company"]]
+            "Comments and reactions keep everyone engaged and in sync - great for distributed teams."]]
         4
         [:div.onboard-overlay-step.step-4
           [:div.empty-line]
           [:div.onboard-overlay-step-title
-            "Gather, create, and reflect, with stories"]
-          [:img.step-illustration
-            {:src (utils/cdn "/img/ML/onboard_overlay_il_4.png")
-             :width 403
-             :height 164}]
+            "Keep stakeholders in the loop, too"]
+          [:div.step-illustration-container
+            "News"]
           [:div.onboard-overlay-step-description
-            "Gather, create and reflect, with Stories: Stories are great for regular updates that cover multiple topics."]])
+            "It’s easy to share your news with investors, advisors, recruits and customers."]])
       [:div.onboard-overlay-footer
         [:div.onboard-overlay-footer-left
           [:button.mlb-reset.skip-button
