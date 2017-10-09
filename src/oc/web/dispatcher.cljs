@@ -47,7 +47,7 @@
   (vec (conj (board-key org-slug board-slug) :comments-data)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
-  (vec (conj (comments-key org-slug board-slug) activity-uuid)))
+  (vec (conj (comments-key org-slug board-slug) activity-uuid :sorted-comments)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -157,7 +157,7 @@
                           (get-in base (comments-key org-slug board-slug)))]
    :activity-comments-data [[:base :org-slug :board-slug :activity-uuid :secure-id]
                            (fn [base org-slug board-slug activity-uuid secure-id]
-                              (get-in base (activity-comments-key org-slug board-slug (or activity-uuid secure-id))))]
+                              (get-in base (butlast (activity-comments-key org-slug board-slug (or activity-uuid secure-id)))))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
@@ -399,7 +399,7 @@
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintSecureStoryData js/window) print-secure-story-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
-(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)

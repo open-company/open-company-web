@@ -18,12 +18,13 @@
   (let [author (:author c)]
     [:div.comment
       [:div.comment-header.group
-        [:div.comment-avatar.left
+        [:div.comment-avatar
           {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
-        [:div.comment-author.left
-          (:name author)]
-        [:div.comment-timestamp.left
-          (utils/time-since (:created-at c))]]
+        [:div.comment-author-timestamp
+          [:div.comment-author
+            (:name author)]
+          [:div.comment-timestamp
+            (utils/time-since (:created-at c))]]]
       [:p.comment-body.group
         {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
       [:div.comment-footer.group]]))
@@ -106,9 +107,9 @@
       (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
 
 (defn add-comment-expand-cb [s expanding?]
+  (reset! (::add-comment-focus s) expanding?)
   (when expanding?
-    (utils/after 200 #(scroll-to-bottom s)))
-  (reset! (::add-comment-focus s) expanding?))
+    (utils/after 200 #(scroll-to-bottom s))))
 
 (defn load-comments-if-needed [s]
   (let [activity-data (first (:rum/args s))]
@@ -130,38 +131,42 @@
                                       (load-comments-if-needed s)
                                       s)
                        :after-render (fn [s]
-                                       (let [comments (js/$ ".comments")
-                                             comments-internal-scroll (js/$ ".comments-internal-scroll")
-                                             comments-internal-scroll-final-height (- (.height comments) (if @(::add-comment-focus s) 130 65))
-                                             next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") comments-internal-scroll-final-height)]
-                                         (.css comments-internal-scroll #js {:height (str comments-internal-scroll-final-height "px")})
-                                         ;; Show the gradient at the top only if there are at least 5 comments
-                                         ;; or the container has some scroll
-                                         (when (not= @(::needs-gradient s) next-needs-gradient)
-                                           (reset! (::needs-gradient s) next-needs-gradient))
-                                         ;; recall scroll to bottom if needed
-                                         (scroll-to-bottom s))
+                                       (utils/after 10
+                                        #(let [comments (js/$ ".comments")
+                                               comments-internal-scroll (js/$ ".comments-internal-scroll")
+                                               comments-internal-scroll-final-height (- (.height comments) (if @(::add-comment-focus s) 127 51))
+                                               next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") comments-internal-scroll-final-height)]
+                                           (.css comments-internal-scroll #js {:height (str comments-internal-scroll-final-height "px")})
+                                           ;; Show the gradient at the top only if there are at least 5 comments
+                                           ;; or the container has some scroll
+                                           (when (not= @(::needs-gradient s) next-needs-gradient)
+                                             (reset! (::needs-gradient s) next-needs-gradient))
+                                           ;; recall scroll to bottom if needed
+                                           (scroll-to-bottom s)))
                                        s)}
   [s activity-data]
   (let [comments-data (drv/react s :activity-comments-data)
+        sorted-comments (:sorted-comments comments-data)
         needs-gradient @(::needs-gradient s)]
-    (if (:loading comments-data)
+    (if (and (zero? (count sorted-comments))
+             (or (:loading comments-data)
+                 (not (contains? comments-data :sorted-comments))))
       [:div.comments
         (small-loading)]
       [:div.comments
         (when needs-gradient
           [:div.top-gradient])
         [:div.comments-internal
-          {:class (utils/class-set {:add-comment-focus (and (pos? (count comments-data)) @(::add-comment-focus s))
-                                    :empty (zero? (count comments-data))})}
-          (if (pos? (count comments-data))
+          {:class (utils/class-set {:add-comment-focus (and (pos? (count sorted-comments)) @(::add-comment-focus s))
+                                    :empty (zero? (count sorted-comments))})}
+          (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
-              (for [c comments-data]
-                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
-              ]
-            [:div.comments-internal-empty
-              [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
-              [:div "No comments yet"]
-              [:div "Jump in and let everybody know"]
-              [:div "what you think!"]])
+              (for [c sorted-comments]
+                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
+            (when-not @(::add-comment-focus s)
+              [:div.comments-internal-empty
+                [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
+                [:div "No comments yet"]
+                [:div "Jump in and let everybody know"]
+                [:div "what you think!"]]))
           (add-comment activity-data (partial add-comment-expand-cb s))]])))
