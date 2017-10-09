@@ -45,9 +45,10 @@
             {:src (utils/cdn "/img/carrot_logo.png")
              :height 101}]
           [:div.onboard-overlay-step-title
-            "Wellcome to Carrot"]
-          [:div.onboard-overlay-step-description
-            "The big picture keeps everyone aligned."]]
+            "Welcome to Carrot"]
+          ; [:div.onboard-overlay-step-description
+          ;   "The big picture keeps everyone aligned."]
+            ]
         2
         [:div.onboard-overlay-step.step-2
           [:div.empty-line]
