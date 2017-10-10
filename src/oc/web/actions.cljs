@@ -1052,12 +1052,13 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [temp-uuid activity-data]}]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+  (let [board-slug (:board-slug activity-data)
+        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
   ; Add the new activity into the board
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
         board-data (get-in db board-key)
         fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
         fixed-items (if (not (empty? temp-uuid))
@@ -1296,14 +1297,12 @@
   [db [_]]
   (dissoc db :org-settings))
 
-(defmethod dispatcher/action :activity-board-move
+(defmethod dispatcher/action :activity-move
   [db [_ activity-data board-data]]
-  (let [board-key (if (= (:type activity-data) "story") :storyboard-slug :board-slug)
-        fixed-activity-data (-> activity-data
-                              (assoc board-key (:slug board-data))
-                              (dissoc (if (= (:type activity-data) "entry") :storyboard-slug :board-slug)))]
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+        fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
     (api/update-entry fixed-activity-data)
-    (if (utils/in? (:route @router/path) "all-posts")
+    (if is-all-posts
       (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-posts (:uuid activity-data))]
         (assoc-in db next-activity-data-key fixed-activity-data))
       (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))

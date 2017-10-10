@@ -194,6 +194,7 @@ provided in the table below:
 |  ------ | ------ | ------ |
 |  :activity-delete | UI | Delete the selected entry. |
 |  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
+|  :activity-move | UI | Move an activity from a board to another. |
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |

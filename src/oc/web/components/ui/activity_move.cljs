@@ -12,7 +12,7 @@
         new-board @(::selected-board s)
         on-change (:on-change opts)
         dismiss-cb (:dismiss-cb opts)]
-    (dis/dispatch! [:activity-board-move activity-data new-board])
+    (dis/dispatch! [:activity-move activity-data new-board])
     (reset! (::show-boards-list s) false)
     (reset! (::selected-board s) nil)
     (when (fn? on-change)
