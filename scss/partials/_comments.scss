@@ -40,10 +40,6 @@ div.comments {
     &.add-comment-focus {
       padding-bottom: 127px;
       min-height: 127px;
-
-      div.comments-internal-scroll {
-        height: calc(100% - 76px);
-      }
     }
 
     div.comments-internal-scroll {
