@@ -179,12 +179,6 @@
     (= type "attachment")
     (add-attachment s editable)))
 
-(defn body-placeholder []
-  (let [first-name (jwt/get-key :first-name)]
-    (if-not (empty? first-name)
-      (str "What's new, " first-name "?")
-      "What's new?")))
-
 (defn body-on-change [state]
   (when (not @(::did-change state))
     (reset! (::did-change state) true))
@@ -201,7 +195,6 @@
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
-        body-placeholder (body-placeholder)
         buttons (if show-subtitle
                   ["custombold" "italic" "h2" "unorderedlist" "anchor"]
                   ["custombold" "italic" "unorderedlist" "anchor"])
@@ -223,7 +216,7 @@
                              :cleanAttrs #js ["class" "style" "alt" "dir"]
                              :cleanTags #js ["meta" "video" "audio"]
                              :unwrapTags #js ["div" "span" "label"]}
-                 :placeholder #js {:text body-placeholder
+                 :placeholder #js {:text "Start writing..."
                                    :hideOnClick true}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
     (reset! (::media-picker-ext s) media-picker-ext)
