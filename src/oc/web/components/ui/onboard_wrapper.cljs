@@ -18,6 +18,8 @@
 (rum/defcs email-lander < rum/static
                           rum/reactive
                           (drv/drv :signup-with-email)
+                          (rum/local false ::email-error)
+                          (rum/local false ::password-error)
                           {:will-mount (fn [s]
                                         (let [signup-with-email @(drv/get-ref s :signup-with-email)]
                                           (when-not (contains? signup-with-email :email)
@@ -41,22 +43,34 @@
       [:div.onboard-form
         [:div.field-label
           "Enter email"
-          (when (= (:error signup-with-email) 409)
-            [:span.error "Email already exists"])]
+          (cond
+            (= (:error signup-with-email) 409)
+            [:span.error "Email already exists"]
+            @(::email-error s)
+            [:span.error "Email not valid"])]
         [:input.field
           {:type "email"
            :class (when (= (:error signup-with-email) 409) "error")
            :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
            :value (:email signup-with-email)
-           :on-change #(dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)])}]
+           :on-change #(do
+                         (reset! (::password-error s) false)
+                         (reset! (::email-error s) false)
+                         (dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)]))}]
         [:div.field-label
-          "Password"]
+          "Password"
+          (when @(::password-error s)
+            [:span.error
+              "Minimum 8 characters"])]
         [:input.field
           {:type "password"
            :pattern ".{8,}"
            :value (:pswd signup-with-email)
            :placeholder "Minimum 8 characters"
-           :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)])}]
+           :on-change #(do
+                         (reset! (::password-error s) false)
+                         (reset! (::email-error s) false)
+                         (dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)]))}]
         [:div.field-description
           "By signing up you are agreeing to our "
           [:a
@@ -66,9 +80,17 @@
             "privacy policy"]
           "."]
         [:button.continue
-          {:disabled (or (not (utils/valid-email? (:email signup-with-email)))
-                         (<= (count (:pswd signup-with-email)) 7))
-           :on-click #(dis/dispatch! [:signup-with-email])}
+          {:class (when (or (not (utils/valid-email? (:email signup-with-email)))
+                            (<= (count (:pswd signup-with-email)) 7))
+                    "disabled")
+           :on-click #(if (or (not (utils/valid-email? (:email signup-with-email)))
+                              (<= (count (:pswd signup-with-email)) 7))
+                        (do
+                          (when (not (utils/valid-email? (:email signup-with-email)))
+                            (reset! (::email-error s) true))
+                          (when (<= (count (:pswd signup-with-email)) 7)
+                            (reset! (::password-error s) true)))
+                        (dis/dispatch! [:signup-with-email]))}
           "Continue"]
         [:div.footer-link
           "Already have an account?"
@@ -380,6 +402,7 @@
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
+                            (rum/local false ::password-error)
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)
         jwt (:jwt confirm-invitation)
@@ -402,12 +425,16 @@
         [:div.field-label
           "Password"
           (when collect-pswd-error
-            [:span.error "An error occurred, please try again."])]
+            [:span.error "An error occurred, please try again."])
+          (when @(::password-error s)
+            [:span.error "Minimum 8 characters"])]
         [:input.field
           {:type "password"
            :class (when collect-pswd-error "error")
            :value (or (:pswd collect-pswd) "")
-           :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)])
+           :on-change #(do
+                         (reset! (::password-error s) false)
+                         (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
            :placeholder "Minimum 8 characters"
            :pattern ".{8,}"}]
         [:div.description
@@ -419,8 +446,10 @@
             "privacy policy"]
           "."]
         [:button.continue
-          {:disabled (< (count (:pswd collect-pswd)) 8)
-           :on-click #(dis/dispatch! [:pswd-collect])}
+          {:clss (when (< (count (:pswd collect-pswd)) 8) "disabled")
+           :on-click #(if (< (count (:pswd collect-pswd)) 8)
+                        (reset! (::password-error s) true)
+                        (dis/dispatch! [:pswd-collect]))}
           "Continue"]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive

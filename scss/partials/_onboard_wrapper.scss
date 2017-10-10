@@ -98,6 +98,10 @@ div.onboard-email-container {
     border-radius: 4px;
     outline: none;
     border: none;
+
+    &.disabled {
+      opacity: 0.8;
+    }
   }
 }
 
@@ -415,8 +419,7 @@ div.onboard-lander {
       font-size: 16px;
       border-radius: 4px;
 
-      &:disabled {
-        cursor: not-allowed;
+      &.disabled {
         opacity: 0.8;
       }
     }
