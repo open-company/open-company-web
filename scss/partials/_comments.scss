@@ -25,7 +25,7 @@ div.comments {
   div.comments-internal {
     padding-bottom: 51px;
     min-height: 51px;
-    max-height: 100%;
+    height: 100%;
     width: 100%;
     bottom: 0px;
     left: 0;
@@ -126,7 +126,7 @@ div.comments {
         color: rgba(78,90,107,0.8);
         font-weight: 300;
         margin: 0 0 0 #{$comment-avatar-size + 16}px;
-        white-space: pre;
+        white-space: pre-line;
 
         .emojione {
           @include emoji-size(13);

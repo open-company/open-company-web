@@ -131,18 +131,14 @@
                                       (load-comments-if-needed s)
                                       s)
                        :after-render (fn [s]
-                                       (utils/after 10
-                                        #(let [comments (js/$ ".comments")
-                                               comments-internal-scroll (js/$ ".comments-internal-scroll")
-                                               comments-internal-scroll-final-height (- (.height comments) (if @(::add-comment-focus s) 127 51))
-                                               next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") comments-internal-scroll-final-height)]
-                                           (.css comments-internal-scroll #js {:height (str comments-internal-scroll-final-height "px")})
-                                           ;; Show the gradient at the top only if there are at least 5 comments
-                                           ;; or the container has some scroll
-                                           (when (not= @(::needs-gradient s) next-needs-gradient)
-                                             (reset! (::needs-gradient s) next-needs-gradient))
-                                           ;; recall scroll to bottom if needed
-                                           (scroll-to-bottom s)))
+                                       (let [comments-internal-scroll (js/$ ".comments-internal-scroll")
+                                             next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") (.height comments-internal-scroll))]
+                                         ;; Show the gradient at the top only if there are at least 5 comments
+                                         ;; or the container has some scroll
+                                         (when (not= @(::needs-gradient s) next-needs-gradient)
+                                           (reset! (::needs-gradient s) next-needs-gradient))
+                                         ;; recall scroll to bottom if needed
+                                         (scroll-to-bottom s))
                                        s)}
   [s activity-data]
   (let [comments-data (drv/react s :activity-comments-data)
