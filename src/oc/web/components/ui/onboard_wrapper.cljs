@@ -47,7 +47,7 @@
             (= (:error signup-with-email) 409)
             [:span.error "Email already exists"]
             @(::email-error s)
-            [:span.error "Email not valid"])]
+            [:span.error "Email is not valid"])]
         [:input.field
           {:type "email"
            :class (when (= (:error signup-with-email) 409) "error")
