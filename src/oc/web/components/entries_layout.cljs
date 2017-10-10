@@ -4,6 +4,7 @@
             [cuerdas.core :as s]
             [cljs-time.core :as time]
             [cljs-time.format :as f]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.urls :as oc-urls]
@@ -14,6 +15,10 @@
   "
   An entry is new if:
   
+    user is part of the team (we don't track new for non-team members accessing public boards)
+      -and-
+    user is not the post's author
+      -and-
     created-at is < 30 days
       -and-
     
@@ -25,10 +30,17 @@
   (let [created-at (:created-at entry)
         too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
         seen-at (:seen-at changes)
-        new? (and (> created-at too-old)
+        user-id (jwt/get-key :user-id)
+        author-id (-> entry :author first :user-id)
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        new? (and in-team?
+                  (not= author-id user-id)
+                  (> created-at too-old)
                   (or (> created-at seen-at)
                       (nil? seen-at)))]
     (timbre/debug "New'ness in board test for:" (:uuid entry)
+                  "in-team?:" in-team?
+                  "user-id / author-id:" user-id author-id
                   "created:" created-at
                   "seen:" seen-at
                   "new?:" new?)
