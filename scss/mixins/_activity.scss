@@ -156,8 +156,12 @@ $h2_top_margin: 20;
 
   h2 {
     margin-top: #{$bottom_margin + $h2_top_margin}px;
-    font-size: #{$font-size + 1}px;
     @include avenir_H();
+    font-size: #{$font-size + 3}px;
+
+    .emojione {
+      @include emoji-size($font-size + 1);
+    }
   }
 
   a {
