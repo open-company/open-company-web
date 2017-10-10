@@ -1116,16 +1116,16 @@
         is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
-      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
-  ; Add the new activity into the board
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
-        board-data (get-in db board-key)
-        fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
-        fixed-items (if (not (empty? temp-uuid))
-                      (dissoc (:fixed-items board-data) temp-uuid)
-                      (:fixed-items board-data))
-        next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
-    (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)))
+      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+    ; Add the new activity into the board
+    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+          board-data (get-in db board-key)
+          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          fixed-items (if (not (empty? temp-uuid))
+                        (dissoc (:fixed-items board-data) temp-uuid)
+                        (:fixed-items board-data))
+          next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
+      (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
