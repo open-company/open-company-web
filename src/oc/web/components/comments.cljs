@@ -78,12 +78,13 @@
            :on-focus (fn [_]
                        (reset! show-footer true)
                        (when (fn? did-expand-cb) (did-expand-cb true)))
-           :on-blur #(utils/after 100
-                      (fn []
-                        (when-not @(::keep-expanded s)
-                          (reset! show-footer false)
-                          (when (fn? did-expand-cb)
-                            (did-expand-cb false)))))
+           :on-blur #(when (empty? (.-innerHTML (rum/ref-node s "add-comment")))
+                      (utils/after 100
+                       (fn []
+                         (when-not @(::keep-expanded s)
+                           (reset! show-footer false)
+                           (when (fn? did-expand-cb)
+                             (did-expand-cb false))))))
            :placeholder "Add a comment..."}]
         [:div.add-comment-footer.group
           {:style {:display (if fixed-show-footer "block" "none")}}
@@ -91,7 +92,10 @@
             [:button.btn-reset.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
                             (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                            (set! (.-innerHTML add-comment-div) ""))}
+                            (set! (.-innerHTML add-comment-div) "")
+                            (reset! show-footer false)
+                            (when (fn? did-expand-cb)
+                              (did-expand-cb false)))}
               "Post"]]]]
       (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                      :width 20

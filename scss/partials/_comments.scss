@@ -176,6 +176,8 @@ div.comments {
       }
 
       &.expanded{
+        padding: 8px 8px 2px;
+
         div.add-comment-internal {
           width: calc(100% - 42px);
           float: right;
@@ -188,7 +190,7 @@ div.comments {
             height: 1px;
             background-color: rgba($carrot_light_gray_1, 0.3);
             position: absolute;
-            bottom: 28px;
+            bottom: 34px;
             left: -40px;
           }
 
@@ -253,6 +255,7 @@ div.comments {
               color: $carrot_green;
               @include avenir_H();
               font-size: 14px;
+              padding: 6px 6px 9px 18px; //2px 6px 9px 16px;
 
               &:hover {
                 text-decoration: underline;
