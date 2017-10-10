@@ -24,6 +24,9 @@
   "
   A board is new if:
   
+    user is part of the team (we don't track new for non-team members accessing public boards)
+     -and-
+    
     change-at is newer than seen at
       -or-
     we have a change-at and no seen at
@@ -32,9 +35,12 @@
   (let [changes (get change-data (:uuid board))
         change-at (:change-at changes)
         nav-at (:nav-at changes)
-        new? (or (and change-at nav-at (> change-at nav-at))
-                 (and change-at (not nav-at)))]
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        new? (and in-team?
+                  (or (and change-at nav-at (> change-at nav-at))
+                      (and change-at (not nav-at))))]
     (timbre/debug "New'ness in nav. test for:" (:slug board)
+                  "in-team?:" in-team?
                   "change:" change-at
                   "nav:" nav-at
                   "new?:" new?)
