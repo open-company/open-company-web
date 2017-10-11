@@ -64,8 +64,8 @@
              (zero? (count orgs)))
         (router/nav! oc-urls/sign-up-team)
         ; If I have the secure-id i need to load the story only
-        (router/current-secure-story-id)
-        (api/get-secure-story (router/current-org-slug) (router/current-secure-story-id))
+        (router/current-secure-activity-id)
+        (api/get-secure-story (router/current-org-slug) (router/current-secure-activity-id))
         ; If i have an org slug let's load the org data
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
@@ -758,13 +758,13 @@
   (api/get-comments activity-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
+        activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
     (assoc-in db (vec (conj (butlast comments-key) :loading)) true)))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
-  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
+  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
         comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) fixed-activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
@@ -833,8 +833,8 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
-        is-secure-story (router/current-secure-story-id)
+        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        is-secure-story (router/current-secure-activity-id)
         secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
@@ -894,8 +894,8 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
-        is-secure-story (router/current-secure-story-id)
+        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        is-secure-story (router/current-secure-activity-id)
         secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
@@ -1318,3 +1318,7 @@
 (defmethod dispatcher/action :onboard-overlay-hide
   [db [_]]
   (dissoc db :show-onboard-overlay))
+
+(defmethod dispatcher/action :activity-share
+  [db [_ activity-data]]
+  (assoc db :activity-share true))
