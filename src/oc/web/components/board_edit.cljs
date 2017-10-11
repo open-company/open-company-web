@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]
@@ -26,12 +27,14 @@
     (dis/dispatch! [:input [:board-editing :name] cleaned-board-name])))
 
 (rum/defcs board-edit < rum/reactive
+                        ;; Derivatives
                         (drv/drv :board-editing)
                         (drv/drv :current-user-data)
                         (drv/drv :org-data)
                         (drv/drv :board-data)
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
+                        ;; Locals
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
@@ -41,6 +44,9 @@
                         (rum/local nil ::dom-remove-event)
                         (rum/local nil ::char-data-mod-event)
                         (rum/local nil ::initial-board-name)
+                        ;; Mixins
+                        no-scroll-mixin
+
                         {:will-mount (fn [s]
                                       (dis/dispatch! [:teams-get])
                                       (let [board-data @(drv/get-ref s :board-editing)]
@@ -54,8 +60,6 @@
                                       s)
                          :did-mount (fn [s]
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                                      ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                      (dommy/add-class! (sel1 [:body]) :no-scroll)
                                       (utils/after 100 #(utils/remove-tooltips))
                                       (js/emojiAutocomplete)
                                       (let [board-name-node (rum/ref-node s "board-name")]
@@ -88,8 +92,6 @@
                                             (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                         s)
                          :will-unmount (fn [s]
-                                         ;; Remove no-scroll class from the body tag
-                                         (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                          (when @(::input-event s)
                                             (events/unlistenByKey @(::input-event s))
                                             (reset! (::input-event s) nil))

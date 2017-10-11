@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
@@ -57,9 +58,11 @@
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (rum/defcs activity-modal < rum/reactive
+                            ;; Derivatives
                             (drv/drv :activity-modal-fade-in)
                             (drv/drv :org-data)
                             (drv/drv :board-filters)
+                            ;; Locals
                             (rum/local false ::first-render-done)
                             (rum/local false ::dismiss)
                             (rum/local false ::animate)
@@ -68,6 +71,9 @@
                             (rum/local nil ::esc-key-listener)
                             (rum/local false ::move-activity)
                             (rum/local 330 ::activity-modal-height)
+                            ;; Mixins
+                            no-scroll-mixin
+
                             {:before-render (fn [s]
                                               (when (and (not @(::animate s))
                                                        (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
@@ -81,8 +87,6 @@
                                             (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
                                            s)
                              :did-mount (fn [s]
-                                          ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                          (dommy/add-class! (sel1 [:body]) :no-scroll)
                                           (let [activity-data (first (:rum/args s))]
                                             (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
                                              "show.bs.dropdown"
@@ -98,8 +102,6 @@
                                               (reset! (::first-render-done s) true))
                                             s)
                             :will-unmount (fn [s]
-                                            ;; Remove no-scroll class from the body tag
-                                            (dommy/remove-class! (sel1 [:body]) :no-scroll)
                                             ;; Remove window resize listener
                                             (when @(::window-resize-listener s)
                                               (events/unlistenByKey @(::window-resize-listener s))
@@ -171,20 +173,20 @@
                           {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
                           [:div.triangle]
                           [:ul.activity-modal-more-menu
-                            (when (utils/link-for (:links activity-data) "delete")
+                            (when (utils/link-for (:links activity-data) "partial-update")
                               [:li
                                 {:on-click (fn [e]
                                              (utils/event-stop e)
                                              (dis/dispatch! [:entry-edit activity-data]))}
                                 "Edit"])
-                            (when (utils/link-for (:links activity-data) "delete")
-                              [:li
-                                {:on-click #(delete-clicked % activity-data)}
-                                "Delete"])
                             (when (utils/link-for (:links activity-data) "partial-update")
                               [:li
                                 {:on-click #(reset! (::move-activity s) true)}
-                                "Move"])]]
+                                "Move"])
+                            (when (utils/link-for (:links activity-data) "delete")
+                              [:li
+                                {:on-click #(delete-clicked % activity-data)}
+                                "Delete"])]]
                         (when @(::move-activity s)
                           (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))]]]]
           (when show-comments?

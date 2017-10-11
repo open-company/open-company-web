@@ -12,6 +12,7 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.icon :as i]
+            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn close-overlay [e]
@@ -33,8 +34,7 @@
                         (when (sel1 [:nav.navbar-static-top])
                           (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-none))
                         (when (sel1 [:div.fullscreen-page])
-                          (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-none)))
-                      (dommy/add-class! (sel1 [:body]) :no-scroll))
+                          (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-none))))
                     s)
    :will-unmount (fn [s]
                    (if (responsive/is-mobile-size?)
@@ -46,12 +46,12 @@
                       (when (sel1 [:nav.navbar-static-top])
                         (gstyle/setStyle (sel1 [:nav.navbar-static-top]) display-block))
                       (when (sel1 [:div.fullscreen-page])
-                          (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-block)))
-                    (dommy/remove-class! (sel1 [:body]) :no-scroll))
+                          (gstyle/setStyle (sel1 [:div.fullscreen-page]) display-block))))
                    s)})
 
 (rum/defcs login-signup-with-slack < rum/reactive
                                      dont-scroll
+                                     no-scroll-mixin
   [state]
   (let [action-title (if (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack) "Sign Up" "Sign In")
         slack-error [:span.block.red "There was an issue validating with Slack."]]
@@ -101,8 +101,9 @@
                    [:span.blue-link "Sign Up now."]])]]]))
 
 (rum/defcs login-with-email < rum/reactive
-                              (merge dont-scroll
-                                {:did-mount (fn [s] (.focus (sel1 [:input.email])) s)})
+                              dont-scroll
+                              no-scroll-mixin
+                              {:did-mount (fn [s] (.focus (sel1 [:input.email])) s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -175,8 +176,9 @@
           [:span.blue-link "Sign Up now."]]]]])
 
 ; (rum/defcs signup-with-email < rum/reactive
-;                                (merge dont-scroll
-;                                  {:did-mount (fn [s] (.focus (sel1 [:input.firstname])) s)})
+;                                dont-scroll
+;                                no-scroll-mixin
+;                                {:did-mount (fn [s] (.focus (sel1 [:input.firstname])) s)}
 ;   [state]
 ;   [:div.login-overlay-container.group
 ;     {:on-click (partial close-overlay)}
@@ -281,8 +283,9 @@
 ;           [:span.blue-link "Sign In now."]]]]])
 
 (rum/defcs password-reset < rum/reactive
-                            (merge dont-scroll
-                              {:did-mount (fn [s] (.focus (sel1 [:div.sign-in-field-container.email])) s)})
+                            dont-scroll
+                            no-scroll-mixin
+                            {:did-mount (fn [s] (.focus (sel1 [:div.sign-in-field-container.email])) s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -333,16 +336,16 @@
                   "Cancel"]]])]]]])
 
 (rum/defcs collect-name-password < rum/reactive
-                                   (merge
-                                     dont-scroll
-                                     {:did-mount (fn [s]
-                                                   ; initialise the keys to string to avoid jumps in UI focus
-                                                   (utils/after 500
-                                                      #(dis/dispatch! [:input [:collect-name-pswd] {:firstname (or (:first-name (:current-user-data @dis/app-state)) "")
-                                                                                                    :lastname (or (:last-name (:current-user-data @dis/app-state)) "")
-                                                                                                    :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
-                                                   (utils/after 100 #(.focus (sel1 [:input.firstname])))
-                                                   s)})
+                                   dont-scroll
+                                   no-scroll-mixin
+                                   {:did-mount (fn [s]
+                                                 ; initialise the keys to string to avoid jumps in UI focus
+                                                 (utils/after 500
+                                                  #(dis/dispatch! [:input [:collect-name-pswd] {:firstname (or (:first-name (:current-user-data @dis/app-state)) "")
+                                                                                                :lastname (or (:last-name (:current-user-data @dis/app-state)) "")
+                                                                                                :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
+                                                 (utils/after 100 #(.focus (sel1 [:input.firstname])))
+                                                 s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click #(utils/event-stop %)}
@@ -403,15 +406,15 @@
                 "Let Me In"]]]]]]])
 
 (rum/defcs collect-password < rum/reactive
-                              (merge
-                                dont-scroll
-                                {:did-mount (fn [s]
-                                              ; initialise the keys to string to avoid jumps in UI focus
-                                              (utils/after 500
-                                                 #(dis/dispatch! [:input [:collect-pswd] {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
-                                             (utils/after 1000 #(when-let [pswd-el (sel1 [:input.sign-in-field.pswd])]
-                                                                  (.focus pswd-el)))
-                                             s)})
+                              dont-scroll
+                              no-scroll-mixin
+                              {:did-mount (fn [s]
+                                            ; initialise the keys to string to avoid jumps in UI focus
+                                            (utils/after 500
+                                             #(dis/dispatch! [:input [:collect-pswd] {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
+                                            (utils/after 1000 #(when-let [pswd-el (sel1 [:input.sign-in-field.pswd])]
+                                                                 (.focus pswd-el)))
+                                            s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click #(utils/event-stop %)}

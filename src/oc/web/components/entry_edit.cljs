@@ -9,6 +9,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -102,12 +103,14 @@
       (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
 
 (rum/defcs entry-edit < rum/reactive
+                        ;; Derivatives
                         (drv/drv :entry-edit-topics)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
+                        ;; Locals
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -115,9 +118,11 @@
                         (rum/local "" ::initial-headline)
                         (rum/local "" ::new-topic)
                         (rum/local false ::focusing-create-topic)
-                        (rum/local false ::remove-no-scroll)
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
+                        ;; Mixins
+                        no-scroll-mixin
+
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -137,11 +142,6 @@
                                                 (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
                                        s)
                          :did-mount (fn [s]
-                                      ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                      (let [body (sel1 [:body])]
-                                        (when-not (dommy/has-class? body :no-scroll)
-                                          (reset! (::remove-no-scroll s) true)
-                                          (dommy/add-class! (sel1 [:body]) :no-scroll)))
                                       (utils/after 300 #(setup-headline s))
                                       (utils/to-end-of-content-editable (rum/ref-node s "headline"))
                                       s)
@@ -153,9 +153,6 @@
                                            (reset! (::first-render-done s) true))
                                          s)
                          :will-unmount (fn [s]
-                                         ;; Remove no-scroll class from the body tag
-                                         (when @(::remove-no-scroll s)
-                                           (dommy/remove-class! (sel1 [:body]) :no-scroll))
                                          (when @(::body-editor s)
                                            (.destroy @(::body-editor s))
                                            (reset! (::body-editor s) nil))

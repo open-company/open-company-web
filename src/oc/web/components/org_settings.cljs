@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
@@ -63,33 +64,22 @@
   "Org settings main component. It handles the data loading/reset and the tab logic."
   < rum/static
     rum/reactive
+    ;; Derivatives
     (drv/drv :org-data)
     (drv/drv :org-settings)
     (drv/drv :alert-modal)
     (drv/drv :teams-load)
     (drv/drv :org-editing)
     (drv/drv :invite-users)
-    (rum/local false ::remove-no-scroll)
+    ;; Mixins
+    no-scroll-mixin
+
     {:before-render (fn [s]
                       (let [teams-load @(drv/get-ref s :teams-load)]
                         (when (and (:auth-settings teams-load)
                                    (not (:teams-data-requested teams-load)))
                           (dis/dispatch! [:teams-get])))
-                      s)
-     :did-mount (fn [s]
-                 ;; Add no-scroll to the body if it doesn't has it already
-                 ;; to avoid scrolling while showing this modal
-                 (let [body (sel1 [:body])]
-                   (when-not (dommy/has-class? body :no-scroll)
-                     (reset! (::remove-no-scroll s) true)
-                     (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                 s)
-     :will-unmount (fn [s]
-                    ;; Remove no-scroll class from the body tag
-                    ;; if it wasn't already there
-                    (when @(::remove-no-scroll s)
-                      (dommy/remove-class! (sel1 [:body]) :no-scroll))
-                    s)}
+                      s)}
   [s]
   (let [settings-tab (drv/react s :org-settings)
         org-data (drv/react s :org-data)

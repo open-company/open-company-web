@@ -3,7 +3,8 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:alert-modal-hide-done]))
@@ -22,21 +23,17 @@
   (when (fn? (:solid-button-cb alert-modal))
     ((:solid-button-cb alert-modal))))
 
-(rum/defcs alert-modal < (drv/drv :alert-modal)
-                         rum/reactive
+(rum/defcs alert-modal < rum/reactive
+                         ;; Derivatives
+                         (drv/drv :alert-modal)
+                         ;; Locals
                          (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
                          (rum/local false ::dismissing)
-                         (rum/local false ::remove-no-scroll)
-                         {:did-mount (fn [s]
-                                       ;; Add no-scroll to the body if it doesn't has it already
-                                       ;; to avoid scrolling while showing this modal
-                                       (let [body (sel1 [:body])]
-                                         (when-not (dommy/has-class? body :no-scroll)
-                                           (reset! (::remove-no-scroll s) true)
-                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                                       s)
-                          :after-render (fn [s]
+                         ;; Mixins
+                         no-scroll-mixin
+
+                         {:after-render (fn [s]
                                           (when (not @(::first-render-done s))
                                             (reset! (::first-render-done s) true))
                                           (let [alert-modal @(drv/get-ref s :alert-modal)]
@@ -44,12 +41,6 @@
                                                        (not @(::dismissing s)))
                                               (reset! (::dismissing s) true)
                                               (close-clicked s)))
-                                          s)
-                          :will-unmount (fn [s]
-                                          ;; Remove no-scroll class from the body tag
-                                          ;; if it wasn't already there
-                                          (when @(::remove-no-scroll s)
-                                            (dommy/remove-class! (sel1 [:body]) :no-scroll))
                                           s)}
   "Customizable alert modal. It gets the following property from the :alert-modal derivative:
    :icon The src to use for an image, it's encapsulated in utils/cdn.
