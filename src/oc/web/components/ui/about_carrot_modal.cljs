@@ -6,7 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]))
 
 (defn dismiss-modal []
@@ -26,18 +26,14 @@
 
 (rum/defcs about-carrot-modal < rum/static
                                 ;; Locals
-                                (rum/local false ::first-render-done)
                                 (rum/local false ::dismiss)
                                 ;; Mixins
-                                no-scroll-mixin
-                                {:after-render (fn [s]
-                                                 (when (not @(::first-render-done s))
-                                                   (reset! (::first-render-done s) true))
-                                                 s)}
+                                mixins/no-scroll-mixin
+                                mixins/first-render-mixin
   [s]
   [:div.about-carrot-modal-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                              :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
+                              :appear (and (not @(::dismiss s)) (:first-render-done s))})}
     [:div.modal-wrapper
       [:button.carrot-modal-close.mlb-reset
         {:on-click #(close-clicked s)}]

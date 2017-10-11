@@ -10,7 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
@@ -63,7 +63,6 @@
                             (drv/drv :org-data)
                             (drv/drv :board-filters)
                             ;; Locals
-                            (rum/local false ::first-render-done)
                             (rum/local false ::dismiss)
                             (rum/local false ::animate)
                             (rum/local false ::showing-dropdown)
@@ -72,7 +71,8 @@
                             (rum/local false ::move-activity)
                             (rum/local 330 ::activity-modal-height)
                             ;; Mixins
-                            no-scroll-mixin
+                            mixins/no-scroll-mixin
+                            mixins/first-render-mixin
 
                             {:before-render (fn [s]
                                               (when (and (not @(::animate s))
@@ -97,10 +97,6 @@
                                              (fn [e]
                                               (reset! (::showing-dropdown s) false))))
                                           s)
-                            :after-render (fn [s]
-                                            (when (not @(::first-render-done s))
-                                              (reset! (::first-render-done s) true))
-                                            s)
                             :will-unmount (fn [s]
                                             ;; Remove window resize listener
                                             (when @(::window-resize-listener s)
@@ -111,12 +107,13 @@
                                               (reset! (::esc-key-listener s) nil))
                                             s)}
   [s activity-data]
+  (js/console.log "activity-modal/render" s (:first-render-done s))
   (let [show-comments? (utils/link-for (:links activity-data) "comments")
         fixed-activity-modal-height (max @(::activity-modal-height s) 330)
         wh (.-innerHeight js/window)]
     [:div.activity-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not (:first-render-done s))))
+                                :appear (and (not @(::dismiss s)) (:first-render-done s))
                                 :no-comments (not show-comments?)})
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
                     (close-clicked s))}
@@ -153,7 +150,7 @@
                    :class (when (empty? (:headline activity-data)) "no-headline")}]
                 (media-attachments (:attachments activity-data) nil nil)]
               [:div.activity-modal-footer.group
-                {:class (when (and @(::first-render-done s)
+                {:class (when (and (:first-render-done s)
                                    (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
                 (reactions activity-data)
                 [:div.activity-modal-footer-right

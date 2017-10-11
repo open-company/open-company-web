@@ -27,3 +27,16 @@
         (dommy/remove-class! (sel1 [:body]) -no-scroll-mixin-class)
         (dissoc state ::-no-scroll-mixin-remove-body-class))
       state)})
+
+(def first-render-mixin
+  {:init (fn [state]
+           (assoc state :first-render-done false))
+   :after-render
+    (fn [state]
+      (js/console.log "first-render-mixin/after-render" state)
+      (if (:first-render-done state)
+        state
+        (assoc state :first-render-done true)))
+   :will-unmount
+    (fn [state]
+      (assoc state :first-render-done false))})

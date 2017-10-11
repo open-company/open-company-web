@@ -9,7 +9,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -18,7 +18,7 @@
             [goog.events.EventType :as EventType]))
 
 (defn calc-edit-entry-modal-height [s]
-  (when @(::first-render-done s)
+  (when (:first-render-done s)
     (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
       (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
         (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
@@ -111,7 +111,6 @@
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         ;; Locals
-                        (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
                         (rum/local "" ::initial-body)
@@ -121,7 +120,8 @@
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         ;; Mixins
-                        no-scroll-mixin
+                        mixins/no-scroll-mixin
+                        mixins/first-render-mixin
 
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -148,10 +148,6 @@
                          :before-render (fn [s]
                                           (calc-edit-entry-modal-height s)
                                           s)
-                         :after-render (fn [s]
-                                         (when (not @(::first-render-done s))
-                                           (reset! (::first-render-done s) true))
-                                         s)
                          :will-unmount (fn [s]
                                          (when @(::body-editor s)
                                            (.destroy @(::body-editor s))
@@ -170,8 +166,8 @@
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)]
     [:div.entry-edit-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
+                                :appear (and (not @(::dismiss s)) (:first-render-done s))})
        :on-click #(when (and (not (:has-changes entry-editing))
                              (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
                     (cancel-clicked s))}

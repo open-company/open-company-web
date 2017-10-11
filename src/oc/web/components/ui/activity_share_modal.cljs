@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
@@ -18,11 +18,13 @@
     (utils/after 180 close-cb)))
 
 (rum/defcs activity-share-modal < rum/reactive
+                                 ;; Derivatives
                                  (drv/drv :activity-share)
+                                 ;; Locals
                                  (rum/local nil ::share-data)
                                  (rum/local false ::dismiss)
-                                 (rum/local false ::first-render-done)
-                                 no-scroll-mixin
+                                 mixins/no-scroll-mixin
+                                 mixins/first-render-mixin
                                  {:will-mount (fn [s]
                                                 (dis/dispatch! [:teams-get])
                                                 (let [activity-data (first (:rum/args s))]
@@ -36,10 +38,6 @@
                                                (utils/after 500 #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
                                                                    (.select activity-shared-url)))
                                                s)
-                                  :after-render (fn [s]
-                                                  (when (not @(::first-render-done s))
-                                                    (reset! (::first-render-done s) true))
-                                                  s)
                                   :did-remount (fn [o s]
                                                  (utils/after 500 #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
                                                                      (.select activity-shared-url)))
@@ -58,8 +56,8 @@
                       (if (:secure-uuid shared-data) (:secure-uuid shared-data) (:secure-uuid activity-data))
                       (router/current-secure-activity-id))]
     [:div.activity-share-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
+                                :appear (and (not @(::dismiss s)) (:first-render-done s))})}
       [:div.modal-wrapper
         [:button.carrot-modal-close.mlb-reset
             {:on-click #(close-clicked s)}]

@@ -6,7 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]
@@ -35,7 +35,6 @@
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
                         ;; Locals
-                        (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
                         (rum/local false ::slack-enabled)
@@ -45,7 +44,8 @@
                         (rum/local nil ::char-data-mod-event)
                         (rum/local nil ::initial-board-name)
                         ;; Mixins
-                        no-scroll-mixin
+                        mixins/no-scroll-mixin
+                        mixins/first-render-mixin
 
                         {:will-mount (fn [s]
                                       (dis/dispatch! [:teams-get])
@@ -77,10 +77,6 @@
                                          (events/listen board-name-node EventType/DOMCHARACTERDATAMODIFIED
                                           #(board-name-on-change s board-name-node))))
                                       s)
-                         :after-render (fn [s]
-                                         (when (not @(::first-render-done s))
-                                           (reset! (::first-render-done s) true))
-                                         s)
                          :did-remount (fn [o s]
                                         ;; Dismiss animated since the board-editing was removed
                                         (when (nil? @(drv/get-ref s :board-editing))
@@ -115,8 +111,8 @@
         title (if (= (:type board-editing) "story") "Journal" "Board")
         label (if (= (:type board-editing) "story") "journal" "board")]
     [:div.board-edit-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
+                                :appear (and (not @(::dismiss s)) (:first-render-done s))})}
       [:div.modal-wrapper
         [:button.carrot-modal-close.mlb-reset
           {:on-click #(close-clicked s)}]

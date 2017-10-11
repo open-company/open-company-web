@@ -4,7 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]))
+            [oc.web.components.ui.mixins :as mixins]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:alert-modal-hide-done]))
@@ -27,15 +27,13 @@
                          ;; Derivatives
                          (drv/drv :alert-modal)
                          ;; Locals
-                         (rum/local false ::first-render-done)
                          (rum/local false ::dismiss)
                          (rum/local false ::dismissing)
                          ;; Mixins
-                         no-scroll-mixin
+                         mixins/no-scroll-mixin
+                         mixins/first-render-mixin
 
                          {:after-render (fn [s]
-                                          (when (not @(::first-render-done s))
-                                            (reset! (::first-render-done s) true))
                                           (let [alert-modal @(drv/get-ref s :alert-modal)]
                                             (when (and (:dismiss alert-modal)
                                                        (not @(::dismissing s)))
@@ -56,8 +54,8 @@
         has-buttons (or (:link-button-title alert-modal)
                         (:solid-button-title alert-modal))]
     [:div.alert-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
+                                :appear (and (not @(::dismiss s)) (:first-render-done s))
                                 action true})
        :on-click #(when-not has-buttons
                     (dis/dispatch! [:alert-modal-hide]))}

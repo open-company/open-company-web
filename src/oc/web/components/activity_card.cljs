@@ -235,7 +235,7 @@
                     {:on-click (fn [e]
                                  (utils/event-stop e)
                                  ; open the activity-share-modal component
-                                 (dis/dispatch! [:post-share]))}
+                                 (dis/dispatch! [:activity-share activity-data]))}
                     "Share"])
                 (when (utils/link-for (:links activity-data) "partial-update")
                   [:li
