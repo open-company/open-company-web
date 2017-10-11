@@ -1322,3 +1322,7 @@
 (defmethod dispatcher/action :activity-share
   [db [_ activity-data]]
   (assoc db :activity-share activity-data))
+
+(defmethod dispatcher/action :activity-share-hide
+  [db [_ activity-data]]
+  (dissoc db :activity-share))
