@@ -10,7 +10,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
+            [oc.web.components.ui.activity-share-modal :refer (activity-share-modal)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -75,7 +75,7 @@
         ww (min (responsive/ww) 840)]
     [:div.story-container
       (when @(::show-publish-modal s)
-        (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
+        (activity-share-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-header.group
         [:div.story-header-left
           [:div.story-header-back

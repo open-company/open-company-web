@@ -16,7 +16,7 @@
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
-            [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
+            [oc.web.components.ui.activity-share-modal :refer (activity-share-modal)]
             [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -220,7 +220,7 @@
       (when (:media-chart media-input)
         (media-chart-modal))
       (when @(::show-publish-modal s)
-        (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
+        (activity-share-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-edit-header.group
         [:div.story-edit-header-left
           [:div.story-edit-header-back

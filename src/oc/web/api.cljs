@@ -777,7 +777,7 @@
       (storage-http (method-for-link story-link) (:href story-link)
         {:headers (headers-for-link story-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:story-get/finish status {:story-uuid (router/current-secure-story-id) :story-data (if success (json->cljs body) {})}]))))))
+          (dispatcher/dispatch! [:story-get/finish status {:story-uuid (router/current-secure-activity-id) :story-data (if success (json->cljs body) {})}]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
