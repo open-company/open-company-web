@@ -1,4 +1,4 @@
-div.story-publish-modal-container {
+div.activity-share-modal-container {
   width: 100%;
   height: 100vh;
   position: fixed;
@@ -22,7 +22,7 @@ div.story-publish-modal-container {
     margin: 100px auto 50px;
     position: relative;
 
-    div.story-publish-modal {
+    div.activity-share-modal {
       width: 520px;
       margin: 0px 0px 0px 28px;
       position: relative;
@@ -48,12 +48,12 @@ div.story-publish-modal-container {
         color: $carrot_gray;
         font-size: 15px;
 
-        span.storyboard-name {
+        span.board-name {
           @include avenir_H();
         }
       }
 
-      div.story-publish-share {
+      div.activity-share-share {
 
         div.mediums-box {
           margin-top: 24px;
@@ -213,7 +213,7 @@ div.story-publish-modal-container {
           }
         }
 
-        div.publish-footer{
+        div.share-footer{
           div.buttons {
             float: right;
             height: 48px;
@@ -228,17 +228,17 @@ div.story-publish-modal-container {
         }
       }
 
-      div.story-publish-modal-published {
+      div.activity-share-modal-shareed {
         text-align: center;
 
-        div.published-headline {
+        div.shareed-headline {
           @include avenir_H();
           font-size: 16px;
           color: $carrot_dark_gray_1;
           margin-top: 8px;
         }
 
-        div.published-url-container {
+        div.shareed-url-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.6);
           padding: 7px 4px 7px 8px;
           border-radius: 4px;
@@ -270,7 +270,7 @@ div.story-publish-modal-container {
           }
         }
 
-        div.published-subheadline {
+        div.shareed-subheadline {
           @include avenir_M();
           font-size: 16px;
           color: $carrot_dark_gray_1;
