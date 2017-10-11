@@ -33,7 +33,6 @@
            (assoc state :first-render-done false))
    :after-render
     (fn [state]
-      (js/console.log "first-render-mixin/after-render" state)
       (if (:first-render-done state)
         state
         (assoc state :first-render-done true)))

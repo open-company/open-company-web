@@ -107,7 +107,6 @@
                                               (reset! (::esc-key-listener s) nil))
                                             s)}
   [s activity-data]
-  (js/console.log "activity-modal/render" s (:first-render-done s))
   (let [show-comments? (utils/link-for (:links activity-data) "comments")
         fixed-activity-modal-height (max @(::activity-modal-height s) 330)
         wh (.-innerHeight js/window)]
