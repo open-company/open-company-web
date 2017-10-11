@@ -12,10 +12,12 @@
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
+(defn dismiss []
+  (dis/dispatch! [:activity-share-hide]))
+
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
-  (let [close-cb (nth (:rum/args s) 1)]
-    (utils/after 180 close-cb)))
+  (utils/after 180 dismiss))
 
 (rum/defcs activity-share-modal < rum/reactive
                                  ;; Derivatives
@@ -45,8 +47,9 @@
                                   :will-unmount (fn [s]
                                                   (utils/after 100 #(dis/dispatch! [:input [:activity-shared-url] nil]))
                                                   s)}
-  [s activity-data close-cb]
-  (let [share-data @(::share-data s)
+  [s]
+  (let [activity-data (drv/react s :activity-data)
+        share-data @(::share-data s)
         slack-data (:slack-data share-data)
         email-data (:email-data share-data)
         shared-data (drv/react s :activity-share)

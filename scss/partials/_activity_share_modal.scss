@@ -228,17 +228,17 @@ div.activity-share-modal-container {
         }
       }
 
-      div.activity-share-modal-shareed {
+      div.activity-share-modal-shared {
         text-align: center;
 
-        div.shareed-headline {
+        div.shared-headline {
           @include avenir_H();
           font-size: 16px;
           color: $carrot_dark_gray_1;
           margin-top: 8px;
         }
 
-        div.shareed-url-container {
+        div.shared-url-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.6);
           padding: 7px 4px 7px 8px;
           border-radius: 4px;
@@ -270,7 +270,7 @@ div.activity-share-modal-container {
           }
         }
 
-        div.shareed-subheadline {
+        div.shared-subheadline {
           @include avenir_M();
           font-size: 16px;
           color: $carrot_dark_gray_1;
