@@ -1321,4 +1321,4 @@
 
 (defmethod dispatcher/action :activity-share
   [db [_ activity-data]]
-  (assoc db :activity-share true))
+  (assoc db :activity-share activity-data))
