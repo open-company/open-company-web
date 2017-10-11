@@ -230,6 +230,13 @@
               {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
               [:div.triangle]
               [:ul.activity-card-more-menu
+                (when true ;(utils/linkf-r (:links activity-data) "share")
+                  [:li
+                    {:on-click (fn [e]
+                                 (utils/event-stop e)
+                                 ; open the activity-share-modal component
+                                 (dis/dispatch! [:post-share]))}
+                    "Share"])
                 (when (utils/link-for (:links activity-data) "partial-update")
                   [:li
                     {:on-click (fn [e]
@@ -238,14 +245,14 @@
                                    (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
                                    (dis/dispatch! [:entry-edit activity-data])))}
                     "Edit"])
-                (when (utils/link-for (:links activity-data) "delete")
-                  [:li
-                    {:on-click #(delete-clicked % activity-data)}
-                    "Delete"])
                 (when (and (utils/link-for (:links activity-data) "partial-update")
                            (> (count same-type-boards) 1))
                   [:li
                     {:on-click #(do (utils/event-stop %) (reset! (::move-activity s) true))}
-                    "Move"])]]
+                    "Move"])
+                (when (utils/link-for (:links activity-data) "delete")
+                  [:li
+                    {:on-click #(delete-clicked % activity-data)}
+                    "Delete"])]]
             (when @(::move-activity s)
               (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))]])
