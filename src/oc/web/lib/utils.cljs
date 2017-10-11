@@ -734,14 +734,6 @@
     (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
 
-(defn disable-scroll []
-  (dommy/add-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
-
-(defn enable-scroll []
-  (dommy/remove-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.main-scroll]) #js {:height "auto" :overflow "auto"}))
-
 (defn su-default-title []
   (let [js-date (js-date)
         month (month-string (add-zero (.getMonth js-date)))
