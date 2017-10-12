@@ -18,6 +18,7 @@
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
+            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
             [oc.web.components.ui.activity-share-modal :refer (activity-share-modal)]))
 
 (defn refresh-board-data []
@@ -64,7 +65,8 @@
             (org-settings)
             ;; About carrot
             (:about-carrot-modal data)
-            (about-carrot-modal)
+            ; (about-carrot-modal)
+            (made-with-carrot-modal)
             ;; Entry editing
             (:entry-editing data)
             (entry-edit)
