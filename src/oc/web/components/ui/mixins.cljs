@@ -30,12 +30,13 @@
 
 (def first-render-mixin
   {:init (fn [state]
-           (assoc state :first-render-done false))
+           (assoc state :first-render-done (atom false)))
    :after-render
     (fn [state]
-      (if (:first-render-done state)
-        state
-        (assoc state :first-render-done true)))
+      (when-not @(:first-render-done state)
+        (reset! (:first-render-done state) true))
+      state)
    :will-unmount
     (fn [state]
-      (assoc state :first-render-done false))})
+      (reset! (:first-render-done state) false)
+      state)})

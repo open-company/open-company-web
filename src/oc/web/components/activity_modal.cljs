@@ -111,8 +111,8 @@
         fixed-activity-modal-height (max @(::activity-modal-height s) 330)
         wh (.-innerHeight js/window)]
     [:div.activity-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not (:first-render-done s))))
-                                :appear (and (not @(::dismiss s)) (:first-render-done s))
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(:first-render-done s))))
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :no-comments (not show-comments?)})
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
                     (close-clicked s))}
@@ -149,7 +149,7 @@
                    :class (when (empty? (:headline activity-data)) "no-headline")}]
                 (media-attachments (:attachments activity-data) nil nil)]
               [:div.activity-modal-footer.group
-                {:class (when (and (:first-render-done s)
+                {:class (when (and @(:first-render-done s)
                                    (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
                 (reactions activity-data)
                 [:div.activity-modal-footer-right

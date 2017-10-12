@@ -32,8 +32,8 @@
                                 mixins/first-render-mixin
   [s]
   [:div.about-carrot-modal-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
-                              :appear (and (not @(::dismiss s)) (:first-render-done s))})}
+    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+                              :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
     [:div.modal-wrapper
       [:button.carrot-modal-close.mlb-reset
         {:on-click #(close-clicked s)}]

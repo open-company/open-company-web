@@ -131,7 +131,7 @@
       (dis/dispatch! [:all-posts-more @(::has-prev s) :down])
       (reset! (::has-prev s) false)))
   ; ;; Highlight the right year/month
-  ; (when (:first-render-done s)
+  ; (when @(:first-render-done s)
   ;   (highlight-calendar s))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
@@ -268,7 +268,7 @@
           (when (or @(::top-loading s)
                     @(::retrieving-calendar s)
                     (and (:loading-more all-posts-data)
-                         (not (:first-render-done s)))
+                         (not @(:first-render-done s)))
                     @(::scroll-to-entry s)
                     (= @(::last-direction s) :up))
             [:div.activities-overlay

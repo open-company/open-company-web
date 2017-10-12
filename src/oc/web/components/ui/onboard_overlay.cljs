@@ -24,8 +24,8 @@
                              mixins/first-render-mixin
   [s]
   [:div.onboard-overlay-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
-                              :appear (and (not @(::dismiss s)) (:first-render-done s))})}
+    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+                              :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
     [:div.onboard-overlay
       (case @(::step s)
         1

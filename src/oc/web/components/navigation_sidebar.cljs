@@ -40,7 +40,7 @@
                                                (events/listen js/window EventType/RESIZE #(reset! (::window-height s) (.-innerHeight js/window))))
                                               s)
                                  :will-update (fn [s]
-                                                (when (:first-render-done s)
+                                                (when @(:first-render-done s)
                                                   (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
                                                     (when (not= height @(::content-height s))
                                                       (reset! (::content-height s) height))))
