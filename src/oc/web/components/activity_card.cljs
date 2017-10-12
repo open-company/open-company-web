@@ -125,16 +125,10 @@
   [s activity-data has-headline has-body is-all-posts]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                              :all-posts-card is-all-posts
-                              :story-card (= (:type activity-data) "story")})
-     :on-click #(if (= (:type activity-data) "story")
-                  (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                  (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
+                              :all-posts-card is-all-posts})
+     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
-    (when (and (not is-all-posts)
-               (= (:type activity-data) "story"))
-      [:div.triangle])
     ; Card header
     [:div.activity-card-head.group
       {:class "entry-card"}
@@ -169,11 +163,9 @@
              :on-click #(do
                           (utils/event-stop %)
                           (router/nav!
-                            (if (= (:type activity-data) "story")
-                              (oc-urls/board (:board-slug activity-data))
-                              (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
+                            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
                                 (oc-urls/board-sort-by-topic (:board-slug activity-data))
-                                (oc-urls/board (:board-slug activity-data))))))}
+                                (oc-urls/board (:board-slug activity-data)))))}
             (:board-name activity-data)])]]
     [:div.activity-card-content.group
       ; Headline
@@ -182,9 +174,7 @@
          :class (when has-headline "has-headline")}]
       ; Body
       (let [body-without-preview (utils/body-without-preview (:body activity-data))
-            activity-url (if (= (:type activity-data) "story")
-                           (oc-urls/story (:board-slug activity-data) (:uuid activity-data))
-                           (oc-urls/entry (:board-slug activity-data) (:uuid activity-data)))
+            activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
             emojied-body (utils/emojify body-without-preview)]
         [:div.activity-card-body
           {:dangerouslySetInnerHTML emojied-body
@@ -195,12 +185,7 @@
       (when @(::first-body-image s)
         [:div.activity-card-media-preview
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
-           :class (or (:type @(::first-body-image s)) "image")}])
-      (when (and (= (:type activity-data) "story")
-                 (not (empty? (:banner-url activity-data))))
-        [:div.story-banner
-          {:style #js {:backgroundImage (str "url(\"" (:banner-url activity-data) "\")")
-                       :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
+           :class (or (:type @(::first-body-image s)) "image")}])]
     [:div.activity-card-footer.group
       (interactions-summary activity-data)
       (when (or (utils/link-for (:links activity-data) "partial-update")
@@ -232,9 +217,7 @@
                   [:li
                     {:on-click (fn [e]
                                  (utils/event-stop e)
-                                 (if (= (:type activity-data) "story")
-                                   (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
-                                   (dis/dispatch! [:entry-edit activity-data])))}
+                                 (dis/dispatch! [:entry-edit activity-data]))}
                     "Edit"])
                 (when (and (utils/link-for (:links activity-data) "partial-update")
                            (> (count same-type-boards) 1))

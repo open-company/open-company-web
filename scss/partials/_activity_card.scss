@@ -93,48 +93,6 @@ div.activity-card {
     }
   }
 
-  &.story-card {
-    width: 667px;
-    float: right;
-
-    & > div.triangle {
-      background-color: white;
-      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-      width: 24px;
-      height: 24px;
-      transform: rotate(45deg);
-      position: absolute;
-      left: -10px;
-      top: 25px;
-
-      &:after {
-        content: "";
-        width: 14px;
-        height: 20px;
-        background-color: white;
-        box-shadow: none;
-        top: 3px;
-        left: 12px;
-        position: absolute;
-        transform: rotate(0deg);
-      }
-    }
-
-    div.activity-card-content {
-      div.activity-card-headline.has-headline {
-        margin-top: 0px;
-      }
-
-      div.activity-card-body.has-body {
-        margin-top: 0px;
-
-        &.has-headline {
-          margin-top: 16px;
-        }
-      }
-    }
-  }
-
   div.activity-card-breadcrumb {
     @include avenir_R();
     font-size: 14px;
@@ -269,15 +227,6 @@ div.activity-card {
           margin-top: -14px;
         }
       }
-    }
-
-    div.story-banner {
-      margin-top: 16px;
-      width: 100%;
-      min-height: 200px;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
     }
 
     div.activity-card-body {

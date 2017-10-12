@@ -107,9 +107,7 @@
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (and (not (empty? (:slug board-editing)))
-                                  (pos? (apply + (map #(-> % :channels count) slack-teams))))
-        title "Board"
-        label "board"]
+                                  (pos? (apply + (map #(-> % :channels count) slack-teams))))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) (:first-render-done s))})}
@@ -121,12 +119,12 @@
           [:div.board-edit-header.group
             (user-avatar-image current-user-data)
             (if new-board?
-              [:div.title (str "Creating a new " title)]
+              [:div.title "Creating a new Board"]
               [:div.title "Editing " [:span.board-name {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
           [:div.board-edit-divider]
           [:div.board-edit-body
             [:div.board-edit-name-label-container.group
-              [:div.board-edit-label.board-edit-name-label (str (string/upper label) " NAME")]
+              [:div.board-edit-label.board-edit-name-label "BOARD NAME"]
               (when (:board-name-error board-editing)
                 [:div.board-name-error (:board-name-error board-editing)])]
             [:div.board-edit-name-field.emoji-autocomplete
@@ -137,28 +135,28 @@
                :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
                :placeholder "All-hands, Investor Updates, Weekly Kickoffs, Development, Finance, etc."
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
-            [:div.board-edit-label.board-edit-access-label (str (string/upper label) " PERMISSIONS")]
+            [:div.board-edit-label.board-edit-access-label "BOARD PERMISSIONS"]
             [:div.board-edit-access-field.group
               [:div.board-edit-access-bt.board-edit-access-team-bt
                 {:class (when (= (:access board-editing) "team") "selected")
                  :on-click #(dis/dispatch! [:input [:board-editing :access] "team"])
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :title (str "Anyone on the team can see this " label ". Contributors can edit.")}
+                 :title "Anyone on the team can see this board. Contributors can edit."}
                 [:span.board-edit-access-title "Team"]]
               [:div.board-edit-access-bt.board-edit-access-private-bt
                 {:class (when (= (:access board-editing) "private") "selected")
                  :on-click #(dis/dispatch! [:input [:board-editing :access] "private"])
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :title (str "Only team members you invite can see or edit this " label ".")}
+                 :title "Only team members you invite can see or edit this board."}
                 [:span.board-edit-access-title "Private"]]
               [:div.board-edit-access-bt.board-edit-access-public-bt
                 {:class (when (= (:access board-editing) "public") "selected")
                  :on-click #(dis/dispatch! [:input [:board-editing :access] "public"])
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :title (str "This " label " is open for the public to see. Contributors can edit.")}
+                 :title "This board is open for the public to see. Contributors can edit."}
                 [:span.board-edit-access-title "Public"]]]]
           [:div.board-edit-divider]
           (when show-slack-channels?
@@ -185,8 +183,8 @@
                 [:button.mlb-reset.mlb-link-black.delete-board
                   {:on-click (fn []
                               (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
-                                                                 :action (str "delete-" label)
-                                                                 :message (str "Delete this " label "?")
+                                                                 :action "delete-board"
+                                                                 :message (str "Delete this board?")
                                                                  :link-button-title "No"
                                                                  :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                                                  :solid-button-title "Yes"
