@@ -41,7 +41,7 @@
 }
 
 div.fsp-picker {
-  background-color: rgba(#FCFBF7,0.4) !important;
+  background-color: $carrot_modal_bg !important;
   @include avenir_M();
 
   div {

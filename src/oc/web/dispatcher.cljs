@@ -390,7 +390,7 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
-(set! (.-OCWebPrintAllActivityData js/window) print-all-posts-data)
+(set! (.-OCWebPrintAllPostsData js/window) print-all-posts-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
