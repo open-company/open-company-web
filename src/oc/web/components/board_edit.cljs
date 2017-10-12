@@ -108,8 +108,8 @@
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (and (not (empty? (:slug board-editing)))
                                   (pos? (apply + (map #(-> % :channels count) slack-teams))))
-        title (if (= (:type board-editing) "story") "Journal" "Board")
-        label (if (= (:type board-editing) "story") "journal" "board")]
+        title "Board"
+        label "board"]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not (:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) (:first-render-done s))})}
@@ -135,7 +135,7 @@
                :ref "board-name"
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
                :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
-               :placeholder (if (= (:type board-editing) "story") "All-hands, Investor Updates, Weekly Kickoffs, etc." "Product, Development, Finance, Operations, etc.")
+               :placeholder "All-hands, Investor Updates, Weekly Kickoffs, Development, Finance, etc."
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
             [:div.board-edit-label.board-edit-access-label (str (string/upper label) " PERMISSIONS")]
             [:div.board-edit-access-field.group

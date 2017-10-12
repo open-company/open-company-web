@@ -15,9 +15,7 @@
             [goog.object :as gobj]))
 
 (defn get-activity-date [activity]
-  (if (= (:type activity) "entry")
-    (:created-at activity)
-    (:published-at activity)))
+  (or (:published-at activity) (:created-at activity)))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 5)

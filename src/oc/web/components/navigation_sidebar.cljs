@@ -98,7 +98,7 @@
                 "BOARDS"]
               (when show-create-new-board
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-                  {:on-click #(dis/dispatch! [:board-edit nil "entry"])
+                  {:on-click #(dis/dispatch! [:board-edit nil])
                    :title "Create a new board"
                    :data-placement "top"
                    :data-toggle "tooltip"
