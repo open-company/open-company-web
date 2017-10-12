@@ -34,7 +34,8 @@
    :after-render
     (fn [state]
       (when-not @(:first-render-done state)
-        (reset! (:first-render-done state) true))
+        (reset! (:first-render-done state) true)
+        (rum/request-render (:rum/react-component state)))
       state)
    :will-unmount
     (fn [state]
