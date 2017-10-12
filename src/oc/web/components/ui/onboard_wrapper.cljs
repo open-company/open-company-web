@@ -446,7 +446,7 @@
             "privacy policy"]
           "."]
         [:button.continue
-          {:clss (when (< (count (:pswd collect-pswd)) 8) "disabled")
+          {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
            :on-click #(if (< (count (:pswd collect-pswd)) 8)
                         (reset! (::password-error s) true)
                         (dis/dispatch! [:pswd-collect]))}
