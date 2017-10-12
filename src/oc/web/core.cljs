@@ -407,12 +407,12 @@
     ;   (timbre/info "Routing org-settings-invite-slash-route" (str (urls/org-settings-invite ":org") "/"))
     ;   (team-handler "org-settings-invite" target #(om/component (org-settings)) params))
 
-    (defroute secure-story-route (urls/secure-story ":org" ":secure-id") {:as params}
-      (timbre/info "Routing secure-story-route" (urls/secure-story ":org" ":secure-id"))
+    (defroute secure-story-route (urls/secure-activity ":org" ":secure-id") {:as params}
+      (timbre/info "Routing secure-story-route" (urls/secure-activity ":org" ":secure-id"))
       (story-handler #(om/component (secure-story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
-    (defroute secure-story-slash-route (str (urls/secure-story ":org" ":secure-id") "/") {:as params}
-      (timbre/info "Routing secure-story-slash-route" (str (urls/secure-story ":org" ":secure-id") "/"))
+    (defroute secure-story-slash-route (str (urls/secure-activity ":org" ":secure-id") "/") {:as params}
+      (timbre/info "Routing secure-story-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
       (story-handler #(om/component (secure-story)) "secure-story" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}

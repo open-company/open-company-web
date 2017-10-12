@@ -16,7 +16,7 @@
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
-            [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
+            [oc.web.components.ui.activity-share-modal :refer (activity-share-modal)]
             [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -145,6 +145,7 @@
                         (drv/drv :alert-modal)
                         (drv/drv :org-data)
                         (drv/drv :media-input)
+                        (drv/drv :activity-share)
                         ;; Medium editor
                         (rum/local nil ::body-editor)
                         ;; Initial data
@@ -160,8 +161,6 @@
                         (rum/local false ::banner-add-did-success)
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
-                        ;; Publish dialog
-                        (rum/local false ::show-publish-modal)
                         ;; Title input listener
                         (rum/local nil ::title-input-listener)
                         {:will-mount (fn [s]
@@ -204,7 +203,8 @@
                                           (reset! (::title-input-listener s) nil))
                                         s)}
   [s]
-  (let [story-data (drv/react s :story-editing)
+  (let [activity-share (drv/react s :activity-share)
+        story-data (drv/react s :story-editing)
         media-input (drv/react s :media-input)
         story-author (if (:author story-data)
                        (if (map? (:author story-data))
@@ -219,8 +219,8 @@
         (media-video-modal))
       (when (:media-chart media-input)
         (media-chart-modal))
-      (when @(::show-publish-modal s)
-        (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
+      (when activity-share
+        (activity-share-modal))
       [:div.story-edit-header.group
         [:div.story-edit-header-left
           [:div.story-edit-header-back
@@ -238,9 +238,9 @@
             "Delete"]
           (when (= "draft" (:status story-data))
             [:button.mlb-reset.mlb-default.post-button
-              {:on-click #(do
-                            (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html (.-innerHTML (sel1 [:div.rich-body-editor])))])
-                            (reset! (::show-publish-modal s) true))}
+              {:on-click #(let [body-data (utils/clean-body-html (.-innerHTML (sel1 [:div.rich-body-editor])))]
+                            (dis/dispatch! [:input [:story-editing :body] body-data])
+                            (dis/dispatch! [:activity-share (assoc story-data :body body-data)]))}
               "Post"])]]
       [:div.story-edit-content
         [:div.story-edit-content-authorship.group

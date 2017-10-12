@@ -17,8 +17,7 @@
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entries-layout :refer (entries-layout)]
-            [oc.web.components.drafts-layout :refer (drafts-layout)]
-            [oc.web.components.stories-layout :refer (stories-layout)]
+            ; [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.events :as events]
@@ -127,9 +126,7 @@
               (dom/div {:class "board-name"}
                 (if is-all-posts
                   (dom/div {:class "all-posts-icon"})
-                  (if (= (:type board-data) "story")
-                    (dom/div {:class "stories-icon"})
-                    (dom/div {:class "boards-icon"})))
+                  (dom/div {:class "boards-icon"}))
                 (if is-all-posts
                   "All Posts"
                   (:name board-data))
@@ -147,7 +144,6 @@
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
-                         (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
                              :on-click (fn [_]
@@ -165,7 +161,6 @@
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
-                         (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn floating-button"
                              :id "new-entry-floating-btn"
@@ -187,7 +182,6 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
-                         (= (:type board-data) "entry")
                          (> (count entry-topics) 1))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
@@ -202,14 +196,11 @@
               (empty-board)
               ; for each column key contained in best layout
               :else
-              (cond
-                ;; Drafts
-                (and (= (:type board-data) "story")
-                     (= (:slug board-data) "drafts"))
-                (drafts-layout board-data)
-                ;; Stories
-                (= (:type board-data) "story")
-                (stories-layout board-data)
+              (cond ; REMOVE if we don't end up with entry drafts
+                ;; Drafts 
+                ; (and (= (:type board-data) "story")
+                ;      (= (:slug board-data) "drafts"))
+                ; (drafts-layout board-data)
                 ;; Entries
                 :else
                 (entries-layout board-data board-filters)))))))))

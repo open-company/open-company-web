@@ -35,7 +35,7 @@
   (conj (board-key org-slug board-slug) :board-data))
 
 (defn secure-activity-key [org-slug secure-id]
-  (vec (concat (org-key org-slug) [:secure-stories secure-id])))
+  (vec (concat (org-key org-slug) [:secure-activities secure-id])))
 
 (defn activity-key [org-slug board-slug activity-uuid]
   (let [board-key (if (= board-slug :all-posts)
@@ -199,9 +199,8 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
-   :story-editing-publish [[:base]
-                           (fn [base]
-                              (:story-editing-published-url base))]
+   :story-editing-publish [[:base] (fn [base] (:story-editing-published-url base))]
+   :activity-share        [[:base] (fn [base] (:activity-share base))]
    :confirm-invitation    [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
@@ -370,8 +369,8 @@
 (defn print-activity-data []
   (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
-(defn print-secure-story-data []
-  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-story-id)))))
+(defn print-secure-activity-data []
+  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-activity-id)))))
 
 (defn print-reactions-data []
   (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
@@ -397,7 +396,7 @@
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
-(set! (.-OCWebPrintSecureStoryData js/window) print-secure-story-data)
+(set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
 (set! (.-OCWebPrintCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)

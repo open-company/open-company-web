@@ -32,8 +32,8 @@
 (defn- delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action (str "delete-" (:type activity-data))
-                    :message (str "Delete this " (if (= (:type activity-data) "story") "journal entry" "update") "?")
+                    :action "delete-entry"
+                    :message "Delete this post?"
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
@@ -97,16 +97,14 @@
                          :will-mount (fn [s]
                                        (let [activity-data (first (:rum/args s))
                                              is-all-posts (nth (:rum/args s) 3 false)]
-                                         (when (= (:type activity-data) "entry")
-                                          (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts))))
+                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts)))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-activity-data (first (:rum/args o))
                                               new-activity-data (first (:rum/args s))
                                               is-all-posts (nth (:rum/args s) 3 false)]
                                           (when (not= (:body old-activity-data) (:body new-activity-data))
-                                            (when (= (:type new-activity-data) "entry")
-                                              (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts)))
+                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
                                             (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
                                             (reset! (::truncated s) false)))
                                         s)
@@ -127,74 +125,57 @@
   [s activity-data has-headline has-body is-new is-all-posts]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                              :all-posts-card is-all-posts
-                              :story-card (= (:type activity-data) "story")})
-     :on-click #(if (= (:type activity-data) "story")
-                  (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                  (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
+                              :all-posts-card is-all-posts})
+     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
-    (when (and (not is-all-posts)
-               (= (:type activity-data) "story"))
-      [:div.triangle])
     ; Card header
-    (when (or is-all-posts
-              (= (:type activity-data) "entry"))
-      [:div.activity-card-head.group
-        {:class (when (or is-all-posts (= (:type activity-data) "entry")) "entry-card")}
-        ; Card author
-        [:div.activity-card-head-author
-          (user-avatar-image (first (:author activity-data)))
-          [:div.name (:name (first (:author activity-data)))]
-          [:div.time-since
-            (let [t (if (= (:type activity-data) "story") (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
-        ; Card labels
-        [:div.activity-card-head-right
-          ; Topic tag button
-          (when (:topic-slug activity-data)
-            (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
-              [:div.activity-tag
-                {:class (when is-all-posts "double-tag")
-                 :on-click #(do
-                              (utils/event-stop %)
-                              (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
-                topic-name]))
-          (when is-all-posts
+    [:div.activity-card-head.group
+      {:class "entry-card"}
+      ; Card author
+      [:div.activity-card-head-author
+        (user-avatar-image (first (:author activity-data)))
+        [:div.name (:name (first (:author activity-data)))]
+        [:div.time-since
+          (let [t (or (:published-at activity-data) (:created-at activity-data))]
+            [:time
+              {:date-time t
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+               :title (utils/activity-date-tooltip activity-data)}
+              (utils/time-since t)])]]
+      ; Card labels
+      [:div.activity-card-head-right
+        ; Topic tag button
+        (when (:topic-slug activity-data)
+          (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
             [:div.activity-tag
-              {:class (utils/class-set {:board-tag (= (:type activity-data) "entry")
-                                        :storyboard-tag (= (:type activity-data) "story")
-                                        :double-tag (:topic-slug activity-data)})
+              {:class (when is-all-posts "double-tag")
                :on-click #(do
                             (utils/event-stop %)
-                            (router/nav!
-                              (if (= (:type activity-data) "story")
-                                (oc-urls/board (:board-slug activity-data))
-                                (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
-                                  (oc-urls/board-sort-by-topic (:board-slug activity-data))
-                                  (oc-urls/board (:board-slug activity-data))))))}
-              (:board-name activity-data)])
-              (when is-new [:div.new-tag "New"])]])
+                            (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
+              topic-name]))
+        (when is-all-posts
+          [:div.activity-tag
+            {:class (utils/class-set {:board-tag true
+                                      :double-tag (:topic-slug activity-data)})
+             :on-click #(do
+                          (utils/event-stop %)
+                          (router/nav!
+                            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
+                                (oc-urls/board-sort-by-topic (:board-slug activity-data))
+                                (oc-urls/board (:board-slug activity-data)))))}
+            (:board-name activity-data)])
+            (when is-new [:div.new-tag "New"])]]
     [:div.activity-card-content.group
-      (when (= (:type activity-data) "story")
-        [:div.activity-card-title
-          {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
       ; Headline
-      (when (= (:type activity-data) "entry")
-        [:div.activity-card-headline
-          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-           :class (when has-headline "has-headline")}])
+      [:div.activity-card-headline
+        {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
+         :class (when has-headline "has-headline")}]
       ; Body
       (let [body-without-preview (utils/body-without-preview (:body activity-data))
-            activity-url (if (= (:type activity-data) "story")
-                           (oc-urls/story (:board-slug activity-data) (:uuid activity-data))
-                           (oc-urls/entry (:board-slug activity-data) (:uuid activity-data)))
+            activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
             emojied-body (utils/emojify body-without-preview)]
         [:div.activity-card-body
           {:dangerouslySetInnerHTML emojied-body
@@ -205,12 +186,7 @@
       (when @(::first-body-image s)
         [:div.activity-card-media-preview
           {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
-           :class (or (:type @(::first-body-image s)) "image")}])
-      (when (and (= (:type activity-data) "story")
-                 (not (empty? (:banner-url activity-data))))
-        [:div.story-banner
-          {:style #js {:backgroundImage (str "url(\"" (:banner-url activity-data) "\")")
-                       :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
+           :class (or (:type @(::first-body-image s)) "image")}])]
     [:div.activity-card-footer.group
       (interactions-summary activity-data)
       (when (or (utils/link-for (:links activity-data) "partial-update")
@@ -231,22 +207,27 @@
               {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
               [:div.triangle]
               [:ul.activity-card-more-menu
+                (when true ;(utils/linkf-r (:links activity-data) "share")
+                  [:li
+                    {:on-click (fn [e]
+                                 (utils/event-stop e)
+                                 ; open the activity-share-modal component
+                                 (dis/dispatch! [:activity-share activity-data]))}
+                    "Share"])
                 (when (utils/link-for (:links activity-data) "partial-update")
                   [:li
                     {:on-click (fn [e]
                                  (utils/event-stop e)
-                                 (if (= (:type activity-data) "story")
-                                   (router/nav! (oc-urls/story-edit (:board-slug activity-data) (:uuid activity-data)))
-                                   (dis/dispatch! [:entry-edit activity-data])))}
+                                 (dis/dispatch! [:entry-edit activity-data]))}
                     "Edit"])
-                (when (utils/link-for (:links activity-data) "delete")
-                  [:li
-                    {:on-click #(delete-clicked % activity-data)}
-                    "Delete"])
                 (when (and (utils/link-for (:links activity-data) "partial-update")
                            (> (count same-type-boards) 1))
                   [:li
                     {:on-click #(do (utils/event-stop %) (reset! (::move-activity s) true))}
-                    "Move"])]]
+                    "Move"])
+                (when (utils/link-for (:links activity-data) "delete")
+                  [:li
+                    {:on-click #(delete-clicked % activity-data)}
+                    "Delete"])]]
             (when @(::move-activity s)
               (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))]])

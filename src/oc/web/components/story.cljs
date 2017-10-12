@@ -10,7 +10,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
+            [oc.web.components.ui.activity-share-modal :refer (activity-share-modal)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary comments-summary)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -43,6 +43,7 @@
 
 (rum/defcs story < rum/reactive
                    (drv/drv :activity-data)
+                   (drv/drv :activity-share)
                    (rum/local false ::comments-expanded)
                    (rum/local nil ::window-resize)
                    (rum/local false ::show-you-did-it)
@@ -65,7 +66,8 @@
                                     (events/unlistenByKey @(::window-resize s))
                                     s)}
   [s]
-  (let [story-data (drv/react s :activity-data)
+  (let [activity-share (drv/react s :activity-share)
+        story-data (drv/react s :activity-data)
         story-author (if (map? (:author story-data)) (:author story-data) (first (:author story-data)))
         left-space (/ (- (.-innerWidth js/window) 840) 2)
         offset (if (> left-space default-comments-total-width)
@@ -74,8 +76,8 @@
         margin-left (- left-space (when @(::comments-expanded s) offset))
         ww (min (responsive/ww) 840)]
     [:div.story-container
-      (when @(::show-publish-modal s)
-        (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
+      (when activity-share
+        (activity-share-modal))
       [:div.story-header.group
         [:div.story-header-left
           [:div.story-header-back
@@ -91,7 +93,7 @@
               (comments-summary story-data true)])
           (when (utils/link-for (:links story-data) "share")
             [:button.mlb-reset.mlb-link.share-button
-              {:on-click #(reset! (::show-publish-modal s) true)}
+              {:on-click #(dis/dispatch! [:activity-share story-data])}
               "Share"])]]
       [:div.story-content-outer
         {:style #js {:marginLeft (str (int margin-left) "px")}}

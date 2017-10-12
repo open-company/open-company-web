@@ -168,8 +168,10 @@
   ([board-slug story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
   ([org-slug board-slug story-uuid] (str (story org-slug board-slug story-uuid) "/edit")))
 
-(defn secure-story
+;; Secure activities
+
+(defn secure-activity
   "Secure url for story to show readonly view."
-  ([] (secure-story (router/current-org-slug) (router/current-activity-id)))
-  ([secure-id] (secure-story (router/current-org-slug) secure-id))
-  ([org-slug secure-id] (str (org org-slug) "/story/" secure-id)))
+  ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
+  ([secure-id] (secure-activity (router/current-org-slug) secure-id))
+  ([org-slug secure-id] (str (org org-slug) "/activity/" secure-id)))

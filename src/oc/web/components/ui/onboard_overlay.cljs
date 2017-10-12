@@ -5,7 +5,8 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]))
+            [oc.web.lib.cookies :as cook]
+            [oc.web.components.ui.mixins :as mixins]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:onboard-overlay-hide]))
@@ -15,32 +16,16 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
-(rum/defcs onboard-overlay < (rum/local 1 ::step)
-                             (rum/local false ::remove-no-scroll)
-                             (rum/local false ::first-render-done)
+(rum/defcs onboard-overlay < ;; Locals
+                             (rum/local 1 ::step)
                              (rum/local false ::dismiss)
-                             {:did-mount (fn [s]
-                                            ;; Add no-scroll to the body if it doesn't has it already
-                                            ;; to avoid scrolling while showing this modal
-                                            (let [body (sel1 [:body])]
-                                              (when-not (dommy/has-class? body :no-scroll)
-                                                (reset! (::remove-no-scroll s) true)
-                                                (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                                            s)
-                              :after-render (fn [s]
-                                              (when (not @(::first-render-done s))
-                                                (reset! (::first-render-done s) true))
-                                              s)
-                              :will-unmount (fn [s]
-                                              ;; Remove no-scroll class from the body tag
-                                              ;; if it wasn't already there
-                                              (when @(::remove-no-scroll s)
-                                                (dommy/remove-class! (sel1 [:body]) :no-scroll))
-                                              s)}
+                             ;; Mixins
+                             mixins/no-scroll-mixin
+                             mixins/first-render-mixin
   [s]
   [:div.onboard-overlay-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                              :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+                              :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
     [:div.onboard-overlay
       (case @(::step s)
         1

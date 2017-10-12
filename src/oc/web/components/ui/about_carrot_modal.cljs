@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]))
 
 (defn dismiss-modal []
@@ -24,31 +25,15 @@
     :body "Aliquam eget porttitor ex. Nam pellentesque vitae nunc eget ultrices. Proin fermentum elit id tortor viverra aliquam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla dolor ligula..."}])
 
 (rum/defcs about-carrot-modal < rum/static
-                                (rum/local false ::first-render-done)
+                                ;; Locals
                                 (rum/local false ::dismiss)
-                                (rum/local false ::remove-no-scroll)
-                                {:did-mount (fn [s]
-                                              ;; Add no-scroll to the body if it doesn't has it already
-                                              ;; to avoid scrolling while showing this modal
-                                              (let [body (sel1 [:body])]
-                                                (when-not (dommy/has-class? body :no-scroll)
-                                                  (reset! (::remove-no-scroll s) true)
-                                                  (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                                              s)
-                                 :after-render (fn [s]
-                                                 (when (not @(::first-render-done s))
-                                                   (reset! (::first-render-done s) true))
-                                                 s)
-                                 :will-unmount (fn [s]
-                                                 ;; Remove no-scroll class from the body tag
-                                                 ;; if it wasn't already there
-                                                 (when @(::remove-no-scroll s)
-                                                   (dommy/remove-class! (sel1 [:body]) :no-scroll))
-                                                 s)}
+                                ;; Mixins
+                                mixins/no-scroll-mixin
+                                mixins/first-render-mixin
   [s]
   [:div.about-carrot-modal-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                              :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+                              :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
     [:div.modal-wrapper
       [:button.carrot-modal-close.mlb-reset
         {:on-click #(close-clicked s)}]

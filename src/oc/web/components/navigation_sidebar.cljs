@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.mixins :refer (first-render-mixin)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -50,14 +51,16 @@
 (def footer-button-height 31)
 
 (rum/defcs navigation-sidebar < rum/reactive
+                                ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :change-data)
-                                (rum/local false ::first-render-done)
+                                ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::resize-listener)
                                 (rum/local nil ::window-height)
+                                ;; Mixins
+                                first-render-mixin
                                 {:did-mount (fn [s]
-                                             (reset! (::first-render-done s) true)
                                               (when-not (utils/is-test-env?)
                                                 (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                               (reset! (::window-height s) (.-innerHeight js/window))
@@ -65,7 +68,7 @@
                                                (events/listen js/window EventType/RESIZE #(reset! (::window-height s) (.-innerHeight js/window))))
                                               s)
                                  :will-update (fn [s]
-                                                (when @(::first-render-done s)
+                                                (when @(:first-render-done s)
                                                   (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
                                                     (when (not= height @(::content-height s))
                                                       (reset! (::content-height s) height))))
@@ -124,7 +127,7 @@
                 "BOARDS"]
               (when show-create-new-board
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-                  {:on-click #(dis/dispatch! [:board-edit nil "entry"])
+                  {:on-click #(dis/dispatch! [:board-edit nil])
                    :title "Create a new board"
                    :data-placement "top"
                    :data-toggle "tooltip"
