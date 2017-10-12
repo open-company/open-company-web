@@ -476,12 +476,12 @@
                 ; if not refirect the user to the slug
                 (router/redirect! org-url)))))))))
 
-(defn create-board [board-name board-access board-type]
+(defn create-board [board-name board-access]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
     (when (and board-name create-link)
       (storage-http (method-for-link create-link) (relative-href create-link)
         {:headers (headers-for-link create-link)
-         :json-params (cljs->json {:name board-name :access board-access :type board-type})}
+         :json-params (cljs->json {:name board-name :access board-access})}
         (fn [{:keys [success status body]}]
           (let [board-data (if success (json->cljs body) {})]
             (if (= status 409)
