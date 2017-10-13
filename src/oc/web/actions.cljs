@@ -1230,7 +1230,7 @@
 ; (defmethod dispatcher/action :story-create/finish
 ;   [db [_ board-slug story-data]]
 ;   (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) board-slug (:uuid story-data))))
-;   (let [fixed-story (utils/fix-story story-data board-slug)]
+;   (let [fixed-story (utils/fix-story story-data {:slug board-slug})]
 ;     (assoc db :story-editing fixed-story)))
 
 ; (defmethod dispatcher/action :draft-autosave
@@ -1266,7 +1266,7 @@
 
 ; (defmethod dispatcher/action :story-share/finish
 ;   [db [_ story-data]]
-;   (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
+;   (assoc db :story-editing-published-url (utils/fix-story story-data {:slug (:storyboard-slug story-data)})))
 
 (defmethod dispatcher/action :org-edit
   [db [_ org-data]]
@@ -1316,10 +1316,29 @@
   [db [_]]
   (dissoc db :show-onboard-overlay))
 
-(defmethod dispatcher/action :activity-share
+(defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
-  (assoc db :activity-share activity-data))
+  (-> db
+    (assoc :activity-share activity-data)
+    (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_ activity-data]]
   (dissoc db :activity-share))
+
+(defmethod dispatcher/action :activity-share
+  [db [_ share-data]]
+  (api/share-activity (:activity-share db) share-data)
+  (assoc db :activity-share-data share-data))
+
+(defmethod dispatcher/action :activity-share/finish
+  [db [_ shared-data]]
+  (assoc db :activity-shared-data (utils/fix-entry shared-data (:board-slug shared-data) nil)))
+
+(defmethod dispatcher/action :made-with-carrot-modal-show
+  [db [_]]
+  (assoc db :made-with-carrot-modal true))
+
+(defmethod dispatcher/action :made-with-carrot-modal-hide
+  [db [_]]
+  (dissoc db :made-with-carrot-modal))
