@@ -33,8 +33,8 @@
                                                 (let [activity-data (first (:rum/args s))]
                                                   (reset! (::share-data s) {:email false
                                                                               :slack false
-                                                                              :email-data {:subject (str (:org-name activity-data)
-                                                                                                         " " (:board-name activity-data)
+                                                                              :email-data {:subject (str (:name (dis/org-data))
+                                                                                                         (when (not (empty? (:board-name activity-data))) " " (:board-name activity-data))
                                                                                                          ": " (.text (.html (js/$ "<textarea />") (:headline activity-data))))
                                                                                            :note ""}
                                                                               :slack-data {:note ""}}))
