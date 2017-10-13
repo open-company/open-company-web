@@ -15,6 +15,7 @@
 (rum/defcs secure-activity < rum/reactive
                           (drv/drv :activity-data)
                           (drv/drv :about-carrot-modal)
+                          (drv/drv :made-with-carrot-modal)
                           {:will-mount (fn [s]
                                          (utils/after 100 #(dis/dispatch! [:activity-get]))
                                          s)}
