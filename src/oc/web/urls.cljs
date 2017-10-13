@@ -150,7 +150,7 @@
   ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
   ([entry-uuid] ( (router/current-org-slug) (router/current-board-slug) entry-uuid))
   ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
-  ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/update/" (name entry-uuid))))
+  ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/post/" (name entry-uuid))))
 
 ;; Stories
 
@@ -174,4 +174,4 @@
   "Secure url for story to show readonly view."
   ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
   ([secure-id] (secure-activity (router/current-org-slug) secure-id))
-  ([org-slug secure-id] (str (org org-slug) "/activity/" secure-id)))
+  ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))
