@@ -63,9 +63,9 @@
           (and (:email-lander-check-team-redirect db)
                (zero? (count orgs)))
           (router/nav! oc-urls/sign-up-team)
-          ; If I have the secure-id i need to load the story only
+          ; If I have the secure-id i need to load the activity only
           (router/current-secure-activity-id)
-          (api/get-secure-story (router/current-org-slug) (router/current-secure-activity-id))
+          (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
           ; If i have an org slug let's load the org data
           (router/current-org-slug)
           (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
@@ -1294,7 +1294,7 @@
 ; (defmethod dispatcher/action :story-create/finish
 ;   [db [_ board-slug story-data]]
 ;   (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) board-slug (:uuid story-data))))
-;   (let [fixed-story (utils/fix-story story-data board-slug)]
+;   (let [fixed-story (utils/fix-story story-data {:slug board-slug})]
 ;     (assoc db :story-editing fixed-story)))
 
 ; (defmethod dispatcher/action :draft-autosave
@@ -1330,7 +1330,7 @@
 
 ; (defmethod dispatcher/action :story-share/finish
 ;   [db [_ story-data]]
-;   (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
+;   (assoc db :story-editing-published-url (utils/fix-story story-data {:slug (:storyboard-slug story-data)})))
 
 (defmethod dispatcher/action :org-edit
   [db [_ org-data]]
@@ -1410,10 +1410,44 @@
   [db [_]]
   (dissoc db :show-onboard-overlay))
 
-(defmethod dispatcher/action :activity-share
+(defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
-  (assoc db :activity-share activity-data))
+  (-> db
+    (assoc :activity-share activity-data)
+    (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_ activity-data]]
   (dissoc db :activity-share))
+
+(defmethod dispatcher/action :activity-share
+  [db [_ share-data]]
+  (api/share-activity (:activity-share db) share-data)
+  (assoc db :activity-share-data share-data))
+
+(defmethod dispatcher/action :activity-share/finish
+  [db [_ shared-data]]
+  (assoc db :activity-shared-data (utils/fix-entry shared-data (:board-slug shared-data) nil)))
+
+(defmethod dispatcher/action :made-with-carrot-modal-show
+  [db [_]]
+  (assoc db :made-with-carrot-modal true))
+
+(defmethod dispatcher/action :made-with-carrot-modal-hide
+  [db [_]]
+  (dissoc db :made-with-carrot-modal))
+
+(defmethod dispatcher/action :activity-get/finish
+  [db [_ status {:keys [activity-uuid activity-data]}]]
+  (when (= status 404)
+    (router/redirect-404!))
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
+        fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+    (when (jwt/jwt)
+      (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
+        (wsc/reconnect ws-link (jwt/get-key :user-id))))
+    (-> db
+      (dissoc :activity-loading)
+      (assoc-in activity-key fixed-activity-data))))

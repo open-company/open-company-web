@@ -1,4 +1,4 @@
-div.secure-story-container {
+div.secure-activity-container {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
@@ -6,7 +6,7 @@ div.secure-story-container {
   background-color: white;
   min-height: 100vh;
 
-  div.story-header {
+  div.activity-header {
     height: 72px;
     position: fixed;
     width: 100%;
@@ -35,17 +35,17 @@ div.secure-story-container {
     }
   }
 
-  div.story-content-outer {
+  div.activity-content-outer {
     margin: 0px auto 32px;
     width: 840px;
     transition: margin-left 230ms;
 
-    div.story-content {
+    div.activity-content {
       min-height: 136px;
       padding: 68px 80px 32px;
       border-radius: 8px;
 
-      div.story-banner {
+      div.activity-banner {
         margin-left: -80px;
         margin-top: 50px;
         margin-bottom: 20px;
@@ -59,12 +59,12 @@ div.secure-story-container {
         // border-top-right-radius: 8px;
       }
 
-      div.story-tags {
+      div.activity-tags {
         margin-top: 21px;
         @include activity-tag();
       }
 
-      div.story-title {
+      div.activity-title {
         margin-top: 59px;
         @include activity-title();
         @include avenir_M();
@@ -76,11 +76,11 @@ div.secure-story-container {
         }
       }
 
-      div.story-author {
+      div.activity-author {
         text-align: center;
         width: 100%;
 
-        div.story-author-inner {
+        div.activity-author-inner {
           // float: center;
           margin: auto 1.5em;
           display: inline-block;
@@ -103,7 +103,7 @@ div.secure-story-container {
         }
       }
 
-      div.story-body {
+      div.activity-body {
         margin-top: 40px;
         @include activity-body(20);
         @include avenir_M();
@@ -137,7 +137,7 @@ div.secure-story-container {
     }
   }
 
-  div.story-content-footer {
+  div.activity-content-footer {
     position: fixed;
     bottom: 0px;
     left: 0px;
@@ -149,9 +149,9 @@ div.secure-story-container {
     cursor: pointer;
 
     &:hover {
-      div.story-content-footer-inner {
+      div.activity-content-footer-inner {
         div.carrot-logo {
-          background-image: cdnUrl("/img/ML/secure_story_carrot_logo_hover.svg");
+          background-image: cdnUrl("/img/ML/secure_activity_carrot_logo_hover.svg");
         }
 
         div.you-did-it {
@@ -160,13 +160,13 @@ div.secure-story-container {
       }
     }
 
-    div.story-content-footer-inner {
+    div.activity-content-footer-inner {
       display: inline-block;
 
       div.carrot-logo {
         width: 17px;
         height: 30px;
-        background-image: cdnUrl("/img/ML/secure_story_carrot_logo.svg");
+        background-image: cdnUrl("/img/ML/secure_activity_carrot_logo.svg");
         background-size: 17px 30px;
         background-repeat: no-repeat;
       }

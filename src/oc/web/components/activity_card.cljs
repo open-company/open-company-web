@@ -207,12 +207,12 @@
               {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
               [:div.triangle]
               [:ul.activity-card-more-menu
-                (when true ;(utils/linkf-r (:links activity-data) "share")
+                (when (utils/link-for (:links activity-data) "share")
                   [:li
                     {:on-click (fn [e]
                                  (utils/event-stop e)
                                  ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share activity-data]))}
+                                 (dis/dispatch! [:activity-share-show activity-data]))}
                     "Share"])
                 (when (utils/link-for (:links activity-data) "partial-update")
                   [:li

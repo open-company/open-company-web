@@ -201,6 +201,7 @@
                                 (assoc :board-data board-data))))]
    :story-editing-publish [[:base] (fn [base] (:story-editing-published-url base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
+   :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :confirm-invitation    [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)

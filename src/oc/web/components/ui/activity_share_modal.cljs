@@ -22,6 +22,7 @@
 (rum/defcs activity-share-modal < rum/reactive
                                  ;; Derivatives
                                  (drv/drv :activity-share)
+                                 (drv/drv :activity-shared-data)
                                  ;; Locals
                                  (rum/local nil ::share-data)
                                  (rum/local false ::dismiss)
@@ -32,7 +33,9 @@
                                                 (let [activity-data (first (:rum/args s))]
                                                   (reset! (::share-data s) {:email false
                                                                               :slack false
-                                                                              :email-data {:subject (str (:org-name activity-data) " " (:board-name activity-data) ": " (.text (.html (js/$ "<textarea />") (:title activity-data))))
+                                                                              :email-data {:subject (str (:org-name activity-data)
+                                                                                                         " " (:board-name activity-data)
+                                                                                                         ": " (.text (.html (js/$ "<textarea />") (:headline activity-data))))
                                                                                            :note ""}
                                                                               :slack-data {:note ""}}))
                                                 s)
@@ -43,21 +46,15 @@
                                   :did-remount (fn [o s]
                                                  (utils/after 500 #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
                                                                      (.select activity-shared-url)))
-                                                 s)
-                                  :will-unmount (fn [s]
-                                                  (utils/after 100 #(dis/dispatch! [:input [:activity-shared-url] nil]))
-                                                  s)}
+                                                 s)}
   [s]
-  (let [activity-data (drv/react s :activity-data)
+  (let [activity-data (drv/react s :activity-share)
         share-data @(::share-data s)
         slack-data (:slack-data share-data)
         email-data (:email-data share-data)
-        shared-data (drv/react s :activity-share)
-        no-draft? (not= (:status activity-data) "draft")
+        shared-data (drv/react s :activity-shared-data)
         shared? (not (empty? (:secure-uuid shared-data)))
-        secure-uuid (if (not (router/current-secure-activity-id))
-                      (if (:secure-uuid shared-data) (:secure-uuid shared-data) (:secure-uuid activity-data))
-                      (router/current-secure-activity-id))]
+        secure-uuid (if (:secure-uuid shared-data) (:secure-uuid shared-data) (:secure-uuid activity-data))]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -66,17 +63,13 @@
             {:on-click #(close-clicked s)}]
         [:div.activity-share-modal
           (when (not shared?)
-            [:div.title (if no-draft? "Share " "Post ") (when-not no-draft? [:span {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])])
-          (when (or no-draft?
-                    shared?)
+            [:div.title "Share " [:span {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]])
+          (when shared?
             [:div.activity-share-modal-shared
               (when shared?
                 [:img {:src (utils/cdn "/img/ML/caught_up.svg") :width 42 :height 42}])
               (when shared?
-                (let [show-posted? (not no-draft?)
-                      show-shared? (or (:slack share-data) (:email share-data))
-                      headline (str "Your journal has been " (when show-posted? "posted") (when (and show-posted? show-shared?) " and ") (when show-shared? "shared") "!")]
-                  [:div.shared-headline headline]))
+                [:div.shared-headline "Your post has been shared!"])
               (let [share-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
                 [:div.shared-url-container.group
                   [:input
@@ -88,23 +81,13 @@
                                 (.select (sel1 :input#activity-share-modal-shared-url))
                                 (utils/copy-to-clipboard))}
                     "Copy"]])
-              [:div.shared-subheadline (str "You can" (when (and (not no-draft?) shared?) " also") " provide anyone with this link to your update.")]
+              [:div.shared-subheadline (str "You can provide anyone with this link to your update.")]
               (when shared?
                 [:button.mlb-reset.mlb-default.done-btn
-                  {:on-click #(if no-draft?
-                               (close-clicked s)
-                               (router/nav! (oc-urls/board (router/current-org-slug) (:board-slug shared-data))))}
+                  {:on-click #(close-clicked s)}
                   "Done"])])
           (when (not shared?)
             [:div.activity-share-share
-              (when (not no-draft?)
-                [:div.access
-                  "Journals posted in "
-                  [:span.board-name (:board-name activity-data)]
-                  (cond
-                    (= (:access activity-data) "private") " are private and can be viewed by people you invite."
-                    (= (:access activity-data) "public") " are public and can be viewed by anyone that has the link."
-                    :else " can be viewed by anyone on the team.")])
               [:div.mediums-box
                 [:div.medium
                   [:div.medium-row.group
@@ -204,7 +187,7 @@
                                                      :note (:note email-data)
                                                      :subject (:subject email-data)
                                                      :to (:to email-data)})
-                                      share-data (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
+                                      data-to-share (vec (remove nil? [(when slack-share slack-share) (when email-share email-share)]))]
                                   (if (or (and (:email share-data) (empty? (:to email-data)))
                                           (and (:slack share-data) (empty? (:channel slack-data))))
                                     (do
@@ -212,10 +195,8 @@
                                         (reset! (::share-data s) (merge share-data {:email-data (merge email-data {:to-error true})})))
                                       (when (and (:slack share-data) (empty? (:channel slack-data)))
                                         (reset! (::share-data s) (merge share-data {:slack-data (merge slack-data {:channel-error true})}))))
-                                    (when (or (not no-draft?)
-                                              (not (empty? share-data)))
+                                    (when (not (empty? data-to-share))
                                       ;; FIXME: change share action
-                                      ;; (dis/dispatch! [(if no-draft? :activity-reshare :activity-share) share-data])
-                                      )))
-                     :disabled (and no-draft? (not (:slack share-data)) (not (:email share-data)))}
-                    (if no-draft? "Share" "Post")]]]])]]]))
+                                      (dis/dispatch! [:activity-share data-to-share]))))
+                     :disabled (and (not (:slack share-data)) (not (:email share-data)))}
+                    "Share"]]]])]]]))
