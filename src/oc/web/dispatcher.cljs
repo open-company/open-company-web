@@ -104,6 +104,7 @@
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
    :about-carrot-modal  [[:base] (fn [base] (:about-carrot-modal base))]
+   :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

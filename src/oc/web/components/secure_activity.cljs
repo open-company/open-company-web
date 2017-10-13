@@ -8,13 +8,14 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
+            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (rum/defcs secure-activity < rum/reactive
                           (drv/drv :activity-data)
                           (drv/drv :about-carrot-modal)
+                          (drv/drv :made-with-carrot-modal)
                           {:will-mount (fn [s]
                                          (utils/after 100 #(dis/dispatch! [:activity-get]))
                                          s)}
@@ -23,8 +24,8 @@
         activity-author (:publisher activity-data)
         ww (min (responsive/ww) 840)]
     [:div.secure-activity-container
-      (when (drv/react s :about-carrot-modal)
-        (about-carrot-modal))
+      (when (drv/react s :made-with-carrot-modal)
+        (made-with-carrot-modal))
       [:div.activity-header.group
         (org-avatar (clojure.set/rename-keys activity-data {:org-logo-height :logo-height :org-logo-width :logo-width :org-logo-url :logo-url :org-name :name :org-slug :slug}))]
       [:div.activity-content-outer
@@ -41,7 +42,7 @@
             [:div.activity-body
               {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])]]
     [:div.activity-content-footer
-      ; {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
+      {:on-click #(dis/dispatch! [:made-with-carrot-modal-show])}
       [:div.activity-content-footer-inner
         [:div.carrot-logo]
         [:div.you-did-it "Made with Carrot"]]]]))
