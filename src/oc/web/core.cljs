@@ -178,6 +178,24 @@
     (drv-root component target)))
 
 ;; Component specific to a storyboard
+(defn secure-activity-handler [component route target params]
+  (let [org (:org (:params params))
+        secure-id (:secure-id (:params params))
+        query-params (:query-params params)]
+    (pre-routing query-params)
+    ;; save the route
+    (router/set-route! (vec (remove nil? [org route secure-id])) {:org org :secure-id secure-id :query-params query-params})
+    ;; do we have the company data already?
+    (when (or (not (dis/board-data))              ;; if the company data are not present
+              (not (:fixed-items (dis/board-data))) ;; or the entries key is missing that means we have only
+                                                    ;; a subset of the company data loaded with a SU
+              (not (dis/secure-activity-data)))
+      (swap! dis/app-state merge {:loading true}))
+    (post-routing)
+    ;; render component
+    (drv-root component target)))
+
+;; Component specific to a storyboard
 (defn story-handler [component route target params]
   (let [org (:org (:params params))
         storyboard (:storyboard (:params params))
@@ -409,11 +427,11 @@
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
-      (story-handler #(om/component (secure-activity)) "secure-activity" target (assoc-in params [:params :storyboard] "secure-stories")))
+      (secure-activity-handler #(om/component (secure-activity)) "secure-activity" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute secure-activity-slash-route (str (urls/secure-activity ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
-      (story-handler #(om/component (secure-activity)) "secure-activity" target (assoc-in params [:params :storyboard] "secure-stories")))
+      (secure-activity-handler #(om/component (secure-activity)) "secure-activity" target (assoc-in params [:params :storyboard] "secure-stories")))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))

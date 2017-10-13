@@ -143,9 +143,12 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
-                          (fn [base org-slug board-slug activity-uuid secure-id]
-                            (get-in base (activity-key org-slug board-slug (or activity-uuid secure-id))))]
+   :activity-data       [[:base :org-slug :board-slug :activity-uuid]
+                          (fn [base org-slug board-slug activity-uuid]
+                            (get-in base (activity-key org-slug board-slug activity-uuid)))]
+   :secure-activity-data [[:base :org-slug :secure-id]
+                          (fn [base org-slug secure-id]
+                            (get-in base (secure-activity-key org-slug secure-id)))]
    :comments-data       [[:base :org-slug :board-slug]
                         (fn [base org-slug board-slug]
                           (get-in base (comments-key org-slug board-slug)))]
@@ -287,6 +290,18 @@
     (activity-data org-slug board-slug activity-id @app-state))
   ([org-slug board-slug activity-id data]
     (let [activity-key (activity-key org-slug board-slug activity-id)]
+      (get-in data activity-key))))
+
+(defn secure-activity-data
+  "Get secure activity data."
+  ([]
+    (secure-activity-data (router/current-org-slug) (router/current-secure-activity-id) @app-state))
+  ([secure-id]
+    (secure-activity-data (router/current-org-slug) secure-id @app-state))
+  ([org-slug secure-id]
+    (secure-activity-data org-slug secure-id @app-state))
+  ([org-slug secure-id data]
+    (let [activity-key (secure-activity-key org-slug secure-id)]
       (get-in data activity-key))))
 
 (defn comments-data

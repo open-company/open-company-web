@@ -169,6 +169,13 @@
                           {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
                           [:div.triangle]
                           [:ul.activity-modal-more-menu
+                            (when (utils/link-for (:links activity-data) "share")
+                              [:li
+                                {:on-click (fn [e]
+                                             (utils/event-stop e)
+                                             ; open the activity-share-modal component
+                                             (dis/dispatch! [:activity-share-show activity-data]))}
+                                "Share"])
                             (when (utils/link-for (:links activity-data) "partial-update")
                               [:li
                                 {:on-click (fn [e]
