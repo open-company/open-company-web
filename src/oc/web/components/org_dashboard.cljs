@@ -65,7 +65,9 @@
             (org-settings)
             ;; About carrot
             (:about-carrot-modal data)
-            ; (about-carrot-modal)
+            (about-carrot-modal)
+            ;; Made with carrot modal
+            (:made-with-carrot-modal data)
             (made-with-carrot-modal)
             ;; Entry editing
             (:entry-editing data)
