@@ -1447,7 +1447,7 @@
         fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
     (when (jwt/jwt)
       (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
-        (wsc/reconnect ws-link (jwt/get-key :user-id))))
+        (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
     (-> db
       (dissoc :activity-loading)
       (assoc-in activity-key fixed-activity-data))))
