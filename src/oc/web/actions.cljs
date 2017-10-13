@@ -62,7 +62,7 @@
         (router/nav! oc-urls/sign-up-team)
         ; If I have the secure-id i need to load the story only
         (router/current-secure-activity-id)
-        (api/get-secure-story (router/current-org-slug) (router/current-secure-activity-id))
+        (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
         ; If i have an org slug let's load the org data
         (router/current-org-slug)
         (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
@@ -1342,3 +1342,18 @@
 (defmethod dispatcher/action :made-with-carrot-modal-hide
   [db [_]]
   (dissoc db :made-with-carrot-modal))
+
+(defmethod dispatcher/action :activity-get/finish
+  [db [_ status {:keys [activity-uuid activity-data]}]]
+  (when (= status 404)
+    (router/redirect-404!))
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
+        fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+    (when (jwt/jwt)
+      (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
+        (wsc/reconnect ws-link (jwt/get-key :user-id))))
+    (-> db
+      (dissoc :activity-loading)
+      (assoc-in activity-key fixed-activity-data))))

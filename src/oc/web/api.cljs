@@ -771,6 +771,13 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:story-share/finish (if success (json->cljs body) nil)]))))))
 
+(defn get-activity [activity-uuid activity-link]
+  (when activity-link
+    (storage-http (method-for-link activity-link) (relative-href activity-link)
+      {:headers (headers-for-link activity-link)}
+      (fn [{:keys [status success body]}]
+        (dispatcher/dispatch! [:activity-get/finish status {:activity-uuid activity-uuid :activity-data (if success (json->cljs body) nil)}])))))
+
 (defn share-activity [post-data share-data]
   (when post-data
     (let [share-link (utils/link-for (:links post-data) "share")
@@ -788,6 +795,17 @@
         {:headers (headers-for-link story-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:story-get/finish status {:story-uuid (router/current-secure-activity-id) :story-data (if success (json->cljs body) {})}]))))))
+
+(defn get-secure-activity [org-slug secure-activity-id]
+ (when secure-activity-id
+    (let [activity-link {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)
+                         :method "GET"
+                         :rel ""
+                         :accept "application/vnd.open-company.entry.v1+json"}]
+      (storage-http (method-for-link activity-link) (relative-href activity-link)
+        {:headers (headers-for-link activity-link)}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:activity-get/finish status {:activity-uuid (router/current-secure-activity-id) :activity-data (if success (json->cljs body) {})}]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
