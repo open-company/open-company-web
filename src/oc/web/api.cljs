@@ -675,7 +675,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-slug :attachments :title :board-slug :storyboard-slug])
+(def entry-keys [:headline :body :topic-name :attachments :title :board-slug :storyboard-slug])
 
 (defn create-entry
   [entry-data temp-uuid]
