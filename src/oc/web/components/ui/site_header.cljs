@@ -67,5 +67,5 @@
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               (if (jwt/jwt)
-                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Carrot Boards"]
+                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Boards"]
                 [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/sign-up-with-slack)} "Sign Up"])]]]]]])

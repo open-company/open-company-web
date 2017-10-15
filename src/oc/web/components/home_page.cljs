@@ -33,9 +33,9 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "The Company Newsboard"]
+          [:h1.headline "Grow Together"]
           [:div.subheadline#thank-you-top
-            "News and company updates that create greater transparency and alignment"]
+            "Announcements, udpates, ideas and stories that bring teams closer"]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
