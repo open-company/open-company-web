@@ -171,9 +171,10 @@
                             (assoc :saved saved?)
                             (dissoc :has-changes)))))
 
-(defmethod dispatcher/action :boards-load-other [db [_]]
-  (doseq [board (:boards (dispatcher/org-data db))
-        :when (not= (:slug board) (router/current-board-slug))]
+(defmethod dispatcher/action :boards-load-other
+  [db [_ boards]]
+  (doseq [board boards
+          :when (not= (:slug board) (router/current-board-slug))]
     (api/get-board (utils/link-for (:links board) ["item" "self"] "GET")))
   db)
 
@@ -193,6 +194,9 @@
 (defmethod dispatcher/action :container/change
   [db [_ {board-uuid :container-id change-at :change-at}]]
   (timbre/debug "Board change:" board-uuid "at:" change-at)
+  (let [boards (:boards (dispatcher/org-data db))
+        filtered-boards (filter #(= (:uuid %) board-uuid) boards)]
+    (utils/after 1000 #(dispatcher/dispatch! [:boards-load-other filtered-boards])))
   ;; Update change-data state that the board has a change
   (update-change-data db board-uuid :change-at change-at))
 
@@ -201,16 +205,25 @@
   (timbre/debug "Board seen:" board-uuid)
   ;; Let the change service know we saw the board
   (ws-cc/container-seen board-uuid)
-  ;; Update change-data state that we nav'd to the board
-  (update-change-data db board-uuid :nav-at (oc-time/current-timestamp)))
+  (let [next-db (dissoc db :no-reset-seen-at)]
+    (if (:no-reset-seen-at db)
+      ;; Do not update the seen-at if coming from the modal view
+      next-db
+      ;; Update change-data state that we nav'd to the board
+      (update-change-data next-db board-uuid :nav-at (oc-time/current-timestamp)))))
 
 (defmethod dispatcher/action :board-nav-away
   [db [_ {board-uuid :board-uuid}]]
   (timbre/debug "Board nav away:" board-uuid)
-  ;; Update change-data state that we saw the board
-  (update-change-data db board-uuid :seen-at (oc-time/current-timestamp)))
+  (let [next-db (dissoc db :no-reset-seen-at)]
+    (if (:no-reset-seen-at db)
+      ;;  Do not update seen-at if navigating to an activity modal of the current board
+      next-db
+      ;; Update change-data state that we saw the board
+      (update-change-data next-db board-uuid :seen-at (oc-time/current-timestamp)))))
 
-(defmethod dispatcher/action :board [db [_ board-data]]
+(defmethod dispatcher/action :board
+ [db [_ board-data]]
  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
        fixed-board-data (utils/fix-board board-data)]
     (when is-currently-shown
@@ -235,7 +248,10 @@
       ;; Tell the container service that we are seeing this board,
       ;; and update change-data to reflect that we are seeing this board
       (when-let [board-uuid (:uuid fixed-board-data)]
-        (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}]))))
+        (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}])))
+
+      ;; Load the other boards
+      (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
     
     (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
@@ -1012,7 +1028,10 @@
                          (oc-urls/story board-slug activity-uuid)
                          (oc-urls/entry board-slug activity-uuid))]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
-  (assoc db :activity-modal-fade-in activity-uuid))
+  (-> db
+    (assoc :activity-modal-fade-in activity-uuid)
+    ;; Make sure the seen-at is not reset when navigating to modal view
+    (assoc :no-reset-seen-at true)))
 
 (defmethod dispatcher/action :entry-edit
   [db [_ initial-entry-data]]
@@ -1312,8 +1331,7 @@
                                                           (map #(assoc % :nav-at (:seen-at %))))) ; dup seen-at as nav-at
         new-status-data (merge old-status-data clean-status-data)]
     (timbre/debug "Change status data:" new-status-data)
-    (-> db
-      (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
+    (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
 
 (defmethod dispatcher/action :initial-loads
   [db [_]]
