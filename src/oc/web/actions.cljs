@@ -39,8 +39,10 @@
 
 ;; Get the board to show counting the last accessed and the last created
 
+(def default-board "welcome")
+
 (defn get-default-board [org-data]
-  (let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
     (if (= last-board-slug "all-posts")
       {:slug "all-posts"}
       (let [boards (:boards org-data)
