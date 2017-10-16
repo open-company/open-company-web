@@ -1196,78 +1196,6 @@
       (assoc-in db all-posts-key new-all-posts))
     db))
 
-; (defmethod dispatcher/action :story-get
-;   [db [_]]
-;   (when (router/current-activity-id)
-;     (let [story-uuid (router/current-activity-id)
-;           story-data (dispatcher/activity-data story-uuid)
-;           story-link (utils/link-for (:links story-data) "self")
-;           fixed-story-link (or story-link {:href (str "/orgs/" (router/current-org-slug) "/boards/" (router/current-board-slug) "/stories/" story-uuid)
-;                                            :accept "application/vnd.open-company.story.v1+json"})]
-;       (api/get-story story-uuid fixed-story-link)))
-;   (assoc db :story-loading true))
-
-; (defmethod dispatcher/action :story-get/finish
-;   [db [_ status {:keys [story-uuid story-data]}]]
-;   (when (= status 404)
-;     (router/redirect-404!))
-;   (let [org-slug (router/current-org-slug)
-;         board-slug (router/current-board-slug)
-;         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
-;         fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})]
-;     (when (jwt/jwt)
-;       (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
-;         (wsc/reconnect ws-link (jwt/get-key :user-id))))
-;     (-> db
-;       (dissoc :story-loading)
-;       (assoc-in story-key fixed-story-data))))
-
-; (defmethod dispatcher/action :story-create
-;   [db [_ board-data]]
-;   (api/create-story board-data)
-;   db)
-
-; (defmethod dispatcher/action :story-create/finish
-;   [db [_ board-slug story-data]]
-;   (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) board-slug (:uuid story-data))))
-;   (let [fixed-story (utils/fix-story story-data {:slug board-slug})]
-;     (assoc db :story-editing fixed-story)))
-
-; (defmethod dispatcher/action :draft-autosave
-;   [db [_]]
-;   (api/autosave-draft (:story-editing db) nil)
-;   (assoc-in db [:story-editing :autosaving] true))
-
-; (defmethod dispatcher/action :draft-autosave/finish
-;   [db [_ share-data]]
-;   (let [story-editing (:story-editing db)]
-;     (when share-data
-;       ;; Needs to publish the story
-;       (when (= (:status story-editing) "draft")
-;         (api/share-story story-editing share-data)))
-;     ;; User when the user changes the board of a story
-;     (when (:redirect story-editing)
-;       (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug story-editing) (:uuid story-editing))))
-;     (assoc db :story-editing (dissoc story-editing :autosaving :redirect))))
-
-; (defmethod dispatcher/action :story-share
-;   [db [_ share-data]]
-;   ;; Make a last autosave to make sure we have everything saved
-;   (api/autosave-draft (:story-editing db) share-data)
-;   ;; Remember to publish when autosave finishes
-;   db)
-
-; (defmethod dispatcher/action :story-reshare
-;   [db [_ share-data]]
-;   ;; Make a last autosave to make sure we have everything saved
-;   (api/share-story (dispatcher/activity-data) share-data)
-;   ;; Remember to publish when autosave finishes
-;   (assoc db :story-reshare share-data))
-
-; (defmethod dispatcher/action :story-share/finish
-;   [db [_ story-data]]
-;   (assoc db :story-editing-published-url (utils/fix-story story-data {:slug (:storyboard-slug story-data)})))
-
 (defmethod dispatcher/action :org-edit
   [db [_ org-data]]
   (assoc db :org-editing org-data))
@@ -1317,9 +1245,9 @@
   (dissoc db :show-onboard-overlay))
 
 (defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data]]
+  [db [_ medium activity-data]]
   (-> db
-    (assoc :activity-share activity-data)
+    (assoc :activity-share {:medium medium :share-data activity-data})
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
@@ -1328,7 +1256,7 @@
 
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]
-  (api/share-activity (:activity-share db) share-data)
+  (api/share-activity (:share-data (:activity-share db)) share-data)
   (assoc db :activity-share-data share-data))
 
 (defmethod dispatcher/action :activity-share/finish
