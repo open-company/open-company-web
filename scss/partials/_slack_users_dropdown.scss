@@ -58,6 +58,7 @@ div.slack-users-dropdown {
     top: 39px;
     left: 260px;
     overflow-y: auto;
+    border-radius: 4px;
 
     div.user {
       width: 100%;
@@ -67,17 +68,7 @@ div.slack-users-dropdown {
       text-overflow: ellipsis;
       overflow: hidden;
 
-      div.user-avatar-img-container {
-        width: 24px;
-        height: 24px;
-        float: left;
-        margin-top: -6px;
-
-        img {
-          max-width: 24px;
-          max-height: 24px;
-        }
-      }
+      @include user-profile(24);
 
       div.user-name {
         @include avenir_M();
@@ -86,7 +77,6 @@ div.slack-users-dropdown {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-      
 
         span.slack-org {
           @include avenir_R();
@@ -99,9 +89,7 @@ div.slack-users-dropdown {
       }
 
       &:hover {
-        span.ch {
-          text-decoration: underline;
-        }
+        background-color: rgba($carrot_light_gray_4, 0.2);
       }
     }
   }

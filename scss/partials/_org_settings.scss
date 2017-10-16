@@ -4,16 +4,19 @@
 // FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
 div.org-settings {
-  background-color: $oc_gray_8;
-  position: relative;
+  background-color: $carrot_modal_bg;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
 
-  button.carrot-close-bt {
+  button.carrot-modal-close {
     // Fallback for mobile that doesn't support fix positioning
     position: absolute;
     position: fixed;
     left: 50%;
-    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
-    top: 0px;
+    margin-left: #{($settings_content_width / 2 * -1) - 28}px;
+    top: 4px;
   }
 
   div.org-settings-inner {
@@ -21,7 +24,7 @@ div.org-settings {
     margin: 0 auto;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     background-color: white;
-    min-height: 100vh;
+    height: 100vh;
     overflow-x: visible;
     overflow-y: auto;
     position: relative;
@@ -133,6 +136,13 @@ div.org-settings {
               @include avenir_H();
               font-size: 14px;
               color: $oc_gray_7;
+
+              span.error {
+                @include avenir_H();
+                font-size: 14px;
+                margin-left: 16px;
+                color: $carrot_orange;
+              }
 
             }
 

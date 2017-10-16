@@ -18,47 +18,16 @@ div.story-edit-container {
     div.story-edit-header-left{
       float: left;
 
-      a.board-name {
+      div.story-edit-header-back {
         @include avenir_H();
         font-size: 16px;
-        color: $carrot_light_gray_1;
-        float: left;
-      }
+        color: $carrot_dark_gray_1;
+        cursor: pointer;
 
-      span.arrow {
-        margin-left: 10px;
-        @include avenir_H();
-        font-size: 20px;
-        color: $carrot_light_gray_1;
-        margin-top: -3px;
-        float: left;
-      }
-
-      span.story-edit-top-title {
-        margin-left: 10px;
-        @include avenir_H();
-        font-size: 16px;
-        color: black;
-        float: left;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 400px;
-
-        .emojione {
-          @include emoji-size(14);
-        }
-      }
-
-      button.delete-link {
-        margin-left: 24px;
-        @include avenir_H();
-        font-size: 11px;
-        color: $oc_gray_7;
-        opacity: 0.6;
-
-        &:hover {
-          opacity: 1;
+        span.back-arrow {
+          color: $carrot_light_gray_1;
+          font-size: 20px;
+          margin-right: 8px;
         }
       }
     }
@@ -67,22 +36,27 @@ div.story-edit-container {
       position: absolute;
       left: 50%;
       top: 24px;
-      margin-left: -100px;
+      margin-left: -200px;
       text-align: center;
-      width: 200px;
+      width: 400px;
 
-      span.story-edit-header-left-save {
-        height: 25px;
-        @include avenir_R();
-        font-size: 15px;
-        color: $carrot_light_gray_1;
-        text-align: center;
-        opacity: 0;
-        transition: opacity 230ms;
-        margin-top: 4px;
+      div.story-edit-header-center-title {
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_dark_gray;
+        margin-left: 68px;
 
-        &.showing {
-          opacity: 1;
+        .emojione {
+          @include emoji-size(14);
+        }
+
+        span.saving-message {
+          margin-left: 8px;
+          color: $carrot_light_gray_3;
+          font-size: 16px;
+          @include avenir_BOOK();
+          width: 60px;
+          display: inline-block;
         }
       }
     }
@@ -90,6 +64,13 @@ div.story-edit-container {
     div.story-edit-header-right {
       float: right;
       margin-top: -6px;
+
+      button.delete-link {
+        margin-right: 24px;
+        @include avenir_M();
+        font-size: 15px;
+        color: #999999;
+      }
 
       div.share-draft-container {
         position: absolute;
@@ -201,50 +182,76 @@ div.story-edit-container {
     }
   }
 
-  div.story-edit-content {
-    min-height: calc(100vh - 104px);
-    padding: 40px 80px 32px;
+  div.story-edit-footer {
+    position: absolute;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 66px;
     background-color: white;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
+
+    div.story-edit-footer-inner {
+      margin: 22px auto;
+      width: 780px;
+    }
+  }
+
+  div.story-edit-content {
+    min-height: calc(100vh - 104px - 66px);
+    padding: 40px 0px 32px;
     border-radius: 8px;
-    width: 840px;
-    margin: 104px auto 0px;
+    width: 780px;
+    margin: 104px auto 66px;
     position: relative;
 
-    div.story-edit-author {
-      @include activity-author();
-    }
+    div.story-edit-content-authorship {
+      height: 41px;
+      margin-bottom: 32px;
 
-    div.story-edit-add-banner {
-      margin-left: -80px;
-      margin-top: 40px;
-      width: 840px;
-      height: 100px;
-      @include avenir_H();
-      font-size: 18px;
-      color: $oc_gray_7;
-      text-align: center;
-      padding-top: 40px;
-      cursor: pointer;
-      background-color: rgba($carrot_light_gray_2, 0.3);
-
-      span.blue {
-        color: $carrot_text_blue;
+      div.story-edit-content-authorship-left {
+        float: left;
+        width: 50%;
+        @include activity-author();
       }
 
-      &:hover {
-        span.blue {
-          text-decoration: underline;
+      div.story-edit-content-authorship-right {
+        float: right;
+        width: 50%;
+
+        div.story-edit-add-banner {
+          float: right;
+          margin-right: 16px;
+          margin-top: 2px;
+          @include avenir_H();
+          font-size: 15px;
+          color: #999999;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        div.story-edit-tags {
+          float: right;
+          // margin-top: 21px;
+          position: relative;
+          @include activity-tag();
+          div.dropdown-list-container {
+            left: -60px;
+            top: 30px;
+            width: 170px;
+          }
         }
       }
     }
 
     div.story-edit-banner {
-      margin-left: -80px;
-      margin-top: 50px;
-      margin-bottom: 20px;
-      width: 840px;
-      max-height: 200px;
+      // margin-left: -80px;
+      // width: 100vw;
+      max-height: 520px;
       background-position: 50%;
       background-size: cover;
       background-repeat: no-repeat;
@@ -257,30 +264,27 @@ div.story-edit-container {
       }
     }
 
-    div.story-edit-tags {
-      margin-top: 21px;
-      position: relative;
-      @include activity-tag();
-      div.dropdown-list-container {
-        left: -60px;
-        top: 30px;
-        width: 170px;
-      }
-    }
-
     div.story-edit-title {
-      margin-top: 21px;
+      margin-top: 32px;
       @include activity-title();
       @include avenir_M();
       font-size: 32px;
       outline: none;
       cursor: text;
 
+      .emojione {
+        @include emoji-size(30);
+      }
+
       &:empty:before {
         content: attr(placeholder);
         display: block;
         font-style: none;
       }
+    }
+
+    div.media-picker {
+      left: -62px !important;
     }
 
     div.story-edit-body {
@@ -291,6 +295,11 @@ div.story-edit-container {
       color: $oc_gray_7;
       outline: none;
       cursor: text;
+      min-height: calc(100vh - 400px);
+
+      .emojione {
+        @include emoji-size(18);
+      }
 
       h2 {
         font-size: 26px;
@@ -306,12 +315,7 @@ div.story-edit-container {
         display: inline-block;
 
         label.media-attachment-title {
-          font-size: 16px;
-          margin-top: 4px;
-        }
-
-        label.media-attachment-subtitle {
-          display: none;
+          margin-top: -4px;
         }
       }
     }

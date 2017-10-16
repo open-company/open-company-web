@@ -7,7 +7,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.menu :refer (menu)]
-            [oc.web.components.trend-bar :refer (trend-bar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -58,8 +57,6 @@
                         [:img
                           {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}]])]
                   (login-button)))]]]]
-      (when-not (responsive/is-mobile-size?)
-        (trend-bar (:name org-data)))
       (when (responsive/is-mobile-size?)
         ;; Render the menu here only on mobile so it can expand the navbar
         (menu {:mobile-menu-open mobile-menu-open}))]))

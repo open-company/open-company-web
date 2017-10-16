@@ -24,7 +24,7 @@
   (utils/event-stop e)
   (when-not (om/get-state owner :loading)
     (let [data         (om/get-props owner)
-          org-name (:name (:create-org data))]
+          org-name (:name (:org-editing data))]
       (if (clojure.string/blank? org-name)
         (create-org-alert owner)
         (do
@@ -36,7 +36,7 @@
     ;; using utils/after here because we can't dispatch inside another dispatch.
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
-    (utils/after 1 #(dis/dispatch! [:input [:create-org] {:name (or (:name team-data) "") :logo-url (or (:logo-url team-data) "")}]))
+    (utils/after 1 #(dis/dispatch! [:input [:org-editing] {:name (or (:name team-data) "") :logo-url (or (:logo-url team-data) "")}]))
     (when-not (empty? (:name team-data))
       (om/set-state! owner :message "Is this the organization name you’d like to use?"))))
 
@@ -49,7 +49,7 @@
 
   (did-mount [_]
     (utils/update-page-title "Carrot - Setup Your Organization")
-    (when-not (:create-org data)
+    (when-not (:org-editing data)
       (setup-org-name owner data)))
 
   (will-receive-props [_ next-props]
@@ -71,12 +71,12 @@
                             :class "org-editor-input domine h4"
                             :style #js {:width "100%"}
                             :placeholder "Simple name without the Inc., LLC, etc."
-                            :value (or (:name (:create-org data)) "")
+                            :value (or (:name (:org-editing data)) "")
                             :on-change #(do
                                           (om/set-state! owner :name-did-change true)
-                                          (dis/dispatch! [:input [:create-org :name] (.. % -target -value)]))})))
+                                          (dis/dispatch! [:input [:org-editing :name] (.. % -target -value)]))})))
               (dom/div {:class "center"}
                 (dom/button {:class "mlb-reset mlb-default"
-                             :disabled (not (pos? (count (:name (:create-org data)))))
+                             :disabled (not (pos? (count (:name (:org-editing data)))))
                              :on-click (partial create-org-clicked owner)}
                             "Ok, Let’s Go"))))))))

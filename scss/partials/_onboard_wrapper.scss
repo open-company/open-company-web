@@ -27,11 +27,11 @@ div.onboard-wrapper-container {
       }
 
       div.onboard-wrapper-box {
-        position: relative;
+        position: absolute;
         left: 50%;
-        top: 50%;
+        top: 220px;
         margin-left: -147px;
-        margin-top: -150px;
+        margin-top: 0px;
         width: 294px;
         height: 301px;
         background-image: cdnUrl("/img/ML/carrot_box.svg");
@@ -245,7 +245,7 @@ div.onboard-lander {
 
     div.logo-upload-container {
       margin-top: 32px;
-      width: 325px;
+      width: 400px;
       height: 82px;
       cursor: pointer;
 
@@ -255,20 +255,54 @@ div.onboard-lander {
         }
       }
 
-      div.user-avatar-img-container, div.org-avatar {
-        width: 82px;
-        height: 82px;
-        float: left;
+      &.org-logo {
+        div.org-avatar.missing-logo {
+          border: 1px solid $carrot_light_gray;
+          border-radius: 4px;
+          opacity: 0.2;
+          position: relative;
+          width: 82px;
+          height: 82px;
 
-        img {
-          max-width: 82px;
-          max-height: 82px;
-          min-width: 82px;
-          min-height: 82px;
-          text-align: center;
-          border-radius: 41px;
+          &:after {
+            content: "";
+            background-image: cdnUrl("/img/ML/carrot_grey.svg");
+            background-position: 50%;
+            background-size: 30px 62px;
+            background-repeat: no-repeat;
+            width: 82px;
+            height: 82px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
+        }
+
+        div.org-avatar {
+          div.org-avatar-container {
+            height: 82px;
+
+            div.org-avatar-border {
+              width: 82px;
+              height: 82px;
+              float: left;
+              padding: 0px;
+
+              img {
+                max-width: 82px;
+                max-height: 82px;
+                text-align: center;
+              }
+            }
+          }
         }
       }
+
+      div.user-avatar-img-container {
+        float: left;
+      }
+
+      @include user-profile(82);
 
       div.add-picture-link {
         @include avenir_H();
@@ -285,7 +319,7 @@ div.onboard-lander {
         color: rgba($oc_gray_7, 0.5);
         float: left;
         margin-left: 16px;
-        margin-top: 8px;
+        margin-top: 12px;
       }
     }
 

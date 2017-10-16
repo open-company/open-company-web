@@ -7,12 +7,15 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [cljsjs.moment-timezone]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
+            ; [cljsjs.moment-timezone]
             [goog.object :as googobj]
             [goog.dom :as gdom]))
+
+(def default-user-profile (random-user-image))
 
 (defn- img-on-load [url img]
   (dis/dispatch! [:input [:edit-user-profile :avatar-url] url])
@@ -36,94 +39,164 @@
 (defn error-cb [res error]
   (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000]))
 
-(defn change! [k v]
+(defn change! [s k v]
+  (reset! (::name-error s) false)
+  (reset! (::email-error s) false)
+  (reset! (::password-error s) false)
+  (reset! (::current-password-error s) false)
   (dis/dispatch! [:input [:edit-user-profile k] v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
-(defn close-cb [orgs current-user-data]
+(defn real-close-cb [orgs current-user-data]
   (let [last-org-slug (cook/get-cookie (router/last-org-cookie))
         first-org-slug (:slug (first orgs))
         to-url (if last-org-slug
                 (oc-urls/org last-org-slug)
                 (if first-org-slug
                   (oc-urls/org first-org-slug)
-                  oc-urls/orgs))]
+                  oc-urls/login))]
     (when (:has-changes current-user-data)
       (dis/dispatch! [:user-profile-reset]))
     (router/nav! to-url)))
+
+(defn close-cb [orgs current-user-data]
+  (if (:has-changes current-user-data)
+    (let [alert-data {:icon "/img/ML/trash.svg"
+                      :message "There are unsaved edits. OK to delete them?"
+                      :link-button-title "Cancel"
+                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                          (dis/dispatch! [:alert-modal-hide])
+                                          (real-close-cb orgs current-user-data))}]
+      (dis/dispatch! [:alert-modal-show alert-data]))
+    (real-close-cb orgs current-user-data)))
 
 (def default-user-profile-image-key {:accept "image/*"
                                      :transformations {
                                        :crop {
                                          :aspectRatio 1}}})
 
+(defn upload-user-profile-pictuer-clicked []
+  (dis/dispatch! [:input [:edit-user-profile :avatar-url] default-user-profile])
+  (iu/upload! default-user-profile-image-key success-cb progress-cb error-cb))
+
+(defn save-clicked [s]
+  (reset! (::name-error s) false)
+  (reset! (::email-error s) false)
+  (reset! (::password-error s) false)
+  (reset! (::current-password-error s) false)
+  (reset! (::loading s) true)
+  (let [user-data (:user-data @(drv/get-ref s :edit-user-profile))]
+    (cond
+      (and (empty? (:first-name user-data))
+           (empty? (:last-name user-data)))
+      (reset! (::name-error s) true)
+
+      (not (utils/valid-email? (:email user-data)))
+      (reset! (::email-error s) true)
+
+      (and (not (empty? (:password user-data)))
+           (empty? (:current-password user-data)))
+      (reset! (::current-password-error s) true)
+
+      (and (not (empty? (:password user-data)))
+           (< (count (:password user-data)) 8))
+      (reset! (::password-error s) true)
+
+      :else
+      (dis/dispatch! [:user-profile-save]))))
+
 (rum/defcs user-profile < rum/reactive
                           (rum/local false ::loading)
                           (rum/local false ::show-success)
                           (drv/drv :edit-user-profile)
                           (drv/drv :orgs)
-                          {:init (fn [s _]
-                                   (dis/dispatch! [:user-profile-reset])
-                                   s)
-                           :after-render (fn [s]
-                                           (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
-                                              (change! :timezone (.. js/moment -tz guess)))
-                                           s)
+                          (drv/drv :alert-modal)
+                          (rum/local false ::name-error)
+                          (rum/local false ::email-error)
+                          (rum/local false ::password-error)
+                          (rum/local false ::current-password-error)
+                          {:will-mount (fn [s]
+                                         (dis/dispatch! [:user-profile-reset])
+                                         s)
+                           ; :after-render (fn [s]
+                           ;                 (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
+                           ;                   (dis/dispatch! [:input [:edit-user-profile :timezone] (.. js/moment -tz guess)]))
+                           ;                 s)
                            :did-remount (fn [old-state new-state]
-                                          (when @(::loading new-state)
-                                            (reset! (::show-success new-state) true)
-                                            (reset! (::loading new-state) false)
-                                            (utils/after 2000 (fn [] (reset! (::show-success new-state) false))))
+                                          (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
+                                            (when (and @(::loading new-state)
+                                                       (not (:has-changes user-data)))
+                                              (reset! (::show-success new-state) true)
+                                              (reset! (::loading new-state) false)
+                                              (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
                                           new-state)}
   [s]
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
-        timezones (.names (.-tz js/moment))
+        ; timezones (.names (.-tz js/moment))
         orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
+      (when (drv/react s :alert-modal)
+        (alert-modal))
       (carrot-close-bt {:on-click #(close-cb orgs current-user-data)})
       [:div.user-profile-header {} "Your Profile"]
       [:div.user-profile-internal
         [:div.user-profile-content.group
           [:div.user-profile-avatar-box.group
             [:button.user-profile-avatar.mlb-reset
-              {:on-click #(iu/upload! default-user-profile-image-key success-cb progress-cb error-cb)}
+              {:on-click #(upload-user-profile-pictuer-clicked)}
               (user-avatar-image current-user-data)]
-            [:div.user-profile-avatar-change
-              [:button.mlb-reset.mlb-link.upload-photo
-                {:on-click #(iu/upload! default-user-profile-image-key success-cb progress-cb error-cb)}
-                [:span.user-avatar-upload-cta "Upload Photo"]
-                [:span.user-avatar-upload-description
-                  "A 160x160 transparent Gif or PNG works best"]]]]
+            [:button.mlb-reset.mlb-link.upload-photo
+              {:on-click #(upload-user-profile-pictuer-clicked)}
+              [:span.user-avatar-upload-cta "Upload profile photo"]
+              [:span.user-avatar-upload-description
+                "A 160x160 PNG or JPG works best"]]]
+          [:div.user-profile-field-box
+            [:div.user-profile-field-label
+              [:span.error
+                {:style {:margin-left "0px"}}
+                (when error
+                  "An error occurred while saving, please try again.")]]]
           ; Left column
           [:div.user-profile-column-left
             ; First name
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "First Name"]
+                "First Name"
+                (when @(::name-error s)
+                  [:span.error "Please provide your name."])]
               [:div.user-profile-field
                 [:input
                   {:type "text"
-                   :on-change #(change! :first-name (.. % -target -value))
+                   :tab-index 1
+                   :on-change #(change! s :first-name (.. % -target -value))
                    :value (:first-name current-user-data)}]]]
             ; Current password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "Current Password"]
+                "Current Password"
+                (when @(::current-password-error s)
+                  [:span.error "Current password required"])]
               [:div.user-profile-field
                 [:input
                   {:type "password"
-                   :on-change #(change! :current-password (.. % -target -value))
+                   :tab-index 3
+                   :on-change #(change! s :current-password (.. % -target -value))
                    :value (:current-password current-user-data)}]]]
             ; Email
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "Email"]
+                "Email"
+                (when @(::email-error s)
+                  [:span.error "This email isn't valid."])]
               [:div.user-profile-field
                 [:input
                   {:type "text"
-                   :on-change #(change! :email (.. % -target -value))
+                   :tab-index 5
+                   :on-change #(change! s :email (.. % -target -value))
                    :value (:email current-user-data)}]]]]
           ; Right column
           [:div.user-profile-column-right
@@ -134,101 +207,114 @@
               [:div.user-profile-field
                 [:input
                   {:type "text"
-                   :on-change #(change! :last-name (.. % -target -value))
+                   :tab-index 2
+                   :on-change #(change! s :last-name (.. % -target -value))
                    :value (:last-name current-user-data)}]]]
             ; New password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
-                "New Password"]
+                "New Password"
+                (when @(::password-error s)
+                  [:span.error "Minimum 8 characters"])]
               [:div.user-profile-field
                 [:input
                   {:type "password"
-                   :on-change #(change! :password (.. % -target -value))
+                   :tab-index 4
+                   :on-change #(change! s :password (.. % -target -value))
                    :value (:password current-user-data)}]]]
-            ; Time zone
-            [:div.user-profile-field-box
-              [:div.user-profile-field-label
-                "Time Zone"]
-              [:div.user-profile-field
-                [:select
-                  {:value (:timezone current-user-data)
-                   :on-change #(change! :timezone (.. % -target -value))}
-                  ;; Promoted timezones
-                  (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
-                    [:option
-                      {:key (str "timezone-" t "-promoted")
-                       :value t} t])
-                  ;; Divider line option
-                  [:option
-                    {:disabled true
-                     :value ""}
-                    "------------"]
-                  ;; All the timezones, repeating the promoted
-                  (for [t timezones]
-                    [:option
-                      {:key (str "timezone-" t)
-                       :value t}
-                      t])]]]]
-          ; Digest frequency
-          [:div.user-profile-field-box
-            [:div.user-profile-field-label
-              "Digest Frequency " [:i.fa.fa-info-circle]]
-            [:div.user-profile-field.digest-frequency-field.digest-frequency
-              [:select
-                {:value (:digest-frequency current-user-data)
-                 :on-change #(change! :digest-frequency (.. % -target -value))}
-                [:option {:value "weekly"} "WEEKLY"]
-                [:option {:value "daily"} "DAILY"]
-                [:option {:value "never"} "NEVER"]]]
-            [:div.user-profile-field.digest-frequency-field.digest-day
-              [:select
-                {:value (:digest-day current-user-data)
-                 :disabled (not= (:digest-frequency current-user-data) "weekly")
-                 :on-change #(change! :digest-day (.. % -target -value))}
-                [:option {:value "monday"} "MONDAY"]
-                [:option {:value "tuesday"} "TUESDAY"]
-                [:option {:value "wednesday"} "WEDNESDAY"]
-                [:option {:value "thursday"} "THURSDAY"]
-                [:option {:value "friday"} "FRIDAY"]
-                [:option {:value "saturday"} "SATURDAY"]
-                [:option {:value "sunday"} "SUNDAY"]]]
-            [:div.user-profile-field.digest-frequency-field.digest-time
-              [:select
-                {:value (:digest-time current-user-data)
-                 :disabled (= (:digest-frequency current-user-data) "never")
-                 :on-change #(change! :digest-time (.. % -target -value))}
-                [:option {:value "7am"} "7AM"]
-                [:option {:value "8am"} "8AM"]
-                [:option {:value "9am"} "9AM"]
-                [:option {:value "10am"} "10AM"]
-                [:option {:value "11am"} "11AM"]
-                [:option {:value "12pm"} "12PM"]
-                [:option {:value "1pm"} "1PM"]
-                [:option {:value "2pm"} "2PM"]
-                [:option {:value "3pm"} "3PM"]
-                [:option {:value "4pm"} "4PM"]
-                [:option {:value "5pm"} "5PM"]
-                [:option {:value "6pm"} "6PM"]
-                [:option {:value "7pm"} "7PM"]
-                [:option {:value "8pm"} "8PM"]
-                [:option {:value "9pm"} "9PM"]
-                [:option {:value "10pm"} "10PM"]
-                [:option {:value "11pm"} "11PM"]
-                [:option {:value "12am"} "12AM"]
-                [:option {:value "1am"} "1AM"]
-                [:option {:value "2am"} "2AM"]
-                [:option {:value "3am"} "3AM"]
-                [:option {:value "4am"} "4AM"]
-                [:option {:value "5am"} "5AM"]
-                [:option {:value "6am"} "6AM"]]]]]]
+            ; ; Time zone
+            ; [:div.user-profile-field-box
+            ;   [:div.user-profile-field-label
+            ;     "Time Zone"]
+            ;   [:div.user-profile-field
+            ;     [:select
+            ;       {:value (:timezone current-user-data)
+            ;        :on-change #(change! s :timezone (.. % -target -value))}
+            ;       ;; Promoted timezones
+            ;       (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+            ;         [:option
+            ;           {:key (str "timezone-" t "-promoted")
+            ;            :value t} t])
+            ;       ;; Divider line option
+            ;       [:option
+            ;         {:disabled true
+            ;          :value ""}
+            ;         "------------"]
+            ;       ;; All the timezones, repeating the promoted
+            ;       (for [t timezones]
+            ;         [:option
+            ;           {:key (str "timezone-" t)
+            ;            :value t}
+            ;           t])]]]
+            ]
+          ; ; Digest frequency
+          ; [:div.user-profile-field-box
+          ;   [:div.user-profile-field-label
+          ;     "Digest Frequency " [:i.fa.fa-info-circle]]
+          ;   [:div.user-profile-field.digest-frequency-field.digest-frequency
+          ;     [:select
+          ;       {:value (:digest-frequency current-user-data)
+          ;        :on-change #(change! s :digest-frequency (.. % -target -value))}
+          ;       [:option {:value "weekly"} "WEEKLY"]
+          ;       [:option {:value "daily"} "DAILY"]
+          ;       [:option {:value "never"} "NEVER"]]]
+          ;   [:div.user-profile-field.digest-frequency-field.digest-day
+          ;     [:select
+          ;       {:value (:digest-day current-user-data)
+          ;        :disabled (not= (:digest-frequency current-user-data) "weekly")
+          ;        :on-change #(change! s :digest-day (.. % -target -value))}
+          ;       [:option {:value "monday"} "MONDAY"]
+          ;       [:option {:value "tuesday"} "TUESDAY"]
+          ;       [:option {:value "wednesday"} "WEDNESDAY"]
+          ;       [:option {:value "thursday"} "THURSDAY"]
+          ;       [:option {:value "friday"} "FRIDAY"]
+          ;       [:option {:value "saturday"} "SATURDAY"]
+          ;       [:option {:value "sunday"} "SUNDAY"]]]
+          ;   [:div.user-profile-field.digest-frequency-field.digest-time
+          ;     [:select
+          ;       {:value (:digest-time current-user-data)
+          ;        :disabled (= (:digest-frequency current-user-data) "never")
+          ;        :on-change #(change! s :digest-time (.. % -target -value))}
+          ;       [:option {:value "7am"} "7AM"]
+          ;       [:option {:value "8am"} "8AM"]
+          ;       [:option {:value "9am"} "9AM"]
+          ;       [:option {:value "10am"} "10AM"]
+          ;       [:option {:value "11am"} "11AM"]
+          ;       [:option {:value "12pm"} "12PM"]
+          ;       [:option {:value "1pm"} "1PM"]
+          ;       [:option {:value "2pm"} "2PM"]
+          ;       [:option {:value "3pm"} "3PM"]
+          ;       [:option {:value "4pm"} "4PM"]
+          ;       [:option {:value "5pm"} "5PM"]
+          ;       [:option {:value "6pm"} "6PM"]
+          ;       [:option {:value "7pm"} "7PM"]
+          ;       [:option {:value "8pm"} "8PM"]
+          ;       [:option {:value "9pm"} "9PM"]
+          ;       [:option {:value "10pm"} "10PM"]
+          ;       [:option {:value "11pm"} "11PM"]
+          ;       [:option {:value "12am"} "12AM"]
+          ;       [:option {:value "1am"} "1AM"]
+          ;       [:option {:value "2am"} "2AM"]
+          ;       [:option {:value "3am"} "3AM"]
+          ;       [:option {:value "4am"} "4AM"]
+          ;       [:option {:value "5am"} "5AM"]
+          ;       [:option {:value "6am"} "6AM"]]]]
+          ]]
         [:div.user-profile-footer
           [:button.mlb-reset.mlb-default
-            {:on-click #(dis/dispatch! [:user-profile-save])
+            {:on-click #(save-clicked s)
+             :class (when @(::show-success s) "no-disable")
              :disabled (not (:has-changes current-user-data))}
              (when (:loading current-user-data)
                 (small-loading))
-            "Save"]
+            (if @(::show-success s)
+              "Saved!"
+              "Save")]
           [:button.mlb-reset.mlb-link-black
             {:on-click #(when (:has-changes current-user-data)
+                          (reset! (::name-error s) false)
+                          (reset! (::email-error s) false)
+                          (reset! (::password-error s) false)
+                          (reset! (::current-password-error s) false) 
                           (dis/dispatch! [:user-profile-reset]))}
             "Cancel"]]]))

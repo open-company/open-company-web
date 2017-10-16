@@ -6,4 +6,4 @@
   [:div.all-caught-up
     [:div.all-caught-up-inner
       [:div.message
-        "You’re all caught up!"]]])
+        "That’s all for now!"]]])

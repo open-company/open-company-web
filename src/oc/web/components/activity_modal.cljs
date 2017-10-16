@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.media-attachments :refer (media-attachments)]
@@ -44,67 +45,87 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(rum/defcs activity-modal < (rum/local false ::first-render-done)
-                         (rum/local false ::dismiss)
-                         (rum/local false ::animate)
-                         (rum/local false ::showing-dropdown)
-                         (rum/local nil ::column-height)
-                         (rum/local nil ::window-resize-listener)
-                         rum/reactive
-                         (drv/drv :activity-modal-fade-in)
-                         {:before-render (fn [s]
-                                           (when (and (not @(::animate s))
-                                                    (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
-                                             (reset! (::animate s) true))
+(rum/defcs activity-modal < rum/reactive
+                            (drv/drv :activity-modal-fade-in)
+                            (drv/drv :org-data)
+                            (rum/local false ::first-render-done)
+                            (rum/local false ::dismiss)
+                            (rum/local false ::animate)
+                            (rum/local false ::showing-dropdown)
+                            (rum/local nil ::column-height)
+                            (rum/local nil ::window-resize-listener)
+                            (rum/local nil ::esc-key-listener)
+                            (rum/local false ::move-activity)
+                            (rum/local 330 ::activity-modal-height)
+                            {:before-render (fn [s]
+                                              (when (and (not @(::animate s))
+                                                       (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
+                                                (reset! (::animate s) true))
+                                              (when-let [activity-modal (sel1 [:div.activity-modal])]
+                                                (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
+                                                  (reset! (::activity-modal-height s) (.-clientHeight activity-modal))))
+                                              s)
+                             :will-mount (fn [s]
+                                           (reset! (::window-resize-listener s)
+                                            (events/listen js/window EventType/RESIZE #(reset! (::column-height s) nil)))
+                                           (reset! (::esc-key-listener s)
+                                            (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
                                            s)
-                          :will-mount (fn [s]
-                                        (reset! (::window-resize-listener s)
-                                         (events/listen js/window EventType/RESIZE #(reset! (::column-height s) nil)))
-                                        s)
-                          :did-mount (fn [s]
-                                       ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                       (dommy/add-class! (sel1 [:body]) :no-scroll)
-                                       ;; Scroll to the bottom of the comments box
-                                       (let [el (sel1 [:div.activity-right-column-content])]
-                                          (set! (.-scrollTop el) (.-scrollHeight el)))
-                                       (let [activity-data (first (:rum/args s))]
-                                        (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
-                                         "show.bs.dropdown"
-                                         (fn [e]
-                                           (reset! (::showing-dropdown s) true)))
-                                        (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
-                                         "hidden.bs.dropdown"
-                                         (fn [e]
-                                           (reset! (::showing-dropdown s) false))))
-                                       s)
-                          :did-remount (fn [o s]
-                                         (reset! (::column-height s) nil)
-                                         s)
-                          :after-render (fn [s]
-                                          (when (not @(::first-render-done s))
-                                            (reset! (::first-render-done s) true))
-                                          (when-not @(::column-height s)
-                                            (reset! (::column-height s) (max 284 (.height (js/$ ".activity-left-column"))))
-                                            (.load (js/$ ".activity-modal-content-body img")
-                                             #(reset! (::column-height s) (max 284 (.height (js/$ ".activity-left-column"))))))
+                             :did-mount (fn [s]
+                                          ;; Add no-scroll to the body to avoid scrolling while showing this modal
+                                          (dommy/add-class! (sel1 [:body]) :no-scroll)
+                                          ;; Scroll to the bottom of the comments box
+                                          (let [el (sel1 [:div.activity-right-column-content])]
+                                           (set! (.-scrollTop el) (.-scrollHeight el)))
+                                          (let [activity-data (first (:rum/args s))]
+                                            (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
+                                             "show.bs.dropdown"
+                                             (fn [e]
+                                              (reset! (::showing-dropdown s) true)))
+                                            (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
+                                             "hidden.bs.dropdown"
+                                             (fn [e]
+                                              (reset! (::showing-dropdown s) false))))
                                           s)
-                          :will-unmount (fn [s]
-                                          ;; Remove no-scroll class from the body tag
-                                          (dommy/remove-class! (sel1 [:body]) :no-scroll)
-                                          ;; Remove window resize listener
-                                          (when @(::window-resize-listener s)
-                                            (events/unlistenByKey @(::window-resize-listener s))
-                                            (reset! (::window-resize-listener s) nil))
-                                          s)}
+                            :did-remount (fn [o s]
+                                            (reset! (::column-height s) nil)
+                                            s)
+                            :after-render (fn [s]
+                                            (when (not @(::first-render-done s))
+                                              (reset! (::first-render-done s) true))
+                                            (when-not @(::column-height s)
+                                              (reset! (::column-height s) (max 284 (.height (js/$ ".activity-left-column"))))
+                                              (.load (js/$ ".activity-modal-content-body img")
+                                               #(reset! (::column-height s) (max 284 (.height (js/$ ".activity-left-column"))))))
+                                            s)
+                            :will-unmount (fn [s]
+                                            ;; Remove no-scroll class from the body tag
+                                            (dommy/remove-class! (sel1 [:body]) :no-scroll)
+                                            ;; Remove window resize listener
+                                            (when @(::window-resize-listener s)
+                                              (events/unlistenByKey @(::window-resize-listener s))
+                                              (reset! (::window-resize-listener s) nil))
+                                            (when @(::esc-key-listener s)
+                                              (events/unlistenByKey @(::esc-key-listener s))
+                                              (reset! (::esc-key-listener s) nil))
+                                            s)}
   [s activity-data]
-  (let [column-height @(::column-height s)]
+  (let [column-height @(::column-height s)
+        show-comments? (utils/link-for (:links activity-data) "comments")
+        fixed-activity-modal-height (max @(::activity-modal-height s) 330)
+        wh (.-innerHeight js/window)]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(::first-render-done s))))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
-      [:div.activity-modal.group
-        {:class (str "activity-modal-" (:uuid activity-data))}
-        (carrot-close-bt {:on-click #(close-clicked s)})
-        [:div.activity-modal-inner.group
+                                :appear (and (not @(::dismiss s)) @(::first-render-done s))
+                                :no-comments (not show-comments?)})
+       :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
+                    (close-clicked s))}
+      [:div.modal-wrapper
+        {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
+        [:button.carrot-modal-close.mlb-reset
+          {:on-click #(close-clicked s)}]
+        [:div.activity-modal.group
+          {:class (str "activity-modal-" (:uuid activity-data))}
           [:div.activity-left-column
             {:style (when column-height {:minHeight (str column-height "px")})}
             [:div.activity-left-column-content
@@ -132,11 +153,16 @@
                 [:div.activity-modal-content-body
                   {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                    :class (when (empty? (:headline activity-data)) "no-headline")}]
-                (media-attachments (:attachments activity-data))
-                [:div.activity-modal-footer.group
-                  (reactions activity-data)
-                  [:div.activity-modal-footer-right
-                    (when-not (:read-only activity-data)
+                (media-attachments (:attachments activity-data) nil nil)]
+              [:div.activity-modal-footer.group
+                {:class (when (and @(::first-render-done s)
+                                   (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
+                (reactions activity-data)
+                [:div.activity-modal-footer-right
+                  (when (or (utils/link-for (:links activity-data) "partial-update")
+                            (utils/link-for (:links activity-data) "delete"))
+                    (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
+                          same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
                       [:div.more-dropdown.dropdown
                         [:button.mlb-reset.activity-modal-more.dropdown-toggle
                           {:type "button"
@@ -149,15 +175,24 @@
                           {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
                           [:div.triangle]
                           [:ul.activity-modal-more-menu
-                            [:li
-                              {:on-click (fn [e]
-                                           (utils/event-stop e)
-                                           (dis/dispatch! [:entry-edit activity-data]))}
-                              "Edit"]
-                            [:li
-                              {:on-click #(delete-clicked % activity-data)}
-                              "Delete"]]]])]]]]]
-          [:div.activity-right-column
-            {:style (when column-height {:minHeight (str column-height "px")})}
-            [:div.activity-right-column-content
-              (comments activity-data)]]]]]))
+                            (when (utils/link-for (:links activity-data) "delete")
+                              [:li
+                                {:on-click (fn [e]
+                                             (utils/event-stop e)
+                                             (dis/dispatch! [:entry-edit activity-data]))}
+                                "Edit"])
+                            (when (utils/link-for (:links activity-data) "delete")
+                              [:li
+                                {:on-click #(delete-clicked % activity-data)}
+                                "Delete"])
+                            (when (utils/link-for (:links activity-data) "partial-update")
+                              [:li
+                                {:on-click #(reset! (::move-activity s) true)}
+                                "Move"])]]
+                        (when @(::move-activity s)
+                          (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))]]]]
+          (when show-comments?
+            [:div.activity-right-column
+              {:style (when column-height {:minHeight (str column-height "px")})}
+              [:div.activity-right-column-content
+                (comments activity-data)]])]]]))

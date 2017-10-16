@@ -18,6 +18,8 @@
 
 (def contact "/contact")
 
+(def help "https://help.carrot.io")
+
 (def home-try-it-focus (str home "?tif"))
 
 (def contact-email "hello@carrot.io")
@@ -50,6 +52,7 @@
 (def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")
+(def confirm-invitation-profile "/invite/profile")
 
 (def password-reset "/reset")
 
@@ -60,8 +63,6 @@
 (def user-profile "/profile")
 
 ;; Organizations
-
-(def orgs "/orgs")
 
 (def create-org "/create-org")
 
@@ -121,6 +122,8 @@
   "Board sorted by latest topic"
   ([]
     (board-sort-by-topic (router/current-org-slug) (router/current-board-slug)))
+  ([board-slug]
+   (board-sort-by-topic (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (board org-slug board-slug) "/by-topic")))
 
@@ -130,13 +133,6 @@
     (board-filter-by-topic (router/current-org-slug) (router/current-board-slug) topic-slug))
   ([org-slug board-slug topic-slug]
     (str (board org-slug board-slug) "/topic/" (name topic-slug))))
-
-(defn board-settings
-  "Board settings url"
-  ([]
-    (board-settings (router/current-org-slug) (router/current-board-slug)))
-  ([org-slug board-slug]
-    (str (board org-slug board-slug) "/settings")))
 
 ;; Storyboards
 

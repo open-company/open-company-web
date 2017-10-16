@@ -26,11 +26,13 @@
   (vec (conj (org-key org-slug) :calendar)))
 
 (defn board-key [org-slug board-slug]
-  (let [board-key (if board-slug (keyword board-slug) :all-activity)]
-    (vec (concat (org-key org-slug) [:boards board-key]))))
+  (vec (concat (org-key org-slug) [:boards (keyword board-slug)])))
 
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
+
+(defn secure-activity-key [org-slug secure-id]
+  (vec (concat (org-key org-slug) [:secure-stories secure-id])))
 
 (defn activity-key [org-slug board-slug activity-uuid]
   (let [board-key (if (= board-slug :all-activity)
@@ -38,14 +40,11 @@
                     (board-data-key org-slug board-slug))]
     (vec (concat board-key [:fixed-items activity-uuid]))))
 
-(defn secure-activity-key [org-slug secure-id]
-  (vec (concat (org-key org-slug) [:secure-stories secure-id])))
-
 (defn comments-key [org-slug board-slug]
- (vec (conj (board-key org-slug board-slug) :comments-data)))
+  (vec (conj (board-key org-slug board-slug) :comments-data)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
- (vec (conj (comments-key org-slug board-slug) activity-uuid)))
+  (vec (conj (comments-key org-slug board-slug) activity-uuid)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -77,6 +76,7 @@
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
+   :org-settings        [[:base] (fn [base] (:org-settings base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -100,6 +100,7 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
+   :about-carrot-modal  [[:base] (fn [base] (:about-carrot-modal base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -112,21 +113,17 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :invite-users        [[:base :team-data :current-user-data :team-roster :auth-settings]
-                          (fn [base team-data current-user-data team-roster auth-settings]
+   :invite-users        [[:base :team-data :current-user-data :team-roster]
+                          (fn [base team-data current-user-data team-roster]
                             {:team-data team-data
-                             :teams-data-requested (:teams-data-requested base)
-                             :auth-settings auth-settings
                              :invite-users (:invite-users base)
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
                         [[:base :query-params :org-data :team-data :auth-settings]
-                          (fn [base query-params org-data team-data auth-settings]
-                            {:auth-settings auth-settings
-                             :um-domain-invite (:um-domain-invite base)
+                          (fn [base query-params org-data team-data]
+                            {:um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
-                             :teams-data-requested (:teams-data-requested base)
                              :team-data team-data
                              :query-params query-params})]
    :all-activity        [[:base :org-slug]
@@ -147,22 +144,13 @@
                               (get-in base (board-data-key org-slug board-slug))))]
    :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
                           (fn [base org-slug board-slug activity-uuid secure-id]
-                            (when (and org-slug (or (and board-slug activity-uuid) secure-id))
-                              (if (and board-slug activity-uuid)
-                                (get-in base (activity-key org-slug board-slug activity-uuid))
-                                (get-in base (secure-activity-key org-slug secure-id)))))]
+                            (get-in base (activity-key org-slug board-slug (or activity-uuid secure-id))))]
    :comments-data       [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (let [comments-key (comments-key org-slug board-slug)
-                                    comments-data (get-in base comments-key)]
-                                comments-data)))]
-   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid]
-                          (fn [base org-slug board-slug activity-uuid]
-                            (when (and org-slug board-slug activity-uuid)
-                              (let [comments-key (activity-comments-key org-slug board-slug activity-uuid)
-                                    comments-data (get-in base comments-key)]
-                                comments-data)))]
+                        (fn [base org-slug board-slug]
+                          (get-in base (comments-key org-slug board-slug)))]
+   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid :secure-id]
+                           (fn [base org-slug board-slug activity-uuid secure-id]
+                              (get-in base (activity-comments-key org-slug board-slug (or activity-uuid secure-id))))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
@@ -192,6 +180,12 @@
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
+   :entry-edit-topics   [[:base :org-slug :board-slug :board-data :entry-editing]
+                          (fn [base org-slug board-slug board-data entry-editing]
+                            (if (:topics board-data)
+                              (:topics board-data)
+                              (let [edit-board-slug (:board-slug entry-editing)]
+                                (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]
@@ -200,7 +194,17 @@
                                 (assoc :board-data board-data))))]
    :story-editing-publish [[:base]
                            (fn [base]
-                              (:story-editing-published-url base))]})
+                              (:story-editing-published-url base))]
+   :confirm-invitation    [[:base :jwt]
+                            (fn [base jwt]
+                              {:invitation-confirmed (:email-confirmed base)
+                               :collect-pswd (:collect-pswd base)
+                               :collect-pswd-error (:collect-password-error base)
+                               :jwt jwt})]
+   :password-reset        [[:base :auth-settings]
+                            (fn [base auth-settings]
+                              {:auth-settings auth-settings
+                               :error (:collect-pswd-error base)})]})
 
 ;; Action Loop =================================================================
 

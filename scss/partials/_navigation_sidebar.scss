@@ -1,61 +1,99 @@
+@mixin default-item(){
+  background-color: transparent;
+  .internal, div.all-activity-label {
+    @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    color: $carrot_light_gray_3;
+    text-decoration: none;
+  }
+}
+
+@mixin item-selected(){
+  background-color: rgba($carrot_orange_1, 0.1);
+  .internal, div.all-activity-label {
+    color: $carrot_orange;
+    @include avenir_H();
+    font-size: 14px;
+    line-height: 1.71;
+    text-decoration: none;
+  }
+}
+
+@mixin item-selected-hover(){
+  background-color: rgba($carrot_light_gray_4, 0.2);
+  .internal, div.all-activity-label {
+    color: $carrot_dark_gray;
+    @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    text-decoration: none;
+  }
+}
+
 div.left-navigation-sidebar {
-  float: left;
+  position: absolute;
   position: fixed;
-  margin-right: 20px;
   max-height: calc(100vh - 122px);
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: visible;
   padding-bottom: 20px;
+  width: #{$left_navigation_sidebar_width}px;
+  top: 138px;
+  left: 0px;
+  height: calc(100vh - 138px);
 
   a.all-activity {
     display: block;
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 44px;
-    border-radius: 3px;
-    padding-left: 5px;
+    margin-bottom: 24px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    padding-left: 25px;
 
-    &.selected {
-      background-color: $carrot_light_blue;
-      color: #3E4547;
-    }
+    &.hover-item{
+      @include default-item();
 
-    &:hover {
-      text-decoration: underline;
+      * {
+        cursor: pointer;
+      }
+
+      &:not(.item-selected):hover {
+        @include item-selected-hover();
+      }
+
+      &.item-selected {
+        @include item-selected();
+      }
     }
 
     div.all-activity-label {
-      border-radius: 3px;
-      font-size: 14px;
-      color: $oc_gray_7;
-      @include avenir_M();
-      padding: 0.2rem 0.4rem;
+      padding: 5px 5px 0 5px;
       width: 135px;
       margin-left: 19px;
       text-align: left;
+      margin-left: 20px;
     }
 
     div.all-activity-icon {
       background-image: cdnUrl("/img/ML/activity_hamburger.svg");
-      background-size: 12px 12px;
+      background-size: 12px 11px;
       width: 12px;
-      height: 12px;
+      height: 11px;
       float: left;
-      margin-left: 4px;
-      margin-top: 5px;
+      margin-left: 0px;
+      margin-top: 8px;
     }
   }
 
   div.left-navigation-sidebar-top{
-    border-radius: 4px;
 
     .left-navigation-sidebar-top-title {
-      padding: 0 0 0 5px;
+      padding: 0 0 0 25px;
       margin: 0;
-      float: left;
-      width: #{$left_boards_list_width - 20 - 48}px;
-      margin-bottom: 12px;
+      margin-bottom: 24px;
 
       span {
         @include avenir_B();
@@ -66,13 +104,24 @@ div.left-navigation-sidebar {
         cursor: default;
       }
 
-      div.boards-icon, div.stories-icon {
-        background-size: 16px 16px;
-        width: 16px;
-        height: 16px;
+      div.boards-icon {
+        background-size: 12px 10px;
+        background-repeat: no-repeat;
+        width: 12px;
+        height: 10px;
         float: left;
-        margin-right: 5px;
-        margin-top: -3px;
+        margin-right: 7px;
+        margin-top: -1px;
+      }
+
+      div.stories-icon {
+        background-size: 13px 12px;
+        background-repeat: no-repeat;
+        width: 13px;
+        height: 12px;
+        float: left;
+        margin-right: 7px;
+        margin-top: -2px;
       }
 
       div.boards-icon {
@@ -86,12 +135,13 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 28px;
-      margin-top: -6px;
+      margin-right: 0px;
+      margin-top: -5px;
+      float: right;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
-      background-color: rgba(82,222,149,0.25);
+      background-color: #F0EFEA;
       background-image: cdnUrl("/img/ML/plus_button_icon.svg");
       background-repeat: no-repeat;
       background-position: 50%;
@@ -100,42 +150,46 @@ div.left-navigation-sidebar {
       @include avenir_H();
 
       &:hover {
-        background-color: #3FBD7C;
+        background-color: $carrot_green_2;
         background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
       }
     }
   }
 
   div.left-navigation-sidebar-items{
-    cursor: pointer;
-    margin-bottom: 44px;
+    margin-bottom: 24px;
 
-    div.left-navigation-sidebar-draft-divider {
-      width: 96px;
-      height: 2px;
-      background-color: rgba($carrot_light_gray, 0.3);
-      margin: 4px 30px;
+    div.left-navigation-sidebar-draft {
+      margin-top: 24px;
     }
 
     a.left-navigation-sidebar-item {
       display: block;
       cursor: default;
-      color: $oc_gray_7;
-      margin-top: 10px;
-      border-radius: 3px;
+      margin-top: 4px;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      padding-left: 20px;
 
-      &.selected {
-        background-color: $carrot_light_blue;
-        color: #3E4547;
-        @include avenir_H();
-        font-size: 14px;
-        line-height: 1.71;
+      &.hover-item {
+        @include default-item();
+        * {
+          cursor: pointer;
+        }
+
+        &:not(.item-selected):hover {
+          @include item-selected-hover();
+        }
+
+        &.item-selected {
+          @include item-selected();
+        }
       }
 
       img.public {
         float: left;
         margin-left: 6px;
-        margin-top: 2px;
+        margin-top: 6px;
         width: 16px;
         height: 16px;
       }
@@ -143,7 +197,7 @@ div.left-navigation-sidebar {
       img.private{
         float: left;
         margin-left: 8px;
-        margin-top: 3px;
+        margin-top: 7px;
         width: 10px;
         height: 14px;
       }
@@ -152,21 +206,16 @@ div.left-navigation-sidebar {
         margin-left: 25px;
 
         div.internal {
-          border-radius: 3px;
-          padding: 0.1rem 5px 0 5px;
+          padding: 5px 5px 0 5px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
           width: 133px;
           float: left;
-          font-size: 14px;
-          line-height: 1.71;
-          color: $oc_gray_7;
-          @include avenir_M();
           cursor: pointer;
 
-          &:hover {
-            text-decoration: underline;
+          .emojione {
+            @include emoji-size(12);
           }
         }
       }
@@ -174,10 +223,13 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
+    margin-left: 20px;
+    position: absolute;
+    bottom: 16px;
 
     button.about-carrot-btn {
       @include avenir_M();
-      margin-top: 10px;
+      margin-top: 4px;
       &:hover {
         text-decoration: underline;
       }

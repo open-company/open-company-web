@@ -102,10 +102,15 @@ div.comments {
       }
 
       p.comment-body {
+        @include avenir_M();
         font-size: 13px;
         color: rgba(78,90,107,0.8);
         font-weight: 300;
         margin: 0 0 0 #{$comment-avatar-size + 20}px;
+
+        .emojione {
+          @include emoji-size(12);
+        }
       }
 
       div.comment-footer {
@@ -128,7 +133,7 @@ div.comments {
 
       &.expanded{
         div.add-comment-internal {
-          textarea.add-comment {
+          div.add-comment {
             height: 70px;
             overflow: auto;
           }
@@ -136,21 +141,15 @@ div.comments {
       }
 
       div.user-avatar-img-container {
-        width: 23px;
-        height: 23px;
         float: left;
-
-        img.user-avatar-img {
-          max-width: 23px;
-          max-height: 23px;
-          border-radius: 11.5px;
-        }
       }
+
+      @include user-profile(23);
 
       div.add-comment-internal{
         margin-left: 35px;
 
-        textarea.add-comment {
+        div.add-comment {
           resize: none;
           width: 100%;
           border: none;
@@ -158,13 +157,22 @@ div.comments {
           @include avenir_R();
           background-color: transparent;
           color: $oc_gray_5;
-          height: 18px;
+          // height: 18px;
           font-size: 14px;
           transition: 230ms;
           overflow: hidden;
+          cursor: text;
 
-          @include placeholder {
+          .emojione {
+            @include emoji-size(12);
+          }
+
+          &:empty:before {
+            @include avenir_R();
+            font-size: 14px;
+            content: attr(placeholder);
             color: $carrot_light_gray_1;
+            cursor: text;
           }
         }
 

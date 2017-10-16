@@ -12,8 +12,7 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.icon :as i]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn close-overlay [e]
   (utils/event-stop e)
@@ -58,7 +57,8 @@
         slack-error [:span.block.red "There was an issue validating with Slack."]]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
-      (carrot-close-bt {:on-click close-overlay})
+      [:button.carrot-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
       [:div.login-overlay.login-with-slack
         {:on-click #(utils/event-stop %)}
         [:div.login-overlay-cta.pl2.pr2.group
@@ -100,7 +100,8 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (carrot-close-bt {:on-click close-overlay})
+    [:button.carrot-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
     [:div.login-overlay.login-with-email.group
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -173,7 +174,8 @@
 ;   [state]
 ;   [:div.login-overlay-container.group
 ;     {:on-click (partial close-overlay)}
-;     (carrot-close-bt {:on-click close-overlay})
+;     [:button.carrot-modal-close.mlb-reset
+;        {:on-click (partial close-overlay)}]
 ;     [:div.login-overlay.signup-with-email.group
 ;       {:on-click #(utils/event-stop %)}
 ;       [:div.login-overlay-cta.pl2.pr2.group
@@ -262,7 +264,7 @@
 ;                                (and (s/blank? (:firstname (:signup-with-email (rum/react dis/app-state))))
 ;                                     (s/blank? (:lastname (:signup-with-email (rum/react dis/app-state)))))
 ;                                (gobj/get (gobj/get (sel1 [:input.email]) "validity") "patternMismatch")
-;                                (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 5))
+;                                (< (count (:pswd (:signup-with-email (rum/react dis/app-state)))) 8))
 ;                  :on-click #(do
 ;                               (utils/event-stop %)
 ;                               (dis/dispatch! [:signup-with-email]))}
@@ -278,7 +280,8 @@
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
-    (carrot-close-bt {:on-click close-overlay})
+    [:button.carrot-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
     [:div.login-overlay.password-reset
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay-cta.pl2.pr2.group
@@ -387,7 +390,7 @@
               [:button.mlb-reset.mlb-default
                 {:disabled (or (and (s/blank? (:firstname (:collect-name-pswd (rum/react dis/app-state))))
                                     (s/blank? (:lastname (:collect-name-pswd (rum/react dis/app-state)))))
-                               (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 5))
+                               (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 8))
                  :on-click #(do
                               (utils/event-stop %)
                               (dis/dispatch! [:name-pswd-collect]))}
@@ -400,7 +403,8 @@
                                               ; initialise the keys to string to avoid jumps in UI focus
                                               (utils/after 500
                                                  #(dis/dispatch! [:input [:collect-pswd] {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
-                                             (utils/after 100 #(.focus (sel1 [:input.pswd])))
+                                             (utils/after 1000 #(when-let [pswd-el (sel1 [:input.sign-in-field.pswd])]
+                                                                  (.focus pswd-el)))
                                              s)})
   [state]
   [:div.login-overlay-container.group
@@ -433,11 +437,11 @@
                :name "pswd"}]]
           [:div.group.my3
             [:div.right
-              [:button.mlb-reset.mlb-defautl
-                {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 5)
+              [:button.mlb-reset.mlb-default
+                {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                  :on-click #(do
                               (utils/event-stop %)
-                              (dis/dispatch! [:pswd-collect]))}
+                              (dis/dispatch! [:pswd-collect true]))}
                 "Let Me In"]]]]]]])
 
 (rum/defcs login-overlays-handler < rum/static

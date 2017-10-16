@@ -7,27 +7,53 @@ div.org-settings-main {
       width: 64px;
       height: 64px;
       text-align: center;
-      margin-right: 16px;
 
-      &.no-logo {
-        border: 1px solid $carrot_light_gray;
-        border-radius: 4px;
-        opacity: 0.2;
+      div.org-avatar {
 
-        img.org-logo {
-          margin-top: 8px;
-          height: 48px;
+        &.missing-logo {
+          border: 1px solid $carrot_light_gray;
+          border-radius: 4px;
+          opacity: 0.2;
+          position: relative;
+
+          &:after {
+            content: "";
+            background-image: cdnUrl("/img/ML/carrot_grey.svg");
+            background-position: 50%;
+            background-size: 23px 48px;
+            background-repeat: no-repeat;
+            width: 64px;
+            height: 64px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
         }
-      }
 
-      img.org-logo {
-        max-width: 64px;
-        max-height: 64px;
-        cursor: pointer;
+        div.org-avatar-container {
+          height: 64px;
+          width: 64px;
+
+          div.org-avatar-border {
+            height: 64px;
+            width: 64px;
+            padding: 0px;
+
+            img {
+              max-width: 64px;
+              max-height: 64px;
+              text-align: center;
+            }
+          }
+        }
       }
     }
 
     div.org-logo-label {
+      float: left;
+      margin-left: 16px;
+      margin-top: 8px;
+
       div.cta {
         @include avenir_H();
         font-size: 16px;
@@ -90,6 +116,12 @@ div.org-settings-main {
       float: left;
       width: 61px;
       height: 40px;
+    }
+  }
+
+  button.save-btn {
+    &.no-disable {
+      opacity: 1 !important;
     }
   }
 

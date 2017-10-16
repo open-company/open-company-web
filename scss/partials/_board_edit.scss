@@ -4,7 +4,7 @@ div.board-edit-container {
   position: fixed;
   top: 0px;
   left: 0px;
-  background-color: rgba(250,250,257,0.95);
+  background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 100};
   transition: opacity 180ms ease-in;
   overflow-y: auto;
@@ -17,251 +17,262 @@ div.board-edit-container {
     opacity: 1;
   }
 
-  div.board-edit {
+  div.modal-wrapper {
+    width: #{552 + 20 + 8}px;
     margin: 100px auto;
-    position: relative;
-    width: 552px;
     height: 387px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-    padding: 24px 16px;
+    position: relative;
 
-    &.show-slack-channels {
-      height: 500px;
-    }
+    div.board-edit {
+      margin: 0px 0px 0px 28px;
+      position: relative;
+      width: 552px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+      padding: 24px 16px;
 
-    span.more-info {
-      width: 16px;
-      height: 16px;
-      background-image: cdnUrl("/img/ML/board_edit_more_info.svg");
-      background-size: 16px 16px;
-      background-position: 50%;
-      display: inline-block;
-      margin-left: 10px;
-      margin-bottom: -1px;
-      opacity: 0.5;
-    }
-
-    div.board-edit-header {
-      height: 44px;
-
-      div.user-avatar-img-container{
-        margin-right: 16px;
-        float: left;
-
-        img {
-          max-width: 32px;
-          max-height: 32px;
-          border-radius: 16px;
-        }
+      &.show-slack-channels {
+        height: 500px;
       }
 
-      div.title {
-        @include avenir_M();
-        font-size: 16px;
-        color: $carrot_light_gray_1;
-        float: left;
-        margin-top: 5px;
-
-        span.board-name {
-          color: $oc_gray_7;
-          @include avenir_H();
-        }
-      }
-    }
-
-    div.board-edit-divider {
-      width: calc(100% + 48px);
-      margin-left: -24px;
-      height: 1px;
-      background-color: $carrot_light_gray_1;
-      opacity: 0.3;
-    }
-
-    div.board-edit-body {
-      margin-bottom: 16px;
-
-      div.board-edit-label {
-        @include avenir_H();
-        font-size: 12px;
-        color: $oc_gray_7;
+      span.more-info {
+        width: 16px;
+        height: 16px;
+        background-image: cdnUrl("/img/ML/board_edit_more_info.svg");
+        background-size: 16px 16px;
+        background-position: 50%;
+        display: inline-block;
+        margin-left: 10px;
+        margin-bottom: -1px;
+        opacity: 0.5;
       }
 
-      div.board-edit-name-label-container {
-        margin-top: 16px;
-        height: 22px;
+      div.board-edit-header {
+        height: 44px;
 
-        div.board-edit-name-label {
-          width: 135px;
+        div.user-avatar-img-container{
+          margin-right: 16px;
           float: left;
-          margin-top: 4px;
         }
 
-        div.board-name-error {
-          color: $carrot_orange;
+        @include user-profile(32);
+
+        div.title {
+          @include avenir_M();
           font-size: 16px;
-          @include avenir_R();
-          margin-left: 10px;
+          color: $carrot_light_gray_1;
           float: left;
+          margin-top: 5px;
+
+          span.board-name {
+            color: $oc_gray_7;
+            @include avenir_H();
+
+            .emojione {
+              @include emoji-size(14);
+            }
+          }
         }
       }
 
-      input.board-edit-name-field {
-        border-radius: 2px;
-        background-color: white;
-        border: 1px solid rgba($carrot_light_gray_1, 0.5);
-        width: 100%;
-        margin-top: 6px;
-        height: 40px;
-        @include avenir_M();
-        font-size: 14px;
-        color: $oc_gray_7;
-        padding: 0.4rem 0.8rem;
-        outline: none;
+      div.board-edit-divider {
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        height: 1px;
+        background-color: $carrot_light_gray_1;
+        opacity: 0.3;
+      }
 
-        @include placeholder() {
+      div.board-edit-body {
+        margin-bottom: 16px;
+
+        div.board-edit-label {
+          @include avenir_H();
+          font-size: 12px;
+          color: $oc_gray_7;
+        }
+
+        div.board-edit-name-label-container {
+          margin-top: 16px;
+          height: 22px;
+
+          div.board-edit-name-label {
+            width: 135px;
+            float: left;
+            margin-top: 4px;
+          }
+
+          div.board-name-error {
+            color: $carrot_orange;
+            font-size: 16px;
+            @include avenir_R();
+            margin-left: 10px;
+            float: left;
+          }
+        }
+
+        div.board-edit-name-field {
+          border-radius: 2px;
+          background-color: white;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          width: 100%;
+          margin-top: 6px;
+          height: 40px;
           @include avenir_M();
           font-size: 14px;
-          color: $carrot_light_gray_1;
-        }
+          color: $oc_gray_7;
+          padding: 10px 16px;
+          outline: none;
 
-        &.board-name-error {
-          border: 1px solid $carrot_orange;
-        }
-      }
+          .emojione {
+            @include emoji-size(13);
+          }
 
-      div.board-edit-access-label {
-        margin-top: 26px;
-      }
+          &:empty:before {
+            @include avenir_M();
+            font-size: 14px;
+            color: $carrot_light_gray_1;
+            content: attr(placeholder);
+          }
 
-      div.board-edit-access-field {
-        width: 100%;
-        height: 96px;
-        margin-top: 6px;
-
-        div.tooltip {
-          .tooltip-inner {
-            white-space: normal;
-            max-width: 150px;
-            text-align: center;
+          &.board-name-error {
+            border: 1px solid $carrot_orange;
           }
         }
 
-        div.board-edit-access-bt {
-          width: 33%;
-          border: 1px solid rgba($carrot_light_gray_1, 0.5);
-          padding: 1px;
+        div.board-edit-access-label {
+          margin-top: 26px;
+        }
+
+        div.board-edit-access-field {
+          width: 100%;
           height: 96px;
-          float: left;
-          cursor: pointer;
-          background-position: 50% 15px;
-          background-size: 38px 38px;
-          background-repeat: no-repeat;
-          text-align: center;
+          margin-top: 6px;
 
-          &:first-child {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
+          div.tooltip {
+            .tooltip-inner {
+              white-space: normal;
+              max-width: 150px;
+              text-align: center;
+            }
           }
 
-          &:last-child {
-            border-top-right-radius: 8px;
-            border-bottom-bottom-radius: 8px;
-          }
+          div.board-edit-access-bt {
+            width: 33%;
+            border: 1px solid rgba($carrot_light_gray_1, 0.5);
+            padding: 1px;
+            height: 96px;
+            float: left;
+            cursor: pointer;
+            background-position: 50% 15px;
+            background-size: 38px 38px;
+            background-repeat: no-repeat;
+            text-align: center;
 
-          &.selected {
-            border: 2px solid $carrot_text_blue;
-            background-position: 50% 14px;
-            padding: 0px;
-          }
+            &:first-child {
+              border-top-left-radius: 8px;
+              border-bottom-left-radius: 8px;
+            }
 
-          &.board-edit-access-team-bt {
-            background-image: cdnUrl("/img/ML/board_edit_access_team.svg");
-          }
+            &:last-child {
+              border-top-right-radius: 8px;
+              border-bottom-bottom-radius: 8px;
+            }
 
-          &.board-edit-access-private-bt {
-            background-image: cdnUrl("/img/ML/board_edit_access_private.svg");
-          }
+            &.selected {
+              border: 2px solid $carrot_text_blue;
+              background-position: 50% 14px;
+              padding: 0px;
+            }
 
-          &.board-edit-access-public-bt {
-            background-image: cdnUrl("/img/ML/board_edit_access_public.svg");
-          }
+            &.board-edit-access-team-bt {
+              background-image: cdnUrl("/img/ML/board_edit_access_team.svg");
+            }
 
-          span.board-edit-access-title {
-            position: relative;
-            top: 60px;
-            color: $carrot_dark_gray;
+            &.board-edit-access-private-bt {
+              background-image: cdnUrl("/img/ML/board_edit_access_private.svg");
+            }
+
+            &.board-edit-access-public-bt {
+              background-image: cdnUrl("/img/ML/board_edit_access_public.svg");
+            }
+
+            span.board-edit-access-title {
+              position: relative;
+              top: 60px;
+              color: $carrot_dark_gray;
+              font-size: 16px;
+              @include avenir_H();
+              @include no-user-select();
+            }
+          }
+        }
+      }
+
+      div.board-edit-slack-channels-container {
+        background-color: rgba($carrot_light_gray_2, 0.3);
+        height: 114px;
+        border-bottom: 1px solid rgba($carrot_light_gray_1, 0.3);
+        width: calc(100% + 32px);
+        margin-left: -16px;
+        padding: 16px;
+
+        div.board-edit-slack-channels-label {
+          div.title {
             font-size: 16px;
-            @include avenir_H();
-            @include no-user-select();
+            color: $carrot_dark_gray;
+            @include avenir_M();
+            float: left;
+            width: 70%;
+          }
+
+          div.carrot-checkbox {
+            float: right;
           }
         }
-      }
-    }
 
-    div.board-edit-slack-channels-container {
-      background-color: rgba($carrot_light_gray_2, 0.3);
-      height: 114px;
-      border-bottom: 1px solid rgba($carrot_light_gray_1, 0.3);
-      width: calc(100% + 32px);
-      margin-left: -16px;
-      padding: 16px;
-
-      div.board-edit-slack-channels-label {
-        div.title {
-          font-size: 16px;
-          color: $carrot_dark_gray;
-          @include avenir_M();
-          float: left;
-          width: 70%;
-        }
-
-        div.carrot-checkbox {
-          float: right;
+        div.slack-channels-dropdown {
+          margin: 16px 0px;
         }
       }
 
-      div.slack-channels-dropdown {
-        margin: 16px 0px;
-      }
-    }
-
-    div.board-edit-footer {
-      height: 40px;
-      margin-top: 15px;
-
-      div.board-edit-footer-left {
-        float: left;
-        button {
-          float: left;
-          margin-right: 16px;
-          padding-left: 0px;
-          text-align: left;
-        }
-
-        button.cancel-btn {
-          color: $oc_gray_7;
-        }
-
-        button.delete-board {
-          color: $oc_gray_7;
-          @include avenir_M();
-          font-size: 16px;
-        }
-      }
-
-      div.board-edit-footer-right {
-        float: right;
-        button {
-          float: right;
-          margin-left: 16px;
-          width: 115px;
-        }
-      }
-
-      button {
+      div.board-edit-footer {
         height: 40px;
+        margin-top: 15px;
+
+        div.board-edit-footer-left {
+          float: left;
+          button {
+            float: left;
+            margin-right: 16px;
+            padding-left: 0px;
+            text-align: left;
+          }
+
+          button.cancel-btn {
+            color: $oc_gray_7;
+          }
+
+          button.delete-board {
+            color: $oc_gray_7;
+            @include avenir_M();
+            font-size: 16px;
+          }
+        }
+
+        div.board-edit-footer-right {
+          float: right;
+          button {
+            float: right;
+            margin-left: 16px;
+            width: 115px;
+          }
+        }
+
+        button {
+          height: 40px;
+        }
       }
     }
   }

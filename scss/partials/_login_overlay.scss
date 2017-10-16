@@ -8,7 +8,7 @@ div.login-overlay-container {
   padding: 0px;
   opacity: 1;
   transition: 230ms;
-  background-color: rgba(250,250,257,0.95);
+  background-color: $carrot_modal_bg;
 
   @include mobile{
     width: 100%;
@@ -19,7 +19,7 @@ div.login-overlay-container {
     background-color: white;
   }
 
-  button.carrot-close-bt {
+  button.carrot-modal-close {
     position: absolute;
     left: 50%;
     margin-left: -282px;

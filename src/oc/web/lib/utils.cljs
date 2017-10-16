@@ -277,23 +277,15 @@
          (nil? update-link)
          (nil? delete-link))))
 
-(defn readonly-topic? [links]
-  (let [create (link-for links "create")
-        partial-update (link-for links "partial-update")
-        delete (link-for links "delete")]
-    (and (nil? create) (nil? partial-update) (nil? delete))))
-
 (defn readonly-entry? [links]
-  (let [create (link-for links "create")
-        partial-update (link-for links "partial-update")
+  (let [partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
-    (and (nil? create) (nil? partial-update) (nil? delete))))
+    (and (nil? partial-update) (nil? delete))))
 
 (defn readonly-story? [links]
-  (let [create (link-for links "create")
-        partial-update (link-for links "partial-update")
+  (let [partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
-    (and (nil? create) (nil? partial-update) (nil? delete))))
+    (and (nil? partial-update) (nil? delete))))
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -307,17 +299,6 @@
         fixed-topic (assoc topic-body :data sorted-finances)]
     fixed-topic))
 
-(defn fix-topic
-  "Add `:topic` name and `:as-of` keys to the topic map"
-  [topic-body topic-name & [read-only force-write]]
-  (let [with-keys (-> topic-body
-                      (assoc :topic (name topic-name))
-                      (assoc :as-of (:created-at topic-body))
-                      (assoc :read-only (readonly-topic? (:links topic-body))))]
-    (if (= topic-name :finances)
-      (fix-finances with-keys)
-      with-keys)))
-
 (defn css-color [color]
   (let [colors (subvec (clojure.string/split color #"") 2)
         red (take 2 colors)
@@ -330,22 +311,24 @@
 
 (defn fix-entry
   "Add `:read-only` and `:topic-name` keys to the entry map"
-  [entry-body board-slug topics-data]
+  [entry-body board-data topics-data]
   (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :board-slug board-slug)
+      (assoc :board-slug (:slug board-data))
+      (assoc :board-name (:name board-data))
       (assoc :type "entry")
       (assoc :topic-name topic-name))))
 
 (defn fix-story
   "Add `:read-only`, :board-slug and :uuid keys to the story map."
-  [story-body storyboard-slug]
+  [story-body storyboard-data]
   (-> story-body
     (assoc :read-only (readonly-story? (:links story-body)))
     (assoc :type "story")
-    (assoc :related (when (:related story-body) (map #(fix-story % (:storyboard-slug %)) (:related story-body))))
-    (assoc :board-slug storyboard-slug)))
+    (assoc :related (when (:related story-body) (map #(fix-story % {:slug (:storyboard-slug %) :name (:storyboard-name %)}) (:related story-body))))
+    (assoc :board-slug (:slug storyboard-data))
+    (assoc :board-name (:name storyboard-data))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
@@ -353,7 +336,7 @@
   (let [links (:links board-data)
         read-only (readonly-storyboard? links)
         with-read-only (assoc board-data :read-only read-only)
-        fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % (:slug board-data) (:topics board-data)) (:entries board-data)))
+        fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
         with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
     with-fixed-entries))
@@ -364,21 +347,21 @@
   (let [links (:links storyboard-data)
         read-only (readonly-board? links)
         with-read-only (assoc storyboard-data :read-only read-only)
-        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % (or (:storyboard-slug %) (:slug storyboard-data))) (:stories storyboard-data)))
+        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % storyboard-data) (:stories storyboard-data)))
         without-stories (dissoc with-read-only :stories)
         with-fixed-stories (assoc without-stories :fixed-items fixed-stories)]
     with-fixed-stories))
 
-(defn fix-activity [activity collection-slug]
+(defn fix-activity [activity collection-data]
   (if (:board-slug activity)
-    (fix-entry activity collection-slug nil)
-    (fix-story activity collection-slug)))
+    (fix-entry activity collection-data nil)
+    (fix-story activity collection-data)))
 
 (defn fix-all-activity
   "Fix org data coming from the API."
   [all-activity-data]
-  (assoc all-activity-data :items (vec (map #(fix-activity % (or (:board-slug %) (:storyboard-slug %))) (:items all-activity-data))))
-  (let [fixed-activities-list (map #(fix-activity % (or (:board-slug %) (:storyboard-slug %))) (:items all-activity-data))
+  (assoc all-activity-data :items (vec (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-activity-data))))
+  (let [fixed-activities-list (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-activity-data))
         without-items (dissoc all-activity-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
@@ -1065,7 +1048,13 @@
       (pulse-animation el))))
 
 (defn cdn [img-src & [no-deploy-folder]]
-  (str (when-not (empty? ls/cdn-url) (str ls/cdn-url (when no-deploy-folder (str "/" ls/deploy-key)))) img-src))
+  (let [use-cdn? (empty? ls/cdn-url)
+        cdn (if use-cdn? "" (str "/" ls/cdn-url))
+        deploy-key (if (empty? ls/deploy-key) "" (str "/" ls/deploy-key))
+        with-deploy-folder (if no-deploy-folder
+                             cdn
+                             (str cdn deploy-key))]
+    (str (when use-cdn? with-deploy-folder) img-src)))
 
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
@@ -1090,9 +1079,40 @@
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
-(defn activity-date [js-date]
+(defn activity-date-string [js-date hide-time]
   (let [time-string (format-time-string js-date)]
-    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) " at " time-string)))
+    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) (when-not hide-time (str " at " time-string)))))
+
+(defn activity-date
+  "Get a string representing the elapsed time from a date in the past"
+  [past-js-date & [hide-time]]
+  (let [past (.getTime past-js-date)
+        now (.getTime (js-date))
+        seconds (.floor js/Math (/ (- now past) 1000))
+        years-interval (.floor js/Math (/ seconds 31536000))
+        months-interval (.floor js/Math (/ seconds 2592000))
+        days-interval (.floor js/Math (/ seconds 86400))
+        hours-interval (.floor js/Math (/ seconds 3600))
+        minutes-interval (.floor js/Math (/ seconds 60))]
+    (cond
+      (pos? years-interval)
+      (str "on " (activity-date-string past-js-date hide-time))
+
+      (or (pos? months-interval)
+          (> days-interval 7))
+      (str "on " (activity-date-string past-js-date hide-time))
+
+      (pos? days-interval)
+      (str days-interval " " (pluralize "day" days-interval) " ago")
+
+      (pos? hours-interval)
+      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+
+      (pos? minutes-interval)
+      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+
+      :else
+      "just now")))
 
 (defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (:created-at entry-data))
@@ -1100,8 +1120,8 @@
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]
     (if (= (:created-at entry-data) (:updated-at entry-data))
-      (str "Posted on " created-str)
-      (str "Posted on " created-str "\nEdited on " updated-str " by " (:name (last (:author entry-data)))))))
+      (str "Posted " created-str)
+      (str "Posted " created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
 
 (defn story-date-tooltip [story-data]
   (let [published-at (js-date (:published-at story-data))
@@ -1110,8 +1130,8 @@
         published-str (activity-date published-at)
         updated-str (activity-date updated-at)]
     (if (not edited-later?)
-      (str "Posted on " published-str)
-      (str "Posted on " published-str "\nEdited on " updated-str " by " (:name (last (:author story-data)))))))
+      (str "Posted " published-str)
+      (str "Posted " published-str "\nEdited " updated-str " by " (:name (last (:author story-data)))))))
 
 (defn activity-date-tooltip [activity-data]
   (if (= (:type activity-data) "entry")

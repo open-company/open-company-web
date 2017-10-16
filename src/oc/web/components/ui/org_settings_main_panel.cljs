@@ -8,21 +8,16 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
-(defn reset-form [s keep?]
+(defn reset-form [s]
   (let [org-data (first (:rum/args s))
-        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))
-        domain (if (and keep?
-                        um-domain-invite
-                        (:domain um-domain-invite))
-                  (:domain um-domain-invite)
-                  "")]
-    (dis/dispatch! [:org-edit org-data keep?])
-    (dis/dispatch! [:input [:um-domain-invite :domain] domain])
-    (when-not keep?
-      (dis/dispatch! [:input [:add-email-domain-team-error] nil]))))
+        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
+    (dis/dispatch! [:org-edit org-data])
+    (dis/dispatch! [:input [:um-domain-invite :domain] ""])
+    (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
 (defn logo-on-load [org-data url img]
   (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
@@ -43,20 +38,20 @@
 
 (rum/defcs org-settings-main-panel
   < rum/reactive
+    (rum/local false ::saving)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
     {:will-mount (fn [s]
-                   (reset-form s true)
+                   (reset-form s)
                    s)
-     :before-render (fn [s]
-                     (let [team-management-data @(drv/get-ref s :org-settings-team-management)
-                           auth-settings (:auth-settings team-management-data)
-                           teams-data-requested (:teams-data-requested team-management-data)]
-                       (when (and auth-settings
-                                  (not teams-data-requested))
-                         (dis/dispatch! [:teams-get])))
-                     s)
+     :will-update (fn [s]
+                    (let [org-editing @(drv/get-ref s :org-editing)]
+                      (when (and @(::saving s)
+                                 (:saved org-editing))
+                        (reset! (::saving s) false)
+                        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))))
+                    s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
@@ -90,29 +85,26 @@
         ;; Org logo row
         [:div.org-settings-panel-row.org-logo-row.group
           {:on-click (fn [_]
+                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0})])
                       (iu/upload! {:accept "image/*"}
-                      (fn [res]
-                        (let [url (gobj/get res "url")
-                              img (gdom/createDom "img")]
-                          (set! (.-onload img) #(logo-on-load org-editing url img))
-                          (set! (.-className img) "hidden")
-                          (gdom/append (.-body js/document) img)
-                          (set! (.-src img) url)))
-                      nil
-                      (fn [err]
-                        (logo-add-error))))}
+                        (fn [res]
+                          (let [url (gobj/get res "url")
+                                img (gdom/createDom "img")]
+                            (set! (.-onload img) #(logo-on-load org-editing url img))
+                            (set! (.-className img) "hidden")
+                            (gdom/append (.-body js/document) img)
+                            (set! (.-src img) url)))
+                        nil
+                        (fn [err]
+                          (logo-add-error))))}
           [:div.org-logo-container
             {:title (if (empty? (:logo-url org-editing))
                       "Add a logo"
                       "Change logo")
              :data-toggle "tooltip"
              :data-container "body"
-             :data-position "top"
-             :class (when (empty? (:logo-url org-editing)) "no-logo")}
-            [:img.org-logo
-              {:src (if (empty? (:logo-url org-editing))
-                      (utils/cdn "/img/ML/carrot_grey.svg")
-                      (:logo-url org-editing))}]]
+             :data-position "top"}
+            (org-avatar org-editing false false true)]
           [:div.org-logo-label
             [:div.cta
               (if (empty? (:logo-url org-editing))
@@ -217,9 +209,18 @@
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
-          {:disabled (not (:has-changes org-editing))
-           :on-click #(dis/dispatch! [:org-edit-save])}
-          "Save"]
+          {:disabled (or @(::saving s)
+                         (:saved org-editing)
+                         (not (:has-changes org-editing)))
+           :class (when (:saved org-editing) "no-disable")
+           :on-click #(do
+                        (reset! (::saving s) true)
+                        (dis/dispatch! [:org-edit-save]))}
+          (if (:saved org-editing)
+            "Saved!"
+            (if @(::saving s)
+              "Saving..."
+              "Save"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(reset-form s false)}
+          {:on-click #(do (reset-form s) (dis/dispatch! [:org-settings-hide]))}
           "Cancel"]]]))

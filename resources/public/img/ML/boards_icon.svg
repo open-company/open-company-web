@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="12px" height="9px" viewBox="0 0 12 9" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
-    <title>ic_view_quilt_black_24px</title>
+<svg width="12px" height="10px" viewBox="0 0 12 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>Icon - Boards</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Components-/-Navigation-/-Design" transform="translate(-3.000000, -71.000000)">
-            <g transform="translate(1.000000, 0.000000)" id="Boards">
-                <g transform="translate(0.000000, 64.000000)">
-                    <g id="Title">
-                        <g id="ic_view_quilt_black_24px" transform="translate(0.000000, 4.000000)">
-                            <g id="Group">
-                                <path d="M6.66666667,12 L10,12 L10,8 L6.66666667,8 L6.66666667,12 Z M2.66666667,12 L6,12 L6,3.33333333 L2.66666667,3.33333333 L2.66666667,12 Z M10.6666667,12 L14,12 L14,8 L10.6666667,8 L10.6666667,12 Z M6.66666667,3.33333333 L6.66666667,7.33333333 L14,7.33333333 L14,3.33333333 L6.66666667,3.33333333 Z" id="Shape" fill="#637282" fill-rule="nonzero"></path>
-                                <polygon id="Shape" points="0 0 16 0 16 16 0 16"></polygon>
-                            </g>
-                        </g>
-                    </g>
+    <g id="September-5th---Stories-Cont." stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="5.-Stories-Index" transform="translate(-31.000000, -171.000000)">
+            <g id="Icon---Boards" transform="translate(29.000000, 168.000000)">
+                <g>
+                    <polygon id="Shape" points="0 0 16 0 16 16 0 16"></polygon>
+                    <path d="M2,3 L7,3 L7,7 L2,7 L2,3 Z M9,3 L14,3 L14,7 L9,7 L9,3 Z M2,9 L7,9 L7,13 L2,13 L2,9 Z M9,9 L14,9 L14,13 L9,13 L9,9 Z" id="Combined-Shape" fill="#C8C4BB"></path>
                 </g>
             </g>
         </g>

@@ -6,26 +6,11 @@ $h2_top_margin: 20;
 
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
-    height: #{$avatar_size}px;
     float: left;
-    white-space: nowrap;
-    width: #{$avatar_size};
-    text-align: center;
     margin-right: 16px;
-
-    div.user-avatar-img-helper {
-      display: inline-block;
-      height: 100%;
-      vertical-align: middle;
-    }
-
-    img.user-avatar-img {
-      max-width: #{$avatar_size}px;
-      max-height: #{$avatar_size}px;
-      border-radius: #{$avatar_size / 2}px;
-      vertical-align: middle;
-    }
   }
+
+  @include user-profile($avatar_size);
 
   div.name {
     overflow: hidden;
@@ -55,21 +40,70 @@ $h2_top_margin: 20;
 
 @mixin activity-tag(){
   div.activity-tag {
-    display: inline;
+    display: inline-block;
     height: 26px;
     border-radius: 4px;
-    @include avenir_H();
+    @include avenir_B();
     font-size: 12px;
-    color: $carrot_text_blue;
-    background-color: rgba($carrot_text_blue, 0.25);
+    color: $carrot_light_gray_3;
+    background-color: #E4E3DE;
     line-height: 14px;
     text-align: center;
-    padding: .5em .9em;
+    padding: 7px 11px;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 
     &:hover {
       background-color: $carrot_text_blue;
       color: white;
+      cursor: pointer;
+    }
+
+    &.board-tag {
+      margin-right: 2px;
+
+      &:hover {
+        background-color: $carrot_orange;
+        &:before {
+          background-image: cdnUrl("/img/ML/boards_icon_white.png");
+        }
+      }
+
+      &:before {
+        display: inline-block;
+        margin-right: 4px;
+        content: "";
+        background-image: cdnUrl("/img/ML/boards_icon_gray.png");
+        background-size: 12px 10px;
+        background-repeat: no-repeat;
+        width: 12px;
+        height: 10px;
+      }
+    }
+
+    &.storyboard-tag {
+      margin-right: 2px;
+
+      &:hover {
+        background-color: $carrot_orange;
+        &:before {
+          background-image: cdnUrl("/img/ML/storyboards_icon_white.png");
+        }
+      }
+
+      &:before {
+        display: inline-block;
+        margin-right: 4px;
+        content: "";
+        background-image: cdnUrl("/img/ML/storyboards_icon_gray.png");
+        background-size: 12px 10px;
+        background-repeat: no-repeat;
+        width: 12px;
+        height: 10px;
+      }
     }
   }
 }
@@ -169,8 +203,11 @@ $h2_top_margin: 20;
   a.media-attachment {
     display: inline-block;
     width: 100%;
-    height: 26px;
-    padding: 0;
+    height: 56px;
+    padding: 13px 16px;
+    background-color: #F0EFEA;
+    border-radius: 4px;
+    margin-top: 4px;
 
     & > * {
       opacity: 0.8;
@@ -194,14 +231,16 @@ $h2_top_margin: 20;
     i.file-mimetype {
       width: 30px;
       height: 30px;
+      background-color: white;
+      border-radius: 15px;
       color: $oc_gray_5;
       float: left;
-      font-size: 24px;
-      margin-top: 2px;
+      font-size: 16px;
+      padding: 7px 9px;
+      margin-top: -2px;
     }
 
     label {
-      color: $oc_gray_5;
       float: left;
       width: calc(100% - 30px - 30px);
       height: 20px;
@@ -211,22 +250,24 @@ $h2_top_margin: 20;
     }
 
     label.media-attachment-title {
-      font-size: 12px;
+      font-size: 13px;
       @include avenir_H();
-      color: $oc_gray_7;
+      color: $carrot_dark_gray;
+      margin-left: 8px;
     }
 
     label.media-attachment-subtitle {
-      font-size: 10px;
-      @include avenir_B();
-      color: $carrot_light_gray;
+      font-size: 12px;
+      @include avenir_R();
+      color: rgba($oc_gray_7, 0.5);
+      margin-left: 8px;
     }
 
     button.remove-attachment {
       float: right;
       width: 25px;
       height: 25px;
-      margin: -15px 0 0 0;
+      margin: -35px 0 0 0;
       padding: 0;
       color: $oc_gray_5;
       display: none;

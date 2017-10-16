@@ -31,13 +31,7 @@
   < rum/reactive
     (drv/drv :invite-users)
     (rum/local false ::resending-invite)
-    {:before-render (fn [s]
-                     (let [teams-load-data @(drv/get-ref s :invite-users)]
-                       (when (and (:auth-settings teams-load-data)
-                                  (not (:teams-data-requested teams-load-data)))
-                         (dis/dispatch! [:teams-get])))
-                     s)
-     :after-render (fn [s]
+    {:after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
                         (.tooltip "hide"))
@@ -68,7 +62,7 @@
                         author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)
                         remove-fn (fn []
                                     (let [alert-data {:icon "/img/ML/trash.svg"
-                                                      :message "Cancel invitation?"
+                                                      :message (if (= "pending" (:status user)) "Cancel invitation?" "Remove user?")
                                                       :link-button-title "No"
                                                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                                       :solid-button-title "Yes"
@@ -79,9 +73,15 @@
                                       (dis/dispatch! [:alert-modal-show alert-data])))]]
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
-                [:td
+                [:td.user-name
+                  {:class (when (some #(= (:status %) "pending") (:users team-data)) "has-pending")}
                   (user-avatar-image user)
-                  (utils/name-or-email user)]
+                  (let [display-name (utils/name-or-email user)]
+                    [:div.user-name-label
+                      {:title (if (not= display-name (:email user)) (:email user) "")
+                       :data-toggle "tooltip"
+                       :data-placement "top"}
+                      display-name])]
                 [:td.status-column
                   [:div.status-column-inner.group
                     [:div.status-label (s/capital (:status user))]

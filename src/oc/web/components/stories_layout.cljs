@@ -11,9 +11,11 @@
 (defn get-sorted-stories [storyboard-data]
   (vec (reverse (sort-by :published-at (vals (:fixed-items storyboard-data))))))
 
+(def default-vertical-line-max-height 359)
+
 (rum/defc stories-layout < rum/static
                            {:after-render (fn [s]
-                                            (dommy/set-style! (sel1 [:div.stories-vertical-line]) :height (str (+ (.-clientHeight (sel1 [:div.story-cards-container])) 30) "px"))
+                                            (dommy/set-style! (sel1 [:div.stories-vertical-line]) :height (str (max default-vertical-line-max-height (+ (.-clientHeight (sel1 [:div.story-cards-container])) 30)) "px"))
                                            s)}
   [storyboard-data]
   (let [sorted-stories (get-sorted-stories storyboard-data)]
@@ -33,6 +35,7 @@
                     {:date-time (:published-at story)
                      :data-toggle "tooltip"
                      :data-placement "top"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :title (utils/activity-date-tooltip story)}
                     (utils/time-since (:published-at story))]]])
             (activity-card story has-headline has-body)])

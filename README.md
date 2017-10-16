@@ -208,6 +208,7 @@ provided in the table below:
 |  :auth-with-token/failed | API | Token exchange failed, cleanup the app-state of the token exchange stuff. |
 |  :auth-with-token/success | API | Token exchange succeeded. Show the collect name and password overlay if it was an invitation token, load the orgs associated with the user and redirect. |
 |  :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
+|  :board-get | UI | Load a board passing in directly the board link. |
 |  :board-create | UI | Start the request to create a new board for the current org. |
 |  :board-delete | UI | Delete a board of the current org. |
 |  :board-edit | UI | Start the board edit for existing board and new board. |
@@ -288,7 +289,6 @@ provided in the table below:
 |  :user-profile-reset | UI | Reset the user profile data edited by the user but not yet saved. |
 |  :user-profile-save | UI | Save the edited user data. |
 |  :user-profile-update/failed | API | User profile update request failed. |
-|  :welcome-screen-hide | UI | Remove the welcome screen shown the first time the first org user open the dashboard. |
 |  :ws-interaction/comment-add | WS | Websocket message for an added comment. |
 |  :ws-interaction/reaction-add | WS | Websocket message for an added reaction. |
 |  :ws-interaction/reaction-delete | WS | Websocket message for a removed reaction. |

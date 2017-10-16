@@ -13,7 +13,7 @@
             [goog.events.EventType :as EventType]
             [clojure.contrib.humanize :refer (filesize)]))
 
-(def separator "<br /></p>")
+(def separator "<br />")
 
 ;; Photo
 
@@ -29,7 +29,7 @@
 
 (defn media-photo-add-if-finished [s]
   (let [image @(::media-photo s)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (when (and (contains? image :url)
                (contains? image :width)
                (contains? image :height)
@@ -96,7 +96,7 @@
 
 (defn media-video-add [s video-data]
   (let [video-html (get-video-html s video-data)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (when video-html
       (.restoreSelection js/rangy @(::last-selection s))
       (js/pasteHtmlAtCaret video-html (.getSelection js/rangy js/window) false)
@@ -135,7 +135,7 @@
 
 (defn media-chart-add [s chart-url]
   (let [chart-html (get-chart-html s chart-url)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (when chart-html
       (.restoreSelection js/rangy @(::last-selection s))
       (js/pasteHtmlAtCaret chart-html (.getSelection js/rangy js/window) false)
@@ -146,7 +146,7 @@
 ;; Attachment
 
 (defn get-attachment-html [s attachment]
-  (let [prefix (str (utils/date-string (utils/js-date) [:year]) " - ")
+  (let [prefix (str "Uploaded on " (utils/date-string (utils/js-date) [:year]) " - ")
         subtitle (str prefix (filesize (:file-size attachment) :binary false :format "%.2f" ))]
     (str "<a "
           "target=\"_blank\" "
@@ -192,7 +192,7 @@
                              :file-size (gobj/get res "size")
                              :file-url url}
             attachment-html (get-attachment-html state attachment-data)
-            body-did-change-cb (nth (:rum/args state) 2)]
+            body-did-change-cb (:on-change (first (:rum/args state)))]
         (.restoreSelection js/rangy @(::last-selection state))
         (js/pasteHtmlAtCaret attachment-html (.getSelection js/rangy js/window) false)
         (reset! (::last-selection state) nil)
@@ -206,13 +206,13 @@
 ;; Divider line
 
 (defn get-divider-line-html [s]
-  (str "<p><hr "
+  (str "<hr "
         "class=\"carrot-no-preview media-divider-line\" "
-        "contentEditable=\"false\" /></p>" separator))
+        "contentEditable=\"false\" />" separator))
 
 (defn media-divider-line-add [s]
   (let [divider-line-html (get-divider-line-html s)
-        body-did-change-cb (nth (:rum/args s) 2)]
+        body-did-change-cb (:on-change (first (:rum/args s)))]
     (.restoreSelection js/rangy @(::last-selection s))
     (js/pasteHtmlAtCaret divider-line-html (.getSelection js/rangy js/window) false)
     (reset! (::last-selection s) nil)
@@ -221,6 +221,7 @@
 
 (rum/defcs media-picker < rum/reactive
                           (rum/local false ::media-expanded)
+                          (rum/local false ::media-entry)
                           (rum/local false ::media-photo)
                           (rum/local false ::media-video)
                           (rum/local false ::media-chart)
@@ -228,27 +229,24 @@
                           (rum/local false ::media-divider-line)
                           (rum/local false ::media-photo-did-success)
                           (rum/local false ::media-attachment-did-success)
-                          (rum/local false ::body-focused)
                           (rum/local nil ::last-selection)
                           (rum/local nil ::window-click-listener)
                           (rum/local nil ::document-focus-in)
                           {:will-mount (fn [s]
-                                         (let [body-sel (nth (:rum/args s) 3)]
-                                           ;; Document focus in
-                                           (reset! (::document-focus-in s)
-                                            (events/listen js/document EventType/FOCUSIN
-                                             #(let [body-el (sel1 [body-sel])]
-                                               (when (= (.-activeElement js/document) body-el)
-                                                  (reset! (::body-focused s) true)))))
+                                         (let [config (first (:rum/args s))
+                                               body-sel (:body-editor-sel config)
+                                               on-collapse (:on-collapse body-sel)]
                                            ;; Window click listener
                                            (reset! (::window-click-listener s)
                                             (events/listen js/window EventType/CLICK
-                                             #(let [body-el (sel1 [body-sel])]
-                                                (reset! (::body-focused s) (utils/event-inside? % body-el))
+                                             #(let [body-el (sel1 body-sel)]
                                                 (when-not (utils/event-inside? % body-el)
                                                   (reset! (::media-expanded s) false)
+                                                  (when (fn? on-collapse)
+                                                    (on-collapse))
                                                   ; If there was a last selection saved
-                                                  (when (and (not @(::media-photo s))
+                                                  (when (and (not @(::media-entry s))
+                                                             (not @(::media-photo s))
                                                              (not @(::media-video s))
                                                              (not @(::media-chart s))
                                                              (not @(::media-attachment s))
@@ -262,62 +260,82 @@
                                                    (.tooltip "hide")
                                                    (.attr "data-original-title" "Insert media")
                                                    (.tooltip "fixTitle")
-                                                   (.tooltip "hide")))))))
+                                                   (.tooltip "hide"))))))
+                                           )
                                          s)
-                           :did-mount (fn [s]
-                                        (let [body-sel (nth (:rum/args s) 3)
-                                              body-el (sel1 [body-sel])]
-                                          (when (= (.-activeElement js/document) body-el)
-                                            (reset! (::body-focused s) true)))
-                                        s)
                            :did-remount (fn [o s]
-                                          (let [data-editing (nth (:rum/args s) 4)
-                                                dispatch-input-key (nth (:rum/args s) 5)]
-                                            (when (map? (:temp-video data-editing))
+                                          (let [data-editing (:data-editing (first (:rum/args s)))
+                                                dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
+                                            (when (contains? data-editing :temp-video)
                                               (dis/dispatch! [:input [dispatch-input-key :temp-video] nil])
-                                              (media-video-add s (:temp-video data-editing)))
-                                            (when-not (empty? (:temp-chart data-editing))
+                                              (reset! (::media-video s) false)
+                                              (when (map? (:temp-video data-editing))
+                                                (media-video-add s (:temp-video data-editing))))
+                                            (when (contains? data-editing :temp-chart)
                                               (dis/dispatch! [:input [dispatch-input-key :temp-chart] nil])
-                                              (media-chart-add s (:temp-chart data-editing))))
+                                              (reset! (::media-chart s) false)
+                                              (when-not (empty (:temp-chart data-editing))
+                                                (media-chart-add s (:temp-chart data-editing)))))
                                         s)
                            :will-unmount (fn [s]
                                            (events/unlistenByKey @(::window-click-listener s))
-                                           (events/unlistenByKey @(::document-focus-in s))
                                            s)}
-  [s media-config media-picker-id body-did-change-cb body-editor-sel data-editing dispatch-input-key]
+  [s {:keys [media-config media-picker-id on-change body-editor-sel data-editing dispatch-input-key on-expand on-collapse]}]
   [:div.media-picker
     {:id media-picker-id
      :style {:display "none"}}
     ; Add media button
     [:button.mlb-reset.media.add-media-bt
       {:title (if @(::media-expanded s) "Close" "Insert media")
-       :class (utils/class-set {:expanded @(::media-expanded s)
-                                :disabled (not @(::body-focused s))})
+       :class (utils/class-set {:expanded @(::media-expanded s)})
        :data-toggle "tooltip"
        :data-placement "top"
        :data-container "body"
        :on-click (fn [e]
-                   (when @(::body-focused s)
-                     (utils/event-stop e)
-                     (reset! (::last-selection s) (.saveSelection js/rangy js/window))
-                     (reset! (::media-expanded s) (not @(::media-expanded s)))
-                     (utils/after 1 #(utils/remove-tooltips))
-                     (utils/after 100 (fn []
-                                        (-> (js/$ "button.add-media-bt")
-                                          (.tooltip "hide")
-                                          (.attr "data-original-title" "Close")
-                                          (.tooltip "fixTitle")
-                                          (.tooltip "hide"))))))}]
+                   (utils/event-stop e)
+                   ;; Remove last selection if present
+                   (when @(::last-selection s)
+                     (.removeMarkers js/rangy @(::last-selection s))
+                     (reset! (::last-selection s) nil))
+                   ;; Save selection if it's not already expanded
+                   (when-not @(::media-expanded s)
+                     (reset! (::last-selection s) (.saveSelection js/rangy js/window)))
+                   ;; Toggle expanded
+                   (if @(::media-expanded s)
+                     (when (fn? on-collapse)
+                       (on-collapse))
+                     (when (fn? on-expand)
+                       (on-expand)))
+                   (reset! (::media-expanded s) (not @(::media-expanded s)))
+                   ;; Fix tooltips
+                   (utils/after 1 #(utils/remove-tooltips))
+                   (utils/after 100 (fn []
+                                      (-> (js/$ "button.add-media-bt")
+                                        (.tooltip "hide")
+                                        (.attr "data-original-title" "Close")
+                                        (.tooltip "fixTitle")
+                                        (.tooltip "hide")))))}]
 
     [:div.media-picker-container
       {:class (utils/class-set {:expanded @(::media-expanded s)
                                 (str "media-" (count media-config)) true})}
+      ; Add an entry button
+      (when (:entry (set media-config))
+        [:button.mlb-reset.media.media-entry
+          {:class (utils/class-set {:active @(::media-entry s)
+                                    (str "media-" (.indexOf media-config :entry)) true})
+           :title "Add update"
+           :data-toggle "tooltip"
+           :data-placement "top"
+           :data-container "body"
+           :on-click (fn []
+                       (reset! (::media-entry s) (not @(::media-entry s))))}])
       ; Add a picture button
       (when (:photo (set media-config))
         [:button.mlb-reset.media.media-photo
           {:class (utils/class-set {:active @(::media-photo s)
                                     (str "media-" (.indexOf media-config :photo)) true})
-           :title "Add a picture"
+           :title "Add picture"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -351,7 +369,7 @@
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
-           :title "Add a video"
+           :title "Add video"
            :on-click (fn []
                        (reset! (::media-video s) true)
                        (dis/dispatch! [:input [dispatch-input-key :media-video] true]))}])
@@ -360,7 +378,7 @@
         [:button.mlb-reset.media.media-chart
           {:class (utils/class-set {:active @(::media-chart s)
                                     (str "media-" (.indexOf media-config :chart)) true})
-           :title "Add a Google Sheet chart"
+           :title "Add Google Sheet chart"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -371,7 +389,7 @@
         [:button.mlb-reset.media.media-attachment
           {:class (utils/class-set {:active @(::media-attachment s)
                                     (str "media-" (.indexOf media-config :attachment)) true})
-           :title "Add an attachment"
+           :title "Add attachment"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"
@@ -385,10 +403,10 @@
                         (fn []
                           (utils/after 1000 #(media-attachment-dismiss-picker s)))))}])
       (when (:divider-line (set media-config))
-        [:button.mlb-reset.media.media-divider-line
+        [:button.mlb-reset.media.media-divider
           {:class (utils/class-set {:active @(::media-divider-line s)
                                     (str "media-" (.indexOf media-config :divider-line)) true})
-           :title "Add a divider line"
+           :title "Add divider line"
            :data-toggle "tooltip"
            :data-placement "top"
            :data-container "body"

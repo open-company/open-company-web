@@ -57,6 +57,7 @@
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
   (timbre/info "nav!" token)
+  (timbre/debug "history:" @history)
   (.setToken @history token))
 
 (defn redirect! [loc]
@@ -127,15 +128,10 @@
   [org-slug board-slug]
   (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
 
-(defn slack-profile-filled-cookie
-  "Cookie used to save if a user has already filled in his data when signing up with Slack."
-  [user-id]
-  (str "slack-profile-filled-" user-id))
-
-(defn dashboard-tooltips-shown
+(defn should-show-dashboard-tooltips
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
-  (str "dashboard-tooltips-show-" user-id))
+  (str "should-show-dashboard-tooltips-" user-id))
 
 (defn print-router-path []
   (js/console.log @path))

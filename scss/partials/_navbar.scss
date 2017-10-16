@@ -25,6 +25,7 @@ nav.oc-navbar {
   width: 100%;
   background-color: white;
   transition: height 230ms;
+  border-bottom: 4px solid rgba($carrot_orange, 0.3);
 
   @include mobile(){
     &.show-login-overlay {
@@ -33,20 +34,21 @@ nav.oc-navbar {
   }
 
   @include big_web(){
-    height: #{$navbar_height + $carrot_trend_collapsed_height}px;
+    height: #{$navbar_height}px;
   }
 
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
+
+    &:not(.mobile-menu-open) {
+      height: #{$mobile_navbar_height}px;
+    }
   }
+
   z-index: $navbar_zindex;
   background-color: white;
   margin: 0px;
-
-  &:not(.mobile-menu-open) {
-    height: #{$mobile_navbar_height}px;
-  }
 
   div.oc-navbar-header {
     padding-top: 10px;
@@ -76,21 +78,32 @@ nav.oc-navbar {
     }
 
     div.oc-navbar-header-container{
-      height: 45px;
+      height: 40px;
 
       div.navbar-center {
         text-align: center;
         width: 320px;
+        height: 40px;
         position: absolute;
         left: 50%;
+        top: 16px;
         margin-left: -160px;
         @include avenir_H();
         font-size: 26px;
 
-        img.org-avatar-img {
-          max-width: 35px;
-          max-height: 35px;
-          margin-left: 132px;
+        div.org-avatar {
+          height: 40px;
+          div.org-avatar-container {
+            height: 40px;
+            div.org-avatar-border {
+              height: 40px;
+
+              img.org-avatar-img {
+                max-width: 120px;
+                max-height: 40px;
+              }
+            }
+          }
         }
       }
     }

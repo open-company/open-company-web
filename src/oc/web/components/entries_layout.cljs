@@ -31,12 +31,12 @@
               [:div.by-topic-header-title
                 (or topic-name
                     (s/capital topic-slug)
-                    "Uncategorized")]
+                    [:span.oblique "No topic"])]
               ; If there are more than 4 add the button to show all of them
               (when (> (count entries-group) 4)
                 [:button.view-all-updates.mlb-reset
-                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic topic-slug))}
-                  "VIEW " (count entries-group) " UPDATES"])]
+                  {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or topic-slug "uncategorized")))}
+                  "View " (count entries-group) " updates"])]
             ;; First row:
             [:div.entries-cards-container-row.group
               ; Render the first 2 entries
@@ -44,9 +44,7 @@
                 (rum/with-key (activity-card entry first-has-headline first-has-body) (str "entry-by-topic-" topic "-" (:uuid entry))))
               ; If there is only 1 add the empty placeholder
               (when (= (count entries-group) 1)
-                (if (not (empty? topic-slug))
-                  (activity-card-empty (:read-only board-data))
-                  [:div.entry-card.entry-card-placeholder]))]
+                [:div.entry-card.entry-card-placeholder])]
             ; If there are more than 2 entries, render the second row
             (when (> (count entries-group) 2)
               [:div.entries-cards-container-row.group
@@ -82,7 +80,9 @@
                   (rum/with-key (activity-card entry has-headline has-body) (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
                 ; If there is only one entry add the empty card placeholder
                 (if (= (count sorted-entries) 1)
-                  (activity-card-empty (:read-only board-data))
+                  (let [entry-data (select-keys (first entries) [:board-name :topic-slug :topic-name])
+                        with-board (merge entry-data {:board-slug (:slug board-data) :board-name (:name board-data)})]
+                    (activity-card-empty with-board (:read-only board-data)))
                   ; If there is only one entry in this row, but it's not the first add the placheolder
                   (when (= (count entries) 1)
                     [:div.entry-card.entry-card-placeholder]))]))])

@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.comments :refer (comments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -70,21 +71,20 @@
         offset (if (> left-space default-comments-total-width)
                   0
                   (min (- left-space 24) (- default-comments-total-width left-space)))
-        margin-left (- left-space (when @(::comments-expanded s) offset))]
+        margin-left (- left-space (when @(::comments-expanded s) offset))
+        ww (min (responsive/ww) 840)]
     [:div.story-container
       (when @(::show-publish-modal s)
         (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-header.group
         [:div.story-header-left
-          [:a.board-name
-            {:href (when story-data (oc-urls/board (:board-slug story-data)))
-             :on-click #(do (utils/event-stop %) (when story-data (router/nav! (oc-urls/board (:board-slug story-data)))))}
-            (:storyboard-name story-data)]
-          [:span.arrow ">"]
-          [:span.story-title
-            {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (:title story-data)))}]]
+          [:div.story-header-back
+            {:on-click #(router/history-back!)}
+            [:span.back-arrow "<"]
+            "Back"]]
         [:div.story-header-right
-          (reactions story-data)
+          (when (pos? (count (:reactions story-data)))
+            (reactions story-data))
           (when (utils/link-for (:links story-data) "comments")
             [:div.comments-summary-container.group
               {:on-click #(reset! (::comments-expanded s) (not @(::comments-expanded s)))}
@@ -96,20 +96,26 @@
       [:div.story-content-outer
         {:style #js {:marginLeft (str (int margin-left) "px")}}
         [:div.story-content
-          [:div.story-author.group
-            (user-avatar-image story-author)
-            [:div.name (:name story-author)]
-            [:div.time-since
-              [:time
-                {:date-time (:created-at story-data)
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :title (utils/activity-date-tooltip story-data)}
-                (utils/time-since (:created-at story-data))]]]
+          [:div.story-content-authorship.group
+            [:div.story-content-authorship-left.group
+              (user-avatar-image story-author)
+              [:div.name (or (:name story-author) (str (:first-name story-author) " " (:last-name story-author)))]
+              [:div.time-since
+                (if (:published-at story-data)
+                  [:time
+                    {:date-time (:published-at story-data)
+                     :title (utils/activity-date-tooltip story-data)}
+                    (utils/time-since (:published-at story-data))]
+                  "Draft")]]
+              [:div.story-content-authorship-right.group
+                [:div.story-tags
+                  [:div.activity-tag.storyboard-tag
+                    {:on-click #(router/nav! (oc-urls/board (:board-slug story-data)))}
+                    (:storyboard-name story-data)]]]]
           (when (:banner-url story-data)
             [:div.story-banner
               {:style #js {:backgroundImage (str "url(" (:banner-url story-data) ")")
-                           :height (str (min 200 (* (/ (:banner-height story-data) (:banner-width story-data)) 840)) "px")}}])
+                           :height (str (if (pos? (:banner-height story-data)) (min 520 (* (/ (:banner-height story-data) (:banner-width story-data)) ww)) "1") "px")}}])
           (when (:title story-data)
             [:div.story-title
               {:dangerouslySetInnerHTML (utils/emojify (:title story-data))}])

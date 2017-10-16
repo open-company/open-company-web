@@ -1,28 +1,16 @@
 (ns oc.web.components.home
-  (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
-            [om-tools.dom :as dom :include-macros true]
+  (:require [rum.core :as rum]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.footer :refer (footer)]
-            [oc.web.components.ui.login-required :refer (login-required)]
-            [oc.web.components.home-page :refer (home-page)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.home-page :refer (home-page)]))
 
-(defcomponent home [data owner]
-
-  (init-state [_]
-    {:columns-num (responsive/columns-num)})
-
-  (did-mount [_]
-    (events/listen js/window EventType/RESIZE #(om/set-state! owner :columns-num (responsive/columns-num))))
-
-  (render-state [_ {:keys [columns-num]}]
-    (let [card-width  responsive/card-width]
-      (if-not (jwt/jwt)
-        (home-page)
-        (dom/div {:class "home fullscreen-page"}
-          (when-not (:loading data)
-            (dom/div {:class "home-internal"})
-            (footer (responsive/total-layout-width-int card-width columns-num))))))))
+(rum/defcs home
+           < (drv/drv :loading)
+  [s]
+  (if (jwt/jwt)
+    [:div.home.fullscreen-page
+      (when-not (drv/react s :loading)
+        [:div.home-internal]
+        (footer))]
+    (home-page)))

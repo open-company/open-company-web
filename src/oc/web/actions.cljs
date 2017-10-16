@@ -11,7 +11,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.wsclient :as wsc]))
+            [oc.web.lib.wsclient :as wsc]
+            [oc.web.components.ui.user-avatar :refer (random-user-image)]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -52,14 +53,22 @@
 ;; Get the board to show counting the last accessed and the last created
 
 (defn get-default-board [org-data]
-  (when-let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
-    (when-not (= last-board-slug "all-activity")
-      (let [board (first (filter #(= (:slug %) last-board-slug) (:boards org-data)))]
-        (when board
+  (let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+    (if (= last-board-slug "all-activity")
+      {:slug "all-activity"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (if board
           ; Get the last accessed board from the saved cookie
-          board)))))
+          board
+          (let [sorted-boards (vec (sort-by :name (vec (filter #(= (:type %) "entry") boards))))
+                sorted-stories (vec (sort-by :name (vec (filter #(= (:type %) "story") boards))))]
+            (if (pos? (count sorted-boards))
+              (first sorted-boards)
+              (first sorted-stories))))))))
 
-(defmethod dispatcher/action :entry-point [db [_ {:keys [success collection]}]]
+(defmethod dispatcher/action :entry-point
+  [db [_ {:keys [success collection]}]]
   (if success
     (let [orgs (:items collection)]
       (cond
@@ -94,7 +103,8 @@
              (not (utils/in? (:route @router/path) "about"))
              (not (utils/in? (:route @router/path) "features"))
              (not (utils/in? (:route @router/path) "email-wall"))
-             (not (utils/in? (:route @router/path) "sign-up")))
+             (not (utils/in? (:route @router/path) "sign-up"))
+             (not (utils/in? (:route @router/path) "confirm-invitation")))
         (let [login-redirect (cook/get-cookie :login-redirect)]
           (cond
             ; redirect to create-company if the user has no companies
@@ -122,22 +132,24 @@
       (assoc :error-banner-message utils/generic-network-error)
       (assoc :error-banner-time 0))))
 
-(defmethod dispatcher/action :org [db [_ org-data]]
+(defmethod dispatcher/action :org
+  [db [_ org-data saved?]]
   (let [boards (:boards org-data)]
     (cond
+      ;; If it's all activity page, loads all activity for the current org
+      (and (router/current-board-slug)
+           (= (router/current-board-slug) "all-activity"))
+      (api/get-all-activity org-data)
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
         (when (not (utils/in? (:route @router/path) "story"))
-          (api/get-board board-data))
+          (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
           (router/redirect-404!)))
-      ;; If it's all activity page, loads all activity for the current org
-      (utils/in? (:route @router/path) "all-activity")
-      (api/get-all-activity org-data)
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -146,7 +158,8 @@
            (not (utils/in? (:route @router/path) "email-verification"))
            (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
-           (not (utils/in? (:route @router/path) "email-wall")))
+           (not (utils/in? (:route @router/path) "email-wall"))
+           (not (utils/in? (:route @router/path) "confirm-invitation")))
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
@@ -158,12 +171,21 @@
                 (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
                 (router/nav! (oc-urls/board (:slug org-data) (:slug board-to))))
               (router/nav! (oc-urls/all-activity (:slug org-data)))))))))
-  (assoc-in db (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data)))
+  (-> db
+    (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
+    (assoc :org-editing (-> (:org-editing db)
+                            (assoc :saved saved?)
+                            (dissoc :has-changes)))))
 
 (defmethod dispatcher/action :boards-load-other [db [_]]
   (doseq [board (:boards (dispatcher/org-data db))
         :when (not= (:slug board) (router/current-board-slug))]
-    (api/get-board board))
+    (api/get-board (utils/link-for (:links board) ["item" "self"] "GET")))
+  db)
+
+(defmethod dispatcher/action :board-get
+  [db [_ link]]
+  (api/get-board link)
   db)
 
 (defmethod dispatcher/action :board [db [_ board-data]]
@@ -225,10 +247,10 @@
       (assoc db :auth-settings-retry (* auth-settings-retry 2)))))
 
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
-  (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
+  (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
         board-key (if is-all-activity (dispatcher/all-activity-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
-        new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body (router/current-board-slug) (:topics board-data)))
+        new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body board-data (:topics board-data)))
         new-board-data (assoc board-data :fixed-items new-entries)]
   (assoc db board-key new-board-data)))
 
@@ -313,7 +335,9 @@
 (defmethod dispatcher/action :login-with-email/success
   [db [_ jwt]]
   (if (empty? jwt)
-    (assoc db :login-with-email-error :verify-email)
+    (do
+      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
+      db)
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
       (api/get-entry-point)
@@ -333,6 +357,7 @@
 (defmethod dispatcher/action :auth-with-token/success
   [db [_ jwt]]
   (api/get-entry-point)
+  (api/get-auth-settings)
   (when (= (:auth-with-token-type db) :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (assoc db :email-verification-success true))
@@ -351,8 +376,8 @@
   (cond
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
-      (utils/after 200 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
-      (assoc db :signup-with-email-error :verify-email))
+      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
+      db)
     (= status 200) ;; Valid login, not signup, redirect to home
     (do
       (if (or (and (empty? (:first-name jwt))
@@ -470,7 +495,7 @@
           (api/switch-user-type invite-data old-user-type user-type user (utils/get-author (:user-id user) (:authors org-data))))
         (api/send-invitation invite-data (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
         {:success true})
-      {:error "User already active." :success false})))
+      {:error "User already active" :success false})))
 
 (defn valid-inviting-user? [user]
   (or (and (= "email" (:type user))
@@ -480,26 +505,34 @@
            (contains? (:user user) :slack-org-id)
            (contains? (:user user) :slack-id))))
 
+(defn duplicated-user [user team-data]
+  (let [is-email (= (:type user) "email")]
+    (when is-email
+      (let [parsed-email (utils/parse-input-email (:user user))
+            duplicated-user (first (filter #(= (:email %) (:address parsed-email)) (:users team-data)))]
+        (and duplicated-user
+             (not= (string/lower-case (:status duplicated-user)) "pending"))))))
+
 (defmethod dispatcher/action :invite-users
   [db [_]]
   (let [org-data (dispatcher/org-data)
         team-data (dispatcher/team-data (:team-id org-data))
-        invite-users (:invite-users db)]
-    (if (count invite-users)
-      (let [next-invite-users (loop [i 0
-                                     next-invite-users []]
-                                (let [inviting-user (get invite-users i)
-                                      resp (if (valid-inviting-user? inviting-user)
-                                             (invite-user org-data team-data inviting-user)
-                                             (assoc inviting-user :error true))
-                                      next-invite-users (if (:success resp)
-                                                          next-invite-users
-                                                          (conj next-invite-users (assoc inviting-user :error (:error resp))))]
-                                  (if (< i (dec (count invite-users)))
-                                    (recur (inc i) next-invite-users)
-                                    next-invite-users)))]
-        (assoc db :invite-users next-invite-users))
-      db)))
+        invite-users (:invite-users db)
+        checked-users (for [user invite-users]
+                        (let [valid? (valid-inviting-user? user)
+                              duplicated? (duplicated-user user team-data)]
+                          (cond
+                            (not valid?)
+                            (merge user {:error true :success false})
+                            duplicated?
+                            (merge user {:error "User already active" :success false})
+                            :else
+                            (dissoc user :error))))
+        cleaned-invite-users (vec (filter #(not (:error %)) checked-users))]
+    (when (= (count cleaned-invite-users) (count invite-users))
+      (doseq [user cleaned-invite-users]
+        (invite-user org-data team-data user)))
+    (assoc db :invite-users (vec checked-users))))
 
 (defmethod dispatcher/action :invite-user/success
   [db [_ user]]
@@ -520,8 +553,11 @@
   [db [_ team-id invitation action method other-link-params payload]]
   (let [team-data (dispatcher/team-data team-id)
         idx (.indexOf (:users team-data) invitation)]
-    (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload)
-    (assoc-in db (concat (dispatcher/team-data-key team-id) [:users idx :loading]) true)))
+    (if (> idx -1)
+      (do
+        (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload)
+        (assoc-in db (concat (dispatcher/team-data-key team-id) [:users idx :loading]) true))
+      db)))
 
 (defmethod dispatcher/action :user-action/complete
   [db [_]]
@@ -532,7 +568,8 @@
 (defmethod dispatcher/action :invitation-confirmed
   [db [_ status]]
   (when (= status 201)
-    (cook/set-cookie! :show-login-overlay "collect-name-password"))
+    (api/get-entry-point)
+    (api/get-auth-settings))
   (assoc db :email-confirmed (= status 201)))
 
 (defmethod dispatcher/action :name-pswd-collect
@@ -543,12 +580,13 @@
 
 (defn update-user-data [db user-data]
   (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
-                            (assoc user-data :avatar-url (utils/cdn ls/default-user-avatar-url true))
+                            (assoc user-data :avatar-url (utils/cdn (random-user-image) true))
                             user-data)
-        with-empty-password (assoc with-fixed-avatar :password "")]
+        with-empty-password (assoc with-fixed-avatar :password "")
+        with-has-changes (assoc with-empty-password :has-changes false)]
     (-> db
         (assoc :current-user-data with-fixed-avatar)
-        (assoc :edit-user-profile with-empty-password)
+        (assoc :edit-user-profile with-has-changes)
         (dissoc :edit-user-profile-failed))))
 
 (defmethod dispatcher/action :name-pswd-collect/finish
@@ -563,17 +601,21 @@
     (assoc db :collect-name-password-error status)))
 
 (defmethod dispatcher/action :pswd-collect
-  [db [_]]
+  [db [_ password-reset?]]
   (let [form-data (:collect-pswd db)]
     (api/collect-password (:pswd form-data)))
-  db)
+  (assoc db :is-password-reset password-reset?))
 
 (defmethod dispatcher/action :pswd-collect/finish
   [db [_ status]]
   (if (and (>= status 200)
            (<= status 299))
     (do
-      (cook/remove-cookie! :show-login-overlay)
+      (if (:is-password-reset db)
+        (do
+          (cook/remove-cookie! :show-login-overlay)
+          (router/nav! oc-urls/login))
+        (router/nav! oc-urls/confirm-invitation-profile))
       (dissoc db :show-login-overlay))
     (assoc db :collect-password-error status)))
 
@@ -588,10 +630,6 @@
         sorted-reactions (vec (sort-by :reaction reactions))]
     (assoc entry :reactions sorted-reactions)))
 
-(defmethod dispatcher/action :welcome-screen-hide
-  [db [_]]
-  (dissoc db :show-welcome-screen))
-
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
   (update-user-data db (:current-user-data db)))
@@ -605,7 +643,7 @@
   (let [new-password (:password (:edit-user-profile db))
         password-did-change (pos? (count new-password))
         with-pswd (if (and password-did-change
-                           (>= (count new-password) 5))
+                           (>= (count new-password) 8))
                     (:edit-user-profile db)
                     (dissoc (:edit-user-profile db) :password))
         new-email (:email (:edit-user-profile db))
@@ -729,13 +767,14 @@
   (api/get-comments activity-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (router/current-activity-id)
+        activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
     (assoc-in db comments-key {:loading true})))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
-  (let [comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) activity-uuid)
+  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
+        comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) fixed-activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (assoc-in db comments-key sorted-comments)))
 
@@ -799,49 +838,57 @@
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         is-all-activity (:from-all-activity @router/path)
-        activity-uuid (:activity-uuid interaction-data)
+        activity-uuid (:resource-uuid interaction-data)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        entry-data (get (get board-data :fixed-items) activity-uuid)]
-    (if entry-data
-      ; If the entry is present in the local state
-      (let [; get the comment data from the ws message
-            comment-data (:interaction interaction-data)
-            created-at (:created-at comment-data)
-            all-old-comments-data (dispatcher/activity-comments-data activity-uuid)
-            old-comments-data (vec (filter :links all-old-comments-data))
-            ; Add the new comment to the comments list, make sure it's not present already
-            new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-            sorted-comments-data (vec (sort-by :created-at new-comments-data))
-            comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
-            current-user-id (jwt/get-key :user-id)
-            is-current-user (= current-user-id (:user-id (:author comment-data)))
-            ; update the comments link of the entry
-            comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
-            with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
-            old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
-            new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
-            new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
-                          old-authors
-                          (conj old-authors new-author))
-            with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
-        ;; Refresh the topic data if the action coming in is from the current user
-        ;; to get the new links to interact with
-        (when is-current-user
-          (api/get-entry entry-data))
-        ;; Animate the comments count if we don't have already the same number of comments locally
-        (when (not= (count all-old-comments-data) (count new-comments-data))
-          (utils/pulse-comments-count activity-uuid))
-        ; Update the local state with the new comments list
-        (-> db
-            (assoc-in comments-key sorted-comments-data)
-            (assoc-in (concat board-key [:fixed-items activity-uuid]) with-authors)))
-      ;; the entry is not present, refresh the full topic
-      (do
-        ;; force refresh of topic
-        (api/get-board (dispatcher/board-data))
-        db))))
+        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
+        is-secure-story (router/current-secure-story-id)
+        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
+        entry-data (get-in db entry-key)]
+    ;; If looking at a secure story discard all events for other activities
+    (if (and is-secure-story
+             (not= (:uuid secure-story-data) activity-uuid))
+      db
+      (if entry-data
+        ; If the entry is present in the local state
+        (let [; get the comment data from the ws message
+              comment-data (:interaction interaction-data)
+              created-at (:created-at comment-data)
+              all-old-comments-data (dispatcher/activity-comments-data fixed-activity-uuid)
+              old-comments-data (vec (filter :links all-old-comments-data))
+              ; Add the new comment to the comments list, make sure it's not present already
+              new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
+              sorted-comments-data (vec (sort-by :created-at new-comments-data))
+              comments-key (dispatcher/activity-comments-key org-slug board-slug fixed-activity-uuid)
+              current-user-id (jwt/get-key :user-id)
+              is-current-user (= current-user-id (:user-id (:author comment-data)))
+              ; update the comments link of the entry
+              comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
+              with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
+              old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
+              new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
+              new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
+                            old-authors
+                            (conj old-authors new-author))
+              with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
+          ;; Refresh the topic data if the action coming in is from the current user
+          ;; to get the new links to interact with
+          (when is-current-user
+            (api/get-entry entry-data))
+          ; ;; Animate the comments count if we don't have already the same number of comments locally
+          ; (when (not= (count all-old-comments-data) (count new-comments-data))
+          ;   (utils/pulse-comments-count fixed-activity-uuid))
+          ; Update the local state with the new comments list
+          (-> db
+              (assoc-in comments-key sorted-comments-data)
+              (assoc-in (vec (concat board-key [:fixed-items fixed-activity-uuid])) with-authors)))
+        ;; the entry is not present, refresh the full topic
+        (do
+          ;; force refresh of topic
+          (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
+          db)))))
 
 (defn- update-reaction
   "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
@@ -851,41 +898,47 @@
         org-slug (router/current-org-slug)
         is-all-activity (:from-all-activity @router/path)
         board-slug (router/current-board-slug)
-        activity-uuid (:entry-uuid interaction-data)
-        ; Entry data
-        entry-data (dispatcher/activity-data activity-uuid)
+        activity-uuid (:resource-uuid interaction-data)
         ; Board data
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
-        ; Entry idx
-        entry-key (concat board-key [:fixed-items activity-uuid])]
-    (if (and entry-data (not (empty? (:reactions entry-data))))
-      ; If the entry is present in the local state and it has reactions
-      (let [reaction-data (:interaction interaction-data)
-            old-reactions-data (:reactions entry-data)
-            reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
-            new-reaction-data {:count (:count interaction-data)}
-            is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
-            with-reacted (if is-current-user
-                            (assoc new-reaction-data :reacted add-event?)
-                            new-reaction-data)
-            ; Update the reactions data with the new reaction
-            new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
-            ; Update the entry with the new reaction
-            updated-entry-data (assoc entry-data :reactions new-reactions-data)]
-        ;; Refresh the topic data if the action coming in is from the current user
-        ;; to get the new links to interact with
-        (when is-current-user
-          (api/get-entry entry-data))
-        (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
-          (utils/pulse-reaction-count activity-uuid (:reaction reaction-data)))
-        ; Update the entry in the local state with the new reaction
-        (assoc-in db entry-key updated-entry-data))
-      ;; the entry is not present, refresh the full topic
-      (do
-        ;; force refresh of topic
-        (api/get-board (dispatcher/board-data))
-        db))))
+        ; Entry data
+        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
+        is-secure-story (router/current-secure-story-id)
+        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
+        entry-data (get-in db entry-key)]
+    (if (and is-secure-story
+             (not= (:uuid secure-story-data) activity-uuid))
+      db
+      (if (and entry-data (not (empty? (:reactions entry-data))))
+        ; If the entry is present in the local state and it has reactions
+        (let [reaction-data (:interaction interaction-data)
+              old-reactions-data (:reactions entry-data)
+              reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
+              new-reaction-data {:count (:count interaction-data)}
+              is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+              with-reacted (if is-current-user
+                              (assoc new-reaction-data :reacted add-event?)
+                              new-reaction-data)
+              ; Update the reactions data with the new reaction
+              new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+              ; Update the entry with the new reaction
+              updated-entry-data (assoc entry-data :reactions new-reactions-data)]
+          ;; Refresh the topic data if the action coming in is from the current user
+          ;; to get the new links to interact with
+          (when is-current-user
+            (api/get-entry entry-data))
+          ; ;; Animate the interaction count
+          ; (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
+          ;   (utils/pulse-reaction-count fixed-activity-uuid (:reaction reaction-data)))
+          ; Update the entry in the local state with the new reaction
+          (assoc-in db entry-key updated-entry-data))
+        ;; the entry is not present, refresh the full topic
+        (do
+          ;; force refresh of topic
+          (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
+          db)))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
   [db [_ interaction-data]]
@@ -902,7 +955,7 @@
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
-   #(let [from-all-activity (not (router/current-board-slug))
+   #(let [from-all-activity (= (router/current-board-slug) "all-activity")
           new-route (if from-all-activity
                       [(router/current-org-slug) "all-activity" board-slug activity-uuid "activity"]
                       [(router/current-org-slug) board-slug activity-uuid "activity"])
@@ -916,7 +969,7 @@
                          (oc-urls/entry board-slug activity-uuid))]
       (router/set-route! new-route parts)
       (.pushState (.-history js/window) #js {} (.-title js/document) activity-url)
-      (reset! dispatcher/app-state (assoc @dispatcher/app-state :activity-pushed activity-uuid))))
+      (dispatcher/dispatch! [:input [:activity-pushed] activity-uuid])))
   (assoc db :activity-modal-fade-in activity-uuid))
 
 (defmethod dispatcher/action :entry-edit
@@ -952,7 +1005,7 @@
                                       :updated-at as-of
                                       :reactions []
                                       :uuid (utils/activity-uuid)})
-                   (:slug board-data)
+                   board-data
                    (:topics board-data)))
 
 (defn entry-fixed-data [entry-data current-user-data as-of]
@@ -965,7 +1018,7 @@
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)
-        is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))
+        is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))
         org-slug (router/current-org-slug)
         board-key (if is-all-activity (dispatcher/all-activity-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
@@ -995,10 +1048,10 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_]]
-  (let [is-all-activity (or (:from-all-activity @router/path) (utils/in? (:route @router/path) "all-activity"))]
+  (let [is-all-activity (or (:from-all-activity @router/path) (= (router/current-board-slug) "all-activity"))]
     ;; FIXME: refresh the last loaded all-activity link
     (when-not is-all-activity
-      (api/get-board (dispatcher/board-data))))
+      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
   db)
 
 (defmethod dispatcher/action :board-nav
@@ -1022,7 +1075,7 @@
                parts (dissoc @router/path :route :activity)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
          (router/nav! next-board-url)))
     (assoc db :board-filters next-board-filter)))
 
@@ -1035,7 +1088,7 @@
                parts (dissoc @router/path :route :activity)]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) next-board-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
          (router/nav! next-board-url)))
     db))
 
@@ -1045,10 +1098,10 @@
     (utils/after 10
       #(if (:activity-pushed db)
          (let [route [(router/current-org-slug) "all-activity"]
-               parts (dissoc @router/path :route :board :activity)]
+               parts (-> @router/path (dissoc :route :board :activity :from-all-activity) (merge {:board "all-activity"}))]
             (router/set-route! route parts)
             (.pushState (.-history js/window) #js {} (.-title js/document) all-activity-url)
-            (reset! dispatcher/app-state (dissoc @dispatcher/app-state :activity-pushed)))
+            (dispatcher/dispatch! [:input [:activity-pushed] nil]))
          (router/nav! all-activity-url)))
     db))
 
@@ -1067,7 +1120,7 @@
   [db [_]]
   (if (utils/in? (:route @router/path) "story-edit")
     (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
-    (api/get-board (dispatcher/board-data)))
+    (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
   db)
 
 (defmethod dispatcher/action :alert-modal-show
@@ -1197,11 +1250,16 @@
   (assoc db :story-loading true))
 
 (defmethod dispatcher/action :story-get/finish
-  [db [_ {:keys [story-uuid story-data]}]]
+  [db [_ status {:keys [story-uuid story-data]}]]
+  (when (= status 404)
+    (router/redirect-404!))
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
-        fixed-story-data (utils/fix-story story-data (or (:storyboard-slug story-data) board-slug))]
+        fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})]
+    (when (jwt/jwt)
+      (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
+        (wsc/reconnect ws-link (jwt/get-key :user-id))))
     (-> db
       (dissoc :story-loading)
       (assoc-in story-key fixed-story-data))))
@@ -1253,14 +1311,43 @@
   (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
 
 (defmethod dispatcher/action :org-edit
-  [db [_ org-data keep-edits?]]
-  (let [next-org-editing (if keep-edits?
-                            (merge org-data (:org-editing db))
-                            org-data)]
-    (assoc db :org-editing next-org-editing)))
+  [db [_ org-data]]
+  (assoc db :org-editing org-data))
 
 (defmethod dispatcher/action :org-edit-save
   [db [_]]
   (when (:org-editing db)
     (api/patch-org (:org-editing db)))
   db)
+
+(defmethod dispatcher/action :about-carrot-modal-show
+  [db [_]]
+  (assoc db :about-carrot-modal true))
+
+(defmethod dispatcher/action :about-carrot-modal-hide
+  [db [_]]
+  (dissoc db :about-carrot-modal))
+
+(defmethod dispatcher/action :org-settings-show
+  [db [_ panel]]
+  (assoc db :org-settings (or panel :main)))
+
+(defmethod dispatcher/action :org-settings-hide
+  [db [_]]
+  (dissoc db :org-settings))
+
+(defmethod dispatcher/action :activity-board-move
+  [db [_ activity-data board-data]]
+  (let [board-key (if (= (:type activity-data) "story") :storyboard-slug :board-slug)
+        fixed-activity-data (-> activity-data
+                              (assoc board-key (:slug board-data))
+                              (dissoc (if (= (:type activity-data) "entry") :storyboard-slug :board-slug)))]
+    (api/update-entry fixed-activity-data)
+    (if (utils/in? (:route @router/path) "all-activity")
+      (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-activity (:uuid activity-data))]
+        (assoc-in db next-activity-data-key fixed-activity-data))
+      (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
+            next-activity-data-key (dispatcher/activity-key (router/current-org-slug) (:slug board-data) (:uuid activity-data))]
+        (-> db
+          (update-in (butlast activity-data-key) dissoc (last activity-data-key))
+          (assoc-in next-activity-data-key fixed-activity-data))))))

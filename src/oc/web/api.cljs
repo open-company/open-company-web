@@ -196,8 +196,8 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org (json->cljs body)])))))
 
-(defn get-board [board-data]
-  (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+(defn get-board [board-link]
+  (when board-link
     (storage-http (method-for-link board-link) (relative-href board-link)
       {:headers (headers-for-link board-link)}
       (fn [{:keys [status body success]}]
@@ -229,7 +229,7 @@
         {:json-params json-data
          :headers (headers-for-link org-patch-link)}
         (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:org (json->cljs body)]))))))
+          (dispatcher/dispatch! [:org (json->cljs body) true]))))))
 
 (defn get-auth-settings []
   (auth-http http/get "/"
@@ -348,10 +348,9 @@
                           "Access-Control-Allow-Headers" "Content-Type, Authorization"
                           "Authorization" (str "Bearer " token)})}
         (fn [{:keys [status body success]}]
-          (dispatcher/dispatch! [:invitation-confirmed status])
-          (utils/after 1000
-           #(when success
-             (update-jwt-cookie! body))))))))
+          (utils/after 100 #(dispatcher/dispatch! [:invitation-confirmed status]))
+          (when success
+            (update-jwt-cookie! body)))))))
 
 (defn collect-password [pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
@@ -393,7 +392,6 @@
                           (if (:success res)
                             (update-jwt-cookie! (:body res))
                             (dispatcher/dispatch! [:logout])))))))
-                (cook/set-cookie! (router/slack-profile-filled-cookie (:user-id old-user-data)) true (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
                 (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn collect-name-password [firstname lastname pswd]
@@ -677,7 +675,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-name :attachments])
+(def entry-keys [:headline :body :topic-name :attachments :title :board-slug :storyboard-slug])
 
 (defn create-entry
   [entry-data]
@@ -739,7 +737,7 @@
     (storage-http (method-for-link story-link) (relative-href story-link)
       {:headers (headers-for-link story-link)}
       (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:story-get/finish {:story-uuid story-uuid :story-data (if success (json->cljs body) nil)}])))))
+        (dispatcher/dispatch! [:story-get/finish status {:story-uuid story-uuid :story-data (if success (json->cljs body) nil)}])))))
 
 (defn create-story [board-data & [story-data]]
   (when board-data
@@ -779,7 +777,7 @@
       (storage-http (method-for-link story-link) (:href story-link)
         {:headers (headers-for-link story-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:story-get/finish {:story-uuid (router/current-secure-story-id) :story-data (if success (json->cljs body) {})}]))))))
+          (dispatcher/dispatch! [:story-get/finish status {:story-uuid (router/current-secure-story-id) :story-data (if success (json->cljs body) {})}]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
