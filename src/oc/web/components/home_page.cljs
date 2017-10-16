@@ -35,7 +35,7 @@
         [:div.cta
           [:h1.headline "Grow Together"]
           [:div.subheadline#thank-you-top
-            "Announcements, udpates, ideas and stories that bring teams closer"]
+            "Announcements, updates, ideas and stories that bring teams closer"]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
