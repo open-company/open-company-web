@@ -172,9 +172,10 @@
                             (assoc :saved saved?)
                             (dissoc :has-changes)))))
 
-(defmethod dispatcher/action :boards-load-other [db [_]]
-  (doseq [board (:boards (dispatcher/org-data db))
-        :when (not= (:slug board) (router/current-board-slug))]
+(defmethod dispatcher/action :boards-load-other
+  [db [_ boards]]
+  (doseq [board boards
+          :when (not= (:slug board) (router/current-board-slug))]
     (api/get-board (utils/link-for (:links board) ["item" "self"] "GET")))
   db)
 
@@ -194,6 +195,9 @@
 (defmethod dispatcher/action :container/change
   [db [_ {board-uuid :container-id change-at :change-at}]]
   (timbre/debug "Board change:" board-uuid "at:" change-at)
+  (let [boards (:boards (dispatcher/org-data db))
+        filtered-boards (filter #(= (:uuid %) board-uuid) boards)]
+    (utils/after 1000 #(dispatcher/dispatch! [:boards-load-other filtered-boards])))
   ;; Update change-data state that the board has a change
   (update-change-data db board-uuid :change-at change-at))
 
@@ -211,8 +215,9 @@
   ;; Update change-data state that we saw the board
   (update-change-data db board-uuid :seen-at (oc-time/current-timestamp)))
 
-(defmethod dispatcher/action :board [db [_ board-data]]
- (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
+(defmethod dispatcher/action :board
+  [db [_ board-data]]
+  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
        fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))]
     (when is-currently-shown
       
@@ -236,7 +241,10 @@
       ;; Tell the container service that we are seeing this board,
       ;; and update change-data to reflect that we are seeing this board
       (when-let [board-uuid (:uuid fixed-board-data)]
-        (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}]))))
+        (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}])))
+
+      ;; Load the other boards
+      (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
     
     (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
