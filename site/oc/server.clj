@@ -9,8 +9,7 @@
             [org.httpkit.client :as http]
             [compojure.core :refer (defroutes GET)]
             [compojure.route :as route]
-            [oc.lib.proxy.sheets-chart :as sheets-chart]
-            [oc.onboard-tip-svg :refer (get-onboard-image)]))
+            [oc.lib.proxy.sheets-chart :as sheets-chart]))
 
 (defn app-shell []
   (res/resource-response "/app-shell.html" {:root "public"}))
@@ -39,12 +38,6 @@
 (defn- sheets-proxy [path params]
   (sheets-chart/proxy-sheets-pass-through path params))
 
-(defn- onboard-tip-response [params]
-  (let [qparams (:query-params params)
-        [px py] (s/split (get qparams "p") ",")
-        svg (get-onboard-image (get qparams "w") (get qparams "h") px py)]
-    {:status 200 :body svg :headers {"Content-Type" "image/svg+xml"}}))
-
 (defroutes resources
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
@@ -53,8 +46,7 @@
   (GET "/" [] (index))
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))
-  (GET ["/:path" :path #"[^\.]+"] [path] (app-shell))
-  (GET "/img/ML/onboard_tip.svg" {:as params} (onboard-tip-response params)))
+  (GET ["/:path" :path #"[^\.]+"] [path] (app-shell)))
 
 ;; Some routes like /, /404 and similar can't have their content-type
 ;; derived automatically, because of that we set it with the middleware below
