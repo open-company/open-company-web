@@ -103,7 +103,7 @@
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
-            (carrot-tip {:x (+ boards-left 105 30 40)
+            (carrot-tip {:x (+ boards-left 65 30)
                          :y (- (aget offset "top") 160)
                          :title "Welcome to Carrot"
                          :message "Boards make it easy to find the latest news and key updates from across the company. You can create boards for different areas of your company, like Sales, Marketing and Products."
