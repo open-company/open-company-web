@@ -5,7 +5,6 @@
             [ring.middleware.resource :refer (wrap-resource)]
             [ring.middleware.file :refer (wrap-file)]
             [ring.middleware.reload :refer (wrap-reload)]
-            [cuerdas.core :as s]
             [org.httpkit.client :as http]
             [compojure.core :refer (defroutes GET)]
             [compojure.route :as route]
