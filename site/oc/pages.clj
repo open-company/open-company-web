@@ -53,7 +53,7 @@
       [:div.cta
         [:h1.headline "Grow Together"]
         [:div.subheadline
-          "Announcements, udpates, ideas and stories that bring teams closer"]
+          "Announcements, updates, ideas and stories that bring teams closer"]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
