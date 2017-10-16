@@ -824,7 +824,9 @@
   (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
         comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) fixed-activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
-    (assoc-in db comments-key sorted-comments)))
+    (-> db
+      (assoc-in comments-key sorted-comments)
+      (assoc-in (vec (conj (vec (butlast comments-key)) :loading)) false))))
 
 (defmethod dispatcher/action :comment-add
   [db [_ activity-data comment-body]]

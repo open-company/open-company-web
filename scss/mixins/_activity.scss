@@ -136,7 +136,11 @@ $h2_top_margin: 20;
     font-weight: normal;
   }
 
-  h2 {
+  h2:first-child {
+    margin-top: 0px;
+  }
+
+  h2:not(:first-child) {
     margin-top: #{$bottom_margin + $h2_top_margin}px;
     @include avenir_H();
     font-size: #{$font-size + 3}px;
