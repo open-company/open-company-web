@@ -450,7 +450,7 @@ function log(){
         p = element;
       }
       var hr = this.document.createElement("hr");
-      hr.className = "media-divider-line";
+      hr.className = "carrot-no-preview media-divider-line";
       p.appendChild(hr);
 
       var nextP = this.document.createElement("p");
