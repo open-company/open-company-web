@@ -116,7 +116,7 @@
           (when-let* [nav-journals (js/$ "h3#navigation-sidebar-journals")
                       offset (.offset nav-journals)
                       journals-left (aget offset "left")]
-            (carrot-tip {:x (+ journals-left 105 30)
+            (carrot-tip {:x (+ journals-left 105 30 40)
                          :y (- (aget offset "top") 160)
                          :title "Welcome to Carrot"
                          :message "Journals are the easiest way to share longer updates and ideas with your stakeholders, like monthly all-hands, weekly kickoffs, and investor updates."
