@@ -193,7 +193,6 @@ div.activity-card {
       float: right;
       text-align: center;
       white-space: nowrap;
-      margin-top: 16px;
       overflow: hidden;
       background-position: 50%;
       background-size: cover;
@@ -249,17 +248,17 @@ div.activity-card {
         display: none;
       }
 
-      p {
-        margin-top: 0px;
-        margin-bottom: 0px;
-      }
-
       a:not(.read-more):hover {
         text-decoration: none !important;
       }
 
       img:not(.emojione){
         display: none;
+      }
+
+      b {
+        font-weight: 400;
+        @include avenir_M();
       }
 
       a.read-more {
@@ -291,7 +290,7 @@ div.activity-card {
       //     @include activity-body;
       //     color: $carrot_text_blue;
       //     cursor: pointer;
-      //   } 
+      //   }
       // }
     }
   }
