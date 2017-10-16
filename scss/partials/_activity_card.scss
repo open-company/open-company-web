@@ -325,11 +325,11 @@ div.activity-card {
 
       div.dropdown-menu {
         position: absolute;
-        top: unset; //calc(100% - 122px); // -93px;
+        top: unset;
         bottom: -20px;
-        left: -102px;
-        width: 100px;
-        min-width: 100px;
+        left: -132px;
+        width: 130px;
+        min-width: 130px;
         height: auto;
         border: none;
         outline: none;
@@ -358,7 +358,7 @@ div.activity-card {
           padding: 10px 13px 6px 8px;
           min-height: 50px;
           list-style-type: none;
-          width: 100px;
+          width: 100%;
 
           li {
             padding: 3px 8px;
