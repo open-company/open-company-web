@@ -33,6 +33,9 @@
               (oc-urls/board org board))))))))
 
 (defn close-clicked [s & [board-filters]]
+  (when-not (:from-all-posts @router/path)
+    ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
+    (dis/dispatch! [:input [:no-reset-seen-at] true]))
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s board-filters)))
 
