@@ -85,7 +85,7 @@
                                          (let [activity-data (first (:rum/args s))
                                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                                body-a-sel (str body-sel " a")
-                                               is-all-posts (nth (:rum/args s) 3 false)]
+                                               is-all-posts (nth (:rum/args s) 4 false)]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.stopPropagation %))
                                            ; Truncate body text with dotdotdot
@@ -97,13 +97,13 @@
                                          s)
                          :will-mount (fn [s]
                                        (let [activity-data (first (:rum/args s))
-                                             is-all-posts (nth (:rum/args s) 3 false)]
-                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts)))
+                                             is-all-posts (nth (:rum/args s) 4 false)]
+                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts) is-all-posts))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-activity-data (first (:rum/args o))
                                               new-activity-data (first (:rum/args s))
-                                              is-all-posts (nth (:rum/args s) 3 false)]
+                                              is-all-posts (nth (:rum/args s) 4 false)]
                                           (when (not= (:body old-activity-data) (:body new-activity-data))
                                             (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
                                             (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
