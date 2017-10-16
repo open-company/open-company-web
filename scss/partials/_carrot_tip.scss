@@ -10,6 +10,11 @@ div.carrot-tip-container {
   background-repeat: no-repeat;
   background-size: 100%;
 
+  div.carrot-tip-background {
+    width: 100%;
+    height: 100%;
+  }
+
   div.carrot-tip {
     position: absolute;
     
