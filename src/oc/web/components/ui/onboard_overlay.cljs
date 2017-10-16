@@ -12,7 +12,6 @@
   (dis/dispatch! [:onboard-overlay-hide]))
 
 (defn close-clicked [s]
-  (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)))
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
