@@ -5,6 +5,7 @@
             [cuerdas.core :as string]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -175,7 +176,22 @@
                                              (utils/event-stop e)
                                              ; open the activity-share-modal component
                                              (dis/dispatch! [:activity-share-show activity-data]))}
-                                "Share"])
+                                "Share Link"])
+                            (when (utils/link-for (:links activity-data) "share")
+                              [:li
+                                {:on-click (fn [e]
+                                             (utils/event-stop e)
+                                             ; open the activity-share-modal component
+                                             (dis/dispatch! [:activity-share-show activity-data]))}
+                                "Share Email"])
+                            (when (and (utils/link-for (:links activity-data) "share")
+                                       (jwt/team-has-bot? (:team-id (dis/org-data))))
+                              [:li
+                                {:on-click (fn [e]
+                                             (utils/event-stop e)
+                                             ; open the activity-share-modal component
+                                             (dis/dispatch! [:activity-share-show activity-data]))}
+                                "Share Slack"])
                             (when (utils/link-for (:links activity-data) "partial-update")
                               [:li
                                 {:on-click (fn [e]

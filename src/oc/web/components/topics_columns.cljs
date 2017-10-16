@@ -23,9 +23,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn did-select-storyboard-cb [storyboard]
-  (dis/dispatch! [:story-create (clojure.set/rename-keys storyboard {:value :slug :label :name :links :links})]))
-
 (def min-scroll 50)
 (def max-scroll 92)
 
@@ -84,7 +81,7 @@
       (events/unlistenByKey (om/get-state owner :resize-listener))
       (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip ww]}]
+  (render-state [_ {:keys [show-boards-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id

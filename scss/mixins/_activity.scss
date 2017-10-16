@@ -82,24 +82,6 @@ $h2_top_margin: 20;
         height: 10px;
       }
     }
-
-    &.storyboard-tag {
-
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/storyboards_icon_blue.png");
-      }
-
-      &:before {
-        display: inline-block;
-        margin-right: 4px;
-        content: "";
-        background-image: cdnUrl("/img/ML/storyboards_icon_gray.png");
-        background-size: 12px 10px;
-        background-repeat: no-repeat;
-        width: 12px;
-        height: 10px;
-      }
-    }
   }
 }
 

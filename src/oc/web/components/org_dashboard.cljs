@@ -18,8 +18,10 @@
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
-            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
-            [oc.web.components.ui.activity-share-modal :refer (activity-share-modal)]))
+            [oc.web.components.ui.activity-share-link :refer (activity-share-link)]
+            [oc.web.components.ui.activity-share-email :refer (activity-share-email)]
+            [oc.web.components.ui.activity-share-slack :refer (activity-share-slack)]
+            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data []
   (when (not (router/current-activity-id))
@@ -83,7 +85,13 @@
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
           ;; Activity share modal
           (when (:activity-share data)
-            (activity-share-modal))
+            (cond
+              (= (:medium (:activity-share data)) :email)
+              (activity-share-email)
+              (= (:medium (:activity-share data)) :slack)
+              (activity-share-slack)
+              (= (:medium (:activity-share data)) :link)
+              (activity-share-link)))
           ;; Alert modal
           (when (:alert-modal data)
             (alert-modal))

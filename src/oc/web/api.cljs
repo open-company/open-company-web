@@ -675,7 +675,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-name :attachments :title :board-slug :storyboard-slug])
+(def entry-keys [:headline :body :topic-name :attachments :title :board-slug])
 
 (defn create-entry
   [entry-data temp-uuid]
@@ -752,7 +752,7 @@
 (defn autosave-draft [story-data share-data]
   (when story-data
     (let [autosave-link (utils/link-for (:links story-data) "partial-update")
-          fixed-story-data (clojure.set/rename-keys (select-keys story-data [:title :body :board-slug :banner-url :banner-width :banner-height]) {:board-slug :storyboard-slug})]
+          fixed-story-data (select-keys story-data [:title :body :board-slug :banner-url :banner-width :banner-height])]
       (storage-http (method-for-link autosave-link) (relative-href autosave-link)
         {:headers (headers-for-link autosave-link)
          :json-params (cljs->json fixed-story-data)}

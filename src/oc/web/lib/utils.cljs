@@ -269,14 +269,6 @@
          (nil? update-link)
          (nil? delete-link))))
 
-(defn readonly-storyboard? [links]
-  (let [new-link (link-for links "new")
-        update-link (link-for links "partial-update")
-        delete-link (link-for links "delete")]
-    (and (nil? new-link)
-         (nil? update-link)
-         (nil? delete-link))))
-
 (defn readonly-entry? [links]
   (let [partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
@@ -323,7 +315,7 @@
   "Add topic name in each topic and a topic sorter"
   [board-data]
   (let [links (:links board-data)
-        read-only (readonly-storyboard? links)
+        read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
         fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
@@ -336,8 +328,7 @@
 (defn fix-all-posts
   "Fix org data coming from the API."
   [all-posts-data]
-  (assoc all-posts-data :items (vec (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (:board-name %)}) (:items all-posts-data))))
-  (let [fixed-activities-list (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (:board-name %)}) (:items all-posts-data))
+  (let [fixed-activities-list (map #(fix-activity % {:slug (:board-slug %) :name (:board-name %)}) (:items all-posts-data))
         without-items (dissoc all-posts-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]

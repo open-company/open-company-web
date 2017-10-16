@@ -39,6 +39,12 @@ div.activity-share-modal-container {
         span {
           @include activity-title();
           color: $carrot_dark_gray_1;
+          white-space: pre;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 400px;
+          display: block;
+          float: right;
         }
       }
 
@@ -167,14 +173,20 @@ div.activity-share-modal-container {
                     @include avenir_M();
                     font-size: 14px;
                     color: $oc_gray_7;
-                    padding: 0.4rem 0.8rem;
+                    padding: 0rem 0.8rem 0.4rem;
                     outline: none;
+
+                    &:empty {
+                      padding: 0.4rem 0.8rem;
+                    }
 
                     div.email-item {
                       margin-right: .4rem;
-                      margin-bottom: .4rem;
+                      margin-top: .4rem;
+                      margin-bottom: 0px;
                       display: inline-block;
                       border-radius: 3px;
+                      height: 26px;
 
                       span.email-item {
                         padding: .25rem .4rem;
@@ -192,6 +204,9 @@ div.activity-share-modal-container {
                       font-size: 14px;
                       color: $oc_gray_7;
                       height: 26px;
+                      width: auto;
+                      max-width: 100%;
+                      margin-top: 0.4rem;
                     }
                   }
 
@@ -223,6 +238,10 @@ div.activity-share-modal-container {
               margin-left: 16px;
               height: 48px;
               padding: .2em 1.8em;
+
+              &.disabled {
+                opacity: 0.6;
+              }
             }
           }
         }
