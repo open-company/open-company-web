@@ -31,6 +31,7 @@
              on-intermediate-change]
       :or {valid-item? identity
            tab-index 0
+           auto-focus true
            container-node :div
            input-node :input}}]
   (let [*items       (::items s) ; tracking items already entered
