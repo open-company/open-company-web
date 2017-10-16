@@ -52,7 +52,6 @@
         :ellipsis "... "}))
 
 (defn get-first-body-thumbnail [body is-ap]
-  (js/console.log "get-first-body-thumbnail" is-ap)
   (let [$body (js/$ (str "<div>" body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
