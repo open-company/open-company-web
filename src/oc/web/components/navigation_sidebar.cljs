@@ -67,6 +67,7 @@
                        create-link)
               [:button.left-navigation-sidebar-top-title-button.btn-reset.right
                 {:on-click #(dis/dispatch! [:board-edit nil "entry"])
+                 :id "add-board-button"
                  :title "Create a new board"
                  :data-placement "top"
                  :data-toggle "tooltip"
@@ -105,6 +106,7 @@
               [:button.left-navigation-sidebar-top-title-button.btn-reset.right
                 {:on-click #(dis/dispatch! [:board-edit nil "story"])
                  :title "Create a new journal"
+                 :id "add-journal-button"
                  :data-placement "top"
                  :data-toggle "tooltip"
                  :data-container "body"}])]])

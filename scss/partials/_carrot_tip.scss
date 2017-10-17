@@ -6,6 +6,14 @@ div.carrot-tip-container {
   right: 0px;
   bottom: 0px;
   z-index: #{$navbar_zindex + 1501};
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+  background-size: 100%;
+
+  div.carrot-tip-background {
+    width: 100%;
+    height: 100%;
+  }
 
   div.carrot-tip {
     position: absolute;

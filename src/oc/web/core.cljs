@@ -188,6 +188,10 @@
               (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
+    (when (and (not (:show-login-overlay @dis/app-state))
+               (jwt/jwt)
+               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
+      (swap! dis/app-state assoc :show-onboard-overlay true))
     (post-routing)
     ;; render component
     (drv-root component target)))
