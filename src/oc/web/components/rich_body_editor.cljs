@@ -106,7 +106,7 @@
 (defn media-video-add [s editable video-data]
   (if (= :dismiss video-data)
     (.addVideo editable nil nil nil nil)
-    (.addVideo editable (get-video-src video-data) (:type video-data) (:id video-data) (get-video-thumbnail video-data))))
+    (.addVideo editable (get-video-src video-data) (name (:type video-data)) (:id video-data) (get-video-thumbnail video-data))))
 
 ;; Photo
 
