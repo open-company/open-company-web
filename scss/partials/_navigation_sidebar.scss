@@ -141,7 +141,7 @@ div.left-navigation-sidebar {
       border-radius: 2px;
       @include avenir_H();
 
-      &:hover {
+      &:hover, &.active {
         background-color: $carrot_green_2;
         background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
       }
