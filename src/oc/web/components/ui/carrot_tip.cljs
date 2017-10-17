@@ -49,7 +49,7 @@
       [:svg
         {:width "100%"
          :height "100%"
-         :viewBox (str "0 0 " width " " height)
+         :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-innerHeight js/window))
          :version "1.1"
          :xmlns "http://www.w3.org/2000/svg"
          :xmlnsXlink "http://www.w3.org/1999/xlink"}
