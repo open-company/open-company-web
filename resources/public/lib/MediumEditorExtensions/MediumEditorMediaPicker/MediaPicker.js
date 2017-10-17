@@ -257,6 +257,7 @@ function log(){
         }
         var iframe = this.document.createElement("iframe");
         iframe.className = "carrot-no-preview";
+        iframe.dataset.mediaType = "video";
         iframe.setAttribute("frameborder", 0);
         iframe.setAttribute("webkitallowfullscreen", true);
         iframe.setAttribute("mozallowfullscreen",true);
@@ -315,6 +316,7 @@ function log(){
         }
         var iframe = this.document.createElement("iframe");
         iframe.className = "carrot-no-preview";
+        iframe.dataset.mediaType = "chart";
         iframe.setAttribute("frameborder", 0);
         iframe.setAttribute("webkitallowfullscreen", true);
         iframe.setAttribute("mozallowfullscreen",true);
@@ -373,6 +375,7 @@ function log(){
         var uniqueID = "remove-bt-" + parseInt(Math.random() * 100000);
         var link = this.document.createElement("a");
         link.className = "carrot-no-preview media-attachment";
+        link.dataset.mediaType = "attachment";
         link.setAttribute("contenteditable", false);
         link.setAttribute("href", attachmentUrl);
         link.setAttribute("target", "_blank");
