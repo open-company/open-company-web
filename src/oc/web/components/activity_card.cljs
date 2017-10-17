@@ -184,9 +184,10 @@
                                     :has-media-preview @(::first-body-image s)})}])
       ; Body preview
       (when @(::first-body-image s)
-        [:div.activity-card-media-preview
-          {:style #js {:backgroundImage (str "url(" (:thumbnail @(::first-body-image s)) ")")}
-           :class (or (:type @(::first-body-image s)) "image")}])]
+        [:div.activity-card-media-preview-container
+          {:class (or (:type @(::first-body-image s)) "image")}
+          [:img
+            {:src (:thumbnail @(::first-body-image s))}]])]
     [:div.activity-card-footer.group
       (interactions-summary activity-data)
       (when (or (utils/link-for (:links activity-data) "partial-update")
