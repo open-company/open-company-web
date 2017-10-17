@@ -100,7 +100,7 @@
                                          :group true
                                          :content-loaded content-loaded})}
         (when (and show-boards-tooltip
-                   (not (:show-onboard-overlay)))
+                   (not showing-onboard-overlay))
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
