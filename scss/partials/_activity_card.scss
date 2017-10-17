@@ -80,15 +80,21 @@ div.activity-card {
         font-size: 16px;
       }
 
-      div.activity-card-media-preview {
+      div.activity-card-media-preview-container {
         width: 100%;
+        text-align: center;
         float: initial;
         margin-top: 16px;
         max-height: 200px;
-        height: 200px;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        overflow: hidden;
+
+        img {
+          max-width: 100%;
+          max-height: 200px;
+        }
       }
     }
   }
