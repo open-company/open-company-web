@@ -70,11 +70,10 @@
               {:on-click #(do
                             (.preventDefault %)
                             (when (:auth-settings @dis/app-state)
-                              (dis/dispatch! [:login-with-slack])))}
+                              (dis/dispatch! [:login-with-slack])))
+               :disabled (not (:auth-settings (rum/react dis/app-state)))}
               (str action-title " with ")
-              [:span.slack "Slack"]
-              (when-not (:auth-settings (rum/react dis/app-state))
-                (small-loading))]]
+              [:span.slack "Slack"]]]
           [:div.login-with-email.domine.underline.bold
             [:a {:on-click (fn [e]
                               (utils/event-stop e)
