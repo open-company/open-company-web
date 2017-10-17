@@ -63,7 +63,7 @@
                                (jwt/jwt)
                                (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
      :ww (responsive/ww)
-     :show-journals-tooltip false
+     :show-plus-tooltip false
      :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
 
   ; (will-mount [_]
@@ -84,7 +84,7 @@
       (events/unlistenByKey (om/get-state owner :resize-listener))
       (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip show-journals-tooltip ww]}]
+  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip show-plus-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -104,25 +104,31 @@
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
-            (carrot-tip {:x (+ boards-left 65 30)
-                         :y (- (aget offset "top") 160)
+            (carrot-tip {:x (+ boards-left 145 30)
+                         :y (- (aget offset "top") 110)
                          :title "Welcome to Carrot"
-                         :message "Boards make it easy to find the latest news and key updates from across the company. You can create boards for different areas of your company, like Sales, Marketing and Products."
+                         :message "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!"
                          :footer "1 of 2"
+                         :button-title "Next"
+                         :big-circle true
                          :on-next-click (fn []
-                                          (om/update-state! owner #(merge % {:show-journals-tooltip true
-                                                                             :show-boards-tooltip false})))})))
-        (when show-journals-tooltip
-          (when-let* [nav-journals (js/$ "h3#navigation-sidebar-journals")
-                      offset (.offset nav-journals)
-                      journals-left (aget offset "left")]
-            (carrot-tip {:x (+ journals-left 65 30)
-                         :y (- (aget offset "top") 160)
-                         :title "Welcome to Carrot"
-                         :message "Journals are the easiest way to share longer updates and ideas with your stakeholders, like monthly all-hands, weekly kickoffs, and investor updates."
+                                          (om/update-state! owner #(merge % {:show-plus-tooltip true
+                                                                             :show-boards-tooltip false}))
+                                          (.addClass (js/$ "button#add-board-button") "active"))})))
+        (when show-plus-tooltip
+          (when-let* [plus-button (js/$ "button#add-board-button")
+                      offset (.offset plus-button)
+                      plus-button-left (aget offset "left")]
+            (carrot-tip {:x (+ plus-button-left 90 30)
+                         :y (- (aget offset "top") 110)
+                         :title "Creating boards"
+                         :message "When you’re ready, click here and get rolling with your first boards. You can create boards for different areas like Sales, Marketing and Product."
                          :footer "2 of 2"
+                         :button-title "Got It!"
+                         :big-circle false
                          :on-next-click (fn []
-                                          (om/set-state! owner :show-journals-tooltip false)
+                                          (.removeClass (js/$ "button#add-board-button") "active")
+                                          (om/set-state! owner :show-plus-tooltip false)
                                           (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
         (dom/div {:class "topics-column-container group"
                   :key columns-container-key}
