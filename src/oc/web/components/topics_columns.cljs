@@ -59,11 +59,9 @@
                                       board-filters] :as data} owner options]
 
   (init-state [_]
-    {:show-boards-tooltip (and (not (:show-login-overlay data))
-                               (jwt/jwt)
-                               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
-     :ww (responsive/ww)
+    {:show-boards-tooltip (:show-onboard-overlay data)
      :show-plus-tooltip false
+     :ww (responsive/ww)
      :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
 
   ; (will-mount [_]
