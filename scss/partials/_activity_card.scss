@@ -205,7 +205,7 @@ div.activity-card {
       }
     }
 
-    div.activity-card-media-preview {
+    div.activity-card-media-preview-container {
       width: 72px;
       height: 72px;
       float: right;
@@ -216,6 +216,12 @@ div.activity-card {
       background-size: cover;
       border-radius: 4px;
       position: relative;
+
+      img {
+        max-width: 72px;
+        max-height: 54px;
+        margin-top: 9px;
+      }
 
       &:hover {
         cursor: pointer;
