@@ -61,6 +61,7 @@
         (dis/dispatch! [:onboard-overlay-show]))
       {:show-boards-tooltip first-user-visit
        :show-plus-tooltip fals
+       :showing-onboard-overlay first-user-visit
        :ww (responsive/ww)
        :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))}))
 
@@ -82,7 +83,11 @@
       (events/unlistenByKey (om/get-state owner :resize-listener))
       (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-boards-tooltip show-plus-tooltip ww]}]
+  (will-receive-props [_ next-props]
+    (when-not (:show-onboard-overlay next-props)
+      (om/set-state! owner :showing-onboard-overlay false)))
+
+  (render-state [_ {:keys [show-boards-tooltip showing-onboard-overlay show-plus-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -100,7 +105,7 @@
                                          :group true
                                          :content-loaded content-loaded})}
         (when (and show-boards-tooltip
-                   (not (:show-onboard-overlay data)))
+                   (not showing-onboard-overlay))
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
