@@ -102,17 +102,20 @@
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
-            (carrot-tip {:x (+ boards-left 145 30)
-                         :y (- (aget offset "top") 110)
-                         :title "Welcome to Carrot"
-                         :message "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!"
-                         :footer "1 of 2"
-                         :button-title "Next"
-                         :big-circle true
-                         :on-next-click (fn []
-                                          (om/update-state! owner #(merge % {:show-plus-tooltip true
-                                                                             :show-boards-tooltip false}))
-                                          (.addClass (js/$ "button#add-board-button") "active"))})))
+            (let [create-link (utils/link-for (:links org-data) "create")]
+              (carrot-tip {:x (+ boards-left 145 30)
+                           :y (- (aget offset "top") 110)
+                           :title "Welcome to Carrot"
+                           :message "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!"
+                           :footer (if create-link "1 of 2" "")
+                           :button-title (if create-link "Next" "Got It!")
+                           :big-circle true
+                           :on-next-click (fn []
+                                            (om/update-state! owner #(merge % {:show-plus-tooltip (not (not create-link))
+                                                                               :show-boards-tooltip false}))
+                                            (if create-link
+                                              (.addClass (js/$ "button#add-board-button") "active")
+                                              (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)))))}))))
         (when show-plus-tooltip
           (when-let* [plus-button (js/$ "button#add-board-button")
                       offset (.offset plus-button)
