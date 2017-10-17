@@ -54,16 +54,11 @@
                                       board-filters] :as data} owner options]
 
   (init-state [_]
-    (let [first-user-visit (and (not (:show-login-overlay data))
-                                 (jwt/jwt)
-                                 (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))]
-      (when first-user-visit
-        (dis/dispatch! [:onboard-overlay-show]))
-      {:show-boards-tooltip first-user-visit
-       :show-plus-tooltip false
-       :showing-onboard-overlay first-user-visit
-       :ww (responsive/ww)
-       :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))}))
+    {:show-boards-tooltip (:show-onboard-overlay data)
+     :show-plus-tooltip false
+     :ww (responsive/ww)
+     :showing-onboard-overlay (:show-onboard-overlay data)
+     :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
 
   ; (will-mount [_]
   ;   (when (and (not (utils/is-test-env?))
@@ -105,7 +100,7 @@
                                          :group true
                                          :content-loaded content-loaded})}
         (when (and show-boards-tooltip
-                   (not showing-onboard-overlay))
+                   (not (:show-onboard-overlay)))
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]

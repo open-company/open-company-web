@@ -171,6 +171,10 @@
     (when (and (contains? query-params :org-settings)
                (#{:main :team :invite} (keyword (:org-settings query-params))))
       (swap! dis/app-state assoc :org-settings (keyword (:org-settings query-params))))
+    (when (and (not (:show-login-overlay @dis/app-state))
+               (jwt/jwt)
+               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
+      (swap! dis/app-state assoc :show-onboard-overlay true))
     (post-routing)
     ;; render component
     (drv-root component target)))
