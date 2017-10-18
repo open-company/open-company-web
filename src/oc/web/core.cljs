@@ -160,21 +160,24 @@
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
         (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
-    ;; do we have the company data already?
-    (when (or (and (not (contains? query-params :ap))
-                   (not (:fixed-items (dis/board-data))))         ;; if the board data are not present
-              (and (contains? query-params :ap)                   ;; if the all-posts data are not preset
-                   (not (:fixed-items (dis/all-posts-data))))) ;; this latter is used when displaying modal over AP
-      (swap! dis/app-state merge {:loading true}))
-    (when (contains? query-params :access)
-      (swap! dis/app-state assoc :org-settings :main))
-    (when (and (contains? query-params :org-settings)
-               (#{:main :team :invite} (keyword (:org-settings query-params))))
-      (swap! dis/app-state assoc :org-settings (keyword (:org-settings query-params))))
-    (when (and (not (:show-login-overlay @dis/app-state))
-               (jwt/jwt)
-               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
-      (swap! dis/app-state assoc :show-onboard-overlay true))
+    (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
+                                    (jwt/jwt)
+                                    (= (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))) "true"))
+          ;; do we have the company data already?
+          loading (or (and (not (contains? query-params :ap))
+                           (not (:fixed-items (dis/board-data))))         ;; if the board data are not present
+                      (and (contains? query-params :ap)                   ;; if the all-posts data are not preset
+                           (not (:fixed-items (dis/all-posts-data))))) ;; this latter is used when displaying modal over AP
+
+          org-settings (if (contains? query-params :access)
+                         :main
+                         (if (and (contains? query-params :org-settings)
+                                  (#{:main :team :invite} (keyword (:org-settings query-params))))
+                           (keyword (:org-settings query-params))))
+          next-app-state {:show-onboard-overlay show-onboard-overlay
+                          :loading loading
+                          :org-settings org-settings}]
+      (utils/after 1 #(swap! dis/app-state merge next-app-state)))
     (post-routing)
     ;; render component
     (drv-root component target)))

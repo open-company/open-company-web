@@ -20,11 +20,10 @@
                              (rum/local false ::dismiss)
                              ;; Mixins
                              mixins/no-scroll-mixin
-                             mixins/first-render-mixin
   [s]
   [:div.onboard-overlay-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                              :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
+    {:class (utils/class-set {:will-appear @(::dismiss s)
+                              :appear (not @(::dismiss s))})}
     [:div.onboard-overlay
       (case @(::step s)
         1
@@ -47,7 +46,7 @@
             [:div.step-illustration-right
               "Sales Update"]]
           [:div.onboard-overlay-step-description
-            "It’s simple to post announcements, team updates, ideas and stories that bring everyone together."]]
+            "It’s simple to post announcements, updates, and stories that bring everyone together."]]
         3
         [:div.onboard-overlay-step.step-3
           [:div.empty-line]
@@ -73,13 +72,17 @@
             "Skip"]]
         [:div.onboard-overlay-footer-steps
           [:div.dot-step
-            {:class (when (= @(::step s) 1) "active")}]
+            {:class (when (= @(::step s) 1) "active")
+             :on-click #(reset! (::step s) 1)}]
           [:div.dot-step
-            {:class (when (= @(::step s) 2) "active")}]
+            {:class (when (= @(::step s) 2) "active")
+             :on-click #(reset! (::step s) 2)}]
           [:div.dot-step
-            {:class (when (= @(::step s) 3) "active")}]
+            {:class (when (= @(::step s) 3) "active")
+             :on-click #(reset! (::step s) 3)}]
           [:div.dot-step
-            {:class (when (= @(::step s) 4) "active")}]]
+            {:class (when (= @(::step s) 4) "active")
+             :on-click #(reset! (::step s) 4)}]]
         [:div.onboard-overlay-footer-right
           [:button.mlb-reset.mlb-default.next-button
             {:on-click #(if (< @(::step s) 4)

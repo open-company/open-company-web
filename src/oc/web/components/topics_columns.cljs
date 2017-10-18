@@ -136,7 +136,7 @@
                          :y (- (aget offset "top") 110)
                          :title "Creating boards"
                          :message (get-second-tooltip-message org-data)
-                         :footer "2 of 2"
+                         :footer ""
                          :button-title "Got It!"
                          :big-circle false
                          :on-next-click (fn []
