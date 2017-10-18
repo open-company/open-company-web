@@ -133,7 +133,7 @@
                :ref "board-name"
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
                :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
-               :placeholder "All-hands, Investor Updates, Weekly Kickoffs, Development, Finance, etc."
+               :placeholder "Announcements, CEO, Marketing, Sales, Who We Are"
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
             [:div.board-edit-label.board-edit-access-label "BOARD PERMISSIONS"]
             [:div.board-edit-access-field.group
