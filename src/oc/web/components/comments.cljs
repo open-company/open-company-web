@@ -8,6 +8,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.components.ui.mixins :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.reactions :as reactions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -27,6 +28,7 @@
             (utils/time-since (:created-at c))]]]
       [:p.comment-body.group
         {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
+      [:div.comment-reactions (reactions/reactions c)]
       [:div.comment-footer.group]]))
 
 (defn add-comment-content [add-comment-div]
