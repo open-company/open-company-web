@@ -106,6 +106,18 @@ $h2_top_margin: 20;
 
 @mixin activity-body($font-size: 16){
 
+  &.uploading[contenteditable=true]{
+    .rangySelectionBoundary {
+      display: inline-block !important;
+      width: 16px;
+      height: 16px;
+      background-image: cdnUrl("/img/small_loading.gif");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 16px 16px;
+    }
+  }
+
   &.medium-editor-placeholder-hidden:after {
     display: none !important;
   }

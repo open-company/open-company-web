@@ -31,10 +31,10 @@
   (utils/after 180 #(dismiss-modal)))
 
 (defn cancel-clicked [s]
-  (if (:has-changes @(drv/get-ref s :entry-editing))
+  (if @(::uploading-media s)
     (let [alert-data {:icon "/img/ML/trash.svg"
-                      :action "dismiss-edit-dirty-data"
-                      :message (str "Cancel without saving your changes?")
+                      :action "dismiss-edit-uploading-media"
+                      :message (str "Cancel before finishing upload?")
                       :link-button-title "No"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
@@ -43,7 +43,19 @@
                                           (real-close s))
                       }]
       (dis/dispatch! [:alert-modal-show alert-data]))
-    (real-close s)))
+    (if (:has-changes @(drv/get-ref s :entry-editing))
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "dismiss-edit-dirty-data"
+                        :message (str "Cancel without saving your changes?")
+                        :link-button-title "No"
+                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :solid-button-title "Yes"
+                        :solid-button-cb #(do
+                                            (dis/dispatch! [:alert-modal-hide])
+                                            (real-close s))
+                        }]
+        (dis/dispatch! [:alert-modal-show alert-data]))
+      (real-close s))))
 
 (defn unique-slug [topics topic-name]
   (let [slug (atom (s/slug topic-name))]
@@ -119,6 +131,7 @@
                         (rum/local false ::focusing-create-topic)
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
+                        (rum/local nil ::uploading-media)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -267,6 +280,8 @@
                              :show-placeholder (not (contains? entry-editing :links))
                              :show-h2 true
                              :dispatch-input-key :entry-editing
+                             :upload-progress-cb (fn [is-uploading?]
+                                                   (reset! (::uploading-media s) is-uploading?))
                              :media-config ["photo" "video" "chart" "attachment" "divider-line"]
                              :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
