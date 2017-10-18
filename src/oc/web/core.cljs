@@ -161,20 +161,18 @@
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
         (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
-    ;; do we have the company data already?
-    (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
-                                                    ;; a subset of the company data loaded with a SU
-      (swap! dis/app-state merge {:loading true}))
-    (when (contains? query-params :access)
-      (swap! dis/app-state assoc :org-settings :main))
-    (when (and (contains? query-params :org-settings)
-               (#{:main :team :invite} (keyword (:org-settings query-params))))
-      (swap! dis/app-state assoc :org-settings (keyword (:org-settings query-params))))
-    (when (and (not (:show-login-overlay @dis/app-state))
-               (jwt/jwt)
-               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
-      (swap! dis/app-state assoc :show-onboard-overlay true))
+    (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
+                                    (jwt/jwt)
+                                    (= (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))) "true"))
+          loading (or (not (dis/board-data))                 ;; if the company data are not present
+                      (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
+                                                             ;; a subset of the company data loaded with a SU
+          org-settings (and (contains? query-params :org-settings)
+                            (#{:main :team :invite} (keyword (:org-settings query-params))))
+          next-app-state {:show-onboard-overlay show-onboard-overlay
+                          :loading loading
+                          :org-settings org-settings}]
+      (utils/after 1 #(swap! dis/app-state merge next-app-state)))
     (post-routing)
     ;; render component
     (drv-root component target)))
