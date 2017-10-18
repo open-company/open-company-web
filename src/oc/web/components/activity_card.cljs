@@ -180,7 +180,9 @@
                                   (oc-urls/board-sort-by-topic (:board-slug activity-data))
                                   (oc-urls/board (:board-slug activity-data))))))}
               (:board-name activity-data)])
-              (when is-new [:div.new-tag "New"])]])
+              ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
+              ;;(when is-new [:div.new-tag "New"])
+              ]])
     [:div.activity-card-content.group
       (when (= (:type activity-data) "story")
         [:div.activity-card-title
