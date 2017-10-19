@@ -43,7 +43,7 @@ $h2_top_margin: 20;
   div.activity-tag {
     display: inline-block;
     height: 26px;
-    border-radius: 4px;
+    border-radius: 100px;
     @include avenir_B();
     font-size: 12px;
     color: $carrot_light_gray_3;
