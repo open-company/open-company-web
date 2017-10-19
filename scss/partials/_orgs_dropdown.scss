@@ -1,7 +1,7 @@
 div.orgs-dropdown {
   height: 56px;
 
-  button#orgsDropdown {
+  button.orgs-dropdown-btn {
     border: none;
     outline: none;
     background-color: transparent;
@@ -11,13 +11,14 @@ div.orgs-dropdown {
     margin: 0;
 
     &.dropdown-toggle:after {
-      position: absolute;
-      top: 8px;
-      right: -15px;
-      font-family: FontAwesome;
-      content: "\f078";
-      color: $oc_gray_5;
-      font-size: 14px;
+      float: left;
+      content: "";
+      background-image: cdnUrl("/img/ML/board_settings.svg");
+      background-size: 8px 8px;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 8px;
+      height: 40px;
     }
   }
 

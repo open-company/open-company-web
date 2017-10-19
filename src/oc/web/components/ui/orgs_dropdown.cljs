@@ -26,12 +26,12 @@
   (let [orgs (drv/react s :orgs)
         org-data (drv/react s :org-data)
         current-org-slug (:slug org-data)
-        should-show-dropdown? (> (count orgs) 1)]
+        should-show-dropdown? true] ;(> (count orgs) 1)]
     [:div.orgs-dropdown
       {:class (utils/class-set {:dropdown should-show-dropdown?
                                 :org-has-logo (not (empty? (:logo-url org-data)))})}
       [:button.orgs-dropdown-btn
-        {:id "orgsDropdown"
+        {:id "orgs-dropdown"
          :class (when should-show-dropdown? "dropdown-toggle")
          :data-toggle (when should-show-dropdown? "dropdown")
          :aria-haspopup true
@@ -40,7 +40,7 @@
         (org-avatar org-data (not should-show-dropdown?))]
       (when should-show-dropdown?
         [:ul.dropdown-menu
-          {:aria-labelledby "orgsDropdown"}
+          {:aria-labelledby "orgs-dropdown"}
           (for [org orgs]
             (rum/with-key
              (org-dropdown-item current-org-slug org)
