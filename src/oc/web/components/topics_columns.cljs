@@ -182,7 +182,7 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
-                  (dom/label {:class "add-to-board-label"}) "New Post"))
+                  (dom/label {:class "add-to-board-label"} "New Post")))
               ;; Add entry floating button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))

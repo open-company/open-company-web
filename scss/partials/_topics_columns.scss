@@ -56,11 +56,11 @@ div.topics-columns {
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
           background-repeat: no-repeat;
-          background-position: 50%;
-          width: 8px;
-          height: 8px;
-          margin-top: 17px;
-          margin-left: 10px;
+          background-position: center;
+          width: 20px;
+          height: 20px;
+          margin-top: 6px;
+          margin-left: 6px;
           opacity: 0.8;
 
           &:hover {
@@ -110,7 +110,7 @@ div.topics-columns {
           background-color: $carrot_orange_light;
           color: $carrot_orange;
           border-radius: 100px;
-          padding: 10px 24px;
+          padding: 10px 22px;
           margin-right: 16px;
           border: 2px solid transparent;
           opacity: 1;
