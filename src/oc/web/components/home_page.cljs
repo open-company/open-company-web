@@ -1,8 +1,11 @@
 (ns oc.web.components.home-page
   (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
-            [oc.web.lib.utils :as utils]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.try-it-form :refer (try-it-form)]
@@ -39,6 +42,15 @@
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
+          (if (jwt/jwt)
+            [:button.mlb-reset.get-started-centred-bt
+              {:on-click #(router/nav! oc-urls/login)}
+              "Your Boards"]
+            [:button.mlb-reset.get-started-centred-bt
+              {:on-click #(if (utils/in? (:route @router/path) "login")
+                            (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                            (router/nav! oc-urls/sign-up-with-slack))}
+            "Get started for free"])
           [:div.small-teams
             "Easy set-up • Free for small teams"]
           (when (and (not @(::confirm s))
