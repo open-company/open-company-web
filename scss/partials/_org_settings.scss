@@ -132,28 +132,37 @@ div.org-settings {
           margin: 0;
           padding: 0;
 
-          tr {
+          tbody, thead {
 
-            th {
-              @include avenir_H();
-              font-size: 14px;
-              color: $oc_gray_7;
-
-              span.error {
-                @include avenir_H();
-                font-size: 14px;
-                margin-left: 16px;
-                color: $carrot_orange;
+            &:last-child {
+              td {
+                border-bottom: none;
               }
-
             }
 
-            td {
-              padding: 16px 0;
-              border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
-              @include avenir_R();
-              font-size: 16px;
-              color: $carrot_dark_gray;
+            tr {
+
+              th {
+                @include avenir_H();
+                font-size: 14px;
+                color: $oc_gray_7;
+
+                span.error {
+                  @include avenir_H();
+                  font-size: 14px;
+                  margin-left: 16px;
+                  color: $carrot_orange;
+                }
+
+              }
+
+              td {
+                padding: 16px 0;
+                border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
+                @include avenir_R();
+                font-size: 16px;
+                color: $carrot_dark_gray;
+              }
             }
           }
         }
