@@ -74,6 +74,8 @@
                             (rum/local nil ::esc-key-listener)
                             (rum/local false ::move-activity)
                             (rum/local 330 ::activity-modal-height)
+                            (rum/local false ::share-dropdown)
+                            (rum/local nil ::window-click)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -91,21 +93,19 @@
                                             (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
                                            s)
                              :did-mount (fn [s]
-                                          (let [activity-data (first (:rum/args s))]
-                                            (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
-                                             "show.bs.dropdown"
-                                             (fn [e]
-                                              (reset! (::showing-dropdown s) true)))
-                                            (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
-                                             "hidden.bs.dropdown"
-                                             (fn [e]
-                                              (reset! (::showing-dropdown s) false))))
+                                          (reset! (::window-click s)
+                                           (events/listen js/window EventType/CLICK #(do
+                                                                                      (reset! (::showing-dropdown s) false)
+                                                                                      (reset! (::share-dropdown s) false))))
                                           s)
                             :will-unmount (fn [s]
                                             ;; Remove window resize listener
                                             (when @(::window-resize-listener s)
                                               (events/unlistenByKey @(::window-resize-listener s))
                                               (reset! (::window-resize-listener s) nil))
+                                            (when @(::window-click s)
+                                              (events/unlistenByKey @(::window-click s))
+                                              (reset! (::window-click s) nil))
                                             (when @(::esc-key-listener s)
                                               (events/unlistenByKey @(::esc-key-listener s))
                                               (reset! (::esc-key-listener s) nil))
@@ -126,92 +126,109 @@
           {:on-click #(close-clicked s)}]
         [:div.activity-modal.group
           {:class (str "activity-modal-" (:uuid activity-data))}
-          [:div.activity-left-column
-            [:div.activity-left-column-content
-              [:div.activity-modal-head.group
-                [:div.activity-modal-head-left
-                  (user-avatar-image (first (:author activity-data)))
-                  [:div.name (:name (first (:author activity-data)))]
-                  [:div.time-since
-                    [:time
-                      {:date-time (:created-at activity-data)
+          [:div.activity-modal-header.group
+            [:div.activity-modal-header-left
+              (user-avatar-image (first (:author activity-data)))
+              [:div.name (:name (first (:author activity-data)))]
+              [:div.time-since
+                [:time
+                  {:date-time (:created-at activity-data)
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :title (utils/activity-date-tooltip activity-data)}
+                  (utils/time-since (:created-at activity-data))]]]
+            [:div.activity-modal-header-right
+              (when (or (utils/link-for (:links activity-data) "partial-update")
+                        (utils/link-for (:links activity-data) "delete"))
+                (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
+                      same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
+                  [:div.more-dropdown
+                    [:button.mlb-reset.activity-modal-more.dropdown-toggle
+                      {:type "button"
+                       :on-click (fn [e]
+                                   (utils/event-stop e)
+                                   (utils/remove-tooltips)
+                                   (reset! (::showing-dropdown s) (not @(::showing-dropdown s)))
+                                   (reset! (::move-activity s) false))
                        :data-toggle "tooltip"
-                       :data-placement "top"
-                       :title (utils/activity-date-tooltip activity-data)}
-                      (utils/time-since (:created-at activity-data))]]]
-                [:div.activity-modal-head-right
-                  (when (:topic-slug activity-data)
-                    (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                      [:div.activity-tag
-                        {:on-click #(close-clicked s (:topic-slug activity-data))}
-                        topic-name]))]]
-              [:div.activity-modal-content
-                [:div.activity-modal-content-headline
-                  {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-                [:div.activity-modal-content-body
-                  {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                   :class (when (empty? (:headline activity-data)) "no-headline")}]
-                (media-attachments (:attachments activity-data) nil nil)]
-              [:div.activity-modal-footer.group
-                {:class (when (and @(:first-render-done s)
-                                   (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
-                (reactions activity-data)
-                [:div.activity-modal-footer-right
-                  (when (or (utils/link-for (:links activity-data) "partial-update")
-                            (utils/link-for (:links activity-data) "delete"))
-                    (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
-                          same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
-                      [:div.more-dropdown.dropdown
-                        [:button.mlb-reset.activity-modal-more.dropdown-toggle
-                          {:type "button"
-                           :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
-                           :data-toggle "dropdown"
-                           :aria-haspopup true
-                           :aria-expanded false
-                           :title "More"}]
-                        [:div.dropdown-menu
-                          {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
-                          [:div.triangle]
-                          [:ul.activity-modal-more-menu
-                            (when (utils/link-for (:links activity-data) "share")
-                              [:li
-                                {:on-click (fn [e]
-                                             (utils/event-stop e)
-                                             ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show activity-data]))}
-                                "Share Link"])
-                            (when (utils/link-for (:links activity-data) "share")
-                              [:li
-                                {:on-click (fn [e]
-                                             (utils/event-stop e)
-                                             ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show activity-data]))}
-                                "Share Email"])
-                            (when (and (utils/link-for (:links activity-data) "share")
-                                       (jwt/team-has-bot? (:team-id (dis/org-data))))
-                              [:li
-                                {:on-click (fn [e]
-                                             (utils/event-stop e)
-                                             ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show activity-data]))}
-                                "Share Slack"])
-                            (when (utils/link-for (:links activity-data) "partial-update")
-                              [:li
-                                {:on-click (fn [e]
-                                             (utils/event-stop e)
-                                             (dis/dispatch! [:entry-edit activity-data]))}
-                                "Edit"])
-                            (when (utils/link-for (:links activity-data) "partial-update")
-                              [:li
-                                {:on-click #(reset! (::move-activity s) true)}
-                                "Move"])
-                            (when (utils/link-for (:links activity-data) "delete")
-                              [:li
-                                {:on-click #(delete-clicked % activity-data)}
-                                "Delete"])]]
-                        (when @(::move-activity s)
-                          (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))]]]]
-          (when show-comments?
-            [:div.activity-right-column
-              [:div.activity-right-column-content
-                (comments activity-data)]])]]]))
+                       :data-placement "right"
+                       :data-container "body"
+                       :title "More"}]
+                    (when @(::showing-dropdown s)
+                      [:div.activity-modal-dropdown-menu
+                        [:div.triangle]
+                        [:ul.activity-modal-more-menu
+                          (when (utils/link-for (:links activity-data) "partial-update")
+                            [:li
+                              {:on-click #(do
+                                           (reset! (::showing-dropdown s) false)
+                                           (reset! (::move-activity s) true))}
+                              "Move"])
+                          (when (utils/link-for (:links activity-data) "delete")
+                            [:li
+                              {:on-click #(delete-clicked % activity-data)}
+                              "Delete"])]])
+                    (when @(::move-activity s)
+                      (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
+              (when (:topic-slug activity-data)
+                (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
+                  [:div.activity-tag
+                    {:on-click #(close-clicked s (:topic-slug activity-data))}
+                    topic-name]))]]
+          [:div.activity-modal-columns
+            ;; Left column
+            [:div.activity-left-column
+              [:div.activity-left-column-content
+                [:div.activity-modal-content
+                  [:div.activity-modal-content-headline
+                    {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+                  [:div.activity-modal-content-body
+                    {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
+                     :class (when (empty? (:headline activity-data)) "no-headline")}]
+                  (media-attachments (:attachments activity-data) nil nil)]
+                [:div.activity-modal-footer.group
+                  {:class (when (and @(:first-render-done s)
+                                     (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
+                  (reactions activity-data)
+                  [:div.activity-modal-share
+                    (js/console.log "share-dropdown" @(::share-dropdown s))
+                    (when @(::share-dropdown s)
+                      [:div.share-dropdown
+                        [:div.triangle]
+                        [:ul.share-dropdown-menu
+                          (when (utils/link-for (:links activity-data) "share")
+                            [:li.share-dropdown-item
+                              {:on-click (fn [e]
+                                           (utils/event-stop e)
+                                           (reset! (::share-dropdown s) false)
+                                           ; open the activity-share-modal component
+                                           (dis/dispatch! [:activity-share-show :link activity-data]))}
+                              "Share Link"])
+                          (when (utils/link-for (:links activity-data) "share")
+                            [:li.share-dropdown-item
+                              {:on-click (fn [e]
+                                           (utils/event-stop e)
+                                           (reset! (::share-dropdown s) false)
+                                           ; open the activity-share-modal component
+                                           (dis/dispatch! [:activity-share-show :email activity-data]))}
+                              "Share Email"])
+                          (when (and (utils/link-for (:links activity-data) "share")
+                                     (jwt/team-has-bot? (:team-id (dis/org-data))))
+                            [:li.share-dropdown-item
+                              {:on-click (fn [e]
+                                           (utils/event-stop e)
+                                           (reset! (::share-dropdown s) false)
+                                           ; open the activity-share-modal component
+                                           (dis/dispatch! [:activity-share-show :slack activity-data]))}
+                              "Share Slack"])]])
+                    [:button.mlb-reset.share-button
+                      {:on-click #(do
+                                   (utils/event-stop %)
+                                   (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
+                      "Share"]]
+                  [:div.activity-modal-footer-right]]]]
+            ;; Right column
+            (when show-comments?
+              [:div.activity-right-column
+                [:div.activity-right-column-content
+                  (comments activity-data)]])]]]]))
