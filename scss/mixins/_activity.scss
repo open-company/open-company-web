@@ -110,12 +110,14 @@ $h2_top_margin: 20;
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
       display: inline-block !important;
-      width: 16px;
-      height: 16px;
+      width: 32px;
+      height: 32px;
       background-image: cdnUrl("/img/small_loading.gif");
       background-position: center;
       background-repeat: no-repeat;
-      background-size: 16px 16px;
+      background-size: 32px 32px;
+      top: -16px;
+      position: relative;
     }
   }
 
