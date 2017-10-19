@@ -65,6 +65,10 @@ div.fsp-picker {
       }
 
       div.fsp-source-list {
+        .fsp-source-list__item--active {
+          background-color: white;
+        }
+
         .fsp-source-list__item.active {
           display: inherit !important;
           .fsp-source-list__label {
@@ -88,6 +92,13 @@ div.fsp-picker {
             border-radius: 20px;
             background-color: rgba($oc_gray_7,0.4);
             position: absolute;
+          }
+        }
+
+        .fsp-source-list__item--active {
+          span.fsp-source-list__icon {
+            background-color: $carrot_light_blue;
+            border-radius: 19px;
           }
         }
 
