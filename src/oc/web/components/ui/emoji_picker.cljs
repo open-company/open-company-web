@@ -7,7 +7,6 @@
             [goog.events.EventType :as EventType]
             [goog.object :as googobj]
             [cljsjs.emojione-picker]
-            [cljsjs.rangy-selectionsaverestore]
             [cljsjs.react]
             [cljsjs.react.dom]))
 
@@ -20,7 +19,11 @@
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
     (remove-markers s)
-    (reset! (::visible s) false)))
+    (let [prior-value @(::visible s)]
+      (reset! (::visible s) false)
+      (let [will-hide-picker (:will-hide-picker (first (:rum/args s)))]
+        (when (and prior-value (fn? will-hide-picker))
+          (will-hide-picker))))))
 
 (defn save-caret-position [s]
   (remove-markers s)
@@ -76,16 +79,18 @@
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
   
-  [s {:keys [add-emoji-cb position]
-      :or {:position "bottom"}}]
+  [s {:keys [add-emoji-cb position width height will-show-picker will-hide-picker]
+      :or {:position "bottom"
+           :width 25
+           :height 25}}]
   (let [visible (::visible s)
         caret-pos (::caret-pos s)
         last-active-element (::last-active-element s)
         disabled (::disabled s)]
     [:div.emoji-picker.relative
-      {:style {:width "25px"
+      {:style {:width (str width "px")
                :z-index 1132
-               :height "24px"}}
+               :height (str height "px")}}
       [:button
         {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
          :type "button"
@@ -96,12 +101,15 @@
          :on-mouse-down #(save-caret-position s)
          :on-click #(do
                       (.preventDefault %)
-                      (if (and @caret-pos (not @visible))
-                        (reset! visible true)
-                        (reset! visible false)))}]
+                      (let [vis (and @caret-pos (not @visible))]
+                        (when (and vis (fn? will-show-picker))
+                          (will-show-picker))
+                        (when (and vis (fn? will-hide-picker))
+                          (will-hide-picker))
+                        (reset! visible vis)))}]
       [:div.picker-container.absolute
         {:style {:display (if @visible "block" "none")
-                 :top (if (= position "bottom") "25px" "-220px")
+                 :top (if (= position "bottom") (str height "px") "-220px")
                  :right "-10px"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search ""

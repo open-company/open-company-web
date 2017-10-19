@@ -23,7 +23,7 @@ div.topics-columns {
       width: #{$board_container_width}px;
       background-color: $oc_gray_8;
 
-      div.all-activity-icon {
+      div.all-posts-icon {
         background-image: cdnUrl("/img/ML/activity_hamburger.svg");
         background-size: 26px 24px;
         width: 26px;
@@ -88,9 +88,20 @@ div.topics-columns {
           width: 66px;
           height: 66px;
           border-radius: 33px;
-          background-color: $carrot_orange;
+          background-color: #FA6654;
           z-index: 1000;
           box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
+          opacity: 1;
+
+          &:hover {
+            background-color: #FF7C6C;
+            opacity: 1;
+          }
+
+          &:active, &:focus {
+            background-color: #ED4F3B;
+            opacity: 1;
+          }
 
           div.add-to-board-pencil {
             background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
@@ -104,17 +115,29 @@ div.topics-columns {
 
         &.top-button {
           float: right;
-          width: 103px;
+          width: auto;
           height: 42px;
-          background-color: #FAEAE5;
-          color: $carrot_orange;
+          background-color: #FA6654;
+          color: white;
           border-radius: 4px;
           padding: 10px 23.5px;
           margin-right: 16px;
           @include avenir_H();
+          border: 2px solid transparent;
+          opacity: 1;
+
+          &:hover {
+            background-color: #FF7C6C;
+            opacity: 1;
+          }
+
+          &:active, &:focus {
+            background-color: #ED4F3B;
+            opacity: 1;
+          }
 
           div.add-to-board-pencil {
-            background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
+            background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
             background-size: 14px 14px;
             width: 14px;
             height: 14px;
@@ -128,78 +151,6 @@ div.topics-columns {
             font-size: 16px;
             color: $carrot_orange;
             float: left;
-          }
-
-          &:hover {
-            background-color: $carrot_orange;
-            color: white;
-
-            div.add-to-board-pencil {
-              background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-            }
-          }
-        }
-      }
-
-      div.new-story-container {
-        float: right;
-        position: relative;
-
-        button.add-to-board-btn {
-          &.top-button {
-            width: 103px;
-          }
-        }
-
-        div.tooltip {
-          width: 168px;
-        }
-
-        div.dropdown-top {
-          div.dropdown-list-container {
-            left: -8.5px;
-            top: 52px;
-            width: 170px;
-          }
-        }
-
-        div.dropdown-floating {
-          position: absolute;
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          width: 66px;
-          height: 66px;
-          z-index: 10000;
-
-          div.tooltip {
-            width: 178px;
-          }
-
-          button.add-to-board-btn.floating-button {
-            position: relative;
-            top: 0px;
-            left: 0px;
-            width: 66px;
-            height: 66px;
-          }
-
-          div.dropdown-list-container {
-            left: -97px;
-            top: unset;
-            bottom: 76px;
-            width: 170px;
-
-            div.triangle {
-              top: unset;
-              left: unset;
-              right: 30px;
-              bottom: -2px;
-              border-top: unset;
-              border-left: unset;
-              border-bottom: 1px solid rgba(177,184,192,0.50);
-              border-right: 1px solid rgba(177,184,192,0.50);
-            }
           }
         }
       }

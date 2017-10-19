@@ -12,7 +12,7 @@
         new-board @(::selected-board s)
         on-change (:on-change opts)
         dismiss-cb (:dismiss-cb opts)]
-    (dis/dispatch! [:activity-board-move activity-data new-board])
+    (dis/dispatch! [:activity-move activity-data new-board])
     (reset! (::show-boards-list s) false)
     (reset! (::selected-board s) nil)
     (when (fn? on-change)
@@ -47,7 +47,8 @@
     [:div.move-post-inner
       [:div.move-post-title
         "Move"
-        [:i.mdi.mdi-information-outline]]
+        ; [:i.mdi.mdi-information-outline]
+        ]
       [:div.select-new-board
         {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
          :class (when (nil? @(::selected-board s)) "placeholder")}

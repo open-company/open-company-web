@@ -4,7 +4,6 @@
             [goog.style :as gstyle]
             [goog.object :as gobj]
             [cljsjs.medium-editor]
-            [cljsjs.rangy-selectionsaverestore]
             [org.martinklepsch.cljsjs-medium-button]))
 
 (defn inject-extension [config-map ext-map]

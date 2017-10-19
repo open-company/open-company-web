@@ -9,12 +9,11 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.media-picker :refer (media-picker)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.story-publish-modal :refer (story-publish-modal)]
@@ -36,8 +35,12 @@
   (reset! (::last-timeout s)
    (utils/after default-save-wait
     (fn []
-      (dis/dispatch! [:draft-autosave])
-      (reset! (::central-message s) "saving...")))))
+      (let [story-editing @(drv/get-ref s :story-editing)
+            raw-body (:raw-body story-editing)
+            final-body (if (not (empty? raw-body)) raw-body (:body story-editing))]
+        (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html final-body)])
+        (dis/dispatch! [:draft-autosave])
+        (reset! (::central-message s) "saving..."))))))
 
 (defn update-story-editing [s new-data]
   (dis/dispatch! [:input [:story-editing] (merge @(drv/get-ref s :story-editing) new-data {:has-changes true})])
@@ -45,41 +48,19 @@
 
 ;; Body change handling
 
-(defn body-on-change [state]
-  (when-let [body-el (sel1 [:div.story-edit-body])]
-    ; Hide/show placeholder capturing the situation medium-editor ignores:
-    ; multiple empty Ps, img or iframes
-    (utils/after 1000
-     #(when-let [$body-el (js/$ "div.story-edit-body.medium-editor-placeholder")]
-        (if (and (empty? (.text $body-el))
-                 (<= (.-length (.find $body-el "div, p")) 1)
-                 (zero? (.-length (.find $body-el "img, iframe"))))
-          (.removeClass $body-el "hide-placeholder")
-          (.addClass $body-el "hide-placeholder"))))
-    ; Attach paste listener to the body and all its children
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
-    (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (update-story-editing state {:body emojied-body}))))
+(defn body-on-change [s]
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (update-story-editing s {:raw-body (.-innerHTML body-el)})))
 
 (defn- title-on-change [state]
-  (when-let [title (sel1 [:div.story-edit-title])]
+  (when-let [title (rum/ref-node state "title")]
     (let [emojied-title   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML title)) "__html"))]
       (update-story-editing state {:title emojied-title}))))
 
-(defn- setup-body-editor [state]
-  (let [media-picker-id @(::media-picker-id state)
-        title-el  (sel1 [:div.story-edit-title])
-        body-el      (sel1 [:div.story-edit-body])
-        body-editor  (new js/MediumEditor body-el (clj->js (-> "Start writing..."
-                                                            (utils/medium-editor-options false true)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {:left 36 :top -111})))))]
-    (.subscribe body-editor
-                "editableInput"
-                (fn [event editable]
-                  (body-on-change state)))
-    (reset! (::body-editor state) body-editor)
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
-    (events/listen title-el EventType/INPUT #(title-on-change state))
+(defn- setup-title [state]
+  (let [title-el  (rum/ref-node state "title")]
+    (when title-el
+      (reset! (::title-input-listener state) (events/listen title-el EventType/INPUT #(title-on-change state))))
     ;; Make sure the jss lib is loaded before calling it
     (utils/after 2500 #(js/emojiAutocomplete))))
 
@@ -121,6 +102,7 @@
   "Show an error alert view for failed uploads."
   []
   (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "banner-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
@@ -132,22 +114,10 @@
   (gdom/removeNode img)
   (banner-add-if-finished s))
 
-;; Media picker handling
-
-(defn media-picker-did-change [s]
-  (body-on-change s)
-  (story-autosave s)
-  (utils/after 100
-    #(do
-       (utils/to-end-of-content-editable (sel1 [:div.story-edit-body]))
-       (utils/scroll-to-bottom (.-body js/document) true))))
-
-(defn complete-story-edit-url [uuid]
-  (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/story-edit (router/current-org-slug) (router/current-board-slug) uuid)))
-
 (defn delete-clicked [e story-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-journal"
                     :message "Delete this journal entry?"
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
@@ -164,12 +134,17 @@
       (update-story-editing s {:board-slug (:value storyboard) :storyboard-name (:label storyboard) :redirect true})
       (reset! (::show-storyboards-list s) false))))
 
+(defn add-emoji-cb [s _ _]
+  (title-on-change s)
+  (body-on-change s))
+
 (rum/defcs story-edit < rum/reactive
                         ;; Story edits
                         (drv/drv :story-editing)
                         (drv/drv :current-user-data)
                         (drv/drv :alert-modal)
                         (drv/drv :org-data)
+                        (drv/drv :media-input)
                         ;; Medium editor
                         (rum/local nil ::body-editor)
                         ;; Initial data
@@ -183,24 +158,23 @@
                         ;; Banner url
                         (rum/local nil ::banner-url)
                         (rum/local false ::banner-add-did-success)
-                        ;; Media picker
-                        (rum/local "story-edit-media-picker" ::media-picker-id)
-                        (rum/local false ::media-picker-expanded)
                         ;; Storyboard tag
                         (rum/local nil ::show-storyboards-list)
                         ;; Publish dialog
                         (rum/local false ::show-publish-modal)
+                        ;; Title input listener
+                        (rum/local nil ::title-input-listener)
                         {:will-mount (fn [s]
                                        (utils/after 100 #(dis/dispatch! [:story-get]))
                                        (let [story-editing @(drv/get-ref s :story-editing)]
                                          (when (:uuid story-editing)
                                            (reset! (::initial-title s) (:title story-editing))
-                                           (reset! (::initial-body s) (:body story-editing))
+                                           (reset! (::initial-body s) (if (empty? (:body story-editing)) utils/default-body (:body story-editing)))
                                            (reset! (::activity-uuid s) (:uuid story-editing))))
                                        s)
                          :did-mount (fn [s]
-                                      (utils/after 100 #(setup-body-editor s))
-                                      (utils/after 10 #(.focus (sel1 [:div.story-edit-title])))
+                                      (utils/after 300 #(setup-title s))
+                                      (utils/to-end-of-content-editable (rum/ref-node s "title"))
                                       s)
                          :did-remount (fn [o s]
                                         (when-let [story-editing @(drv/get-ref s :story-editing)]
@@ -225,9 +199,13 @@
                                         (when @(::body-editor s)
                                           (.destroy @(::body-editor s))
                                           (reset! (::body-editor s) nil))
+                                        (when @(::title-input-listener s)
+                                          (events/unlistenByKey @(::title-input-listener s))
+                                          (reset! (::title-input-listener s) nil))
                                         s)}
   [s]
   (let [story-data (drv/react s :story-editing)
+        media-input (drv/react s :media-input)
         story-author (if (:author story-data)
                        (if (map? (:author story-data))
                          (:author story-data)
@@ -237,10 +215,10 @@
     [:div.story-edit-container
       (when (drv/react s :alert-modal)
         (alert-modal))
-      (when (:media-video story-data)
-        (media-video-modal :story-editing))
-      (when (:media-chart story-data)
-        (media-chart-modal :story-editing))
+      (when (:media-video media-input)
+        (media-video-modal))
+      (when (:media-chart media-input)
+        (media-chart-modal))
       (when @(::show-publish-modal s)
         (story-publish-modal story-data #(reset! (::show-publish-modal s) (not @(::show-publish-modal s)))))
       [:div.story-edit-header.group
@@ -260,7 +238,9 @@
             "Delete"]
           (when (= "draft" (:status story-data))
             [:button.mlb-reset.mlb-default.post-button
-              {:on-click #(reset! (::show-publish-modal s) true)}
+              {:on-click #(do
+                            (dis/dispatch! [:input [:story-editing :body] (utils/clean-body-html (.-innerHTML (sel1 [:div.rich-body-editor])))])
+                            (reset! (::show-publish-modal s) true))}
               "Post"])]]
       [:div.story-edit-content
         [:div.story-edit-content-authorship.group
@@ -322,25 +302,24 @@
               "Remove Image"])]
         [:div.story-edit-title.emoji-autocomplete.emojiable
           {:content-editable true
+           :ref "title"
            :placeholder default-story-title
            :on-paste    #(title-on-paste s %)
-           :on-key-Up   #(title-on-change s)
            :on-key-down #(title-on-change s)
-           :on-focus    #(title-on-change s)
-           :on-blur     #(title-on-change s)
+           :on-click    #(title-on-change s)
+           :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
            :dangerouslySetInnerHTML (utils/emojify @(::initial-title s))}]
-        [:div.story-edit-body.emoji-autocomplete.emojiable
-          {:class (utils/class-set {:medium-editor-placeholder-hidden (or (not (empty? @(::initial-body s)))
-                                                                          @(::media-picker-expanded s))})
-           :dangerouslySetInnerHTML (utils/emojify @(::initial-body s))}]
-        (media-picker {:media-config [:photo :video :chart :attachment :divider-line]
-                       :media-picker-id @(::media-picker-id s)
-                       :on-change #(media-picker-did-change s)
-                       :body-editor-sel "div.story-edit-body"
-                       :data-editing story-data
-                       :dispatch-input-key :story-editing
-                       :on-expand #(reset! (::media-picker-expanded s) true)
-                       :on-collapse #(reset! (::media-picker-expanded s) false)})]
+        (rich-body-editor {:on-change #(body-on-change s)
+                           :initial-body @(::initial-body s)
+                           :show-placeholder (or (empty? @(::initial-body s))
+                                                 (= @(::initial-body s) utils/default-body))
+                           :show-h2 true
+                           :dispatch-input-key :story-editing
+                           :media-config ["photo" "video" "chart" "attachment" "divider-line"]
+                           :classes "emoji-autocomplete emojiable"})]
       [:div.story-edit-footer.group
         [:div.story-edit-footer-inner
-          (emoji-picker {:add-emoji-cb #(do (title-on-change s) (body-on-change s))})]]]))
+          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})]]]))

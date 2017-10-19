@@ -18,15 +18,16 @@ $h2_top_margin: 20;
     @include avenir_H();
     color: $carrot_dark_gray;
     font-size: 15px;
+    white-space: nowrap;
   }
 
   div.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
-    width: calc(100% - 52px);
     @include avenir_R();
     color: rgba($oc_gray_7, 0.5);
     font-size: 14px;
+    white-space: nowrap;
 
     div.tooltip {
       .tooltip-inner {
@@ -57,19 +58,16 @@ $h2_top_margin: 20;
     max-width: 100%;
 
     &:hover {
-      background-color: $carrot_text_blue;
-      color: white;
+      background-color: #C7CEFF !important;
+      color: $carrot_text_blue;
       cursor: pointer;
     }
 
     &.board-tag {
       margin-right: 2px;
 
-      &:hover {
-        background-color: $carrot_orange;
-        &:before {
-          background-image: cdnUrl("/img/ML/boards_icon_white.png");
-        }
+      &:hover:before {
+        background-image: cdnUrl("/img/ML/boards_icon_blue.png");
       }
 
       &:before {
@@ -87,11 +85,8 @@ $h2_top_margin: 20;
     &.storyboard-tag {
       margin-right: 2px;
 
-      &:hover {
-        background-color: $carrot_orange;
-        &:before {
-          background-image: cdnUrl("/img/ML/storyboards_icon_white.png");
-        }
+      &:hover:before {
+        background-image: cdnUrl("/img/ML/storyboards_icon_blue.png");
       }
 
       &:before {
@@ -128,7 +123,21 @@ $h2_top_margin: 20;
   }
 }
 
-@mixin activity-body(){
+@mixin activity-body($font-size: 16){
+
+  &.uploading[contenteditable=true]{
+    .rangySelectionBoundary {
+      display: inline-block !important;
+      width: 32px;
+      height: 32px;
+      background-image: cdnUrl("/img/small_loading.gif");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 32px 32px;
+      top: -16px;
+      position: relative;
+    }
+  }
 
   &.medium-editor-placeholder-hidden:after {
     display: none !important;
@@ -136,20 +145,20 @@ $h2_top_margin: 20;
 
   &.medium-editor-placeholder:after {
     @include avenir_R();
-    font-size: 16px;
+    font-size: #{$font-size}px;
     color: $carrot_light_gray_1;
     font-style: none !important;
   }
 
   @include avenir_R();
-  font-size: 16px;
+  font-size: #{$font-size}px;
   color: $carrot_dark_gray;
 
   * {
     color: $carrot_dark_gray;
   }
 
-  p, img, h1, h2, h3, h4, h5 {
+  p {
     margin: 0 0 #{$bottom_margin}px;
   }
 
@@ -161,8 +170,12 @@ $h2_top_margin: 20;
 
   h2 {
     margin-top: #{$bottom_margin + $h2_top_margin}px;
-    font-size: 19px;
     @include avenir_H();
+    font-size: #{$font-size + 3}px;
+
+    .emojione {
+      @include emoji-size($font-size + 1);
+    }
   }
 
   a {
@@ -180,7 +193,7 @@ $h2_top_margin: 20;
   }
 
   .emojione {
-    @include emoji-size(14);
+    @include emoji-size($font-size - 2);
   }
 
   p:last-child, & > div:last-child {
@@ -190,16 +203,18 @@ $h2_top_margin: 20;
 
   hr.media-divider-line {
     display: inline-block;
-    width: 90%;
-    margin-left: 5%;
+    position: relative;
+    width: 60px;
+    left: 50%;
+    margin-left: -30px;
     height: 1px;
-    background-color: rgba($oc_gray_7, 0.4);
-    margin-top: #{$bottom_margin}px;
-    margin-bottom: #{$bottom_margin}px;
+    background-color: $carrot_dark_gray;
+    margin-top: 0px;
+    margin-bottom: 0px;
   }
 }
 
-@mixin activity-attachment(){
+@mixin activity-attachment($hide-remove-button: false){
   a.media-attachment {
     display: inline-block;
     width: 100%;
@@ -222,9 +237,10 @@ $h2_top_margin: 20;
       label.media-attachment-title {
         text-decoration: underline;
       }
-
-      button.remove-attachment {
-        display: block;
+      @if $hide-remove-button == true {
+        button.remove-attachment {
+          display: block;
+        }
       }
     }
 

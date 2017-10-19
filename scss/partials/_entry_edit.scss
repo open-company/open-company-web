@@ -83,7 +83,7 @@ div.entry-edit-modal-container {
 
           div.entry-edit-topics-dd {
             position: absolute;
-            top: 25px;
+            top: 30px;
             left: calc(50% - 130px);
             width: 260px;
             border: none;
@@ -152,7 +152,7 @@ div.entry-edit-modal-container {
                   button.remove {
                     color: $carrot_light_gray;
                     @include avenir_R();
-                    font-size: 14px;
+                    font-size: 12px;
                     margin: 0;
                     padding: 0;
                     margin-left: 17px;
@@ -245,10 +245,12 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-body {
         margin: 0px;
-        padding: 24px 36px;
+        padding: 24px 24px 24px 58px;
         overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: visible;
         max-height: calc(100vh - 64px - 72px);
+        width: calc(100% + 22px);
+        margin-left: -22px;
 
         div.entry-edit-headline {
           border: none;
@@ -267,32 +269,45 @@ div.entry-edit-modal-container {
           }
         }
 
-        div.entry-edit-body {
-          border: none;
-          outline: none;
-          color: $carrot_dark_gray;
-          @include avenir_R();
-          font-size: 16px;
-          margin: 24px 0;
-          cursor: text;
-          min-height: 85px;
-          @include activity-body();
+        div.rich-body-editor-container {
+          position: relative;
+          overflow: visible;
 
-          &.medium-editor-placeholder:after {
-            color: $oc_gray_7 !important;
+          div.medium-editor-media-picker {
+            margin-top: 0px;
+            margin-left: -36px;
+            top: 0px;
           }
 
-          &:after {
-            margin: 0;
+          div.rich-body-editor {
+            border: none;
+            outline: none;
+            color: $carrot_dark_gray;
+            @include avenir_R();
+            font-size: 16px;
+            margin: 24px 0;
+            cursor: text;
+            min-height: 85px;
+            @include activity-body();
+
+            @include activity-attachment(true);
+
+            &.medium-editor-placeholder:after {
+              color: $carrot_dark_gray !important;
+            }
+
+            * {
+              color: $carrot_dark_gray;
+            }
+
+            &:after {
+              margin: 0;
+            }
           }
         }
 
         div.entry-edit-controls {
           margin-bottom: 16px;
-
-          div.emoji-picker {
-            float: right;
-          }
         }
       }
 
@@ -303,6 +318,11 @@ div.entry-edit-modal-container {
       div.entry-edit-modal-footer {
         height: 40px;
         margin: 16px 36px;
+
+        div.emoji-picker {
+          float: left;
+          margin-top: 4px;
+        }
 
         button.attachment {
           float: left;

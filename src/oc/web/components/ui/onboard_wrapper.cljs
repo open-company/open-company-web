@@ -11,15 +11,15 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
-
-(def default-avatar-url (random-user-image))
 
 (rum/defcs email-lander < rum/static
                           rum/reactive
                           (drv/drv :signup-with-email)
+                          (rum/local false ::email-error)
+                          (rum/local false ::password-error)
                           {:will-mount (fn [s]
                                         (let [signup-with-email @(drv/get-ref s :signup-with-email)]
                                           (when-not (contains? signup-with-email :email)
@@ -43,27 +43,54 @@
       [:div.onboard-form
         [:div.field-label
           "Enter email"
-          (when (= (:error signup-with-email) 409)
-            [:span.error "Email already exists"])]
+          (cond
+            (= (:error signup-with-email) 409)
+            [:span.error "Email already exists"]
+            @(::email-error s)
+            [:span.error "Email is not valid"])]
         [:input.field
           {:type "email"
            :class (when (= (:error signup-with-email) 409) "error")
            :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
            :value (:email signup-with-email)
-           :on-change #(dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)])}]
+           :on-change #(do
+                         (reset! (::password-error s) false)
+                         (reset! (::email-error s) false)
+                         (dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)]))}]
         [:div.field-label
-          "Password"]
+          "Password"
+          (when @(::password-error s)
+            [:span.error
+              "Minimum 8 characters"])]
         [:input.field
           {:type "password"
-           :pattern ".{5,}"
+           :pattern ".{8,}"
            :value (:pswd signup-with-email)
-           :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)])}]
+           :placeholder "Minimum 8 characters"
+           :on-change #(do
+                         (reset! (::password-error s) false)
+                         (reset! (::email-error s) false)
+                         (dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)]))}]
         [:div.field-description
-          "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
+          "By signing up you are agreeing to our "
+          [:a
+            "terms of service"]
+          " and "
+          [:a
+            "privacy policy"]
+          "."]
         [:button.continue
-          {:disabled (or (not (utils/valid-email? (:email signup-with-email)))
-                         (<= (count (:pswd signup-with-email)) 7))
-           :on-click #(dis/dispatch! [:signup-with-email])}
+          {:class (when (or (not (utils/valid-email? (:email signup-with-email)))
+                            (<= (count (:pswd signup-with-email)) 7))
+                    "disabled")
+           :on-click #(if (or (not (utils/valid-email? (:email signup-with-email)))
+                              (<= (count (:pswd signup-with-email)) 7))
+                        (do
+                          (when (not (utils/valid-email? (:email signup-with-email)))
+                            (reset! (::email-error s) true))
+                          (when (<= (count (:pswd signup-with-email)) 7)
+                            (reset! (::password-error s) true)))
+                        (dis/dispatch! [:signup-with-email]))}
           "Continue"]
         [:div.footer-link
           "Already have an account?"
@@ -73,7 +100,9 @@
                                   (drv/drv :edit-user-profile)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
+                                  (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
+                                                 (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                                  (cook/set-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)) true (* 60 60 24 7))
                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                                  s)
@@ -88,7 +117,11 @@
                                                  s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        temp-user-avatar @(::temp-user-avatar s)
+        fixed-user-data (if (empty? (:avatar-url user-data))
+                          (assoc user-data :avatar-url temp-user-avatar)
+                          user-data)]
     [:div.onboard-lander.second-step
       [:div.steps.three-steps
         [:div.step-1
@@ -100,8 +133,8 @@
         [:div.step-3
           "Your Team"]]
       [:div.main-cta
-        [:div.title
-          "Tell us about yourself"]
+        [:div.title.about-yourself
+          "Tell us a bit about yourself..."]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -110,8 +143,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) temp-user-avatar)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -121,9 +154,9 @@
                         nil
                         (fn [_])
                         nil))}
-          (user-avatar-image user-data)
+          (user-avatar-image fixed-user-data)
           [:div.add-picture-link
-            "Upload profile photo"]
+            "Change photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -219,7 +252,9 @@
                           (drv/drv :edit-user-profile)
                           (drv/drv :orgs)
                           (rum/local false ::saving)
+                          (rum/local nil ::temp-user-avatar)
                           {:will-mount (fn [s]
+                                         (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                          (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                          s)
                            :will-update (fn [s]
@@ -229,11 +264,15 @@
                                             (let [orgs @(drv/get-ref s :orgs)]
                                               (if (pos? (count orgs))
                                                 (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
-                                                (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
+                                                (utils/after 100 #(router/nav! oc-urls/slack-lander-team)))))
                                          s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        temp-user-avatar @(::temp-user-avatar s)
+        fixed-user-data (if (empty? (:avatar-url user-data))
+                          (assoc user-data :avatar-url temp-user-avatar)
+                          user-data)]
     [:div.onboard-lander
       [:div.steps.two-steps
         [:div.step-1
@@ -242,15 +281,15 @@
         [:div.step-2
           "Your Team"]]
       [:div.main-cta
-        [:div.title
-          "Tell us about yourself"]
+        [:div.title.about-yourself
+          "Tell us a bit about yourself..."]
         [:div.subtitle
           "This information will be visible to your team"]]
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) temp-user-avatar)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -260,9 +299,9 @@
                         nil
                         (fn [_])
                         nil))}
-          (user-avatar-image user-data)
+          (user-avatar-image fixed-user-data)
           [:div.add-picture-link
-            "Upload profile photo"]
+            "Change photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -363,6 +402,7 @@
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
+                            (rum/local false ::password-error)
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)
         jwt (:jwt confirm-invitation)
@@ -385,26 +425,41 @@
         [:div.field-label
           "Password"
           (when collect-pswd-error
-            [:span.error "An error occurred, please try again."])]
+            [:span.error "An error occurred, please try again."])
+          (when @(::password-error s)
+            [:span.error "Minimum 8 characters"])]
         [:input.field
           {:type "password"
            :class (when collect-pswd-error "error")
            :value (or (:pswd collect-pswd) "")
-           :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)])
-           :pattern ".{5,}"}]
+           :on-change #(do
+                         (reset! (::password-error s) false)
+                         (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
+           :placeholder "Minimum 8 characters"
+           :pattern ".{8,}"}]
         [:div.description
-          "By signing up you are agreeing to our " [:a {:href oc-urls/about} "terms of service"] " and " [:a {:href oc-urls/about} "privacy policy"] "."]
+          "By signing up you are agreeing to our "
+          [:a
+            "terms of service"]
+          " and "
+          [:a
+            "privacy policy"]
+          "."]
         [:button.continue
-          {:disabled (< (count (:pswd collect-pswd)) 8)
-           :on-click #(dis/dispatch! [:pswd-collect])}
+          {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
+           :on-click #(if (< (count (:pswd collect-pswd)) 8)
+                        (reset! (::password-error s) true)
+                        (dis/dispatch! [:pswd-collect]))}
           "Continue"]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
                                     (drv/drv :edit-user-profile)
                                     (drv/drv :orgs)
                                     (rum/local false ::saving)
+                                    (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                                  (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                                   (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
+                                                    (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                                   s)
                                      :will-update (fn [s]
                                                     (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
@@ -416,7 +471,11 @@
                                                     s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        temp-user-avatar @(::temp-user-avatar s)
+        fixed-user-data (if (empty? (:avatar-url user-data))
+                          (assoc user-data :avatar-url temp-user-avatar)
+                          user-data)]
     [:div.onboard-lander.second-step
       [:div.steps.two-steps
         [:div.step-1
@@ -425,8 +484,8 @@
         [:div.step-2
           "Your Profile"]]
       [:div.main-cta
-        [:div.title
-          "Tell us about yourself"]
+        [:div.title.about-yourself
+          "Tell us a bit about yourself..."]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -435,8 +494,8 @@
       [:div.onboard-form
         [:div.logo-upload-container
           {:on-click (fn []
-                      (when (not= (:avatar-url user-data) (utils/cdn default-avatar-url true))
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] (utils/cdn default-avatar-url true)]))
+                      (when (not= (:avatar-url user-data) temp-user-avatar)
+                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
                       (iu/upload! {:accept "image/*"
                                    :transformations {
                                      :crop {
@@ -446,9 +505,9 @@
                         nil
                         (fn [_])
                         nil))}
-          (user-avatar-image user-data)
+          (user-avatar-image fixed-user-data)
           [:div.add-picture-link
-            "Upload profile photo"]
+            "Change photo"]
           [:div.add-picture-link-subtitle
             "A 160x160 PNG or JPG works best"]]
         [:div.field-label
@@ -510,6 +569,7 @@
 
 (rum/defcs email-verified < rum/reactive
                             (drv/drv :email-verification)
+                            (drv/drv :orgs)
                             (rum/local false ::exchange-started)
                             (vertical-center-mixin ".onboard-email-container")
                             {:will-mount (fn [s]
@@ -523,7 +583,8 @@
                                           (exchange-token-when-ready s)
                                           s)}
   [s]
-  (let [email-verification (drv/react s :email-verification)]
+  (let [email-verification (drv/react s :email-verification)
+        orgs (drv/react s :orgs)]
     (cond
       (= (:error email-verification) 401)
       [:div.onboard-email-container.error
@@ -535,7 +596,11 @@
       [:div.onboard-email-container
         "Thanks for verifying"
         [:button.mlb-reset.continue
-          {:on-click #(router/nav! oc-urls/confirm-invitation-profile)}
+          {:on-click #(router/nav!
+                        (let [org (utils/get-default-org orgs)]
+                          (if org
+                            (oc-urls/org (:slug org))
+                            oc-urls/login)))}
           "Get Started"]]
       :else
       [:div.onboard-email-container.small.dot-animation

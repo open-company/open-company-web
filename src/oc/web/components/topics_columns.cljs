@@ -20,7 +20,7 @@
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.stories-layout :refer (stories-layout)]
-            [oc.web.components.all-activity :refer (all-activity)]
+            [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -52,23 +52,25 @@
 
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
-                                      all-activity-data
+                                      all-posts-data
                                       is-dashboard
-                                      is-all-activity
+                                      is-all-posts
                                       is-stakeholder-update
                                       board-filters] :as data} owner options]
 
   (init-state [_]
-    {:show-boards-tooltip (and (not (:show-login-overlay data))
-                               (jwt/jwt)
-                               (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))
-     :ww (responsive/ww)
-     :show-journals-tooltip false
-     :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
+    (let [first-user-visit (and (not (:show-login-overlay data))
+                                 (jwt/jwt)
+                                 (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))]
+      (when first-user-visit
+        (dis/dispatch! [:onboard-overlay-show]))
+      {:show-boards-tooltip false ;; Disable the welcome tooltip for now
+       :ww (responsive/ww)
+       :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))}))
 
   ; (will-mount [_]
   ;   (when (and (not (utils/is-test-env?))
-  ;              is-all-activity)
+  ;              is-all-posts)
   ;     (utils/after 100 #(dis/dispatch! [:calendar-get]))))
 
   (did-mount [_]
@@ -84,7 +86,7 @@
       (events/unlistenByKey (om/get-state owner :resize-listener))
       (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip show-journals-tooltip ww]}]
+  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -95,12 +97,14 @@
           sidebar-width (+ responsive/left-navigation-sidebar-width
                            responsive/left-navigation-sidebar-minimum-right-margin)
           board-container-style {:margin-left (str (max sidebar-width (+ (/ (- ww responsive/board-container-width sidebar-width) 2) sidebar-width)) "px")
-                                 :left "50%"}]
+                                 :left "50%"}
+          entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :group true
                                          :content-loaded content-loaded})}
-        (when show-boards-tooltip
+        (when (and show-boards-tooltip
+                   (not (:show-onboard-overlay data)))
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
@@ -108,21 +112,9 @@
                          :y (- (aget offset "top") 160)
                          :title "Welcome to Carrot"
                          :message "Boards make it easy to find the latest news and key updates from across the company. You can create boards for different areas of your company, like Sales, Marketing and Products."
-                         :footer "1 of 2"
+                         :footer ""
                          :on-next-click (fn []
-                                          (om/update-state! owner #(merge % {:show-journals-tooltip true
-                                                                             :show-boards-tooltip false})))})))
-        (when show-journals-tooltip
-          (when-let* [nav-journals (js/$ "h3#navigation-sidebar-journals")
-                      offset (.offset nav-journals)
-                      journals-left (aget offset "left")]
-            (carrot-tip {:x (+ journals-left 105 30)
-                         :y (- (aget offset "top") 160)
-                         :title "Welcome to Carrot"
-                         :message "Journals are the easiest way to share longer updates and ideas with your stakeholders, like monthly all-hands, weekly kickoffs, and investor updates."
-                         :footer "2 of 2"
-                         :on-next-click (fn []
-                                          (om/set-state! owner :show-journals-tooltip false)
+                                          (om/update-state! owner #(merge % {:show-boards-tooltip false}))
                                           (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
         (dom/div {:class "topics-column-container group"
                   :key columns-container-key}
@@ -134,17 +126,17 @@
             (dom/div {:class "group"}
               ;; Board name and settings button
               (dom/div {:class "board-name"}
-                (if is-all-activity
-                  (dom/div {:class "all-activity-icon"})
+                (if is-all-posts
+                  (dom/div {:class "all-posts-icon"})
                   (if (= (:type board-data) "story")
                     (dom/div {:class "stories-icon"})
                     (dom/div {:class "boards-icon"})))
-                (if is-all-activity
-                  "All Activity"
+                (if is-all-posts
+                  "All Posts"
                   (:name board-data))
                 ;; Settings button
                 (when (and (router/current-board-slug)
-                           (not is-all-activity)
+                           (not is-all-posts)
                            (not (:read-only board-data)))
                   (dom/button {:class "mlb-reset board-settings-bt"
                                :data-toggle "tooltip"
@@ -153,7 +145,7 @@
                                :title (str (:name board-data) " settings")
                                :on-click #(dis/dispatch! [:board-edit board-data])})))
               ;; Add entry button
-              (when (and (not is-all-activity)
+              (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
                          (= (:type board-data) "entry")
@@ -169,9 +161,9 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
-                  (dom/label {:class "add-to-board-label"}) "New"))
+                  (dom/label {:class "add-to-board-label"}) "New Post"))
               ;; Add entry floating button
-              (when (and (not is-all-activity)
+              (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
                          (= (:type board-data) "entry")
@@ -192,72 +184,18 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
-              ;; Add story buttons container
-              (when (= (:type board-data) "story")
-                (let [;; All the boards that are of story type, that are not drafts and that are not read-only
-                      storyboards (filter #(and (= (:type %) "story") (not= (:slug %) "drafts") (utils/link-for (:links %) "create")) (:boards org-data))
-                      ;; Select only the needed keys
-                      storyboards-list (map #(select-keys % [:name :slug :links]) storyboards)
-                      ;; Rename the keys for the dropdown
-                      fixed-storyboards (vec (map #(clojure.set/rename-keys % {:name :label :slug :value :links :links}) storyboards-list))]
-                  (when (or (not (:read-only board-data))
-                            (and (= (:slug board-data) "drafts")
-                                 (pos? (count storyboards))))
-                    (dom/div {:class "new-story-container group"}
-                      ;; Add story button
-                      (when (and (not is-all-activity)
-                                 (not (responsive/is-tablet-or-mobile?))
-                                 (or (utils/link-for (:links board-data) "create")
-                                     (= (:slug board-data) "drafts")))
-                        (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
-                                     :on-click #(if (= (router/current-board-slug) "drafts")
-                                                  (if (= (count fixed-storyboards) 1)
-                                                    (dis/dispatch! [:story-create (first storyboards)])
-                                                    (om/set-state! owner :show-storyboards-top-dropdown (not show-storyboards-top-dropdown)))
-                                                  (dis/dispatch! [:story-create board-data]))}
-                          (dom/div {:class "add-to-board-pencil"})
-                          (dom/label {:class "add-to-board-label"}) "New"))
-                      ;; Add story dropdown
-                      (when show-storyboards-top-dropdown
-                        (dom/div {:class "dropdown-top"}
-                          (dropdown-list {:items fixed-storyboards
-                                          :value nil
-                                          :on-change did-select-storyboard-cb
-                                          :on-blur #(om/set-state! owner :show-storyboards-top-dropdown false)})))
-                      ;; Add story flaoting button
-                      (dom/div {:class "dropdown-floating"
-                                :id "new-story-floating-btn"
-                                :style {:opacity (calc-opacity (document-scroll-top))}}
-                        (when (and (not is-all-activity)
-                                   (not (responsive/is-tablet-or-mobile?))
-                                   (or (utils/link-for (:links board-data) "create")
-                                       (= (:slug board-data) "drafts")))
-                          (dom/button {:class (str "mlb-reset mlb-default add-to-board-btn floating-button" (when (= (:slug board-data) "drafts") " is-draft"))
-                                       :data-placement "left"
-                                       :data-toggle "tooltip"
-                                       :title (str "Create a new journal entry")
-                                       :on-click #(if (= (router/current-board-slug) "drafts")
-                                                    (if (= (count fixed-storyboards) 1)
-                                                      (dis/dispatch! [:story-create (first storyboards)])
-                                                      (om/set-state! owner :show-storyboards-floating-dropdown (not show-storyboards-floating-dropdown)))
-                                                    (dis/dispatch! [:story-create board-data]))}
-                            (dom/div {:class "add-to-board-pencil"})))
-                        ;; Add story floating dropdown
-                        (when show-storyboards-floating-dropdown
-                          (dropdown-list {:items fixed-storyboards
-                                          :value nil
-                                          :on-change did-select-storyboard-cb
-                                          :on-blur #(om/set-state! owner :show-storyboards-floating-dropdown false)})))))))
               ;; Board filters dropdown
               (when (and (not is-mobile-size?)
                          (not empty-board?)
-                         (= (:type board-data) "entry"))
+                         (not is-all-posts)
+                         (= (:type board-data) "entry")
+                         (> (count entry-topics) 1))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
               (and is-dashboard
-                   is-all-activity)
-              (rum/with-key (all-activity all-activity-data) (str "all-activity-" (apply str (keys (:fixed-items all-activity-data)))))
+                   is-all-posts)
+              (rum/with-key (all-posts all-posts-data) (str "all-posts-" (apply str (keys (:fixed-items all-posts-data)))))
               (and is-dashboard
                    (not is-mobile-size?)
                    (not current-activity-id)

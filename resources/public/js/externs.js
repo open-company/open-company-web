@@ -58,12 +58,21 @@ var recursiveAttachPasteListener = function(){};
 var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
+// MediumEditorMediaPicker
+var MediaPicker = function(){};
+MediaPicker.addEntry = function(){};
+MediaPicker.addPhoto = function(){};
+MediaPicker.addVideo = function(){};
+MediaPicker.addChart = function(){};
+MediaPicker.addAttachment = function(){};
+// MediumEditorCustomBold
+var CustomBold = function(){};
 // Tooltip http://darsa.in/tooltip/
 var Tooltip = function(){};
 // Debug app state
 var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};
-var OCWebPrintAllActivityData = function(){};
+var OCWebPrintAllPostsData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
 var OCWebPrintBoardData = function(){};
@@ -72,6 +81,9 @@ var OCWebPrintActivityData = function(){};
 var OCWebPrintSecureStoryData = function(){};
 var OCWebPrintCommentsData = function(){};
 var OCWebPrintActivityCommentsData = function(){};
+var OCWebPrintReactionsData = function(){};
+var OCWebPrintEntryEditingData = function(){};
+var OCWebPrintStoryEditingData = function(){};
 var OCWebPrintReactionsData = function(){};
 var OCWebPrintJWTContents = function(){};
 var OCWebHelp = function(){};
@@ -96,3 +108,11 @@ var mailchimpApiSubmit = function(){};
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};
 var isIE = function(){};
+// Rangy
+var rangy = function(){};
+rangy.createClassApplier = function(){};
+rangy.init = function(){};
+rangy.saveSelection = function(){};
+rangy.removeMarkers = function(){};
+rangy.restoreSelection = function(){};
+rangy.getSelection = function(){};

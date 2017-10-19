@@ -1,6 +1,6 @@
 div.entries-layout {
   div.entry-cards-container {
-    max-width: 928px;
+    max-width: #{$board_container_width}px;
 
     &.by-topic {
       width: 100%;

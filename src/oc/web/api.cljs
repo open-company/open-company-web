@@ -678,7 +678,7 @@
 (def entry-keys [:headline :body :topic-name :attachments :title :board-slug :storyboard-slug])
 
 (defn create-entry
-  [entry-data]
+  [entry-data temp-uuid]
   (when entry-data
     (let [board-data (dispatcher/board-data)
           create-entry-link (utils/link-for (:links board-data) "create")
@@ -686,8 +686,8 @@
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-save/finish]))))))
+        (fn [{:keys [status success body headers] :as resp}]
+          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :temp-uuid temp-uuid}]))))))
 
 (defn update-entry
   [entry-data]
@@ -698,7 +698,7 @@
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-save/finish]))))))
+          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {})}]))))))
 
 (defn delete-activity [activity-data]
   (when activity-data
@@ -708,20 +708,20 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-delete/finish]))))))
 
-(defn get-all-activity [org-data & [activity-link year month]]
+(defn get-all-posts [org-data & [activity-link year month]]
   (when org-data
-    (let [all-activity-link (or activity-link (utils/link-for (:links org-data) "activity"))]
-      (storage-http (method-for-link all-activity-link) (relative-href all-activity-link)
-        {:headers (headers-for-link all-activity-link)}
+    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))]
+      (storage-http (method-for-link all-posts-link) (relative-href all-posts-link)
+        {:headers (headers-for-link all-posts-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:all-activity-get/finish {:org (:slug org-data) :year year :month month :body (if success (json->cljs body) nil)}]))))))
+          (dispatcher/dispatch! [:all-posts-get/finish {:org (:slug org-data) :year year :month month :body (if success (json->cljs body) nil)}]))))))
 
-(defn load-more-all-activity [more-link direction]
+(defn load-more-all-posts [more-link direction]
   (when (and more-link direction)
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
       (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:all-activity-more/finish {:org (router/current-org-slug) :direction direction :body (if success (json->cljs body) nil)}])))))
+        (dispatcher/dispatch! [:all-posts-more/finish {:org (router/current-org-slug) :direction direction :body (if success (json->cljs body) nil)}])))))
 
 (defn get-calendar [org-slug]
   (when org-slug

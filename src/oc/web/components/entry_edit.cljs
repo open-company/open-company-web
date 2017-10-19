@@ -3,48 +3,58 @@
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
-            [oc.web.components.ui.media-picker :refer (media-picker)]
-            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.media-attachments :refer (media-attachments)]
-            [cljsjs.medium-editor]
-            [cljsjs.rangy-selectionsaverestore]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn attachment-upload-success-cb [state res]
-  (let [url    (gobj/get res "url")]
-    (if-not url
-      (dis/dispatch! [:error-banner-show "An error has occurred while processing the file URL. Please try again." 5000])
-      (let [entry-editing   @(drv/get-ref state :entry-editing)
-            attachments (or (:attachments entry-editing) [])
-            attachment-data {:file-name (gobj/get res "filename")
-                             :file-type (gobj/get res "mimetype")
-                             :file-size (gobj/get res "size")
-                             :file-url url}]
-        (dis/dispatch! [:input [:entry-editing :attachments] (vec (conj attachments attachment-data))])
-        (dis/dispatch! [:input [:entry-editing :has-changes] true])))))
+(defn calc-edit-entry-modal-height [s]
+  (when @(::first-render-done s)
+    (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
+      (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
+        (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
 
-(defn attachment-upload-error-cb [state res error]
-  (dis/dispatch! [:error-banner-show "An error has occurred while processing the file. Please try again." 5000]))
+(defn dismiss-modal []
+  (dis/dispatch! [:entry-edit/dismiss]))
 
-(defn dismiss-modal [saving?]
-  (dis/dispatch! [:entry-edit/dismiss])
-  (when-not saving?
-    (dis/dispatch! [:input [:entry-editing] nil])))
-
-(defn close-clicked [s & [saving?]]
+(defn real-close [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal saving?)))
+  (utils/after 180 #(dismiss-modal)))
+
+(defn cancel-clicked [s]
+  (if @(::uploading-media s)
+    (let [alert-data {:icon "/img/ML/trash.svg"
+                      :action "dismiss-edit-uploading-media"
+                      :message (str "Cancel before finishing upload?")
+                      :link-button-title "No"
+                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                          (dis/dispatch! [:alert-modal-hide])
+                                          (real-close s))
+                      }]
+      (dis/dispatch! [:alert-modal-show alert-data]))
+    (if (:has-changes @(drv/get-ref s :entry-editing))
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "dismiss-edit-dirty-data"
+                        :message (str "Cancel without saving your changes?")
+                        :link-button-title "No"
+                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :solid-button-title "Yes"
+                        :solid-button-cb #(do
+                                            (dis/dispatch! [:alert-modal-hide])
+                                            (real-close s))
+                        }]
+        (dis/dispatch! [:alert-modal-show alert-data]))
+      (real-close s))))
 
 (defn unique-slug [topics topic-name]
   (let [slug (atom (s/slug topic-name))]
@@ -56,21 +66,8 @@
   (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
 
 (defn body-on-change [state]
-  (when-let [body-el (sel1 [:div.entry-edit-body])]
-    ; Hide/show placeholder capturing the situation medium-editor ignores:
-    ; multiple empty Ps, img or iframes
-    (utils/after 1000
-     #(when-let [$body-el (js/$ "div.entry-edit-body.medium-editor-placeholder")]
-        (if (and (empty? (.text $body-el))
-                 (<= (.-length (.find $body-el "div, p")) 1)
-                 (zero? (.-length (.find $body-el "img, iframe"))))
-          (.removeClass $body-el "hide-placeholder")
-          (.addClass $body-el "hide-placeholder"))))
-    ; Attach paste listener to the body and all its children
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
-    (let [emojied-body (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML body-el)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :body] emojied-body])
-      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+  (dis/dispatch! [:input [:entry-editing :has-changes] true])
+  (calc-edit-entry-modal-height state))
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
@@ -78,26 +75,9 @@
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
-(defn body-placeholder []
-  (let [first-name (jwt/get-key :first-name)]
-    (if-not (empty? first-name)
-      (str "What's new, " first-name "?")
-      "What's new?")))
-
-(defn- setup-body-editor [state]
-  (let [media-picker-id @(::media-picker-id state)
-        headline-el  (sel1 [:div.entry-edit-headline])
-        body-el      (sel1 [:div.entry-edit-body])
-        body-editor  (new js/MediumEditor body-el (clj->js (-> (body-placeholder)
-                                                            (utils/medium-editor-options false false)
-                                                            (editor/inject-extension (editor/media-upload media-picker-id {:top -10 :left -26} (sel1 [:div.entry-edit-modal]))))))]
-    (.subscribe body-editor
-                "editableInput"
-                (fn [event editable]
-                  (body-on-change state)))
-    (reset! (::body-editor state) body-editor)
-    (js/recursiveAttachPasteListener body-el (comp #(utils/medium-editor-hide-placeholder @(::body-editor state) body-el) #(body-on-change state)))
-    (events/listen headline-el EventType/INPUT #(headline-on-change state))
+(defn- setup-headline [state]
+  (let [headline-el  (rum/ref-node state "headline")]
+    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
     (js/emojiAutocomplete)))
 
 (defn headline-on-paste
@@ -123,18 +103,23 @@
       (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
       (reset! (::new-topic s) ""))))
 
-(defn media-picker-did-change [s]
-  (body-on-change s)
-  (utils/after 100 
-    #(do
-       (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
-       (utils/scroll-to-bottom (sel1 [:div.entry-edit-modal-container]) true))))
+(defn add-emoji-cb [s]
+  (headline-on-change s)
+  (when-let [body (sel1 [:div.rich-body-editor])]
+    (body-on-change s)))
+
+(defn clean-body []
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (let [raw-html (.-innerHTML body-el)]
+      (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
 
 (rum/defcs entry-edit < rum/reactive
                         (drv/drv :entry-edit-topics)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
+                        (drv/drv :alert-modal)
+                        (drv/drv :media-input)
                         (rum/local false ::first-render-done)
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -143,13 +128,13 @@
                         (rum/local "" ::new-topic)
                         (rum/local false ::focusing-create-topic)
                         (rum/local false ::remove-no-scroll)
-                        (rum/local "entry-edit-media-picker" ::media-picker-id)
                         (rum/local 330 ::entry-edit-modal-height)
-                        (rum/local false ::media-picker-expanded)
+                        (rum/local nil ::headline-input-listener)
+                        (rum/local nil ::uploading-media)
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
-                                             initial-body (utils/emojify (if (contains? entry-editing :links) (:body entry-editing) ""))
+                                             initial-body (if (contains? entry-editing :links) (:body entry-editing) utils/default-body)
                                              initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
                                          ;; Load board if it's not already
                                          (when-not @(drv/get-ref s :entry-edit-topics)
@@ -170,14 +155,11 @@
                                         (when-not (dommy/has-class? body :no-scroll)
                                           (reset! (::remove-no-scroll s) true)
                                           (dommy/add-class! (sel1 [:body]) :no-scroll)))
-                                      (setup-body-editor s)
-                                      (utils/to-end-of-content-editable (sel1 [:div.entry-edit-body]))
-                                      (utils/after 10 #(.focus (sel1 [:div.entry-edit-headline])))
+                                      (utils/after 300 #(setup-headline s))
+                                      (utils/to-end-of-content-editable (rum/ref-node s "headline"))
                                       s)
                          :before-render (fn [s]
-                                          (when-let [entry-edit-modal (sel1 [:div.entry-edit-modal])]
-                                            (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
-                                              (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))
+                                          (calc-edit-entry-modal-height s)
                                           s)
                          :after-render (fn [s]
                                          (when (not @(::first-render-done s))
@@ -190,27 +172,35 @@
                                          (when @(::body-editor s)
                                            (.destroy @(::body-editor s))
                                            (reset! (::body-editor s) nil))
+                                         (when @(::headline-input-listener s)
+                                           (events/unlistenByKey @(::headline-input-listener s))
+                                           (reset! (::headline-input-listener s) nil))
                                          s)}
   [s]
   (let [topics            (distinct (drv/react s :entry-edit-topics))
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
+        alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
-        attachments       (:attachments entry-editing)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
-        wh (.-innerHeight js/window)]
+        wh (.-innerHeight js/window)
+        media-input (drv/react s :media-input)]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(::first-render-done s))})
-       :on-click #(when (and (empty? (:body entry-editing))
-                             (empty? (:headline entry-editing))
+       :on-click #(when (and (not (:has-changes entry-editing))
                              (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
-                    (close-clicked s))}
+                    (cancel-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
-        [:button.carrot-modal-close.mlb-reset
-          {:on-click #(close-clicked s)}]
+        ;; Show the close button only when there are no modals shown
+        (when (and (not (:media-video media-input))
+                   (not (:media-chart media-input))
+                   (not alert-modal))
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(cancel-clicked s)}])
         [:div.entry-edit-modal.group
+          {:ref "entry-edit-modal"}
           [:div.entry-edit-modal-header.group
             (user-avatar-image current-user-data)
             [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
@@ -277,64 +267,43 @@
                                        (utils/event-stop e)
                                        (create-new-topic s))
                            :disabled (empty? (s/trim @(::new-topic s)))}
-                          "Create"])]]]]]]
+                          "Apply"])]]]]]]
         [:div.entry-edit-modal-body
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable true
+             :ref "headline"
              :placeholder "Title this (if you like)"
              :on-paste    #(headline-on-paste s %)
-             :on-key-Up   #(headline-on-change s)
              :on-key-down #(headline-on-change s)
-             :on-focus    #(headline-on-change s)
-             :on-blur     #(headline-on-change s)
-             :auto-focus true
+             :on-click    #(headline-on-change s)
+             :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          ; Body element
-          [:div.entry-edit-body.emoji-autocomplete.emojiable
-            {:role "textbox"
-             :aria-multiline true
-             :content-editable true
-             :class (utils/class-set {:medium-editor-placeholder-hidden (or (not (empty? (gobj/get @(::initial-body s) "__html")))
-                                                                            @(::media-picker-expanded s))})
-             :dangerouslySetInnerHTML @(::initial-body s)}]
-          ; Media handling
-          (media-picker {:media-config [:photo :video :chart]
-                         :media-picker-id @(::media-picker-id s)
-                         :on-change #(media-picker-did-change s)
-                         :body-editor-sel "div.entry-edit-body"
-                         :data-editing entry-editing
-                         :dispatch-input-key :entry-editing
-                         :on-expand #(reset! (::media-picker-expanded s) true)
-                         :on-collapse #(reset! (::media-picker-expanded s) false)})
+          (rich-body-editor {:on-change (partial body-on-change s)
+                             :initial-body @(::initial-body s)
+                             :show-placeholder (not (contains? entry-editing :links))
+                             :show-h2 true
+                             :dispatch-input-key :entry-editing
+                             :upload-progress-cb (fn [is-uploading?]
+                                                   (reset! (::uploading-media s) is-uploading?))
+                             :media-config ["photo" "video" "chart" "attachment" "divider-line"]
+                             :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
           ; Bottom controls
           [:div.entry-edit-controls.group]
-        (media-attachments attachments :entry-editing #(dis/dispatch! [:input [:entry-editing :has-changes] true]))
         [:div.entry-edit-modal-divider]
         [:div.entry-edit-modal-footer.group
-          ;; Attachments button
-          [:button.mlb-reset.attachment
-            {:title "Add an attachment"
-             :type "button"
-             :data-toggle "tooltip"
-             :data-container "body"
-             :data-placement "top"
-             :on-click (fn [e]
-                        (.blur (.-target e))
-                        (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide"))
-                        (iu/upload!
-                         nil
-                         (partial attachment-upload-success-cb s)
-                         nil
-                         (partial attachment-upload-error-cb s)))}
-              [:i.mdi.mdi-paperclip]]
+          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
+                          (clean-body)
                           (dis/dispatch! [:entry-save])
-                          (close-clicked s))
+                          (real-close s))
              :disabled (not (:has-changes entry-editing))}
             (if new-entry? "Post" "Save")]
           [:button.mlb-reset.mlb-link-black.form-action-bt
-            {:on-click #(close-clicked s)}
+            {:on-click #(cancel-clicked s)}
             "Cancel"]]]]]))

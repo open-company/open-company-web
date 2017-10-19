@@ -32,6 +32,7 @@
 (defn delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action (str "delete-" (:type activity-data))
                     :message (str "Delete this " (if (= (:type activity-data) "story") "journal entry" "update") "?")
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
@@ -42,14 +43,14 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel is-all-activity]
+(defn truncate-body [body-sel is-all-posts]
   (.dotdotdot (js/$ body-sel)
-   #js {:height (* 24 (if is-all-activity 6 3))
+   #js {:height (* 24 (if is-all-posts 6 3))
         :wrap "word"
         :watch true
         :ellipsis "... "}))
 
-(defn get-first-body-thumbnail [body is-aa]
+(defn get-first-body-thumbnail [body is-ap]
   (let [$body (js/$ (str "<div>" body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
@@ -65,7 +66,7 @@
                              (<= height (* width 2))))
                 (reset! found
                   {:type "image"
-                   :thumbnail (if (and (not is-aa) (.data $el "thumbnail"))
+                   :thumbnail (if (and (not is-ap) (.data $el "thumbnail"))
                                 (.data $el "thumbnail")
                                 (.attr $el "src"))})))
             (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
@@ -83,29 +84,29 @@
                                          (let [activity-data (first (:rum/args s))
                                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                                body-a-sel (str body-sel " a")
-                                               is-all-activity (nth (:rum/args s) 3 false)]
+                                               is-all-posts (nth (:rum/args s) 3 false)]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.stopPropagation %))
                                            ; Truncate body text with dotdotdot
                                            (when (compare-and-set! (::truncated s) false true)
-                                             (truncate-body body-sel is-all-activity)
+                                             (truncate-body body-sel is-all-posts)
                                              (utils/after 10 #(do
                                                                 (.trigger (js/$ body-sel) "destroy")
-                                                                (truncate-body body-sel is-all-activity)))))
+                                                                (truncate-body body-sel is-all-posts)))))
                                          s)
                          :will-mount (fn [s]
                                        (let [activity-data (first (:rum/args s))
-                                             is-all-activity (nth (:rum/args s) 3 false)]
+                                             is-all-posts (nth (:rum/args s) 3 false)]
                                          (when (= (:type activity-data) "entry")
-                                          (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-activity))))
+                                          (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts))))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-activity-data (first (:rum/args o))
                                               new-activity-data (first (:rum/args s))
-                                              is-all-activity (nth (:rum/args s) 3 false)]
+                                              is-all-posts (nth (:rum/args s) 3 false)]
                                           (when (not= (:body old-activity-data) (:body new-activity-data))
                                             (when (= (:type new-activity-data) "entry")
-                                              (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-activity)))
+                                              (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts)))
                                             (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
                                             (reset! (::truncated s) false)))
                                         s)
@@ -123,25 +124,24 @@
                          :will-unmount (fn [s]
                                          (events/unlistenByKey @(::window-click s))
                                          s)}
-  [s activity-data has-headline has-body is-all-activity]
+  [s activity-data has-headline has-body is-all-posts]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                              :all-activity-card is-all-activity
+                              :all-posts-card is-all-posts
                               :story-card (= (:type activity-data) "story")})
+     :on-click #(if (= (:type activity-data) "story")
+                  (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
+                  (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
-    (when (and (not is-all-activity)
+    (when (and (not is-all-posts)
                (= (:type activity-data) "story"))
       [:div.triangle])
     ; Card header
-    (when (or is-all-activity
+    (when (or is-all-posts
               (= (:type activity-data) "entry"))
       [:div.activity-card-head.group
-        {:class (when (or is-all-activity (= (:type activity-data) "entry")) "entry-card")
-         :on-click #(when (not (and (not is-all-activity) (= (:type activity-data) "entry")))
-                      (if (= (:type activity-data) "story")
-                        (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                        (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))}
+        {:class (when (or is-all-posts (= (:type activity-data) "entry")) "entry-card")}
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (first (:author activity-data)))
@@ -161,12 +161,12 @@
           (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
               [:div.activity-tag
-                {:class (when is-all-activity "double-tag")
+                {:class (when is-all-posts "double-tag")
                  :on-click #(do
                               (utils/event-stop %)
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
                 topic-name]))
-          (when is-all-activity
+          (when is-all-posts
             [:div.activity-tag
               {:class (utils/class-set {:board-tag (= (:type activity-data) "entry")
                                         :storyboard-tag (= (:type activity-data) "story")
@@ -181,9 +181,6 @@
                                   (oc-urls/board (:board-slug activity-data))))))}
               (:board-name activity-data)])]])
     [:div.activity-card-content.group
-      {:on-click #(if (= (:type activity-data) "story")
-                    (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))}
       (when (= (:type activity-data) "story")
         [:div.activity-card-title
           {:dangerouslySetInnerHTML (utils/emojify (:title activity-data))}])
@@ -214,9 +211,6 @@
           {:style #js {:backgroundImage (str "url(\"" (:banner-url activity-data) "\")")
                        :height (str (* (/ (:banner-height activity-data) (:banner-width activity-data)) 619) "px")}}])]
     [:div.activity-card-footer.group
-      {:on-click #(if (= (:type activity-data) "story")
-                    (router/nav! (oc-urls/story (:board-slug activity-data) (:uuid activity-data)))
-                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)]))}
       (interactions-summary activity-data)
       (when (or (utils/link-for (:links activity-data) "partial-update")
                 (utils/link-for (:links activity-data) "delete"))

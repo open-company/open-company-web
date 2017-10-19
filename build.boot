@@ -40,9 +40,8 @@
 
     ;; CLJSJS packages http://cljsjs.github.io/
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
-    [cljsjs/rangy-selectionsaverestore "1.3.0-1"]
     [cljsjs/raven "3.17.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
-    [cljsjs/medium-editor "5.22.1-2"] ; Medium editor https://clojars.org/cljsjs/medium-editor
+    [cljsjs/medium-editor "5.23.2-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.6.1-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
@@ -52,7 +51,7 @@
 
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
-    [open-company/lib "0.11.20" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component]] ; Library for OC projects https://github.com/open-company/open-company-lib
+    [open-company/lib "0.12.21" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component]] ; Library for OC projects https://github.com/open-company/open-company-lib
     ; In addition to common functions, brings in the following common dependencies used by this project:
     ; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
@@ -123,7 +122,20 @@
                         "public/img/emojione.sprites.svg"]
                        ['cljsjs/emojione-picker
                         "cljsjs/emojione-picker/common/emojione-picker.css"
-                        "public/css/emojione-picker.css"]}})
+                        "public/css/emojione-picker.css"]
+                       ;; MediumEditor default theme
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/medium-editor.css"
+                        "public/css/medium-editor/medium-editor.css"]
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/medium-editor.min.css"
+                        "public/css/medium-editor/medium-editor.min.css"]
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/themes/default.css"
+                        "public/css/medium-editor/default.css"]
+                       ['cljsjs/medium-editor
+                        "cljsjs/medium_editor/common/themes/default.min.css"
+                        "public/css/medium-editor/default.min.css"]}})
 
 ;; We use a bunch of edn files in `resources/pages` to declare a "page"
 ;; these edn files can hold additional information about the page such

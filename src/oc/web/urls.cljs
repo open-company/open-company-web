@@ -26,6 +26,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
+(def sign-up-with-slack "/login?slack")
 (def sign-up "/sign-up")
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
@@ -73,12 +74,12 @@
   ([org-slug]
     (str "/" (name org-slug))))
 
-(defn all-activity
-  "Org all activity url"
+(defn all-posts
+  "Org all posts url"
   ([]
-    (all-activity (router/current-org-slug)))
+    (all-posts (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/all-activity")))
+    (str (org org-slug) "/all-posts")))
 
 (defn org-settings
   "Org settings url"

@@ -1,0 +1,250 @@
+@import "../mixins/_reusable";
+
+div.onboard-overlay-container {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 103};
+  transition: opacity 180ms ease-in;
+  overflow: auto;
+
+  &.will-appear {
+    opacity: 0;
+  }
+
+  &.appear {
+    opacity: 1;
+  }
+
+  div.onboard-overlay {
+    width: 600px;
+    height: 500px;
+    left: 50%;
+    top: 50%;
+    margin-left: -300px;
+    margin-top: -250px;
+    position: relative;
+    background-color: white;
+    border-radius: 24px;
+    box-shadow: 0 4px 34px 0 rgba(#7B7B7B, 0.5);
+    text-align: center;
+
+    div.onboard-overlay-step {
+      height: 414px;
+      background-size: 600px 414px;
+      background-repeat: no-repeat;
+      background-color: rgb(242, 241, 237);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+
+      div.empty-line {
+        width: 100%;
+        height: 1px;
+      }
+
+      div.onboard-overlay-step-title {
+        @include avenir_H();
+        font-size: 25px;
+        color: $carrot_dark_gray;
+      }
+
+      div.step-illustration-container {
+        margin: 32px auto 0px;
+        background-position: center;
+        background-repeat: no-repeat;
+        text-align: left;
+        @include avenir_H();
+        font-size: 16px;
+        color: black;
+        cursor: default;
+        @include no-user-select();
+      }
+
+      div.onboard-overlay-step-description {
+        @include avenir_R();
+        font-size: 20px;
+        color: $carrot_dark_gray;
+        width: 449px;
+        margin: 0 auto;
+      }
+
+      &.step-1 {
+        background-image: cdnUrl("/img/ML/onboard_overlay_step_1.png");
+
+        div.step-illustration-container {
+          padding-top: 110px;
+          margin-top: 0px;
+          width: 56px;
+          height: 211px;
+          background-size: 56px 101px;
+          background-position: 0px 110px;
+          @include image-2x("/img/ML/onboard_overlay_il_1");
+        }
+
+        div.onboard-overlay-step-title {
+          margin-top: 32px;
+        }
+
+        div.onboard-overlay-step-description {
+          margin-top: 8px;
+        }
+      }
+
+      &.step-2 {
+        background-image: cdnUrl("/img/ML/onboard_overlay_step_2.png");
+        background-position: 0px 120px;
+        background-size: 600px 294px;
+
+        div.onboard-overlay-step-title {
+          margin-top: 32px;
+        }
+
+        div.step-illustration-container {
+          width: 450px;
+          height: 177px;
+
+          div.step-illustration-left {
+            float: left;
+            width: 220px;
+            height: 143px;
+            margin-top: 34px;
+            float: left;
+            @include image-2x("/img/ML/onboard_overlay_il_2_left");
+            background-size: 220px 143px;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: left;
+            padding: 15px 50px;
+            cursor: default;
+            @include no-user-select();
+          }
+
+          div.step-illustration-right {
+            float: left;
+            width: 220px;
+            height: 143px;
+            float: right;
+            @include image-2x("/img/ML/onboard_overlay_il_2_right");
+            background-size: 220px 143px;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: left;
+            padding: 15px 50px;
+            cursor: default;
+            @include no-user-select();
+          }
+        }
+
+        div.onboard-overlay-step-description {
+          margin-top: 32px;
+        }
+      }
+
+      &.step-3 {
+        background-image: cdnUrl("/img/ML/onboard_overlay_step_3.png");
+
+        div.onboard-overlay-step-title {
+          margin-top: 32px;
+        }
+
+        div.step-illustration-container {
+          @include image-2x("/img/ML/onboard_overlay_il_3");
+          background-size: 443px 179px;
+          width: 443px;
+          height: 179px;
+          padding: 22px 86px;
+        }
+
+        div.onboard-overlay-step-description {
+          margin-top: 32px;
+        }
+      }
+
+      &.step-4 {
+        background-image: cdnUrl("/img/ML/onboard_overlay_step_4.png");
+        background-position: 0px 40px;
+        background-size: 600px 374px;
+
+        div.onboard-overlay-step-title {
+          margin-top: 32px;
+        }
+
+        div.step-illustration-container {
+          @include image-2x("/img/ML/onboard_overlay_il_4");
+          background-size: 402px 164px;
+          width: 402px;
+          height: 164px;
+          padding: 40px 0px 0px 284px;
+        }
+
+        div.onboard-overlay-step-description {
+          margin-top: 32px;
+        }
+      }
+    }
+
+    div.onboard-overlay-footer {
+      width: 600px;
+      height: 86px;
+      padding: 24px 16px;
+
+      div.onboard-overlay-footer-left {
+        float: left;
+
+        button.skip-button {
+          background-color: transparent;
+          boder: none;
+          outline: none;
+          margin-top: 8px;
+          color: $carrot_text_blue;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      div.onboard-overlay-footer-steps {
+        width: 56px;
+        height: 8px;
+        margin-left: 212px;
+        margin-top: 16px;
+        float: left;
+
+        div.dot-step {
+          width: 8px;
+          height: 8px;
+          background-color: #E0E1EC;
+          border-radius: 4px;
+          float: left;
+          margin-left: 8px;
+
+          &:first-child {
+            margin-left: 0px;
+          }
+
+          &.active {
+            background-color: $carrot_text_blue;
+          }
+        }
+      }
+
+      div.onboard-overlay-footer-right {
+        float: right;
+
+        button.next-button {
+          background-color: $carrot_text_blue;
+          color: white;
+          opacity: 1;
+          width: 124px;
+          height: 40px;
+          @include avenir_H();
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}

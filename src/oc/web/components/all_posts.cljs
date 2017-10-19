@@ -1,4 +1,4 @@
-(ns oc.web.components.all-activity
+(ns oc.web.components.all-posts
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
@@ -86,8 +86,8 @@
         time-2 (get-activity-date act-2)]
     (compare time-2 time-1)))
 
-(defn get-sorted-items [all-activity-data]
-  (vec (sort compare-activities (vals (:fixed-items all-activity-data)))))
+(defn get-sorted-items [all-posts-data]
+  (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
 
 ; (defn highlight-calendar
 ;   "Highlight the current visible entry year and month in the calendar."
@@ -120,7 +120,7 @@
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
-      (dis/dispatch! [:all-activity-more @(::has-next s) :up])
+      (dis/dispatch! [:all-posts-more @(::has-next s) :up])
       (reset! (::has-next s) false))
     ;; scrolling down
     (when (and @(::has-prev s)
@@ -129,7 +129,7 @@
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
-      (dis/dispatch! [:all-activity-more @(::has-prev s) :down])
+      (dis/dispatch! [:all-posts-more @(::has-prev s) :down])
       (reset! (::has-prev s) false)))
   ; ;; Highlight the right year/month
   ; (when @(::first-render-done s)
@@ -137,9 +137,9 @@
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
-(rum/defcs all-activity < rum/static
+(rum/defcs all-posts < rum/static
                           rum/reactive
-                          (drv/drv :all-activity)
+                          (drv/drv :all-posts)
                           (drv/drv :calendar)
                           (rum/local false ::first-render-done)
                           (rum/local nil ::scroll-listener)
@@ -154,15 +154,15 @@
                           (rum/local false ::show-all-caught-up-message)
                           (rum/local nil ::last-direction)
                           {:will-mount (fn [s]
-                                        (let [all-activity-data (first (:rum/args s))
-                                              sorted-items (get-sorted-items all-activity-data)
-                                              year (:year all-activity-data)
-                                              month (:month all-activity-data)
-                                              direction (:direction all-activity-data)
-                                              next-link (utils/link-for (:links all-activity-data) "previous")
-                                              prev-link (utils/link-for (:links all-activity-data) "next")
+                                        (let [all-posts-data (first (:rum/args s))
+                                              sorted-items (get-sorted-items all-posts-data)
+                                              year (:year all-posts-data)
+                                              month (:month all-posts-data)
+                                              direction (:direction all-posts-data)
+                                              next-link (utils/link-for (:links all-posts-data) "previous")
+                                              prev-link (utils/link-for (:links all-posts-data) "next")
                                               first-entry-date (utils/js-date (get-activity-date (first sorted-items)))
-                                              first-available-entry (when (and year month) (get-first-available-entry (get-sorted-items all-activity-data) year month))]
+                                              first-available-entry (when (and year month) (get-first-available-entry (get-sorted-items all-posts-data) year month))]
                                           (if (and year month)
                                             ;; Loading from calendar since we have year and month from the click action
                                             (do
@@ -172,7 +172,7 @@
                                             ;; First load or subsequent load more with different set of items
                                             (if (= direction :up)
                                               ;; did scrolled up, we need to scroll to the first of the old items to not lose the previous position
-                                              (let [saved-items (:saved-items all-activity-data)
+                                              (let [saved-items (:saved-items all-posts-data)
                                                     last-new-entry-idx (dec (- (count sorted-items) saved-items))
                                                     scroll-to-entry (get sorted-items last-new-entry-idx)
                                                     created-date (utils/js-date (get-activity-date scroll-to-entry))
@@ -185,7 +185,7 @@
                                               ;; did scrolled down, results where simply concatenated, just need to update the calendar highlighting
                                               (if (= direction :down)
                                                 ; Load more :down scroll, needs to set the calendar
-                                                (let [last-old-entry-idx (dec (:saved-items all-activity-data))
+                                                (let [last-old-entry-idx (dec (:saved-items all-posts-data))
                                                       last-old-entry (get sorted-items last-old-entry-idx)
                                                       created-date (utils/js-date (get-activity-date last-old-entry))
                                                       to-year (.getFullYear created-date)
@@ -222,9 +222,9 @@
                                                                    (reset! (::last-direction s) nil))))
                                            s)
                            :did-remount (fn [_ s]
-                                          (let [all-activity-data (first (:rum/args s))
-                                                sorted-items (get-sorted-items all-activity-data)]
-                                            (when-not (:loading-more all-activity-data)
+                                          (let [all-posts-data (first (:rum/args s))
+                                                sorted-items (get-sorted-items all-posts-data)]
+                                            (when-not (:loading-more all-posts-data)
                                               (when @(::top-loading s)
                                                 (reset! (::top-loading s) false)
                                                 (reset! (::has-next s) nil))
@@ -239,8 +239,8 @@
                                                     year @(::selected-year s)
                                                     month (or @(::selected-month s) (:month (first (filter #(= (:year %) year) calendar-data))))
                                                     first-available-entry (get-first-available-entry sorted-items @(::selected-year s) month)
-                                                    next-link (utils/link-for (:links all-activity-data) "previous")
-                                                    prev-link (utils/link-for (:links all-activity-data) "next")]
+                                                    next-link (utils/link-for (:links all-posts-data) "previous")
+                                                    prev-link (utils/link-for (:links all-posts-data) "next")]
                                                 (reset! (::has-next s) next-link)
                                                 (if prev-link
                                                   (do
@@ -256,18 +256,18 @@
                                           (when @(::scroll-listener s)
                                             (events/unlistenByKey @(::scroll-listener s)))
                                            s)}
-  [s all-activity-data]
+  [s all-posts-data]
   (let [calendar-data (drv/react s :calendar)
-        items (get-sorted-items all-activity-data)]
-    [:div.all-activity.group
-      [:div.all-activity-cards
+        items (get-sorted-items all-posts-data)]
+    [:div.all-posts.group
+      [:div.all-posts-cards
         (when @(::top-loading s)
           [:div.loading-updates.top-loading
             "Retrieving activity..."])
-        [:div.all-activity-cards-inner.group
+        [:div.all-posts-cards-inner.group
           (when (or @(::top-loading s)
                     @(::retrieving-calendar s)
-                    (and (:loading-more all-activity-data)
+                    (and (:loading-more all-posts-data)
                          (not @(::first-render-done s)))
                     @(::scroll-to-entry s)
                     (= @(::last-direction s) :up))
@@ -277,14 +277,14 @@
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
-            (rum/with-key (activity-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-activity-entry-" (:uuid e))))]
+            (rum/with-key (activity-card e (not (empty? (:headline e))) (not (empty? (:body e))) true) (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
         (when @(::show-all-caught-up-message s)
           (all-caught-up))]
-      [:div.all-activity-nav
-        ; [:div.all-activity-nav-inner
+      [:div.all-posts-nav
+        ; [:div.all-posts-nav-inner
         ;   (for [year (vec (reverse (sort-by :year calendar-data)))
         ;         :let [selected (= @(::selected-year s) (:year year))]]
         ;     [:div.group
@@ -296,7 +296,7 @@
         ;                       (reset! (::selected-month s) month)
         ;                       (reset! (::scroll-to-entry s) false)
         ;                       (reset! (::retrieving-calendar s) (str (:year year)))
-        ;                       (dis/dispatch! [:all-activity-calendar {:link link :year (:year year) :month month}]))
+        ;                       (dis/dispatch! [:all-posts-calendar {:link link :year (:year year) :month month}]))
         ;          :class (when selected "selected")}
         ;         [:span.calendar-label (:year year)]
         ;         (when (= @(::retrieving-calendar s) (str (:year year)))
@@ -312,7 +312,7 @@
         ;                           (reset! (::selected-month s) (:month month))
         ;                           (reset! (::scroll-to-entry s) false)
         ;                           (reset! (::retrieving-calendar s) (str (:year month) (:month month)))
-        ;                           (dis/dispatch! [:all-activity-calendar {:link link :year (:year month) :month (:month month)}]))}
+        ;                           (dis/dispatch! [:all-posts-calendar {:link link :year (:year month) :month (:month month)}]))}
         ;             [:span.calendar-label (utils/full-month-string (:month month))]
         ;             (when (= @(::retrieving-calendar s) (str (:year month) (:month month)))
         ;               [:span.retrieving "Retrieving..."])]))])]

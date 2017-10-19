@@ -1,6 +1,6 @@
 div.stories-layout {
   div.story-cards-container {
-    max-width: 928px;
+    max-width: #{$board_container_width}px;
     position: relative;
 
     div.stories-vertical-line {

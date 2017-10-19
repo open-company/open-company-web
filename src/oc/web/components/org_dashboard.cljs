@@ -25,6 +25,7 @@
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
+            [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -38,8 +39,6 @@
       #(dis/dispatch! [:board-get (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")]))))
 
 (defcomponent org-dashboard [data owner]
-
-  (init-state [_])
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
@@ -58,10 +57,10 @@
           org-data (dis/org-data data)
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
-          all-activity-data (dis/all-activity-data data)]
+          all-posts-data (dis/all-posts-data data)]
       (if (or (not org-data)
               (and (not board-data)
-                   (not all-activity-data)))
+                   (not all-posts-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
@@ -73,6 +72,8 @@
                                            :no-scroll (router/current-activity-id)})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
+            (:show-onboard-overlay data)
+            (onboard-overlay)
             ;; Org settings
             (:org-settings data)
             (org-settings)
@@ -86,21 +87,22 @@
             (:board-editing data)
             (board-edit)
             ;; Activity modal
-            (router/current-activity-id)
-            (let [from-aa (:from-all-activity @router/path)
-                  board-slug (if from-aa :all-activity (router/current-board-slug))]
+            (and (router/current-activity-id)
+                 (not (:entry-edit-dissmissing data)))
+            (let [from-ap (:from-all-posts @router/path)
+                  board-slug (if from-ap :all-posts (router/current-board-slug))]
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
           ;; Alert modal
           (when (:alert-modal data)
             (alert-modal))
           ;; Media video modal for entry editing
-          (when (and (:entry-editing data)
-                     (:media-video (:entry-editing data)))
-            (media-video-modal :entry-editing))
+          (when (and (:media-input data)
+                     (:media-video (:media-input data)))
+            (media-video-modal))
           ;; Media chart modal for entry editing
-          (when (and (:entry-editing data)
-                     (:media-chart (:entry-editing data)))
-            (media-chart-modal :entry-editing))
+          (when (and (:media-input data)
+                     (:media-chart (:media-input data)))
+            (media-chart-modal))
           (dom/div {:class "page"}
             ;; Navbar
             (when-not (and (responsive/is-tablet-or-mobile?)
@@ -113,13 +115,14 @@
                    :content-loaded (or (:loading board-data) (:loading data))
                    :org-data org-data
                    :board-data board-data
-                   :all-activity-data all-activity-data
+                   :all-posts-data all-posts-data
                    :force-edit-topic (:force-edit-topic data)
                    :card-width card-width
                    :columns-num columns-num
                    :show-login-overlay (:show-login-overlay data)
-                   :entry-editing (:entry-editing data)
                    :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
                    :is-dashboard true
                    :board-filters (:board-filters data)
-                   :is-all-activity (utils/in? (:route @router/path) "all-activity")})))))))))
+                   :show-onboard-overlay (:show-onboard-overlay data)
+                   :is-all-posts (or (utils/in? (:route @router/path) "all-posts")
+                                     (:from-all-posts @router/path))})))))))))

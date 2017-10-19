@@ -76,8 +76,13 @@
               (when-not (:auth-settings (rum/react dis/app-state))
                 (small-loading))]]
           [:div.login-with-email.domine.underline.bold
-            [:a {:on-click #(do (utils/event-stop %)
-                                (dis/dispatch! [:login-overlay-show (if (= (:show-login-overlay @dis/app-state) :signup-with-slack) :signup-with-email :login-with-email)]))}
+            [:a {:on-click (fn [e]
+                              (utils/event-stop e)
+                              (if (= (:show-login-overlay @dis/app-state) :signup-with-slack)
+                                (do
+                                  (router/nav! oc-urls/sign-up)
+                                  (utils/after 100 #(dis/dispatch! [:login-overlay-show :signup-with-email])))
+                                (dis/dispatch! [:login-overlay-show :login-with-email])))}
               (cond
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
                 "or Sign Up via email"
@@ -86,11 +91,12 @@
           [:div.login-overlay-footer.group
             (cond
                 (= (:show-login-overlay (rum/react dis/app-state)) :signup-with-slack)
-                [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])}
+                [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :login-with-slack])}
                   "Already have an account? "
                    [:span.blue-link "Sign In now."]]
                 :else
-                [:a.left {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-email])}
+                [:a.left
+                  {:on-click #(dis/dispatch! [:login-overlay-show :signup-with-slack])}
                   "Don't have an account? "
                    [:span.blue-link "Sign Up now."]])]]]))
 
@@ -164,7 +170,7 @@
                               (dis/dispatch! [:login-with-email]))}
                 "Sign In"]]]]]
       [:div.login-overlay-footer.group
-        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
+        [:a.left {:on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :signup-with-email]))}
           "Don't have an account? "
           [:span.blue-link "Sign Up now."]]]]])
 
@@ -250,8 +256,8 @@
 ;               {:value (:pswd (:signup-with-email (rum/react dis/app-state)))
 ;                :id "sign-up-pswd"
 ;                :on-change #(dis/dispatch! [:input [:signup-with-email :pswd] (.-value (sel1 [:input.pswd]))])
-;                :pattern ".{4,}"
-;                :placeholder "at least 5 characters"
+;                :pattern ".{8,}"
+;                :placeholder "Minimum 8 characters"
 ;                :type "password"
 ;                :tabIndex 4
 ;                :name "pswd"}]]
@@ -380,8 +386,8 @@
               {:value (:pswd (:collect-name-pswd (rum/react dis/app-state)))
                :id "collect-name-pswd-pswd"
                :on-change #(dis/dispatch! [:input [:collect-name-pswd :pswd] (.-value (sel1 [:input.pswd]))])
-               :pattern ".{4,}"
-               :placeholder "at least 5 characters"
+               :pattern ".{8,}"
+               :placeholder "Minimum 8 characters"
                :type "password"
                :tabIndex 4
                :name "pswd"}]]
@@ -430,8 +436,8 @@
               {:value (:pswd (:collect-pswd (rum/react dis/app-state)))
                :id "collect-pswd-pswd"
                :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.-value (sel1 [:input.pswd]))])
-               :pattern ".{4,}"
-               :placeholder "at least 5 characters"
+               :pattern ".{8,}"
+               :placeholder "Minimum 8 characters"
                :type "password"
                :tabIndex 4
                :name "pswd"}]]

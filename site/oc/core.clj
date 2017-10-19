@@ -81,13 +81,17 @@
             [:a.navbar-item {:href "/about"} "About"]]
           [:li
             [:a.navbar-item {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
+          [:li
+            {:id "site-header-login-item"}
+            [:a.navbar-item {:href "/login"} "Login"]]
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
-                {:onClick (str "window.location=\"/?tif=1\"")}
-                "Get Early Access"]
-              [:div.mobile-already-account
-                [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]]]]]]])
+                {:id "site-header-signup-item"}
+                "Sign Up"]
+              ; [:div.mobile-already-account
+              ;   [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]
+                ]]]]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer and every change here should be reflected there."

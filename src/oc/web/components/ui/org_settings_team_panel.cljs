@@ -20,6 +20,7 @@
 
 (defn alert-resend-done []
   (let [alert-data {:icon "/img/ML/invite_resend.png"
+                    :action "invite-resend"
                     :message "Invite resent."
                     :link-button-title nil
                     :link-button-cb nil
@@ -62,6 +63,7 @@
                         author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)
                         remove-fn (fn []
                                     (let [alert-data {:icon "/img/ML/trash.svg"
+                                                      :action (if (= "pending" (:status user)) "cancel-invitation" "remove-user")
                                                       :message (if (= "pending" (:status user)) "Cancel invitation?" "Remove user?")
                                                       :link-button-title "No"
                                                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])

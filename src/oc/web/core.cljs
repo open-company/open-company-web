@@ -115,8 +115,8 @@
         query-params (:query-params params)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
-    (when (= route "all-activity")
-      (cook/set-cookie! (router/last-board-cookie org) "all-activity" (* 60 60 24 6)))
+    (when (= route "all-posts")
+      (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save route
     (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
@@ -156,9 +156,9 @@
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
-    (pre-routing query-params)
+    (pre-routing query-params true)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params})
+    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params :from-all-posts (contains? query-params :ap)})
     (when board-sort-or-filter
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
@@ -168,26 +168,11 @@
               (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
                                                     ;; a subset of the company data loaded with a SU
       (swap! dis/app-state merge {:loading true}))
-    (post-routing)
-    ;; render component
-    (drv-root component target)))
-
-;; Component specific to a storyboard
-(defn storyboard-handler [route target component params]
-  (let [org (:org (:params params))
-        storyboard (:storyboard (:params params))
-        story (:story (:params params))
-        query-params (:query-params params)]
-    (when org
-      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
-    (pre-routing query-params)
-    ;; save the route
-    (router/set-route! (vec (remove nil? [org storyboard (when story story) route])) {:org org :board storyboard :activity story :query-params query-params})
-    ;; do we have the company data already?
-    (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
-                                                    ;; a subset of the company data loaded with a SU
-      (swap! dis/app-state merge {:loading true}))
+    (when (contains? query-params :access)
+      (swap! dis/app-state assoc :org-settings :main))
+    (when (and (contains? query-params :org-settings)
+               (#{:main :team :invite} (keyword (:org-settings query-params))))
+      (swap! dis/app-state assoc :org-settings (keyword (:org-settings query-params))))
     (post-routing)
     ;; render component
     (drv-root component target)))
@@ -240,7 +225,9 @@
       (timbre/info "Routing login-route" urls/login)
       (when (and (not (contains? (:query-params params) :jwt))
                  (not (jwt/jwt)))
-        (swap! dis/app-state assoc :show-login-overlay :login-with-slack))
+        (if (contains? (:query-params params) :slack)
+          (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
+          (swap! dis/app-state assoc :show-login-overlay :login-with-slack)))
       (simple-handler home-page "login" target params))
 
     (defroute signup-route urls/sign-up {:as params}
@@ -379,13 +366,13 @@
       (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
       (org-handler "org" target #(om/component) params))
 
-    (defroute all-activity-route (urls/all-activity ":org") {:as params}
-      (timbre/info "Routing all-activity-route" (urls/all-activity ":org"))
-      (org-handler "all-activity" target org-dashboard (assoc-in params [:params :board] "all-activity")))
+    (defroute all-posts-route (urls/all-posts ":org") {:as params}
+      (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))
+      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
 
-    (defroute all-activity-slash-route (str (urls/all-activity ":org") "/") {:as params}
-      (timbre/info "Routing all-activity-slash-route" (str (urls/all-activity ":org") "/"))
-      (org-handler "all-activity" target org-dashboard (assoc-in params [:params :board] "all-activity")))
+    (defroute all-posts-slash-route (str (urls/all-posts ":org") "/") {:as params}
+      (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
+      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
@@ -529,8 +516,8 @@
                                  ;; Org routes
                                  org-route
                                  org-slash-route
-                                 all-activity-route
-                                 all-activity-slash-route
+                                 all-posts-route
+                                 all-posts-slash-route
                                  ; org-settings-route
                                  ; org-settings-slash-route
                                  ; org-settings-team-route

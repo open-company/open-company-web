@@ -37,7 +37,7 @@
          :aria-haspopup true
          :aria-expanded false
          :on-click (fn [e] (utils/event-stop e))}
-        (org-avatar (some #(when (= (:slug %) current-org-slug) %) orgs) (not should-show-dropdown?))]
+        (org-avatar org-data (not should-show-dropdown?))]
       (when should-show-dropdown?
         [:ul.dropdown-menu
           {:aria-labelledby "orgsDropdown"}

@@ -6,6 +6,7 @@
 div.org-settings {
   background-color: $carrot_modal_bg;
   position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   z-index: 1000;
@@ -28,6 +29,7 @@ div.org-settings {
     overflow-x: visible;
     overflow-y: auto;
     position: relative;
+    border-radius: 4px;
 
     & > div {
       padding: 0 32px;

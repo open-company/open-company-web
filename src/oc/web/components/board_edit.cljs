@@ -59,6 +59,7 @@
                                       (utils/after 100 #(utils/remove-tooltips))
                                       (js/emojiAutocomplete)
                                       (let [board-name-node (rum/ref-node s "board-name")]
+                                        (utils/to-end-of-content-editable board-name-node)
                                         (reset! (::input-event s)
                                          (events/listen board-name-node EventType/INPUT
                                           #(board-name-on-change s board-name-node)))
@@ -186,6 +187,7 @@
                 [:button.mlb-reset.mlb-link-black.delete-board
                   {:on-click (fn []
                               (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
+                                                                 :action (str "delete-" label)
                                                                  :message (str "Delete this " label "?")
                                                                  :link-button-title "No"
                                                                  :link-button-cb #(dis/dispatch! [:alert-modal-hide])

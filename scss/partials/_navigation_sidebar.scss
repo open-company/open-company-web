@@ -1,6 +1,6 @@
 @mixin default-item(){
   background-color: transparent;
-  .internal, div.all-activity-label {
+  .internal, div.all-posts-label {
     @include avenir_M();
     font-size: 14px;
     line-height: 1.71;
@@ -11,7 +11,7 @@
 
 @mixin item-selected(){
   background-color: rgba($carrot_orange_1, 0.1);
-  .internal, div.all-activity-label {
+  .internal, div.all-posts-label {
     color: $carrot_orange;
     @include avenir_H();
     font-size: 14px;
@@ -22,7 +22,7 @@
 
 @mixin item-selected-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
-  .internal, div.all-activity-label {
+  .internal, div.all-posts-label {
     color: $carrot_dark_gray;
     @include avenir_M();
     font-size: 14px;
@@ -42,16 +42,21 @@ div.left-navigation-sidebar {
   top: 138px;
   left: 0px;
   height: calc(100vh - 138px);
+  @include no-user-select();
 
-  a.all-activity {
+  div.left-navigation-sidebar-content {
+    padding-bottom: 32px; 
+  }
+
+  a.all-posts {
     display: block;
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-    padding-left: 25px;
+    padding-left: 32px;
 
     &.hover-item{
       @include default-item();
@@ -69,15 +74,15 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-activity-label {
+    div.all-posts-label {
       padding: 5px 5px 0 5px;
-      width: 135px;
+      width: 148px;
       margin-left: 19px;
       text-align: left;
       margin-left: 20px;
     }
 
-    div.all-activity-icon {
+    div.all-posts-icon {
       background-image: cdnUrl("/img/ML/activity_hamburger.svg");
       background-size: 12px 11px;
       width: 12px;
@@ -91,14 +96,14 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-top{
 
     .left-navigation-sidebar-top-title {
-      padding: 0 0 0 25px;
+      padding: 3px 0 2px 32px;
       margin: 0;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
 
       span {
         @include avenir_B();
         font-size: 13px;
-        color: $oc_gray_7;
+        color: $carrot_gray;
         float: left;
         margin-left: 5px;
         cursor: default;
@@ -111,7 +116,7 @@ div.left-navigation-sidebar {
         height: 10px;
         float: left;
         margin-right: 7px;
-        margin-top: -1px;
+        margin-top: 0px;
       }
 
       div.stories-icon {
@@ -157,19 +162,22 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-items{
-    margin-bottom: 24px;
 
-    div.left-navigation-sidebar-draft {
-      margin-top: 24px;
-    }
+    // div.left-navigation-sidebar-draft {
+    //   margin-top: 24px;
+    // }
 
     a.left-navigation-sidebar-item {
       display: block;
       cursor: default;
-      margin-top: 4px;
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
-      padding-left: 20px;
+      padding-left: 24px;
+      margin: 0;
+
+      &:last-child {
+        margin-bottom: 16px;
+      }
 
       &.hover-item {
         @include default-item();
@@ -189,24 +197,24 @@ div.left-navigation-sidebar {
       img.public {
         float: left;
         margin-left: 6px;
-        margin-top: 6px;
+        margin-top: 5px;
         width: 16px;
         height: 16px;
       }
 
       img.private{
         float: left;
-        margin-left: 8px;
-        margin-top: 7px;
+        margin-left: 9px;
+        margin-top: 5px;
         width: 10px;
         height: 14px;
       }
 
       div.board-name {
-        margin-left: 25px;
+        margin-left: 24px;
 
         div.internal {
-          padding: 5px 5px 0 5px;
+          padding: 3px 5px 0 5px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -224,7 +232,7 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-footer {
     margin-left: 20px;
-    position: absolute;
+    position: relative;
     bottom: 16px;
 
     button.about-carrot-btn {
