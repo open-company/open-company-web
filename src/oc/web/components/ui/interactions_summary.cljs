@@ -23,9 +23,9 @@
         [:div.is-reactions-summary
           {:class (utils/class-set {(str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction)) true})}
           (if (:reacted max-reaction)
-            (str "You"
-              (when (> (:count max-reaction) 1)
-                (str " and +" (dec (:count max-reaction)) " other")))
+            (if (> (:count max-reaction) 1)
+              (str "You and +" (dec (:count max-reaction)) " other")
+              (str "You reacted to this"))
             (str "+" (:count max-reaction)))]])))
 
 (rum/defcs comments-summary < rum/static
