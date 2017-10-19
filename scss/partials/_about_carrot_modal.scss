@@ -5,7 +5,7 @@ div.about-carrot-modal-container {
   top: 0px;
   left: 0px;
   background-color: $carrot_modal_bg;
-  z-index: #{$navbar_zindex + 103};
+  z-index: #{$navbar_zindex + 110};
   transition: opacity 180ms ease-in;
   overflow: auto;
 

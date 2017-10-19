@@ -7,7 +7,7 @@ div.entry-edit-modal-container {
   top: 0px;
   left: 0px;
   background-color: $carrot_modal_bg;
-  z-index: #{$navbar_zindex + 101};
+  z-index: #{$navbar_zindex + 105};
   transition: opacity 180ms ease-in;
 
   &.will-appear {
