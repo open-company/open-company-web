@@ -171,6 +171,91 @@ div.activity-card {
       }
 
       @include activity-tag();
+
+      div.more-button {
+        float: right;
+        position: relative;
+        margin-right: -6px;
+
+        button.more-ellipsis {
+          width: 24px;
+          height: 24px;
+          padding: 2px 10px;
+          display: block;
+          background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+          background-position: center;
+          background-size: 4px 20px;
+          background-repeat: no-repeat;
+          opacity: 0.8;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.not-hover {
+            opacity: 0;
+          }
+        }
+
+        div.activity-move {
+          position: absolute;
+          top: 36px;
+          left: unset;
+          right: -10px;
+        }
+
+        div.activity-mode-dropdown-menu {
+          position: absolute;
+          top: 36px;
+          right: -10px;
+          left: unset;
+          width: 130px;
+          min-width: 130px;
+          height: auto;
+          border: none;
+          outline: none;
+          box-shadow: none;
+          background-color: transparent;
+          overflow: visible;
+
+          div.triangle {
+            position: absolute;
+            top: -7px;
+            right: 14px;
+            background-color: white;
+            border-top: 1px solid rgba(177,184,192,0.50);
+            border-left: 1px solid rgba(177,184,192,0.50);
+            transform: rotate(45deg);
+            width: 15px;
+            height: 15px;
+          }
+
+          ul.activity-card-more-menu {
+            background-color: white;
+            border: 1px solid rgba(177,184,192,0.50);
+            box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+            border-radius: 5px;
+            margin: 0px;
+            padding: 10px 13px 6px 8px;
+            min-height: 50px;
+            list-style-type: none;
+            width: 100%;
+
+            li {
+              padding: 3px 8px;
+              @include avenir_M();
+              font-size: 14px;
+              color: $carrot_light_gray_3;
+              cursor: pointer;
+              background-color: transparent;
+
+              &:hover {
+                background-color: rgba($carrot_light_gray_4, 0.2);
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -324,78 +409,23 @@ div.activity-card {
     height: 72px;
     padding: 24px 24px 24px 32px;
 
-    div.more-button {
+    button.post-edit {
       float: right;
-      position: relative;
       margin-right: -6px;
+      width: 24px;
+      height: 24px;
+      background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
+      background-position: center;
+      background-size: 14px 14px;
+      background-repeat: no-repeat;
+      opacity: 0.8;
 
-      button.more-ellipsis {
-        width: 24px;
-        height: 24px;
-        padding: 8px;
-        display: block;
-        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-        background-position: center;
-        background-size: 6px 16px;
-        background-repeat: no-repeat;
+      &.not-hover {
+        opacity: 0;
       }
 
-      div.activity-move {
-        position: absolute;
-        top: -104px;
-        left: -301px;
-      }
-
-      div.dropdown-menu {
-        position: absolute;
-        top: unset;
-        bottom: -20px;
-        left: -132px;
-        width: 130px;
-        min-width: 130px;
-        height: auto;
-        border: none;
-        outline: none;
-        box-shadow: none;
-        background-color: transparent;
-        overflow: visible;
-
-        div.triangle {
-          position: absolute;
-          bottom: 25px;
-          right: -7px;
-          background-color: white;
-          border-top: 1px solid rgba(177,184,192,0.50);
-          border-left: 1px solid rgba(177,184,192,0.50);
-          transform: rotate(135deg);
-          width: 15px;
-          height: 15px;
-        }
-
-        ul.activity-card-more-menu {
-          background-color: white;
-          border: 1px solid rgba(177,184,192,0.50);
-          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-          border-radius: 5px;
-          margin: 8px 0;
-          padding: 10px 13px 6px 8px;
-          min-height: 50px;
-          list-style-type: none;
-          width: 100%;
-
-          li {
-            padding: 3px 8px;
-            @include avenir_M();
-            font-size: 14px;
-            color: $carrot_light_gray_3;
-            cursor: pointer;
-            background-color: transparent;
-
-            &:hover {
-              background-color: rgba($carrot_light_gray_4, 0.2);
-            }
-          }
-        }
+      &:hover {
+        opacity: 1;
       }
     }
   }
