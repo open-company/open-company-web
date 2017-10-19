@@ -138,8 +138,15 @@ div.activity-modal-container {
 
                 div.activity-move {
                   position: absolute;
-                  top: -104px;
+                  top: -128px;
                   left: -301px;
+
+                  div.triangle {
+                    top: unset;
+                    bottom: 15px;
+                    right: -7px;
+                    transform: rotate(135deg);
+                  }
                 }
 
                 button.activity-modal-more {
@@ -170,7 +177,8 @@ div.activity-modal-container {
 
                   div.triangle {
                     position: absolute;
-                    bottom: 25px;
+                    top: unset;
+                    bottom: 26px;
                     right: -7px;
                     background-color: white;
                     border-top: 1px solid rgba(177,184,192,0.50);
@@ -178,6 +186,7 @@ div.activity-modal-container {
                     transform: rotate(135deg);
                     width: 15px;
                     height: 15px;
+                    z-index: 1001
                   }
 
                   ul.activity-modal-more-menu {
