@@ -1,7 +1,19 @@
 @mixin default-item(){
   background-color: transparent;
-  .internal, div.all-posts-label {
+  .internal {
     @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    color: $carrot_light_gray_3;
+    text-decoration: none;
+
+    &.new {
+      @include avenir_B();
+    }
+  }
+
+  div.all-posts-label {
+    @include avenir_H();
     font-size: 14px;
     line-height: 1.71;
     color: $carrot_light_gray_3;
@@ -30,9 +42,21 @@
   background-color: rgba($carrot_light_gray_4, 0.2);
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
-  .internal, div.all-posts-label {
+  .internal {
     color: $carrot_dark_gray;
     @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    text-decoration: none;
+
+    &.new {
+      @include avenir_B();
+    }
+  }
+
+  div.all-posts-label {
+    color: $carrot_dark_gray;
+    @include avenir_H();
     font-size: 14px;
     line-height: 1.71;
     text-decoration: none;
