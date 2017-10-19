@@ -61,6 +61,8 @@
   [s entry-data show-zero-comments?]
   [:div.interactions-summary.group
     ;; Reactions
-    (reactions-summary entry-data)
+    (when (:reactions entry-data)
+      (reactions-summary entry-data))
     ; Comments
-    (comments-summary entry-data show-zero-comments?)])
+    (when (utils/link-for (:links entry-data) "comments")
+      (comments-summary entry-data show-zero-comments?))])
