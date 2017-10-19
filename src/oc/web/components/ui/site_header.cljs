@@ -72,4 +72,4 @@
                   {:on-click #(if (utils/in? (:route @router/path) "login")
                                 (dis/dispatch! [:login-overlay-show :signup-with-slack])
                                 (router/nav! oc-urls/sign-up-with-slack))}
-                "Sign Up"])]]]]]])
+                "Get Started"])]]]]]])
