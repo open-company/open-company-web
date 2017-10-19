@@ -152,7 +152,6 @@
                  :class (utils/class-set {:not-hover (and (not @(::move-activity s))
                                                           (not @(::hovering-card s))
                                                           (not @(::showing-dropdown s)))})
-                 :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
                  :on-click (fn [e]
                              (utils/event-stop e)
                              (utils/remove-tooltips)
@@ -163,8 +162,7 @@
                  :data-placement "top"
                  :data-container "body"}]
               (when @(::showing-dropdown s)
-                [:div.activity-mode-dropdown-menu
-                  {:ref "activity-mode-dropdown-menu"}
+                [:div.activity-more-dropdown-menu
                   [:div.triangle]
                   [:ul.activity-card-more-menu
                     (when (utils/link-for (:links activity-data) "share")

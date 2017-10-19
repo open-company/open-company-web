@@ -204,12 +204,11 @@ div.activity-card {
           right: -10px;
         }
 
-        div.activity-mode-dropdown-menu {
+        div.activity-more-dropdown-menu {
           position: absolute;
           top: 36px;
           right: -10px;
-          left: unset;
-          width: 130px;
+          left: calc(100% - 130px + 10px);
           min-width: 130px;
           height: auto;
           border: none;
@@ -217,11 +216,12 @@ div.activity-card {
           box-shadow: none;
           background-color: transparent;
           overflow: visible;
+          z-index: 100;
 
           div.triangle {
             position: absolute;
             top: -7px;
-            right: 14px;
+            left: calc(100% - 30px);
             background-color: white;
             border-top: 1px solid rgba(177,184,192,0.50);
             border-left: 1px solid rgba(177,184,192,0.50);
