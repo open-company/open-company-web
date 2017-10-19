@@ -80,56 +80,20 @@ div.activity-card {
         font-size: 16px;
       }
 
-      div.activity-card-media-preview {
+      div.activity-card-media-preview-container {
         width: 100%;
+        text-align: center;
         float: initial;
         margin-top: 16px;
         max-height: 200px;
-        height: 200px;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-      }
-    }
-  }
+        overflow: hidden;
 
-  &.story-card {
-    width: 667px;
-    float: right;
-
-    & > div.triangle {
-      background-color: white;
-      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-      width: 24px;
-      height: 24px;
-      transform: rotate(45deg);
-      position: absolute;
-      left: -10px;
-      top: 25px;
-
-      &:after {
-        content: "";
-        width: 14px;
-        height: 20px;
-        background-color: white;
-        box-shadow: none;
-        top: 3px;
-        left: 12px;
-        position: absolute;
-        transform: rotate(0deg);
-      }
-    }
-
-    div.activity-card-content {
-      div.activity-card-headline.has-headline {
-        margin-top: 0px;
-      }
-
-      div.activity-card-body.has-body {
-        margin-top: 0px;
-
-        &.has-headline {
-          margin-top: 16px;
+        img {
+          max-width: 100%;
+          max-height: 200px;
         }
       }
     }
@@ -229,18 +193,23 @@ div.activity-card {
       }
     }
 
-    div.activity-card-media-preview {
+    div.activity-card-media-preview-container {
       width: 72px;
       height: 72px;
       float: right;
       text-align: center;
       white-space: nowrap;
-      margin-top: 16px;
       overflow: hidden;
       background-position: 50%;
       background-size: cover;
       border-radius: 4px;
       position: relative;
+
+      img {
+        max-width: 72px;
+        max-height: 54px;
+        margin-top: 9px;
+      }
 
       &:hover {
         cursor: pointer;
@@ -271,15 +240,6 @@ div.activity-card {
       }
     }
 
-    div.story-banner {
-      margin-top: 16px;
-      width: 100%;
-      min-height: 200px;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
     div.activity-card-body {
       @include activity-body();
       display: block;
@@ -300,17 +260,17 @@ div.activity-card {
         display: none;
       }
 
-      p {
-        margin-top: 0px;
-        margin-bottom: 0px;
-      }
-
       a:not(.read-more):hover {
         text-decoration: none !important;
       }
 
       img:not(.emojione){
         display: none;
+      }
+
+      b {
+        font-weight: 400;
+        @include avenir_M();
       }
 
       a.read-more {
@@ -342,7 +302,7 @@ div.activity-card {
       //     @include activity-body;
       //     color: $carrot_text_blue;
       //     cursor: pointer;
-      //   } 
+      //   }
       // }
     }
   }
@@ -376,23 +336,28 @@ div.activity-card {
 
       div.dropdown-menu {
         position: absolute;
-        top: -73px;
-        left: -108px;
+        top: unset;
+        bottom: -20px;
+        left: -132px;
+        width: 130px;
+        min-width: 130px;
+        height: auto;
         border: none;
         outline: none;
         box-shadow: none;
         background-color: transparent;
+        overflow: visible;
 
         div.triangle {
           position: absolute;
-          top: 75px;
-          left: 90px;
+          bottom: 25px;
+          right: -7px;
           background-color: white;
           border-top: 1px solid rgba(177,184,192,0.50);
           border-left: 1px solid rgba(177,184,192,0.50);
           transform: rotate(135deg);
-          width: 20px;
-          height: 20px;
+          width: 15px;
+          height: 15px;
         }
 
         ul.activity-card-more-menu {
@@ -404,7 +369,7 @@ div.activity-card {
           padding: 10px 13px 6px 8px;
           min-height: 50px;
           list-style-type: none;
-          width: 100px;
+          width: 100%;
 
           li {
             padding: 3px 8px;

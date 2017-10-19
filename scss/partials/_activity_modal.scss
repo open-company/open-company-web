@@ -156,24 +156,28 @@ div.activity-modal-container {
 
                 div.dropdown-menu {
                   position: absolute;
-                  top: -69px;
-                  left: -91px;
+                  top: unset;
+                  bottom: -17px;
+                  left: -121px;
+                  width: 130px;
+                  min-width: 130px;
                   border: none;
                   outline: none;
                   box-shadow: none;
                   background-color: transparent;
                   padding: 0 0 .3em;
+                  overflow: visible;
 
                   div.triangle {
                     position: absolute;
-                    top: 75px;
-                    left: 90px;;
+                    bottom: 25px;
+                    right: -7px;
                     background-color: white;
                     border-top: 1px solid rgba(177,184,192,0.50);
                     border-left: 1px solid rgba(177,184,192,0.50);
                     transform: rotate(135deg);
-                    width: 20px;
-                    height: 20px;
+                    width: 15px;
+                    height: 15px;
                   }
 
                   ul.activity-modal-more-menu {
@@ -185,7 +189,7 @@ div.activity-modal-container {
                     padding: 10px 13px 6px 8px;
                     min-height: 50px;
                     list-style-type: none;
-                    width: 100px;
+                    width: 100%;
 
                     li {
                       padding: 3px 8px;

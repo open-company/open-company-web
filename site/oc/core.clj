@@ -88,7 +88,7 @@
             [:div.get-started-button.navbar-item
               [:button.mlb-reset.mlb-get-started
                 {:id "site-header-signup-item"}
-                "Sign Up"]
+                "Get Started"]
               ; [:div.mobile-already-account
               ;   [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]
                 ]]]]]])

@@ -51,10 +51,13 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "The Company Newsboard"]
+        [:h1.headline "Grow Together"]
         [:div.subheadline
-          "News and company updates that create greater transparency and alignment"]
+          "Announcements, updates, ideas and stories that bring teams closer"]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+        [:button.mlb-reset.get-started-centred-bt
+          {:id "get-started-centred-bt"}
+          "Get started for free"]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style #js {:display "none"}}

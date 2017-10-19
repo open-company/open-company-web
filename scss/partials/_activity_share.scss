@@ -1,4 +1,4 @@
-div.story-publish-modal-container {
+div.activity-share-modal-container {
   width: 100%;
   height: 100vh;
   position: fixed;
@@ -22,7 +22,7 @@ div.story-publish-modal-container {
     margin: 100px auto 50px;
     position: relative;
 
-    div.story-publish-modal {
+    div.activity-share-modal {
       width: 520px;
       margin: 0px 0px 0px 28px;
       position: relative;
@@ -39,6 +39,12 @@ div.story-publish-modal-container {
         span {
           @include activity-title();
           color: $carrot_dark_gray_1;
+          white-space: pre;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 400px;
+          display: block;
+          float: right;
         }
       }
 
@@ -48,12 +54,12 @@ div.story-publish-modal-container {
         color: $carrot_gray;
         font-size: 15px;
 
-        span.storyboard-name {
+        span.board-name {
           @include avenir_H();
         }
       }
 
-      div.story-publish-share {
+      div.activity-share-share {
 
         div.mediums-box {
           margin-top: 24px;
@@ -167,14 +173,20 @@ div.story-publish-modal-container {
                     @include avenir_M();
                     font-size: 14px;
                     color: $oc_gray_7;
-                    padding: 0.4rem 0.8rem;
+                    padding: 0rem 0.8rem 0.4rem;
                     outline: none;
+
+                    &:empty {
+                      padding: 0.4rem 0.8rem;
+                    }
 
                     div.email-item {
                       margin-right: .4rem;
-                      margin-bottom: .4rem;
+                      margin-top: .4rem;
+                      margin-bottom: 0px;
                       display: inline-block;
                       border-radius: 3px;
+                      height: 26px;
 
                       span.email-item {
                         padding: .25rem .4rem;
@@ -192,6 +204,9 @@ div.story-publish-modal-container {
                       font-size: 14px;
                       color: $oc_gray_7;
                       height: 26px;
+                      width: auto;
+                      max-width: 100%;
+                      margin-top: 0.4rem;
                     }
                   }
 
@@ -213,7 +228,7 @@ div.story-publish-modal-container {
           }
         }
 
-        div.publish-footer{
+        div.share-footer{
           div.buttons {
             float: right;
             height: 48px;
@@ -223,22 +238,26 @@ div.story-publish-modal-container {
               margin-left: 16px;
               height: 48px;
               padding: .2em 1.8em;
+
+              &.disabled {
+                opacity: 0.6;
+              }
             }
           }
         }
       }
 
-      div.story-publish-modal-published {
+      div.activity-share-modal-shared {
         text-align: center;
 
-        div.published-headline {
+        div.shared-headline {
           @include avenir_H();
           font-size: 16px;
           color: $carrot_dark_gray_1;
           margin-top: 8px;
         }
 
-        div.published-url-container {
+        div.shared-url-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.6);
           padding: 7px 4px 7px 8px;
           border-radius: 4px;
@@ -270,7 +289,7 @@ div.story-publish-modal-container {
           }
         }
 
-        div.published-subheadline {
+        div.shared-subheadline {
           @include avenir_M();
           font-size: 16px;
           color: $carrot_dark_gray_1;

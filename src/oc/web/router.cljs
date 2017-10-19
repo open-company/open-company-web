@@ -107,7 +107,7 @@
 (defn current-activity-id []
   (:activity @path))
 
-(defn current-secure-story-id []
+(defn current-secure-activity-id []
   (:secure-id @path))
 
 (defn query-params []

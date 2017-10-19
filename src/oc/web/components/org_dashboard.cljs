@@ -1,37 +1,27 @@
 (ns oc.web.components.org-dashboard
-  (:require-macros [cljs.core.async.macros :refer (go)]
-                   [if-let.core :refer (when-let*)])
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
-            [dommy.core :refer (sel1)]
-            [rum.core :as rum]
-            [cljs.core.async :refer (chan <!)]
-            [oc.web.api :as api]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.router :as router]
-            [oc.web.lib.cookies :as cook]
-            [oc.web.components.topics-columns :refer (topics-columns)]
-            [oc.web.components.activity-modal :refer (activity-modal)]
-            [oc.web.components.entry-edit :refer (entry-edit)]
-            [oc.web.components.board-edit :refer (board-edit)]
-            [oc.web.components.ui.login-required :refer (login-required)]
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.entry-edit :refer (entry-edit)]
+            [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.topics-columns :refer (topics-columns)]
+            [oc.web.components.activity-modal :refer (activity-modal)]
+            [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
-            [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
-            [oc.web.lib.jwt :as jwt]
-            [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
-            [goog.object :as gobj]))
+            [oc.web.components.ui.activity-share-link :refer (activity-share-link)]
+            [oc.web.components.ui.activity-share-email :refer (activity-share-email)]
+            [oc.web.components.ui.activity-share-slack :refer (activity-share-slack)]
+            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data []
   (when (not (router/current-activity-id))
@@ -48,9 +38,7 @@
 
   (will-unmount [_]
     (when (om/get-state owner :board-refresh-interval)
-      (js/clearInterval (om/get-state owner :board-refresh-interval)))
-    (when (om/get-state owner :resize-listener)
-      (events/unlistenByKey (om/get-state owner :resize-listener))))
+      (js/clearInterval (om/get-state owner :board-refresh-interval))))
 
   (render-state [_ {:keys [columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
@@ -80,6 +68,9 @@
             ;; About carrot
             (:about-carrot-modal data)
             (about-carrot-modal)
+            ;; Made with carrot modal
+            (:made-with-carrot-modal data)
+            (made-with-carrot-modal)
             ;; Entry editing
             (:entry-editing data)
             (entry-edit)
@@ -92,6 +83,15 @@
             (let [from-ap (:from-all-posts @router/path)
                   board-slug (if from-ap :all-posts (router/current-board-slug))]
               (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
+          ;; Activity share modal
+          (when (:activity-share data)
+            (cond
+              (= (:medium (:activity-share data)) :email)
+              (activity-share-email)
+              (= (:medium (:activity-share data)) :slack)
+              (activity-share-slack)
+              (= (:medium (:activity-share data)) :link)
+              (activity-share-link)))
           ;; Alert modal
           (when (:alert-modal data)
             (alert-modal))

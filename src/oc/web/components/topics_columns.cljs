@@ -16,17 +16,12 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            ; [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.entries-layout :refer (entries-layout)]
-            [oc.web.components.drafts-layout :refer (drafts-layout)]
-            [oc.web.components.stories-layout :refer (stories-layout)]
+            ; [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
-
-(defn did-select-storyboard-cb [storyboard]
-  (dis/dispatch! [:story-create (clojure.set/rename-keys storyboard {:value :slug :label :name :links :links})]))
 
 (def min-scroll 50)
 (def max-scroll 92)
@@ -50,6 +45,21 @@
       (let [scroll-top (document-scroll-top)]
         (.css story-floating #js {:opacity (calc-opacity scroll-top)})))))
 
+(defn get-first-tooltip-message [org-data]
+  (let [create-link (utils/link-for (:links org-data) "create")
+        boards (:boards org-data)]
+    (if create-link
+      (if (> (count boards) 1)
+        "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can create new posts or react and comment on what you read"
+        "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!")
+      "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can react and comment on what you read.")))
+
+(defn get-second-tooltip-message [org-data]
+  (let [boards (:boards org-data)]
+    (if (> (count boards) 1)
+      "When you need to, you can click here to create new boards for different areas like Sales, Marketing and Product."
+      "When you’re ready, click here and get rolling with your first boards. You can create boards for different areas like Sales, Marketing and Product.")))
+
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
                                       all-posts-data
@@ -59,14 +69,10 @@
                                       board-filters] :as data} owner options]
 
   (init-state [_]
-    (let [first-user-visit (and (not (:show-login-overlay data))
-                                 (jwt/jwt)
-                                 (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))]
-      (when first-user-visit
-        (dis/dispatch! [:onboard-overlay-show]))
-      {:show-boards-tooltip false ;; Disable the welcome tooltip for now
-       :ww (responsive/ww)
-       :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))}))
+    {:show-boards-tooltip (:show-onboard-overlay data)
+     :show-plus-tooltip false
+     :ww (responsive/ww)
+     :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
 
   ; (will-mount [_]
   ;   (when (and (not (utils/is-test-env?))
@@ -86,7 +92,7 @@
       (events/unlistenByKey (om/get-state owner :resize-listener))
       (events/unlistenByKey (om/get-state owner :scroll-listener))))
 
-  (render-state [_ {:keys [show-storyboards-floating-dropdown show-storyboards-top-dropdown show-boards-tooltip ww]}]
+  (render-state [_ {:keys [show-boards-tooltip show-plus-tooltip ww]}]
     (let [current-activity-id (router/current-activity-id)
           is-mobile-size? (responsive/is-mobile-size?)
           columns-container-key (if current-activity-id
@@ -108,13 +114,34 @@
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
-            (carrot-tip {:x (+ boards-left 105 30)
-                         :y (- (aget offset "top") 160)
-                         :title "Welcome to Carrot"
-                         :message "Boards make it easy to find the latest news and key updates from across the company. You can create boards for different areas of your company, like Sales, Marketing and Products."
+            (let [create-link (utils/link-for (:links org-data) "create")]
+              (carrot-tip {:x (+ boards-left 145 30)
+                           :y (- (aget offset "top") 110)
+                           :title "Welcome to Carrot"
+                           :message (get-first-tooltip-message org-data)
+                           :footer (if create-link "1 of 2" "")
+                           :button-title (if create-link "Next" "Got It!")
+                           :big-circle true
+                           :on-next-click (fn []
+                                            (om/update-state! owner #(merge % {:show-plus-tooltip (not (not create-link))
+                                                                               :show-boards-tooltip false}))
+                                            (if create-link
+                                              (.addClass (js/$ "button#add-board-button") "active")
+                                              (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)))))}))))
+        (when show-plus-tooltip
+          (when-let* [plus-button (js/$ "button#add-board-button")
+                      offset (.offset plus-button)
+                      plus-button-left (aget offset "left")]
+            (carrot-tip {:x (+ plus-button-left 90 30)
+                         :y (- (aget offset "top") 110)
+                         :title "Creating boards"
+                         :message (get-second-tooltip-message org-data)
                          :footer ""
+                         :button-title "Got It!"
+                         :big-circle false
                          :on-next-click (fn []
-                                          (om/update-state! owner #(merge % {:show-boards-tooltip false}))
+                                          (.removeClass (js/$ "button#add-board-button") "active")
+                                          (om/set-state! owner :show-plus-tooltip false)
                                           (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
         (dom/div {:class "topics-column-container group"
                   :key columns-container-key}
@@ -128,9 +155,7 @@
               (dom/div {:class "board-name"}
                 (if is-all-posts
                   (dom/div {:class "all-posts-icon"})
-                  (if (= (:type board-data) "story")
-                    (dom/div {:class "stories-icon"})
-                    (dom/div {:class "boards-icon"})))
+                  (dom/div {:class "boards-icon"}))
                 (if is-all-posts
                   "All Posts"
                   (:name board-data))
@@ -148,7 +173,6 @@
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
-                         (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn top-button group"
                              :on-click (fn [_]
@@ -166,7 +190,6 @@
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
-                         (= (:type board-data) "entry")
                          (utils/link-for (:links board-data) "create"))
                 (dom/button {:class "mlb-reset mlb-default add-to-board-btn floating-button"
                              :id "new-entry-floating-btn"
@@ -188,7 +211,6 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
-                         (= (:type board-data) "entry")
                          (> (count entry-topics) 1))
                 (filters-dropdown)))
             ;; Board content: empty board, add topic, topic view or topic cards
@@ -203,14 +225,11 @@
               (empty-board)
               ; for each column key contained in best layout
               :else
-              (cond
-                ;; Drafts
-                (and (= (:type board-data) "story")
-                     (= (:slug board-data) "drafts"))
-                (drafts-layout board-data)
-                ;; Stories
-                (= (:type board-data) "story")
-                (stories-layout board-data)
+              (cond ; REMOVE if we don't end up with entry drafts
+                ;; Drafts 
+                ; (and (= (:type board-data) "story")
+                ;      (= (:slug board-data) "drafts"))
+                ; (drafts-layout board-data)
                 ;; Entries
                 :else
                 (entries-layout board-data board-filters)))))))))

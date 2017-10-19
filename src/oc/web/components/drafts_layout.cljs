@@ -18,9 +18,6 @@
           [:div.draft-banner
             {:style #js {:backgroundImage (str "url(\"" (:banner-url draft) "\")")
                          :height (str (min 234 (* (/ (:banner-height draft) (:banner-width draft)) 430)) "px")}}])
-        ; [:div.draft-card-tag
-        ;   [:div.activity-tag.storyboard-tag
-        ;     (:storyboard-name draft)]]
         [:div.draft-card-title
           {:dangerouslySetInnerHTML (utils/emojify (utils/strip-HTML-tags (if (empty? (:title draft)) "Untitled Draft" (:title draft))))}]
         (let [fixed-body (utils/body-without-preview (:body draft))
