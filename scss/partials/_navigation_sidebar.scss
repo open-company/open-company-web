@@ -14,9 +14,11 @@
 }
 
 @mixin item-selected(){
-  background-color: rgba($carrot_orange_1, 0.1);
+  background-color: $carrot_light_blue_2;
+  border-top-right-radius: 100px;
+  border-bottom-right-radius: 100px;
   .internal, div.all-posts-label {
-    color: $carrot_orange;
+    color: $carrot_text_blue_3;
     @include avenir_H();
     font-size: 14px;
     line-height: 1.71;
@@ -26,6 +28,8 @@
 
 @mixin item-selected-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
+  border-top-right-radius: 100px;
+  border-bottom-right-radius: 100px;
   .internal, div.all-posts-label {
     color: $carrot_dark_gray;
     @include avenir_M();
@@ -146,7 +150,7 @@ div.left-navigation-sidebar {
       background-repeat: no-repeat;
       background-position: 50%;
       background-size: 8px 8px;
-      border-radius: 2px;
+      border-radius: 10px;
       @include avenir_H();
 
       &:hover, &.active {
