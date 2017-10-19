@@ -50,4 +50,4 @@
                            (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}
             [:span.reaction (:reaction r)]
             [:div.count
-              (:count r)]])])))
+              (str "+" (:count r))]])])))
