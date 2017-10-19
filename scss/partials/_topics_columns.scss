@@ -105,20 +105,29 @@ div.topics-columns {
 
         &.top-button {
           float: right;
-          width: auto;
+          width: 143px;
           height: 42px;
-          background-color: #FA6654;
-          color: white;
-          border-radius: 4px;
-          padding: 10px 23.5px;
+          background-color: $carrot_orange_light;
+          color: $carrot_orange;
+          border-radius: 100px;
+          padding: 10px 24px;
           margin-right: 16px;
-          @include avenir_H();
           border: 2px solid transparent;
           opacity: 1;
+          transition: 0ms;
 
-          &:hover {
-            background-color: #FF7C6C;
+          &:hover, &:active, &:focus {
+            background-color: $carrot_orange;
+            color: white;
             opacity: 1;
+
+            div.add-to-board-pencil {
+              background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+            }
+
+            label.add-to-board-label {
+              color: white;
+            }
           }
 
           &:active, &:focus {
@@ -127,7 +136,7 @@ div.topics-columns {
           }
 
           div.add-to-board-pencil {
-            background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+            background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
             background-size: 14px 14px;
             width: 14px;
             height: 14px;
