@@ -80,7 +80,7 @@
         cur-user-data (:current-user-data invite-users-data)
         team-roster (:team-roster invite-users-data)
         uninvited-users (vec (filter #(= (:status %) "uninvited") (:users team-roster)))]
-    [:div.org-settings-panel
+    [:div.org-settings-panel.org-settings-invite-panel
       [:div.org-settings-panel-row.invite-from.group
         [:div.invite-from-label "Invite with:"]
         [:div.org-settings-panel-choice

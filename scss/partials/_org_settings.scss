@@ -47,15 +47,15 @@ div.org-settings {
 
     div.org-settings-footer {
       margin-top: 64px;
-      height: 90px;
+      margin-bottom: 32px;
+      height: 42px;
       width: 100%;
-      padding: 0 32px;
+      padding: 0px;
 
       button {
         float: right;
         margin-left: 24px;
         height: 42px;
-        margin-top: 24px;
 
         &.save-btn {
           width: 124px;
