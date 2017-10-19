@@ -3,22 +3,10 @@ div.activity-move {
   height: 166px;
   z-index: 1000;
 
-  // div.triangle {
-  //   position: absolute;
-  //   top: 110px;
-  //   left: 300px;
-  //   background-color: white;
-  //   border-top: 1px solid rgba(177,184,192,0.50);
-  //   border-left: 1px solid rgba(177,184,192,0.50);
-  //   transform: rotate(135deg);
-  //   width: 20px;
-  //   height: 20px;
-  //   z-index: 1001;
-  // }
   div.triangle {
     position: absolute;
     top: -7px;
-    right: 14px;
+    left: calc(100% - 30px);
     background-color: white;
     border-top: 1px solid rgba(177,184,192,0.50);
     border-left: 1px solid rgba(177,184,192,0.50);
