@@ -115,6 +115,7 @@ div.topics-columns {
           border: 2px solid transparent;
           opacity: 1;
           transition: 0ms;
+          cursor: pointer;
 
           &:hover, &:active, &:focus {
             background-color: $carrot_orange;
@@ -143,6 +144,7 @@ div.topics-columns {
             margin: 3px 6px 0px 0px;
             padding: 0;
             float: left;
+            cursor: pointer;
           }
 
           label.add-to-board-label {
@@ -150,6 +152,7 @@ div.topics-columns {
             font-size: 16px;
             color: $carrot_orange;
             float: left;
+            cursor: pointer;
           }
         }
       }
