@@ -154,9 +154,6 @@
               ;; Board name and settings button
               (dom/div {:class "board-name"}
                 (if is-all-posts
-                  (dom/div {:class "all-posts-icon"})
-                  (dom/div {:class "boards-icon"}))
-                (if is-all-posts
                   "All Posts"
                   (:name board-data))
                 ;; Settings button
