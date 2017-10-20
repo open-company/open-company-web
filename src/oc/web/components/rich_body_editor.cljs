@@ -44,7 +44,8 @@
       (let [size (gobj/get res "size")
             mimetype (gobj/get res "mimetype")
             filename (gobj/get res "filename")
-            prefix (str "Uploaded on " (utils/date-string (utils/js-date) [:year]) " - ")
+            createdat (utils/js-date)
+            prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
             subtitle (str prefix (filesize size :binary false :format "%.2f" ))
             icon (utils/icon-for-mimetype mimetype)
             attachment-data {:fileName filename
@@ -52,6 +53,8 @@
                              :fileSize size
                              :title filename
                              :subtitle subtitle
+                             :createdat (.getTime createdat)
+                             :author (jwt/get-key :name)
                              :icon icon}]
         (reset! (::media-attachment state) false)
         (.addAttachment editable url (clj->js attachment-data))
@@ -243,9 +246,9 @@
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
-                             :cleanAttrs #js ["class" "style" "alt" "dir"]
+                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color"]
                              :cleanTags #js ["meta" "video" "audio"]
-                             :unwrapTags #js ["div" "span" "label"]}
+                             :unwrapTags #js ["div" "span" "label" "font"]}
                  :placeholder #js {:text "Start writing..."
                                    :hideOnClick true}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
