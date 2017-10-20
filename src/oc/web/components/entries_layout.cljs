@@ -7,6 +7,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.urls :as oc-urls]
             [taoensso.timbre :as timbre]
             [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
@@ -46,6 +47,16 @@
                   "new?:" new?)
     new?))
 
+(defn is-share-thoughts? [entry changes]
+  (and (new? entry changes)
+       (zero? (:count (utils/link-for (:links entry) "comments")))
+       (zero? (count (filter :reacted (:reactions entry))))))
+
+(defn find-share-thoughts-uuid [board-data changes]
+  (let [entries (vals (:fixed-items board-data))
+        sorted-entries (reverse (sort-by :created-at entries))]
+    (some #(when (is-share-thoughts? % changes) (:uuid %)) sorted-entries)))
+
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           {:will-unmount (fn [s]
@@ -56,7 +67,8 @@
   [:div.entries-layout
     (let [change-data (drv/react s :change-data)
           board-uuid (:uuid board-data)
-          changes (get change-data board-uuid)]
+          changes (get change-data board-uuid)
+          share-thoughts-uuid (find-share-thoughts-uuid board-data changes)]
       ;; Determine what sort of layout this is
       (cond
         ;; :by-topic
@@ -90,8 +102,10 @@
               ;; First row:
               [:div.entries-cards-container-row.group
                 ; Render the first 2 entries
-                (for [entry first-line-entries]
-                  (rum/with-key (activity-card entry first-has-headline first-has-body (new? entry changes))
+                (for [entry first-line-entries
+                      :let [is-new (new? entry changes)
+                            share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
+                  (rum/with-key (activity-card entry first-has-headline first-has-body is-new false share-thoughts)
                     (str "entry-by-topic-" topic "-" (:uuid entry))))
                 ; If there is only 1 add the empty placeholder
                 (when (= (count entries-group) 1)
@@ -101,8 +115,10 @@
                 [:div.entries-cards-container-row.group
                   ; Render the second 2 entries
                   (when (> (count entries-group) 2)
-                    (for [entry (subvec entries-group 2 (min 4 (count entries-group)))]
-                      (rum/with-key (activity-card entry second-has-headline second-has-body (new? entry changes))
+                    (for [entry (subvec entries-group 2 (min 4 (count entries-group)))
+                          :let [is-new (new? entry changes)
+                                share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
+                      (rum/with-key (activity-card entry second-has-headline second-has-body is-new false share-thoughts)
                         (str "entry-by-topic-" topic "-" (:uuid entry)))))
                   ; If the total entries are 3 add a placeholder to avoid taking the full width
                   (when (= (count entries-group) 3)
@@ -128,8 +144,10 @@
                 [:div.entries-cards-container-row.group
                   {:key (str "entries-row-" idx)}
                   ; Render the entries in the row
-                  (for [entry entries]
-                    (rum/with-key (activity-card entry has-headline has-body (new? entry changes))
+                  (for [entry entries
+                        :let [is-new (new? entry changes)
+                              share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
+                    (rum/with-key (activity-card entry has-headline has-body is-new false share-thoughts)
                       (str "entry-topic-" (:topic-slug entry) "-" (:uuid entry))))
                   ; If there is only one entry add the empty card placeholder
                   (if (= (count sorted-entries) 1)
@@ -157,8 +175,10 @@
                 ; Renteder the entries in thisnrow
                 [:div.entries-cards-container-row.group
                   {:key (str "entries-row-" idx)}
-                  (for [entry entries]
-                    (rum/with-key (activity-card entry has-headline has-body (new? entry changes))
+                  (for [entry entries
+                        :let [is-new (new? entry changes)
+                              share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
+                    (rum/with-key (activity-card entry has-headline has-body is-new false share-thoughts)
                       (str "entry-latest-" (:uuid entry))))
                   ; If the row contains less than 2, add a placeholder div to avoid having the first cover the full width
                   (when (= (count entries) 1)
