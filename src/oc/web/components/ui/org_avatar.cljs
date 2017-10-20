@@ -14,8 +14,7 @@
         [:span.helper]
         [:img.org-avatar-img
           {:src (:logo-url org-data)
-           :style #js {:width (str (:logo-width org-data) "px")
-                       :height (str (:logo-height org-data) "px")}
+           :style #js {:height (str (:logo-height org-data) "px")}
            :on-error #(reset! (::img-load-failed s) true)}]])
     (when (and (not hide-name)
                (or (not show-org-avatar?)
