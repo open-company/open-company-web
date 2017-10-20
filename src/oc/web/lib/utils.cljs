@@ -319,14 +319,8 @@
         with-read-only (assoc board-data :read-only read-only)
         fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
-        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)
-        sorted-entries (reverse (sort-by :created-at (:entries board-data)))
-        first-uncommented-entry (first (filter #(let [comments-link (link-for (:links %) "comments")]
-                                                  (and comments-link
-                                                       (zero? (:count comments-link))
-                                                       (zero? (apply + (map :count (filter :reacted (:reactions %))))))) sorted-entries))
-        with-share-thoughts (assoc-in with-fixed-entries [:fixed-items (:uuid first-uncommented-entry) :share-thoughts] true)]
-    with-share-thoughts))
+        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+    with-fixed-entries))
 
 (defn fix-activity [activity collection-data]
   (fix-entry activity collection-data nil))
