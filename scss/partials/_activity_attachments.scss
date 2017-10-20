@@ -1,0 +1,153 @@
+div.activity-attachments{
+  button.attachments-button {
+    min-width: 45px;
+    height: 26px;
+    padding: 7px 8px 6px 26px;
+    @include avenir_H();
+    font-size: 12px;
+    color: $carrot_light_gray_3;
+    background-image: cdnUrl("/img/ML/attachment_icon.svg");
+    background-size: 16px 24px;
+    background-repeat: no-repeat;
+    background-position: 8px 1px;
+    border-radius: 100px;
+    background-color: $carrot_light_gray_7;
+
+    &:hover, &:active, &:focus, &.expanded {
+      background-image: cdnUrl("/img/ML/attachment_icon_white.svg");
+      color: white;
+      background-color: $carrot_light_gray_3;
+    }
+  }
+    
+  div.attachments-dropdown {
+    position: absolute;
+    top: 36px;
+    left: calc(100% - 600px - 18px);
+    width: 600px;
+    height: auto;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background-color: transparent;
+    overflow: visible;
+    z-index: 100;
+
+    div.triangle {
+      position: absolute;
+      top: -7px;
+      left: calc(100% - 30px);
+      background-color: white;
+      border-top: 1px solid rgba(177,184,192,0.50);
+      border-left: 1px solid rgba(177,184,192,0.50);
+      transform: rotate(45deg);
+      width: 15px;
+      height: 15px;
+    }
+
+    div.attachments-dropdown-list {
+      background-color: white;
+      border: 1px solid rgba(177,184,192,0.50);
+      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+      border-radius: 5px;
+      margin: 0px;
+      padding: 32px;
+      min-height: 50px;
+      width: 100%;
+      margin-bottom: 8px;
+      max-height: 241px;
+      overflow: auto;
+
+      div.title {
+        float: left;
+        @include avenir_H();
+        font-size: 15px;
+        color: $carrot_light_gray_3;
+      }
+
+      div.subtitle {
+        float: right;
+        @include avenir_M();
+        font-size: 15px;
+        color: $carrot_light_gray_3;
+      }
+
+      a.attachments-dropdown-item {
+        display: block;
+        background-color: $carrot_light_gray_7;
+        height: 64px;
+        padding: 16px;
+        @include avenir_M();
+        font-size: 14px;
+        color: $carrot_light_gray_3;
+        cursor: pointer;
+        position: relative;
+        margin-bottom: 8px;
+        border-radius: 4px;
+
+        div.file-icon {
+          border-radius: 16px;
+          width: 32px;
+          height: 32px;
+          background-color: #BFC1C4;
+          float: left;
+
+          i.fa {
+            color: white;
+            margin: 9px 11px;
+          }
+        }
+
+        div.file-title {
+          @include avenir_H();
+          font-size: 14px;
+          color: #47535F;
+          width: calc(100% - 32px - 32px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          float: left;
+          margin-left: 8px;
+        }
+
+        div.file-subtitle {
+          @include avenir_M();
+          font-size: 12px;
+          color: $carrot_light_gray_3;
+          width: calc(100% - 32px - 32px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          float: left;
+          margin-left: 8px;
+        }
+
+        div.file-download {
+          background-image: cdnUrl("/img/ML/attachment_download.svg");
+          background-size: 12px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
+          position: absolute;
+          width: 12px;
+          height: 16px;
+          right: 16px;
+          top: 24px;
+        }
+
+        &:hover {
+          background-color: rgba($carrot_green_3, 0.5);
+
+          div.file-icon {
+            background-color: $carrot_green_2;
+          }
+
+          div.file-title {
+            color: #0F8749;
+          }
+
+          div.file-download {
+            background-image: cdnUrl("/img/ML/attachment_download_green.svg");
+          }
+        }
+      }
+    }
+  }
+}
