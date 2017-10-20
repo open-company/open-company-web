@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="➡️-Board-Flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Board:-Grid-(jelly)" transform="translate(-439.000000, -430.000000)" fill="#0E8749">
+            <g id="Group-5" transform="translate(297.000000, 178.000000)">
+                <g id="Group-9" transform="translate(119.000000, 241.000000)">
+                    <g id="Group-8" transform="translate(23.000000, 3.000000)">
+                        <path d="M7.68684492,8 L11,8 C11.5522847,8 12,8.44771525 12,9 L12,11.3636364 C12,11.420103 11.9953199,11.4754765 11.9863263,11.5293901 C11.9908825,11.5294046 11.9954404,11.5294118 12,11.5294118 L12,15.7647059 C12,16.5432941 11.3668235,17.1764706 10.5882353,17.1764706 L5.88282353,17.1764706 L2.11764706,20 L2.11764706,17.1764706 L1.41176471,17.1764706 C0.633176471,17.1764706 0,16.5432941 0,15.7647059 L0,9.41176471 C0,8.63317647 0.633176471,8 1.41176471,8 L7.68684492,8 Z" id="Combined-Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

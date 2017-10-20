@@ -260,6 +260,9 @@
               {:src (:thumbnail @(::first-body-image s))}]])]
       [:div.activity-card-footer.group
         (interactions-summary activity-data)
+        (when (:share-thoughts activity-data)
+          [:div.activity-share-thoughts
+            "Share your thoughts"])
         (when (utils/link-for (:links activity-data) "partial-update")
           [:button.mlb-reset.post-edit
             {:title "Edit"
