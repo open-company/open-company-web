@@ -323,7 +323,8 @@
         sorted-entries (reverse (sort-by :created-at (:entries board-data)))
         first-uncommented-entry (first (filter #(let [comments-link (link-for (:links %) "comments")]
                                                   (and comments-link
-                                                       (zero? (:count comments-link)))) sorted-entries))
+                                                       (zero? (:count comments-link))
+                                                       (zero? (apply + (map :count (filter :reacted (:reactions %))))))) sorted-entries))
         with-share-thoughts (assoc-in with-fixed-entries [:fixed-items (:uuid first-uncommented-entry) :share-thoughts] true)]
     with-share-thoughts))
 
