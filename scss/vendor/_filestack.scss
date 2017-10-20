@@ -192,44 +192,44 @@ div.fsp-picker {
         }
       }
 
-      div.fsp-content {
+      div.fsp-footer {
         background-color: white;
+        border-top: none;
 
-        div.fsp-footer {
-          background-color: white;
-          border-top: none;
+        div.fsp-nav {
 
-          div.fsp-nav {
+          span.fsp-nav__left {
 
-            span.fsp-nav__left {
+            span.fsp-button.fsp-button--cancel {
+              cursor: pointer;
+              outline: none;
+              border-width: 0;
+              opacity: 0.9;
+              background-color: transparent;
+              color: $carrot_dark_gray;
+              @include avenir_B();
 
-              span.fsp-button.fsp-button--cancel {
-                cursor: pointer;
-                outline: none;
-                border-width: 0;
-                opacity: 0.9;
-                background-color: transparent;
-                color: $carrot_dark_gray;
-                @include avenir_B();
-
-                &:disabled {
-                  cursor: not-allowed;
-                  opacity: 0.2 !important;
-                }
-
-                &:hover {
-                  opacity: 1;
-                  text-decoration: underline;
-                }
+              &:disabled {
+                cursor: not-allowed;
+                opacity: 0.2 !important;
               }
-            }
-            span.fsp-nav__right {
-              span.fsp-button.fsp-button--primary {
-                @include carrot_button();
+
+              &:hover {
+                opacity: 1;
+                text-decoration: underline;
               }
             }
           }
+          span.fsp-nav__right {
+            span.fsp-button.fsp-button--primary {
+              @include carrot_button();
+            }
+          }
         }
+      }
+
+      div.fsp-content {
+        background-color: white;
 
         div.fsp-cloud {
           div.fsp-source-auth__wrapper {
