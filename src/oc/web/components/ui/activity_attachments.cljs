@@ -6,21 +6,12 @@
             [goog.events.EventType :as EventType]))
 
 (rum/defcs activity-attachments < (rum/local false ::attachments-dropdown)
-                                  (rum/local nil ::window-click)
-                                  {:did-mount (fn [s]
-                                    (reset! (::window-click s)
-                                     (events/listen js/window EventType/CLICK
-                                      #(when-not (utils/event-inside? % (rum/ref-node s "attachments-button"))
-                                         (reset! (::attachments-dropdown s) false))))
-                                    s)
-                                   :will-unmount (fn [s]
-                                    (when @(::window-click s)
-                                      (events/unlistenByKey @(::window-click s))
-                                      (reset! (::window-click s) nil)))}
   [s activity-data]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))]
     (when (pos? (count attachments))
       [:div.activity-attachments
+        {:on-mouse-enter #(reset! (::attachments-dropdown s) true)
+         :on-mouse-leave #(reset! (::attachments-dropdown s) false)}
         [:button.mlb-reset.attachments-button
           {:ref "attachments-button"
            :class (when @(::attachments-dropdown s) "expanded")

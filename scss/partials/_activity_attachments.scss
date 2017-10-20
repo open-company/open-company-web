@@ -22,7 +22,7 @@ div.activity-attachments{
     
   div.attachments-dropdown {
     position: absolute;
-    top: 36px;
+    top: 10px;
     left: calc(100% - 600px - 18px);
     width: 600px;
     height: auto;
@@ -32,10 +32,11 @@ div.activity-attachments{
     background-color: transparent;
     overflow: visible;
     z-index: 100;
+    padding-top: 26px;
 
     div.triangle {
       position: absolute;
-      top: -7px;
+      top: 19px;
       left: calc(100% - 30px);
       background-color: white;
       border-top: 1px solid rgba(177,184,192,0.50);
