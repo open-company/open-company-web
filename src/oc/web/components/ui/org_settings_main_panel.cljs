@@ -15,7 +15,6 @@
 (defn form-is-clean? [s]
   (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
         {:keys [um-domain-invite]} @(drv/get-ref s :org-settings-team-management)]
-    (js/console.log "form-is-clean?" has-org-edit-changes "domain-invite" um-domain-invite)
     (and (not has-org-edit-changes)
          (empty? (:domain um-domain-invite)))))
 
