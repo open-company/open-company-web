@@ -133,7 +133,7 @@ div.activity-card {
 
     div.activity-card-head-author {
       float: left;
-      width: 58%;
+      width: 45%;
       padding-right: 20px;
       overflow: hidden;
 
@@ -143,8 +143,12 @@ div.activity-card {
     div.activity-card-head-right {
       float: right;
       position: relative;
-      width: 42%;
+      width: 55%;
       margin-top: 8px;
+
+      div.activity-attachments {
+        float: right;
+      }
 
       div.new-tag {
         @include avenir_B();        
@@ -164,6 +168,7 @@ div.activity-card {
         max-width: 100%;
         text-overflow: ellipsis;
         overflow: hidden;
+        margin-right: 8px;
 
         &.double-tag {
           max-width: 50%;
