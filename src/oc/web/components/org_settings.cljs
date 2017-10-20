@@ -101,5 +101,5 @@
             (org-settings-team-panel org-data)
             :invite
             (org-settings-invite-panel org-data #(close-clicked s))
-            (org-settings-main-panel org-data))]]
+            (org-settings-main-panel org-data #(close-clicked s)))]]
       (rloading {:loading true}))))

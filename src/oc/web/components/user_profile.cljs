@@ -312,10 +312,12 @@
               "Saved!"
               "Save")]
           [:button.mlb-reset.mlb-link-black
-            {:on-click #(when (:has-changes current-user-data)
-                          (reset! (::name-error s) false)
-                          (reset! (::email-error s) false)
-                          (reset! (::password-error s) false)
-                          (reset! (::current-password-error s) false) 
-                          (dis/dispatch! [:user-profile-reset]))}
+            {:on-click #(if (:has-changes current-user-data)
+                          (do
+                            (reset! (::name-error s) false)
+                            (reset! (::email-error s) false)
+                            (reset! (::password-error s) false)
+                            (reset! (::current-password-error s) false) 
+                            (dis/dispatch! [:user-profile-reset]))
+                          (real-close-cb orgs current-user-data))}
             "Cancel"]]]))
