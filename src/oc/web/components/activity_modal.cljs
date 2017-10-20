@@ -42,7 +42,6 @@
   (utils/after 180 #(dismiss-modal s board-filters)))
 
 (defn delete-clicked [e activity-data]
-  (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
                     :message (str "Delete this update?")
@@ -94,9 +93,12 @@
                                            s)
                              :did-mount (fn [s]
                                           (reset! (::window-click s)
-                                           (events/listen js/window EventType/CLICK #(do
-                                                                                      (reset! (::showing-dropdown s) false)
-                                                                                      (reset! (::share-dropdown s) false))))
+                                           (events/listen js/window EventType/CLICK (fn [e]
+                                                                                      (when (and (not (utils/event-inside? e (sel1 [:div.activity-modal :div.more-dropdown])))
+                                                                                                 (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-move]))))
+                                                                                        (reset! (::showing-dropdown s) false))
+                                                                                      (when (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-modal-share])))
+                                                                                        (reset! (::share-dropdown s) false)))))
                                           s)
                             :will-unmount (fn [s]
                                             ;; Remove window resize listener
@@ -146,7 +148,6 @@
                     [:button.mlb-reset.activity-modal-more.dropdown-toggle
                       {:type "button"
                        :on-click (fn [e]
-                                   (utils/event-stop e)
                                    (utils/remove-tooltips)
                                    (reset! (::showing-dropdown s) (not @(::showing-dropdown s)))
                                    (reset! (::move-activity s) false))
@@ -161,12 +162,20 @@
                           (when (utils/link-for (:links activity-data) "partial-update")
                             [:li
                               {:on-click #(do
+                                            (reset! (::showing-dropdown s) false)
+                                            (dis/dispatch! [:entry-edit activity-data]))}
+                              "Edit"])
+                          (when (utils/link-for (:links activity-data) "partial-update")
+                            [:li
+                              {:on-click #(do
                                            (reset! (::showing-dropdown s) false)
                                            (reset! (::move-activity s) true))}
                               "Move"])
                           (when (utils/link-for (:links activity-data) "delete")
                             [:li
-                              {:on-click #(delete-clicked % activity-data)}
+                              {:on-click #(do
+                                            (reset! (::showing-dropdown s) false)
+                                            (delete-clicked % activity-data))}
                               "Delete"])]])
                     (when @(::move-activity s)
                       (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
@@ -181,6 +190,8 @@
             [:div.activity-left-column
               [:div.activity-left-column-content
                 [:div.activity-modal-content
+                  {:on-click #(when (utils/link-for (:links activity-data) "partial-update")
+                                (dis/dispatch! [:entry-edit activity-data]))}
                   [:div.activity-modal-content-headline
                     {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
                   [:div.activity-modal-content-body
@@ -198,7 +209,6 @@
                           (when (utils/link-for (:links activity-data) "share")
                             [:li.share-dropdown-item
                               {:on-click (fn [e]
-                                           (utils/event-stop e)
                                            (reset! (::share-dropdown s) false)
                                            ; open the activity-share-modal component
                                            (dis/dispatch! [:activity-share-show :link activity-data]))}
@@ -206,7 +216,6 @@
                           (when (utils/link-for (:links activity-data) "share")
                             [:li.share-dropdown-item
                               {:on-click (fn [e]
-                                           (utils/event-stop e)
                                            (reset! (::share-dropdown s) false)
                                            ; open the activity-share-modal component
                                            (dis/dispatch! [:activity-share-show :email activity-data]))}
@@ -215,14 +224,12 @@
                                      (jwt/team-has-bot? (:team-id (dis/org-data))))
                             [:li.share-dropdown-item
                               {:on-click (fn [e]
-                                           (utils/event-stop e)
                                            (reset! (::share-dropdown s) false)
                                            ; open the activity-share-modal component
                                            (dis/dispatch! [:activity-share-show :slack activity-data]))}
                               "Share Slack"])]])
                     [:button.mlb-reset.share-button
                       {:on-click #(do
-                                   (utils/event-stop %)
                                    (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
                       "Share"]]
                   [:div.activity-modal-footer-right]]]]
