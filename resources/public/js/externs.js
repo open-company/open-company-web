@@ -91,13 +91,6 @@ var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
 var OCWebPrintRouterPath = function(){};
 var OCWebForceRefreshToken = function(){};
-// Filestack
-var filestack = {};
-filestack.init = function(){};
-filestack.pick = function(){};
-filestack.then = function(){};
-filestack.transform = function(){};
-filestack.storeURL = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
