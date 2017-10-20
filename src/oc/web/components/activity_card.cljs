@@ -121,7 +121,7 @@
                          :will-unmount (fn [s]
                                          (events/unlistenByKey @(::window-click s))
                                          s)}
-  [s activity-data has-headline has-body is-new is-all-posts]
+  [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
@@ -260,7 +260,7 @@
               {:src (:thumbnail @(::first-body-image s))}]])]
       [:div.activity-card-footer.group
         (interactions-summary activity-data)
-        (when (:share-thoughts activity-data)
+        (when share-thoughts
           [:div.activity-share-thoughts
             "Share your thoughts"])
         (when (utils/link-for (:links activity-data) "partial-update")
