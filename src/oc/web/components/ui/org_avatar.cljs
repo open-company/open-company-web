@@ -7,20 +7,21 @@
             [oc.web.lib.utils :as utils]))
 
 (defn internal-org-avatar
-  [s org-logo org-name show-org-avatar? hide-name show-avatar-and-name]
+  [s org-data show-org-avatar? hide-name show-avatar-and-name]
   [:div.org-avatar-container.group
     (when show-org-avatar?
       [:div.org-avatar-border
         [:span.helper]
         [:img.org-avatar-img
-          {:src org-logo
+          {:src (:logo-url org-data)
+           :style #js {:height (str (:logo-height org-data) "px")}
            :on-error #(reset! (::img-load-failed s) true)}]])
     (when (and (not hide-name)
                (or (not show-org-avatar?)
                    show-avatar-and-name))
       [:span.org-name
         {:class (when-not show-org-avatar? "no-logo")}
-        org-name])])
+        (:name org-data)])])
 
 (rum/defcs org-avatar < rum/static
                         (rum/local false ::img-load-failed)
@@ -50,5 +51,5 @@
                            (.preventDefault e)
                            (when should-show-link
                              (router/redirect! avatar-link)))}
-              (internal-org-avatar s org-logo org-name show-org-avatar? hide-name show-avatar-and-name)]
-            (internal-org-avatar s org-logo org-name show-org-avatar? hide-name show-avatar-and-name))))]))
+              (internal-org-avatar s org-data show-org-avatar? hide-name show-avatar-and-name)]
+            (internal-org-avatar s org-data show-org-avatar? hide-name show-avatar-and-name))))]))

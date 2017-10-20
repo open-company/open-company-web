@@ -171,14 +171,21 @@
          (gdom/append (.-body js/document) img)
          (set! (.-src img) url)
          (reset! (::media-photo s) {:res res :url url})
-         (iu/thumbnail! url
-          (fn [thumbnail-url]
-            (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
-            (media-photo-add-if-finished s editable))
-          (fn [res progress])
-          (fn [res err]
-            (media-photo-add-error s))
-          )))
+         ;; if the image is a vector image
+         (if (or (= (string/lower (gobj/get res "mimetype")) "image/svg+xml")
+                 (string/ends-with? (string/lower (gobj/get res "filename")) ".svg"))
+           ;l use the same url for the thumbnail since the size doesn't matter
+           (do
+             (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
+             (media-photo-add-if-finished s editable))
+           ;; else create the thumbnail
+           (iu/thumbnail! url
+            (fn [thumbnail-url]
+              (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
+              (media-photo-add-if-finished s editable))
+            (fn [res progress])
+            (fn [res err]
+              (media-photo-add-error s))))))
      ;; progress-cb
      (fn [res progress])
      ;; error-cb
