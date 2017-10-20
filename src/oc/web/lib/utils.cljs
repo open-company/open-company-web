@@ -1155,3 +1155,17 @@
         cleaned-html (.html $container)
         _ (.detach $container)]
     (emoji-images-to-unicode (gobj/get (emojify cleaned-html) "__html"))))
+
+(defn get-attachments-from-body [body]
+  (let [$body (.html (js/$ "<div/>") body)
+        attachments (js/$ "a.media-attachment" $body)
+        atch-map (atom [])]
+    (.each attachments (fn [idx item]
+      (let [$item (js/$ item)]
+        (reset! atch-map (vec (conj @atch-map {:name (.data $item "name")
+                                               :size (.data $item "size")
+                                               :mimetype (.data $item "mimetype")
+                                               :author (.data $item "author")
+                                               :createdat (.data $item "createdat")
+                                               :url (.attr $item "href")}))))))
+    @atch-map))
