@@ -12,6 +12,12 @@
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
+(defn form-is-clean? [s]
+  (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
+        {:keys [um-domain-invite]} @(drv/get-ref s :org-settings-team-management)]
+    (and (not has-org-edit-changes)
+         (empty? (:domain um-domain-invite)))))
+
 (defn reset-form [s]
   (let [org-data (first (:rum/args s))
         um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
@@ -58,7 +64,7 @@
                         (.tooltip "fixTitle")
                         (.tooltip "hide"))
                      s)}
-  [s org-data]
+  [s org-data dismiss-settings-cb]
   (let [org-editing (drv/react s :org-editing)
         {:keys [query-params
                 um-domain-invite
@@ -222,5 +228,7 @@
               "Saving..."
               "Save"))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(do (reset-form s) (dis/dispatch! [:org-settings-hide]))}
+          {:on-click #(if (form-is-clean? s)
+                        (dismiss-settings-cb)
+                        (reset-form s))}
           "Cancel"]]]))
