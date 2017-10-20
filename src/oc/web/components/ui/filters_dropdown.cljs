@@ -28,30 +28,31 @@
         org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
     [:div.filters-dropdown-name.group
-      (when (string? board-filters)
-        (carrot-close-bt {:width 24
-                          :height 24
-                          :on-click #(if (= (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)) "by-topic")
-                                       (router/nav! (oc-urls/board-sort-by-topic))
-                                       (router/nav! (oc-urls/board)))}))
+      ; (when (string? board-filters)
+      ;   (carrot-close-bt {:width 24
+      ;                     :height 24
+      ;                     :on-click #(if (= (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)) "by-topic")
+      ;                                  (router/nav! (oc-urls/board-sort-by-topic))
+      ;                                  (router/nav! (oc-urls/board)))}))
       [:button.mlb-reset.filters-dropdown-button.choice
         {:type "button"
          :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}
         (cond
-          (= board-filters :by-topic)
-          [:span "View by " [:span.filter-highlight "topic"] " "]
-          (string? board-filters)
-          [:span.filter-highlight
-            (if (= board-filters "uncategorized")
-              "No topic "
-              (str (:name (utils/get-topic (:topics board-data) board-filters)) " "))]
+          (or (= board-filters :by-topic)
+              (string? board-filters))
+          [:span "View by " [:span.filter-highlight "Topic"] " "]
+          ; (string? board-filters)
+          ; [:span.filter-highlight
+          ;   (if (= board-filters "uncategorized")
+          ;     "No topic "
+          ;     (str (:name (utils/get-topic (:topics board-data) board-filters)) " "))]
           :else
-          [:span "View by " [:span.filter-highlight "most recent"] " "])
+          [:span "View by " [:span.filter-highlight "Recent"] " "])
         [:i.fa.fa-caret-down]]
       (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
-            default-options [{:label "Most recent" :value :latest} {:label "By topic" :value :by-topic}]
+            default-options [{:label "Recent" :value :latest} {:label "By topic" :value :by-topic}]
             divider-line-option {:label :divider-line :value nil}
             start-options (if (pos? (count topics)) (vec (conj default-options divider-line-option)) default-options)
             final-topics (vec (concat start-options topics))]

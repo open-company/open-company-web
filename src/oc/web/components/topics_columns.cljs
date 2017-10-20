@@ -193,7 +193,7 @@
                              :style {:opacity (calc-opacity (document-scroll-top))}
                              :data-placement "left"
                              :data-toggle "tooltip"
-                             :title (str "Create a new update")
+                             :title (str "Start a new post")
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}

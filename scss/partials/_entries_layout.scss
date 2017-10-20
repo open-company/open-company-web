@@ -9,10 +9,15 @@ div.entries-layout {
 
     div.by-topic-header {
       div.by-topic-header-title{
+        height: 32px;
+        border-radius: 100px;
         @include avenir_H();
-        font-size: 24px;
-        color: $oc_gray_7;
+        font-size: 12px;
+        color: $carrot_light_gray_3;
+        background-color: $carrot_light_gray_7;
+        padding: 8px 16px;
         margin-left: 16px;
+        margin-right: 16px;
         float: left;
 
         span.oblique {
@@ -20,10 +25,23 @@ div.entries-layout {
         }
       }
 
+      button.add-entry-to-topic {
+        float: left;
+        width: 20px;
+        height: 20px;
+        margin-top: 6px;
+        background-image: cdnUrl("/img/ML/add_topic_bt.svg");
+        background-size: 8px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: $carrot_light_gray_7;
+        border-radius: 10px;
+      }
+
       button.view-all-updates {
-        font-size: 13px;
-        color: $oc_gray_7;
-        @include avenir_B();
+        font-size: 15px;
+        color: $carrot_light_gray_3;
+        @include avenir_M();
         float: right;
         margin-top: 10px;
         margin-right: 12px;

@@ -75,9 +75,9 @@ div.left-navigation-sidebar {
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 138px;
+  top: 118px;
   left: 0px;
-  height: calc(100vh - 138px);
+  height: calc(100vh - 118px);
   @include no-user-select();
 
   div.left-navigation-sidebar-content {

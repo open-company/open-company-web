@@ -94,6 +94,8 @@
                   (or topic-name
                       (s/capital topic-slug)
                       [:span.oblique "No topic"])]
+                [:button.mlb-reset.add-entry-to-topic
+                  {:on-click #(dis/dispatch! [:entry-edit {:topic-slug topic-slug :topic-name topic-name}])}]
                 ; If there are more than 4 add the button to show all of them
                 (when (> (count entries-group) 4)
                   [:button.view-all-updates.mlb-reset
