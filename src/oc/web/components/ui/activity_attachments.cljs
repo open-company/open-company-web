@@ -14,9 +14,7 @@
          :on-mouse-leave #(reset! (::attachments-dropdown s) false)}
         [:button.mlb-reset.attachments-button
           {:ref "attachments-button"
-           :class (when @(::attachments-dropdown s) "expanded")
-           :on-click #(do
-                        (reset! (::attachments-dropdown s) (not @(::attachments-dropdown s))))}
+           :class (when @(::attachments-dropdown s) "expanded")}
           (count attachments)]
         (when @(::attachments-dropdown s)
           [:div.attachments-dropdown
