@@ -15,7 +15,7 @@
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [oc.web.components.ui.media-attachments :refer (media-attachments)]
+            [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
 
@@ -170,6 +170,7 @@
                               "Delete"])]])
                     (when @(::move-activity s)
                       (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
+              (activity-attachments activity-data)
               (when (:topic-slug activity-data)
                 (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                   [:div.activity-tag
@@ -184,14 +185,12 @@
                     {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
                   [:div.activity-modal-content-body
                     {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                     :class (when (empty? (:headline activity-data)) "no-headline")}]
-                  (media-attachments (:attachments activity-data) nil nil)]
+                     :class (when (empty? (:headline activity-data)) "no-headline")}]]
                 [:div.activity-modal-footer.group
                   {:class (when (and @(:first-render-done s)
                                      (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
                   (reactions activity-data)
                   [:div.activity-modal-share
-                    (js/console.log "share-dropdown" @(::share-dropdown s))
                     (when @(::share-dropdown s)
                       [:div.share-dropdown
                         [:div.triangle]

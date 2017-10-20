@@ -54,10 +54,25 @@ div.activity-modal-container {
         div.activity-modal-header-right {
           float: right;
           max-width: 50%;
+
           div.activity-tag {
             float: right;
             margin-top: 7px;
             max-width: 100%;
+          }
+
+          div.activity-attachments {
+            float: right;
+            margin-top: 8px;
+
+            div.attachments-dropdown {
+              top: 62px;
+              left: calc(100% - 600px - 58px);
+
+              div.attachments-dropdown-list {
+                max-height: calc(100vh - 160px);
+              }
+            }
           }
 
           @include activity-tag();
