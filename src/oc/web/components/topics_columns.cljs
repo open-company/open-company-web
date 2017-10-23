@@ -217,7 +217,6 @@
                          (not is-all-posts)
                          (> (count entry-topics) 1))
                 (filters-dropdown)))
-            (js/console.log "Here!" org-data (:boards org-data))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
               (zero? (count (:boards org-data)))
