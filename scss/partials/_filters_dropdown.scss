@@ -20,15 +20,17 @@ div.filters-dropdown {
       float: left;
       margin-left: 8px;
       height: 32px;
-      padding: 8px 16px 8px 36px;
+      padding: 8px 16px 5px 32px;
       background-color: $carrot_light_purple;
       color: $carrot_purple;
       border-radius: 100px;
       cursor: pointer;
       background-image: cdnUrl("/img/ML/purple_x.svg");
-      background-size: 12px 12px;
+      background-size: 10px 10px;
       background-position: 16px 10px;
       background-repeat: no-repeat;
+      @include avenir_H();
+      font-size: 12px;
     }
   }
 

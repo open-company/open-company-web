@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="8px" height="8px" viewBox="0 0 8 8" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="➡️-Board-Flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="New-Post---A" transform="translate(-979.000000, -701.000000)" fill="#0F8E4C">
+            <g id="Group-6" transform="translate(771.000000, 337.000000)">
+                <g id="Group-5">
+                    <g id="Group-3" transform="translate(17.000000, 324.000000)">
+                        <g id="Components-/-Inputs-/-Textbox" transform="translate(0.000000, 24.000000)">
+                            <g id="Input">
+                                <g id="Components-/-Buttons-/-Add" transform="translate(185.000000, 10.000000)">
+                                    <g id="Icon">
+                                        <g id="+" transform="translate(6.000000, 6.000000)">
+                                            <g id="Combined-Shape">
+                                                <path d="M5,3 L5,0.997030139 C5,0.453036308 4.55228475,0 4,0 C3.44386482,0 3,0.446385598 3,0.997030139 L3,3 L0.997030139,3 C0.453036308,3 0,3.44771525 0,4 C0,4.55613518 0.446385598,5 0.997030139,5 L3,5 L3,7.00296986 C3,7.54696369 3.44771525,8 4,8 C4.55613518,8 5,7.5536144 5,7.00296986 L5,5 L7.00296986,5 C7.54696369,5 8,4.55228475 8,4 C8,3.44386482 7.5536144,3 7.00296986,3 L5,3 Z"></path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
