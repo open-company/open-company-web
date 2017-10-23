@@ -59,7 +59,7 @@ $h2_top_margin: 20;
     margin-left: 3px;
 
 
-    &:hover {
+    &:hover, &:active, &:focus, &.active {
       background-color: $carrot_light_purple !important;
       color: $carrot_purple;
       cursor: pointer;
