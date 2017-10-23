@@ -12,6 +12,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
@@ -153,12 +154,14 @@
             (dom/div {:class "group"}
               ;; Board name and settings button
               (dom/div {:class "board-name"}
-                (if is-all-posts
-                  (dom/div {:class "all-posts-icon"})
-                  (dom/div {:class "boards-icon"}))
-                (if is-all-posts
-                  "All Posts"
-                  (:name board-data))
+                (when (router/current-board-slug)
+                  (if is-all-posts
+                    (dom/div {:class "all-posts-icon"})
+                    (dom/div {:class "boards-icon"})))
+                (when (router/current-board-slug)
+                  (if is-all-posts
+                    "All Posts"
+                    (:name board-data)))
                 ;; Settings button
                 (when (and (router/current-board-slug)
                            (not is-all-posts)
@@ -208,13 +211,17 @@
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
               ;; Board filters dropdown
-              (when (and (not is-mobile-size?)
+              (when (and (router/current-board-slug)
+                         (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
                          (> (count entry-topics) 1))
                 (filters-dropdown)))
+            (js/console.log "Here!" org-data (:boards org-data))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
+              (zero? (count (:boards org-data)))
+              (empty-org)
               (and is-dashboard
                    is-all-posts)
               (rum/with-key (all-posts all-posts-data) (str "all-posts-" (apply str (keys (:fixed-items all-posts-data)))))

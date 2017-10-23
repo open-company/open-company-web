@@ -47,7 +47,8 @@
           board-data (dis/board-data data)
           all-posts-data (dis/all-posts-data data)]
       (if (or (not org-data)
-              (and (not board-data)
+              (and (router/current-board-slug)
+                   (not board-data)
                    (not all-posts-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}

@@ -1,0 +1,30 @@
+div.empty-org {
+  margin-top: 68px;
+  margin: 4px 130px;
+  float: left;
+  text-align: center;
+  width: 600px;
+
+  div.empty-org-headline {
+    @include avenir_H();
+    font-size: 16px;
+    color: $carrot_light_gray;
+    margin: 32px auto;
+
+    button {
+      color: $carrot_text_blue;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  div.empty-org-image {
+    width: 416px;
+    height: 424px;
+    background-image: cdnUrl("/img/ML/empty_board.svg");
+    background-size: 416px 424px;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    margin: 0px auto;
+  }
+}

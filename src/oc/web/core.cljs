@@ -364,11 +364,11 @@
 
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
-      (org-handler "org" target #(om/component) params))
+      (org-handler "org" target org-dashboard params))
 
     (defroute org-slash-route (str (urls/org ":org") "/") {:as params}
       (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
-      (org-handler "org" target #(om/component) params))
+      (org-handler "org" target org-dashboard params))
 
     (defroute all-posts-route (urls/all-posts ":org") {:as params}
       (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))
