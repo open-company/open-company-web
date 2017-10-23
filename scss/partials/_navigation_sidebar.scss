@@ -145,6 +145,8 @@ div.left-navigation-sidebar {
         background-color: $carrot_green_2;
         background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
       }
+
+      @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
     }
   }
 
