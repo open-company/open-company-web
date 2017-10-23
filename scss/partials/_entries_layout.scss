@@ -8,7 +8,8 @@ div.entries-layout {
     }
 
     div.by-topic-header {
-      div.by-topic-header-title{
+      a.by-topic-header-title{
+        display: block;
         height: 32px;
         border-radius: 100px;
         @include avenir_H();
@@ -19,6 +20,12 @@ div.entries-layout {
         margin-left: 16px;
         margin-right: 16px;
         float: left;
+        cursor: pointer;
+
+        &:hover {
+          color: $carrot_purple;
+          background-color: $carrot_light_purple;
+        }
 
         span.oblique {
           @include avenir_HO();
@@ -36,6 +43,13 @@ div.entries-layout {
         background-repeat: no-repeat;
         background-color: $carrot_light_gray_7;
         border-radius: 10px;
+
+        &:hover {
+          background-color: $carrot_light_purple;
+          background-image: cdnUrl("/img/ML/add_topic_bt_purple.svg");
+        }
+
+        @include preload_image(cdnUrl("/img/ML/add_topic_bt_purple.svg"));
       }
 
       button.view-all-updates {

@@ -80,6 +80,9 @@
                 :let [entries-group (get grouped-entries topic)
                       topic-name (:topic-name (first entries-group))
                       topic-slug (:topic-slug (first entries-group))
+                      board-url (if topic-slug
+                                  (oc-urls/board-filter-by-topic topic-slug)
+                                  (oc-urls/board-sort-by-topic))
                       first-line-entries (take 2 entries-group)
                       first-has-headline (some #(not (empty? (:headline %))) first-line-entries)
                       first-has-body (some #(not (empty? (:body %))) first-line-entries)
@@ -90,7 +93,11 @@
               {:key (str "entries-topic-group-" (or topic "uncategorized"))}
               ; Title of the topic group
               [:div.by-topic-header.group
-                [:div.by-topic-header-title
+                [:a.by-topic-header-title
+                  {:href board-url
+                   :on-click #(do
+                               (utils/event-stop %)
+                               (router/nav! board-url))}
                   (or topic-name
                       (s/capital topic-slug)
                       [:span.oblique "No topic"])]
