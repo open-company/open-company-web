@@ -91,8 +91,7 @@
   (inject-loading))
 
 (defn post-routing []
-  (api/get-entry-point)
-  (api/get-auth-settings))
+  (utils/after 10 #(dis/dispatch! [:initial-loads])))
 
 ;; home
 (defn home-handler [target params]
@@ -164,11 +163,17 @@
     (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
                                     (jwt/jwt)
                                     (= (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))) "true"))
-          loading (or (not (dis/board-data))                 ;; if the company data are not present
-                      (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
-                                                             ;; a subset of the company data loaded with a SU
-          org-settings (and (contains? query-params :org-settings)
-                            (#{:main :team :invite} (keyword (:org-settings query-params))))
+          ;; do we have the company data already?
+          loading (or (and (not (contains? query-params :ap))
+                           (not (:fixed-items (dis/board-data))))         ;; if the board data are not present
+                      (and (contains? query-params :ap)                   ;; if the all-posts data are not preset
+                           (not (:fixed-items (dis/all-posts-data))))) ;; this latter is used when displaying modal over AP
+
+          org-settings (if (contains? query-params :access)
+                         :main
+                         (if (and (contains? query-params :org-settings)
+                                  (#{:main :team :invite} (keyword (:org-settings query-params))))
+                           (keyword (:org-settings query-params))))
           next-app-state {:show-onboard-overlay show-onboard-overlay
                           :loading loading
                           :org-settings org-settings}]
