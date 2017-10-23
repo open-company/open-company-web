@@ -43,6 +43,7 @@ div.dropdown-list-container {
         font-size: 14px;
         color: $carrot_light_gray_3;
         cursor: pointer;
+        border-radius: 100px;
 
         &.divider-line {
           display: block;
@@ -51,6 +52,7 @@ div.dropdown-list-container {
           padding: 0px;
           margin: 3px 0 3px -8px;
           background-color: rgba(177,184,192,0.50);
+          border-radius: 0px;
 
           &:hover {
             background-color: rgba(177,184,192,0.50);
@@ -58,14 +60,15 @@ div.dropdown-list-container {
         }
 
         &:hover {
-          background-color: rgba($carrot_light_gray_4, 0.2);
+          background-color: $carrot_light_purple;//rgba($carrot_light_gray_4, 0.2);
+          color: $carrot_purple;
         }
 
         &.select {
           @include avenir_H();
-          background-color: rgba($carrot_orange, 0.1);
+          background-color: $carrot_light_purple; //rgba($carrot_orange, 0.1);
           text-decoration: none;
-          color: $carrot_orange;
+          color: $carrot_purple; //$carrot_orange;
         }
 
         img.dropdown-list-item-icon {
