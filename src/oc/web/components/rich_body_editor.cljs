@@ -253,9 +253,9 @@
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
-                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color"]
+                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop"]
                              :cleanTags #js ["meta" "video" "audio"]
-                             :unwrapTags #js ["div" "span" "label" "font"]}
+                             :unwrapTags #js ["div" "span" "label" "font" "h1" "h3" "h4" "h5" "h6" "strong"]}
                  :placeholder #js {:text "Start writing..."
                                    :hideOnClick true}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
