@@ -122,27 +122,25 @@ div.entry-edit-modal-container {
               box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
               border-radius: 5px;
               margin: 8px 0;
-              padding: 10px 0 6px 8px;
               min-height: 50px;
 
               ul {
                 list-style-type: none;
                 margin: 0;
-                padding: 0;
-                padding-right: 8px;
+                padding: 24px 16px;
                 overflow-x: hidden;
                 overflow-y: auto;
 
                 li.selectable {
-                  padding: 3px 8px;
+                  padding: 3px 16px;
                   cursor: pointer;
                   border-radius: 100px;
 
                   &:hover {
                     background-color: $carrot_light_purple;
-                    button {
-                      color: $carrot_purple;
-                    }
+                    // button {
+                    //   color: $carrot_purple;
+                    // }
                   }
 
                   &.select {
@@ -182,8 +180,8 @@ div.entry-edit-modal-container {
                 }
 
                 li.divider {
-                  border-top: 1px solid rgba($carrot_light_gray, 0.5);
-                  width: calc(100% + 16px);
+                  border-top: 1px solid rgba($carrot_light_gray, 0.2);
+                  width: calc(100% + 32px);
                   cursor: default;
                   margin: 12px 0 12px -16px;
                   min-height: initial;
@@ -198,52 +196,64 @@ div.entry-edit-modal-container {
 
                 li.entry-edit-new-topic {
 
+                  div.entry-edit-new-topic-title {
+                    color: #34414F;
+                    @include avenir_H();
+                    font-size: 12px;
+                    margin-bottom: 4px;
+                  }
+
                   &:hover {
                     background-color: initial;
                   }
 
-                  button.entry-edit-new-topic-plus {
-                    width: 20px;
-                    height: 20px;
-                    padding: 0;
-                    float: left;
-                    margin-right: 10px;
-                    margin-top: 3px;
-                    cursor: pointer;
-                    transition: $add_media_animation;
-                    background-color: #F0EFEA;
-                    background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-                    background-repeat: no-repeat;
-                    background-position: 50%;
-                    background-size: 8px 8px;
-                    border-radius: 2px;
-                    float: left;
+                  div.entry-edit-new-topic-container {
+                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+                    border-radius: 4px;
+                    padding: 4px 16px;
 
-                    &:hover {
-                      background-color: $carrot_green_2;
-                      background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
+                    input.entry-edit-new-topic-field {
+                      float: left;
+                      width: calc(100% - 20px);
+                      border: none;
+                      outline: none;
+                      @include avenir_M();
+                      font-size: 14px;
+                      color: $oc_gray_7;
+                      margin: 0.3rem 0;
+                      padding: 0;
+
+                      @include placeholder(){
+                        color: #D0D1D4;
+                      }
                     }
-                  }
 
-                  button.entry-edit-new-topic-create {
-                    float: left;
-                    margin-left: 10px;
-                    height: 26px;
-                    font-size: 14px;
-                  }
+                    button.entry-edit-new-topic-plus {
+                      width: 20px;
+                      height: 20px;
+                      padding: 0;
+                      float: left;
+                      margin-top: 3px;
+                      cursor: pointer;
+                      transition: $add_media_animation;
+                      background-color: #F0EFEA;
+                      background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+                      background-repeat: no-repeat;
+                      background-position: 50%;
+                      background-size: 8px 8px;
+                      border-radius: 10px;
+                      float: left;
 
-                  input.entry-edit-new-topic-field {
-                    float: left;
-                    border: none;
-                    outline: none;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $carrot_dark_gray;
-                    margin: 0.3rem 0;
-                    padding: 0;
+                      &.active {
+                        background-image: cdnUrl("/img/ML/plus_button_icon_green.svg");
+                        background-color: $carrot_green_3;
+                      }
 
-                    @include placeholder(){
-                      color: $carrot_light_gray;
+                      &:hover, &:active, &:focus {
+                        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
+                        background-color: $carrot_green_2; 
+                      }
                     }
                   }
                 }

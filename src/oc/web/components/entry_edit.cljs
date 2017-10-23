@@ -63,9 +63,6 @@
       (reset! slug (str (s/slug topic-name) "-" (int (rand 1000)))))
     @slug))
 
-(defn toggle-topics-dd []
-  (.dropdown (js/$ "div.entry-card-dd-container button.dropdown-toggle") "toggle"))
-
 (defn body-on-change [state]
   (dis/dispatch! [:input [:entry-editing :has-changes] true])
   (calc-edit-entry-modal-height state))
@@ -235,32 +232,26 @@
                             "Remove"])])
                     [:li.divider]
                     [:li.entry-edit-new-topic.group
-                      ; {:on-click #(do (utils/event-stop %) (toggle-topics-dd))}
-                      (when-not @(::focusing-create-topic s)
+                      [:div.entry-edit-new-topic-title "CREATE NEW TOPIC"]
+                      [:div.entry-edit-new-topic-container.group
+                        [:input.entry-edit-new-topic-field
+                          {:type "text"
+                           :value @(::new-topic s)
+                           :on-focus #(reset! (::focusing-create-topic s) true)
+                           :on-blur (fn [e] (utils/after 100 #(reset! (::focusing-create-topic s) false)))
+                           :on-key-up (fn [e]
+                                        (cond
+                                          (= "Enter" (.-key e))
+                                          (create-new-topic s)))
+                           :on-change #(reset! (::new-topic s) (.. % -target -value))
+                           :placeholder "Create New Topic"}]
                         [:button.mlb-reset.entry-edit-new-topic-plus
                           {:on-click (fn [e]
                                        (utils/event-stop e)
-                                       (toggle-topics-dd)
-                                       (.focus (js/$ "input.entry-edit-new-topic-field")))
-                           :title "Create a new topic"}])
-                      [:input.entry-edit-new-topic-field
-                        {:type "text"
-                         :value @(::new-topic s)
-                         :on-focus #(reset! (::focusing-create-topic s) true)
-                         :on-blur (fn [e] (utils/after 100 #(reset! (::focusing-create-topic s) false)))
-                         :on-key-up (fn [e]
-                                      (cond
-                                        (= "Enter" (.-key e))
-                                        (create-new-topic s)))
-                         :on-change #(reset! (::new-topic s) (.. % -target -value))
-                         :placeholder "Create New Topic"}]
-                      (when @(::focusing-create-topic s)
-                        [:button.mlb-reset.mlb-default.entry-edit-new-topic-create
-                          {:on-click (fn [e]
-                                       (utils/event-stop e)
                                        (create-new-topic s))
-                           :disabled (empty? (s/trim @(::new-topic s)))}
-                          "Apply"])]]]]]]
+                           :class (utils/class-set {:empty (empty? @(::new-topic s))
+                                                    :active (not (empty? @(::new-topic s)))})
+                           :title "Create a new topic"}]]]]]]]]
         [:div.entry-edit-modal-body
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
