@@ -1,9 +1,36 @@
-div.filters-dropdown-name {
+div.filters-dropdown {
   @include avenir_M();
   color: $oc_gray_7;
   font-size: 16px;
   margin: 0 0 16px 20px;
   position: relative;
+
+  div.topic-filter-center {
+    margin-left: 280px;
+
+    label {
+      float: left;
+      @include avenir_H();
+      font-size: 15px;
+      color: $carrot_light_gray_3;
+      margin-top: 9px;
+    }
+
+    div.topic-filter {
+      float: left;
+      margin-left: 8px;
+      height: 32px;
+      padding: 8px 16px 8px 36px;
+      background-color: $carrot_light_purple;
+      color: $carrot_purple;
+      border-radius: 100px;
+      cursor: pointer;
+      background-image: cdnUrl("/img/ML/purple_x.svg");
+      background-size: 12px 12px;
+      background-position: 16px 10px;
+      background-repeat: no-repeat;
+    }
+  }
 
   button.carrot-close-bt {
     width: 24px;
@@ -41,15 +68,20 @@ div.filters-dropdown-name {
       font-size: 14px;
       color: $carrot_light_gray_3;
       cursor: pointer;
+      border-radius: 100px;
 
       &:hover {
-        background-color: rgba($carrot_light_gray_4, 0.2);
+        // background-color: rgba($carrot_light_gray_4, 0.2);
+        background-color: $carrot_light_purple;
+        color: $carrot_purple;
       }
 
       &.select {
         @include avenir_H();
-        background-color: rgba($carrot_orange, 0.1);
-        color: $carrot_orange;
+        // background-color: rgba($carrot_orange, 0.1);
+        // color: $carrot_orange;
+        background-color: $carrot_light_purple;
+        color: $carrot_purple;
       }
     }
 

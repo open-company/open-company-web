@@ -26,29 +26,35 @@
         board-filters (drv/react s :board-filters)
         topic-groups (group-by :topic-slug (vals (:fixed-items board-data)))
         org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)]
-    [:div.filters-dropdown-name.group
-      ; (when (string? board-filters)
-      ;   (carrot-close-bt {:width 24
-      ;                     :height 24
-      ;                     :on-click #(if (= (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)) "by-topic")
-      ;                                  (router/nav! (oc-urls/board-sort-by-topic))
-      ;                                  (router/nav! (oc-urls/board)))}))
-      [:button.mlb-reset.filters-dropdown-button.choice
-        {:type "button"
-         :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}
-        (cond
-          (or (= board-filters :by-topic)
-              (string? board-filters))
-          [:span "View by " [:span.filter-highlight "Topic"] " "]
-          ; (string? board-filters)
-          ; [:span.filter-highlight
-          ;   (if (= board-filters "uncategorized")
-          ;     "No topic "
-          ;     (str (:name (utils/get-topic (:topics board-data) board-filters)) " "))]
-          :else
-          [:span "View by " [:span.filter-highlight "Recent"] " "])
-        [:i.fa.fa-caret-down]]
+        board-slug (router/current-board-slug)
+        topic-data (when (string? board-filters)
+                     (utils/get-topic (:topics board-data) board-filters))]
+    [:div.filters-dropdown.group
+      {:class (when topic-data "filtering-by-topic")}
+      (if topic-data
+        [:div.topic-filter-center
+          [:label "Viewing"]
+          [:div.topic-filter
+            {:on-click #(router/nav!
+                          (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:slug board-data)))) :by-topic)
+                            (oc-urls/board-sort-by-topic)
+                            (oc-urls/board)))}
+            (:name topic-data)]]
+        [:button.mlb-reset.filters-dropdown-button.choice
+          {:type "button"
+           :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}
+          (cond
+            (or (= board-filters :by-topic)
+                (string? board-filters))
+            [:span "View by " [:span.filter-highlight "Topic"] " "]
+            ; (string? board-filters)
+            ; [:span.filter-highlight
+            ;   (if (= board-filters "uncategorized")
+            ;     "No topic "
+            ;     (str (:name (utils/get-topic (:topics board-data) board-filters)) " "))]
+            :else
+            [:span "View by " [:span.filter-highlight "Recent"] " "])
+          [:i.fa.fa-caret-down]])
       (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
