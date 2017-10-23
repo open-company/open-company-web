@@ -68,16 +68,29 @@ div.entry-edit-modal-container {
           display: inline-block;
           max-width: 50%;
 
-          button.dropdown-toggle {
-            color: #999999;
-            font-size: 15px;
+          button.dropdown-toggle:not(.has-topic) {
+            color: $carrot_light_gray_3;
             @include avenir_H();
+            font-size: 12px;
             max-width: 100%;
+            background-color: $carrot_light_gray_7;
+            padding: 6px 16px 3px 16px;
+            border-radius: 100px;
 
-            &.has-topic {
-              margin: 0;
-              padding: 0;
-              @include activity-tag();
+            &:hover, &[aria-expanded=true] {
+              background-color: $carrot_light_gray_3;
+              color: white;
+            }
+          }
+
+          button.dropdown-toggle.has-topic {
+            margin: 0;
+            padding: 0;
+            @include activity-tag();
+
+            &[aria-expanded=true] div.activity-tag{
+              background-color: $carrot_light_purple;
+              color: $carrot_purple;
             }
           }
 
@@ -123,17 +136,22 @@ div.entry-edit-modal-container {
                 li.selectable {
                   padding: 3px 8px;
                   cursor: pointer;
+                  border-radius: 100px;
 
                   &:hover {
-                    background-color: rgba($carrot_light_gray_4, 0.2);
+                    background-color: $carrot_light_purple;
+                    button {
+                      color: $carrot_purple;
+                    }
                   }
 
                   &.select {
-                    background-color: rgba($carrot_orange, 0.1);
+                    background-color: $carrot_light_purple;
+                    color: $carrot_purple;
 
                     button {
                       @include avenir_H();
-                      color: $carrot_orange;
+                      color: $carrot_purple;
                     }
                   }
 
