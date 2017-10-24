@@ -90,8 +90,15 @@ $(document).ready(function(){
   }
   $("#site-header-signup-item").text( jwt? "Your Boards" : "Get Started" );
   $("#site-header-signup-item").attr("onClick", jwt? "window.location = \"/login\"" : "window.location = \"/login?slack\"");
-  $("#get-started-centred-bt").text( jwt? "Your Boards" : "Get started for free" );
-  $("#get-started-centred-bt").attr("onClick", jwt? "window.location = \"/login\"" : "window.location = \"/login?slack\"");
+
+  if (!jwt) {
+    $("#get-started-centred-bt").text( "Get started for free" );
+    $("#get-started-centred-bt").attr("onClick", "window.location = \"/login?slack\"");
+  } else {
+    // Remove the get started centered button if the user is signed out
+    $("#get-started-centred-bt").css({"display": "none"});
+  }
+
 });
 
 function getParameterByName(name, url) {
