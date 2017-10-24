@@ -60,6 +60,8 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+(def default-min-modal-height 450)
+
 (rum/defcs activity-modal < rum/reactive
                             ;; Derivatives
                             (drv/drv :activity-modal-fade-in)
@@ -72,7 +74,7 @@
                             (rum/local nil ::window-resize-listener)
                             (rum/local nil ::esc-key-listener)
                             (rum/local false ::move-activity)
-                            (rum/local 330 ::activity-modal-height)
+                            (rum/local default-min-modal-height ::activity-modal-height)
                             (rum/local false ::share-dropdown)
                             (rum/local nil ::window-click)
                             ;; Mixins
@@ -114,7 +116,7 @@
                                             s)}
   [s activity-data]
   (let [show-comments? (utils/link-for (:links activity-data) "comments")
-        fixed-activity-modal-height (max @(::activity-modal-height s) 330)
+        fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
         wh (.-innerHeight js/window)]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(:first-render-done s))))
@@ -179,7 +181,7 @@
                               "Delete"])]])
                     (when @(::move-activity s)
                       (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
-              (activity-attachments activity-data)
+              (activity-attachments activity-data false)
               (when (:topic-slug activity-data)
                 (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                   [:div.activity-tag

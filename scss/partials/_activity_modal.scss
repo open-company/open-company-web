@@ -68,7 +68,7 @@ div.activity-modal-container {
 
             div.attachments-dropdown {
               top: 36px;
-              left: calc(100% - 600px - 58px);
+              left: calc(100% - 600px - 38px);
 
               div.attachments-dropdown-list {
                 max-height: calc(100vh - 160px);
@@ -253,7 +253,7 @@ div.activity-modal-container {
                     background-size: 14px 14px;
                     background-repeat: no-repeat;
                     background-position: 14px 8px;
-                    padding: 9px 20px 11px 28px;
+                    padding: 9px 20px 11px 32px;
                     @include avenir_H();
                     font-size: 12px;
                     color: $carrot_light_gray_3;
