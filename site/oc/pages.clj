@@ -53,7 +53,7 @@
       [:div.cta
         [:h1.headline "Grow Together"]
         [:div.subheadline
-          "Announcements, updates, ideas and stories that bring teams closer"]
+          "Announcements, updates and stories that bring teams closer"]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:button.mlb-reset.get-started-centred-bt
           {:id "get-started-centred-bt"}
