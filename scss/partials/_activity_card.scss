@@ -7,8 +7,18 @@ div.activity-card {
   margin: 12px;
   position: relative;
 
-  &:hover {
+  &.hovering {
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+
+    div.activity-card-head.entry-card {
+      background-color: $carrot_light_gray_5;
+    }
+
+    div.activity-card-head div.activity-card-head-right {
+      div.activity-tag {
+        background-color: $carrot_light_gray_6;
+      }
+    }
   }
 
   &.activity-card-placeholder {
@@ -114,12 +124,6 @@ div.activity-card {
     }
   }
 
-  &:hover {
-    div.activity-card-head.entry-card {
-      background-color: $carrot_light_gray_5;
-    }
-  }
-
   div.activity-card-head {
     width: 100%;
     padding: 16px 24px;
@@ -213,8 +217,8 @@ div.activity-card {
           position: absolute;
           top: 36px;
           right: -10px;
-          left: calc(100% - 130px + 10px);
-          min-width: 130px;
+          left: calc(100% - 100px + 10px);
+          min-width: 100px;
           height: auto;
           border: none;
           outline: none;
@@ -260,14 +264,6 @@ div.activity-card {
             }
           }
         }
-      }
-    }
-  }
-
-  &:hover {
-    div.activity-card-head div.activity-card-head-right {
-      div.activity-tag {
-        background-color: $carrot_light_gray_6;
       }
     }
   }
@@ -428,6 +424,77 @@ div.activity-card {
       background-repeat: no-repeat;
       float: left;
       cursor: pointer;
+    }
+
+    div.activity-share {
+      float: right;
+      position: relative;
+      margin-right: 8px;
+
+      &.not-hover {
+        display: none;
+      }
+
+      button.activity-share-bt {
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/foc_share_icon.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 24px 24px;
+      }
+
+      div.activity-share-dropdown {
+        position: absolute;
+        bottom: 42px;
+        right: -10px;
+        left: calc(100% - 100px + 10px);
+        min-width: 100px;
+        height: auto;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        background-color: transparent;
+        overflow: visible;
+        z-index: 100;
+
+        div.triangle {
+          position: absolute;
+          bottom: -7px;
+          left: calc(100% - 30px);
+          background-color: white;
+          border-top: 1px solid rgba(177,184,192,0.50);
+          border-left: 1px solid rgba(177,184,192,0.50);
+          transform: rotate(225deg);
+          width: 15px;
+          height: 15px;
+        }
+
+        ul.activity-share-dropdown-list {
+          background-color: white;
+          border: 1px solid rgba(177,184,192,0.50);
+          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+          border-radius: 5px;
+          margin: 0px;
+          padding: 10px 13px 6px 8px;
+          min-height: 50px;
+          list-style-type: none;
+          width: 100%;
+
+          li.activity-share-dropdown-item {
+            padding: 3px 8px;
+            @include avenir_M();
+            font-size: 14px;
+            color: $carrot_light_gray_3;
+            cursor: pointer;
+            background-color: transparent;
+
+            &:hover {
+              background-color: rgba($carrot_light_gray_4, 0.2);
+            }
+          }
+        }
+      }
     }
 
     button.post-edit {

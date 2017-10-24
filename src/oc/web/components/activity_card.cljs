@@ -80,6 +80,7 @@
                         (rum/local nil ::first-body-image)
                         (rum/local false ::move-activity)
                         (rum/local nil ::window-click)
+                        (rum/local false ::share-dropdown)
                         (drv/drv :org-data)
                         {:after-render (fn [s]
                                          (let [activity-data (first (:rum/args s))
@@ -116,7 +117,9 @@
                                          (events/listen js/window EventType/CLICK (fn [e]
                                                                                     (when (and (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
                                                                                                (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
-                                                                                      (reset! (::more-dropdown s) false))))))
+                                                                                      (reset! (::more-dropdown s) false))
+                                                                                    (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
+                                                                                      (reset! (::share-dropdown s) false))))))
                                       s)
                          :will-unmount (fn [s]
                                          (events/unlistenByKey @(::window-click s))
@@ -125,13 +128,18 @@
   (let [attachments (utils/get-attachments-from-body (:body activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
+                                :hovering (or @(::hovering-card s)
+                                              @(::more-dropdown s)
+                                              @(::share-dropdown s)
+                                              @(::move-activity s))
                                 :all-posts-card is-all-posts})
        :on-click (fn [e]
                   (when (and (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments])))
                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button])))
                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move])))
                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit])))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))))
                     (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))
        :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
        :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
@@ -162,7 +170,8 @@
                   {:type "button"
                    :class (utils/class-set {:not-hover (and (not @(::move-activity s))
                                                             (not @(::hovering-card s))
-                                                            (not @(::more-dropdown s)))})
+                                                            (not @(::more-dropdown s))
+                                                            (not @(::share-dropdown s)))})
                    :on-click (fn [e]
                                (utils/remove-tooltips)
                                (reset! (::more-dropdown s) (not @(::more-dropdown s)))
@@ -175,31 +184,6 @@
                   [:div.activity-more-dropdown-menu
                     [:div.triangle]
                     [:ul.activity-card-more-menu
-                      (when (utils/link-for (:links activity-data) "share")
-                        [:li
-                          {:on-click (fn [e]
-                                       (reset! (::more-dropdown s) false)
-                                       (reset! (::hovering-card s) false)
-                                       ; open the activity-share-modal component
-                                       (dis/dispatch! [:activity-share-show :link activity-data]))}
-                          "Share Link"])
-                      (when (utils/link-for (:links activity-data) "share")
-                        [:li
-                          {:on-click (fn [e]
-                                       (reset! (::more-dropdown s) false)
-                                       (reset! (::hovering-card s) false)
-                                       ; open the activity-share-modal component
-                                       (dis/dispatch! [:activity-share-show :email activity-data]))}
-                          "Share Email"])
-                      (when (and (utils/link-for (:links activity-data) "share")
-                                 (jwt/team-has-bot? (:team-id (dis/org-data))))
-                        [:li
-                          {:on-click (fn [e]
-                                       (reset! (::more-dropdown s) false)
-                                       (reset! (::hovering-card s) false)
-                                       ; open the activity-share-modal component
-                                       (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                          "Share Slack"])
                       (when (and (utils/link-for (:links activity-data) "partial-update")
                                  (> (count same-type-boards) 1))
                         [:li
@@ -271,9 +255,47 @@
              :data-container "body"
              :class (utils/class-set {:not-hover (and (not @(::move-activity s))
                                                       (not @(::hovering-card s))
-                                                      (not @(::more-dropdown s)))})
+                                                      (not @(::more-dropdown s))
+                                                      (not @(::share-dropdown s)))})
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::hovering-card s) false)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch! [:entry-edit activity-data]))}])]]))
+                         (dis/dispatch! [:entry-edit activity-data]))}])
+        (when (utils/link-for (:links activity-data) "share")
+          [:div.activity-share
+            {:class (utils/class-set {:not-hover (and (not @(::hovering-card s))
+                                                      (not @(::share-dropdown s)))})}
+            [:button.mlb-reset.activity-share-bt
+              {:title "Share this post"
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :on-click #(reset! (::share-dropdown s) (not @(::share-dropdown s)))}]
+            (when @(::share-dropdown s)
+              [:div.activity-share-dropdown
+                [:div.triangle]
+                [:ul.activity-share-dropdown-list
+                  (when (and (utils/link-for (:links activity-data) "share")
+                             (jwt/team-has-bot? (:team-id (dis/org-data))))
+                    [:li.activity-share-dropdown-item
+                      {:on-click (fn [e]
+                                   (reset! (::share-dropdown s) false)
+                                   (reset! (::hovering-card s) false)
+                                   ; open the activity-share-modal component
+                                   (dis/dispatch! [:activity-share-show :slack activity-data]))}
+                      "Slack"])
+                  [:li.activity-share-dropdown-item
+                    {:on-click (fn [e]
+                                 (reset! (::share-dropdown s) false)
+                                 (reset! (::hovering-card s) false)
+                                 ; open the activity-share-modal component
+                                 (dis/dispatch! [:activity-share-show :email activity-data]))}
+                    "Email"]
+                  [:li.activity-share-dropdown-item
+                    {:on-click (fn [e]
+                                 (reset! (::share-dropdown s) false)
+                                 (reset! (::hovering-card s) false)
+                                 ; open the activity-share-modal component
+                                 (dis/dispatch! [:activity-share-show :link activity-data]))}
+                    "Link"]]])])]]))
