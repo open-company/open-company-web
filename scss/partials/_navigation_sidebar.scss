@@ -141,6 +141,7 @@ div.left-navigation-sidebar {
         color: $carrot_gray;
         float: left;
         margin-left: 21px;
+        margin-top: 6px;
         cursor: default;
       }
 
@@ -151,7 +152,7 @@ div.left-navigation-sidebar {
         height: 10px;
         float: left;
         margin-right: 7px;
-        margin-top: 0px;
+        margin-top: 6px;
         background-image: cdnUrl("/img/ML/boards_icon.svg");
       }
     }
@@ -160,7 +161,7 @@ div.left-navigation-sidebar {
       width: 20px;
       height: 20px;
       margin-right: 0px;
-      margin-top: -5px;
+      margin-top: 1px;
       float: right;
       padding: 0;
       cursor: pointer;
@@ -197,7 +198,7 @@ div.left-navigation-sidebar {
       margin: 0;
 
       &:last-child {
-        margin-bottom: 16px;
+        margin-bottom: 10px;
       }
 
       &.hover-item {
