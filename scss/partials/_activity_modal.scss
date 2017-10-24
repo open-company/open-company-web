@@ -37,10 +37,16 @@ div.activity-modal-container {
       box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
       border-radius: 8px;
       background-color: white;
+      display: flex;
+      flex-direction: row;
 
       div.activity-left-column {
-        float: left;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 617px;
         width: 617px;
+        max-height: 100vh;
+        min-height: 200px;
         border-top-left-radius: 8px;
         border-bottom-left-radius: 8px;
 
@@ -150,24 +156,28 @@ div.activity-modal-container {
 
                 div.dropdown-menu {
                   position: absolute;
-                  top: -69px;
-                  left: -91px;
+                  top: unset;
+                  bottom: -17px;
+                  left: -121px;
+                  width: 130px;
+                  min-width: 130px;
                   border: none;
                   outline: none;
                   box-shadow: none;
                   background-color: transparent;
                   padding: 0 0 .3em;
+                  overflow: visible;
 
                   div.triangle {
                     position: absolute;
-                    top: 75px;
-                    left: 90px;;
+                    bottom: 25px;
+                    right: -7px;
                     background-color: white;
                     border-top: 1px solid rgba(177,184,192,0.50);
                     border-left: 1px solid rgba(177,184,192,0.50);
                     transform: rotate(135deg);
-                    width: 20px;
-                    height: 20px;
+                    width: 15px;
+                    height: 15px;
                   }
 
                   ul.activity-modal-more-menu {
@@ -179,7 +189,7 @@ div.activity-modal-container {
                     padding: 10px 13px 6px 8px;
                     min-height: 50px;
                     list-style-type: none;
-                    width: 100px;
+                    width: 100%;
 
                     li {
                       padding: 3px 8px;
@@ -202,17 +212,17 @@ div.activity-modal-container {
       }
 
       div.activity-right-column {
-        float: right;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 301px;
         width: 301px;
         border-top-right-radius: 8px;
         border-bottom-right-radius: 8px;
         background-color: $carrot_light_gray_2;
-        max-height: 100vh;
-        min-height: 200px;
         position: relative;
 
         div.activity-right-column-content {
-          padding: 14px 32px 24px 16px;
+          padding: 24px 32px 24px 16px;
           overflow-x: hidden;
           overflow-y: auto;
           position: absolute;

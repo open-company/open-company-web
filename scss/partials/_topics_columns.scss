@@ -43,16 +43,6 @@ div.topics-columns {
         margin-top: 10px;
       }
 
-      div.stories-icon {
-        background-image: cdnUrl("/img/ML/stories_icon.svg");
-        background-size: 26px 22px;
-        width: 26px;
-        height: 22px;
-        float: left;
-        margin-right: 11px;
-        margin-top: 7px;
-      }
-
       div.board-name {
         @include avenir_M();
         font-size: 32px;

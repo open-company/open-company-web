@@ -269,14 +269,6 @@
          (nil? update-link)
          (nil? delete-link))))
 
-(defn readonly-storyboard? [links]
-  (let [new-link (link-for links "new")
-        update-link (link-for links "partial-update")
-        delete-link (link-for links "delete")]
-    (and (nil? new-link)
-         (nil? update-link)
-         (nil? delete-link))))
-
 (defn readonly-entry? [links]
   (let [partial-update (link-for links "partial-update")
         delete (link-for links "delete")]
@@ -317,51 +309,26 @@
       (assoc :read-only (readonly-entry? (:links entry-body)))
       (assoc :board-slug (:slug board-data))
       (assoc :board-name (:name board-data))
-      (assoc :type "entry")
       (assoc :topic-name topic-name))))
-
-(defn fix-story
-  "Add `:read-only`, :board-slug and :uuid keys to the story map."
-  [story-body storyboard-data]
-  (-> story-body
-    (assoc :read-only (readonly-story? (:links story-body)))
-    (assoc :type "story")
-    (assoc :related (when (:related story-body) (map #(fix-story % {:slug (:storyboard-slug %) :name (:storyboard-name %)}) (:related story-body))))
-    (assoc :board-slug (:slug storyboard-data))
-    (assoc :board-name (:name storyboard-data))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
   [board-data]
   (let [links (:links board-data)
-        read-only (readonly-storyboard? links)
+        read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
         fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
         with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
     with-fixed-entries))
 
-(defn fix-storyboard
-  "Add topic name in each topic and a topic sorter"
-  [storyboard-data]
-  (let [links (:links storyboard-data)
-        read-only (readonly-board? links)
-        with-read-only (assoc storyboard-data :read-only read-only)
-        fixed-stories (zipmap (map :uuid (:stories storyboard-data)) (map #(fix-story % storyboard-data) (:stories storyboard-data)))
-        without-stories (dissoc with-read-only :stories)
-        with-fixed-stories (assoc without-stories :fixed-items fixed-stories)]
-    with-fixed-stories))
-
 (defn fix-activity [activity collection-data]
-  (if (:board-slug activity)
-    (fix-entry activity collection-data nil)
-    (fix-story activity collection-data)))
+  (fix-entry activity collection-data nil))
 
 (defn fix-all-posts
   "Fix org data coming from the API."
   [all-posts-data]
-  (assoc all-posts-data :items (vec (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-posts-data))))
-  (let [fixed-activities-list (map #(fix-activity % {:slug (or (:board-slug %) (:storyboard-slug %)) :name (or (:board-name %) (:storyboard-name %))}) (:items all-posts-data))
+  (let [fixed-activities-list (map #(fix-activity % {:slug (:board-slug %) :name (:board-name %)}) (:items all-posts-data))
         without-items (dissoc all-posts-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
@@ -733,14 +700,6 @@
   (when text
     (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
-
-(defn disable-scroll []
-  (dommy/add-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.main-scroll]) #js {:height "100vh" :overflow "hidden"}))
-
-(defn enable-scroll []
-  (dommy/remove-class! (sel1 [:body]) :no-scroll)
-  (setStyle (sel1 [:div.main-scroll]) #js {:height "auto" :overflow "auto"}))
 
 (defn su-default-title []
   (let [js-date (js-date)
@@ -1123,20 +1082,8 @@
       (str "Posted " created-str)
       (str "Posted " created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
 
-(defn story-date-tooltip [story-data]
-  (let [published-at (js-date (:published-at story-data))
-        updated-at (js-date (:updated-at story-data))
-        edited-later? (> (.getTime updated-at) (.getTime published-at))
-        published-str (activity-date published-at)
-        updated-str (activity-date updated-at)]
-    (if (not edited-later?)
-      (str "Posted " published-str)
-      (str "Posted " published-str "\nEdited " updated-str " by " (:name (last (:author story-data)))))))
-
 (defn activity-date-tooltip [activity-data]
-  (if (= (:type activity-data) "entry")
-    (entry-date-tooltip activity-data)
-    (story-date-tooltip activity-data)))
+  (entry-date-tooltip activity-data))
 
 (defn copy-to-clipboard []
   (try

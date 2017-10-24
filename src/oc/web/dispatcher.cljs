@@ -35,7 +35,7 @@
   (conj (board-key org-slug board-slug) :board-data))
 
 (defn secure-activity-key [org-slug secure-id]
-  (vec (concat (org-key org-slug) [:secure-stories secure-id])))
+  (vec (concat (org-key org-slug) [:secure-activities secure-id])))
 
 (defn activity-key [org-slug board-slug activity-uuid]
   (let [board-key (if (= board-slug :all-posts)
@@ -47,7 +47,7 @@
   (vec (conj (board-key org-slug board-slug) :comments-data)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
-  (vec (conj (comments-key org-slug board-slug) activity-uuid)))
+  (vec (conj (comments-key org-slug board-slug) activity-uuid :sorted-comments)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -104,6 +104,7 @@
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
    :about-carrot-modal  [[:base] (fn [base] (:about-carrot-modal base))]
+   :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -149,15 +150,18 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :activity-data       [[:base :org-slug :board-slug :activity-uuid :secure-id]
-                          (fn [base org-slug board-slug activity-uuid secure-id]
-                            (get-in base (activity-key org-slug board-slug (or activity-uuid secure-id))))]
+   :activity-data       [[:base :org-slug :board-slug :activity-uuid]
+                          (fn [base org-slug board-slug activity-uuid]
+                            (get-in base (activity-key org-slug board-slug activity-uuid)))]
+   :secure-activity-data [[:base :org-slug :secure-id]
+                          (fn [base org-slug secure-id]
+                            (get-in base (secure-activity-key org-slug secure-id)))]
    :comments-data       [[:base :org-slug :board-slug]
                         (fn [base org-slug board-slug]
                           (get-in base (comments-key org-slug board-slug)))]
    :activity-comments-data [[:base :org-slug :board-slug :activity-uuid :secure-id]
                            (fn [base org-slug board-slug activity-uuid secure-id]
-                              (get-in base (activity-comments-key org-slug board-slug (or activity-uuid secure-id))))]
+                              (get-in base (butlast (activity-comments-key org-slug board-slug (or activity-uuid secure-id)))))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
@@ -199,9 +203,9 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
-   :story-editing-publish [[:base]
-                           (fn [base]
-                              (:story-editing-published-url base))]
+   :story-editing-publish [[:base] (fn [base] (:story-editing-published-url base))]
+   :activity-share        [[:base] (fn [base] (:activity-share base))]
+   :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :confirm-invitation    [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
@@ -214,7 +218,8 @@
                                :error (:collect-pswd-error base)})]
    :media-input           [[:base]
                             (fn [base]
-                              (:media-input base))]})
+                              (:media-input base))]
+   :comment-add-finish    [[:base] (fn [base] (:comment-add-finish base))]})
 
 ;; Action Loop =================================================================
 
@@ -303,6 +308,18 @@
     (let [activity-key (activity-key org-slug board-slug activity-id)]
       (get-in data activity-key))))
 
+(defn secure-activity-data
+  "Get secure activity data."
+  ([]
+    (secure-activity-data (router/current-org-slug) (router/current-secure-activity-id) @app-state))
+  ([secure-id]
+    (secure-activity-data (router/current-org-slug) secure-id @app-state))
+  ([org-slug secure-id]
+    (secure-activity-data org-slug secure-id @app-state))
+  ([org-slug secure-id data]
+    (let [activity-key (secure-activity-key org-slug secure-id)]
+      (get-in data activity-key))))
+
 (defn comments-data
   ([]
     (comments-data (router/current-org-slug) (router/current-board-slug) @app-state))
@@ -369,8 +386,8 @@
 (defn print-activity-data []
   (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
-(defn print-secure-story-data []
-  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-story-id)))))
+(defn print-secure-activity-data []
+  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-activity-id)))))
 
 (defn print-reactions-data []
   (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
@@ -389,16 +406,16 @@
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
-(set! (.-OCWebPrintAllActivityData js/window) print-all-posts-data)
+(set! (.-OCWebPrintAllPostsData js/window) print-all-posts-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
-(set! (.-OCWebPrintSecureStoryData js/window) print-secure-story-data)
+(set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
-(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)

@@ -42,6 +42,11 @@
     (when (zero? (count invite-users))
       (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))]))))
 
+(defn has-dirty-data? [s]
+  (let [invite-users-data @(drv/get-ref s :invite-users)
+        invite-users (:invite-users invite-users-data)]
+    (some #(not (empty? (:user %))) invite-users)))
+
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-users)
@@ -73,14 +78,14 @@
      :did-update (fn [s]
                    (setup-initial-rows s)
                    s)}
-  [s org-data]
+  [s org-data dismiss-settings-cb]
   (let [invite-users-data (drv/react s :invite-users)
         team-data (:team-data invite-users-data)
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         team-roster (:team-roster invite-users-data)
         uninvited-users (vec (filter #(= (:status %) "uninvited") (:users team-roster)))]
-    [:div.org-settings-panel
+    [:div.org-settings-panel.org-settings-invite-panel
       [:div.org-settings-panel-row.invite-from.group
         [:div.invite-from-label "Invite with:"]
         [:div.org-settings-panel-choice
@@ -189,7 +194,9 @@
               send-cta
               (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(do
-                        (reset! (::rand s) (int (rand 10000)))
-                        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))]))}
+          {:on-click #(if (has-dirty-data? s)
+                        (do
+                          (reset! (::rand s) (int (rand 10000)))
+                          (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))]))
+                        (dismiss-settings-cb))}
           "Cancel"]]]))

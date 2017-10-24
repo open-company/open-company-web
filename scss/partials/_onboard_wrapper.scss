@@ -98,6 +98,10 @@ div.onboard-email-container {
     border-radius: 4px;
     outline: none;
     border: none;
+
+    &.disabled {
+      opacity: 0.8;
+    }
   }
 }
 
@@ -218,7 +222,11 @@ div.onboard-lander {
       margin-top: 64px;
       @include avenir_M();
       font-size: 32px;
-      color: $carrot_gray;
+      color: $carrot_dark_gray;
+
+      &.about-yourself {
+        @include avenir_H();
+      }
     }
 
     div.subtitle {
@@ -411,8 +419,7 @@ div.onboard-lander {
       font-size: 16px;
       border-radius: 4px;
 
-      &:disabled {
-        cursor: not-allowed;
+      &.disabled {
         opacity: 0.8;
       }
     }

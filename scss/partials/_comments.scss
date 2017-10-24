@@ -7,7 +7,7 @@ div.comments {
 
   div.top-gradient {
     position: absolute;
-    top: 10px;
+    top: 0px;
     left: 0px;
     right: 10px;
     height: 40px;
@@ -23,15 +23,14 @@ div.comments {
   }
 
   div.comments-internal {
-    padding-bottom: 55px;
-    max-height: 100%;
-    min-height: 55px;
+    padding-bottom: 51px;
+    min-height: 51px;
+    height: 100%;
     width: 100%;
     bottom: 0px;
     left: 0;
     right: 0;
     position: absolute;
-    transition: 230ms;
 
     &.empty {
       transition: 0ms !important;
@@ -39,19 +38,15 @@ div.comments {
     }
 
     &.add-comment-focus {
-      padding-bottom: 120px;
-      min-height: 120px;
-
-      div.comments-internal-scroll {
-        height: calc(100% - 65px);
-      }
+      padding-bottom: 127px;
+      min-height: 127px;
     }
 
     div.comments-internal-scroll {
       overflow-x: hidden;
       overflow-y: auto;
       height: 100%;
-      padding: 10px;
+      padding: 10px 10px 0px;
     }
 
     div.comments-internal-empty {
@@ -85,19 +80,39 @@ div.comments {
           background-position: 50%;
           background-size: #{$comment_avatar_size}px #{$comment_avatar_size}px;
           border-radius: #{$comment_avatar_size / 2}px;
-        }
-        div.comment-author {
-          margin-left: 20px;
-          font-size: 14px;
-          color: $oc_gray_5;
-          font-weight: 700;
+          float: left;
         }
 
-        div.comment-timestamp {
-          margin-left: 5px;
-          margin-top: 4px;
-          font-size: 11px;
-          color: rgba(78,90,107,0.6);
+        div.comment-author-timestamp {
+          display: block;
+          float: left;
+          width: calc(100% - 23px);
+
+          div.comment-author {
+            max-width: calc(60% - 16px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 16px;
+            font-size: 14px;
+            color: $oc_gray_5;
+            @include avenir_H();
+            white-space: nowrap;
+            // display: block;
+            float: left;
+          }
+
+          div.comment-timestamp {
+            max-width: calc(40% - 5px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 5px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: rgba(78,90,107,0.6);
+            white-space: nowrap;
+            // display: block;
+            float: left;
+          }
         }
       }
 
@@ -106,10 +121,11 @@ div.comments {
         font-size: 13px;
         color: rgba(78,90,107,0.8);
         font-weight: 300;
-        margin: 0 0 0 #{$comment-avatar-size + 20}px;
+        margin: 0 0 0 #{$comment-avatar-size + 16}px;
+        white-space: pre-line;
 
         .emojione {
-          @include emoji-size(12);
+          @include emoji-size(13);
         }
       }
 
@@ -123,20 +139,71 @@ div.comments {
       background-color: white;
       border-radius: 4px;
       border: 1px solid rgba(177, 184, 192, 0.5);
-      padding: 0.5rem;
+      padding: 8px;
       transition: 230ms;
       left: 0;
       right: 0;
       position: absolute;
       bottom: 0px;
-      width: calc(100% + 16px);
+      width: 100%;
+
+      div.successfully-posted {
+        width: 168px;
+        height: 55px;
+        background-color: $carrot_dark_gray;
+        border-radius: 4px;
+        position: absolute;
+        padding: 12px 24px;
+        text-align: center;
+        @include avenir_H();
+        color: white;
+        font-size: 12px;
+        top: -65px;
+        left: calc(50% - 84px);
+        @include no-user-select();
+
+        &:before {
+          display: block;
+          content: "";
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          transform: rotate(45deg);
+          background-color: $carrot_dark_gray;
+          left: calc(50% - 4px);
+          bottom: -4px;
+        }
+      }
 
       &.expanded{
+        padding: 8px 8px 2px;
+
         div.add-comment-internal {
+          width: calc(100% - 42px);
+          float: right;
+          position: relative;
+
+          &:after {
+            display: block;
+            width: calc(100% + 33px);
+            content: "";
+            height: 1px;
+            background-color: rgba($carrot_light_gray_1, 0.3);
+            position: absolute;
+            bottom: 34px;
+            left: -40px;
+          }
+
           div.add-comment {
             height: 70px;
+            margin-bottom: 4px;
             overflow: auto;
           }
+        }
+
+        div.emoji-picker {
+          right: unset;
+          left: 10px;
         }
       }
 
@@ -147,7 +214,9 @@ div.comments {
       @include user-profile(23);
 
       div.add-comment-internal{
-        margin-left: 35px;
+        margin-left: 16px;
+        width: calc(100% - 68px);
+        float: left;
 
         div.add-comment {
           resize: none;
@@ -164,7 +233,7 @@ div.comments {
           cursor: text;
 
           .emojione {
-            @include emoji-size(12);
+            @include emoji-size(13);
           }
 
           &:empty:before {
@@ -180,17 +249,41 @@ div.comments {
           transition: 230ms;
 
           div.reply-button-container {
+            float: right;
             button.reply-btn {
               float: left;
-              color: $carrot_text_blue;
-              @include avenir_R();
+              color: $carrot_green;
+              @include avenir_H();
               font-size: 14px;
+              padding: 6px 6px 9px 18px; //2px 6px 9px 16px;
 
               &:hover {
                 text-decoration: underline;
               }
             }
           }
+        }
+      }
+
+      div.emoji-picker {
+        transition: left 230ms;
+        bottom: 10px;
+        position: absolute;
+        right: 10px;
+
+        button.emoji-button {
+          width: 20px;
+          height: 20px;
+          background-size: 20px 20px;
+
+          img {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        div.picker-container {
+          right: -240px !important;
         }
       }
     }

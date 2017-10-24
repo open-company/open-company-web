@@ -7,19 +7,14 @@
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :board-data)
   [s]
-  (let [board-data (drv/react s :board-data)
-        storyboard? (= (:type board-data) "story")]
+  (let [board-data (drv/react s :board-data)]
     [:div.empty-board.group
       (if (:read-only board-data)
         [:div.empty-board-headline
-          (str "There aren't " (if storyboard? "entries" "updates") " in " (:name board-data) " yet. ")]
+          (str "There aren't updates in " (:name board-data) " yet. ")]
         [:div.empty-board-headline
-          (str "You don’t have any " (if storyboard? "entries" "updates") " in " (:name board-data) " yet. ")
+          (str "You don’t have any updates in " (:name board-data) " yet. ")
           [:button.mlb-reset
-            {:on-click #(if storyboard?
-                          (dis/dispatch! [:story-create board-data])
-                          (dis/dispatch! [:entry-edit {:board-slug (:slug board-data) :board-name (:name board-data)}]))}
+            {:on-click #(dis/dispatch! [:entry-edit {:board-slug (:slug board-data) :board-name (:name board-data)}])}
             "Add one?"]])
-      [:div
-        {:class (utils/class-set {:empty-board-image (not storyboard?)
-                                  :empty-storyboard-image storyboard?})}]]))
+      [:div.empty-board-image]]))

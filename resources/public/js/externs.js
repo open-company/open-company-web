@@ -72,13 +72,13 @@ var Tooltip = function(){};
 // Debug app state
 var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};
-var OCWebPrintAllActivityData = function(){};
+var OCWebPrintAllPostsData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
 var OCWebPrintBoardData = function(){};
 var OCWebPrintActivitiesData = function(){};
 var OCWebPrintActivityData = function(){};
-var OCWebPrintSecureStoryData = function(){};
+var OCWebPrintSecureActivityData = function(){};
 var OCWebPrintCommentsData = function(){};
 var OCWebPrintActivityCommentsData = function(){};
 var OCWebPrintReactionsData = function(){};
@@ -91,13 +91,6 @@ var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
 var OCWebPrintRouterPath = function(){};
 var OCWebForceRefreshToken = function(){};
-// Filestack
-var filestack = {};
-filestack.init = function(){};
-filestack.pick = function(){};
-filestack.then = function(){};
-filestack.transform = function(){};
-filestack.storeURL = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
