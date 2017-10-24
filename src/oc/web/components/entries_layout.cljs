@@ -86,9 +86,7 @@
                 :let [entries-group (get grouped-entries topic)
                       topic-name (:topic-name (first entries-group))
                       topic-slug (:topic-slug (first entries-group))
-                      board-url (if topic-slug
-                                  (oc-urls/board-filter-by-topic topic-slug)
-                                  (oc-urls/board-sort-by-topic))
+                      board-url (oc-urls/board-filter-by-topic (or topic-slug "uncategorized"))
                       first-line-entries (take 2 entries-group)
                       first-has-headline (some #(not (empty? (:headline %))) first-line-entries)
                       first-has-body (some #(not (empty? (:body %))) first-line-entries)
@@ -102,7 +100,7 @@
                 [:a.by-topic-header-title
                   {:href board-url
                    :on-click #(do
-                               (utils/event-stop %)
+                               (.preventDefault %)
                                (router/nav! board-url))}
                   (or topic-name
                       (s/capital topic-slug)
@@ -117,8 +115,11 @@
                    :on-click #(dis/dispatch! [:entry-edit {:topic-slug topic-slug :topic-name topic-name :board-slug (:slug board-data) :board-name (:name board-data)}])}]
                 ; If there are more than 4 add the button to show all of them
                 (when (> (count entries-group) 4)
-                  [:button.view-all-updates.mlb-reset
-                    {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or topic-slug "uncategorized")))}
+                  [:a.view-all-updates.mlb-reset
+                    {:href board-url
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (router/nav! board-url))}
                     "View all updates"])]
               ;; First row:
               [:div.entries-cards-container-row.group

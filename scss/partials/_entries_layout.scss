@@ -50,7 +50,8 @@ div.entries-layout {
         }
       }
 
-      button.view-all-updates {
+      a.view-all-updates {
+        display: block;
         font-size: 15px;
         color: $carrot_light_gray_3;
         @include avenir_M();
