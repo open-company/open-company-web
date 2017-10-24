@@ -26,7 +26,7 @@
   (let [orgs (drv/react s :orgs)
         org-data (drv/react s :org-data)
         current-org-slug (:slug org-data)
-        should-show-dropdown? true] ;(> (count orgs) 1)]
+        should-show-dropdown? (> (count orgs) 1)]
     [:div.orgs-dropdown
       {:class (utils/class-set {:dropdown should-show-dropdown?
                                 :org-has-logo (not (empty? (:logo-url org-data)))})}
