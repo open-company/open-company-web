@@ -108,7 +108,9 @@
                       (s/capital topic-slug)
                       [:span.oblique "No topic"])]
                 [:button.mlb-reset.add-entry-to-topic
-                  {:title (str "Add post in " topic-name)
+                  {:title (if (empty? topic-name)
+                            "Add a new post"
+                            (str "Add post in " topic-name))
                    :data-toggle "tooltip"
                    :data-placement "right"
                    :data-container "body"
