@@ -1,4 +1,23 @@
 div.activity-attachments{
+
+  &.small-version {
+    div.attachments-dropdown {
+      left: calc(100% - 384px);
+      width: 384px;
+
+      div.attachments-dropdown-list {
+        a.attachments-dropdown-item {
+          height: 40px;
+          padding: 10px 16px;
+
+          div.file-download {
+            top: 12px;
+          }
+        }
+      }
+    }
+  }
+
   button.attachments-button {
     min-width: 45px;
     height: 26px;
@@ -22,8 +41,8 @@ div.activity-attachments{
     
   div.attachments-dropdown {
     position: absolute;
-    top: 10px;
-    left: calc(100% - 600px - 18px);
+    top: 12px;
+    left: calc(100% - 600px);
     width: 600px;
     height: auto;
     border: none;
@@ -37,7 +56,7 @@ div.activity-attachments{
     div.triangle {
       position: absolute;
       top: 19px;
-      left: calc(100% - 30px);
+      left: calc(100% - 48px);
       background-color: white;
       border-top: 1px solid rgba(177,184,192,0.50);
       border-left: 1px solid rgba(177,184,192,0.50);
@@ -70,14 +89,14 @@ div.activity-attachments{
         float: right;
         @include avenir_M();
         font-size: 15px;
-        color: $carrot_light_gray_3;
+        color: rgba($carrot_light_gray_3, 0.5);
       }
 
       a.attachments-dropdown-item {
         display: block;
-        background-color: $carrot_light_gray_7;
+        background-color: rgba($carrot_light_gray_7, 0.3);
         height: 64px;
-        padding: 16px;
+        padding: 16px 12px;
         @include avenir_M();
         font-size: 14px;
         color: $carrot_light_gray_3;

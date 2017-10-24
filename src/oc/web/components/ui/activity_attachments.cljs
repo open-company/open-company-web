@@ -6,11 +6,12 @@
             [goog.events.EventType :as EventType]))
 
 (rum/defcs activity-attachments < (rum/local false ::attachments-dropdown)
-  [s activity-data]
+  [s activity-data small-version?]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))]
     (when (pos? (count attachments))
       [:div.activity-attachments
-        {:on-mouse-enter #(reset! (::attachments-dropdown s) true)
+        {:class (utils/class-set {:small-version small-version?})
+         :on-mouse-enter #(reset! (::attachments-dropdown s) true)
          :on-mouse-leave #(reset! (::attachments-dropdown s) false)}
         [:button.mlb-reset.attachments-button
           {:ref "attachments-button"
@@ -38,11 +39,13 @@
                   {:key (str "attachment-" size "-" (:url atch))
                    :href (:url atch)
                    :target "_blank"}
-                  [:div.file-icon
-                    [:i.fa
-                      {:class (utils/icon-for-mimetype (:mimetype atch))}]]
+                  (when-not small-version?
+                    [:div.file-icon
+                      [:i.fa
+                        {:class (utils/icon-for-mimetype (:mimetype atch))}]])
                   [:div.file-title
                     (:name atch)]
-                  [:div.file-subtitle
-                    subtitle]
+                  (when-not small-version?
+                    [:div.file-subtitle
+                      subtitle])
                   [:div.file-download]])]])])))
