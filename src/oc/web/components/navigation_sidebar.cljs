@@ -122,7 +122,6 @@
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               {:id "navigation-sidebar-boards"}
-              [:div.boards-icon]
               [:span
                 "BOARDS"]
               (when show-create-new-board

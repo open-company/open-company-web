@@ -113,9 +113,8 @@ div.left-navigation-sidebar {
     div.all-posts-label {
       padding: 5px 5px 0 5px;
       width: 148px;
-      margin-left: 19px;
       text-align: left;
-      margin-left: 20px;
+      margin-left: 16px;
     }
 
     div.all-posts-icon {
@@ -141,7 +140,7 @@ div.left-navigation-sidebar {
         font-size: 13px;
         color: $carrot_gray;
         float: left;
-        margin-left: 5px;
+        margin-left: 21px;
         cursor: default;
       }
 
@@ -153,9 +152,6 @@ div.left-navigation-sidebar {
         float: left;
         margin-right: 7px;
         margin-top: 0px;
-      }
-
-      div.boards-icon {
         background-image: cdnUrl("/img/ML/boards_icon.svg");
       }
     }
