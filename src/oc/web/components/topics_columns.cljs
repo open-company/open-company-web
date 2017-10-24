@@ -50,9 +50,9 @@
         boards (:boards org-data)]
     (if create-link
       (if (> (count boards) 1)
-        "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can create new posts or react and comment on what you read"
+        "Boards are where you’ll find the announcements, updates and stories that help connect you with your team. You can create new posts or react and comment on what you read"
         "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!")
-      "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can react and comment on what you read.")))
+      "Boards are where you’ll find the announcements, updates and stories that help connect you with your team. You can react and comment on what you read.")))
 
 (defn get-second-tooltip-message [org-data]
   (let [boards (:boards org-data)]
