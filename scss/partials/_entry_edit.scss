@@ -269,6 +269,10 @@ div.entry-edit-modal-container {
         height: 1px;
         background-color: $carrot_light_gray_1;
         opacity: 0.3;
+
+        &.not-visible {
+          opacity: 0;
+        }
       }
 
       div.entry-edit-modal-body {

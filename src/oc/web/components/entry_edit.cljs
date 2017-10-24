@@ -17,6 +17,14 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn should-show-divider-line [s]
+  (when @(:first-render-done s)
+    (when-let [entry-edit-modal-body (rum/ref-node s "entry-edit-modal-body")]
+      (let [container-height (+ (.-clientHeight entry-edit-modal-body) 11) ;; Remove padding
+            next-show-divider-line (> (.-scrollHeight entry-edit-modal-body) container-height)]
+        (when (not= next-show-divider-line @(::show-divider-line s))
+          (reset! (::show-divider-line s) next-show-divider-line))))))
+
 (defn calc-edit-entry-modal-height [s]
   (when @(:first-render-done s)
     (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
@@ -129,6 +137,7 @@
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
+                        (rum/local false ::show-divider-line)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -157,6 +166,9 @@
                                       s)
                          :before-render (fn [s]
                                           (calc-edit-entry-modal-height s)
+                                          s)
+                         :after-render  (fn [s]
+                                          (should-show-divider-line s)
                                           s)
                          :will-unmount (fn [s]
                                          (when @(::body-editor s)
@@ -253,6 +265,7 @@
                                                     :active (not (empty? @(::new-topic s)))})
                            :title "Create a new topic"}]]]]]]]]
         [:div.entry-edit-modal-body
+          {:ref "entry-edit-modal-body"}
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable true
@@ -278,7 +291,8 @@
           [:div.entry-edit-controls-right]]
           ; Bottom controls
           [:div.entry-edit-controls.group]
-        [:div.entry-edit-modal-divider]
+        [:div.entry-edit-modal-divider
+          {:class (when-not @(::show-divider-line s) "not-visible")}]
         [:div.entry-edit-modal-footer.group
           (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
           [:button.mlb-reset.mlb-default.form-action-bt
