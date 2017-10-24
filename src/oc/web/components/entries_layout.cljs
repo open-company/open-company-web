@@ -48,9 +48,15 @@
     new?))
 
 (defn is-share-thoughts? [entry changes]
-  (and (new? entry changes)
-       (zero? (:count (utils/link-for (:links entry) "comments")))
-       (zero? (count (filter :reacted (:reactions entry))))))
+  (let [entry-js-date (utils/js-date (:created-at entry))
+        now (utils/js-date)
+        thirty-days (* 1000 60 60 24 30)]
+         ;; Was created in the last 30 days
+    (and (<= (- (.getTime now) thirty-days) (.getTime entry-js-date))
+         ;; Has 0 comments
+         (zero? (:count (utils/link-for (:links entry) "comments")))
+         ;; Has no reactions from the current user
+         (zero? (count (filter :reacted (:reactions entry)))))))
 
 (defn find-share-thoughts-uuid [board-data changes]
   (let [entries (vals (:fixed-items board-data))
@@ -102,7 +108,11 @@
                       (s/capital topic-slug)
                       [:span.oblique "No topic"])]
                 [:button.mlb-reset.add-entry-to-topic
-                  {:on-click #(dis/dispatch! [:entry-edit {:topic-slug topic-slug :topic-name topic-name}])}]
+                  {:title (str "Add post in " topic-name)
+                   :data-toggle "tooltip"
+                   :data-placement "right"
+                   :data-container "body"
+                   :on-click #(dis/dispatch! [:entry-edit {:topic-slug topic-slug :topic-name topic-name :board-slug (:slug board-data) :board-name (:name board-data)}])}]
                 ; If there are more than 4 add the button to show all of them
                 (when (> (count entries-group) 4)
                   [:button.view-all-updates.mlb-reset
