@@ -139,7 +139,10 @@
                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move])))
                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag])))
                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share])))
+                             (not @(::more-dropdown s))
+                             (not @(::move-activity s))
+                             (not @(::share-dropdown s)))
                     (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))
        :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
        :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
@@ -265,9 +268,11 @@
         (when (utils/link-for (:links activity-data) "share")
           [:div.activity-share
             {:class (utils/class-set {:not-hover (and (not @(::hovering-card s))
-                                                      (not @(::share-dropdown s)))})}
+                                                      (not @(::share-dropdown s))
+                                                      (not @(::more-dropdown s))
+                                                      (not @(::move-activity s)))})}
             [:button.mlb-reset.activity-share-bt
-              {:title "Share this post"
+              {:title "Share"
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
