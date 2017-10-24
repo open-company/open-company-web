@@ -25,20 +25,20 @@
 
 (defn refresh-board-data []
   (when (not (router/current-activity-id))
-    (utils/after 100
-      #(dis/dispatch! [:board-get (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")]))))
+    (utils/after 100 (fn []
+     (if (= (router/current-board-slug) "all-posts")
+       (dis/dispatch! [:all-posts-get])
+       (let [board-data (dis/board-data)
+             fixed-board-data (if board-data
+                                board-data
+                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards (dis/org-data))))]
+         (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))
 
 (defcomponent org-dashboard [data owner]
 
   (did-mount [_]
     (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-    (refresh-board-data)
-    (om/set-state! owner :board-refresh-interval
-      (js/setInterval #(refresh-board-data) (* 60 1000))))
-
-  (will-unmount [_]
-    (when (om/get-state owner :board-refresh-interval)
-      (js/clearInterval (om/get-state owner :board-refresh-interval))))
+    (refresh-board-data))
 
   (render-state [_ {:keys [columns-num card-width] :as state}]
     (let [org-slug (keyword (router/current-org-slug))
@@ -47,7 +47,8 @@
           board-data (dis/board-data data)
           all-posts-data (dis/all-posts-data data)]
       (if (or (not org-data)
-              (and (not board-data)
+              (and (router/current-board-slug)
+                   (not board-data)
                    (not all-posts-data)))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}

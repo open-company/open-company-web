@@ -91,8 +91,7 @@
   (inject-loading))
 
 (defn post-routing []
-  (api/get-entry-point)
-  (api/get-auth-settings))
+  (utils/after 10 #(dis/dispatch! [:initial-loads])))
 
 ;; home
 (defn home-handler [target params]
@@ -164,11 +163,16 @@
     (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
                                     (jwt/jwt)
                                     (= (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))) "true"))
-          loading (or (not (dis/board-data))                 ;; if the company data are not present
-                      (not (:fixed-items (dis/board-data)))) ;; or the entries key is missing that means we have only
-                                                             ;; a subset of the company data loaded with a SU
-          org-settings (and (contains? query-params :org-settings)
-                            (#{:main :team :invite} (keyword (:org-settings query-params))))
+          loading (or (and (not (contains? query-params :ap))          ;; if is board page
+                           (not (:fixed-items (dis/board-data))))      ;; if the board data are not present
+                      (and (contains? query-params :ap)                ;; if the all-posts data are not preset
+                           (not (:fixed-items (dis/all-posts-data))))) ;; this latter is used when displaying modal over AP
+          org-settings (if (and (contains? query-params :org-settings)
+                                (#{:main :team :invite} (keyword (:org-settings query-params))))
+                         (keyword (:org-settings query-params))
+                         (if (contains? query-params :access)
+                           :main
+                           nil))
           next-app-state {:show-onboard-overlay show-onboard-overlay
                           :loading loading
                           :org-settings org-settings}]
@@ -359,11 +363,11 @@
 
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
-      (org-handler "org" target #(om/component) params))
+      (org-handler "org" target org-dashboard params))
 
     (defroute org-slash-route (str (urls/org ":org") "/") {:as params}
       (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
-      (org-handler "org" target #(om/component) params))
+      (org-handler "org" target org-dashboard params))
 
     (defroute all-posts-route (urls/all-posts ":org") {:as params}
       (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))

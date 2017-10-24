@@ -208,7 +208,7 @@ provided in the table below:
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
 |  :auth-with-token/failed | API | Token exchange failed, cleanup the app-state of the token exchange stuff. |
 |  :auth-with-token/success | API | Token exchange succeeded. Show the collect name and password overlay if it was an invitation token, load the orgs associated with the user and redirect. |
-|  :board | API | Read and save the board data from APi. Call the :load-other-boards action if necessary |
+|  :board | API | Read and save the board data from API. Call the :load-other-boards action if necessary |
 |  :board-get | UI | Load a board passing in directly the board link. |
 |  :board-create | UI | Start the request to create a new board for the current org. |
 |  :board-delete | UI | Delete a board of the current org. |
@@ -216,6 +216,8 @@ provided in the table below:
 |  :board-edit-save | UI | Save the board edited data. |
 |  :board-edit-save/finish | API | Board created or updated. |
 |  :board-edit/dismiss | UI | Starts the dismiss process of the board editing modal. |
+|  :board-nav-away | UI | Updates local change state when a user leaves a board. |
+|  :board-seen | UI | Updates local change state and the change service when a user sees a board. |
 |  :boards-load-other | UI | Start the request to load the data of all the rest of the org boards, not the one currently shown. |
 |  :bot-auth | UI | Start the bot add for a give slack team. |
 |  :calendar-get | UI | Load the calendar data to show the AA sidebar. |
@@ -226,6 +228,8 @@ provided in the table below:
 |  :comment-add/finish | API | Request to add a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
 |  :comments-get | UI | Starts the request to load the comments given an entry UUID. |
 |  :comments-get/finish | API | Request to load the comments for an entry finished, could be it failed though. |
+|  :container/change | WS | Notice from change service with change info for a board |
+|  :container/status | WS | Response from change service watch request with timestamp info for boards |
 |  :default | - | Default action, never used, it's only a fallback |
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |

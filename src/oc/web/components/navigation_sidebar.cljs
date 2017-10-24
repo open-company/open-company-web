@@ -11,6 +11,7 @@
             [oc.web.components.ui.mixins :refer (first-render-mixin)]
             [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [goog.events :as events]
+            [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
 
 (defn sort-boards [boards]
@@ -20,12 +21,39 @@
   (utils/event-stop e)
   (router/nav! url))
 
+(defn new?
+  "
+  A board is new if:
+  
+    user is part of the team (we don't track new for non-team members accessing public boards)
+     -and-
+    
+    change-at is newer than seen at
+      -or-
+    we have a change-at and no seen at
+  "
+  [change-data board]
+  (let [changes (get change-data (:uuid board))
+        change-at (:change-at changes)
+        nav-at (:nav-at changes)
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        new? (and in-team?
+                  (or (and change-at nav-at (> change-at nav-at))
+                      (and change-at (not nav-at))))]
+    (timbre/debug "New'ness in nav. test for:" (:slug board)
+                  "in-team?:" in-team?
+                  "change:" change-at
+                  "nav:" nav-at
+                  "new?:" new?)
+    new?))
+
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
+                                (drv/drv :change-data)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::resize-listener)
@@ -55,6 +83,7 @@
                                                  s)}
   [s]
   (let [org-data (drv/react s :org-data)
+        change-data (drv/react s :change-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (vec (filter #(not= (:slug %) "drafts") all-boards))
@@ -69,7 +98,7 @@
         show-drafts (pos? (:count drafts-link))
         show-invite-people (and (router/current-org-slug)
                                 (jwt/is-admin? (:team-id org-data)))
-        is-enough-tall (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))
+        is-tall-enough? (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))
         org-slug (router/current-org-slug)
         board-url-fn #(let [c-val (cook/get-cookie (router/last-board-filter-cookie org-slug %))]
                         (if (= c-val "by-topic")
@@ -124,7 +153,8 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:key (str "board-list-" (name (:slug board)) "-internal")
+                    {:class (utils/class-set {:new (new? change-data board)})
+                     :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])
             (when show-drafts
               (let [board-url (oc-urls/board (:slug drafts-board))]
@@ -147,7 +177,7 @@
                       {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
                        :dangerouslySetInnerHTML (utils/emojify (or (:name drafts-board) (:slug drafts-board)))}]]]))])]
       [:div.left-navigation-sidebar-footer
-        {:style {:position (if is-enough-tall "absolute" "relative")}}
+        {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(dis/dispatch! [:org-settings-show :invite])}

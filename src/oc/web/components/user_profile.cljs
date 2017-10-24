@@ -60,6 +60,7 @@
     (router/nav! to-url)))
 
 (defn close-cb [orgs current-user-data]
+  (dis/dispatch! [:input [:latest-entry-point] 0])
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "user-profile-unsaved-edits"

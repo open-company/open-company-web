@@ -30,7 +30,7 @@
             {:on-click #(dis/dispatch! [:entry-edit topic])}
             "Add an update?"]]])])
 
-(defn delete-clicked [e activity-data]
+(defn- delete-clicked [e activity-data]
   (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
@@ -44,14 +44,14 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn truncate-body [body-sel is-all-posts]
+(defn- truncate-body [body-sel is-all-posts]
   (.dotdotdot (js/$ body-sel)
    #js {:height (* 24 (if is-all-posts 6 3))
         :wrap "word"
         :watch true
         :ellipsis "... "}))
 
-(defn get-first-body-thumbnail [body is-ap]
+(defn- get-first-body-thumbnail [body is-ap]
   (let [$body (js/$ (str "<div>" body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
@@ -85,7 +85,7 @@
                                          (let [activity-data (first (:rum/args s))
                                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                                body-a-sel (str body-sel " a")
-                                               is-all-posts (nth (:rum/args s) 3 false)]
+                                               is-all-posts (nth (:rum/args s) 4 false)]
                                            ; Prevent body links in FoC
                                            (.click (js/$ body-a-sel) #(.stopPropagation %))
                                            ; Truncate body text with dotdotdot
@@ -97,13 +97,13 @@
                                          s)
                          :will-mount (fn [s]
                                        (let [activity-data (first (:rum/args s))
-                                             is-all-posts (nth (:rum/args s) 3 false)]
-                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts) is-all-posts))
+                                             is-all-posts (nth (:rum/args s) 4 false)]
+                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts)))
                                        s)
                          :did-remount (fn [o s]
                                         (let [old-activity-data (first (:rum/args o))
                                               new-activity-data (first (:rum/args s))
-                                              is-all-posts (nth (:rum/args s) 3 false)]
+                                              is-all-posts (nth (:rum/args s) 4 false)]
                                           (when (not= (:body old-activity-data) (:body new-activity-data))
                                             (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
                                             (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
@@ -123,7 +123,7 @@
                          :will-unmount (fn [s]
                                          (events/unlistenByKey @(::window-click s))
                                          s)}
-  [s activity-data has-headline has-body is-all-posts]
+  [s activity-data has-headline has-body is-new is-all-posts]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-posts-card is-all-posts})
@@ -167,7 +167,10 @@
                             (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
                                 (oc-urls/board-sort-by-topic (:board-slug activity-data))
                                 (oc-urls/board (:board-slug activity-data)))))}
-            (:board-name activity-data)])]]
+            (:board-name activity-data)])
+        ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
+        ;;(when is-new [:div.new-tag "New"])
+        ]]
     [:div.activity-card-content.group
       ; Headline
       [:div.activity-card-headline

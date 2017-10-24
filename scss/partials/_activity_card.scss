@@ -146,6 +146,18 @@ div.activity-card {
       width: 42%;
       margin-top: 8px;
 
+      div.new-tag {
+        @include avenir_B();        
+        color: $carrot_green_1;
+        font-size: 12px;
+        line-height: 14px;
+        padding: 6px 7px 4px 7px;
+        float: right;
+        text-transform: uppercase;
+        border: 1px solid $carrot_green_2;
+        border-radius: 3px;
+      }
+
       div.activity-tag {
         margin-top: 0;
         float: right;
