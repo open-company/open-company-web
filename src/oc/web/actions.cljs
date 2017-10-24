@@ -195,9 +195,15 @@
 (defmethod dispatcher/action :container/change
   [db [_ {board-uuid :container-id change-at :change-at}]]
   (timbre/debug "Board change:" board-uuid "at:" change-at)
-  (let [boards (:boards (dispatcher/org-data db))
-        filtered-boards (filter #(= (:uuid %) board-uuid) boards)]
-    (utils/after 1000 #(dispatcher/dispatch! [:boards-load-other filtered-boards])))
+  (utils/after 1000 (fn []
+    (let [current-board-data (dispatcher/board-data)]
+      (if (= board-uuid (:uuid current-board-data))
+        ;; Reload the current board data
+        (dispatcher/dispatch! [:board-get (utils/link-for (:links current-board-data) "self")])
+        ;; Reload a secondary board data
+        (let [boards (:boards (dispatcher/org-data db))
+              filtered-boards (filter #(= (:uuid %) board-uuid) boards)]
+          (dispatcher/dispatch! [:boards-load-other filtered-boards]))))))
   ;; Update change-data state that the board has a change
   (update-change-data db board-uuid :change-at change-at))
 
