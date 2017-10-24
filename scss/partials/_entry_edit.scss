@@ -321,7 +321,7 @@ div.entry-edit-modal-container {
             @include activity-attachment(true);
 
             &.medium-editor-placeholder:after {
-              color: $carrot_dark_gray !important;
+              color: #D0D1D4 !important;
             }
 
             * {

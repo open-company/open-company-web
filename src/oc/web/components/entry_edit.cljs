@@ -257,7 +257,7 @@
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable true
              :ref "headline"
-             :placeholder "Title this (if you like)"
+             :placeholder "Untitled post"
              :on-paste    #(headline-on-paste s %)
              :on-key-down #(headline-on-change s)
              :on-click    #(headline-on-change s)
