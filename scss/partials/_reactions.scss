@@ -18,12 +18,19 @@ div.reactions {
     @include avenir_H();
     font-size: 12px;
 
+    span.reaction {
+      font-size: 20px;
+      top: 3px;
+      position: relative;
+    }
+
     &.has-reactions {
       opacity: 1;
     }
 
     div.count {
       margin-left: 5px;
+      // margin-top: -3px;
       display: inline-block;
     }
 
