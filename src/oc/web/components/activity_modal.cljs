@@ -201,38 +201,38 @@
                   {:class (when (and @(:first-render-done s)
                                      (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
                   (reactions activity-data)
-                  [:div.activity-modal-share
-                    (when @(::share-dropdown s)
-                      [:div.share-dropdown
-                        [:div.triangle]
-                        [:ul.share-dropdown-menu
-                          (when (utils/link-for (:links activity-data) "share")
-                            [:li.share-dropdown-item
-                              {:on-click (fn [e]
-                                           (reset! (::share-dropdown s) false)
-                                           ; open the activity-share-modal component
-                                           (dis/dispatch! [:activity-share-show :link activity-data]))}
-                              "Share Link"])
-                          (when (utils/link-for (:links activity-data) "share")
-                            [:li.share-dropdown-item
-                              {:on-click (fn [e]
-                                           (reset! (::share-dropdown s) false)
-                                           ; open the activity-share-modal component
-                                           (dis/dispatch! [:activity-share-show :email activity-data]))}
-                              "Share Email"])
-                          (when (and (utils/link-for (:links activity-data) "share")
-                                     (jwt/team-has-bot? (:team-id (dis/org-data))))
-                            [:li.share-dropdown-item
-                              {:on-click (fn [e]
-                                           (reset! (::share-dropdown s) false)
-                                           ; open the activity-share-modal component
-                                           (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                              "Share Slack"])]])
-                    [:button.mlb-reset.share-button
-                      {:on-click #(do
-                                   (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
-                      "Share"]]
-                  [:div.activity-modal-footer-right]]]]
+                  [:div.activity-modal-footer-right
+                    [:div.activity-modal-share
+                      (when @(::share-dropdown s)
+                        [:div.share-dropdown
+                          [:div.triangle]
+                          [:ul.share-dropdown-menu
+                            (when (utils/link-for (:links activity-data) "share")
+                              [:li.share-dropdown-item
+                                {:on-click (fn [e]
+                                             (reset! (::share-dropdown s) false)
+                                             ; open the activity-share-modal component
+                                             (dis/dispatch! [:activity-share-show :link activity-data]))}
+                                "Share Link"])
+                            (when (utils/link-for (:links activity-data) "share")
+                              [:li.share-dropdown-item
+                                {:on-click (fn [e]
+                                             (reset! (::share-dropdown s) false)
+                                             ; open the activity-share-modal component
+                                             (dis/dispatch! [:activity-share-show :email activity-data]))}
+                                "Share Email"])
+                            (when (and (utils/link-for (:links activity-data) "share")
+                                       (jwt/team-has-bot? (:team-id (dis/org-data))))
+                              [:li.share-dropdown-item
+                                {:on-click (fn [e]
+                                             (reset! (::share-dropdown s) false)
+                                             ; open the activity-share-modal component
+                                             (dis/dispatch! [:activity-share-show :slack activity-data]))}
+                                "Share Slack"])]])
+                      [:button.mlb-reset.share-button
+                        {:on-click #(do
+                                     (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
+                        "Share"]]]]]]
             ;; Right column
             (when show-comments?
               [:div.activity-right-column

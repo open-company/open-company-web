@@ -238,87 +238,87 @@ div.activity-modal-container {
                 border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
               }
 
-              div.activity-modal-share {
-                float: left;
-                position: relative;
+              div.activity-modal-footer-right {
+                float: right;
 
-                button.share-button {
-                  width: 84px;
-                  height: 32px;
-                  border-radius: 100px;
-                  background-image: cdnUrl("/img/ML/share_icon.svg");
-                  background-size: 14px 14px;
-                  background-repeat: no-repeat;
-                  background-position: 14px 8px;
-                  padding: 9px 20px 11px 28px;
-                  @include avenir_H();
-                  font-size: 12px;
-                  color: $carrot_light_gray_3;
-                  background-color: #F5F4F1;
-                  opacity: 0.7;
+                div.activity-modal-share {
+                  float: right;
+                  position: relative;
 
-                  &:hover {
-                    opacity: 1;
+                  button.share-button {
+                    width: 84px;
+                    height: 32px;
+                    border-radius: 100px;
+                    background-image: cdnUrl("/img/ML/share_icon.svg");
+                    background-size: 14px 14px;
+                    background-repeat: no-repeat;
+                    background-position: 14px 8px;
+                    padding: 9px 20px 11px 28px;
+                    @include avenir_H();
+                    font-size: 12px;
+                    color: $carrot_light_gray_3;
+                    background-color: #F5F4F1;
+                    opacity: 0.7;
+
+                    &:hover {
+                      opacity: 1;
+                    }
                   }
-                }
 
-                div.share-dropdown {
-                  position: absolute;
-                  bottom: 42px;
-                  left: calc(50% - 65px);
-                  width: 130px;
-                  min-width: 130px;
-                  border: none;
-                  outline: none;
-                  box-shadow: none;
-                  background-color: transparent;
-                  padding: 0 0 .3em;
-                  overflow: visible;
-                  margin: 0px;
-                  z-index: 100;
-
-                  div.triangle {
+                  div.share-dropdown {
                     position: absolute;
-                    bottom: -2px;
-                    right: calc(50% - 7px);
-                    background-color: white;
-                    border-top: 1px solid rgba(177,184,192,0.50);
-                    border-left: 1px solid rgba(177,184,192,0.50);
-                    transform: rotate(225deg);
-                    width: 15px;
-                    height: 15px;
-                    z-index: 1001;
-                  }
+                    bottom: 42px;
+                    left: calc(50% - 65px);
+                    width: 130px;
+                    min-width: 130px;
+                    border: none;
+                    outline: none;
+                    box-shadow: none;
+                    background-color: transparent;
+                    padding: 0 0 .3em;
+                    overflow: visible;
+                    margin: 0px;
+                    z-index: 100;
 
-                  ul.share-dropdown-menu {
-                    background-color: white;
-                    border: 1px solid rgba(177,184,192,0.50);
-                    box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-                    border-radius: 5px;
-                    margin: 0;
-                    padding: 10px 13px 6px 8px;
-                    min-height: 50px;
-                    list-style-type: none;
-                    width: 100%;
+                    div.triangle {
+                      position: absolute;
+                      bottom: -2px;
+                      right: calc(50% - 7px);
+                      background-color: white;
+                      border-top: 1px solid rgba(177,184,192,0.50);
+                      border-left: 1px solid rgba(177,184,192,0.50);
+                      transform: rotate(225deg);
+                      width: 15px;
+                      height: 15px;
+                      z-index: 1001;
+                    }
 
-                    li.share-dropdown-item {
-                      padding: 3px 8px;
-                      @include avenir_M();
-                      font-size: 14px;
-                      color: $carrot_light_gray_3;
-                      cursor: pointer;
-                      background-color: transparent;
+                    ul.share-dropdown-menu {
+                      background-color: white;
+                      border: 1px solid rgba(177,184,192,0.50);
+                      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                      border-radius: 5px;
+                      margin: 0;
+                      padding: 10px 13px 6px 8px;
+                      min-height: 50px;
+                      list-style-type: none;
+                      width: 100%;
 
-                      &:hover {
-                        background-color: rgba($carrot_light_gray_4, 0.2);
+                      li.share-dropdown-item {
+                        padding: 3px 8px;
+                        @include avenir_M();
+                        font-size: 14px;
+                        color: $carrot_light_gray_3;
+                        cursor: pointer;
+                        background-color: transparent;
+
+                        &:hover {
+                          background-color: rgba($carrot_light_gray_4, 0.2);
+                        }
                       }
                     }
                   }
                 }
-              }
-
-              div.activity-modal-footer-right {
-                float: right;
               }
             }
           }
