@@ -243,3 +243,25 @@
     background-image: cdnUrl($image + "@2x" + $suffix);
   }
 }
+
+@mixin preload_image($image_urls, $place: "after") {
+  @if $place == "after" {
+    &:after{
+      position:absolute;
+      width:0;
+      height:0;
+      overflow:hidden;
+      z-index:-1;
+      content: $image_urls;
+    }
+  } @else if $place == "before" {
+    &:before{
+      position:absolute;
+      width:0;
+      height:0;
+      overflow:hidden;
+      z-index:-1;
+      content: $image_urls;
+    }
+  }
+}

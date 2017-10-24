@@ -164,7 +164,7 @@ $h2_top_margin: 20;
     }
   }
 
-  a {
+  a, span[data-auto-link] {
     text-decoration: none;
     color: $carrot_text_blue;
   }
