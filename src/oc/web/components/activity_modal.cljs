@@ -164,12 +164,6 @@
                           (when (utils/link-for (:links activity-data) "partial-update")
                             [:li
                               {:on-click #(do
-                                            (reset! (::showing-dropdown s) false)
-                                            (dis/dispatch! [:entry-edit activity-data]))}
-                              "Edit"])
-                          (when (utils/link-for (:links activity-data) "partial-update")
-                            [:li
-                              {:on-click #(do
                                            (reset! (::showing-dropdown s) false)
                                            (reset! (::move-activity s) true))}
                               "Move"])
@@ -192,7 +186,10 @@
             [:div.activity-left-column
               [:div.activity-left-column-content
                 [:div.activity-modal-content
-                  {:on-click #(when (utils/link-for (:links activity-data) "partial-update")
+                  {:on-click #(when (and (utils/link-for (:links activity-data) "partial-update")
+                                         (not @(::showing-dropdown s))
+                                         (not @(::move-activity s))
+                                         (not @(::share-dropdown s)))
                                 (dis/dispatch! [:entry-edit activity-data]))}
                   [:div.activity-modal-content-headline
                     {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
@@ -204,37 +201,47 @@
                                      (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
                   (reactions activity-data)
                   [:div.activity-modal-footer-right
-                    [:div.activity-modal-share
-                      (when @(::share-dropdown s)
-                        [:div.share-dropdown
-                          [:div.triangle]
-                          [:ul.share-dropdown-menu
-                            (when (utils/link-for (:links activity-data) "share")
-                              [:li.share-dropdown-item
-                                {:on-click (fn [e]
-                                             (reset! (::share-dropdown s) false)
-                                             ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show :link activity-data]))}
-                                "Share Link"])
-                            (when (utils/link-for (:links activity-data) "share")
+                    (when (utils/link-for (:links activity-data) "partial-update")
+                      [:button.mlb-reset.post-edit
+                        {:title "Edit"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :class (utils/class-set {:not-hover (and (not @(::move-activity s))
+                                                                  (not @(::showing-dropdown s))
+                                                                  (not @(::share-dropdown s)))})
+                         :on-click (fn [e]
+                                     (utils/remove-tooltips)
+                                     (dis/dispatch! [:entry-edit activity-data]))}])
+                    (when (utils/link-for (:links activity-data) "share")
+                      [:div.activity-modal-share
+                        (when @(::share-dropdown s)
+                          [:div.share-dropdown
+                            [:div.triangle]
+                            [:ul.share-dropdown-menu
+                              (when (jwt/team-has-bot? (:team-id (dis/org-data)))
+                                [:li.share-dropdown-item
+                                  {:on-click (fn [e]
+                                               (reset! (::share-dropdown s) false)
+                                               ; open the activity-share-modal component
+                                               (dis/dispatch! [:activity-share-show :slack activity-data]))}
+                                  "Slack"])
                               [:li.share-dropdown-item
                                 {:on-click (fn [e]
                                              (reset! (::share-dropdown s) false)
                                              ; open the activity-share-modal component
                                              (dis/dispatch! [:activity-share-show :email activity-data]))}
-                                "Share Email"])
-                            (when (and (utils/link-for (:links activity-data) "share")
-                                       (jwt/team-has-bot? (:team-id (dis/org-data))))
+                                "Email"]
                               [:li.share-dropdown-item
                                 {:on-click (fn [e]
                                              (reset! (::share-dropdown s) false)
                                              ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                                "Share Slack"])]])
-                      [:button.mlb-reset.share-button
-                        {:on-click #(do
-                                     (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
-                        "Share"]]]]]]
+                                             (dis/dispatch! [:activity-share-show :link activity-data]))}
+                                "Link"]]])
+                        [:button.mlb-reset.share-button
+                          {:on-click #(do
+                                       (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
+                          "Share"]])]]]]
             ;; Right column
             (when show-comments?
               [:div.activity-right-column
