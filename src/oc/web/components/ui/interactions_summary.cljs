@@ -24,7 +24,7 @@
           {:class (utils/class-set {(str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction)) true})}
           (if (:reacted max-reaction)
             (if (> (:count max-reaction) 1)
-              (str "You and +" (dec (:count max-reaction)) " other" (when (> (dec (:count max-reaction)) 1) "s"))
+              (str "You and +" (dec (:count max-reaction)))
               (str "You reacted to this"))
             (str "+" (:count max-reaction)))]])))
 
