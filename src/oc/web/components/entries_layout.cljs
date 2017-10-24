@@ -117,7 +117,7 @@
                 (when (> (count entries-group) 4)
                   [:button.view-all-updates.mlb-reset
                     {:on-click #(router/nav! (oc-urls/board-filter-by-topic (or topic-slug "uncategorized")))}
-                    "View " (count entries-group) " updates"])]
+                    "View all updates"])]
               ;; First row:
               [:div.entries-cards-container-row.group
                 ; Render the first 2 entries
