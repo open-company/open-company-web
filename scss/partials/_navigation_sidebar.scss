@@ -6,6 +6,10 @@
     line-height: 1.71;
     color: $carrot_light_gray_3;
     text-decoration: none;
+
+    &.new {
+      @include avenir_B();
+    }
   }
 }
 
@@ -28,6 +32,10 @@
     font-size: 14px;
     line-height: 1.71;
     text-decoration: none;
+
+    &.new {
+      @include avenir_B();
+    }
   }
 }
 
@@ -210,14 +218,6 @@ div.left-navigation-sidebar {
           width: 133px;
           float: left;
           cursor: pointer;
-
-          &.new {
-            @include avenir_B();
-
-            &:hover {
-              @include avenir_B();
-            }
-          }
 
           .emojione {
             @include emoji-size(12);
