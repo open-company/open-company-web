@@ -200,7 +200,7 @@
                           "Delete"])]])
                 (when @(::move-activity s)
                   (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))
-          (activity-attachments activity-data)
+          (activity-attachments activity-data true)
           ; Topic tag button
           (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
