@@ -25,7 +25,7 @@ div.activity-modal-container {
   div.modal-wrapper {
     width: 1029px;
     max-height: 100vh;
-    min-height: 330px;
+    min-height: 450px;
     position: relative;
     margin: 0px auto;
 
@@ -179,7 +179,7 @@ div.activity-modal-container {
           flex-basis: 700px;
           width: 700px;
           max-height: 100vh;
-          min-height: 200px;
+          min-height: 378px;
           border-top-left-radius: 8px;
           border-bottom-left-radius: 8px;
 
@@ -192,7 +192,7 @@ div.activity-modal-container {
               position: relative;
               overflow-y: auto;
               max-height: calc(100vh - 65px - 74px);
-              min-height: 148px;
+              min-height: 304px;
 
               div.activity-modal-content-title {
                 margin-top: 32px;
