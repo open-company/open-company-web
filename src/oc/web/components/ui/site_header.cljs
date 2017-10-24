@@ -67,5 +67,9 @@
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               (if (jwt/jwt)
-                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Carrot Boards"]
-                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/sign-up-with-slack)} "Sign Up"])]]]]]])
+                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Boards"]
+                [:button.mlb-reset.mlb-get-started
+                  {:on-click #(if (utils/in? (:route @router/path) "login")
+                                (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                                (router/nav! oc-urls/sign-up-with-slack))}
+                "Get Started"])]]]]]])

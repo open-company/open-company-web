@@ -3,7 +3,8 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.mixins :refer (first-render-mixin)]))
 
 (defn dismiss-modal [s]
   (dis/dispatch! [:input [:media-input :media-video] :dismiss]))
@@ -77,16 +78,15 @@
           (dis/dispatch! [:input [:media-input :media-video] video-data])
           (close-clicked s true))))))
 
-(rum/defcs media-video-modal < (rum/local false ::first-render-done)
+(rum/defcs media-video-modal < rum/reactive
+                               ;; Locals
                                (rum/local false ::dismiss)
                                (rum/local "" ::video-url)
-                               rum/reactive
+                               ;; Derivatives
                                (drv/drv :current-user-data)
-                               {:after-render (fn [s]
-                                                (when (not @(::first-render-done s))
-                                                  (reset! (::first-render-done s) true))
-                                                s)
-                                :did-mount (fn [s]
+                               ;; Mixins
+                               first-render-mixin
+                               {:did-mount (fn [s]
                                             (utils/after 100
                                              #(when-let [input-field (rum/ref-node s "video-input")]
                                                 (.focus input-field)))
@@ -94,8 +94,8 @@
   [s]
   (let [current-user-data (drv/react s :current-user-data)]
     [:div.media-video-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-       :appear (and (not @(::dismiss s)) @(::first-render-done s))})}
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+       :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.modal-wrapper
         [:button.carrot-modal-close.mlb-reset
             {:on-click #(close-clicked s)}]

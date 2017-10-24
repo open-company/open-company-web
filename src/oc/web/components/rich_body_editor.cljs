@@ -106,35 +106,44 @@
 (defn media-video-add [s editable video-data]
   (if (= :dismiss video-data)
     (.addVideo editable nil nil nil nil)
-    (.addVideo editable (get-video-src video-data) (:type video-data) (:id video-data) (get-video-thumbnail video-data))))
+    (.addVideo editable (get-video-src video-data) (name (:type video-data)) (:id video-data) (get-video-thumbnail video-data))))
 
 ;; Photo
 
 (defn media-photo-add-error
   "Show an error alert view for failed uploads."
-  []
+  [s]
   (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "media-photo-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
-                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
+                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}
+        upload-progress-cb (:upload-progress-cb (first (:rum/args s)))]
+    (upload-progress-cb false)
+    (reset! (::upload-lock s) false)
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (defn media-photo-add-if-finished [s editable]
-  (let [image @(::media-photo s)]
+  (let [image @(::media-photo s)
+        upload-progress-cb (:upload-progress-cb (first (:rum/args s)))]
     (when (and (contains? image :url)
                (contains? image :width)
                (contains? image :height)
                (contains? image :thumbnail))
       (.addPhoto editable (:url image) (:thumbnail image) (:width image) (:height image))
       (reset! (::media-photo s) nil)
-      (reset! (::media-photo-did-success s) false))))
+      (reset! (::media-photo-did-success s) false)
+      (reset! (::upload-lock s) false)
+      (upload-progress-cb false))))
 
 (defn img-on-load [s editable url img]
-  (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
-  (gdom/removeNode img)
-  (media-photo-add-if-finished s editable))
+  (if (and url img)
+    (do
+      (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
+      (gdom/removeNode img)
+      (media-photo-add-if-finished s editable))
+    (media-photo-add-error s)))
 
 (defn media-photo-dismiss-picker
   "Called every time the image picke close, reset to inital state."
@@ -145,26 +154,54 @@
 
 (defn add-photo [s editable]
   (reset! (::media-photo s) true)
-  (iu/upload! {:accept "image/*"}
-   (fn [res]
-     (reset! (::media-photo-did-success s) true)
-     (let [url (gobj/get res "url")
-           img   (gdom/createDom "img")]
-       (set! (.-onload img) #(img-on-load s editable url img))
-       (set! (.-className img) "hidden")
-       (gdom/append (.-body js/document) img)
-       (set! (.-src img) url)
-       (reset! (::media-photo s) {:res res :url url})
-       (iu/thumbnail! url
-        (fn [thumbnail-url]
-         (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
-         (media-photo-add-if-finished s editable)))))
-   nil
-   (fn [err]
-     (media-photo-add-error))
-   (fn []
-     ;; Delay the check because this is called on cancel but also on success
-     (utils/after 1000 #(media-photo-dismiss-picker s editable)))))
+  (let [props (first (:rum/args s))
+        upload-progress-cb (:upload-progress-cb props)]
+    (iu/upload! {:accept "image/*"}
+     ;; success-cb
+     (fn [res]
+       (reset! (::media-photo-did-success s) true)
+       (let [url (gobj/get res "url")
+             img   (gdom/createDom "img")]
+         (set! (.-onload img) #(img-on-load s editable url img))
+         (set! (.-onerror img) #(img-on-load s editable nil nil))
+         (set! (.-className img) "hidden")
+         (gdom/append (.-body js/document) img)
+         (set! (.-src img) url)
+         (reset! (::media-photo s) {:res res :url url})
+         ;; if the image is a vector image
+         (if (or (= (string/lower (gobj/get res "mimetype")) "image/svg+xml")
+                 (string/ends-with? (string/lower (gobj/get res "filename")) ".svg"))
+           ;l use the same url for the thumbnail since the size doesn't matter
+           (do
+             (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
+             (media-photo-add-if-finished s editable))
+           ;; else create the thumbnail
+           (iu/thumbnail! url
+            (fn [thumbnail-url]
+              (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
+              (media-photo-add-if-finished s editable))
+            (fn [res progress])
+            (fn [res err]
+              (media-photo-add-error s))))))
+     ;; progress-cb
+     (fn [res progress])
+     ;; error-cb
+     (fn [err]
+       (media-photo-add-error s))
+     ;; close-cb
+     (fn []
+       ;; Delay the check because this is called on cancel but also on success
+       (utils/after 1000 #(media-photo-dismiss-picker s editable)))
+     ;; finished-cb
+     (fn [res])
+     ;; selected-cb
+     (fn [res]
+       (reset! (::upload-lock s) true)
+       (upload-progress-cb true))
+     ;; started-cb
+     (fn [res]
+       (reset! (::upload-lock s) true)
+       (upload-progress-cb true)))))
 
 ;; Picker cb
 
@@ -178,12 +215,6 @@
     (do (dis/dispatch! [:input [:media-input :media-chart] true]) (reset! (::media-chart s) true))
     (= type "attachment")
     (add-attachment s editable)))
-
-(defn body-placeholder []
-  (let [first-name (jwt/get-key :first-name)]
-    (if-not (empty? first-name)
-      (str "What's new, " first-name "?")
-      "What's new?")))
 
 (defn body-on-change [state]
   (when (not @(::did-change state))
@@ -201,7 +232,6 @@
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
-        body-placeholder (body-placeholder)
         buttons (if show-subtitle
                   ["custombold" "italic" "h2" "unorderedlist" "anchor"]
                   ["custombold" "italic" "unorderedlist" "anchor"])
@@ -219,8 +249,11 @@
                               :targetCheckbox false
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
-                             :cleanPastedHTML false}
-                 :placeholder #js {:text body-placeholder
+                             :cleanPastedHTML true
+                             :cleanAttrs #js ["class" "style" "alt" "dir"]
+                             :cleanTags #js ["meta" "video" "audio"]
+                             :unwrapTags #js ["div" "span" "label"]}
+                 :placeholder #js {:text "Start writing..."
                                    :hideOnClick true}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
     (reset! (::media-picker-ext s) media-picker-ext)
@@ -242,6 +275,8 @@
                                (rum/local false ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
+                               ;; Image upload lock
+                               (rum/local false ::upload-lock)
                                (drv/drv :media-input)
                                {:did-mount (fn [s]
                                              (utils/after 300 #(do
@@ -279,10 +314,12 @@
                                                 (when @(::editor s)
                                                   (.destroy @(::editor s)))
                                                 s)}
-  [s {:keys [initial-body on-change classes show-placeholder]}]
+  [s {:keys [initial-body on-change classes show-placeholder upload-progress-cb]}]
   [:div.rich-body-editor-container
     [:div.rich-body-editor
       {:ref "body"
        :content-editable true
-       :class (str classes (when (or (not show-placeholder) @(::did-change s)) " medium-editor-placeholder-hidden"))
+       :class (str classes
+               (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                                 :uploading @(::upload-lock s)}))
        :dangerouslySetInnerHTML (utils/emojify initial-body)}]])

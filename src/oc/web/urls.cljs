@@ -135,13 +135,13 @@
   ([org-slug board-slug topic-slug]
     (str (board org-slug board-slug) "/topic/" (name topic-slug))))
 
-;; Storyboards
+; ;; Drafts
 
-(defn drafts
-  ([]
-    (drafts (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/drafts")))
+; (defn drafts
+;   ([]
+;     (drafts (router/current-org-slug)))
+;   ([org-slug]
+;     (str (org org-slug) "/drafts")))
 
 ;; Entries
 
@@ -150,7 +150,7 @@
   ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
   ([entry-uuid] ( (router/current-org-slug) (router/current-board-slug) entry-uuid))
   ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
-  ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/update/" (name entry-uuid))))
+  ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/post/" (name entry-uuid))))
 
 ;; Stories
 
@@ -168,8 +168,10 @@
   ([board-slug story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
   ([org-slug board-slug story-uuid] (str (story org-slug board-slug story-uuid) "/edit")))
 
-(defn secure-story
+;; Secure activities
+
+(defn secure-activity
   "Secure url for story to show readonly view."
-  ([] (secure-story (router/current-org-slug) (router/current-activity-id)))
-  ([secure-id] (secure-story (router/current-org-slug) secure-id))
-  ([org-slug secure-id] (str (org org-slug) "/story/" secure-id)))
+  ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
+  ([secure-id] (secure-activity (router/current-org-slug) secure-id))
+  ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))

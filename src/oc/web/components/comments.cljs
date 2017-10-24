@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.object :as gobj]
@@ -17,46 +18,73 @@
   (let [author (:author c)]
     [:div.comment
       [:div.comment-header.group
-        [:div.comment-avatar.left
+        [:div.comment-avatar
           {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
-        [:div.comment-author.left
-          (:name author)]
-        [:div.comment-timestamp.left
-          (utils/time-since (:created-at c))]]
+        [:div.comment-author-timestamp
+          [:div.comment-author
+            (:name author)]
+          [:div.comment-timestamp
+            (utils/time-since (:created-at c))]]]
       [:p.comment-body.group
         {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
       [:div.comment-footer.group]]))
 
 (defn add-comment-content [add-comment-div]
   (let [inner-html (.-innerHTML add-comment-div)
-        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))]
-    with-emojis-html))
+        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
+        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
+        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
+        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
+        final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
+    final-text))
 
-(rum/defcs add-comment < (rum/local false ::show-footer)
-                         (rum/local false ::input)
-                         (rum/local false ::dom-node-add)
-                         (rum/local false ::dom-node-remove)
-                         (rum/local false ::dom-char-modified)
+(defn add-emoji-cb [s]
+  (reset! (::keep-expanded s) false))
+
+(rum/defcs add-comment < (rum/local false ::expanded)
+                         (rum/local false ::keep-expanded)
+                         (rum/local false ::show-successful)
                          rum/reactive
                          (drv/drv :current-user-data)
+                         (drv/drv :comment-add-finish)
                          rum/static
                          {:did-mount (fn [s]
                                        (utils/after 2500 #(js/emojiAutocomplete))
-                                       s)}
+                                       s)
+                          :after-render (fn [s]
+                                          (when (and (not @(::show-successful s))
+                                                     @(drv/get-ref s :comment-add-finish))
+                                            (utils/after 100 (fn []
+                                              (reset! (::show-successful s) true)
+                                              (utils/after 2500 (fn []
+                                               (dis/dispatch! [:input [:comment-add-finish] false])
+                                               (reset! (::show-successful s) false))))))
+                                          s)}
   [s activity-data did-expand-cb]
-  (let [show-footer (::show-footer s)
+  (let [show-footer (::expanded s)
         fixed-show-footer @show-footer
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box
       {:class (if fixed-show-footer "expanded" "")}
+      (when @(::show-successful s)
+        [:div.successfully-posted
+          "Comment was posted successfully!"])
       (user-avatar-image current-user-data)
       [:div.add-comment-internal
-        [:div.add-comment.emoji-autocomplete
+        [:div.add-comment.emoji-autocomplete.emojiable
           {:ref "add-comment"
            :content-editable true
            :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
-           :on-focus (fn [_] (reset! show-footer true) (when (fn? did-expand-cb) (did-expand-cb true)))
-           :on-blur #(utils/after 100 (fn [] (reset! show-footer false) (when (fn? did-expand-cb) (did-expand-cb false))))
+           :on-focus (fn [_]
+                       (reset! show-footer true)
+                       (when (fn? did-expand-cb) (did-expand-cb true)))
+           :on-blur #(when (empty? (.-innerHTML (rum/ref-node s "add-comment")))
+                      (utils/after 100
+                       (fn []
+                         (when-not @(::keep-expanded s)
+                           (reset! show-footer false)
+                           (when (fn? did-expand-cb)
+                             (did-expand-cb false))))))
            :placeholder "Add a comment..."}]
         [:div.add-comment-footer.group
           {:style {:display (if fixed-show-footer "block" "none")}}
@@ -64,8 +92,16 @@
             [:button.btn-reset.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
                             (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                            (set! (.-innerHTML add-comment-div) ""))}
-              "Add"]]]]]))
+                            (set! (.-innerHTML add-comment-div) "")
+                            (reset! show-footer false)
+                            (when (fn? did-expand-cb)
+                              (did-expand-cb false)))}
+              "Post"]]]]
+      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                     :width 20
+                     :height 20
+                     :will-show-picker #(reset! (::keep-expanded s) true)
+                     :will-hidepicker #(reset! (::keep-expanded s) false)})]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
@@ -75,9 +111,9 @@
       (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
 
 (defn add-comment-expand-cb [s expanding?]
+  (reset! (::add-comment-focus s) expanding?)
   (when expanding?
-    (utils/after 200 #(scroll-to-bottom s)))
-  (reset! (::add-comment-focus s) expanding?))
+    (utils/after 200 #(scroll-to-bottom s))))
 
 (defn load-comments-if-needed [s]
   (let [activity-data (first (:rum/args s))]
@@ -99,11 +135,8 @@
                                       (load-comments-if-needed s)
                                       s)
                        :after-render (fn [s]
-                                       (let [comments (js/$ ".comments")
-                                             comments-internal-scroll (js/$ ".comments-internal-scroll")
-                                             comments-internal-scroll-final-height (- (.height comments) (if @(::add-comment-focus s) 130 65))
-                                             next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") comments-internal-scroll-final-height)]
-                                         (.css comments-internal-scroll #js {:height (str comments-internal-scroll-final-height "px")})
+                                       (let [comments-internal-scroll (js/$ ".comments-internal-scroll")
+                                             next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") (.height comments-internal-scroll))]
                                          ;; Show the gradient at the top only if there are at least 5 comments
                                          ;; or the container has some scroll
                                          (when (not= @(::needs-gradient s) next-needs-gradient)
@@ -113,24 +146,27 @@
                                        s)}
   [s activity-data]
   (let [comments-data (drv/react s :activity-comments-data)
+        sorted-comments (:sorted-comments comments-data)
         needs-gradient @(::needs-gradient s)]
-    (if (:loading comments-data)
+    (if (and (zero? (count sorted-comments))
+             (or (:loading comments-data)
+                 (not (contains? comments-data :sorted-comments))))
       [:div.comments
         (small-loading)]
       [:div.comments
         (when needs-gradient
           [:div.top-gradient])
         [:div.comments-internal
-          {:class (utils/class-set {:add-comment-focus (and (pos? (count comments-data)) @(::add-comment-focus s))
-                                    :empty (zero? (count comments-data))})}
-          (if (pos? (count comments-data))
+          {:class (utils/class-set {:add-comment-focus (and (pos? (count sorted-comments)) @(::add-comment-focus s))
+                                    :empty (zero? (count sorted-comments))})}
+          (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
-              (for [c comments-data]
-                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
-              ]
-            [:div.comments-internal-empty
-              [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
-              [:div "No comments yet"]
-              [:div "Jump in and let everybody know"]
-              [:div "what you think!"]])
+              (for [c sorted-comments]
+                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
+            (when-not @(::add-comment-focus s)
+              [:div.comments-internal-empty
+                [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
+                [:div "No comments yet"]
+                [:div "Jump in and let everybody know"]
+                [:div "what you think!"]]))
           (add-comment activity-data (partial add-comment-expand-cb s))]])))

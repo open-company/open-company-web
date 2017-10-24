@@ -39,8 +39,10 @@
 
 ;; Get the board to show counting the last accessed and the last created
 
+(def default-board "welcome")
+
 (defn get-default-board [org-data]
-  (let [last-board-slug (cook/get-cookie (router/last-board-cookie (:slug org-data)))]
+  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
     (if (= last-board-slug "all-posts")
       {:slug "all-posts"}
       (let [boards (:boards org-data)
@@ -48,11 +50,8 @@
         (if board
           ; Get the last accessed board from the saved cookie
           board
-          (let [sorted-boards (vec (sort-by :name (vec (filter #(= (:type %) "entry") boards))))
-                sorted-stories (vec (sort-by :name (vec (filter #(= (:type %) "story") boards))))]
-            (if (pos? (count sorted-boards))
-              (first sorted-boards)
-              (first sorted-stories))))))))
+          (let [sorted-boards (vec (sort-by :name boards))]
+            (first sorted-boards)))))))
 
 (defmethod dispatcher/action :entry-point
   [db [_ {:keys [success collection]}]]
@@ -66,9 +65,9 @@
           (and (:email-lander-check-team-redirect db)
                (zero? (count orgs)))
           (router/nav! oc-urls/sign-up-team)
-          ; If I have the secure-id i need to load the story only
-          (router/current-secure-story-id)
-          (api/get-secure-story (router/current-org-slug) (router/current-secure-story-id))
+          ; If I have the secure-id i need to load the activity only
+          (router/current-secure-activity-id)
+          (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
           ; If i have an org slug let's load the org data
           (router/current-org-slug)
           (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
@@ -133,8 +132,8 @@
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
-        (when (not (utils/in? (:route @router/path) "story"))
-          (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))
+        (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+          (api/get-board board-link))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
@@ -145,7 +144,8 @@
            (not (utils/in? (:route @router/path) "org-settings-team"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "email-verification"))
-           (not (utils/in? (:route @router/path) "story-edit"))
+           ;; Drafts
+           ; (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
@@ -226,13 +226,15 @@
 (defmethod dispatcher/action :board
   [db [_ board-data]]
   (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
-       fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))]
+       fixed-board-data (utils/fix-board board-data)]
     (when is-currently-shown
       
       (when (and (router/current-activity-id)
                  (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-                 (or (not (utils/in? (:route @router/path) "story-edit"))
-                     (= (:slug board-data) "drafts")))
+                 ;; Drafts
+                 ; (or (not (utils/in? (:route @router/path) "story-edit"))
+                 ;     (= (:slug board-data) "drafts"))
+                 )
         (router/redirect-404!))
       
       (when (and (string? (:board-filters db))
@@ -259,18 +261,20 @@
                                      (:entry-editing db))
                               old-board-data
                               fixed-board-data)
-          story-editing (when (and (utils/in? (:route @router/path) "story-edit")
-                                   is-currently-shown
-                                   (router/current-activity-id)
-                                   (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-                          (get (:fixed-items fixed-board-data) (router/current-activity-id)))
+          ;; Drafts
+          ; story-editing (when (and (utils/in? (:route @router/path) "story-edit")
+          ;                          is-currently-shown
+          ;                          (router/current-activity-id)
+          ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
+          ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
           next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
-          with-story-editing (if story-editing
-                                (assoc next-db :story-editing story-editing)
-                                next-db)
+          ;; Drafts
+          ; with-story-editing (if story-editing
+          ;                       (assoc next-db :story-editing story-editing)
+          ;                       next-db)
           without-loading (if is-currently-shown
-                            (dissoc with-story-editing :loading)
-                            with-story-editing)]
+                            (dissoc next-db :loading)
+                            next-db)]
       without-loading)))
 
 (defmethod dispatcher/action :auth-settings
@@ -834,16 +838,18 @@
   (api/get-comments activity-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
+        activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
-    (assoc-in db comments-key {:loading true})))
+    (assoc-in db (vec (conj (vec (butlast comments-key)) :loading)) true)))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
-  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-story-id))
+  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
         comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) fixed-activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
-    (assoc-in db comments-key sorted-comments)))
+    (-> db
+      (assoc-in comments-key sorted-comments)
+      (assoc-in (vec (conj (vec (butlast comments-key)) :loading)) false))))
 
 (defmethod dispatcher/action :comment-add
   [db [_ activity-data comment-body]]
@@ -862,7 +868,7 @@
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [activity-uuid]}]]
   (api/get-comments activity-uuid)
-  db)
+  (assoc db :comment-add-finish true))
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ activity-uuid reaction-data]]
@@ -909,14 +915,14 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
-        is-secure-story (router/current-secure-story-id)
-        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        is-secure-activity (router/current-secure-activity-id)
+        secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
-    ;; If looking at a secure story discard all events for other activities
-    (if (and is-secure-story
-             (not= (:uuid secure-story-data) activity-uuid))
+    ;; If looking at a secure activity discard all events for other activities
+    (if (and is-secure-activity
+             (not= (:uuid secure-activity-data) activity-uuid))
       db
       (if entry-data
         ; If the entry is present in the local state
@@ -970,13 +976,13 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-story-id) (router/current-secure-story-id) activity-uuid)
-        is-secure-story (router/current-secure-story-id)
-        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        is-secure-activity (router/current-secure-activity-id)
+        secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
-    (if (and is-secure-story
-             (not= (:uuid secure-story-data) activity-uuid))
+    (if (and is-secure-activity
+             (not= (:uuid secure-activity-data) activity-uuid))
       db
       (if (and entry-data (not (empty? (:reactions entry-data))))
         ; If the entry is present in the local state and it has reactions
@@ -1023,9 +1029,7 @@
   [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
    #(let [from-all-posts (= (router/current-board-slug) "all-posts")
-          activity-url (if (= activity-type "story")
-                         (oc-urls/story board-slug activity-uuid)
-                         (oc-urls/entry board-slug activity-uuid))]
+          activity-url (oc-urls/entry board-slug activity-uuid)]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (-> db
     (assoc :activity-modal-fade-in activity-uuid)
@@ -1131,19 +1135,20 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [temp-uuid activity-data]}]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+  (let [board-slug (:board-slug activity-data)
+        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
-      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))
-  ; Add the new activity into the board
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        board-data (get-in db board-key)
-        fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
-        fixed-items (if (not (empty? temp-uuid))
-                      (dissoc (:fixed-items board-data) temp-uuid)
-                      (:fixed-items board-data))
-        next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
-    (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)))
+      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+    ; Add the new activity into the board
+    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+          board-data (get-in db board-key)
+          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          fixed-items (if (not (empty? temp-uuid))
+                        (dissoc (:fixed-items board-data) temp-uuid)
+                        (:fixed-items board-data))
+          next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
+      (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1157,9 +1162,11 @@
 
 (defmethod dispatcher/action :activity-delete/finish
   [db [_]]
-  (if (utils/in? (:route @router/path) "story-edit")
-    (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
-    (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+  ;; Drafts
+  ; (if (utils/in? (:route @router/path) "story-edit")
+  ;   (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
+  ;   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+  (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
   db)
 
 (defmethod dispatcher/action :alert-modal-show
@@ -1175,10 +1182,10 @@
   (dissoc db :alert-modal))
 
 (defmethod dispatcher/action :board-edit
-  [db [_ initial-board-data type]]
+  [db [_ initial-board-data]]
   (let [fixed-board-data (if initial-board-data
                             initial-board-data
-                            {:name "" :slug "" :access "team" :type (or type "entry")})]
+                            {:name "" :slug "" :access "team"})]
     (assoc db :board-editing fixed-board-data)))
 
 (defmethod dispatcher/action :board-edit-save
@@ -1186,7 +1193,7 @@
   (let [board-data (:board-editing db)]
     (if (and (string/blank? (:slug board-data))
              (not (string/blank? (:name board-data))))
-      (api/create-board (:name board-data) (:access board-data) (or (:type board-data) "entry"))
+      (api/create-board (:name board-data) (:access board-data))
       (api/patch-board board-data)))
   db)
 
@@ -1195,7 +1202,7 @@
   (let [org-slug (router/current-org-slug)
         board-slug (:slug board-data)
         board-key (dispatcher/board-data-key org-slug (:slug board-data))
-        fixed-board-data (if (= (:type board-data) "story") (utils/fix-storyboard board-data) (utils/fix-board board-data))]
+        fixed-board-data (utils/fix-board board-data)]
     (api/get-org (dispatcher/org-data))
     (if (not= (:slug board-data) (router/current-board-slug))
       ;; If creating a new board, redirect to that board page
@@ -1277,82 +1284,6 @@
       (assoc-in db all-posts-key new-all-posts))
     db))
 
-(defmethod dispatcher/action :story-get
-  [db [_]]
-  (when (router/current-activity-id)
-    (let [story-uuid (router/current-activity-id)
-          story-data (dispatcher/activity-data story-uuid)
-          story-link (utils/link-for (:links story-data) "self")
-          fixed-story-link (or story-link {:href (str "/orgs/" (router/current-org-slug) "/boards/" (router/current-board-slug) "/stories/" story-uuid)
-                                           :accept "application/vnd.open-company.story.v1+json"})]
-      (api/get-story story-uuid fixed-story-link)))
-  (assoc db :story-loading true))
-
-(defmethod dispatcher/action :story-get/finish
-  [db [_ status {:keys [story-uuid story-data]}]]
-  (when (= status 404)
-    (router/redirect-404!))
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        story-key (if board-slug (dispatcher/activity-key org-slug board-slug story-uuid) (dispatcher/secure-activity-key org-slug story-uuid))
-        fixed-story-data (utils/fix-story story-data {:slug (or (:storyboard-slug story-data) board-slug) :name (:storyboard-name story-data)})
-        story-editing-data (if (utils/in? (:route @router/path) "story-edit")
-                              fixed-story-data
-                              nil)]
-    (when (jwt/jwt)
-      (when-let [ws-link (utils/link-for (:links fixed-story-data) "interactions")]
-        (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-    (-> db
-      (dissoc :story-loading)
-      (assoc-in story-key fixed-story-data)
-      (assoc :story-editing story-editing-data))))
-
-(defmethod dispatcher/action :story-create
-  [db [_ board-data]]
-  (api/create-story board-data)
-  db)
-
-(defmethod dispatcher/action :story-create/finish
-  [db [_ board-slug story-data]]
-  (utils/after 1000 #(router/nav! (oc-urls/story-edit (router/current-org-slug) board-slug (:uuid story-data))))
-  (let [fixed-story (utils/fix-story story-data board-slug)]
-    (assoc db :story-editing fixed-story)))
-
-(defmethod dispatcher/action :draft-autosave
-  [db [_]]
-  (api/autosave-draft (:story-editing db) nil)
-  (assoc-in db [:story-editing :autosaving] true))
-
-(defmethod dispatcher/action :draft-autosave/finish
-  [db [_ share-data]]
-  (let [story-editing (:story-editing db)]
-    (when share-data
-      ;; Needs to publish the story
-      (when (= (:status story-editing) "draft")
-        (api/share-story story-editing share-data)))
-    ;; User when the user changes the board of a story
-    (when (:redirect story-editing)
-      (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug story-editing) (:uuid story-editing))))
-    (assoc db :story-editing (dissoc story-editing :autosaving :redirect))))
-
-(defmethod dispatcher/action :story-share
-  [db [_ share-data]]
-  ;; Make a last autosave to make sure we have everything saved
-  (api/autosave-draft (:story-editing db) share-data)
-  ;; Remember to publish when autosave finishes
-  db)
-
-(defmethod dispatcher/action :story-reshare
-  [db [_ share-data]]
-  ;; Make a last autosave to make sure we have everything saved
-  (api/share-story (dispatcher/activity-data) share-data)
-  ;; Remember to publish when autosave finishes
-  (assoc db :story-reshare share-data))
-
-(defmethod dispatcher/action :story-share/finish
-  [db [_ story-data]]
-  (assoc db :story-editing-published-url (utils/fix-story story-data (:storyboard-slug story-data))))
-
 (defmethod dispatcher/action :org-edit
   [db [_ org-data]]
   (assoc db :org-editing org-data))
@@ -1379,14 +1310,12 @@
   [db [_]]
   (dissoc db :org-settings))
 
-(defmethod dispatcher/action :activity-board-move
+(defmethod dispatcher/action :activity-move
   [db [_ activity-data board-data]]
-  (let [board-key (if (= (:type activity-data) "story") :storyboard-slug :board-slug)
-        fixed-activity-data (-> activity-data
-                              (assoc board-key (:slug board-data))
-                              (dissoc (if (= (:type activity-data) "entry") :storyboard-slug :board-slug)))]
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+        fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
     (api/update-entry fixed-activity-data)
-    (if (utils/in? (:route @router/path) "all-posts")
+    (if is-all-posts
       (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-posts (:uuid activity-data))]
         (assoc-in db next-activity-data-key fixed-activity-data))
       (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
@@ -1423,3 +1352,53 @@
     (when (> (- now latest-auth-settings) reload-time)
       (api/get-auth-settings)))
   db)
+
+(defmethod dispatcher/action :onboard-overlay-show
+  [db [_]]
+  (assoc db :show-onboard-overlay true))
+
+(defmethod dispatcher/action :onboard-overlay-hide
+  [db [_]]
+  (dissoc db :show-onboard-overlay))
+
+(defmethod dispatcher/action :activity-share-show
+  [db [_ medium activity-data]]
+  (-> db
+    (assoc :activity-share {:medium medium :share-data activity-data})
+    (dissoc :activity-shared-data)))
+
+(defmethod dispatcher/action :activity-share-hide
+  [db [_ activity-data]]
+  (dissoc db :activity-share))
+
+(defmethod dispatcher/action :activity-share
+  [db [_ share-data]]
+  (api/share-activity (:share-data (:activity-share db)) share-data)
+  (assoc db :activity-share-data share-data))
+
+(defmethod dispatcher/action :activity-share/finish
+  [db [_ shared-data]]
+  (assoc db :activity-shared-data (utils/fix-entry shared-data (:board-slug shared-data) nil)))
+
+(defmethod dispatcher/action :made-with-carrot-modal-show
+  [db [_]]
+  (assoc db :made-with-carrot-modal true))
+
+(defmethod dispatcher/action :made-with-carrot-modal-hide
+  [db [_]]
+  (dissoc db :made-with-carrot-modal))
+
+(defmethod dispatcher/action :activity-get/finish
+  [db [_ status {:keys [activity-uuid activity-data]}]]
+  (when (= status 404)
+    (router/redirect-404!))
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
+        fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+    (when (jwt/jwt)
+      (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
+        (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+    (-> db
+      (dissoc :activity-loading)
+      (assoc-in activity-key fixed-activity-data))))

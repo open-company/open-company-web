@@ -9,6 +9,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -17,7 +18,7 @@
             [goog.events.EventType :as EventType]))
 
 (defn calc-edit-entry-modal-height [s]
-  (when @(::first-render-done s)
+  (when @(:first-render-done s)
     (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
       (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
         (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
@@ -30,10 +31,10 @@
   (utils/after 180 #(dismiss-modal)))
 
 (defn cancel-clicked [s]
-  (if (:has-changes @(drv/get-ref s :entry-editing))
+  (if @(::uploading-media s)
     (let [alert-data {:icon "/img/ML/trash.svg"
-                      :action "dismiss-edit-dirty-data"
-                      :message (str "Cancel without saving your changes?")
+                      :action "dismiss-edit-uploading-media"
+                      :message (str "Cancel before finishing upload?")
                       :link-button-title "No"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
@@ -42,7 +43,19 @@
                                           (real-close s))
                       }]
       (dis/dispatch! [:alert-modal-show alert-data]))
-    (real-close s)))
+    (if (:has-changes @(drv/get-ref s :entry-editing))
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "dismiss-edit-dirty-data"
+                        :message (str "Cancel without saving your changes?")
+                        :link-button-title "No"
+                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :solid-button-title "Yes"
+                        :solid-button-cb #(do
+                                            (dis/dispatch! [:alert-modal-hide])
+                                            (real-close s))
+                        }]
+        (dis/dispatch! [:alert-modal-show alert-data]))
+      (real-close s))))
 
 (defn unique-slug [topics topic-name]
   (let [slug (atom (s/slug topic-name))]
@@ -102,22 +115,27 @@
       (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
 
 (rum/defcs entry-edit < rum/reactive
+                        ;; Derivatives
                         (drv/drv :entry-edit-topics)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
-                        (rum/local false ::first-render-done)
+                        ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
                         (rum/local "" ::new-topic)
                         (rum/local false ::focusing-create-topic)
-                        (rum/local false ::remove-no-scroll)
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
+                        (rum/local nil ::uploading-media)
+                        ;; Mixins
+                        mixins/no-scroll-mixin
+                        mixins/first-render-mixin
+
                         {:will-mount (fn [s]
                                        (let [entry-editing @(drv/get-ref s :entry-editing)
                                              board-filters @(drv/get-ref s :board-filters)
@@ -137,25 +155,13 @@
                                                 (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
                                        s)
                          :did-mount (fn [s]
-                                      ;; Add no-scroll to the body to avoid scrolling while showing this modal
-                                      (let [body (sel1 [:body])]
-                                        (when-not (dommy/has-class? body :no-scroll)
-                                          (reset! (::remove-no-scroll s) true)
-                                          (dommy/add-class! (sel1 [:body]) :no-scroll)))
                                       (utils/after 300 #(setup-headline s))
                                       (utils/to-end-of-content-editable (rum/ref-node s "headline"))
                                       s)
                          :before-render (fn [s]
                                           (calc-edit-entry-modal-height s)
                                           s)
-                         :after-render (fn [s]
-                                         (when (not @(::first-render-done s))
-                                           (reset! (::first-render-done s) true))
-                                         s)
                          :will-unmount (fn [s]
-                                         ;; Remove no-scroll class from the body tag
-                                         (when @(::remove-no-scroll s)
-                                           (dommy/remove-class! (sel1 [:body]) :no-scroll))
                                          (when @(::body-editor s)
                                            (.destroy @(::body-editor s))
                                            (reset! (::body-editor s) nil))
@@ -173,8 +179,8 @@
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)]
     [:div.entry-edit-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(::first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(::first-render-done s))})
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})
        :on-click #(when (and (not (:has-changes entry-editing))
                              (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
                     (cancel-clicked s))}
@@ -274,6 +280,8 @@
                              :show-placeholder (not (contains? entry-editing :links))
                              :show-h2 true
                              :dispatch-input-key :entry-editing
+                             :upload-progress-cb (fn [is-uploading?]
+                                                   (reset! (::uploading-media s) is-uploading?))
                              :media-config ["photo" "video" "chart" "attachment" "divider-line"]
                              :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]

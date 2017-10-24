@@ -10,12 +10,6 @@ div.orgs-dropdown {
     padding: 0;
     margin: 0;
 
-    &:hover {
-      &.dropdown-toggle:after {
-        opacity: 1;
-      }
-    }
-
     &.dropdown-toggle:after {
       position: absolute;
       top: 8px;
@@ -24,7 +18,6 @@ div.orgs-dropdown {
       content: "\f078";
       color: $oc_gray_5;
       font-size: 14px;
-      opacity: 0;
     }
   }
 

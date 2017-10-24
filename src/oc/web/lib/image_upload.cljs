@@ -62,7 +62,7 @@
           (when (= (count files-uploaded)1)
             (success-cb (get files-uploaded 0))))))))
 
-(defn thumbnail! [fs-url & [success-cb error-cb]]
+(defn thumbnail! [fs-url & [success-cb progress-cb error-cb]]
   (let [fs-client (init-filestack)
         opts (clj->js {:resize {
                         :fit "crop"
@@ -70,9 +70,29 @@
                         :height 72
                         :align "faces"}})
        transformed-url (.transform fs-client fs-url opts)
-       storing-task (.storeURL fs-client transformed-url (clj->js store-to))]
+       fixed-success-cb (fn [res]
+                          (when (fn? success-cb)
+                            (success-cb res)))
+       fixed-progress-cb (fn [res progress]
+                           (when (fn? progress-cb)
+                             (progress-cb res progress)))
+       fixed-error-cb (fn [res err]
+                        (when (fn? error-cb)
+                          (error-cb res err)))
+       storing-task (.storeURL fs-client
+                     ;; transformed image
+                     transformed-url
+                     ;; store options
+                     (clj->js store-to)
+                     ;; onSuccess
+                     fixed-success-cb
+                     ;; onError
+                     fixed-error-cb
+                      ;; onProgress
+                      fixed-progress-cb)]
     (try
-      (.then storing-task
+      (.then
+        storing-task
         (fn [res]
           (let [url (gobj/get res "url")]
             (when (fn? success-cb)
