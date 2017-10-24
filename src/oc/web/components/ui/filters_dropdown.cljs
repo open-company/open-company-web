@@ -30,16 +30,17 @@
         topic-data (when (string? board-filters)
                      (utils/get-topic (:topics board-data) board-filters))]
     [:div.filters-dropdown.group
-      {:class (when topic-data "filtering-by-topic")}
-      (if topic-data
+      {:class (when (string? board-filters) "filtering-by-topic")}
+      (if (string? board-filters)
         [:div.topic-filter-center
           [:label "Viewing"]
           [:div.topic-filter
-            {:on-click #(router/nav!
+            {:class (when-not topic-data "no-topic")
+             :on-click #(router/nav!
                           (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:slug board-data)))) :by-topic)
                             (oc-urls/board-sort-by-topic)
                             (oc-urls/board)))}
-            (:name topic-data)]]
+            (or (:name topic-data) "No topic")]]
         [:button.mlb-reset.filters-dropdown-button.choice
           {:type "button"
            :on-click #(reset! (::show-filters-dropdown s) (not @(::show-filters-dropdown s)))}

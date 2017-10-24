@@ -31,6 +31,10 @@ div.filters-dropdown {
       background-repeat: no-repeat;
       @include avenir_H();
       font-size: 12px;
+
+      &.no-topic {
+        font-style: italic;
+      }
     }
   }
 
