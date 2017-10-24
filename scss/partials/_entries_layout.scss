@@ -45,11 +45,9 @@ div.entries-layout {
         border-radius: 10px;
 
         &:hover {
-          background-color: $carrot_light_purple;
-          background-image: cdnUrl("/img/ML/add_topic_bt_purple.svg");
+          background-color: $carrot_green_2;
+          background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
         }
-
-        @include preload_image(cdnUrl("/img/ML/add_topic_bt_purple.svg"));
       }
 
       button.view-all-updates {
