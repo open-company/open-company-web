@@ -296,7 +296,7 @@ div.entry-edit-modal-container {
           &:empty:before {
             content: attr(placeholder);
             display: block;
-            color: $carrot_light_gray_1 !important;
+            color: #8A8E94 !important;
             font-style: none;
           }
         }
@@ -325,7 +325,7 @@ div.entry-edit-modal-container {
             @include activity-attachment(true);
 
             &.medium-editor-placeholder:after {
-              color: #D0D1D4 !important;
+              color: #8A8E94 !important;
             }
 
             * {
