@@ -244,7 +244,7 @@
 ;               {:value (:email (:signup-with-email (rum/react dis/app-state)))
 ;                :id "sign-up-email"
 ;                :on-change #(dis/dispatch! [:input [:signup-with-email :email] (.-value (sel1 [:input.email]))])
-;                :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+;                :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
 ;                :placeholder "email@example.com"
 ;                :type "email"
 ;                :tabIndex 3
