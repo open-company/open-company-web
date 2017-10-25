@@ -77,6 +77,7 @@
                             (rum/local default-min-modal-height ::activity-modal-height)
                             (rum/local false ::share-dropdown)
                             (rum/local nil ::window-click)
+                            (rum/local false ::show-bottom-border)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -102,6 +103,14 @@
                                                                                       (when (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-modal-share])))
                                                                                         (reset! (::share-dropdown s) false)))))
                                           s)
+                            :after-render (fn [s]
+                                            (when @(:first-render-done s)
+                                              (let [wh (.-innerHeight js/window)
+                                                    activity-modal (rum/ref-node s "activity-modal")
+                                                    next-show-bottom-border (>= (.-clientHeight activity-modal) wh)]
+                                                (when (not= @(::show-bottom-border s) next-show-bottom-border)
+                                                  (reset! (::show-bottom-border s) next-show-bottom-border))))
+                                            s)
                             :will-unmount (fn [s]
                                             ;; Remove window resize listener
                                             (when @(::window-resize-listener s)
@@ -129,7 +138,8 @@
         [:button.carrot-modal-close.mlb-reset
           {:on-click #(close-clicked s)}]
         [:div.activity-modal.group
-          {:class (str "activity-modal-" (:uuid activity-data))}
+          {:ref "activity-modal"
+           :class (str "activity-modal-" (:uuid activity-data))}
           [:div.activity-modal-header.group
             [:div.activity-modal-header-left
               (user-avatar-image (first (:author activity-data)))
@@ -197,8 +207,7 @@
                     {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                      :class (when (empty? (:headline activity-data)) "no-headline")}]]
                 [:div.activity-modal-footer.group
-                  {:class (when (and @(:first-render-done s)
-                                     (>= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
+                  {:class (when @(::show-bottom-border s) "scrolling-content")}
                   (reactions activity-data)
                   [:div.activity-modal-footer-right
                     (when (utils/link-for (:links activity-data) "partial-update")
