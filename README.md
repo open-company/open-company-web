@@ -236,9 +236,11 @@ provided in the table below:
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
+|  :entry-modal-save | UI | Save editing from modal. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
 |  :entry-point-get | UI | Load the storage entry point passing some flags to add to the app-state. |
 |  :entry-save | UI | Save the edited entry. |
+|  :entry-save/failed | API | Save entry reuqest finish but failed. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
