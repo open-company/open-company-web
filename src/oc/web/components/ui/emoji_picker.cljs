@@ -121,5 +121,5 @@
                                                            (remove-markers s)
                                                            (reset! visible false)
                                                            (.focus @last-active-element)
-                                                           (when add-emoji-cb
+                                                           (when (fn? add-emoji-cb)
                                                               (add-emoji-cb @last-active-element emoji)))}))]]))

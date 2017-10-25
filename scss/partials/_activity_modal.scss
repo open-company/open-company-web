@@ -191,7 +191,7 @@ div.activity-modal-container {
               width: 100%;
               position: relative;
               overflow-y: auto;
-              max-height: calc(100vh - 72px - 74px); // Total window height less the header and the footer
+              max-height: calc(100vh - 72px - 96px); // Total window height less the header and the footer
               min-height: 304px;
 
               div.activity-modal-content-title {
@@ -232,7 +232,7 @@ div.activity-modal-container {
 
             div.activity-modal-footer {
               padding: 24px 20px 22px 32px;
-              height: 74px;
+              height: 96px;
 
               &.scrolling-content {
                 border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
