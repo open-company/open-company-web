@@ -44,7 +44,7 @@
         [:div.about-links
           [:a.about-link
             {:href oc-urls/about
-             :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))}
+             :on-click #(do (utils/event-stop %) (dis/dispatch! [:about-carrot-modal-hide]) (router/nav! oc-urls/about))}
             "Company"]
           [:a.about-link
             {:href oc-urls/help}

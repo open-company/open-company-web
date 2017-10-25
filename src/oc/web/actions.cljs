@@ -1335,7 +1335,8 @@
 
 (defmethod dispatcher/action :initial-loads
   [db [_]]
-  (let [force-refresh (utils/in? (:route @router/path) "org")
+  (let [force-refresh (or (utils/in? (:route @router/path) "org")
+                          (utils/in? (:route @router/path) "login"))
         latest-entry-point (if (or force-refresh (nil? (:latest-entry-point db))) 0 (:latest-entry-point db))
         latest-auth-settings (if (or force-refresh (nil? (:latest-auth-settings db))) 0 (:latest-auth-settings db))
         now (.getTime (js/Date.))
