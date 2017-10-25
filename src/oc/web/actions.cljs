@@ -758,7 +758,7 @@
   [db [_]]
   (let [org-data (:org-editing db)]
     (when-not (string/blank? (:name org-data))
-      (api/create-org (:name org-data) (:logo-url org-data))))
+      (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data))))
   (dissoc db :latest-entry-point :latest-auth-settings))
 
 (defmethod dispatcher/action :private-board-add

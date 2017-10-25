@@ -450,12 +450,12 @@
                    (not (s/blank? redirect-url)))
           (router/redirect! redirect-url))))))
 
-(defn create-org [org-name logo-url]
+(defn create-org [org-name logo-url logo-width logo-height]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
         with-logo (if-not (empty? logo-url)
-                    (assoc org-data :logo-url logo-url)
+                    (merge org-data {:logo-url logo-url :logo-width logo-width :logo-height logo-height})
                     org-data)]
     (when (and org-name create-org-link)
       (storage-http (method-for-link create-org-link) (relative-href create-org-link)
