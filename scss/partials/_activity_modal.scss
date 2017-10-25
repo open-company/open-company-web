@@ -178,7 +178,7 @@ div.activity-modal-container {
           flex-shrink: 0;
           flex-basis: 700px;
           width: 700px;
-          max-height: 100vh;
+          max-height: calc(100vh - 72px);
           min-height: 378px;
           border-top-left-radius: 8px;
           border-bottom-left-radius: 8px;
@@ -191,7 +191,7 @@ div.activity-modal-container {
               width: 100%;
               position: relative;
               overflow-y: auto;
-              max-height: calc(100vh - 65px - 74px);
+              max-height: calc(100vh - 72px - 74px); // Total window height less the header and the footer
               min-height: 304px;
 
               div.activity-modal-content-title {

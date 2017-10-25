@@ -198,7 +198,7 @@
                      :class (when (empty? (:headline activity-data)) "no-headline")}]]
                 [:div.activity-modal-footer.group
                   {:class (when (and @(:first-render-done s)
-                                     (= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
+                                     (>= wh (.-clientHeight (sel1 [:div.activity-modal])))) "scrolling-content")}
                   (reactions activity-data)
                   [:div.activity-modal-footer-right
                     (when (utils/link-for (:links activity-data) "partial-update")
