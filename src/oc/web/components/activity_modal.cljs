@@ -13,6 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.components.ui.mixins :as mixins]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -95,6 +96,11 @@
     ; move cursor at the end
     (utils/to-end-of-content-editable headline-el)))
 
+(defn- add-emoji-cb [state]
+  (headline-on-change state)
+  (when-let [body (sel1 [:div.rich-body-editor])]
+    (body-on-change state)))
+
 (defn- real-start-editing [state & [focus]]
   (let [activity-data (first (:rum/args state))]
     (dis/dispatch! [:input [:entry-modal-editing] activity-data]))
@@ -141,6 +147,40 @@
         (dis/dispatch! [:entry-modal-save (router/current-board-slug)]))
       (stop-editing state))))
 
+(defn- dismiss-editing? [state dismiss-modal?]
+  (if @(::uploading-media state)
+    (let [alert-data {:icon "/img/ML/trash.svg"
+                      :action "dismiss-edit-uploading-media"
+                      :message (str "Cancel before finishing upload?")
+                      :link-button-title "No"
+                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                          (dis/dispatch! [:alert-modal-hide])
+                                          (stop-editing state)
+                                          (when dismiss-modal?
+                                            (close-clicked state)))
+                      }]
+      (dis/dispatch! [:alert-modal-show alert-data]))
+    (if (:has-changes @(drv/get-ref state :entry-modal-editing))
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "dismiss-edit-dirty-data"
+                        :message (str "Cancel without saving your changes?")
+                        :link-button-title "No"
+                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :solid-button-title "Yes"
+                        :solid-button-cb #(do
+                                            (dis/dispatch! [:alert-modal-hide])
+                                            (stop-editing state)
+                                            (when dismiss-modal?
+                                              (close-clicked state)))
+                        }]
+        (dis/dispatch! [:alert-modal-show alert-data]))
+      (do
+        (stop-editing state)
+        (when dismiss-modal?
+          (close-clicked state))))))
+
 (def default-min-modal-height 450)
 
 (rum/defcs activity-modal < rum/reactive
@@ -167,6 +207,7 @@
                             (rum/local "" ::initial-body)
                             (rum/local nil ::headline-input-listener)
                             (rum/local false ::entry-saving)
+                            (rum/local nil ::uploading-media)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -181,7 +222,11 @@
                                               s)
                              :will-mount (fn [s]
                                            (reset! (::esc-key-listener s)
-                                            (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
+                                            (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape")
+                                                                                          (if (and @(::editing s)
+                                                                                                   (not @(::uploading-media s)))
+                                                                                            (dismiss-editing? s true)
+                                                                                            (close-clicked s)))))
                                            (let [activity-data (first (:rum/args s))
                                                  initial-body (:body activity-data)
                                                  initial-headline (utils/emojify (:headline activity-data))]
@@ -243,12 +288,16 @@
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :no-comments (not show-comments?)
                                 :editing @(::editing s)})
-       :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
+       :on-click #(when (and (not @(::editing s))
+                             (not (utils/event-inside? % (sel1 [:div.activity-modal])))
+                             (not (utils/event-inside? % (sel1 [:button.carrot-modal-close]))))
                     (close-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
         [:button.carrot-modal-close.mlb-reset
-          {:on-click #(close-clicked s)}]
+          {:on-click #(if @(::editing s)
+                        (dismiss-editing? s true)
+                        (close-clicked s))}]
         [:div.activity-modal.group
           {:ref "activity-modal"
            :class (str "activity-modal-" (:uuid activity-data))}
@@ -309,6 +358,7 @@
               [:div.activity-left-column-content
                 (if @(::editing s)
                   [:div.activity-modal-content
+                    {:key "activity-modal-content-editing"}
                     [:div.activity-modal-content-headline.emoji-autocomplete.emojiable
                       {:content-editable true
                        :ref "edit-headline"
@@ -331,6 +381,7 @@
                                        :media-config ["photo" "video" "chart" "attachment" "divider-line"]
                                        :classes "emoji-autocomplete emojiable"})]
                   [:div.activity-modal-content
+                    {:key "activity-modal-content"}
                     [:div.activity-modal-content-headline
                       {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
                        :on-click #(start-editing? s :headline)}]
@@ -341,9 +392,10 @@
                 (if @(::editing s)
                   [:div.activity-modal-footer.group
                     {:class (when @(::show-bottom-border s) "scrolling-content")}
+                    (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
                     [:div.activity-modal-footer-right
                       [:button.mlb-reset.mlb-link-black.cancel-edit
-                        {:on-click #(stop-editing s)}
+                        {:on-click #(dismiss-editing? s false)}
                         "Cancel"]
                       [:button.mlb-reset.mlb-default.save-edit
                         {:on-click #(save-editing? s)}

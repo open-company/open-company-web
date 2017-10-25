@@ -30,6 +30,10 @@ div.activity-modal-container {
             div.more-dropdown {
               opacity: 0;
             }
+
+            div.activity-attachments {
+              opacity: 0;
+            }
           }
         }
         div.activity-modal-columns {
@@ -54,7 +58,10 @@ div.activity-modal-container {
                 }
               }
               div.activity-modal-footer {
-
+                div.emoji-picker {
+                  float: left;
+                  margin-top: 4px;
+                }
               }
             }
           }
@@ -284,7 +291,7 @@ div.activity-modal-container {
               }
 
               div.activity-modal-content-body {
-                margin-top: 32px;
+                margin: 32px 0px;
                 border: none;
                 outline: none;
                 color: $carrot_dark_gray;
