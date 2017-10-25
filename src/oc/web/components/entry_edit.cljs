@@ -92,8 +92,8 @@
   ; Prevent the normal paste behaviour
   (utils/event-stop e)
   (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
-        pasted-data (.getData clipboardData "text/plain")
-        headline-el     (.querySelector js/document "div.entry-edit-headline")]
+        pasted-data   (.getData clipboardData "text/plain")
+        headline-el   (rum/ref-node state "headline")]
     ; replace the selected text of headline with the text/plain data of the clipboard
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
@@ -114,7 +114,7 @@
   (when-let [body (sel1 [:div.rich-body-editor])]
     (body-on-change s)))
 
-(defn clean-body []
+(defn- clean-body []
   (when-let [body-el (sel1 [:div.rich-body-editor])]
     (let [raw-html (.-innerHTML body-el)]
       (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
