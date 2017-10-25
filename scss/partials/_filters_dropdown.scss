@@ -1,14 +1,19 @@
 div.filters-dropdown {
+  float: right;
+  margin: 8px 24px 0px 20px;
+  position: relative;
+
   @include avenir_M();
   color: $oc_gray_7;
   font-size: 16px;
-  margin: 0 0 16px 20px;
-  position: relative;
+
+  &.filtering-by-topic {
+    float: left;
+    margin-left: 163px;
+  }
 
   div.topic-filter-center {
-    margin-left: 280px;
-
-    label {
+    span {
       float: left;
       @include avenir_H();
       font-size: 15px;
@@ -33,7 +38,7 @@ div.filters-dropdown {
       font-size: 12px;
 
       &.no-topic {
-        font-style: italic;
+        @include avenir_HO();
       }
     }
   }

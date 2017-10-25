@@ -59,6 +59,10 @@ div.entries-layout {
         margin-top: 10px;
         margin-right: 12px;
 
+        span.topic-name.no-topic {
+          @include avenir_MO();
+        }
+
         &:hover {
           text-decoration: underline;
         }

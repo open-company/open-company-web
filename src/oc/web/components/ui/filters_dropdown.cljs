@@ -32,8 +32,8 @@
     [:div.filters-dropdown.group
       {:class (when (string? board-filters) "filtering-by-topic")}
       (if (string? board-filters)
-        [:div.topic-filter-center
-          [:label "Viewing"]
+        [:div.topic-filter-center.group
+          [:span "Viewing"]
           [:div.topic-filter
             {:class (when-not topic-data "no-topic")
              :on-click #(router/nav!

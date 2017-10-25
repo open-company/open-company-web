@@ -166,6 +166,13 @@
                                :data-container "body"
                                :title (str (:name board-data) " settings")
                                :on-click #(dis/dispatch! [:board-edit board-data])})))
+              ;; Board filters when there is a topic filter
+              (when (and (string? board-filters)
+                         (not is-mobile-size?)
+                         (not empty-board?)
+                         (not is-all-posts)
+                         (> (count entry-topics) 1))
+                (filters-dropdown))
               ;; Add entry button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
@@ -183,6 +190,13 @@
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
                   (dom/label {:class "add-to-board-label"} "New Post")))
+              ;; Board filters when there is not topic filtering
+              (when (and (not (string? board-filters))
+                         (not is-mobile-size?)
+                         (not empty-board?)
+                         (not is-all-posts)
+                         (> (count entry-topics) 1))
+                (filters-dropdown))
               ;; Add entry floating button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
@@ -203,13 +217,7 @@
                                                           (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
-                  (dom/div {:class "add-to-board-pencil"})))
-              ;; Board filters dropdown
-              (when (and (not is-mobile-size?)
-                         (not empty-board?)
-                         (not is-all-posts)
-                         (> (count entry-topics) 1))
-                (filters-dropdown)))
+                  (dom/div {:class "add-to-board-pencil"}))))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
               (and is-dashboard

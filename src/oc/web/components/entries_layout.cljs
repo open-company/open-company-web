@@ -120,7 +120,10 @@
                      :on-click #(do
                                   (.preventDefault %)
                                   (router/nav! board-url))}
-                    "View all updates"])]
+                    "View all "
+                    [:span.topic-name
+                      {:class (when-not topic-name "no-topic")}
+                      (or topic-name "No topic")]])]
               ;; First row:
               [:div.entries-cards-container-row.group
                 ; Render the first 2 entries
