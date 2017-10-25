@@ -22,6 +22,47 @@ div.activity-modal-container {
     }
   }
 
+  &.editing {
+    div.modal-wrapper {
+      div.activity-modal {
+        div.activity-modal-header {
+          div.activity-modal-header-right {
+            div.more-dropdown {
+              opacity: 0;
+            }
+          }
+        }
+        div.activity-modal-columns {
+          div.activity-left-column {
+            div.activity-left-column-content {
+              div.activity-modal-content {
+                div.activity-modal-content-headline {
+                  border: none;
+                  outline: none;
+                  cursor: text;
+                  @include activity-headline();
+                  @include avenir_H();
+                  font-size: 20px;
+                  color: $carrot_dark_gray;
+
+                  &:empty:before {
+                    content: attr(placeholder);
+                    display: block;
+                    color: #8A8E94 !important;
+                    font-style: none;
+                  }
+                }
+              }
+              div.activity-modal-footer {
+
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   div.modal-wrapper {
     width: 1029px;
     max-height: 100vh;
@@ -201,7 +242,45 @@ div.activity-modal-container {
 
               div.activity-modal-content-headline {
                 margin-top: 32px;
+                cursor: text;
                 @include activity-headline();
+              }
+
+              div.rich-body-editor-container {
+                position: relative;
+                overflow: visible;
+
+                div.medium-editor-media-picker {
+                  margin-top: 0px;
+                  margin-left: -26px;
+                  top: 0px;
+                }
+
+                div.rich-body-editor {
+                  border: none;
+                  outline: none;
+                  color: $carrot_dark_gray;
+                  @include avenir_R();
+                  font-size: 16px;
+                  margin: 32px 0;
+                  cursor: text;
+                  min-height: 85px;
+                  @include activity-body();
+
+                  @include activity-attachment(true);
+
+                  &.medium-editor-placeholder:after {
+                    color: #8A8E94 !important;
+                  }
+
+                  * {
+                    color: $carrot_dark_gray;
+                  }
+
+                  &:after {
+                    margin: 0;
+                  }
+                }
               }
 
               div.activity-modal-content-body {
@@ -209,6 +288,7 @@ div.activity-modal-container {
                 border: none;
                 outline: none;
                 color: $carrot_dark_gray;
+                cursor: text;
                 @include avenir_R();
                 font-size: 16px;
                 min-height: 85px;
@@ -240,6 +320,10 @@ div.activity-modal-container {
 
               div.activity-modal-footer-right {
                 float: right;
+
+                button.cancel-edit {
+                  margin-right: 16px;
+                }
 
                 button.post-edit {
                   float: right;

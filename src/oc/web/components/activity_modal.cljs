@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
@@ -13,7 +14,9 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.activity-move :refer (activity-move)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
@@ -60,6 +63,84 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+;; Editing
+
+(defn body-on-change [state]
+  (dis/dispatch! [:input [:entry-modal-editing :has-changes] true]))
+
+(defn- headline-on-change [state]
+  (when-let [headline (sel1 [:div.activity-modal-content-headline])]
+    (let [emojied-headline   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:input [:entry-modal-editing :headline] emojied-headline])
+      (dis/dispatch! [:input [:entry-modal-editing :has-changes] true]))))
+
+(defn- setup-headline [state]
+  (let [headline-el  (rum/ref-node state "edit-headline")]
+    (reset! (::headline-input-listener state)
+     (events/listen headline-el EventType/INPUT #(headline-on-change state)))
+    (js/emojiAutocomplete)))
+
+(defn headline-on-paste
+  "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
+  [state e]
+  ; Prevent the normal paste behaviour
+  (utils/event-stop e)
+  (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
+        pasted-data   (.getData clipboardData "text/plain")
+        headline-el   (rum/ref-node state "edit-headline")]
+    ; replace the selected text of headline with the text/plain data of the clipboard
+    (js/replaceSelectedText pasted-data)
+    ; call the headline-on-change to check for content length
+    (headline-on-change state)
+    ; move cursor at the end
+    (utils/to-end-of-content-editable headline-el)))
+
+(defn- real-start-editing [state & [focus]]
+  (let [activity-data (first (:rum/args state))]
+    (dis/dispatch! [:input [:entry-modal-editing] activity-data]))
+  (reset! (::editing state) true)
+  (utils/after 100 #(setup-headline state))
+  (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
+  (when focus
+    (utils/after 1000
+      #(cond
+         (= focus :body)
+         (let [body-el (sel1 [:div.rich-body-editor])
+               scrolling-el (sel1 [:div.activity-modal-content])]
+           (utils/to-end-of-content-editable body-el)
+           (utils/scroll-to-bottom scrolling-el))
+         (= focus :headline)
+         (utils/to-end-of-content-editable (rum/ref-node state "edit-headline"))))))
+
+(defn- start-editing? [state & [focus]]
+  (let [activity-data (first (:rum/args state))]
+    (when (and (utils/link-for (:links activity-data) "partial-update")
+               (not @(::showing-dropdown state))
+               (not @(::move-activity state))
+               (not @(::share-dropdown state))
+               (not (.contains (.-classList (.-activeElement js/document)) "add-comment")))
+      (real-start-editing state focus))))
+
+(defn- stop-editing [state]
+  (reset! (::editing state) false)
+  (when @(::headline-input-listener state)
+    (events/unlistenByKey @(::headline-input-listener state))
+    (reset! (::headline-input-listener state) nil)))
+
+(defn- clean-body []
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (let [raw-html (.-innerHTML body-el)]
+      (dis/dispatch! [:input [:entry-modal-editing :body] (utils/clean-body-html raw-html)]))))
+
+(defn- save-editing? [state]
+  (let [edit-data @(drv/get-ref state :entry-modal-editing)]
+    (if (:has-changes edit-data)
+      (do
+        (reset! (::entry-saving state) true)
+        (clean-body)
+        (dis/dispatch! [:entry-modal-save (router/current-board-slug)]))
+      (stop-editing state))))
+
 (def default-min-modal-height 450)
 
 (rum/defcs activity-modal < rum/reactive
@@ -67,6 +148,8 @@
                             (drv/drv :activity-modal-fade-in)
                             (drv/drv :org-data)
                             (drv/drv :board-filters)
+                            (drv/drv :entry-edit-topics)
+                            (drv/drv :entry-modal-editing)
                             ;; Locals
                             (rum/local false ::dismiss)
                             (rum/local false ::animate)
@@ -78,6 +161,12 @@
                             (rum/local false ::share-dropdown)
                             (rum/local nil ::window-click)
                             (rum/local false ::show-bottom-border)
+                            ;; Editing locals
+                            (rum/local false ::editing)
+                            (rum/local "" ::initial-headline)
+                            (rum/local "" ::initial-body)
+                            (rum/local nil ::headline-input-listener)
+                            (rum/local false ::entry-saving)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -93,6 +182,14 @@
                              :will-mount (fn [s]
                                            (reset! (::esc-key-listener s)
                                             (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
+                                           (let [activity-data (first (:rum/args s))
+                                                 initial-body (:body activity-data)
+                                                 initial-headline (utils/emojify (:headline activity-data))]
+                                             ;; Load board if it's not already
+                                             (when-not @(drv/get-ref s :entry-edit-topics)
+                                               (dis/dispatch! [:board-get (utils/link-for (:links activity-data) "up")]))
+                                             (reset! (::initial-body s) initial-body)
+                                             (reset! (::initial-headline s) initial-headline))
                                            s)
                              :did-mount (fn [s]
                                           (reset! (::window-click s)
@@ -122,7 +219,21 @@
                                             (when @(::esc-key-listener s)
                                               (events/unlistenByKey @(::esc-key-listener s))
                                               (reset! (::esc-key-listener s) nil))
-                                            s)}
+                                            s)
+                            :did-remount (fn [_ s]
+                                           (let [activity-data (first (:rum/args s))
+                                                 initial-body (:body activity-data)
+                                                 initial-headline (utils/emojify (:headline activity-data))]
+                                             (reset! (::initial-headline s) initial-headline)
+                                             (reset! (::initial-body s) initial-body))
+                                           (when (and @(::editing s)
+                                                      @(::entry-saving s))
+                                             (let [entry-edit @(drv/get-ref s :entry-modal-editing)]
+                                               (when-not (:loading entry-edit)
+                                                 (when-not (:error entry-edit)
+                                                   (stop-editing s))
+                                                 (reset! (::entry-saving s) false))))
+                                           s)}
   [s activity-data]
   (let [show-comments? (utils/link-for (:links activity-data) "comments")
         fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
@@ -130,7 +241,8 @@
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
-                                :no-comments (not show-comments?)})
+                                :no-comments (not show-comments?)
+                                :editing @(::editing s)})
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
                     (close-clicked s))}
       [:div.modal-wrapper
@@ -195,59 +307,91 @@
             ;; Left column
             [:div.activity-left-column
               [:div.activity-left-column-content
-                [:div.activity-modal-content
-                  {:on-click #(when (and (utils/link-for (:links activity-data) "partial-update")
-                                         (not @(::showing-dropdown s))
-                                         (not @(::move-activity s))
-                                         (not @(::share-dropdown s)))
-                                (dis/dispatch! [:entry-edit activity-data]))}
-                  [:div.activity-modal-content-headline
-                    {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-                  [:div.activity-modal-content-body
-                    {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                     :class (when (empty? (:headline activity-data)) "no-headline")}]]
-                [:div.activity-modal-footer.group
-                  {:class (when @(::show-bottom-border s) "scrolling-content")}
-                  (reactions activity-data)
-                  [:div.activity-modal-footer-right
-                    (when (utils/link-for (:links activity-data) "partial-update")
-                      [:button.mlb-reset.post-edit
-                        {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                                  (not @(::showing-dropdown s))
-                                                                  (not @(::share-dropdown s)))})
-                         :on-click (fn [e]
-                                     (utils/remove-tooltips)
-                                     (dis/dispatch! [:entry-edit activity-data]))}
-                        "Edit"])
-                    (when (utils/link-for (:links activity-data) "share")
-                      [:div.activity-modal-share
-                        (when @(::share-dropdown s)
-                          [:div.share-dropdown
-                            [:div.triangle]
-                            [:ul.share-dropdown-menu
-                              (when (jwt/team-has-bot? (:team-id (dis/org-data)))
+                (if @(::editing s)
+                  [:div.activity-modal-content
+                    [:div.activity-modal-content-headline.emoji-autocomplete.emojiable
+                      {:content-editable true
+                       :ref "edit-headline"
+                       :placeholder "Untitled post"
+                       :on-paste    #(headline-on-paste s %)
+                       :on-key-down #(headline-on-change s)
+                       :on-click    #(headline-on-change s)
+                       :on-key-press (fn [e]
+                                     (when (= (.-key e) "Enter")
+                                       (utils/event-stop e)
+                                       (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
+                       :dangerouslySetInnerHTML @(::initial-headline s)}]
+                    (rich-body-editor {:on-change (partial body-on-change s)
+                                       :initial-body @(::initial-body s)
+                                       :show-placeholder false
+                                       :show-h2 true
+                                       :dispatch-input-key :entry-modal-editing
+                                       :upload-progress-cb (fn [is-uploading?]
+                                                             (reset! (::uploading-media s) is-uploading?))
+                                       :media-config ["photo" "video" "chart" "attachment" "divider-line"]
+                                       :classes "emoji-autocomplete emojiable"})]
+                  [:div.activity-modal-content
+                    [:div.activity-modal-content-headline
+                      {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
+                       :on-click #(start-editing? s :headline)}]
+                    [:div.activity-modal-content-body
+                      {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
+                       :on-click #(start-editing? s :body)
+                       :class (when (empty? (:headline activity-data)) "no-headline")}]])
+                (if @(::editing s)
+                  [:div.activity-modal-footer.group
+                    {:class (when @(::show-bottom-border s) "scrolling-content")}
+                    [:div.activity-modal-footer-right
+                      [:button.mlb-reset.mlb-link-black.cancel-edit
+                        {:on-click #(stop-editing s)}
+                        "Cancel"]
+                      [:button.mlb-reset.mlb-default.save-edit
+                        {:on-click #(save-editing? s)}
+                        (when (:loading (drv/react s :entry-modal-editing))
+                          (small-loading))
+                        "Save"]]]
+                  [:div.activity-modal-footer.group
+                    {:class (when @(::show-bottom-border s) "scrolling-content")}
+                    (reactions activity-data)
+                    [:div.activity-modal-footer-right
+                      (when (utils/link-for (:links activity-data) "partial-update")
+                        [:button.mlb-reset.post-edit
+                          {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
+                                                                    (not @(::showing-dropdown s))
+                                                                    (not @(::share-dropdown s)))})
+                           :on-click (fn [e]
+                                       (utils/remove-tooltips)
+                                       (real-start-editing s))}
+                          "Edit"])
+                      (when (utils/link-for (:links activity-data) "share")
+                        [:div.activity-modal-share
+                          (when @(::share-dropdown s)
+                            [:div.share-dropdown
+                              [:div.triangle]
+                              [:ul.share-dropdown-menu
+                                (when (jwt/team-has-bot? (:team-id (dis/org-data)))
+                                  [:li.share-dropdown-item
+                                    {:on-click (fn [e]
+                                                 (reset! (::share-dropdown s) false)
+                                                 ; open the activity-share-modal component
+                                                 (dis/dispatch! [:activity-share-show :slack activity-data]))}
+                                    "Slack"])
                                 [:li.share-dropdown-item
                                   {:on-click (fn [e]
                                                (reset! (::share-dropdown s) false)
                                                ; open the activity-share-modal component
-                                               (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                                  "Slack"])
-                              [:li.share-dropdown-item
-                                {:on-click (fn [e]
-                                             (reset! (::share-dropdown s) false)
-                                             ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show :email activity-data]))}
-                                "Email"]
-                              [:li.share-dropdown-item
-                                {:on-click (fn [e]
-                                             (reset! (::share-dropdown s) false)
-                                             ; open the activity-share-modal component
-                                             (dis/dispatch! [:activity-share-show :link activity-data]))}
-                                "Link"]]])
-                        [:button.mlb-reset.share-button
-                          {:on-click #(do
-                                       (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
-                          "Share"]])]]]]
+                                               (dis/dispatch! [:activity-share-show :email activity-data]))}
+                                  "Email"]
+                                [:li.share-dropdown-item
+                                  {:on-click (fn [e]
+                                               (reset! (::share-dropdown s) false)
+                                               ; open the activity-share-modal component
+                                               (dis/dispatch! [:activity-share-show :link activity-data]))}
+                                  "Link"]]])
+                          [:button.mlb-reset.share-button
+                            {:on-click #(do
+                                         (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
+                            "Share"]])]])]]
             ;; Right column
             (when show-comments?
               [:div.activity-right-column
