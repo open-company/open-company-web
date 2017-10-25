@@ -108,7 +108,7 @@
                 [:button.mlb-reset.add-entry-to-topic
                   {:title (if (empty? topic-name)
                             "Add a new post"
-                            (str "Add post in " topic-name))
+                            (str "Add a new post in " topic-name))
                    :data-toggle "tooltip"
                    :data-placement "right"
                    :data-container "body"
