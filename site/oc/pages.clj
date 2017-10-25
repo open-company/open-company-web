@@ -59,6 +59,7 @@
           {:id "get-started-centred-bt"}
           "Get started for free"]
         [:div.small-teams
+          {:id "easy-setup-label"}
           "Easy set-up • Free for small teams"]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group

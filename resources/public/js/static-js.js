@@ -97,6 +97,8 @@ $(document).ready(function(){
   } else {
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
+    // Remove the label below it too
+    $("#easy-setup-label").css({"display": "none"});
   }
 
 });
