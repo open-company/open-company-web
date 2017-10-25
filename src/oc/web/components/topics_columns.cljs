@@ -153,9 +153,11 @@
             (dom/div {:class "group"}
               ;; Board name and settings button
               (dom/div {:class "board-name"}
-                (if is-all-posts
-                  "All Posts"
-                  (:name board-data))
+                (dom/span
+                  {:class "board-name-span"
+                   :dangerouslySetInnerHTML (if is-all-posts
+                                              #js {"__html" "All Posts"}
+                                              (utils/emojify (:name board-data)))})
                 ;; Settings button
                 (when (and (router/current-board-slug)
                            (not is-all-posts)

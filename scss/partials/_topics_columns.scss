@@ -44,11 +44,18 @@ div.topics-columns {
       }
 
       div.board-name {
-        @include avenir_M();
-        font-size: 32px;
-        color: $carrot_gray;
         float: left;
         margin-left: 15px;
+
+        span.board-name-span {
+          @include avenir_M();
+          font-size: 32px;
+          color: $carrot_gray;
+
+          .emojione {
+            @include emoji-size(32);
+          }
+        }
 
         button.board-settings-bt {
           float: right;
