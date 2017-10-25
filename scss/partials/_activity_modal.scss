@@ -47,13 +47,13 @@ div.activity-modal-container {
 
         div.activity-modal-header-left {
           float: left;
-          max-width: 50%;
+          width: 50%;
           @include activity-author();
         }
 
         div.activity-modal-header-right {
           float: right;
-          max-width: 50%;
+          width: 50%;
 
           div.activity-tag {
             float: right;
