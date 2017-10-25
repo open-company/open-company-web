@@ -1125,7 +1125,7 @@
                                 :latest))]
     (if new-entry?
       (api/create-entry entry-data (:uuid fixed-entry))
-      (api/update-entry entry-data))
+      (api/update-entry entry-data (:board-slug entry-data)))
     (-> db
         (assoc-in board-key next-board-data)
         (assoc :board-filters next-board-filters))))
@@ -1145,7 +1145,15 @@
                         (dissoc (:fixed-items board-data) temp-uuid)
                         (:fixed-items board-data))
           next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
-      (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items))))
+      (-> db
+        (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
+        (update-in [:entry-modal-editing] dissoc :loading)))))
+
+(defmethod dispatcher/action :entry-save/failed
+  [db [_]]
+  (-> db
+    (update-in [:entry-modal-editing] dissoc :loading)
+    (update-in [:entry-modal-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1309,7 +1317,7 @@
   [db [_ activity-data board-data]]
   (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
         fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
-    (api/update-entry fixed-activity-data)
+    (api/update-entry fixed-activity-data (:slug board-data))
     (if is-all-posts
       (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-posts (:uuid activity-data))]
         (assoc-in db next-activity-data-key fixed-activity-data))
@@ -1398,3 +1406,9 @@
     (-> db
       (dissoc :activity-loading)
       (assoc-in activity-key fixed-activity-data))))
+
+(defmethod dispatcher/action :entry-modal-save
+  [db [_ board-slug]]
+  (let [entry-data (:entry-modal-editing db)]
+    (api/update-entry entry-data board-slug)
+    (assoc-in db [:entry-modal-editing :loading] true)))
