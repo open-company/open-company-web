@@ -21,7 +21,6 @@
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
-            [oc.web.components.home :refer (home)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
@@ -98,12 +97,12 @@
   (pre-routing (:query-params params) true)
   ;; save route
   (router/set-route! ["home"] {:query-params (:query-params params)})
-  (when (jwt/jwt)
-    ;; load data from api
-    (swap! dis/app-state assoc :loading true))
+  ; (when (jwt/jwt)
+  ;   ;; load data from api
+  ;   (swap! dis/app-state assoc :loading true))
   (post-routing)
   ;; render component
-  (drv-root #(om/component (home)) target))
+  (drv-root #(om/component (home-page)) target))
 
 ;; Company list
 (defn org-handler [route target component params]
