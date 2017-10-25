@@ -203,16 +203,13 @@
                   [:div.activity-modal-footer-right
                     (when (utils/link-for (:links activity-data) "partial-update")
                       [:button.mlb-reset.post-edit
-                        {:title "Edit"
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :class (utils/class-set {:not-hover (and (not @(::move-activity s))
+                        {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
                                                                   (not @(::showing-dropdown s))
                                                                   (not @(::share-dropdown s)))})
                          :on-click (fn [e]
                                      (utils/remove-tooltips)
-                                     (dis/dispatch! [:entry-edit activity-data]))}])
+                                     (dis/dispatch! [:entry-edit activity-data]))}
+                        "Edit"])
                     (when (utils/link-for (:links activity-data) "share")
                       [:div.activity-modal-share
                         (when @(::share-dropdown s)
