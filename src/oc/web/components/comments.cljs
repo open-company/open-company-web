@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.components.ui.mixins :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [goog.object :as gobj]
@@ -37,11 +38,20 @@
         final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
     final-text))
 
+(defn enable-add-comment? [s]
+  (let [add-comment-div (rum/ref-node s "add-comment")
+        comment-text (add-comment-content add-comment-div)
+        next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
+    (when (not= next-add-bt-disabled @(::add-button-disabled s))
+      (reset! (::add-button-disabled s) next-add-bt-disabled))))
+
 (rum/defcs add-comment < (rum/local false ::show-successful)
                          rum/reactive
                          (drv/drv :current-user-data)
                          (drv/drv :comment-add-finish)
+                         (rum/local true ::add-button-disabled)
                          rum/static
+                         first-render-mixin
                          {:did-mount (fn [s]
                                        (utils/after 2500 #(js/emojiAutocomplete))
                                        s)
@@ -64,17 +74,24 @@
         [:div.add-comment.emoji-autocomplete.emojiable
           {:ref "add-comment"
            :content-editable true
-           :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
+           :on-key-up #(enable-add-comment? s)
+           :on-focus #(enable-add-comment? s)
+           :on-blur #(enable-add-comment? s)
+           :on-paste #(do
+                        (js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
+                        (enable-add-comment? s))
            :placeholder "Share your thoughts..."}]
         [:div.add-comment-footer.group
           [:div.reply-button-container
             [:button.mlb-reset.mlb-default.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
                             (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                            (set! (.-innerHTML add-comment-div) ""))}
+                            (set! (.-innerHTML add-comment-div) ""))
+               :disabled @(::add-button-disabled s)}
               "Add"]]]]
       (emoji-picker {:width 32
-                     :height 32})]))
+                     :height 32
+                     :add-emoji-cb #(enable-add-comment? s)})]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)

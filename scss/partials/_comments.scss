@@ -243,6 +243,11 @@ div.comments {
             background-image: cdnUrl("/img/ML/emoji_picker_bt_white.svg");
           }
 
+          &.disabled:hover {
+            background-color: $carrot_green_3;
+            background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg"); 
+          }
+
           @include preload_image(cdnUrl("/img/ML/emoji_picker_bt_white.svg"), "before");
         }
 
