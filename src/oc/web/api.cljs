@@ -687,10 +687,10 @@
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body headers] :as resp}]
-          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :temp-uuid temp-uuid}]))))))
+          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug (:slug board-data) :temp-uuid temp-uuid}]))))))
 
 (defn update-entry
-  [entry-data]
+  [entry-data board-slug]
   (when entry-data
     (let [update-entry-link (utils/link-for (:links entry-data) "partial-update")
           cleaned-entry-data (select-keys entry-data entry-keys)]
@@ -698,7 +698,9 @@
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {})}]))))))
+          (if success
+            (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug board-slug}])
+            (dispatcher/dispatch! [:entry-save/failed])))))))
 
 (defn delete-activity [activity-data]
   (when activity-data
