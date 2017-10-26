@@ -266,7 +266,9 @@ div.left-navigation-sidebar {
 
       div.about-carrot-icon {
         background-image: cdnUrl("/img/ML/carrot_grey.svg");
-        background-size: 16px 16px;
+        background-size: auto 16px;
+        background-repeat: no-repeat;
+        background-position: center;
         width: 16px;
         height: 16px;
         margin-right: 5px;
@@ -291,7 +293,9 @@ div.left-navigation-sidebar {
 
       div.invite-people-icon {
         background-image: cdnUrl("/img/ML/invite_people.svg");
-        background-size: 16px 16px;
+        background-size: 16px auto;
+        background-repeat: no-repeat;
+        background-position: center;
         width: 16px;
         height: 16px;
         margin-right: 5px;
