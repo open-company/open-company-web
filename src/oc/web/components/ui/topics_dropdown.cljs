@@ -40,7 +40,7 @@
            :data-toggle "dropdown"
            :aria-haspopup true
            :aria-expanded false}
-          [:div.activity-tag
+          [:div.activity-tag.on-gray
             (:topic-name entry-editing)]]
         [:button.mlb-reset.dropdown-toggle
           {:type "button"

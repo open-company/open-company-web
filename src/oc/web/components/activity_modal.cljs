@@ -358,7 +358,7 @@
                 (topics-dropdown (:modal-editing-data modal-data) :modal-editing-data)
                 (when (:topic-slug activity-data)
                   (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                    [:div.activity-tag
+                    [:div.activity-tag.on-gray
                       {:on-click #(close-clicked s (:topic-slug activity-data))}
                       topic-name])))]]
           [:div.activity-modal-columns
