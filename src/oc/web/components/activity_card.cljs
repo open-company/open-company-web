@@ -202,7 +202,7 @@
           ; Topic tag button
           (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
-              [:div.activity-tag
+              [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
                  :on-click #(do
                               (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
