@@ -13,6 +13,7 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -65,12 +66,6 @@
         (dis/dispatch! [:alert-modal-show alert-data]))
       (real-close s))))
 
-(defn unique-slug [topics topic-name]
-  (let [slug (atom (s/slug topic-name))]
-    (while (seq (filter #(= (:slug %) @slug) topics))
-      (reset! slug (str (s/slug topic-name) "-" (int (rand 1000)))))
-    @slug))
-
 (defn body-on-change [state]
   (dis/dispatch! [:input [:entry-editing :has-changes] true])
   (calc-edit-entry-modal-height state))
@@ -101,14 +96,6 @@
     ; move cursor at the end
     (utils/to-end-of-content-editable headline-el)))
 
-(defn create-new-topic [s]
-  (when-not (empty? @(::new-topic s))
-    (let [topics @(drv/get-ref s :entry-edit-topics)
-          topic-name (s/trim @(::new-topic s))
-          topic-slug (unique-slug topics topic-name)]
-      (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} true])
-      (reset! (::new-topic s) ""))))
-
 (defn add-emoji-cb [s]
   (headline-on-change s)
   (when-let [body (sel1 [:div.rich-body-editor])]
@@ -121,7 +108,6 @@
 
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
-                        (drv/drv :entry-edit-topics)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
@@ -132,8 +118,6 @@
                         (rum/local nil ::body-editor)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
-                        (rum/local "" ::new-topic)
-                        (rum/local false ::focusing-create-topic)
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
@@ -147,9 +131,6 @@
                                              board-filters @(drv/get-ref s :board-filters)
                                              initial-body (if (contains? entry-editing :links) (:body entry-editing) utils/default-body)
                                              initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
-                                         ;; Load board if it's not already
-                                         (when-not @(drv/get-ref s :entry-edit-topics)
-                                           (dis/dispatch! [:board-get (utils/link-for (:links entry-editing) "up")]))
                                          (reset! (::initial-body s) initial-body)
                                          (reset! (::initial-headline s) initial-headline)
                                          (when (and (string? board-filters)
@@ -179,8 +160,7 @@
                                            (reset! (::headline-input-listener s) nil))
                                          s)}
   [s]
-  (let [topics            (distinct (drv/react s :entry-edit-topics))
-        current-user-data (drv/react s :current-user-data)
+  (let [current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
         alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
@@ -206,64 +186,7 @@
           [:div.entry-edit-modal-header.group
             (user-avatar-image current-user-data)
             [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
-            [:div.entry-card-dd-container
-              (if (:topic-name entry-editing)
-                [:button.mlb-reset.dropdown-toggle.has-topic
-                  {:type "button"
-                   :id "entry-edit-dd-btn"
-                   :data-toggle "dropdown"
-                   :aria-haspopup true
-                   :aria-expanded false}
-                  [:div.activity-tag
-                    (:topic-name entry-editing)]]
-                [:button.mlb-reset.dropdown-toggle
-                  {:type "button"
-                   :id "entry-edit-dd-btn"
-                   :data-toggle "dropdown"
-                   :aria-haspopup true
-                   :aria-expanded false}
-                  "+ Add a topic"])
-              [:div.entry-edit-topics-dd.dropdown-menu
-                {:aria-labelledby "entry-edit-dd-btn"}
-                [:div.triangle]
-                [:div.entry-dropdown-list-content
-                  [:ul
-                    (for [t (sort #(compare (:name %1) (:name %2)) topics)
-                          :let [selected (= (:topic-name entry-editing) (:name t))]]
-                      [:li.selectable.group
-                        {:key (str "entry-edit-dd-" (:slug t))
-                         :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
-                         :class (when selected "select")}
-                        [:button.mlb-reset
-                          (:name t)]
-                        (when selected
-                          [:button.mlb-reset.mlb-link.remove
-                            {:on-click (fn [e]
-                                         (utils/event-stop e)
-                                         (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
-                            "Remove"])])
-                    [:li.divider]
-                    [:li.entry-edit-new-topic.group
-                      [:div.entry-edit-new-topic-title "CREATE NEW TOPIC"]
-                      [:div.entry-edit-new-topic-container.group
-                        [:input.entry-edit-new-topic-field
-                          {:type "text"
-                           :value @(::new-topic s)
-                           :on-focus #(reset! (::focusing-create-topic s) true)
-                           :on-blur (fn [e] (utils/after 100 #(reset! (::focusing-create-topic s) false)))
-                           :on-key-up (fn [e]
-                                        (cond
-                                          (= "Enter" (.-key e))
-                                          (create-new-topic s)))
-                           :on-change #(reset! (::new-topic s) (.. % -target -value))
-                           :placeholder "Create New Topic"}]
-                        [:button.mlb-reset.entry-edit-new-topic-plus
-                          {:on-click (fn [e]
-                                       (utils/event-stop e)
-                                       (create-new-topic s))
-                           :class (utils/class-set {:empty (empty? @(::new-topic s))
-                                                    :active (not (empty? @(::new-topic s)))})
-                           :title "Create a new topic"}]]]]]]]]
+            (topics-dropdown entry-editing :entry-editing)]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
