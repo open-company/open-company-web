@@ -149,7 +149,7 @@
                     [:input.org-settings-field.email-field
                       {:type "text"
                        :class (when (:error user-data) "error")
-                       :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+                       :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
                        :placeholder "email@example.com"
                        :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
                        :value (:user user-data)}])]
