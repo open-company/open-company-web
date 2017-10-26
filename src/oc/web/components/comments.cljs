@@ -150,6 +150,6 @@
                 (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
             (when-not @(::add-comment-focus s)
               [:div.comments-internal-empty
-                [:img {:src (utils/cdn "/img/ML/no_comments_placeholder.svg")}]
-                [:div "No comments yet. Jump in and let everyone know what you think!"]]))
+                [:div.no-comments-placeholder]
+                [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]]))
           (add-comment activity-data)]])))

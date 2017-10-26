@@ -51,12 +51,17 @@ div.comments {
         width: 218px;
         margin: calc(50% - 62px) auto 0px; //140px
 
-        img {
+        div.no-comments-placeholder {
           width: 110px;
-          height: 60px;
+          height: 30px;
+          background-size: 110px 30px;
+          background-repeat: no-repeat;
+          background-position: center;
+          margin: 0 auto;
+          @include image-2x("/img/ML/no_comments_placeholder");
         }
 
-        div {
+        div.no-comments-message {
           margin-top: 14px;
         }
       }
