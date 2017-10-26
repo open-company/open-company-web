@@ -12,6 +12,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
@@ -153,11 +154,12 @@
             (dom/div {:class "group"}
               ;; Board name and settings button
               (dom/div {:class "board-name"}
-                (dom/span
-                  {:class "board-name-span"
-                   :dangerouslySetInnerHTML (if is-all-posts
-                                              #js {"__html" "All Posts"}
-                                              (utils/emojify (:name board-data)))})
+                (when (router/current-board-slug)
+                  (dom/span
+                    {:class "board-name-span"
+                     :dangerouslySetInnerHTML (if is-all-posts
+                                                #js {"__html" "All Posts"}
+                                                (utils/emojify (:name board-data)))}))
                 ;; Settings button
                 (when (and (router/current-board-slug)
                            (not is-all-posts)
@@ -222,6 +224,8 @@
                   (dom/div {:class "add-to-board-pencil"}))))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
+              (zero? (count (:boards org-data)))
+              (empty-org)
               (and is-dashboard
                    is-all-posts)
               (rum/with-key (all-posts all-posts-data) (str "all-posts-" (apply str (keys (:fixed-items all-posts-data)))))

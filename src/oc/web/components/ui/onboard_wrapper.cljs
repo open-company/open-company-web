@@ -51,7 +51,7 @@
         [:input.field
           {:type "email"
            :class (when (= (:error signup-with-email) 409) "error")
-           :pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+           :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
            :value (:email signup-with-email)
            :on-change #(do
                          (reset! (::password-error s) false)

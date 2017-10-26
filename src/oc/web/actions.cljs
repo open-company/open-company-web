@@ -132,8 +132,8 @@
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
-        (when (not (utils/in? (:route @router/path) "story"))
-          (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))
+        (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+          (api/get-board board-link))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
@@ -144,7 +144,8 @@
            (not (utils/in? (:route @router/path) "org-settings-team"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "email-verification"))
-           (not (utils/in? (:route @router/path) "story-edit"))
+           ;; Drafts
+           ; (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
@@ -194,9 +195,15 @@
 (defmethod dispatcher/action :container/change
   [db [_ {board-uuid :container-id change-at :change-at}]]
   (timbre/debug "Board change:" board-uuid "at:" change-at)
-  (let [boards (:boards (dispatcher/org-data db))
-        filtered-boards (filter #(= (:uuid %) board-uuid) boards)]
-    (utils/after 1000 #(dispatcher/dispatch! [:boards-load-other filtered-boards])))
+  (utils/after 1000 (fn []
+    (let [current-board-data (dispatcher/board-data)]
+      (if (= board-uuid (:uuid current-board-data))
+        ;; Reload the current board data
+        (dispatcher/dispatch! [:board-get (utils/link-for (:links current-board-data) "self")])
+        ;; Reload a secondary board data
+        (let [boards (:boards (dispatcher/org-data db))
+              filtered-boards (filter #(= (:uuid %) board-uuid) boards)]
+          (dispatcher/dispatch! [:boards-load-other filtered-boards]))))))
   ;; Update change-data state that the board has a change
   (update-change-data db board-uuid :change-at change-at))
 
@@ -223,15 +230,17 @@
       (update-change-data next-db board-uuid :seen-at (oc-time/current-timestamp)))))
 
 (defmethod dispatcher/action :board
- [db [_ board-data]]
- (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
+  [db [_ board-data]]
+  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
        fixed-board-data (utils/fix-board board-data)]
     (when is-currently-shown
       
       (when (and (router/current-activity-id)
                  (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-                 (or (not (utils/in? (:route @router/path) "story-edit"))
-                     (= (:slug board-data) "drafts")))
+                 ;; Drafts
+                 ; (or (not (utils/in? (:route @router/path) "story-edit"))
+                 ;     (= (:slug board-data) "drafts"))
+                 )
         (router/redirect-404!))
       
       (when (and (string? (:board-filters db))
@@ -258,18 +267,20 @@
                                      (:entry-editing db))
                               old-board-data
                               fixed-board-data)
-          story-editing (when (and (utils/in? (:route @router/path) "story-edit")
-                                   is-currently-shown
-                                   (router/current-activity-id)
-                                   (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-                          (get (:fixed-items fixed-board-data) (router/current-activity-id)))
+          ;; Drafts
+          ; story-editing (when (and (utils/in? (:route @router/path) "story-edit")
+          ;                          is-currently-shown
+          ;                          (router/current-activity-id)
+          ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
+          ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
           next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
-          with-story-editing (if story-editing
-                                (assoc next-db :story-editing story-editing)
-                                next-db)
+          ;; Drafts
+          ; with-story-editing (if story-editing
+          ;                       (assoc next-db :story-editing story-editing)
+          ;                       next-db)
           without-loading (if is-currently-shown
-                            (dissoc with-story-editing :loading)
-                            with-story-editing)]
+                            (dissoc next-db :loading)
+                            next-db)]
       without-loading)))
 
 (defmethod dispatcher/action :auth-settings
@@ -911,13 +922,13 @@
         board-data (get-in db board-key)
         ; Entry data
         fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
-        is-secure-story (router/current-secure-activity-id)
-        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        is-secure-activity (router/current-secure-activity-id)
+        secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
-    ;; If looking at a secure story discard all events for other activities
-    (if (and is-secure-story
-             (not= (:uuid secure-story-data) activity-uuid))
+    ;; If looking at a secure activity discard all events for other activities
+    (if (and is-secure-activity
+             (not= (:uuid secure-activity-data) activity-uuid))
       db
       (if entry-data
         ; If the entry is present in the local state
@@ -972,12 +983,12 @@
         board-data (get-in db board-key)
         ; Entry data
         fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
-        is-secure-story (router/current-secure-activity-id)
-        secure-story-data (when is-secure-story (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        is-secure-activity (router/current-secure-activity-id)
+        secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
-    (if (and is-secure-story
-             (not= (:uuid secure-story-data) activity-uuid))
+    (if (and is-secure-activity
+             (not= (:uuid secure-activity-data) activity-uuid))
       db
       (if (and entry-data (not (empty? (:reactions entry-data))))
         ; If the entry is present in the local state and it has reactions
@@ -1024,9 +1035,7 @@
   [db [_ board-slug activity-uuid activity-type]]
   (utils/after 10
    #(let [from-all-posts (= (router/current-board-slug) "all-posts")
-          activity-url (if (= activity-type "story")
-                         (oc-urls/story board-slug activity-uuid)
-                         (oc-urls/entry board-slug activity-uuid))]
+          activity-url (oc-urls/entry board-slug activity-uuid)]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (-> db
     (assoc :activity-modal-fade-in activity-uuid)
@@ -1167,9 +1176,11 @@
 
 (defmethod dispatcher/action :activity-delete/finish
   [db [_]]
-  (if (utils/in? (:route @router/path) "story-edit")
-    (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
-    (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+  ;; Drafts
+  ; (if (utils/in? (:route @router/path) "story-edit")
+  ;   (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
+  ;   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+  (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
   db)
 
 (defmethod dispatcher/action :alert-modal-show

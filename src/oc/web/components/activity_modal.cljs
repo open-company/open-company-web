@@ -315,8 +315,7 @@
             [:div.activity-modal-header-right
               (when (or (utils/link-for (:links activity-data) "partial-update")
                         (utils/link-for (:links activity-data) "delete"))
-                (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
-                      same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
+                (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))]
                   [:div.more-dropdown
                     [:button.mlb-reset.activity-modal-more.dropdown-toggle
                       {:type "button"
@@ -345,7 +344,7 @@
                                             (delete-clicked % activity-data))}
                               "Delete"])]])
                     (when @(::move-activity s)
-                      (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
+                      (activity-move {:activity-data activity-data :boards-list all-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
               (activity-attachments activity-data false)
               (when (:topic-slug activity-data)
                 (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
