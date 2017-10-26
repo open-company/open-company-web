@@ -170,10 +170,6 @@
               [:div.more-button
                 [:button.mlb-reset.more-ellipsis
                   {:type "button"
-                   :class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                            (not @(::hovering-card s))
-                                                            (not @(::more-dropdown s))
-                                                            (not @(::share-dropdown s)))})
                    :on-click (fn [e]
                                (utils/remove-tooltips)
                                (reset! (::more-dropdown s) (not @(::more-dropdown s)))
@@ -189,7 +185,8 @@
                       (when (and (utils/link-for (:links activity-data) "partial-update")
                                  (> (count all-boards) 1))
                         [:li
-                          {:on-click #(do
+                          {:class (when editing "disabled")
+                           :on-click #(do
                                         (reset! (::more-dropdown s) false)
                                         (reset! (::move-activity s) true))}
                           "Move"])
@@ -263,7 +260,7 @@
                          (utils/remove-tooltips)
                          (reset! (::hovering-card s) false)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch! [:entry-edit activity-data]))}])
+                         (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data) true]))}])
         (when (utils/link-for (:links activity-data) "share")
           [:div.activity-share
             {:class (utils/class-set {:not-hover (and (not @(::hovering-card s))
