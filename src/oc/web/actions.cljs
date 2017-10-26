@@ -1223,8 +1223,10 @@
         fixed-board-data (utils/fix-board board-data)]
     (api/get-org (dispatcher/org-data))
     (if (not= (:slug board-data) (router/current-board-slug))
-      ;; If creating a new board, redirect to that board page
-      (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug board-data))))
+      ;; If creating a new board, redirect to that board page, and watch the new board
+      (do
+        (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug board-data))))
+        (ws-cc/container-watch [(:uuid board-data)]))
       ;; If updating an existing board, refresh the org data
       (api/get-org (dispatcher/org-data)))
   (-> db

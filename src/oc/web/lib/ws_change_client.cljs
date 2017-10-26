@@ -18,11 +18,14 @@
 
 ;; ----- Actions -----
 
-(defn container-watch []
+(defn container-watch 
+  ([]
+  (container-watch (conj @board-ids (:uuid (dis/org-data)))))
+
+  ([watch-ids]
   (when @chsk-send!
-    (let [watch-ids (conj @board-ids (:uuid (dis/org-data)))]
-      (timbre/debug "Sending container/watch for:" watch-ids)
-      (@chsk-send! [:container/watch watch-ids] 1000))))
+    (timbre/debug "Sending container/watch for:" watch-ids)
+    (@chsk-send! [:container/watch watch-ids] 1000))))
 
 (defn container-seen [container-id]
   (when @chsk-send!
