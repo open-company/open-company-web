@@ -30,7 +30,6 @@
         topic-data (when (string? board-filters)
                      (utils/get-topic (:topics board-data) board-filters))]
     [:div.filters-dropdown.group
-      {:class (when (string? board-filters) "filtering-by-topic")}
       (if (string? board-filters)
         [:div.topic-filter-center.group
           [:span "Viewing"]

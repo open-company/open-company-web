@@ -7,18 +7,13 @@ div.filters-dropdown {
   color: $oc_gray_7;
   font-size: 16px;
 
-  &.filtering-by-topic {
-    float: left;
-    margin-left: 163px;
-  }
-
   div.topic-filter-center {
     span {
       float: left;
       @include avenir_H();
       font-size: 15px;
       color: $carrot_light_gray_3;
-      margin-top: 9px;
+      margin-top: 5px;
     }
 
     div.topic-filter {

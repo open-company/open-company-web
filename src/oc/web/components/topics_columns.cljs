@@ -170,13 +170,6 @@
                                :data-container "body"
                                :title (str (:name board-data) " settings")
                                :on-click #(dis/dispatch! [:board-edit board-data])})))
-              ;; Board filters when there is a topic filter
-              (when (and (string? board-filters)
-                         (not is-mobile-size?)
-                         (not empty-board?)
-                         (not is-all-posts)
-                         (> (count entry-topics) 1))
-                (filters-dropdown))
               ;; Add entry button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
@@ -195,8 +188,7 @@
                   (dom/div {:class "add-to-board-pencil"})
                   (dom/label {:class "add-to-board-label"} "New Post")))
               ;; Board filters when there is not topic filtering
-              (when (and (not (string? board-filters))
-                         (not is-mobile-size?)
+              (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
                          (> (count entry-topics) 1))
