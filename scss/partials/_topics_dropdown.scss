@@ -5,7 +5,7 @@ div.entry-card-dd-container {
   max-width: 50%;
   z-index: 1133;
 
-  button.dropdown-toggle:not(.has-topic) {
+  button.entry-card-dd-button:not(.has-topic) {
     color: $carrot_light_gray_3;
     @include avenir_H();
     font-size: 12px;
@@ -14,13 +14,13 @@ div.entry-card-dd-container {
     padding: 6px 16px 3px 16px;
     border-radius: 100px;
 
-    &:hover, &[aria-expanded=true] {
+    &:hover, &.active {
       background-color: $carrot_light_gray_3;
       color: white;
     }
   }
 
-  button.dropdown-toggle.has-topic {
+  button.entry-card-dd-button.has-topic {
     margin: 0;
     padding: 0;
     @include activity-tag();
@@ -43,14 +43,14 @@ div.entry-card-dd-container {
 
     div.triangle {
       position: absolute;
-      top: 3px;
+      top: 1px;
       left: 120px;
       background-color: white;
       border-top: 1px solid rgba(177,184,192,0.50);
       border-left: 1px solid rgba(177,184,192,0.50);
       transform: rotate(45deg);
-      width: 20px;
-      height: 20px;
+      width: 15px;
+      height: 15px;
     }
 
     div.entry-dropdown-list-content {
@@ -76,18 +76,18 @@ div.entry-card-dd-container {
 
           &:hover {
             background-color: $carrot_light_purple;
-            // button {
-            //   color: $carrot_purple;
-            // }
+            button {
+              color: $carrot_purple;
+            }
           }
 
           &.select {
-            background-color: $carrot_light_purple;
-            color: $carrot_purple;
+            background-color: $carrot_light_gray_8;
+            color: $carrot_dark_gray_2;
 
             button {
               @include avenir_H();
-              color: $carrot_purple;
+              color: $carrot_dark_gray_2;
             }
           }
 
