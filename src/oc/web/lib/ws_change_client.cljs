@@ -20,8 +20,9 @@
 
 (defn container-watch []
   (when @chsk-send!
-    (timbre/debug "Sending container/watch for:" @board-ids)
-    (@chsk-send! [:container/watch @board-ids] 1000)))
+    (let [watch-ids (conj @board-ids (:uuid (dis/org-data)))]
+      (timbre/debug "Sending container/watch for:" watch-ids)
+      (@chsk-send! [:container/watch watch-ids] 1000))))
 
 (defn container-seen [container-id]
   (when @chsk-send!

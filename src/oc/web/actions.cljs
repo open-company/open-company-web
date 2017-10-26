@@ -192,8 +192,7 @@
         new-change-data (assoc change-data board-uuid new-change-map)]
     (assoc-in db change-data-key new-change-data)))
 
-(defmethod dispatcher/action :container/change
-  [db [_ {board-uuid :container-id change-at :change-at}]]
+(defn- board-change [db board-uuid change-at]
   (timbre/debug "Board change:" board-uuid "at:" change-at)
   (utils/after 1000 (fn []
     (let [current-board-data (dispatcher/board-data)]
@@ -206,6 +205,19 @@
           (dispatcher/dispatch! [:boards-load-other filtered-boards]))))))
   ;; Update change-data state that the board has a change
   (update-change-data db board-uuid :change-at change-at))
+
+(defn- org-change [db org-uuid change-at]
+  (timbre/debug "Org change:" org-uuid "at:" change-at)
+  (utils/after 1000 (fn [] (api/get-org (dispatcher/org-data))))
+  db)
+
+(defmethod dispatcher/action :container/change
+  [db [_ {container-uuid :container-id change-at :change-at user-id :user-id}]]
+  (timbre/debug "Container change:" container-uuid "at:" change-at "by:" user-id)
+  (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
+    (if (= container-uuid (:uuid (dispatcher/org-data)))
+      (org-change db container-uuid change-at)
+      (board-change db container-uuid change-at))))
 
 (defmethod dispatcher/action :board-seen
   [db [_ {board-uuid :board-uuid}]]
