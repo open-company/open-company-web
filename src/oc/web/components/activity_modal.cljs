@@ -342,7 +342,8 @@
                         [:ul.activity-modal-more-menu
                           (when (utils/link-for (:links activity-data) "partial-update")
                             [:li
-                              {:on-click #(do
+                              {:class (when editing "disabled")
+                               :on-click #(do
                                            (reset! (::showing-dropdown s) false)
                                            (reset! (::move-activity s) true))}
                               "Move"])
