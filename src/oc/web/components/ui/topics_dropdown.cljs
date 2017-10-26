@@ -17,7 +17,7 @@
           topic-name (s/trim @(::new-topic s))
           topic-slug (unique-slug topics topic-name)
           edit-key (second (:rum/args s))]
-      (dis/dispatch! [:topic-add edit-key {:name topic-name :slug topic-slug}])
+      (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} edit-key])
       (reset! (::new-topic s) ""))))
 
 (rum/defcs topics-dropdown < (rum/local "" ::new-topic)
