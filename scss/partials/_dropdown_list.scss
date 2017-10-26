@@ -60,15 +60,15 @@ div.dropdown-list-container {
         }
 
         &:hover {
-          background-color: $carrot_light_purple;//rgba($carrot_light_gray_4, 0.2);
+          background-color: $carrot_light_purple;
           color: $carrot_purple;
         }
 
         &.select {
           @include avenir_H();
-          background-color: $carrot_light_purple; //rgba($carrot_orange, 0.1);
           text-decoration: none;
-          color: $carrot_purple; //$carrot_orange;
+          background-color: $carrot_light_gray_8;
+          color: $carrot_dark_gray_2;
         }
 
         img.dropdown-list-item-icon {
