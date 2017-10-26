@@ -27,10 +27,6 @@ div.activity-modal-container {
       div.activity-modal {
         div.activity-modal-header {
           div.activity-modal-header-right {
-            div.more-dropdown {
-              opacity: 0;
-            }
-
             div.activity-attachments {
               opacity: 0;
             }
@@ -44,7 +40,6 @@ div.activity-modal-container {
                   border: none;
                   outline: none;
                   cursor: text;
-                  @include activity-headline();
                   @include avenir_H();
                   font-size: 20px;
                   color: $carrot_dark_gray;
@@ -206,6 +201,10 @@ div.activity-modal-container {
                   color: $carrot_light_gray_3;
                   cursor: pointer;
                   background-color: transparent;
+
+                  &.disabled {
+                    opacity: 0.4;
+                  }
 
                   &:hover {
                     background-color: rgba($carrot_light_gray_4, 0.2);

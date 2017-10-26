@@ -1044,13 +1044,15 @@
   (assoc db :trend-bar-status status))
 
 (defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ board-slug activity-uuid activity-type]]
+  [db [_ board-slug activity-uuid activity-type editing]]
   (utils/after 10
    #(let [from-all-posts (= (router/current-board-slug) "all-posts")
           activity-url (oc-urls/entry board-slug activity-uuid)]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (-> db
     (assoc :activity-modal-fade-in activity-uuid)
+    (assoc :modal-editing editing)
+    (assoc :dismiss-modal-on-editing-stop editing)
     ;; Make sure the seen-at is not reset when navigating to modal view
     (assoc :no-reset-seen-at true)))
 
@@ -1168,13 +1170,13 @@
           next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [:entry-modal-editing] dissoc :loading)))))
+        (update-in [:modal-editing-data] dissoc :loading)))))
 
 (defmethod dispatcher/action :entry-save/failed
   [db [_]]
   (-> db
-    (update-in [:entry-modal-editing] dissoc :loading)
-    (update-in [:entry-modal-editing] assoc :error true)))
+    (update-in [:modal-editing-data] dissoc :loading)
+    (update-in [:modal-editing-data] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1432,6 +1434,10 @@
 
 (defmethod dispatcher/action :entry-modal-save
   [db [_ board-slug]]
-  (let [entry-data (:entry-modal-editing db)]
+  (let [entry-data (:modal-editing-data db)]
     (api/update-entry entry-data board-slug)
-    (assoc-in db [:entry-modal-editing :loading] true)))
+    (assoc-in db [:modal-editing-data :loading] true)))
+
+(defmethod dispatcher/action :activity-modal-edit
+  [db [_ activate]]
+  (assoc db :modal-editing activate))
