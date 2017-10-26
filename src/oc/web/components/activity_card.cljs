@@ -185,8 +185,7 @@
                       (when (and (utils/link-for (:links activity-data) "partial-update")
                                  (> (count all-boards) 1))
                         [:li
-                          {:class (when editing "disabled")
-                           :on-click #(do
+                          {:on-click #(do
                                         (reset! (::more-dropdown s) false)
                                         (reset! (::move-activity s) true))}
                           "Move"])
