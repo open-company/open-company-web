@@ -105,6 +105,15 @@ div.activity-modal-container {
             margin-right: 8px;
           }
 
+          div.entry-card-dd-container {
+            button.dropdown-toggle:not(.has-topic) {
+              margin-top: 7px;
+            }
+            div.entry-edit-topics-dd {
+              margin-top: 7px;
+            }
+          }
+
           div.activity-attachments {
             float: right;
             margin-top: 7px;
@@ -204,6 +213,10 @@ div.activity-modal-container {
 
                   &.disabled {
                     opacity: 0.4;
+
+                    &:hover {
+                      background-color: transparent;
+                    }
                   }
 
                   &:hover {

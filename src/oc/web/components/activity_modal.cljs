@@ -19,6 +19,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
+            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
@@ -231,9 +232,6 @@
                                                  initial-body (:body activity-data)
                                                  initial-headline (utils/emojify (:headline activity-data))]
                                              (reset! (::editing s) (:modal-editing modal-data))
-                                             ;; Load board if it's not already
-                                             (when-not (:entry-edit-topics modal-data)
-                                               (dis/dispatch! [:board-get (utils/link-for (:links activity-data) "up")]))
                                              (reset! (::initial-body s) initial-body)
                                              (reset! (::initial-headline s) initial-headline))
                                            s)
@@ -342,8 +340,8 @@
                         [:ul.activity-modal-more-menu
                           (when (utils/link-for (:links activity-data) "partial-update")
                             [:li
-                              {:class (when editing "disabled")
-                               :on-click #(do
+                              {:class (if editing "disabled" "no-editing")
+                               :on-click #(when-not editing
                                            (reset! (::showing-dropdown s) false)
                                            (reset! (::move-activity s) true))}
                               "Move"])
@@ -356,11 +354,13 @@
                     (when @(::move-activity s)
                       (activity-move {:activity-data activity-data :boards-list all-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
               (activity-attachments activity-data false)
-              (when (:topic-slug activity-data)
-                (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                  [:div.activity-tag
-                    {:on-click #(close-clicked s (:topic-slug activity-data))}
-                    topic-name]))]]
+              (if editing
+                (topics-dropdown (:modal-editing-data modal-data) :modal-editing-data)
+                (when (:topic-slug activity-data)
+                  (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
+                    [:div.activity-tag
+                      {:on-click #(close-clicked s (:topic-slug activity-data))}
+                      topic-name])))]]
           [:div.activity-modal-columns
             ;; Left column
             [:div.activity-left-column
