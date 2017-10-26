@@ -82,17 +82,14 @@ div.filters-dropdown {
       border-radius: 100px;
 
       &:hover {
-        // background-color: rgba($carrot_light_gray_4, 0.2);
         background-color: $carrot_light_purple;
         color: $carrot_purple;
       }
 
       &.select {
         @include avenir_H();
-        // background-color: rgba($carrot_orange, 0.1);
-        // color: $carrot_orange;
-        background-color: $carrot_light_purple;
-        color: $carrot_purple;
+        background-color: $carrot_light_gray_8;
+        color: $carrot_dark_gray_2;
       }
     }
 
