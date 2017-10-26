@@ -50,12 +50,16 @@
 (defn is-share-thoughts? [entry changes]
   (let [entry-js-date (utils/js-date (:created-at entry))
         now (utils/js-date)
-        thirty-days (* 1000 60 60 24 30)]
-         ;; Was created in the last 30 days
-    (and (<= (- (.getTime now) thirty-days) (.getTime entry-js-date))
-         ;; Has 0 comments
+        thirty-days (* 1000 60 60 24 30)
+        user-id (jwt/get-key :user-id)
+        author-id (-> entry :author first :user-id)]
+    (and ;; Was not created by this user
+         (not= author-id user-id)
+         ;; was created in the last 30 days
+         (<= (- (.getTime now) thirty-days) (.getTime entry-js-date))
+         ;; has 0 comments
          (zero? (:count (utils/link-for (:links entry) "comments")))
-         ;; Has no reactions from the current user
+         ;; has no reactions from the current user
          (zero? (count (filter :reacted (:reactions entry)))))))
 
 (defn find-share-thoughts-uuid [board-data changes]
