@@ -1076,16 +1076,16 @@
     (assoc :entry-edit-dissmissing true)))
 
 (defmethod dispatcher/action :topic-add
-  [db [_ topic-map use-in-new-entry?]]
+  [db [_ topic-map edit-key]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
         board-data (get-in db board-key)
         next-topics (conj (:topics board-data) topic-map)
         next-board-data (assoc board-data :topics next-topics)
         next-db (assoc-in db board-key next-board-data)]
-    (if use-in-new-entry?
-      (assoc next-db :entry-editing (merge (:entry-editing next-db) {:topic-slug (:slug topic-map)
-                                                                     :topic-name (:name topic-map)
-                                                                     :has-changes true}))
+    (if edit-key
+      (assoc next-db edit-key (merge (edit-key next-db) {:topic-slug (:slug topic-map)
+                                                         :topic-name (:name topic-map)
+                                                         :has-changes true}))
       next-db)))
 
 (defn author-data [current-user-data as-of]
