@@ -121,7 +121,7 @@ div.activity-attachments{
         div.file-title {
           @include avenir_H();
           font-size: 14px;
-          color: #47535F;
+          color: $carrot_dark_gray_2;
           width: calc(100% - 32px - 32px);
           overflow: hidden;
           text-overflow: ellipsis;
