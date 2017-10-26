@@ -194,12 +194,11 @@
                               (:topics board-data)
                               (let [edit-board-slug (:board-slug entry-editing)]
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
-   :modal-data          [[:base :org-data :entry-edit-topics]
+   :modal-data          [[:base :org-data]
                           (fn [base org-data entry-edit-topics]
                             {:org-data org-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
                              :board-filters (:board-filters base)
-                             :entry-edit-topics entry-edit-topics
                              :modal-editing-data (:modal-editing-data base)
                              :modal-editing (:modal-editing base)
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)})]
