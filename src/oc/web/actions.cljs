@@ -1094,7 +1094,7 @@
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)]
-    (api/create-entry entry-data entry-data)
+    (api/create-entry entry-data)
     (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
