@@ -1093,37 +1093,12 @@
 
 (defmethod dispatcher/action :entry-save
   [db [_]]
-  (let [entry-data (:entry-editing db)
-        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        org-slug (router/current-org-slug)
-        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
-        board-data (get-in db board-key)
-        as-of (utils/as-of-now)
-        new-entry? (empty? (:uuid entry-data))
-        current-user-data (:current-user-data db)
-        fixed-entry (if new-entry?
-                      (new-entry-fixed-data entry-data board-data current-user-data as-of)
-                      (entry-fixed-data entry-data current-user-data as-of))
-        old-entries (:fixed-items board-data)
-        new-entries (assoc old-entries (:uuid fixed-entry) fixed-entry)
-        next-board-data (assoc board-data :fixed-items new-entries)
-        next-board-filters (if (or is-all-posts (= (:board-filters db) (:topic-slug entry-data)))
-                              ; if it's filtering by the same topic of the new entry leave it be
-                              (:board-filters db)
-                              (if (keyword? (:board-filters db))
-                                ; if it's different but it's a keyword it means it's sorting (by latest or topic)
-                                (:board-filters db)
-                                ; else sort by latest because it's filtering by a different topic
-                                :latest))]
-    (if new-entry?
-      (api/create-entry entry-data (:uuid fixed-entry))
-      (api/update-entry entry-data (:board-slug entry-data)))
-    (-> db
-        (assoc-in board-key next-board-data)
-        (assoc :board-filters next-board-filters))))
+  (let [entry-data (:entry-editing db)]
+    (api/create-entry entry-data entry-data)
+    (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ {:keys [temp-uuid activity-data]}]]
+  [db [_ {:keys [activity-data edit-key]}]]
   (let [board-slug (:board-slug activity-data)
         is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
@@ -1133,19 +1108,16 @@
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
           fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
-          fixed-items (if (not (empty? temp-uuid))
-                        (dissoc (:fixed-items board-data) temp-uuid)
-                        (:fixed-items board-data))
-          next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
+          next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [:modal-editing-data] dissoc :loading)))))
+        (update-in [edit-key] dissoc :loading)))))
 
 (defmethod dispatcher/action :entry-save/failed
-  [db [_]]
+  [db [_ edit-key]]
   (-> db
-    (update-in [:modal-editing-data] dissoc :loading)
-    (update-in [:modal-editing-data] assoc :error true)))
+    (update-in [edit-key] dissoc :loading)
+    (update-in [edit-key] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]

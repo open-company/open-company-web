@@ -14,6 +14,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -122,6 +123,7 @@
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
                         (rum/local false ::show-divider-line)
+                        (rum/local false ::saving)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -152,6 +154,14 @@
                          :after-render  (fn [s]
                                           (should-show-divider-line s)
                                           s)
+                         :did-remount (fn [s]
+                                        (when @(::saving s)
+                                          (let [entry-editing @(drv/get-ref s :entry-editing)]
+                                            (when (not (:loading entry-editing))
+                                              (reset! (::saving s) false)
+                                              (when-not (:error entry-editing)
+                                                (real-close s)))))
+                                        s)
                          :will-unmount (fn [s]
                                          (when @(::body-editor s)
                                            (.destroy @(::body-editor s))
@@ -222,9 +232,11 @@
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (clean-body)
-                          (dis/dispatch! [:entry-save])
-                          (real-close s))
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:entry-save]))
              :disabled (not (:has-changes entry-editing))}
+             (when @(::saving s)
+               (small-loading))
             (if new-entry? "Post" "Save")]
           [:button.mlb-reset.mlb-link-black.form-action-bt
             {:on-click #(cancel-clicked s)}
