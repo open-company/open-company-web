@@ -678,7 +678,7 @@
 (def entry-keys [:headline :body :topic-name :attachments :title :board-slug])
 
 (defn create-entry
-  [entry-data temp-uuid]
+  [entry-data]
   (when entry-data
     (let [board-data (dispatcher/board-data)
           create-entry-link (utils/link-for (:links board-data) "create")
@@ -687,7 +687,9 @@
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body headers] :as resp}]
-          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug (:slug board-data) :temp-uuid temp-uuid}]))))))
+          (if success
+            (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug (:slug board-data) :edit-key :entry-editing}])
+            (dispatcher/dispatch! [:entry-save/failed  :entry-editing])))))))
 
 (defn update-entry
   [entry-data board-slug]
@@ -699,8 +701,8 @@
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
           (if success
-            (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug board-slug}])
-            (dispatcher/dispatch! [:entry-save/failed])))))))
+            (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug board-slug  :edit-key :modal-editing-data}])
+            (dispatcher/dispatch! [:entry-save/failed  :modal-editing-data])))))))
 
 (defn delete-activity [activity-data]
   (when activity-data

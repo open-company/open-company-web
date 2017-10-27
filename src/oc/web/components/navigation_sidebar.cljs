@@ -97,14 +97,10 @@
         drafts-board (first (filter #(= (:slug %) "drafts") all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
-        show-invite-people (and (router/current-org-slug)
-                                (jwt/is-admin? (:team-id org-data)))
-        is-tall-enough? (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))
         org-slug (router/current-org-slug)
-        board-url-fn #(let [c-val (cook/get-cookie (router/last-board-filter-cookie org-slug %))]
-                        (if (= c-val "by-topic")
-                          (oc-urls/board-sort-by-topic org-slug %)
-                          (oc-urls/board org-slug %)))]
+        show-invite-people (and org-slug
+                                (jwt/is-admin? (:team-id org-data)))
+        is-tall-enough? (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))]
     [:div.left-navigation-sidebar.group
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -136,7 +132,7 @@
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)
-                  :let [board-url (board-url-fn (:slug board))]]
+                  :let [board-url (utils/get-board-url org-slug (:slug board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-posts) (= (router/current-board-slug) (:slug board))) "item-selected")
                  :data-board (name (:slug board))

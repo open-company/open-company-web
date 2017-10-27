@@ -37,22 +37,6 @@
   (router/redirect! "/")
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
 
-;; Get the board to show counting the last accessed and the last created
-
-(def default-board "welcome")
-
-(defn get-default-board [org-data]
-  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (= last-board-slug "all-posts")
-      {:slug "all-posts"}
-      (let [boards (:boards org-data)
-            board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (if board
-          ; Get the last accessed board from the saved cookie
-          board
-          (let [sorted-boards (vec (sort-by :name boards))]
-            (first sorted-boards)))))))
-
 (defmethod dispatcher/action :entry-point
   [db [_ {:keys [success collection]}]]
   (let [next-db (assoc db :latest-entry-point (.getTime (js/Date.)))]
@@ -122,7 +106,7 @@
 (defmethod dispatcher/action :org
   [db [_ org-data saved?]]
   (let [boards (:boards org-data)]
-    
+
     (cond
       ;; If it's all posts page, loads all posts for the current org
       (and (router/current-board-slug)
@@ -137,7 +121,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
-          (router/redirect-404!)))
+          (router/nav! (oc-urls/org (router/current-org-slug)))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -155,12 +139,12 @@
         (>= (count boards) 1)
         (if (responsive/is-tablet-or-mobile?)
           (utils/after 10 #(router/nav! (oc-urls/boards)))
-          (let [board-to (get-default-board org-data)]
-            (if board-to
-              (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
-                (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-                (utils/after 10 #(router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))
-              (utils/after 10 #(router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+          (let [board-to (utils/get-default-board org-data)]
+            (utils/after 10
+              #(router/nav!
+                 (if board-to
+                   (utils/get-board-url (:slug org-data) (:slug board-to))
+                   (oc-urls/all-posts (:slug org-data))))))))))
 
   ;; Change service connection 
   (when (jwt/jwt) ; only for logged in users
@@ -244,7 +228,12 @@
 (defmethod dispatcher/action :board
   [db [_ board-data]]
   (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
-       fixed-board-data (utils/fix-board board-data)]
+        fixed-board-data (utils/fix-board board-data)
+        db-loading (if (and is-currently-shown
+                            (router/current-activity-id)
+                            (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
+                     (dissoc db :loading)
+                     db)]
     (when is-currently-shown
       
       (when (and (router/current-activity-id)
@@ -253,7 +242,7 @@
                  ; (or (not (utils/in? (:route @router/path) "story-edit"))
                  ;     (= (:slug board-data) "drafts"))
                  )
-        (router/redirect-404!))
+        (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
       
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
@@ -285,7 +274,7 @@
           ;                          (router/current-activity-id)
           ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
           ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
-          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
+          next-db (assoc-in db-loading (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
           ;; Drafts
           ; with-story-editing (if story-editing
           ;                       (assoc next-db :story-editing story-editing)
@@ -1066,7 +1055,7 @@
   (when (router/current-activity-id)
     (utils/after 1 #(let [board-filters (:board-filters db)
                           from-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-                          last-cookie (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)))]
+                          board-url (utils/get-board-url (router/current-org-slug) (router/current-board-slug))]
                       (router/nav!
                         (cond
                           ; AA
@@ -1075,12 +1064,9 @@
                           ; Board with topic filter
                           (string? board-filters)
                           (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
-                          ;; Board sort by topic
-                          (or (= "by-topic" last-cookie) (= :by-topic board-filters))
-                          (oc-urls/board-sort-by-topic (router/current-org-slug) (router/current-board-slug))
-                          ;; Board most recent
+                          ;; Board most recent or by topic
                           :else
-                          (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
+                          board-url)))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
   (-> db
@@ -1124,37 +1110,12 @@
 
 (defmethod dispatcher/action :entry-save
   [db [_]]
-  (let [entry-data (:entry-editing db)
-        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        org-slug (router/current-org-slug)
-        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
-        board-data (get-in db board-key)
-        as-of (utils/as-of-now)
-        new-entry? (empty? (:uuid entry-data))
-        current-user-data (:current-user-data db)
-        fixed-entry (if new-entry?
-                      (new-entry-fixed-data entry-data board-data current-user-data as-of)
-                      (entry-fixed-data entry-data current-user-data as-of))
-        old-entries (:fixed-items board-data)
-        new-entries (assoc old-entries (:uuid fixed-entry) fixed-entry)
-        next-board-data (assoc board-data :fixed-items new-entries)
-        next-board-filters (if (or is-all-posts (= (:board-filters db) (:topic-slug entry-data)))
-                              ; if it's filtering by the same topic of the new entry leave it be
-                              (:board-filters db)
-                              (if (keyword? (:board-filters db))
-                                ; if it's different but it's a keyword it means it's sorting (by latest or topic)
-                                (:board-filters db)
-                                ; else sort by latest because it's filtering by a different topic
-                                :latest))]
-    (if new-entry?
-      (api/create-entry entry-data (:uuid fixed-entry))
-      (api/update-entry entry-data (:board-slug entry-data)))
-    (-> db
-        (assoc-in board-key next-board-data)
-        (assoc :board-filters next-board-filters))))
+  (let [entry-data (:entry-editing db)]
+    (api/create-entry entry-data)
+    (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ {:keys [temp-uuid activity-data]}]]
+  [db [_ {:keys [activity-data edit-key]}]]
   (let [board-slug (:board-slug activity-data)
         is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
@@ -1164,19 +1125,16 @@
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
           fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
-          fixed-items (if (not (empty? temp-uuid))
-                        (dissoc (:fixed-items board-data) temp-uuid)
-                        (:fixed-items board-data))
-          next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
+          next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [:modal-editing-data] dissoc :loading)))))
+        (update-in [edit-key] dissoc :loading)))))
 
 (defmethod dispatcher/action :entry-save/failed
-  [db [_]]
+  [db [_ edit-key]]
   (-> db
-    (update-in [:modal-editing-data] dissoc :loading)
-    (update-in [:modal-editing-data] assoc :error true)))
+    (update-in [edit-key] dissoc :loading)
+    (update-in [edit-key] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1421,18 +1379,22 @@
 
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status {:keys [activity-uuid activity-data]}]]
-  (when (= status 404)
-    (router/redirect-404!))
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
-        fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
-    (when (jwt/jwt)
-      (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
-        (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-    (-> db
-      (dissoc :activity-loading)
-      (assoc-in activity-key fixed-activity-data))))
+  (let [next-db (if (= status 404)
+                  (dissoc db :latest-entry-point)
+                  db)]
+    (when (= status 404)
+      ; (router/redirect-404!)
+      (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug))))
+    (let [org-slug (router/current-org-slug)
+          board-slug (router/current-board-slug)
+          activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
+          fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+      (when (jwt/jwt)
+        (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
+          (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+      (-> next-db
+        (dissoc :activity-loading)
+        (assoc-in activity-key fixed-activity-data)))))
 
 (defmethod dispatcher/action :entry-modal-save
   [db [_ board-slug]]

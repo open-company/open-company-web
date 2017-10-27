@@ -13,6 +13,7 @@
             [goog.object :as gobj]
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
+            [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
@@ -1150,6 +1151,27 @@
         ; Fallback to the newest board if the saved board was not found
         (newest-org orgs)))
     (newest-org orgs)))
+
+;; Get the board to show counting the last accessed and the last created
+
+(def default-board "welcome")
+
+(defn get-default-board [org-data]
+  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
+    (if (= last-board-slug "all-posts")
+      {:slug "all-posts"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (if board
+          ; Get the last accessed board from the saved cookie
+          board
+          (let [sorted-boards (vec (sort-by :name boards))]
+            (first sorted-boards)))))))
+
+(defn get-board-url [org-slug board-slug]
+  (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug))) :by-topic)
+    (oc-urls/board-sort-by-topic org-slug board-slug)
+    (oc-urls/board org-slug board-slug)))
 
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)

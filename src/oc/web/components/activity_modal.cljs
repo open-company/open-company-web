@@ -56,12 +56,7 @@
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                       (let [org-slug (router/current-org-slug)
-                                             board-slug (router/current-board-slug)
-                                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                                         (if (= last-filter :by-topic)
-                                           (router/nav! (oc-urls/board-sort-by-topic))
-                                           (router/nav! (oc-urls/board))))
+                                       (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug)))
                                        (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
@@ -79,7 +74,7 @@
       (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))))
 
 (defn- setup-headline [state]
-  (let [headline-el  (rum/ref-node state "edit-headline")]
+  (when-let [headline-el  (rum/ref-node state "edit-headline")]
     (reset! (::headline-input-listener state)
      (events/listen headline-el EventType/INPUT #(headline-on-change state)))
     (js/emojiAutocomplete)))
@@ -90,14 +85,14 @@
   ; Prevent the normal paste behaviour
   (utils/event-stop e)
   (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
-        pasted-data   (.getData clipboardData "text/plain")
-        headline-el   (rum/ref-node state "edit-headline")]
+        pasted-data   (.getData clipboardData "text/plain")]
     ; replace the selected text of headline with the text/plain data of the clipboard
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    ; move cursor at the end
-    (utils/to-end-of-content-editable headline-el)))
+    (when-let [headline-el   (rum/ref-node state "edit-headline")]
+      ; move cursor at the end
+      (utils/to-end-of-content-editable headline-el))))
 
 (defn- add-emoji-cb [state]
   (headline-on-change state)
@@ -120,7 +115,8 @@
            (utils/to-end-of-content-editable body-el)
            (utils/scroll-to-bottom scrolling-el))
          (= focus :headline)
-         (utils/to-end-of-content-editable (rum/ref-node state "edit-headline"))))))
+         (when-let [headline-el (rum/ref-node state "edit-headline")]
+           (utils/to-end-of-content-editable headline-el))))))
 
 (defn- start-editing? [state & [focus]]
   (let [activity-data (first (:rum/args state))]

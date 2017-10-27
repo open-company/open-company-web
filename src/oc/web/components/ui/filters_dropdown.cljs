@@ -35,10 +35,7 @@
           [:span "Viewing"]
           [:div.topic-filter
             {:class (when-not topic-data "no-topic")
-             :on-click #(router/nav!
-                          (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:slug board-data)))) :by-topic)
-                            (oc-urls/board-sort-by-topic)
-                            (oc-urls/board)))}
+             :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data)))}
             (or (:name topic-data) "No topic")]]
         [:button.mlb-reset.filters-dropdown-button.choice
           {:type "button"

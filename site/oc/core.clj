@@ -46,7 +46,9 @@
    ;; Static js files
    [:script {:src (pages/cdn "/js/static-js.js")}]
    ;; Bootstrap JavaScript //getf.com/
-   [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]])
+   [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
+   ;; jQuery textcomplete needed by Emoji One autocomplete
+   [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header and every change here should be reflected there."

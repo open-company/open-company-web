@@ -120,6 +120,7 @@ div.comments {
         font-weight: 300;
         margin: 0 0 0 #{$comment-avatar-size + 16}px;
         white-space: pre-line;
+        word-wrap: break-word;
 
         .emojione {
           @include emoji-size(13);

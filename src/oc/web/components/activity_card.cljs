@@ -211,11 +211,7 @@
             [:div.activity-tag
               {:class (utils/class-set {:board-tag true
                                         :double-tag (:topic-slug activity-data)})
-               :on-click #(do
-                            (router/nav!
-                              (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
-                                  (oc-urls/board-sort-by-topic (:board-slug activity-data))
-                                  (oc-urls/board (:board-slug activity-data)))))}
+               :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
               (:board-name activity-data)])
                 ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
                 ;;(when is-new [:div.new-tag "New"])

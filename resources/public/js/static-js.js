@@ -39,7 +39,7 @@ function getCookie(name) {
     return decodeURI(dc.substring(begin + prefix.length, end));
 }
 
-function cookieName(){
+function cookieName(name){
   var h = window.location.hostname.split(".")[0];
   var prefix = "";
   switch(h) {
@@ -50,55 +50,59 @@ function cookieName(){
       prefix = "staging-";
       break;
   }
-  return prefix + "jwt";
+  return prefix + name;
 }
 
 $(document).ready(function(){
-  // var tif = getParameterByName("tif");
-  // var confirm = getParameterByName("confirm");
-  // var rewriteUrl = window.location.pathname + window.location.hash;
-  // window.history.pushState({}, document.title, rewriteUrl);
-  // if (tif) {
-  //   $(".try-it-form-central-input").focus();
-  // }
-
-  // $("#try-it-form-central").submit( function(e){
-  //   mailchimpApiSubmit(e, this, function(){
-  //     $(".carrot-box-thanks-top").show();
-  //     $(".try-it-combo-field-top").hide();
-  //   }, function(){});
-  //   return false;
-  // });
-
-  // $("#try-it-form-bottom").submit( function(e){
-  //   mailchimpApiSubmit(e, this, function(){
-  //     $(".carrot-box-thanks-bottom").show();
-  //     $(".try-it-combo-field-bottom").hide();
-  //   }, function(){});
-  //   return false;
-  // });
-
-  // if (confirm) {
-  //   $(".confirm-thanks").show();
-  //   $(".carrot-box-thanks-top").hide();
-  //   $("#try-it-form-central").hide();
-  // }
-
-  var jwt = getCookie(cookieName());
+  // Get the jwt cookie to know if the user is logged in
+  var jwt = getCookie(cookieName("jwt"));
   if (jwt) {
     $("#site-header-login-item").hide();
-  }
-  $("#site-header-signup-item").text( jwt? "Your Boards" : "Get Started" );
-  $("#site-header-signup-item").attr("onClick", jwt? "window.location = \"/login\"" : "window.location = \"/login?slack\"");
-
-  if (!jwt) {
-    $("#get-started-centred-bt").text( "Get started for free" );
-    $("#get-started-centred-bt").attr("onClick", "window.location = \"/login?slack\"");
-  } else {
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
     // Remove the label below it too
     $("#easy-setup-label").css({"display": "none"});
+    // Top right corner became Your Boards
+    $("#site-header-signup-item").text( "Your Boards" );
+    var url = "/login",
+        decoded_jwt;
+    if ( typeof jwt_decode === "function" ) {
+      var decoded_jwt = jwt_decode(jwt),
+          user_id,
+          org_slug,
+          board_slug;
+      if (jwt_decode &&  decoded_jwt) {
+        user_id = decoded_jwt["user-id"];
+        if ( user_id ) {
+          org_slug = getCookie(cookieName("last-org-" + user_id))
+          if ( org_slug ) {
+            board_slug = getCookie(cookieName("last-board-" + user_id + "-" + org_slug))
+            if ( board_slug ){
+              if ( getCookie(cookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
+                url = "/" + org_slug + "/" + board_slug + "/by-topic";
+              } else {
+                url = "/" + org_slug + "/" + board_slug;
+              }
+            } else {
+              url = "/" + org_slug;
+            }
+          }
+        }
+      }
+    }
+    $("#site-header-signup-item").attr("onClick", "window.location = \"" + url + "\";");
+    // If in 404 page show error message for logged in users
+    $("div.error-page.not-found-page p.not-logged-in").hide();
+
+  }else{ // No logged in user
+    // Show Get started for free button linked to signup with Slack
+    $("#get-started-centred-bt").text( "Get started for free" );
+    $("#get-started-centred-bt").attr("onClick", "window.location = \"/login?slack\"");
+    // Top right corner button
+    $("#site-header-signup-item").text("Get Started");
+    $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
+    // If in 404 page show error message for not logged in users
+    $("div.error-page.not-found-page p.logged-in").hide();
   }
 
 });
