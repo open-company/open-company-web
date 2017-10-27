@@ -46,10 +46,10 @@ function emojiAutocomplete() {
               return emojiStrategy[shortname].unicode;
             },
             imageTemplate: function(shortname, unicode){
-              return '<img class="emojione emojione-'+unicode+'"  alt="'+unicodeChar(unicode)+'" title=":'+shortname+':"/>';
+              return unicodeChar(unicode);
             },
             SVGImageFromShortname: function(shortname){
-              return '<svg class="emojione"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="'+this.spritePath+'.svg#emoji-' +emojiStrategy[shortname].unicode+ '"></use></svg>';
+              return emojiStrategy[shortname].unicode;
             },
             PNGImageFromShortname: function(shortname){
               var unicode = this.unicodeFromShortname(shortname);
