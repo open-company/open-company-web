@@ -665,21 +665,24 @@
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
   [text & [plain-text]]
-  ;; use an SVG sprite map
-  (set! (.-imageType js/emojione) "png")
-  (set! (.-sprites js/emojione) true)
-  (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png")
-  ;; convert ascii emoji's (like  :) and :D) into emojis
-  (set! (.-ascii js/emojione) true)
-  (let [text-string (or text "") ; handle nil
-        unicode-string (.toImage js/emojione text-string)
-        r (js/RegExp "<span " "ig")
-        with-img (.replace unicode-string r "<img ")
-        without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
+  ; ;; use an SVG sprite map
+  ; (set! (.-imageType js/emojione) "png")
+  ; (set! (.-sprites js/emojione) true)
+  ; (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png")
+  ; ;; convert ascii emoji's (like  :) and :D) into emojis
+  ; (set! (.-ascii js/emojione) true)
+  ; (let [text-string (or text "") ; handle nil
+  ;       unicode-string (.toImage js/emojione text-string)
+  ;       r (js/RegExp "<span " "ig")
+  ;       with-img (.replace unicode-string r "<img ")
+  ;       without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
 
-    (if plain-text
-      without-span
-      #js {"__html" without-span})))
+  ;   (if plain-text
+  ;     without-span
+  ;     #js {"__html" without-span}))
+  (if plain-text
+    text
+    #js {"__html" text}))
 
 (defn strip-HTML-tags [text]
   (when text
