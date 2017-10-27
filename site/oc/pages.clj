@@ -425,6 +425,8 @@
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
+          ;; jQuery textcomplete needed by Emoji One autocomplete
+          [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
           [:script {:type "text/javascript" :src "/lib/tooltip/tooltip.js"}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -497,7 +499,7 @@
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
-          
+
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
