@@ -110,28 +110,36 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (when (or (not @ch-state)
-              (not (:open? @@ch-state))
-              (not= @current-org org-slug))
-      (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state
-                    "current org:" @current-org "this org:" org-slug)
-      ; if the path is different it means
-      (when (and @ch-state
-                 (:open? @@ch-state))
-        (timbre/info "Closing previous connection for:" @current-org)
-        (stop-router!))
-      (timbre/info "Attempting change service connection to:" ws-domain "for org:" org-slug)
-      (reset! board-ids boards)
-      (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
-                                                        {:type :auto
-                                                         :host ws-domain
-                                                         :protocol (if ls/jwt-cookie-secure :https :http)
-                                                         :packer :edn
-                                                         :uid uid
-                                                         :params {:user-id uid}})]
-          (reset! current-org org-slug)
-          (reset! channelsk chsk)
-          (reset! ch-chsk ch-recv)
-          (reset! chsk-send! send-fn)
-          (reset! ch-state state)
-          (start-router!)))))
+    (if (or (not @ch-state)
+            (not (:open? @@ch-state))
+            (not= @current-org org-slug))
+
+      ;; Need a connection to change service
+      (do
+        (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state
+                      "current org:" @current-org "this org:" org-slug)
+        ; if the path is different it means
+        (when (and @ch-state
+                   (:open? @@ch-state))
+          (timbre/info "Closing previous connection for:" @current-org)
+          (stop-router!))
+        (timbre/info "Attempting change service connection to:" ws-domain "for org:" org-slug)
+        (reset! board-ids boards)
+        (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
+                                                          {:type :auto
+                                                           :host ws-domain
+                                                           :protocol (if ls/jwt-cookie-secure :https :http)
+                                                           :packer :edn
+                                                           :uid uid
+                                                           :params {:user-id uid}})]
+            (reset! current-org org-slug)
+            (reset! channelsk chsk)
+            (reset! ch-chsk ch-recv)
+            (reset! chsk-send! send-fn)
+            (reset! ch-state state)
+            (start-router!))))
+
+      ;; already connected, make sure we're watching all the current boards
+      (do
+        (reset! board-ids boards)
+        (container-watch))))
