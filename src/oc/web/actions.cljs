@@ -37,22 +37,6 @@
   (router/redirect! "/")
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
 
-;; Get the board to show counting the last accessed and the last created
-
-(def default-board "welcome")
-
-(defn get-default-board [org-data]
-  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (= last-board-slug "all-posts")
-      {:slug "all-posts"}
-      (let [boards (:boards org-data)
-            board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (if board
-          ; Get the last accessed board from the saved cookie
-          board
-          (let [sorted-boards (vec (sort-by :name boards))]
-            (first sorted-boards)))))))
-
 (defmethod dispatcher/action :entry-point
   [db [_ {:keys [success collection]}]]
   (let [next-db (assoc db :latest-entry-point (.getTime (js/Date.)))]
@@ -155,12 +139,12 @@
         (>= (count boards) 1)
         (if (responsive/is-tablet-or-mobile?)
           (utils/after 10 #(router/nav! (oc-urls/boards)))
-          (let [board-to (get-default-board org-data)]
-            (if board-to
-              (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:slug org-data) (:slug board-to)))) :by-topic)
-                (router/redirect! (oc-urls/board-sort-by-topic (:slug org-data) (:slug board-to)))
-                (utils/after 10 #(router/nav! (oc-urls/board (:slug org-data) (:slug board-to)))))
-              (utils/after 10 #(router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+          (let [board-to (utils/get-default-board org-data)]
+            (utils/after 10
+              #(router/nav!
+                 (if board-to
+                   (utils/get-board-url (:slug org-data) (:slug board-to))
+                   (oc-urls/all-posts (:slug org-data))))))))))
 
   ;; Change service connection 
   (when (jwt/jwt) ; only for logged in users
@@ -1054,7 +1038,7 @@
   (when (router/current-activity-id)
     (utils/after 1 #(let [board-filters (:board-filters db)
                           from-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-                          last-cookie (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (router/current-board-slug)))]
+                          board-url (utils/get-board-url (router/current-org-slug) (router/current-board-slug))]
                       (router/nav!
                         (cond
                           ; AA
@@ -1063,12 +1047,9 @@
                           ; Board with topic filter
                           (string? board-filters)
                           (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
-                          ;; Board sort by topic
-                          (or (= "by-topic" last-cookie) (= :by-topic board-filters))
-                          (oc-urls/board-sort-by-topic (router/current-org-slug) (router/current-board-slug))
-                          ;; Board most recent
+                          ;; Board most recent or by topic
                           :else
-                          (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
+                          board-url)))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
   (-> db
