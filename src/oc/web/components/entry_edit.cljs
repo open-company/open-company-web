@@ -77,9 +77,9 @@
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
 (defn- setup-headline [state]
-  (let [headline-el  (rum/ref-node state "headline")]
-    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
-    (js/emojiAutocomplete)))
+  (when-let [headline-el  (rum/ref-node state "headline")]
+    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state))))
+  (js/emojiAutocomplete))
 
 (defn headline-on-paste
   "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
@@ -87,14 +87,14 @@
   ; Prevent the normal paste behaviour
   (utils/event-stop e)
   (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
-        pasted-data   (.getData clipboardData "text/plain")
-        headline-el   (rum/ref-node state "headline")]
+        pasted-data   (.getData clipboardData "text/plain")]
     ; replace the selected text of headline with the text/plain data of the clipboard
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    ; move cursor at the end
-    (utils/to-end-of-content-editable headline-el)))
+    (when-let [headline-el (rum/ref-node state "headline")]
+      ; move cursor at the end
+      (utils/to-end-of-content-editable headline-el))))
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
@@ -143,7 +143,8 @@
                                        s)
                          :did-mount (fn [s]
                                       (utils/after 300 #(setup-headline s))
-                                      (utils/to-end-of-content-editable (rum/ref-node s "headline"))
+                                      (when-let [headline-el (rum/ref-node s "headline")]
+                                        (utils/to-end-of-content-editable headline-el))
                                       s)
                          :before-render (fn [s]
                                           (calc-edit-entry-modal-height s)
