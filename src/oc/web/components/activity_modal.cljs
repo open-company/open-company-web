@@ -56,12 +56,7 @@
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                       (let [org-slug (router/current-org-slug)
-                                             board-slug (router/current-board-slug)
-                                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
-                                         (if (= last-filter :by-topic)
-                                           (router/nav! (oc-urls/board-sort-by-topic))
-                                           (router/nav! (oc-urls/board))))
+                                       (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug)))
                                        (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
