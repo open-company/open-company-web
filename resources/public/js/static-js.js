@@ -54,36 +54,7 @@ function cookieName(name){
 }
 
 $(document).ready(function(){
-  // var tif = getParameterByName("tif");
-  // var confirm = getParameterByName("confirm");
-  // var rewriteUrl = window.location.pathname + window.location.hash;
-  // window.history.pushState({}, document.title, rewriteUrl);
-  // if (tif) {
-  //   $(".try-it-form-central-input").focus();
-  // }
-
-  // $("#try-it-form-central").submit( function(e){
-  //   mailchimpApiSubmit(e, this, function(){
-  //     $(".carrot-box-thanks-top").show();
-  //     $(".try-it-combo-field-top").hide();
-  //   }, function(){});
-  //   return false;
-  // });
-
-  // $("#try-it-form-bottom").submit( function(e){
-  //   mailchimpApiSubmit(e, this, function(){
-  //     $(".carrot-box-thanks-bottom").show();
-  //     $(".try-it-combo-field-bottom").hide();
-  //   }, function(){});
-  //   return false;
-  // });
-
-  // if (confirm) {
-  //   $(".confirm-thanks").show();
-  //   $(".carrot-box-thanks-top").hide();
-  //   $("#try-it-form-central").hide();
-  // }
-
+  // Get the jwt cookie to know if the user is logged in
   var jwt = getCookie(cookieName("jwt"));
   if (jwt) {
     $("#site-header-login-item").hide();
@@ -120,6 +91,8 @@ $(document).ready(function(){
       }
     }
     $("#site-header-signup-item").attr("onClick", "window.location = \"" + url + "\";");
+    // If in 404 page show error message for logged in users
+    $("div.error-page.not-found-page p.not-logged-in").hide();
 
   }else{ // No logged in user
     // Show Get started for free button linked to signup with Slack
@@ -128,6 +101,8 @@ $(document).ready(function(){
     // Top right corner button
     $("#site-header-signup-item").text("Get Started");
     $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
+    // If in 404 page show error message for not logged in users
+    $("div.error-page.not-found-page p.logged-in").hide();
   }
 
 });

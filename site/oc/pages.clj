@@ -362,11 +362,12 @@
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
   [:div.not-found
     [:div
-      [:div.error-page
+      [:div.error-page.not-found-page
         [:img {:src (cdn "/img/ML/carrot_404.svg") :width 338 :height 189}]
         [:h2 "Page Not Found"]
-        [:p "It seems we can't find what you're looking for."]
-        [:p.last "The page may have been moved or removed."]
+        [:p "The page may have been moved or removed,"]
+        [:p.not-logged-in.last "or you may need to " [:a.login {:href "/login"} "login"] "."]
+        [:p.logged-in.last "or you may not have access with this account."]
         [:script {:src "/js/set-path.js"}]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]

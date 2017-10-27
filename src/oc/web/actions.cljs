@@ -106,7 +106,7 @@
 (defmethod dispatcher/action :org
   [db [_ org-data saved?]]
   (let [boards (:boards org-data)]
-    
+
     (cond
       ;; If it's all posts page, loads all posts for the current org
       (and (router/current-board-slug)
@@ -121,7 +121,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) "drafts")
           (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
-          (router/redirect-404!)))
+          (router/nav! (oc-urls/org (router/current-org-slug)))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
            (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -216,7 +216,12 @@
 (defmethod dispatcher/action :board
   [db [_ board-data]]
   (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
-       fixed-board-data (utils/fix-board board-data)]
+        fixed-board-data (utils/fix-board board-data)
+        db-loading (if (and is-currently-shown
+                            (router/current-activity-id)
+                            (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
+                     (dissoc db :loading)
+                     db)]
     (when is-currently-shown
       
       (when (and (router/current-activity-id)
@@ -225,7 +230,7 @@
                  ; (or (not (utils/in? (:route @router/path) "story-edit"))
                  ;     (= (:slug board-data) "drafts"))
                  )
-        (router/redirect-404!))
+        (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
       
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
@@ -257,7 +262,7 @@
           ;                          (router/current-activity-id)
           ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
           ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
-          next-db (assoc-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
+          next-db (assoc-in db-loading (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
           ;; Drafts
           ; with-story-editing (if story-editing
           ;                       (assoc next-db :story-editing story-editing)
@@ -1360,18 +1365,22 @@
 
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status {:keys [activity-uuid activity-data]}]]
-  (when (= status 404)
-    (router/redirect-404!))
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
-        fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
-    (when (jwt/jwt)
-      (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
-        (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-    (-> db
-      (dissoc :activity-loading)
-      (assoc-in activity-key fixed-activity-data))))
+  (let [next-db (if (= status 404)
+                  (dissoc db :latest-entry-point)
+                  db)]
+    (when (= status 404)
+      ; (router/redirect-404!)
+      (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug))))
+    (let [org-slug (router/current-org-slug)
+          board-slug (router/current-board-slug)
+          activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
+          fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+      (when (jwt/jwt)
+        (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
+          (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+      (-> next-db
+        (dissoc :activity-loading)
+        (assoc-in activity-key fixed-activity-data)))))
 
 (defmethod dispatcher/action :entry-modal-save
   [db [_ board-slug]]
