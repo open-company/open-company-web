@@ -75,9 +75,9 @@
           ; [:li
           ;   {:class (if (= active-page "pricing") "active" "")}
           ;   [:a.navbar-item {:href "/pricing"} "Pricing"]]
-          [:li
-            {:class (if (= active-page "features") "active" "")}
-            [:a.navbar-item {:href "/features"} "Features"]]
+          ; [:li
+          ;   {:class (if (= active-page "features") "active" "")}
+          ;   [:a.navbar-item {:href "/features"} "Features"]]
           [:li
             {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]
@@ -134,15 +134,17 @@
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');"}
             "COMPANY"]
+          [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
-        [:div.column.column-tour
-          [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column:not(.column-tour)').removeClass('expanded');$('nav.navbar-bottom div.column.column-tour').toggleClass('expanded');"}
-            "TOUR"]
-          [:div.column-item [:a {:href "/"} "Home"]]
-          [:div.column-item [:a {:href "/features"} "Features"]]]]]])
+        ; [:div.column.column-tour
+        ;   [:div.column-title
+        ;     {:onClick "$('nav.navbar-bottom div.column:not(.column-tour)').removeClass('expanded');$('nav.navbar-bottom div.column.column-tour').toggleClass('expanded');"}
+        ;     "TOUR"]
+        ;   [:div.column-item [:a {:href "/"} "Home"]]
+        ;   [:div.column-item [:a {:href "/features"} "Features"]]]
+          ]]])
 
 
 (defn read-edn [entry]

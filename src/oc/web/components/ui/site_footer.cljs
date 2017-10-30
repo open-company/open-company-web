@@ -64,19 +64,21 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
+          [:div.column-item [:a {:href oc-urls/home} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
-        [:div.column.column-tour
-          {:class (when (= @(::expanded s) :tour) "expanded")}
-          [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :tour)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :tour)))}
-            "TOUR"]
-          [:div.column-item [:a {:href oc-urls/home} "Home"]]
-          [:div.column-item [:a {:href oc-urls/features} "Features"]]]]
+        ; [:div.column.column-tour
+        ;   {:class (when (= @(::expanded s) :tour) "expanded")}
+        ;   [:div.column-title
+        ;     {:on-click #(when (responsive/is-mobile-size?)
+        ;                   (if (= @(::expanded s) :tour)
+        ;                     (reset! (::expanded s) nil)
+        ;                     (reset! (::expanded s) :tour)))}
+        ;     "TOUR"]
+        ;   [:div.column-item [:a {:href oc-urls/home} "Home"]]
+        ;   [:div.column-item [:a {:href oc-urls/features} "Features"]]]
+          ]
 
         (when (responsive/is-mobile-size?)
           (bottom-footer "mobile-footer"))]])
