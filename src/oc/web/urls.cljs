@@ -18,7 +18,7 @@
 
 (def contact "/contact")
 
-(def help "https://help.carrot.io")
+(def help "http://help.carrot.io")
 
 (def home-try-it-focus (str home "?tif"))
 

@@ -43,7 +43,7 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Help"]]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column.column-integration
