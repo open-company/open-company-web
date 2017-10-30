@@ -36,9 +36,11 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Grow Together"]
-          [:div.subheadline#thank-you-top
-            "Announcements, updates and stories that bring teams closer"]
+          [:h1.headline "When teams have more to say"]
+          [:div.subheadline
+            "Not everything fits in a chat message."]
+          [:div.subheadline.second-line
+            "Elevate your team mission, announcements and updates to create transparency and alignment."]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -69,10 +71,9 @@
           [:div.illustration.illustration-1.group
             [:div.illustration-image]
             [:div.description.group
-              [:div.title
-                "Keep your team informed and aligned"]
-              [:div.subtitle
-                "Check out what’s new this past week, or get new employees up to speed - it’s never been easier to get caught up."]]]
+              [:h1.headline "When teams have more to say"]
+            [:div.subheadline
+              "Not everything fits in a chat message. Elevate your team mission, announcements and updates to create transparency and alignment."]]]
 
           [:div.illustration.illustration-2.group
             [:div.illustration-image]
@@ -133,10 +134,21 @@
         [:div.home-section.third-section
           [:div.illustrations-title
             [:div.why-carrot
-              "Don’t forget your extended team!"]
+              "Don’t forget your extended team"]
             [:div.why-carrot-description
-              "Investors, advisors and other stakeholders stay engaged when you keep them in the loop. With Carrot, it’s never been easier."]]
-          [:div.centred-screenshot]]
+              "Investors, advisors and other stakeholders stay engaged when you keep them in the loop. With Carrot, it’s never been easier."]
+            [:div.centred-screenshot]]
+          [:div.third-section-footer.group
+            [:div.left-copy
+              [:div.title
+                "Simplify investor updates"]
+              [:div.description
+                "Create a Carrot board specifically for investors and advisors in no time. All of your updates will stay organized in one place so it’s easy to know what you’ve sent them in the past. Also ideal for keeping friends and family in the loop."]]
+            [:div.right-copy
+              [:div.title
+                "Build a bigger network"]
+              [:div.description
+                "Share news with recruits, potential investors and customers to keep them engaged and supportive. It’s an easy way to build trust and grow your business."]]]]
 
         (comment
           [:div.customers

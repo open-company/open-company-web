@@ -27,7 +27,7 @@ div#wrap {
         @include avenir_B();
         color: $carrot_dark_blue;
         padding: 0 16px;
-        max-width: 690px;
+        max-width: 800px;
         margin: 0 auto 20px;
         line-height: 60px;
 
@@ -43,8 +43,8 @@ div#wrap {
         padding: 0 16px;
         @include avenir_R();
         line-height: 32px;
-        max-width: 450px;
-        margin: 20px auto 30px;
+        max-width: 650px;
+        margin: 20px auto 0px;
 
         &.second-line {
           margin: 0px auto 40px;
@@ -315,16 +315,47 @@ div#wrap {
     div.third-section {
       div.illustrations-title {
         max-width: 810px;
+        
+        div.centred-screenshot {
+          width: 471px;
+          height: 319px;
+          margin: 64px auto;
+          background-size: 471px 319px;
+          background-repeat: no-repeat;
+          background-position: center;
+          @include image-2x("/img/ML/home_page_screenshot");
+        }
       }
 
-      div.centred-screenshot {
-        width: 471px;
-        height: 319px;
-        margin: 64px auto;
-        background-size: 471px 319px;
-        background-repeat: no-repeat;
-        background-position: center;
-        @include image-2x("/img/ML/home_page_screenshot");
+      div.third-section-footer {
+        max-width: 1074px;
+        margin: 60px auto;
+
+        div.left-copy {
+          float: left;
+          width: 489px;
+        }
+
+        div.right-copy {
+          float: right;
+          width: 489px;
+        }
+
+        div.title {
+          color: $carrot_dark_blue;
+          @include avenir_H();
+          font-size: 36px;
+          letter-spacing: 0.1px;
+          text-align: left;
+        }
+
+        div.description {
+          color: #3B3D41;
+          @include avenir_M();
+          font-size: 20px;
+          line-height: 1.7;
+          text-align: left;
+        }
       }
     }
 
