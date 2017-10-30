@@ -1,3 +1,5 @@
+$illustration_min_width: 1247;
+
 div#wrap {
 
   div.main.home-page {
@@ -41,7 +43,7 @@ div#wrap {
         padding: 0 16px;
         @include avenir_R();
         line-height: 32px;
-        max-width: 550px;
+        max-width: 450px;
         margin: 20px auto 30px;
 
         &.second-line {
@@ -77,11 +79,15 @@ div#wrap {
         margin-top: 16px;
       }
 
-      img.homepage-screenshot {
-        margin-top: 48px;
+      div.homepage-screenshot {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 756px 511px;
+        @include image-2x("/img/ML/home_page_screenshot");
+        width: 756px;
+        height: 511px;
+        margin: 48px auto 0px;
         padding: 0 16px;
-        max-width: 100%;
-        height: auto;
       }
     }
 
@@ -93,11 +99,11 @@ div#wrap {
         margin: 60px auto;
         padding: 0 16px;
 
-        @media screen and (min-width: 1127px){
-          width: 1127px;
+        @media screen and (min-width: #{$illustration_min_width}px){
+          width: #{$illustration_min_width}px;
         }
 
-        @media screen and (max-width: 1126px){
+        @media screen and (max-width: #{$illustration_min_width - 1}px){
           img {
             max-width: 100%;
             height: auto;
@@ -105,15 +111,20 @@ div#wrap {
         }
 
         div.description {
-          @media screen and (max-width: 1126px){
+          @media screen and (max-width: #{$illustration_min_width - 1}px){
             margin-top: 60px;
             padding: 0 16px;
             max-width: 500px;
             margin: 60px auto 0;
           }
 
-          @media screen and (min-width: 1127px){
+          @media screen and (min-width: #{$illustration_min_width}px){
             max-width: 475px;
+          }
+
+          div.illustration-image {
+            background-repeat: no-repeat;
+            background-position: center;
           }
 
           div.title {
@@ -130,58 +141,190 @@ div#wrap {
             font-size: 20px;
             line-height: 1.7;
             text-align: left;
+
+            a {
+              color: #4C67FC;
+              &:hover {
+                text-decoration: underline;
+              }
+            }
           }
         }
 
         // 1st illustration
-        @media screen and (min-width: 1127px){
+        @media screen and (min-width: #{$illustration_min_width}px){
           &.illustration-1 {
 
-            img {
-              float: right;
-              margin-right: 80px;
+            div.illustration-image {
+              float: left;
+              width: 681px;
+              height: 448px;
+              background-size: 618px 448px;
+              @include image-2x("/img/ML/home_page_il_1_681_448");
             }
 
             div.description {
-              float: left;
+              float: right;
               text-align: left;
-              margin-top: 135px;
-              margin-left: 50px
+              margin-top: 90px;
             }
           }
 
           // 2nd illustration
           &.illustration-2 {
 
-            img {
-              float: left;
-              margin-left: 50px;
+            div.illustration-image {
+              float: right;
+              width: 521px;
+              height: 385px;
+              background-size: 521px 385px;
+              @include image-2x("/img/ML/home_page_il_2_521_385");
             }
 
             div.description {
-              float: right;
+              float: left;
               text-align: right;
-              margin-top: 110px;
-              margin-right: 20px;
+              margin-top: 90px;
             }
           }
 
           // 3rd illustration
           &.illustration-3 {
+            div.illustration-image {
+              float: left;
+              width: 430px;
+              height: 329px;
+              background-size: 430px 329px;
+              @include image-2x("/img/ML/home_page_il_3_430_329");
+              margin-left: 90px
+            }
 
-            img {
+            div.description {
               float: right;
-              margin-right: 100px;
+              text-align: left;
+              margin-top: 45px;
+              margin-right: 50px;
+            }
+          }
+
+          &.illustration-4 {
+            div.illustration-image {
+              float: right;
+              width: 521px;
+              height: 283px;
+              background-size: 521px 283px;
+              @include image-2x("/img/ML/home_page_il_4_521_283");
             }
 
             div.description {
               float: left;
               text-align: left;
               margin-left: 50px;
+              margin-top: 70px;
+              max-width: 455px;
+            }
+          }
+
+          &.illustration-5 {
+            div.illustration-image {
+              float: left;
+              width: 424px;
+              height: 329px;
+              background-size: 424px 329px;
+              @include image-2x("/img/ML/home_page_il_5_424_329");
+              margin-left: 70px;
+            }
+
+            div.description {
+              float: right;
+              text-align: left;
+              margin-top: 70px;
+              margin-right: 50px;
+            }
+          }
+
+          &.illustration-6 {
+            margin-top: 20px;
+            div.illustration-image {
+              float: right;
+              width: 346px;
+              height: 321px;
+              background-size: 346px 321px;
+              @include image-2x("/img/ML/home_page_il_6_346_321");
+              margin-right: 200px;
+            }
+
+            div.description {
+              float: left;
+              text-align: left;
+              margin-left: 20px;
               margin-top: 90px;
             }
           }
+
+          &.illustration-7 {
+            div.illustration-image {
+              float: left;
+              width: 333px;
+              height: 274px;
+              background-size: 333px 274px;
+              @include image-2x("/img/ML/home_page_il_7_333_274");
+              margin-left: 50px;
+            }
+
+            div.description {
+              float: right;
+              text-align: left;
+              margin-right: 40px;
+              margin-top: 20px;
+            }
+          }
         }
+      }
+    }
+
+    div.home-section {
+      padding: 120px 0px;
+
+      div.illustrations-title {
+        margin-bottom: 60px;
+        max-width: 720px;
+        text-align: center;
+        margin: 0 auto;
+
+        div.why-carrot {
+          @include avenir_H();
+          font-size: 48px;
+          color: $carrot_dark_blue;
+          margin-bottom: 24px;
+        }
+
+        div.why-carrot-description {
+          @include avenir_R();
+          font-size: 20px;
+          color: #4D4D4D;
+        }
+      }
+    }
+
+    div.second-section {
+      background-color: $oc_gray_8;
+      padding: 120px 0px 0px;
+    }
+
+    div.third-section {
+      div.illustrations-title {
+        max-width: 810px;
+      }
+
+      div.centred-screenshot {
+        width: 471px;
+        height: 319px;
+        margin: 64px auto;
+        background-size: 471px 319px;
+        background-repeat: no-repeat;
+        background-position: center;
+        @include image-2x("/img/ML/home_page_screenshot");
       }
     }
 
