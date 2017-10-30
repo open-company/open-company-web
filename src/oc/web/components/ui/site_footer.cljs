@@ -66,7 +66,9 @@
             "COMPANY"]
           [:div.column-item [:a {:href oc-urls/home} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
-          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
+          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
+          [:div.column-item [:a {:href oc-urls/terms} "Terms of service"]]
+          [:div.column-item [:a {:href oc-urls/privacy} "Privacy"]]]
 
         ; [:div.column.column-tour
         ;   {:class (when (= @(::expanded s) :tour) "expanded")}

@@ -136,7 +136,9 @@
             "COMPANY"]
           [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
-          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
+          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
+          [:div.column-item [:a {:href "/terms"} "Terms of service"]]
+          [:div.column-item [:a {:href "/privacy"} "Privacy"]]]
 
         ; [:div.column.column-tour
         ;   [:div.column-title
