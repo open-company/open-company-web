@@ -1,5 +1,22 @@
 $illustration_min_width: 1247;
 
+button.get-started-button {
+  max-width: 320px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: $carrot_text_blue;
+  color: white;
+  padding: 3px 56px;
+  @include avenir_H();
+  font-size: 18px;
+  margin: 20px 16px 0;
+  opacity: 0.9;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 div#wrap {
 
   div.main.home-page {
@@ -52,23 +69,6 @@ div#wrap {
           @include mobile(){
             margin-top: 20px;
           }
-        }
-      }
-
-      button.get-started-centred-bt {
-        max-width: 320px;
-        height: 48px;
-        border-radius: 8px;
-        background-color: $carrot_text_blue;
-        color: white;
-        padding: 3px 56px;
-        @include avenir_H();
-        font-size: 18px;
-        margin: 20px 16px 0;
-        opacity: 0.9;
-
-        &:hover {
-          opacity: 1;
         }
       }
 
@@ -478,6 +478,12 @@ div#wrap {
       padding: 56px 0 86px;
       background-image: linear-gradient(252deg, #f7c144, #f2558f);
       text-align: center;
+
+      button.get-started-button {
+        border: none;
+        outline: none;
+        background-color: #2E405A;
+      }
 
       div.try-it-title {
         @include avenir_H();
