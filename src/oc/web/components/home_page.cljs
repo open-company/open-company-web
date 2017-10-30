@@ -45,7 +45,7 @@
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
           (when-not (jwt/jwt)
-            [:button.mlb-reset.get-started-centred-bt
+            [:button.mlb-reset.get-started-button
               {:on-click #(if (utils/in? (:route @router/path) "login")
                             (dis/dispatch! [:login-overlay-show :signup-with-slack])
                             (router/nav! oc-urls/sign-up-with-slack))}
@@ -167,18 +167,16 @@
                 [:button.mlb-reset.right-arrow-bt
                   {:disabled true}]]]])
 
-        ; [:div.try-it
-        ;   {:id "mc_embed_signup"}
-        ;   [:div.try-it-title
-        ;     {:id "thank-you-bottom"}
-        ;     "Request early access"]
-        ;   [:div.try-it-subtitle
-        ;     "Easy set-up • Free for small teams"]
-        ;   (when-not @(::thanks-box-bottom s)
-        ;     [:div
-        ;       (try-it-form "try-it-form-bottom" #(reset! (::thanks-box-bottom s) true))])
-        ;   (when @(::thanks-box-bottom s)
-        ;     (carrot-box-thanks))]
+        (when-not (jwt/jwt)
+          [:div.try-it
+            {:id "mc_embed_signup"}
+            [:div.try-it-title
+              {:id "thank-you-bottom"}
+              "Request early access"]
+            [:div.try-it-subtitle
+              "Easy set-up • Free for small teams"]
+            [:button.get-started-button
+              "Get Started"]])
 
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
