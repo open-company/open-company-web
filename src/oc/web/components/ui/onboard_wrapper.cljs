@@ -74,9 +74,11 @@
         [:div.field-description
           "By signing up you are agreeing to our "
           [:a
+            {:href oc-urls/terms}
             "terms of service"]
           " and "
           [:a
+            {:href oc-urls/privacy}
             "privacy policy"]
           "."]
         [:button.continue
@@ -440,9 +442,11 @@
         [:div.description
           "By signing up you are agreeing to our "
           [:a
+            {:href oc-urls/terms}
             "terms of service"]
           " and "
           [:a
+            {:href oc-urls/privacy}
             "privacy policy"]
           "."]
         [:button.continue

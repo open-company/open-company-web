@@ -97,8 +97,9 @@ $(document).ready(function(){
     $("div.error-page.not-found-page p.not-logged-in").hide();
 
   }else{ // No logged in user
-    // Show Get started for free button linked to signup with Slack
-    $(".get-started-button").text( "Get started for free" );
+    // Show Get started for free button in the center
+    $("#get-started-centred-bt").text( "Get started for free");
+    // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/login?slack\"");
     // Top right corner button
     $("#site-header-signup-item").text("Get Started");
