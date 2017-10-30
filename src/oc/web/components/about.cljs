@@ -16,57 +16,65 @@
       (login-overlays-handler)
 
       [:div.container.main.about
+        [:div.about-header
+          [:h1.about "About"]
 
-        [:h1.about "About"]
+          [:div.divider-line]
 
-        [:div.divider-line]
+          [:div.ovals-container.group
 
-        [:div.ovals-container.group
+            [:div.ovals-container-face.face-red]
+            [:div.ovals-container-face.face-yellow]
+            [:div.ovals-container-face.face-blue]
+            [:div.ovals-container-face.face-green]
+            [:div.ovals-container-face.face-purple]
 
-          [:div.ovals-container-face.face-red]
-          [:div.ovals-container-face.face-yellow]
-          [:div.ovals-container-face.face-blue]
-          [:div.ovals-container-face.face-green]
-          [:div.ovals-container-face.face-purple]
-
-          [:div.about-subline
-            "People are hyper-connected in the moment, but still struggle to know what’s really happening across the company."]
-          [:div.paragraphs-container.group
-            [:div.mobile-only.happy-face.yellow-happy-face]
-            [:div.mobile-only.happy-face.red-happy-face]
-            [:div.paragraphs-bg-container.group
-              [:div.paragraph
-                "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
-              [:div.paragraph
-                "With that in mind we designed Carrot based on three principles:"]]
-            [:div.mobile-only.happy-face.blue-happy-face]
-            [:div.mobile-only.happy-face.purple-happy-face]
-            [:div.mobile-only.happy-face.green-happy-face]]]
+            [:div.about-subline
+              "Growing companies struggle to keep everyone on the same page. They grow apart."]
+            [:div.paragraphs-container.group
+              [:div.mobile-only.happy-face.yellow-happy-face]
+              [:div.mobile-only.happy-face.red-happy-face]
+              [:div.paragraphs-bg-container.group
+                [:div.paragraph
+                  "Messaging apps are designed for real-time work. They’re great in the moment, but chat gets noisy and conversations disappear, making it difficult to have a big picture view of what’s important across the company."]
+                [:div.paragraph
+                  "Carrot provides a birds-eye view of the latest announcements, updates, and stories so you can always see what’s happening in context. A common, shared view of what’s important - and the opportunity to react and ask questions about it - creates real transparency and alignment."]
+                [:div.paragraph
+                  "It also brings teams closer so they can grow together."]
+                [:div.paragraph
+                  "Carrot on!"]]
+              [:div.mobile-only.happy-face.blue-happy-face]
+              [:div.mobile-only.happy-face.purple-happy-face]
+              [:div.mobile-only.happy-face.green-happy-face]]]]
 
         [:div.principles.group
+
+          [:div.principles-headline
+            "We designed Carrot based on 3 principles:"]
+
           [:div.principle.principle-1
             [:div.principle-oval-bg]
             [:div.principle-logo]
-            [:div.principle-title "It has to be easy or no one will play"]
-            [:div.principle-description "Alignment might be essential for success, but achieving it has never been easy or fun. We’re changing that. With a simple structure and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
+            [:div.principle-title "Alignment should be simple."]
+            [:div.principle-description "Alignment might be essential for success, but achieving it has never been simple or fun. We’re changing that. With a simple structure, and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
 
           [:div.principle.principle-2
             [:div.principle-oval-bg]
             [:div.principle-logo]
-            [:div.principle-title "The “big picture” should always be visible"]
-            [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
+            [:div.principle-title "The “big picture” should always be visible."]
+            [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant, birds-eye view of what’s happening across the company anytime."]]
 
           [:div.principle.principle-3
             [:div.principle-oval-bg]
             [:div.principle-logo]
-            [:div.principle-title "Alignment is valuable beyond the team, too"]
-            [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
+            [:div.principle-title "Alignment is valuable beyond the team, too."]
+            [:div.principle-description "Make it simple to share the latest updates with investors, advisors, customers and other outside stakeholders as well. It’s the surest way to keep them engaged and supportive, and an easy way to expand your network and grow your business."]]]
 
       ] ;<!-- main -->
 
       [:div.about-alignment
         [:div.quote]
-        [:div.about-alignment-description "Company alignment requires real openness and transparency."]]
+        [:div.about-alignment-description "Company alignment requires real openness and transparency. Carrot makes it simple and fun for your team to get started."]]
 
       [:div.about-team.group
         [:div.about-team-inner.group
