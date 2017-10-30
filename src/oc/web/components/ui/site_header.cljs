@@ -55,12 +55,12 @@
           ; [:li
           ;   {:class (if (utils/in? (:route @router/path) "pricing") "active" "")}
           ;   [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
-          [:li
-            {:class (if (utils/in? (:route @router/path) "features") "active" "")}
-            [:a.navbar-item
-              {:href oc-urls/features
-               :on-click #(do (.preventDefault %) (router/nav! oc-urls/features))}
-              "Features"]]
+          ; [:li
+          ;   {:class (if (utils/in? (:route @router/path) "features") "active" "")}
+          ;   [:a.navbar-item
+          ;     {:href oc-urls/features
+          ;      :on-click #(do (.preventDefault %) (router/nav! oc-urls/features))}
+          ;     "Features"]]
           [:li
             {:class (if (utils/in? (:route @router/path) "about") "active" "")}
             [:a.navbar-item
