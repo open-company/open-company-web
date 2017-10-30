@@ -122,6 +122,8 @@
             {:onClick "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');"}
             "SUPPORT"]
           [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "/terms"} "Terms"]]
+          [:div.column-item [:a {:href "/privacy"} "Privacy"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.column-integration
@@ -136,9 +138,7 @@
             "COMPANY"]
           [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
-          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
-          [:div.column-item [:a {:href "/terms"} "Terms of service"]]
-          [:div.column-item [:a {:href "/privacy"} "Privacy"]]]
+          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
         ; [:div.column.column-tour
         ;   [:div.column-title

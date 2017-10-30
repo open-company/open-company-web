@@ -44,6 +44,8 @@
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
           [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href oc-urls/terms} "Terms"]]
+          [:div.column-item [:a {:href oc-urls/privacy} "Privacy"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column.column-integration
@@ -66,9 +68,7 @@
             "COMPANY"]
           [:div.column-item [:a {:href oc-urls/home} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
-          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
-          [:div.column-item [:a {:href oc-urls/terms} "Terms of service"]]
-          [:div.column-item [:a {:href oc-urls/privacy} "Privacy"]]]
+          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
         ; [:div.column.column-tour
         ;   {:class (when (= @(::expanded s) :tour) "expanded")}
