@@ -60,6 +60,8 @@ $(document).ready(function(){
     $("#site-header-login-item").hide();
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
+    // Hide the try it box at the bottom of the homepage
+    $("div.try-it").css({"display": "none"});
     // Remove the label below it too
     $("#easy-setup-label").css({"display": "none"});
     // Top right corner became Your Boards
@@ -96,8 +98,8 @@ $(document).ready(function(){
 
   }else{ // No logged in user
     // Show Get started for free button linked to signup with Slack
-    $("#get-started-centred-bt").text( "Get started for free" );
-    $("#get-started-centred-bt").attr("onClick", "window.location = \"/login?slack\"");
+    $(".get-started-button").text( "Get started for free" );
+    $(".get-started-button").attr("onClick", "window.location = \"/login?slack\"");
     // Top right corner button
     $("#site-header-signup-item").text("Get Started");
     $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
