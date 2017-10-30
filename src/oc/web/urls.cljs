@@ -39,6 +39,10 @@
 
 (def pricing "/pricing")
 
+(def terms "/terms")
+
+(def privacy "/privacy")
+
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
