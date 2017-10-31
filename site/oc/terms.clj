@@ -2,6 +2,7 @@
 
 (defn terms [{contact-mail-to :contact-mail-to contact-email :contact-email}]
   [:div.container
+    [:div.legal-link "Click here to see OpenCompany " [:a {:href "/privacy"} "Privacy Policy"] "."]
     [:div.readable-content-container
       [:h1 "Terms of Service"]
       [:p "PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING THE SERVICES OFFERED BY OPENCOMPANY, LLC. (\"OPENCOMPANY\"), A DELAWARE CORPORATION. THESE TERMS OF USE SET FORTH THE LEGALLY BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE WEBSITE AT HTTPS://CARROT.IO AND THE CARROT SERVICES, FEATURES, CONTENT, APPLICATIONS OR WIDGETS OFFERED BY OPENCOMPANY (COLLECTIVELY THE \"SERVICES\")."]
