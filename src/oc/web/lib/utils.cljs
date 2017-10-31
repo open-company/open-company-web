@@ -1194,3 +1194,10 @@
                                                :createdat (.data $item "createdat")
                                                :url (.attr $item "href")}))))))
     @atch-map))
+
+(defn your-boards-url []
+  (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
+    (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
+      (get-board-url org-slug board-slug)
+      (oc-urls/org org-slug))
+    oc-urls/login))

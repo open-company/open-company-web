@@ -23,13 +23,8 @@
       (.removeClass body body-class)
       (.addClass body body-class))))
 
-(defn navigate-to-your-boards [s]
-  (router/redirect!
-    (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
-      (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
-        (utils/get-board-url org-slug board-slug)
-        (oc-urls/org org-slug))
-      oc-urls/login)))
+(defn navigate-to-your-boards []
+  (router/redirect! (utils/your-boards-url)))
 
 (rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)}
   [s]
@@ -77,7 +72,7 @@
             [:div.get-started-button.navbar-item
               (if (jwt/jwt)
                 [:button.mlb-reset.mlb-get-started
-                  {:on-click #(navigate-to-your-boards s)}
+                  {:on-click #(navigate-to-your-boards)}
                     "Your Boards"]
                 [:button.mlb-reset.mlb-get-started
                   {:on-click #(if (utils/in? (:route @router/path) "login")

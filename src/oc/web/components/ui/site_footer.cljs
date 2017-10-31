@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.site-footer
   "Component for the site footer. This is copied into oc.core/footer and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
@@ -19,6 +20,9 @@
         [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
+(defn navigate-to-your-boards [your-boards-url]
+  (router/redirect! your-boards-url))
+
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]
   ;; <!-- footer -->
@@ -27,9 +31,24 @@
       [:div.left-column
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        ; FIXME: reactivate request early access
-        ; [:div.small-links
-        ;   [:a {:href oc-urls/home-try-it-focus} "Request Free Early Access"]]
+        [:div.footer-small-links
+          (when (jwt/jwt)
+            (let [your-boards-url (utils/your-boards-url)]
+              [:a {:href your-boards-url
+                   :on-click #(do (utils/event-stop %) (router/nav! your-boards-url))}
+                "Your Boards"]))
+          (when-not (jwt/jwt)
+            [:a
+              {:href oc-urls/sign-up
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
+              "Get Started"])
+          (when-not (jwt/jwt)
+            "|")
+          (when-not (jwt/jwt)
+            [:a
+              {:href oc-urls/login
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
+              "Log in"])]
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 
