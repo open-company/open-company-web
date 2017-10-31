@@ -36,11 +36,9 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "When teams have more to say"]
+          [:h1.headline "Rise above the noise"]
           [:div.subheadline
-            "Not everything fits in a chat message."]
-          [:div.subheadline.second-line
-            "Elevate your team mission, announcements and updates to create transparency and alignment."]
+            "Make key announcements, updates, and plans stand out to create greater transparency and alignment."]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))

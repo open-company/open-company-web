@@ -51,11 +51,9 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "When teams have more to say"]
+        [:h1.headline "Rise above the noise"]
         [:div.subheadline
-          "Not everything fits in a chat message."]
-        [:div.subheadline.second-line
-          "Elevate your team mission, announcements and updates to create transparency and alignment."]
+          "Make key announcements, updates, and plans stand out to create greater transparency and alignment."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:button.mlb-reset.get-started-button
           {:id "get-started-centred-bt"}
@@ -90,7 +88,7 @@
             [:div.subtitle
               "Share updates with your investors and advisors, or the latest news with your customers and partners. Carrot keeps it all organized in one place."]]]]
 
-      [:div.second-section
+      [:div.home-section.second-section
         [:div.illustrations-title
           [:div.why-carrot
             "Why Carrot?"]
