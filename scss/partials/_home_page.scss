@@ -181,6 +181,7 @@ div#wrap {
               height: 385px;
               background-size: 521px 385px;
               @include image-2x("/img/ML/home_page_il_2_521_385");
+              margin-right: 90px;
             }
 
             div.description {
@@ -194,10 +195,10 @@ div#wrap {
           &.illustration-3 {
             div.illustration-image {
               float: left;
-              width: 430px;
-              height: 329px;
-              background-size: 430px 329px;
-              @include image-2x("/img/ML/home_page_il_3_430_329");
+              width: 450px;
+              height: 349px;
+              background-size: 450px 349px;
+              @include image-2x("/img/ML/home_page_il_3_450_349");
               margin-left: 90px
             }
 
@@ -241,7 +242,7 @@ div#wrap {
               float: right;
               text-align: left;
               margin-top: 70px;
-              margin-right: 50px;
+              margin-right: 30px;
             }
           }
 
@@ -253,13 +254,13 @@ div#wrap {
               height: 321px;
               background-size: 346px 321px;
               @include image-2x("/img/ML/home_page_il_6_346_321");
-              margin-right: 200px;
+              margin-right: 170px;
             }
 
             div.description {
               float: left;
               text-align: left;
-              margin-left: 20px;
+              margin-left: 40px;
               margin-top: 90px;
             }
           }
@@ -271,14 +272,14 @@ div#wrap {
               height: 274px;
               background-size: 333px 274px;
               @include image-2x("/img/ML/home_page_il_7_333_274");
-              margin-left: 50px;
+              margin-left: 70px;
             }
 
             div.description {
               float: right;
               text-align: left;
-              margin-right: 40px;
-              margin-top: 20px;
+              margin-right: 30px;
+              margin-top: 40px;
             }
           }
         }
