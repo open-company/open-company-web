@@ -914,7 +914,6 @@
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
-  (js/console.log "action :ws-interaction/comment-add" interaction-data)
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
