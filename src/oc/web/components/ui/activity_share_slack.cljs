@@ -80,7 +80,9 @@
                           {:value (:note slack-data)
                            :on-change (fn [e]
                                        (reset! (::slack-data s)
-                                        (merge slack-data {:note (.. e -target -value)})))}]]]]]]
+                                        (merge slack-data {:note (.. e -target -value)})))}]]]
+                    [:div.medium-row.group
+                      [:div.shared-subheadline (str "Only team members can see and add comments.")]]]]]
               [:div.share-footer.group
                 [:div.buttons
                   [:button.mlb-reset.mlb-black-link

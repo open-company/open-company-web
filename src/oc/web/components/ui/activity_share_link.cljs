@@ -60,6 +60,7 @@
                               (utils/copy-to-clipboard))}
                   "Copy"]])
             [:div.shared-subheadline (str "You can provide anyone with this link to your update.")]
+            [:div.shared-subheadline (str "Only team members can see and add comments.")]
             [:button.mlb-reset.mlb-default.done-btn
               {:on-click #(close-clicked s)}
               "Done"]]]]]))

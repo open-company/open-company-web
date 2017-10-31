@@ -85,7 +85,9 @@
                       [:div.fields
                         [:textarea
                           {:value (:note email-data)
-                           :on-change #(reset! (::email-data s) (merge email-data {:note (.. % -target -value)}))}]]]]]]
+                           :on-change #(reset! (::email-data s) (merge email-data {:note (.. % -target -value)}))}]]]
+                    [:div.medium-row.group
+                      [:div.shared-subheadline (str "Only team members can see and add comments.")]]]]]
               [:div.share-footer.group
                 [:div.buttons
                   [:button.mlb-reset.mlb-black-link
