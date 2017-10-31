@@ -914,6 +914,7 @@
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
+  (js/console.log "action :ws-interaction/comment-add" interaction-data)
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
@@ -942,21 +943,17 @@
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
               sorted-comments-data (vec (sort-by :created-at new-comments-data))
               comments-key (dispatcher/activity-comments-key org-slug board-slug fixed-activity-uuid)
-              current-user-id (jwt/get-key :user-id)
-              is-current-user (= current-user-id (:user-id (:author comment-data)))
               ; update the comments link of the entry
               comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
               with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
               old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
-              new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
-              new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
+              new-author (:author comment-data)
+              new-authors (if (and old-authors (first (filter #(= (:user-id %) (:user-id new-author)) old-authors)))
                             old-authors
-                            (conj old-authors new-author))
+                            (concat [new-author] old-authors))
               with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
-          ;; Refresh the topic data if the action coming in is from the current user
-          ;; to get the new links to interact with
-          (when is-current-user
-            (api/get-entry entry-data))
+          ;; Refresh the entry data to get the new links to interact with
+          (api/get-entry entry-data)
           ; ;; Animate the comments count if we don't have already the same number of comments locally
           ; (when (not= (count all-old-comments-data) (count new-comments-data))
           ;   (utils/pulse-comments-count fixed-activity-uuid))
