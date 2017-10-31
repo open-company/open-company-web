@@ -309,9 +309,12 @@
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
-      (when (or (jwt/jwt)
-                (empty? (:token query-params)))
+      (when (empty? (:token query-params))
         (router/redirect! urls/home))
+      (when (jwt/jwt)
+        (cook/remove-cookie! :jwt)
+        (cook/remove-cookie! :login-redirect)
+        (cook/remove-cookie! :show-login-overlay))
       (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
 
     (defroute confirm-invitation-profile-route urls/confirm-invitation-profile {:as params}
