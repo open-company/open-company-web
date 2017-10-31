@@ -36,7 +36,7 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Rise above the noise"]
+          [:h1.headline "Teams need the big picture"]
           [:div.subheadline
             "Make key announcements, updates, and plans stand out to create greater transparency and alignment."]
           ; (when (and (not @(::confirm s))
