@@ -104,9 +104,12 @@
       [:div.left-column
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        ; FIXME: reactivate request early access
-        ; [:div.small-links
-        ;   [:a {:href "/?tif"} "Request Free Early Access"]]
+        [:div.footer-small-links.not-logged-in
+          [:a {:href "/sign-up"} "Get Started"]
+          "|"
+          [:a {:href "/login"} "Log in"]]
+        [:div.footer-small-links.logged-in
+          [:a {:href ""} "Your Boards"]]
         [:div.small-logos
           [:a.twitter
             {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
