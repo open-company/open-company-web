@@ -104,12 +104,10 @@
       [:div.left-column
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        [:div.footer-small-links.not-logged-in
+        [:div.footer-small-links
           [:a {:href "/sign-up"} "Get Started"]
           "|"
           [:a {:href "/login"} "Log in"]]
-        [:div.footer-small-links.logged-in
-          [:a {:href ""} "Your Boards"]]
         [:div.small-logos
           [:a.twitter
             {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}

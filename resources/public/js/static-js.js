@@ -96,8 +96,7 @@ $(document).ready(function(){
     // If in 404 page show error message for logged in users
     $("div.error-page.not-found-page p.not-logged-in").hide();
     // Footer links
-    $("div.footer-small-links.not-logged-in").hide();
-    $("div.footer-small-links.logged-in a").attr("href", your_board_url);
+    $("div.footer-small-links").hide();
 
   }else{ // No logged in user
     // Show Get started for free button in the center
@@ -109,8 +108,6 @@ $(document).ready(function(){
     $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
     // If in 404 page show error message for not logged in users
     $("div.error-page.not-found-page p.logged-in").hide();
-    // Footer links
-    $("div.footer-small-links.logged-in").hide();
   }
 
 });
