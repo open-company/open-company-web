@@ -104,7 +104,7 @@ div#wrap {
         padding: 0 16px;
 
         @include big_web(){
-          min-width: #{$illustration_min_width}px;
+          width: #{$illustration_min_width}px;
         }
 
         div.description {
