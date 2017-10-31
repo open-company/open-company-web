@@ -31,24 +31,17 @@
       [:div.left-column
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        [:div.footer-small-links
-          (when (jwt/jwt)
-            (let [your-boards-url (utils/your-boards-url)]
-              [:a {:href your-boards-url
-                   :on-click #(do (utils/event-stop %) (router/nav! your-boards-url))}
-                "Your Boards"]))
-          (when-not (jwt/jwt)
+        (when-not (jwt/jwt)
+          [:div.footer-small-links
             [:a
               {:href oc-urls/sign-up
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
-              "Get Started"])
-          (when-not (jwt/jwt)
-            "|")
-          (when-not (jwt/jwt)
+              "Get Started"]
+            "|"
             [:a
               {:href oc-urls/login
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
-              "Log in"])]
+              "Log in"]])
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 
