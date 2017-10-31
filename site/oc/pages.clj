@@ -51,7 +51,7 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "Rise above the noise"]
+        [:h1.headline "Teams need the big picture"]
         [:div.subheadline
           "Make key announcements, updates, and plans stand out to create greater transparency and alignment."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
