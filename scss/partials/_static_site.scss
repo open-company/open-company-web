@@ -5,6 +5,10 @@ div.container {
     @include avenir_BOOK();
     font-size: 18px;
 
+    @include mobile(){
+      width: 100%;
+    }
+
     a {
       color: $carrot_text_blue;
       &:hover {
