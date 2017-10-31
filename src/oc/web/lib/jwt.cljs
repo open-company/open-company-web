@@ -8,12 +8,11 @@
   (cook/get-cookie :jwt))
 
 (defn decode [encoded-jwt]
-  (when (exists? js/jwt_decode)
-    (try
-      (js/jwt_decode encoded-jwt)
-      (catch js/Object e
-        (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
-        nil))))
+  (try
+    (js/jwt_decode encoded-jwt)
+    (catch js/Object e
+      (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
+      nil)))
 
 (defn get-contents []
   (some-> (jwt) decode (js->clj :keywordize-keys true)))
