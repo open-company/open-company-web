@@ -73,7 +73,9 @@
 
       [:div.illustrations.group
         [:div.illustration.illustration-1.group
-          [:div.illustration-image]
+          [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_1_572_438.png")
+               :srcset (str (cdn "/img/ML/home_page_il_1_572_438@2x.png") " 2x")}]
           [:div.description.group
             [:div.title
               "Keep your team informed and aligned"]
@@ -81,7 +83,9 @@
               "Check out what’s new this past week, or get new employees up to speed - it’s never been easier to get caught up."]]]
 
         [:div.illustration.illustration-2.group
-          [:div.illustration-image]
+          [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_2_521_385.png")
+               :srcset (str (cdn "/img/ML/home_page_il_2_521_385@2x.png") " 2x")}]
           [:div.description.group
             [:div.title
               "Keep stakeholders in the loop, too"]
@@ -97,7 +101,9 @@
         [:div.illustrations.group
 
           [:div.illustration.illustration-3.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_3_450_349.png")
+               :srcset (str (cdn "/img/ML/home_page_il_3_450_349@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Visibility"]
@@ -105,7 +111,9 @@
                 "Unlike chat streams and wikis, Carrot creates a birds-eye view of the latest news that’s quick and easy to read. The big picture pulls everyone closer."]]]
 
           [:div.illustration.illustration-4.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_4_521_283.png")
+               :srcset (str (cdn "/img/ML/home_page_il_4_521_283@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Easy alignment"]
@@ -113,7 +121,9 @@
                 "Whether you’re adding a quick team update, or writing an overview that covers many topics, or adding a guide for new employees, getting started is simple and fast."]]]
 
           [:div.illustration.illustration-5.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_5_424_329.png")
+               :srcset (str (cdn "/img/ML/home_page_il_5_424_329@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Feedback loops"]
@@ -121,7 +131,9 @@
                 "Getting on the same page is easier when everyone can react and add comments - great for distributed teams. It’s more fun, too! 💥✌"]]]
 
           [:div.illustration.illustration-6.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_6_346_321.png")
+               :srcset (str (cdn "/img/ML/home_page_il_6_346_321@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Works with Slack"]
@@ -129,7 +141,9 @@
                 "With Slack single sign-on and our Slack bot, posts are automatically shared to the right channels. Discussions about posts can happen in Slack or Carrot - everything is kept in sync. " [:a {:href "/about"} "Learn More"]]]]
 
           [:div.illustration.illustration-7.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_7_333_274.png")
+               :srcset (str (cdn "/img/ML/home_page_il_7_333_274@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Stay private or go public"]

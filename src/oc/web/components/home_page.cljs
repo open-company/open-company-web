@@ -12,6 +12,10 @@
             [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
+(defn retina-src [url]
+  {:src (utils/cdn (str url ".png"))
+   :srcset (str (utils/cdn (str url "@2x.png")) " 2x")})
+
 (rum/defcs home-page < rum/static
                        (rum/local false ::thanks-box-top)
                        (rum/local false ::thanks-box-bottom)
@@ -67,14 +71,16 @@
         [:div.illustrations.group
 
           [:div.illustration.illustration-1.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              (retina-src "/img/ML/home_page_il_1_572_438")]
             [:div.description.group
               [:h1.headline "When teams have more to say"]
             [:div.subheadline
               "Not everything fits in a chat message. Elevate your team mission, announcements and updates to create transparency and alignment."]]]
 
           [:div.illustration.illustration-2.group
-            [:div.illustration-image]
+            [:img.illustration-image
+              (retina-src "/img/ML/home_page_il_2_521_385")]
             [:div.description.group
               [:div.title
                 "Keep stakeholders in the loop, too"]
@@ -90,7 +96,8 @@
 
           [:div.illustrations.group
             [:div.illustration.illustration-3.group
-              [:div.illustration-image]
+              [:img.illustration-image
+                (retina-src "/img/ML/home_page_il_3_450_349")]
               [:div.description.group
                 [:div.title
                   "Visibility"]
@@ -98,7 +105,8 @@
                   "Unlike chat streams and wikis, Carrot creates a birds-eye view of the latest news that’s quick and easy to read. The big picture pulls everyone closer."]]]
 
             [:div.illustration.illustration-4.group
-              [:div.illustration-image]
+              [:img.illustration-image
+                (retina-src "/img/ML/home_page_il_4_521_283")]
               [:div.description.group
                 [:div.title
                   "Easy alignment"]
@@ -106,7 +114,8 @@
                   "Whether you’re adding a quick team update, or writing an overview that covers many topics, or adding a guide for new employees, getting started is simple and fast."]]]
 
             [:div.illustration.illustration-5.group
-              [:div.illustration-image]
+              [:img.illustration-image
+                (retina-src "/img/ML/home_page_il_5_424_329")]
               [:div.description.group
                 [:div.title
                   "Feedback loops"]
@@ -114,7 +123,8 @@
                   "Getting on the same page is easier when everyone can react and add comments - great for distributed teams. It’s more fun, too! 💥✌"]]]
 
             [:div.illustration.illustration-6.group
-              [:div.illustration-image]
+              [:img.illustration-image
+                (retina-src "/img/ML/home_page_il_6_346_321")]
               [:div.description.group
                 [:div.title
                   "Works with Slack"]
@@ -122,7 +132,8 @@
                   "With Slack single sign-on and our Slack bot, posts are automatically shared to the right channels. Discussions about posts can happen in Slack or Carrot - everything is kept in sync. " [:a {:href "/about"} "Learn More"]]]]
 
             [:div.illustration.illustration-7.group
-              [:div.illustration-image]
+              [:img.illustration-image
+                (retina-src "/img/ML/home_page_il_7_333_274")]
               [:div.description.group
                 [:div.title
                   "Stay private or go public"]
