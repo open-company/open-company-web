@@ -7,7 +7,7 @@ div.activity-card {
   margin: 12px;
   position: relative;
 
-  &.hovering {
+  &:hover, &.dropdown-active {
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
 
     div.activity-card-head.entry-card {
@@ -17,6 +17,24 @@ div.activity-card {
     div.activity-card-head div.activity-card-head-right {
       div.activity-tag {
         background-color: $carrot_light_gray_6;
+      }
+
+      div.more-button {
+        button.more-ellipsis {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    div.activity-card-footer {
+      button.post-edit {
+        opacity: 0.8;
+      }
+
+      div.activity-share {
+        button.activity-share-bt {
+          opacity: 1;
+        }
       }
     }
   }
@@ -205,14 +223,10 @@ div.activity-card {
           background-position: center;
           background-size: 4px 20px;
           background-repeat: no-repeat;
-          opacity: 0.8;
+          opacity: 0;
 
           &:hover {
             opacity: 1;
-          }
-
-          &.not-hover {
-            opacity: 0;
           }
         }
 
@@ -312,15 +326,12 @@ div.activity-card {
       background-size: cover;
       border-radius: 4px;
       position: relative;
+      cursor: pointer;
 
       img {
         max-width: 72px;
         max-height: 54px;
         margin-top: 9px;
-      }
-
-      &:hover {
-        cursor: pointer;
       }
 
       &:after {
@@ -442,10 +453,6 @@ div.activity-card {
       margin-right: 8px;
       margin-top: 4px;
 
-      &.not-hover {
-        display: none;
-      }
-
       button.activity-share-bt {
         width: 24px;
         height: 24px;
@@ -455,6 +462,7 @@ div.activity-card {
         background-size: 24px 24px;
         padding: 0;
         margin: 0px;
+        opacity: 0;
       }
 
       div.activity-share-dropdown {
@@ -520,11 +528,7 @@ div.activity-card {
       background-position: center;
       background-size: 14px 14px;
       background-repeat: no-repeat;
-      opacity: 0.8;
-
-      &.not-hover {
-        opacity: 0;
-      }
+      opacity: 0;
 
       &:hover {
         opacity: 1;
