@@ -1,4 +1,18 @@
 div.container {
+  div.legal-link {
+    width: 800px;
+    margin: 20px auto 40px;
+    @include avenir_BOOK();
+    font-size: 18px;
+
+    a {
+      color: $carrot_text_blue;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   div.readable-content-container {
     margin: 0px auto;
     @media screen and (min-width: 900px) {
