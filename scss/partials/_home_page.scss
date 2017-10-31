@@ -157,16 +157,18 @@ div#wrap {
 
             div.illustration-image {
               float: left;
-              width: 681px;
-              height: 448px;
-              background-size: 618px 448px;
-              @include image-2x("/img/ML/home_page_il_1_681_448");
+              width: 572px;
+              height: 438px;
+              background-size: 572px 438px;
+              @include image-2x("/img/ML/home_page_il_1_572_438");
+              margin-left: 40px;
             }
 
             div.description {
               float: right;
               text-align: left;
               margin-top: 90px;
+              margin-right: 50px;
             }
           }
 
