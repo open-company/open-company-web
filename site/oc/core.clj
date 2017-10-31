@@ -129,8 +129,8 @@
         [:div.column.column-integration
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');"}
-            "INTEGRATIONS"]
-          [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
+            "DEVELOPERS"]
+          [:div.column-item [:a {:href "https://github.com/open-company"} "GitHub"]]]
 
         [:div.column.column-company
           [:div.column-title

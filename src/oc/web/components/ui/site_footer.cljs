@@ -66,8 +66,8 @@
                           (if (= @(::expanded s) :integration)
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :integration)))}
-            "INTEGRATIONS"]
-          [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
+            "DEVELOPERS"]
+          [:div.column-item [:a {:href oc-urls/oc-github} "GitHub"]]]
 
         [:div.column.column-company
           {:class (when (= @(::expanded s) :company) "expanded")}
