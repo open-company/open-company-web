@@ -66,7 +66,7 @@ $(document).ready(function(){
     $("#easy-setup-label").css({"display": "none"});
     // Top right corner became Your Boards
     $("#site-header-signup-item").text( "Your Boards" );
-    var url = "/login",
+    var your_board_url = "/login",
         decoded_jwt;
     if ( typeof jwt_decode === "function" ) {
       var decoded_jwt = jwt_decode(jwt),
@@ -81,20 +81,23 @@ $(document).ready(function(){
             board_slug = getCookie(cookieName("last-board-" + user_id + "-" + org_slug))
             if ( board_slug ){
               if ( getCookie(cookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
-                url = "/" + org_slug + "/" + board_slug + "/by-topic";
+                your_board_url = "/" + org_slug + "/" + board_slug + "/by-topic";
               } else {
-                url = "/" + org_slug + "/" + board_slug;
+                your_board_url = "/" + org_slug + "/" + board_slug;
               }
             } else {
-              url = "/" + org_slug;
+              your_board_url = "/" + org_slug;
             }
           }
         }
       }
     }
-    $("#site-header-signup-item").attr("onClick", "window.location = \"" + url + "\";");
+    $("#site-header-signup-item").attr("onClick", "window.location = \"" + your_board_url + "\";");
     // If in 404 page show error message for logged in users
     $("div.error-page.not-found-page p.not-logged-in").hide();
+    // Footer links
+    $("div.footer-small-links.not-logged-in").hide();
+    $("div.footer-small-links.logged-in a").attr("href", your_board_url);
 
   }else{ // No logged in user
     // Show Get started for free button in the center
@@ -106,6 +109,8 @@ $(document).ready(function(){
     $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
     // If in 404 page show error message for not logged in users
     $("div.error-page.not-found-page p.logged-in").hide();
+    // Footer links
+    $("div.footer-small-links.logged-in").hide();
   }
 
 });
