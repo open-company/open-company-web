@@ -38,6 +38,9 @@
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
 
     ;; CLJSJS packages http://cljsjs.github.io/
+    ;; Update together with resources/public/lib/jwt_decode/
+    [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
+    ;; -----------------------------------------------------
     [cljsjs/raven "3.17.0-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/medium-editor "5.23.2-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
