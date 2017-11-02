@@ -56,6 +56,16 @@ div.whats-new-modal-container {
         margin: 0px auto;
       }
 
+      a {
+        @include avenir_H();
+        font-size: 28px;
+        color: $carrot_dark_blue;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
       div.about-title {
         @include avenir_H();
         font-size: 28px;

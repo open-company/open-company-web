@@ -57,13 +57,17 @@
             (let [whats-new-data (drv/react s :whats-new-data)]
               (when (map? whats-new-data)
                 (let [sorted-whats-new (reverse (sort-by :published-at (vals whats-new-data)))]
-                  (for [n sorted-whats-new]
+                  (for [n sorted-whats-new
+                        :let [secure-url (oc-urls/secure-activity "carrot" (:secure-uuid n))]]
                     [:div.news
                       {:key (str "about-news-" (:uuid n))}
                       [:div.news-date
                         (utils/time-since (utils/js-date (:published-at n)))]
-                      [:div.news-title
-                        {:dangerouslySetInnerHTML (utils/emojify (:headline n))}]
+                      [:a
+                        {:href secure-url
+                         :on-click #(do (utils/event-stop %) (router/nav! secure-url))}
+                        [:div.news-title
+                          {:dangerouslySetInnerHTML (utils/emojify (:headline n))}]]
                       [:div.news-body
                         {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))))]
           (all-caught-up)]]]])
