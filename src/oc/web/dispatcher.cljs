@@ -60,6 +60,8 @@
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
+(def whats-new-key [:whats-new-data])
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -103,7 +105,8 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
-   :about-carrot-modal  [[:base] (fn [base] (:about-carrot-modal base))]
+   :whats-new-modal     [[:base] (fn [base] (:whats-new-modal base))]
+   :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
@@ -404,6 +407,9 @@
 (defn print-story-editing-data []
   (js/console.log (get @app-state :story-editing)))
 
+(defn print-whats-new-data []
+  (js/console.log (get-in @app-state whats-new-key)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintAllPostsData js/window) print-all-posts-data)
@@ -419,3 +425,4 @@
 (set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)
+(set! (.-OCWebPrintWhatsNewData js/window) print-whats-new-data)
