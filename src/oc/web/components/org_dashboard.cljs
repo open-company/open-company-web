@@ -17,7 +17,7 @@
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
-            [oc.web.components.ui.about-carrot-modal :refer (about-carrot-modal)]
+            [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
             [oc.web.components.ui.activity-share-link :refer (activity-share-link)]
             [oc.web.components.ui.activity-share-email :refer (activity-share-email)]
             [oc.web.components.ui.activity-share-slack :refer (activity-share-slack)]
@@ -67,8 +67,8 @@
             (:org-settings data)
             (org-settings)
             ;; About carrot
-            (:about-carrot-modal data)
-            (about-carrot-modal)
+            (:whats-new-modal data)
+            (whats-new-modal)
             ;; Made with carrot modal
             (:made-with-carrot-modal data)
             (made-with-carrot-modal)
