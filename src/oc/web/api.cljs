@@ -751,7 +751,7 @@
     (storage-http (method-for-link activity-link) (relative-href activity-link)
       {:headers (headers-for-link activity-link)}
       (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:activity-get/finish status {:activity-uuid activity-uuid :activity-data (if success (json->cljs body) nil)}])))))
+        (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) nil)])))))
 
 (defn share-activity [post-data share-data]
   (when post-data
@@ -772,7 +772,7 @@
       (storage-http (method-for-link activity-link) (relative-href activity-link)
         {:headers (headers-for-link activity-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:activity-get/finish status {:activity-uuid (router/current-secure-activity-id) :activity-data (if success (json->cljs body) {})}]))))))
+          (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) {})]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
