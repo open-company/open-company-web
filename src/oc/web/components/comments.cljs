@@ -105,7 +105,7 @@
     (when (and (not @(::comments-requested s))
                activity-data)
       (reset! (::comments-requested s) true)
-      (dis/dispatch! [:comments-get activity-data]))))
+      (utils/after 10 #(dis/dispatch! [:comments-get activity-data])))))
 
 (rum/defcs comments < (drv/drv :activity-comments-data)
                       rum/reactive
