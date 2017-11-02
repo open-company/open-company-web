@@ -191,7 +191,7 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
-                         (> (count entry-topics) 1))
+                         (or (string? board-filters) (> (count entry-topics) 1)))
                 (filters-dropdown))
               ;; Add entry floating button
               (when (and (not is-all-posts)
