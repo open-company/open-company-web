@@ -43,14 +43,14 @@
           (cond
             (or (= board-filters :by-topic)
                 (string? board-filters))
-            [:span "View by " [:span.filter-highlight "Topic"] " "]
+            [:span "View " [:span.filter-highlight "By topic"] " "]
             ; (string? board-filters)
             ; [:span.filter-highlight
             ;   (if (= board-filters "uncategorized")
             ;     "No topic "
             ;     (str (:name (utils/get-topic (:topics board-data) board-filters)) " "))]
             :else
-            [:span "View by " [:span.filter-highlight "Recent"] " "])
+            [:span "View " [:span.filter-highlight "Recent"] " "])
           [:i.fa.fa-caret-down]])
       (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))

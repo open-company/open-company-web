@@ -74,7 +74,7 @@
                                                   :initial-value ""
                                                   :disabled false})]]
                     [:div.medium-row.note.group
-                      [:span.labels "Add a note (optional)"]
+                      [:span.labels "Add a note"]
                       [:div.fields
                         [:textarea
                           {:value (:note slack-data)
@@ -82,7 +82,7 @@
                                        (reset! (::slack-data s)
                                         (merge slack-data {:note (.. e -target -value)})))}]]]
                     [:div.medium-row.group
-                      [:div.shared-subheadline (str "Only team members can see and add comments.")]]]]]
+                      [:div.shared-subheadline "Anyone outside your Carrot team won't see comments."]]]]]
               [:div.share-footer.group
                 [:div.buttons
                   [:button.mlb-reset.mlb-black-link
