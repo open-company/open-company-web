@@ -49,9 +49,6 @@
           (and (:email-lander-check-team-redirect db)
                (zero? (count orgs)))
           (router/nav! oc-urls/sign-up-team)
-          ; If I have the secure-id i need to load the activity only
-          (router/current-secure-activity-id)
-          (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
           ; If i have an org slug let's load the org data
           (router/current-org-slug)
           (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
@@ -1373,8 +1370,13 @@
   [db [_]]
   (dissoc db :made-with-carrot-modal))
 
+(defmethod dispatcher/action :secure-activity-get
+  [db [_]]
+  (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
+  db)
+
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status {:keys [activity-uuid activity-data]}]]
+  [db [_ status activity-data]]
   (let [next-db (if (= status 404)
                   (dissoc db :latest-entry-point)
                   db)]
@@ -1385,7 +1387,8 @@
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
       (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-    (let [org-slug (router/current-org-slug)
+    (let [activity-uuid (:uuid activity-data)
+          org-slug (router/current-org-slug)
           board-slug (router/current-board-slug)
           activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
           fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
