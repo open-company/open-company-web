@@ -275,11 +275,6 @@
         delete (link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defn readonly-story? [links]
-  (let [partial-update (link-for links "partial-update")
-        delete (link-for links "delete")]
-    (and (nil? partial-update) (nil? delete))))
-
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
