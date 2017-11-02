@@ -31,6 +31,9 @@
 (defn team-id []
   (first (get-key :teams)))
 
+(defn user-id []
+  (get-key :user-id))
+
 (defn is-admin? [team-id]
   (let [admins (get-key :admin)]
     (some #{team-id} admins)))
