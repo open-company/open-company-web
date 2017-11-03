@@ -288,6 +288,12 @@ div.onboard-lander {
 
         div.org-avatar {
           @include org-avatar(82);
+
+          div.org-avatar-container {
+            img.org-avatar-img {
+              max-width: 340px;
+            }
+          }
         }
       }
 
