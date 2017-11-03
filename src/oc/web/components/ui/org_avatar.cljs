@@ -7,16 +7,19 @@
             [oc.web.lib.utils :as utils]))
 
 (defn internal-org-avatar
-  [s org-data show-org-avatar? show-org-name?]
-  [:div.org-avatar-container.group
-    (when show-org-avatar?
-      [:img.org-avatar-img
-        {:src (:logo-url org-data)
-         :on-error #(reset! (::img-load-failed s) true)}])
-    (when show-org-name?
-      [:span.org-name
-        {:class (when-not show-org-avatar? "no-logo")
-         :dangerouslySetInnerHTML (utils/emojify (:name org-data))}])])
+  [s org-data show-org-avatar? show-org-name? & [max-logo-height]]
+  (let [fixed-max-logo-height (or max-logo-height 42)]
+    [:div.org-avatar-container.group
+      (when show-org-avatar?
+        [:img.org-avatar-img
+          {:src (:logo-url org-data)
+           :style #js {:height (str (:logo-height org-data) "px")
+                       :marginTop (when (< (:logo-height org-data) fixed-max-logo-height) (str (/ (- fixed-max-logo-height (:logo-height org-data)) 2) "px"))}
+           :on-error #(reset! (::img-load-failed s) true)}])
+      (when show-org-name?
+        [:span.org-name
+          {:class (when-not show-org-avatar? "no-logo")
+           :dangerouslySetInnerHTML (utils/emojify (:name org-data))}])]))
 
 (rum/defcs org-avatar < rum/static
                         (rum/local false ::img-load-failed)
