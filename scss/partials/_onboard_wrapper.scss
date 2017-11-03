@@ -287,22 +287,7 @@ div.onboard-lander {
         }
 
         div.org-avatar {
-          div.org-avatar-container {
-            height: 82px;
-
-            div.org-avatar-border {
-              width: 82px;
-              height: 82px;
-              float: left;
-              padding: 0px;
-
-              img {
-                max-width: 82px;
-                max-height: 82px;
-                text-align: center;
-              }
-            }
-          }
+          @include org-avatar(82);
         }
       }
 
