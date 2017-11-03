@@ -13,10 +13,7 @@
       {:class (when (= (:slug org) current-slug) "active")
        :on-click #(do (utils/event-stop %) (router/nav! (oc-urls/org (:slug org))))}
       (when-not missing-logo?
-        (org-avatar org false false true))
-      [:span.org-name
-        {:class (when missing-logo? "no-logo")}
-        (:name org)]]))
+        (org-avatar org false false))]))
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive
@@ -37,7 +34,7 @@
          :aria-haspopup true
          :aria-expanded false
          :on-click (fn [e] (utils/event-stop e))}
-        (org-avatar org-data (not should-show-dropdown?))]
+        (org-avatar org-data (not should-show-dropdown?) true)]
       (when should-show-dropdown?
         [:ul.dropdown-menu
           {:aria-labelledby "orgs-dropdown"}
