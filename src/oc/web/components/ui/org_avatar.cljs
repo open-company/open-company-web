@@ -7,25 +7,23 @@
             [oc.web.lib.utils :as utils]))
 
 (defn internal-org-avatar
-  [s org-data show-org-avatar? hide-name show-avatar-and-name]
-  [:div.org-avatar-container.group
-    (when show-org-avatar?
-      [:div.org-avatar-border
-        [:span.helper]
+  [s org-data show-org-avatar? show-org-name? & [max-logo-height]]
+  (let [fixed-max-logo-height (or max-logo-height 42)]
+    [:div.org-avatar-container.group
+      (when show-org-avatar?
         [:img.org-avatar-img
           {:src (:logo-url org-data)
-           :style #js {:height (str (min 42 (:logo-height org-data)) "px")}
-           :on-error #(reset! (::img-load-failed s) true)}]])
-    (when (and (not hide-name)
-               (or (not show-org-avatar?)
-                   show-avatar-and-name))
-      [:span.org-name
-        {:class (when-not show-org-avatar? "no-logo")}
-        (:name org-data)])])
+           :style #js {:height (str (:logo-height org-data) "px")
+                       :marginTop (when (< (:logo-height org-data) fixed-max-logo-height) (str (/ (- fixed-max-logo-height (:logo-height org-data)) 2) "px"))}
+           :on-error #(reset! (::img-load-failed s) true)}])
+      (when show-org-name?
+        [:span.org-name
+          {:class (when-not show-org-avatar? "no-logo")
+           :dangerouslySetInnerHTML (utils/emojify (:name org-data))}])]))
 
 (rum/defcs org-avatar < rum/static
                         (rum/local false ::img-load-failed)
-  [s org-data should-show-link & [show-avatar-and-name hide-name]]
+  [s org-data should-show-link & [hide-name]]
   (let [org-logo (:logo-url org-data)]
     [:div.org-avatar
       {:class (when (empty? org-logo) "missing-logo")}
@@ -37,7 +35,9 @@
                           (utils/camel-case-str org-slug))
               img-load-failed @(::img-load-failed s)
               show-org-avatar? (and (not img-load-failed)
-                                    (not (clojure.string/blank? org-logo)))
+                                    (not (clojure.string/blank? org-logo))
+                                    (pos? (:logo-height org-data))
+                                    (pos? (:logo-width org-data)))
               avatar-link (if should-show-link
                             (if (and (= org-slug (router/current-org-slug))
                                      (router/current-board-slug))
@@ -51,5 +51,5 @@
                            (.preventDefault e)
                            (when should-show-link
                              (router/redirect! avatar-link)))}
-              (internal-org-avatar s org-data show-org-avatar? hide-name show-avatar-and-name)]
-            (internal-org-avatar s org-data show-org-avatar? hide-name show-avatar-and-name))))]))
+              (internal-org-avatar s org-data show-org-avatar? (not hide-name))]
+            (internal-org-avatar s org-data show-org-avatar? (not hide-name)))))]))

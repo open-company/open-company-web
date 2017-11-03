@@ -94,14 +94,22 @@ nav.oc-navbar {
 
         div.org-avatar {
           height: 40px;
-          div.org-avatar-container {
-            height: 40px;
-            div.org-avatar-border {
-              height: 40px;
+          @include org-avatar(40);
+        }
 
-              img.org-avatar-img {
-                max-width: 120px;
-                max-height: 40px;
+        div.orgs-dropdown {
+          ul.dropdown-menu {
+            li div.org-avatar {
+              height: 24px;
+              @include org-avatar(24);
+
+              div.org-avatar-container {
+                span.org-name {
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $oc_gray_5;
+                  margin-top: 6px;
+                }
               }
             }
           }

@@ -1073,7 +1073,7 @@
       "just now")))
 
 (defn entry-date-tooltip [entry-data]
-  (let [created-at (js-date (:created-at entry-data))
+  (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
         updated-at (js-date (:updated-at entry-data))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]

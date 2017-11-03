@@ -241,7 +241,7 @@
                           (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
                                                                                     :logo-width 0
                                                                                     :logo-height 0})])))}
-            (org-avatar org-editing false false true)
+            (org-avatar org-editing false true)
             [:div.add-picture-link
               (if (empty? (:logo-url org-editing))
                 "Upload logo"
@@ -379,7 +379,7 @@
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
-                          (.preventDefault e))}
+                        (.preventDefault e))}
           [:div.logo-upload-container.org-logo
             {:on-click (fn [_]
                         (if (empty? (:logo-url org-editing))
@@ -399,7 +399,7 @@
                           (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
                                                                                     :logo-width 0
                                                                                     :logo-height 0})])))}
-            (org-avatar org-editing false false true)
+            (org-avatar org-editing false true)
             [:div.add-picture-link
               (if (empty? (:logo-url org-editing))
                 "Upload logo"

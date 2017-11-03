@@ -1,0 +1,38 @@
+@mixin org-avatar($max_logo_height: 42){
+  div.org-avatar-container {
+    line-height: 0;
+
+    img.org-avatar-img{
+      max-width: #{$max_logo_height * 8}px;
+      max-height: #{$max_logo_height}px;
+      vertical-align: top;
+    }
+
+    span.org-name {
+      @include avenir_B();
+      font-size: 22px;
+      line-height: 1.2;
+      color: $oc_gray_5;
+      // margin-top: -34px;
+      // margin-left: 54px;
+      float: left;
+      white-space: pre;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+
+      &.no-logo {
+        @include mobile(){
+          margin-left: 9px;
+          margin-top: 13px;
+        }
+
+        @include big_web(){
+          margin-top: #{($max_logo_height - 26) / 2}px;
+          margin-left: 0px;
+        }
+
+      }
+    }
+  }
+}

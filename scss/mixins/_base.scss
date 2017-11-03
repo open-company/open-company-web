@@ -4,6 +4,7 @@
 @import "./_responsive";
 @import "./_reusable";
 @import "./_activity";
+@import "./_org";
 
 @mixin blur ($radius) {
   -webkit-filter: blur($radius+px); /* Chrome, Safari */
