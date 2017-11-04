@@ -25,49 +25,50 @@
                              mixins/no-scroll-mixin
                              mixins/first-render-mixin
   [s]
-  [:div.whats-new-modal-container
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                              :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
-    [:div.modal-wrapper
-      [:button.carrot-modal-close.mlb-reset
-        {:on-click #(close-clicked s)}]
-      [:div.whats-new-modal
-        [:div.carrot-logo]
-        [:div.about-title
-          "What’s New with Carrot"]
-        [:div.about-links
-          [:a.about-link
-            {:href oc-urls/about
-             :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))}
-            "Company"]
-          [:a.about-link
-            {:href oc-urls/help}
-            "Help"]
-          [:a.about-link
-            {:href oc-urls/contact-mail-to}
-            "Contact"]
-          [:a.about-link.twitter
-            {:href oc-urls/oc-twitter}
-            ""]
-          [:a.about-link.medium
-            {:href oc-urls/blog}
-            ""]]
-        [:div.news-list-container
-          [:div.news-list
-            (let [whats-new-data (drv/react s :whats-new-data)]
-              (when (map? whats-new-data)
-                (let [sorted-whats-new (reverse (sort-by :published-at (vals whats-new-data)))]
-                  (for [n sorted-whats-new
-                        :let [secure-url (oc-urls/secure-activity "carrot" (:secure-uuid n))]]
-                    [:div.news
-                      {:key (str "about-news-" (:uuid n))}
-                      [:div.news-date
-                        (utils/time-since (utils/js-date (:published-at n)))]
-                      [:a
-                        {:href secure-url
-                         :on-click #(do (utils/event-stop %) (router/nav! secure-url))}
-                        [:div.news-title
-                          {:dangerouslySetInnerHTML (utils/emojify (:headline n))}]]
-                      [:div.news-body
-                        {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))))]
-          (all-caught-up)]]]])
+
+  (let [whats-new-data (drv/react s :whats-new-data)]
+
+    [:div.whats-new-modal-container
+      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
+      [:div.modal-wrapper
+        [:button.carrot-modal-close.mlb-reset
+          {:on-click #(close-clicked s)}]
+        [:div.whats-new-modal
+          [:div.carrot-logo]
+          [:div.about-title
+            (if (empty? whats-new-data)
+              "About Carrot"
+              "What’s New with Carrot")]
+          [:div.about-links
+            [:a.about-link
+              {:href oc-urls/about
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))}
+              "Company"]
+            [:a.about-link
+              {:href oc-urls/help}
+              "Help"]
+            [:a.about-link
+              {:href oc-urls/contact-mail-to}
+              "Contact"]
+            [:a.about-link.twitter
+              {:href oc-urls/oc-twitter}
+              ""]
+            [:a.about-link.medium
+              {:href oc-urls/blog}
+              ""]]
+          (when (not (empty? whats-new-data))
+            [:div.news-list-container
+              [:div.news-list
+                  (let [sorted-whats-new (reverse (sort-by :published-at (vals whats-new-data)))]
+                    (for [n sorted-whats-new
+                          :let [secure-url (oc-urls/secure-activity "carrot" (:secure-uuid n))]]
+                      [:div.news
+                        {:key (str "about-news-" (:uuid n))}
+                        [:div.news-date
+                          (utils/time-since (utils/js-date (:published-at n)))]
+                          [:div.news-title
+                            {:dangerouslySetInnerHTML (utils/emojify (:headline n))}]
+                        [:div.news-body
+                          {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))]
+              (all-caught-up)])]]]))
