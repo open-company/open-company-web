@@ -180,6 +180,6 @@
             [:div.invite-people-icon]
             [:span "Invite People"]])
         [:button.mlb-reset.about-carrot-btn
-          {:on-click #(dis/dispatch! [:about-carrot-modal-show])}
+          {:on-click #(dis/dispatch! [:whats-new-modal-show])}
           [:div.about-carrot-icon]
           [:span "About Carrot"]]]]))
