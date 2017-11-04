@@ -42,6 +42,8 @@
   (let [next-db (assoc db :latest-entry-point (.getTime (js/Date.)))]
     (if success
       (let [orgs (:items collection)]
+        (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
+          (api/get-whats-new whats-new-link))
         ;; Skip all the checks below if looking at the secure page
         (when-not (router/current-secure-activity-id)
           (cond
@@ -1277,13 +1279,13 @@
     (api/patch-org (:org-editing db)))
   db)
 
-(defmethod dispatcher/action :about-carrot-modal-show
+(defmethod dispatcher/action :whats-new-modal-show
   [db [_]]
-  (assoc db :about-carrot-modal true))
+  (assoc db :whats-new-modal true))
 
-(defmethod dispatcher/action :about-carrot-modal-hide
+(defmethod dispatcher/action :whats-new-modal-hide
   [db [_]]
-  (dissoc db :about-carrot-modal))
+  (dissoc db :whats-new-modal))
 
 (defmethod dispatcher/action :org-settings-show
   [db [_ panel]]
@@ -1414,3 +1416,10 @@
 (defmethod dispatcher/action :activity-modal-edit
   [db [_ activate]]
   (assoc db :modal-editing activate))
+
+(defmethod dispatcher/action :whats-new/finish
+  [db [_ whats-new-data]]
+  (if whats-new-data
+    (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
+      (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
+    db))
