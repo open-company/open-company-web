@@ -1,4 +1,4 @@
-div.about-carrot-modal-container {
+div.whats-new-modal-container {
   width: 100%;
   height: 100vh;
   position: fixed;
@@ -29,7 +29,7 @@ div.about-carrot-modal-container {
       margin-left: -378px;
     }
 
-    div.about-carrot-modal {
+    div.whats-new-modal {
       width: 700px;
       margin: 0px 0px 0px 28px;
       position: relative;
@@ -54,6 +54,16 @@ div.about-carrot-modal-container {
         background-size: 82px 82px;
         background-position: center;
         margin: 0px auto;
+      }
+
+      a {
+        @include avenir_H();
+        font-size: 28px;
+        color: $carrot_dark_blue;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
 
       div.about-title {
