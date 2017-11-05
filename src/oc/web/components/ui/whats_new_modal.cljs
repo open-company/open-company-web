@@ -57,7 +57,7 @@
             [:a.about-link.medium
               {:href oc-urls/blog}
               ""]]
-          (when (not (empty? whats-new-data))
+          (when (seq whats-new-data)
             [:div.news-list-container
               [:div.news-list
                   (let [sorted-whats-new (reverse (sort-by :published-at (vals whats-new-data)))]

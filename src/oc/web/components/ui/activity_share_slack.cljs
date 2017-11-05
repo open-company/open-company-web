@@ -31,8 +31,8 @@
   (let [activity-data (:share-data (drv/react s :activity-share))
         slack-data @(::slack-data s)
         shared-data (drv/react s :activity-shared-data)
-        shared? (not (empty? (:secure-uuid shared-data)))
-        secure-uuid (if (:secure-uuid shared-data) (:secure-uuid shared-data) (:secure-uuid activity-data))]
+        shared? (seq (:secure-uuid shared-data))
+        secure-uuid (or (:secure-uuid shared-data) (:secure-uuid activity-data))]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -40,7 +40,7 @@
         [:button.carrot-modal-close.mlb-reset
             {:on-click #(close-clicked s)}]
         [:div.activity-share-modal
-          (when (not shared?)
+          (when-not shared?
             [:div.title "Share " [:span {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]])
           (when shared?
             [:div.activity-share-modal-shared
@@ -52,7 +52,7 @@
                 [:button.mlb-reset.mlb-default.done-btn
                   {:on-click #(close-clicked s)}
                   "Done"])])
-          (when (not shared?)
+          (when-not shared?
             [:div.activity-share-share
               [:div.mediums-box
                 [:div.medium

@@ -34,7 +34,7 @@
 (defn days-for-month [y m]
   (case m
     1 31
-    2 (if (= (mod y 4) 0) 29 28)
+    2 (if (zero? (mod y 4)) 29 28)
     3 31
     4 30
     5 31
@@ -277,7 +277,7 @@
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
-            (rum/with-key (activity-card e (not (empty? (:headline e))) (not (empty? (:body e))) false true) (str "all-posts-entry-" (:uuid e))))]
+            (rum/with-key (activity-card e (seq (:headline e)) (seq (:body e)) false true) (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])

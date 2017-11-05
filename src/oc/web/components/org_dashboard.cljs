@@ -24,12 +24,12 @@
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data []
-  (when (not (router/current-activity-id))
+  (when-not (router/current-activity-id)
     (utils/after 100 (fn []
      (if (= (router/current-board-slug) "all-posts")
        (dis/dispatch! [:all-posts-get])
        (let [board-data (dis/board-data)
-             fixed-board-data (if board-data
+             fixed-board-data (or
                                 board-data
                                 (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards (dis/org-data))))]
          (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))

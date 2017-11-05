@@ -86,7 +86,7 @@
            :on-click #(if (or (not (utils/valid-email? (:email signup-with-email)))
                               (<= (count (:pswd signup-with-email)) 7))
                         (do
-                          (when (not (utils/valid-email? (:email signup-with-email)))
+                          (when-not (utils/valid-email? (:email signup-with-email))
                             (reset! (::email-error s) true))
                           (when (<= (count (:pswd signup-with-email)) 7)
                             (reset! (::password-error s) true)))
@@ -189,7 +189,7 @@
                                                      teams-data @(drv/get-ref s :teams-data)]
                                                  (when (and (empty? (:name org-editing))
                                                             (empty? (:logo-url org-editing))
-                                                            (not (empty? teams-data)))
+                                                            (seq teams-data))
                                                    (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
                                                s)}
   [s]
@@ -343,7 +343,7 @@
                                                  ;; If the team is loaded setup the form
                                                  (when (and (nil? (:name org-editing))
                                                             (nil? (:logo-url org-editing))
-                                                            (not (empty? teams-data)))
+                                                            (seq teams-data))
                                                    (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
                                                s)}
   [s]
@@ -545,7 +545,7 @@
     [:div.onboard-email-container
       "Please verify your email address"
       [:div.email-wall-sent-link "We have sent a link to "
-        (if (not (empty? email))
+        (if (seq email)
           [:span.email-address email]
           (str "your email address"))
         "."]]))

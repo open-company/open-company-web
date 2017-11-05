@@ -29,7 +29,7 @@
         should-show-dropdown? (> (count orgs) 1)]
     [:div.orgs-dropdown
       {:class (utils/class-set {:dropdown should-show-dropdown?
-                                :org-has-logo (not (empty? (:logo-url org-data)))})}
+                                :org-has-logo (seq (:logo-url org-data))})}
       [:button.orgs-dropdown-btn
         {:id "orgsDropdown"
          :class (when should-show-dropdown? "dropdown-toggle")

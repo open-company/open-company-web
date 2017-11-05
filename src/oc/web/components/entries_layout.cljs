@@ -69,11 +69,11 @@
                       topic-name (:topic-name (first entries-group))
                       topic-slug (:topic-slug (first entries-group))
                       first-line-entries (take 2 entries-group)
-                      first-has-headline (some #(not (empty? (:headline %))) first-line-entries)
-                      first-has-body (some #(not (empty? (:body %))) first-line-entries)
+                      first-has-headline (some #(seq (:headline %)) first-line-entries)
+                      first-has-body (some #(seq (:body %)) first-line-entries)
                       second-line-entries (if (> (count entries-group) 2) (subvec entries-group 2 (min 4 (count entries-group))) [])
-                      second-has-headline (some #(not (empty? (:headline %))) second-line-entries)
-                      second-has-body (some #(not (empty? (:body %))) second-line-entries)]]
+                      second-has-headline (some #(seq (:headline %)) second-line-entries)
+                      second-has-body (some #(seq (:body %)) second-line-entries)]]
             [:div.entry-cards-container.by-topic.group
               {:key (str "entries-topic-group-" (or topic "uncategorized"))}
               ; Title of the topic group
@@ -111,8 +111,8 @@
         (string? layout-type)
         (let [entries (vals (:fixed-items board-data))
               filtered-entries (if (= layout-type "uncategorized")
-                                  (vec (filter #(empty? (:topic-slug %)) entries))
-                                  (vec (filter #(= (:topic-slug %) layout-type) entries)))
+                                  (filterv #(empty? (:topic-slug %)) entries)
+                                  (filterv #(= (:topic-slug %) layout-type) entries))
               sorted-entries (vec (reverse (sort-by :created-at filtered-entries)))]
           [:div.entry-cards-container.by-specific-topic.group
             ; Calc the number of pairs
@@ -123,8 +123,8 @@
                     :let [start (* idx 2)
                           end (min (+ start 2) (count sorted-entries))
                           entries (subvec sorted-entries start end)
-                          has-headline (some #(not (empty? (:headline %))) entries)
-                          has-body (some #(not (empty? (:body %))) entries)]]
+                          has-headline (some #(seq (:headline %)) entries)
+                          has-body (some #(seq (:body %)) entries)]]
                 [:div.entries-cards-container-row.group
                   {:key (str "entries-row-" idx)}
                   ; Render the entries in the row
@@ -152,8 +152,8 @@
                     :let [start (* idx 2)
                           end (min (+ start 2) (count sorted-entries))
                           entries (subvec sorted-entries start end)
-                          has-headline (some #(not (empty? (:headline %))) entries)
-                          has-body (some #(not (empty? (:body %))) entries)]]
+                          has-headline (some #(seq (:headline %)) entries)
+                          has-body (some #(seq (:body %)) entries)]]
                 ; Renteder the entries in thisnrow
                 [:div.entries-cards-container-row.group
                   {:key (str "entries-row-" idx)}

@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown)]
+            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
 
 (def default-user-type "email")
@@ -45,7 +45,7 @@
 (defn has-dirty-data? [s]
   (let [invite-users-data @(drv/get-ref s :invite-users)
         invite-users (:invite-users invite-users-data)]
-    (some #(not (empty? (:user %))) invite-users)))
+    (some #(seq (:user %)) invite-users)))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
@@ -66,7 +66,7 @@
                    (let [sending @(::sending s)]
                      (when (pos? sending)
                        (let [invite-drv @(drv/get-ref s :invite-users)
-                             no-error-invites (vec (filter #(not (:error %)) (:invite-users invite-drv)))]
+                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))]
                          (reset! (::sending s) (count no-error-invites))
                          (when (zero? (count no-error-invites))
                            (utils/after 1000
@@ -84,7 +84,7 @@
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         team-roster (:team-roster invite-users-data)
-        uninvited-users (vec (filter #(= (:status %) "uninvited") (:users team-roster)))]
+        uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
     [:div.org-settings-panel.org-settings-invite-panel
       [:div.org-settings-panel-row.invite-from.group
         [:div.invite-from-label "Invite with:"]
@@ -119,7 +119,7 @@
             [:tr
               [:th "Invitee"
                 [:span.error
-                  (when-let [first-error-user (first (filter #(:error %) invite-users))]
+                  (when-let [first-error-user (first (filter :error invite-users))]
                     (cond
                       (string? (:error first-error-user))
                       (:error first-error-user)
@@ -181,13 +181,13 @@
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(do
-                        (reset! (::sending s) (count (vec (filter valid-user? invite-users))))
+                        (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
                         (dis/dispatch! [:invite-users]))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}
-          (let [valid-users-count (count (vec (filter valid-user? invite-users)))
+          (let [valid-users-count (count (filterv valid-user? invite-users))
                 needs-plural (> valid-users-count 1)
                 send-cta @(::send-bt-cta s)]
             (if (zero? valid-users-count)

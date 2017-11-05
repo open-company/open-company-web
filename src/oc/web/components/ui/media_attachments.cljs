@@ -43,7 +43,7 @@
                                          (fn? remove-cb))
                                (fn [e]
                                  (utils/event-stop e)
-                                 (dis/dispatch! [:input [dispatch-input-key :attachments] (vec (filter #(not= (:file-url %) (:file-url atc)) attachments))])
+                                 (dis/dispatch! [:input [dispatch-input-key :attachments] (filterv #(not= (:file-url %) (:file-url atc)) attachments)])
                                  (when (fn? remove-cb)
                                    (remove-cb (:file-url atc)))))]]
           (rum/with-key (media-attachment atc remove-fn) (str "media-attachment-" (:file-url atc))))])))

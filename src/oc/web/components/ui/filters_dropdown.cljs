@@ -48,7 +48,7 @@
           :else
           [:span "View by " [:span.filter-highlight "most recent"] " "])
         [:i.fa.fa-caret-down]]
-      (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
+      (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove empty? (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
             default-options [{:label "Most recent" :value :latest} {:label "By topic" :value :by-topic}]

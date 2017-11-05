@@ -8,7 +8,7 @@
 
 (rum/defc carrot-box-thanks
   [& [email]]
-  (let [thanks-message (if-not (empty? email)
+  (let [thanks-message (if (seq email)
                           [:div.thanks-subheadline "We’ve sent an email to confirm to " [:span email] "."]
                           [:div.thanks-subheadline "We’ve sent you an email to confirm."])
         carrot-link (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server "/" (get-link))]

@@ -68,7 +68,7 @@
   (let [l (.-location js/window)
         rewrite-to (str (.-pathname l) (.-hash l))]
     ;; Push state only if the query string has parameters or the history will have duplicates.
-    (when-not (empty? (.-search l))
+    (when (seq (.-search l))
       (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to))))
 
 (defn pre-routing [query-params & [should-rewrite-url]]
@@ -170,9 +170,8 @@
           org-settings (if (and (contains? query-params :org-settings)
                                 (#{:main :team :invite} (keyword (:org-settings query-params))))
                          (keyword (:org-settings query-params))
-                         (if (contains? query-params :access)
-                           :main
-                           nil))
+                         (when (contains? query-params :access)
+                           :main))
           next-app-state {:show-onboard-overlay show-onboard-overlay
                           :loading loading
                           :org-settings org-settings}]
@@ -317,7 +316,7 @@
 
     (defroute confirm-invitation-profile-route urls/confirm-invitation-profile {:as params}
       (timbre/info "Routing confirm-invitation-profile-route" urls/confirm-invitation-profile)
-      (when (not (jwt/jwt))
+      (when-not (jwt/jwt)
         (router/redirect! urls/home))
       (simple-handler #(onboard-wrapper :invitee-lander-profile) "confirm-invitation" target params))
 

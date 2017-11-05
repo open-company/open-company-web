@@ -217,7 +217,7 @@
     (add-attachment s editable)))
 
 (defn body-on-change [state]
-  (when (not @(::did-change state))
+  (when-not @(::did-change state)
     (reset! (::did-change state) true))
   (let [options (first (:rum/args state))
         on-change (:on-change options)]

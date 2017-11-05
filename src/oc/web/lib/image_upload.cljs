@@ -7,7 +7,7 @@
 (def _fs (atom nil))
 
 (defn init-filestack []
-  (if @_fs
+  (or
     @_fs
     (let [new-fs (.init js/filestack ls/filestack-key)]
       (reset! _fs new-fs)

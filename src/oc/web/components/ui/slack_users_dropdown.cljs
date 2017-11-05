@@ -17,7 +17,7 @@
 
 (defn filter-users [users s]
   (let [look-for (string/lower s)]
-    (vec (filter #(check-user % look-for) users))))
+    (filterv #(check-user % look-for) users)))
 
 (rum/defcs slack-users-dropdown   <  (rum/local nil ::show-users-dropdown)
                                      (rum/local nil ::field-value)
@@ -52,7 +52,7 @@
                                                       s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change on-focus on-blur] :as data}]
   (let [roster-data (drv/react s :team-roster)
-        all-users (vec (filter #(= (:status %) "uninvited") (:users roster-data)))
+        all-users (filterv #(= (:status %) "uninvited") (:users roster-data))
         team-roster (vals (group-by :slack-org-id all-users))
         sorted-team-roster (vec (map (fn [team] (vec (sort-by #(str (:first-name %) " " (:last-name %)) team))) team-roster))
         all-sorted-users (vec (apply concat sorted-team-roster))
@@ -74,11 +74,11 @@
                        (reset! (::slack-user s) (.. % -target -value)))
          :disabled disabled
          :placeholder (if (pos? (count all-users)) "Select User..." "No more members to add")}]
-      (when (not disabled)
+      (when-not disabled
         [:i.fa
           {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))
                                     :fa-angle-up @(::show-users-dropdown s)})
-           :on-click #(when (not disabled)
+           :on-click #(when-not disabled
                         (let [next-value (not @(::show-users-dropdown s))]
                           (reset! (::typing s) false)
                           (reset! (::show-users-dropdown s) next-value)

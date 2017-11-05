@@ -98,11 +98,11 @@
       (not (utils/valid-email? (:email user-data)))
       (reset! (::email-error s) true)
 
-      (and (not (empty? (:password user-data)))
+      (and (seq (:password user-data))
            (empty? (:current-password user-data)))
       (reset! (::current-password-error s) true)
 
-      (and (not (empty? (:password user-data)))
+      (and (seq (:password user-data))
            (< (count (:password user-data)) 8))
       (reset! (::password-error s) true)
 

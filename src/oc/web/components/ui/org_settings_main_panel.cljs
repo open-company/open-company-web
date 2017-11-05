@@ -127,7 +127,7 @@
                 {:title "Anyone who signs up with your Slack team can contribute to team boards."
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
-            (when (not (empty? (:access query-params)))
+            (when (seq (:access query-params))
               [:label
                 {:class (if (or (= "bot" (:access query-params))
                                 (= "team" (:access query-params))) "success-message" "error")}

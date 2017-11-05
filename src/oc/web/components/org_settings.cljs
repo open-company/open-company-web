@@ -40,9 +40,9 @@
 (defn close-clicked [s]
   (let [org-data @(drv/get-ref s :org-data)
         org-editing @(drv/get-ref s :org-editing)
-        invite-users (vec (filter #(not (:error %)) (:invite-users @(drv/get-ref s :invite-users))))
+        invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-users)))
         has-unsent-invites (and (pos? (count invite-users))
-                                (some #(not (empty? (:user %))) invite-users))
+                                (some #(seq (:user %)) invite-users))
         active-tab @(drv/get-ref s :org-settings)]
     (if (or (and (= :main active-tab)
                  (:has-changes org-editing))

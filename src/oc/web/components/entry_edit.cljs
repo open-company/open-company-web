@@ -28,7 +28,7 @@
 
 (defn real-close [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal)))
+  (utils/after 180 dismiss-modal))
 
 (defn cancel-clicked [s]
   (if @(::uploading-media s)
@@ -97,7 +97,7 @@
     (utils/to-end-of-content-editable headline-el)))
 
 (defn create-new-topic [s]
-  (when-not (empty? @(::new-topic s))
+  (when (seq @(::new-topic s))
     (let [topics @(drv/get-ref s :entry-edit-topics)
           topic-name (s/trim @(::new-topic s))
           topic-slug (unique-slug topics topic-name)]

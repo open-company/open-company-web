@@ -34,7 +34,7 @@
                                 :can-edit-board (and (router/current-org-slug)
                                                      (not (:read-only org-data)))
                                 :jwt (jwt/jwt)})}
-      (when (not (utils/is-test-env?))
+      (when-not (utils/is-test-env?)
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group

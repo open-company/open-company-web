@@ -68,7 +68,7 @@
   (some #(= elm %) coll))
 
 (defn vec-dissoc [coll elem]
-  (vec (filter #(not= elem %) coll)))
+  (filterv #(not= elem %) coll))
 
 (defn full-month-string
   [month]
@@ -223,7 +223,7 @@
 
 (defn current-finance-period []
   (let [date (js/Date.)
-        fixed-date (js/Date. (.setMonth date (- (.getMonth date) 1)))
+        fixed-date (js/Date. (.setMonth date (dec (.getMonth date))))
         month (inc (.getMonth fixed-date))
         month-str (str (when (< month 10) "0") month)
         cur-period (str (.getFullYear fixed-date) "-" month-str)]
@@ -712,7 +712,7 @@
   []
   (.substring
     (.toString
-      (.floor js/Math (* (+ 1 (.random js/Math)) 0x10000)) 16) 1))
+      (.floor js/Math (* (inc (.random js/Math)) 0x10000)) 16) 1))
 
 (defn guid
   "Generate v4 GUID based on this http://stackoverflow.com/a/2117523"
@@ -777,7 +777,7 @@
             (hidePlaceholder editor-el)))))))
 
 (defn filter-placeholder-topics [topics company-data]
-  (vec (filter #(let [sd (->> % keyword (get company-data))] (and sd (not (:placeholder sd)))) topics)))
+  (filterv #(let [sd (->> % keyword (get company-data))] (and sd (not (:placeholder sd)))) topics))
 
 (defn su-date-from-created-at [created-at]
   (let [from-js-date (cljs-time/date-time (js-date created-at))]
@@ -806,8 +806,8 @@
   [body-el]
   (when-not (is-test-env?)
     (while (and (pos? (.-length (.find (js/$ body-el) ">p:last-child")))
-                (= (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))) 0)
-                (= (.-length (.find (js/$ body-el) ">p:last-child img")) 0))
+                (zero? (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))))
+                (zero? (.-length (.find (js/$ body-el) ">p:last-child img"))))
       (.remove (js/$ ">p:last-child" (js/$ body-el))))))
 
 (defn data-topic-has-data [topic topic-data]
@@ -911,14 +911,14 @@
         first-name (:first-name user)
         last-name (:last-name user)]
     (cond
-      (and (not (empty? first-name))
-           (not (empty? last-name)))
+      (and (seq first-name)
+           (seq last-name))
       (str first-name " " last-name)
-      (not (empty? first-name))
+      (seq first-name)
       first-name
-      (not (empty? last-name))
+      (seq last-name)
       last-name
-      (not (empty? user-name))
+      (seq user-name)
       user-name
       :else
       (:email user))))
@@ -928,8 +928,8 @@
    original-url
    team-id
    (str
-    (when-not (empty? team-id) (str team-id ":"))
-    (when-not (empty? user-id) (str user-id ":"))
+    (when (seq team-id) (str team-id ":"))
+    (when (seq user-id) (str user-id ":"))
     redirect)))
 
 (defn icon-for-mimetype
@@ -1028,12 +1028,12 @@
         minutes (add-zero (.getMinutes js-date))
         ampm (if (>= hours 12) " p.m." " a.m.")
         hours (mod hours 12)
-        hours (if (= hours 0) 12 hours)]
+        hours (if (zero? hours) 12 hours)]
     (str hours ":" minutes ampm)))
 
 (defn format-time-string [js-date]
   (let [r (js/RegExp "am|pm" "i")
-        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))]
+        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (str js-date) r))]
     (if h12
       (get-ampm-time js-date)
       (get-24h-time js-date))))
@@ -1141,7 +1141,7 @@
 (defn get-default-org [orgs]
   (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
     (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
-      (if last-org
+      (or
         ; Get the last accessed board from the saved cookie
         last-org
         ; Fallback to the newest board if the saved board was not found

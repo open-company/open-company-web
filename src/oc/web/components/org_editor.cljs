@@ -10,15 +10,16 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.ui.small-loading :as loading]
-            [oc.web.components.ui.popover :refer (add-popover hide-popover)]))
+            [oc.web.components.ui.small-loading :as loading]))
 
 (defn- create-org-alert [owner]
-  (add-popover {:container-id "create-org-alert"
-                :message "Please enter a company name."
-                :height "120px"
-                :success-title "GOT IT"
-                :success-cb #(hide-popover nil "create-org-alert")}))
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "create-org-alert"
+                    :title "Please enter a company name."
+                    :message ""
+                    :solid-button-title "OK"
+                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
+    (dis/dispatch! [:alert-modal-show alert-data])))
 
 (defn create-org-clicked [owner e]
   (utils/event-stop e)
@@ -37,7 +38,7 @@
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
     (utils/after 1 #(dis/dispatch! [:input [:org-editing] {:name (or (:name team-data) "") :logo-url (or (:logo-url team-data) "")}]))
-    (when-not (empty? (:name team-data))
+    (when (seq (:name team-data))
       (om/set-state! owner :message "Is this the organization name you’d like to use?"))))
 
 (defcomponent org-editor [data owner]

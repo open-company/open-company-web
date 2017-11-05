@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown)]))
+            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
 (defn user-action [team-id user action method other-link-params]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")

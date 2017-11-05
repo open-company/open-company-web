@@ -9,13 +9,12 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.mixins :refer (first-render-mixin)]
-            [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
 
 (defn sort-boards [boards]
-  (into [] (sort-by :name boards)))
+  (vec (sort-by :name boards)))
 
 (defn anchor-nav! [e url]
   (utils/event-stop e)
@@ -86,7 +85,7 @@
         change-data (drv/react s :change-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        boards (vec (filter #(not= (:slug %) "drafts") all-boards))
+        boards (filterv #(not= (:slug %) "drafts") all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))

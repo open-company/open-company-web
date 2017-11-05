@@ -19,7 +19,7 @@
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal)))
+  (utils/after 180 dismiss-modal))
 
 (defn board-name-on-change [s board-name-node]
   (let [board-html (.-innerHTML board-name-node)
@@ -106,7 +106,7 @@
         board-editing (drv/react s :board-editing)
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
-        show-slack-channels? (and (not (empty? (:slug board-editing)))
+        show-slack-channels? (and (seq (:slug board-editing))
                                   (pos? (apply + (map #(-> % :channels count) slack-teams))))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
@@ -178,7 +178,7 @@
                                                                                                              :slack-org-id (:slack-org-id team)}]))})])
           [:div.board-edit-footer
             [:div.board-edit-footer-left
-              (when (and (not (empty? (:slug board-editing)))
+              (when (and (seq (:slug board-editing))
                          (utils/link-for (:links board-editing) "delete"))
                 [:button.mlb-reset.mlb-link-black.delete-board
                   {:on-click (fn []

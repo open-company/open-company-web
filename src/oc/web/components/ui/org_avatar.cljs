@@ -31,7 +31,7 @@
       {:class (when (empty? org-logo) "missing-logo")}
       (when org-data
         (let [org-slug (:slug org-data)
-              has-name (not (empty? (:name org-data)))
+              has-name (seq (:name org-data))
               org-name (if has-name
                           (:name org-data)
                           (utils/camel-case-str org-slug))

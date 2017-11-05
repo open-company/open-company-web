@@ -24,7 +24,7 @@
 
 (rum/defcs reactions
   [s entry-data]
-  (when-not (empty? (:reactions entry-data))
+  (when (seq (:reactions entry-data))
     (let [reactions-data (:reactions entry-data)
           reactions-loading (:reactions-loading entry-data)]
       [:div.reactions

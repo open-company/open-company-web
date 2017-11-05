@@ -64,7 +64,7 @@
         yr (js/RegExp youtube-regexp "ig")
         yr2 (js/RegExp youtube-short-regexp "ig")
         vr (js/RegExp vimeo-regexp "ig")]
-    (when-not (empty? trimmed-url)
+    (when (seq trimmed-url)
       (or (.match trimmed-url yr)
           (.match trimmed-url yr2)
           (.match trimmed-url vr)))))

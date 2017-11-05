@@ -223,7 +223,7 @@
               (empty-org)
               (and is-dashboard
                    is-all-posts)
-              (rum/with-key (all-posts all-posts-data) (str "all-posts-" (apply str (keys (:fixed-items all-posts-data)))))
+              (rum/with-key (all-posts all-posts-data) (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
               (and is-dashboard
                    (not is-mobile-size?)
                    (not current-activity-id)

@@ -47,7 +47,7 @@
       {:slug "all-posts"}
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (if board
+        (or
           ; Get the last accessed board from the saved cookie
           board
           (let [sorted-boards (vec (sort-by :name boards))]
@@ -458,17 +458,16 @@
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
       db)
     (= status 200) ;; Valid login, not signup, redirect to home
-    (do
-      (if (or (and (empty? (:first-name jwt))
-                   (empty? (:last-name jwt)))
-              (empty? (:avatar-url jwt)))
-        (do
-          (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-          (api/get-entry-point)
-          db)
-        (do
-          (api/get-entry-point)
-          (assoc db :email-lander-check-team-redirect true))))
+    (if (or
+          (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
+          (empty? (:avatar-url jwt)))
+      (do
+        (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
+        (api/get-entry-point)
+        db)
+      (do
+        (api/get-entry-point)
+        (assoc db :email-lander-check-team-redirect true)))
     :else ;; Valid signup let's collect user data
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -561,11 +560,11 @@
             first-name (cond
                         (and (= invite-from "email") (= name-size 1)) email-name
                         (and (= invite-from "email") splittable-name?) (first splitted-name)
-                        (and (= invite-from "slack") (not (empty? (:first-name slack-user)))) (:first-name slack-user)
+                        (and (= invite-from "slack") (seq (:first-name slack-user))) (:first-name slack-user)
                         :else "")
             last-name (cond
                         (and (= invite-from "email") splittable-name?) (second splitted-name)
-                        (and (= invite-from "slack") (not (empty? (:last-name slack-user)))) (:last-name slack-user)
+                        (and (= invite-from "slack") (seq (:last-name slack-user))) (:last-name slack-user)
                         :else "")]
         ;; If the user is already in the list
         ;; but the type changed we need to change the user type too
@@ -613,7 +612,7 @@
                             (merge user {:error "Duplicated email address" :success false})
                             :else
                             (dissoc user :error))))
-        cleaned-invite-users (vec (filter #(not (:error %)) checked-users))]
+        cleaned-invite-users (filterv #(not (:error %)) checked-users)]
     (when (= (count cleaned-invite-users) (count invite-users))
       (doseq [user cleaned-invite-users]
         (invite-user org-data team-data user)))
@@ -683,8 +682,7 @@
            (<= status 299))
     (do
       (cook/remove-cookie! :show-login-overlay)
-      (-> (update-user-data db user-data)
-          (dissoc :show-login-overlay)))
+      (dissoc (update-user-data db user-data) :show-login-overlay))
     (assoc db :collect-name-password-error status)))
 
 (defmethod dispatcher/action :pswd-collect
@@ -711,7 +709,7 @@
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
   (if (responsive/is-mobile-size?)
-    (assoc db :mobile-menu-open (not (:mobile-menu-open db)))
+    (update-in db [:mobile-menu-open] not)
     db))
 
 (defn sort-reactions [entry]
@@ -796,10 +794,10 @@
         authors (:authors board-data)
         new-viewers (if (= user-type :viewer)
                       (conj viewers {:user-id user-id :loading true})
-                      (vec (filter #(not= (:user-id %) user-id) viewers)))
+                      (filterv #(not= (:user-id %) user-id) viewers))
         new-authors (if (= user-type :author)
                       (conj authors {:user-id user-id :loading true})
-                      (vec (filter #(not= (:user-id %) user-id) authors)))
+                      (filterv #(not= (:user-id %) user-id) authors))
         new-board-data (merge board-data {:viewers new-viewers
                                           :authors new-authors})]
     (api/add-private-board board-data user-id user-type)
@@ -815,10 +813,10 @@
                 (first (filter #(= (:user-id %) user-id) viewers))
                 (first (filter #(= (:user-id %) user-id) authors)))
         new-viewers (if (= user-type :viewer)
-                      (conj (vec (filter #(= (:user-id %) user-id) viewers)) (assoc user :loading true))
+                      (conj (filterv #(= (:user-id %) user-id) viewers) (assoc user :loading true))
                       viewers)
         new-authors (if (= user-type :authors)
-                      (conj (vec (filter #(= (:user-id %) user-id) authors)) (assoc user :loading true))
+                      (conj (filterv #(= (:user-id %) user-id) authors) (assoc user :loading true))
                       authors)
         new-board-data (merge board-data {:viewers new-viewers
                                           :authors new-authors})]
@@ -843,7 +841,7 @@
   [db [_ error-message error-time]]
   (if (empty? error-message)
     (-> db (dissoc :error-banner-message) (dissoc :error-banner-time))
-    (if (not (:error-banner db))
+    (if-not (:error-banner db)
       (-> db
        (assoc :error-banner-message error-message)
        (assoc :error-banner-time error-time))
@@ -935,7 +933,7 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
         is-secure-activity (router/current-secure-activity-id)
         secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
@@ -950,7 +948,7 @@
               comment-data (:interaction interaction-data)
               created-at (:created-at comment-data)
               all-old-comments-data (dispatcher/activity-comments-data fixed-activity-uuid)
-              old-comments-data (vec (filter :links all-old-comments-data))
+              old-comments-data (filterv :links all-old-comments-data)
               ; Add the new comment to the comments list, make sure it's not present already
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
               sorted-comments-data (vec (sort-by :created-at new-comments-data))
@@ -996,7 +994,7 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
         is-secure-activity (router/current-secure-activity-id)
         secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
@@ -1004,7 +1002,7 @@
     (if (and is-secure-activity
              (not= (:uuid secure-activity-data) activity-uuid))
       db
-      (if (and entry-data (not (empty? (:reactions entry-data))))
+      (if (and entry-data (seq (:reactions entry-data)))
         ; If the entry is present in the local state and it has reactions
         (let [reaction-data (:interaction interaction-data)
               old-reactions-data (:reactions entry-data)
@@ -1015,7 +1013,7 @@
                               (assoc new-reaction-data :reacted add-event?)
                               new-reaction-data)
               ; Update the reactions data with the new reaction
-              new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+              new-reactions-data (update-in old-reactions-data [reaction-idx] merge with-reacted)
               ; Update the entry with the new reaction
               updated-entry-data (assoc entry-data :reactions new-reactions-data)]
           ;; Refresh the topic data if the action coming in is from the current user
@@ -1095,9 +1093,9 @@
         next-board-data (assoc board-data :topics next-topics)
         next-db (assoc-in db board-key next-board-data)]
     (if use-in-new-entry?
-      (assoc next-db :entry-editing (merge (:entry-editing next-db) {:topic-slug (:slug topic-map)
-                                                                     :topic-name (:name topic-map)
-                                                                     :has-changes true}))
+      (update-in next-db [:entry-editing] merge {:topic-slug (:slug topic-map)
+                                                 :topic-name (:name topic-map)
+                                                 :has-changes true})
       next-db)))
 
 (defn author-data [current-user-data as-of]
@@ -1164,7 +1162,7 @@
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
           fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
-          fixed-items (if (not (empty? temp-uuid))
+          fixed-items (if (seq temp-uuid)
                         (dissoc (:fixed-items board-data) temp-uuid)
                         (:fixed-items board-data))
           next-fixed-items (assoc fixed-items (:uuid fixed-activity-data) fixed-activity-data)]
@@ -1203,9 +1201,9 @@
 
 (defmethod dispatcher/action :board-edit
   [db [_ initial-board-data]]
-  (let [fixed-board-data (if initial-board-data
-                            initial-board-data
-                            {:name "" :slug "" :access "team"})]
+  (let [fixed-board-data (or
+                           initial-board-data
+                           {:name "" :slug "" :access "team"})]
     (assoc db :board-editing fixed-board-data)))
 
 (defmethod dispatcher/action :board-edit-save

@@ -13,7 +13,7 @@
                    (if (string/starts-with? s "#")
                      (string/strip-prefix s "#")
                      s))]
-    (vec (filter #(string/includes? (string/lower (:name %)) look-for) channels))))
+    (filterv #(string/includes? (string/lower (:name %)) look-for) channels)))
 
 (rum/defcs slack-channels-dropdown < (rum/local nil ::show-channels-dropdown)
                                      (rum/local nil ::field-value)
