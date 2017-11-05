@@ -1196,3 +1196,9 @@
       (get-board-url org-slug board-slug)
       (oc-urls/org org-slug))
     oc-urls/login))
+
+(defn storage-url-org-slug [storage-url]
+  (let [parts (s/split storage-url "/")]
+    (if (s/starts-with? storage-url "http")
+      (nth parts 4)
+      (nth parts 2))))

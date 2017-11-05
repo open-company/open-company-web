@@ -55,22 +55,12 @@ div.whats-new-modal-container {
         background-position: center;
         margin: 0px auto;
       }
-
-      a {
-        @include avenir_H();
-        font-size: 28px;
-        color: $carrot_dark_blue;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-
-      div.about-title {
+      div.about-title, a.about-title {
         @include avenir_H();
         font-size: 28px;
         color: $carrot_dark_blue;
         margin-top: 32px;
+        display: block;
       }
 
       div.about-links {
