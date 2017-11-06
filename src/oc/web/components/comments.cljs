@@ -89,9 +89,10 @@
                             (set! (.-innerHTML add-comment-div) ""))
                :disabled @(::add-button-disabled s)}
               "Add"]]]]
-      (emoji-picker {:width 32
-                     :height 32
-                     :add-emoji-cb #(enable-add-comment? s)})]))
+      (when-not (js/isIE)
+        (emoji-picker {:width 32
+                       :height 32
+                       :add-emoji-cb #(enable-add-comment? s)}))]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)

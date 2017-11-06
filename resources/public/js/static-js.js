@@ -136,10 +136,20 @@ function isSafari(){
   }
 }
 
+function isEdge(){
+  if (navigator.appName == 'Microsoft Internet Explorer' ||
+      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
+  {
+    return true;
+  }else{
+    return false;
+  }
+}
+
 function isIE(){
   if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)) ||
-      (typeof $.browser !== "undefined" && $.browser.msie == 1))
+      !!(navigator.userAgent.match(/Trident/) ||
+         navigator.userAgent.match(/rv:11/)))
   {
     return true;
   }else{
