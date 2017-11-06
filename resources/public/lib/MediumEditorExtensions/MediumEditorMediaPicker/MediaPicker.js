@@ -612,7 +612,11 @@ function log(){
     },
 
     isRangySelectionBoundary: function(el) {
-      return el.classList.contains("rangySelectionBoundary");
+      if (el && el.classList) {
+        return el.classList.contains("rangySelectionBoundary");
+      } else {
+        return false;
+      }
     },
 
     isBR: function(el) {
