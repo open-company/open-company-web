@@ -10,7 +10,7 @@ before_install:
   - sudo mv phantomjs /usr/local/phantomjs/bin/phantomjs
   - sudo bash -c "cd /usr/local/bin && curl -fsSLo boot https://github.com/boot-clj/boot-bin/releases/download/2.5.2/boot.sh && chmod 755 boot"
 install:
-  - boot repl -e '(exit)'
+  - boot repl -e '(System/exit 0)'
 before_script:
   - export BOOT_JVM_OPTIONS="-Xms256m -Xmx2048m"
   - echo $BOOT_JVM_OPTIONS
