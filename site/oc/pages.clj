@@ -494,7 +494,10 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
           ;; MediumEditorMediaPicker
           [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
-          [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
+          [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
+          ;; Automatically load the needed polyfill depending on
+          ;; the browser user agent and the available features
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
@@ -568,7 +571,10 @@
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          ;; Automatically load the needed polyfill depending on
+          ;; the browser user agent and the available features
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
