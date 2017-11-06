@@ -75,7 +75,7 @@
         [:div.illustration.illustration-1.group
           [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_1_572_438.png")
-               :srcset (str (cdn "/img/ML/home_page_il_1_572_438@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_1_572_438@2x.png") " 2x")}]
           [:div.description.group
             [:div.title
               "Keep your team informed and aligned"]
@@ -85,7 +85,7 @@
         [:div.illustration.illustration-2.group
           [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_2_521_385.png")
-               :srcset (str (cdn "/img/ML/home_page_il_2_521_385@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_2_521_385@2x.png") " 2x")}]
           [:div.description.group
             [:div.title
               "Keep stakeholders in the loop, too"]
@@ -103,7 +103,7 @@
           [:div.illustration.illustration-3.group
             [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_3_450_349.png")
-               :srcset (str (cdn "/img/ML/home_page_il_3_450_349@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_3_450_349@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Visibility"]
@@ -113,7 +113,7 @@
           [:div.illustration.illustration-4.group
             [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_4_521_283.png")
-               :srcset (str (cdn "/img/ML/home_page_il_4_521_283@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_4_521_283@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Easy alignment"]
@@ -123,7 +123,7 @@
           [:div.illustration.illustration-5.group
             [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_5_424_329.png")
-               :srcset (str (cdn "/img/ML/home_page_il_5_424_329@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_5_424_329@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Feedback loops"]
@@ -133,7 +133,7 @@
           [:div.illustration.illustration-6.group
             [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_6_346_321.png")
-               :srcset (str (cdn "/img/ML/home_page_il_6_346_321@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_6_346_321@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Works with Slack"]
@@ -143,7 +143,7 @@
           [:div.illustration.illustration-7.group
             [:img.illustration-image
               {:src (cdn "/img/ML/home_page_il_7_333_274.png")
-               :srcset (str (cdn "/img/ML/home_page_il_7_333_274@2x.png") " 2x")}]
+               :src-set (str (cdn "/img/ML/home_page_il_7_333_274@2x.png") " 2x")}]
             [:div.description.group
               [:div.title
                 "Stay private or go public"]

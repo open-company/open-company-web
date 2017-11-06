@@ -14,7 +14,7 @@
 
 (defn retina-src [url]
   {:src (utils/cdn (str url ".png"))
-   :srcset (str (utils/cdn (str url "@2x.png")) " 2x")})
+   :src-set (str (utils/cdn (str url "@2x.png")) " 2x")})
 
 (rum/defcs home-page < rum/static
                        (rum/local false ::thanks-box-top)
