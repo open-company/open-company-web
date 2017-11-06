@@ -14,11 +14,17 @@
   (when-not no-dismiss
     (utils/after 180 #(dismiss-modal s))))
 
-(def youtube-regexp "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?v=([a-zA-Z0-9_-]{11}/?)")
-(def youtube-short-regexp "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/([a-zA-Z0-9_-]{11}/?)")
+(def youtube-regexp
+ "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?v=([a-zA-Z0-9_-]{11}/?)")
+(def youtube-short-regexp
+ "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/([a-zA-Z0-9_-]{11}/?)")
 
 ; https://vimeo.com/223518754 https://vimeo.com/groups/asd/223518754 https://vimeo.com/channels/asd/223518754
-(def vimeo-regexp "(?:http|https)?:\\/\\/(?:www\\.)?vimeo.com\\/(?:channels\\/(?:\\w+\\/)?|groups\\/(?:[?:^\\/]*)\\/videos\\/|)(\\d+)(?:|\\/\\?)")
+(def vimeo-regexp
+ (str
+  "(?:http|https)?:\\/\\/(?:www\\.)?vimeo.com\\/"
+  "(?:channels\\/(?:\\w+\\/)?|groups\\/(?:[?:^\\/]*)"
+  "\\/videos\\/|)(\\d+)(?:|\\/\\?)"))
 
 (defn get-video-data [url]
   (let [yr (js/RegExp youtube-regexp "ig")

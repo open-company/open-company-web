@@ -19,7 +19,10 @@
         (set! (.-left (.-style cloned-el)) (str v "px"))
         (set! (.-top (.-style cloned-el)) "2px")
         (.appendChild (.-parentElement span-reaction) cloned-el)
-        (.animate cloned-el (clj->js translate-y) (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
+        (.animate
+         cloned-el
+         (clj->js translate-y)
+         (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (rum/defcs reactions
@@ -33,7 +36,9 @@
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
                     read-only-reaction (not (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"]))
                     r (if is-loading
-                        (merge reaction-data {:count (if (:reacted reaction-data) (dec (:count reaction-data)) (inc (:count reaction-data)))
+                        (merge reaction-data {:count (if (:reacted reaction-data)
+                                                      (dec (:count reaction-data))
+                                                      (inc (:count reaction-data)))
                                               :reacted (not (:reacted reaction-data))})
                         reaction-data)]]
           [:button.reaction-btn.btn-reset

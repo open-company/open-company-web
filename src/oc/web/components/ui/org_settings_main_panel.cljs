@@ -92,7 +92,10 @@
         ;; Org logo row
         [:div.org-settings-panel-row.org-logo-row.group
           {:on-click (fn [_]
-                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0})])
+                      (dis/dispatch!
+                       [:input
+                        [:org-editing]
+                        (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0})])
                       (iu/upload! {:accept "image/*"}
                         (fn [res]
                           (let [url (gobj/get res "url")

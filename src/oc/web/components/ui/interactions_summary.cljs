@@ -33,7 +33,11 @@
         comments-link (utils/link-for (:links entry-data) "comments")
         has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
         comments-authors (if has-comments-data
-                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at comments-data))))))
+                           (vec
+                            (map
+                             first
+                             (vals
+                              (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (vec (sort-by :created-at (:authors comments-link))))
         comments-count (max (count comments-data) (:count comments-link))]
     (when (and comments-count

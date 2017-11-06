@@ -83,7 +83,12 @@
                  (not (:entry-edit-dissmissing data)))
             (let [from-ap (:from-all-posts @router/path)
                   board-slug (if from-ap :all-posts (router/current-board-slug))]
-              (activity-modal (dis/activity-data (router/current-org-slug) board-slug (router/current-activity-id) data))))
+              (activity-modal
+               (dis/activity-data
+                (router/current-org-slug)
+                board-slug
+                (router/current-activity-id)
+                data))))
           ;; Activity share modal
           (when (:activity-share data)
             (cond

@@ -82,52 +82,61 @@
                         (rum/local nil ::window-click)
                         (drv/drv :org-data)
                         {:after-render (fn [s]
-                                         (let [activity-data (first (:rum/args s))
-                                               body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
-                                               body-a-sel (str body-sel " a")
-                                               is-all-posts (nth (:rum/args s) 4 false)]
-                                           ; Prevent body links in FoC
-                                           (.click (js/$ body-a-sel) #(.stopPropagation %))
-                                           ; Truncate body text with dotdotdot
-                                           (when (compare-and-set! (::truncated s) false true)
-                                             (truncate-body body-sel is-all-posts)
-                                             (utils/after 10 #(do
-                                                                (.trigger (js/$ body-sel) "destroy")
-                                                                (truncate-body body-sel is-all-posts)))))
-                                         s)
+                          (let [activity-data (first (:rum/args s))
+                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
+                                body-a-sel (str body-sel " a")
+                                is-all-posts (nth (:rum/args s) 4 false)]
+                            ; Prevent body links in FoC
+                            (.click (js/$ body-a-sel) #(.stopPropagation %))
+                            ; Truncate body text with dotdotdot
+                            (when (compare-and-set! (::truncated s) false true)
+                              (truncate-body body-sel is-all-posts)
+                              (utils/after 10 #(do
+                                                 (.trigger (js/$ body-sel) "destroy")
+                                                 (truncate-body body-sel is-all-posts)))))
+                          s)
                          :will-mount (fn [s]
-                                       (let [activity-data (first (:rum/args s))
-                                             is-all-posts (nth (:rum/args s) 4 false)]
-                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts)))
-                                       s)
+                          (let [activity-data (first (:rum/args s))
+                                is-all-posts (nth (:rum/args s) 4 false)]
+                            (reset!
+                             (::first-body-image s)
+                             (get-first-body-thumbnail (:body activity-data) is-all-posts)))
+                          s)
                          :did-remount (fn [o s]
-                                        (let [old-activity-data (first (:rum/args o))
-                                              new-activity-data (first (:rum/args s))
-                                              is-all-posts (nth (:rum/args s) 4 false)]
-                                          (when (not= (:body old-activity-data) (:body new-activity-data))
-                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
-                                            (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
-                                            (reset! (::truncated s) false)))
-                                        s)
+                          (let [old-activity-data (first (:rum/args o))
+                                new-activity-data (first (:rum/args s))
+                                is-all-posts (nth (:rum/args s) 4 false)]
+                            (when (not= (:body old-activity-data) (:body new-activity-data))
+                              (reset!
+                               (::first-body-image s)
+                               (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
+                              (.trigger
+                               (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body"))
+                               "destroy")
+                              (reset! (::truncated s) false)))
+                          s)
                          :did-mount (fn [s]
-                                      (let [activity-data (first (:rum/args s))]
-                                        (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
-                                         "show.bs.dropdown"
-                                         (fn [e]
-                                           (reset! (::showing-dropdown s) true)))
-                                        (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
-                                         "hidden.bs.dropdown"
-                                         (fn [e]
-                                           (reset! (::showing-dropdown s) false))))
-                                      s)
+                          (let [activity-data (first (:rum/args s))]
+                            (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
+                             "show.bs.dropdown"
+                             (fn [e]
+                               (reset! (::showing-dropdown s) true)))
+                            (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
+                             "hidden.bs.dropdown"
+                             (fn [e]
+                               (reset! (::showing-dropdown s) false))))
+                          s)
                          :will-unmount (fn [s]
-                                         (events/unlistenByKey @(::window-click s))
-                                         s)}
+                          (events/unlistenByKey @(::window-click s))
+                          s)}
   [s activity-data has-headline has-body is-new is-all-posts]
   [:div.activity-card
     {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                               :all-posts-card is-all-posts})
-     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
+     :on-click #(dis/dispatch!
+                 [:activity-modal-fade-in
+                  (:board-slug activity-data)
+                  (:uuid activity-data) (:type activity-data)])
      :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
      :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
     ; Card header
@@ -155,7 +164,10 @@
               {:class (when is-all-posts "double-tag")
                :on-click #(do
                             (utils/event-stop %)
-                            (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
+                            (router/nav!
+                             (oc-urls/board-filter-by-topic
+                              (router/current-org-slug)
+                              (:board-slug activity-data) (:topic-slug activity-data))))}
               topic-name]))
         (when is-all-posts
           [:div.activity-tag
@@ -164,7 +176,13 @@
              :on-click #(do
                           (utils/event-stop %)
                           (router/nav!
-                            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
+                            (if (=
+                                 (keyword
+                                  (cook/get-cookie
+                                   (router/last-board-filter-cookie
+                                    (router/current-org-slug)
+                                    (:board-slug activity-data))))
+                                 :by-topic)
                                 (oc-urls/board-sort-by-topic (:board-slug activity-data))
                                 (oc-urls/board (:board-slug activity-data)))))}
             (:board-name activity-data)])
@@ -200,7 +218,9 @@
           [:div.more-button.dropdown
             [:button.mlb-reset.more-ellipsis.dropdown-toggle
               {:type "button"
-               :class (utils/class-set {:hidden (and (not @(::move-activity s)) (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
+               :class (utils/class-set {:hidden (and (not @(::move-activity s))
+                                                     (not @(::hovering-card s))
+                                                     (not @(::showing-dropdown s)))})
                :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
                :on-click #(utils/event-stop %)
                :title "More"
@@ -249,4 +269,6 @@
                     {:on-click #(delete-clicked % activity-data)}
                     "Delete"])]]
             (when @(::move-activity s)
-              (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))]])
+              (activity-move {:activity-data activity-data
+                              :boards-list same-type-boards
+                              :dismiss-cb #(reset! (::move-activity s) false)}))]))]])

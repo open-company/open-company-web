@@ -29,13 +29,17 @@
                                  mixins/no-scroll-mixin
                                  mixins/first-render-mixin
                                  {:did-mount (fn [s]
-                                               (utils/after 500 #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
-                                                                   (.select activity-shared-url)))
-                                               s)
+                                   (utils/after
+                                    500
+                                    #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
+                                      (.select activity-shared-url)))
+                                   s)
                                   :did-remount (fn [o s]
-                                                 (utils/after 500 #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
-                                                                     (.select activity-shared-url)))
-                                                 s)}
+                                   (utils/after
+                                    500
+                                    #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
+                                      (.select activity-shared-url)))
+                                   s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
         secure-uuid (:secure-uuid activity-data)]
@@ -48,7 +52,14 @@
         [:div.activity-share-modal
           [:div.title "Share " [:span {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]
           [:div.activity-share-modal-shared
-            (let [share-url (str "http" (when ls/jwt-cookie-secure "s") "://" ls/web-server (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
+            (let [share-url (str
+                             "http"
+                             (when ls/jwt-cookie-secure
+                              "s")
+                             "://"
+                             ls/web-server
+                             (oc-urls/secure-activity
+                              (router/current-org-slug) secure-uuid))]
               [:div.shared-url-container.group
                 [:input
                   {:value share-url

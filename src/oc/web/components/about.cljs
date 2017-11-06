@@ -1,5 +1,6 @@
 (ns oc.web.components.about
-  "About page component, this is copied into oc.pages/about and every change here should be reflected there and vice versa."
+  "About page component, this is copied into oc.pages/about and
+   every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -10,7 +11,8 @@
 
 (rum/defcs about < rum/reactive [s]
   [:div
-    [:div.about-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
+    [:div.about-wrap {:id "wrap"} ; <!-- used to push footer to the bottom -->
+
 
       (site-header)
       (login-overlays-handler)
@@ -30,13 +32,16 @@
           [:div.ovals-container-face.face-purple]
 
           [:div.about-subline
-            "People are hyper-connected in the moment, but still struggle to know what’s really happening across the company."]
+            "People are hyper-connected in the moment, but still struggle "
+            "to know what’s really happening across the company."]
           [:div.paragraphs-container.group
             [:div.mobile-only.happy-face.yellow-happy-face]
             [:div.mobile-only.happy-face.red-happy-face]
             [:div.paragraphs-bg-container.group
               [:div.paragraph
-                "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
+                "The solution is surprisingly simple and "
+                "effective - great company updates that build "
+                "transparency and alignment."]
               [:div.paragraph
                 "With that in mind we designed Carrot based on three principles:"]]
             [:div.mobile-only.happy-face.blue-happy-face]
@@ -48,19 +53,31 @@
             [:div.principle-oval-bg]
             [:div.principle-logo]
             [:div.principle-title "It has to be easy or no one will play"]
-            [:div.principle-description "Alignment might be essential for success, but achieving it has never been easy or fun. We’re changing that. With a simple structure and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
+            [:div.principle-description
+              "Alignment might be essential for success, but achieving it has "
+              "never been easy or fun. We’re changing that. With a simple "
+              "structure and beautiful writing experience, it can’t be easier. "
+              "Just say what’s going on, we’ll take care of the rest."]]
 
           [:div.principle.principle-2
             [:div.principle-oval-bg]
             [:div.principle-logo]
             [:div.principle-title "The “big picture” should always be visible"]
-            [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
+            [:div.principle-description
+              "No one wants to look through folders and documents to "
+              "understand what’s going on, or search through chat messages "
+              "to find something. It should be easy to get an instant view of "
+              "what’s happening across the company anytime."]]
 
           [:div.principle.principle-3
             [:div.principle-oval-bg]
             [:div.principle-logo]
             [:div.principle-title "Alignment is valuable beyond the team, too"]
-            [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
+            [:div.principle-description
+              "Sharing beautiful updates with recruits, investors, customers "
+              "and other outside stakeholders is the surest way to keep "
+              "them engaged and supportive. It’s an easy way to "
+              "expand your network and grow your business."]]]
 
       ] ;<!-- main -->
 
@@ -81,7 +98,12 @@
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
                   [:div.team-title "CEO and cofounder"]
-                  [:div.team-description "Prior to Carrot, Stuart started two venture-backed startups - Venetica (acquired by IBM) and TalkTo (acquired by Path). Those experiences, pre- and post-acquisitions, inspired a passion for transparency and its effect on overall alignment."]
+                  [:div.team-description
+                    "Prior to Carrot, Stuart started two venture-"
+                    "backed startups - Venetica (acquired by IBM) and "
+                    "TalkTo (acquired by Path). Those experiences, "
+                    "pre- and post-acquisitions, inspired a passion for "
+                    "transparency and its effect on overall alignment."]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                     [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
@@ -90,7 +112,9 @@
                   [:img {:src "http://www.gravatar.com/avatar/0224b757acf053e02d8cdf807620417c?s=64"}]]
                 [:div.team-member
                   [:div.team-name "Iacopo Carraro"]
-                  [:div.team-description "Iacopo is a full-stack engineer with lots of remote team and startup experience."]
+                  [:div.team-description
+                    "Iacopo is a full-stack engineer with lots of remote "
+                    "team and startup experience."]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
                     [:a.twitter {:href "http://twitter.com/bago2k4"}]
@@ -103,7 +127,10 @@
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
                   [:div.team-title "CTO and cofounder"]
-                  [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
+                  [:div.team-description
+                    "As a serial startup CTO and engineer, Sean has "
+                    "over 20 years experience building products and "
+                    "startup engineering teams."]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
                     [:a.twitter {:href "http://twitter.com/belucid"}]
@@ -112,7 +139,9 @@
                 [:div.team-avatar]
                   [:div.team-member
                     [:div.team-name "You?"]
-                    [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]]
+                    [:div.team-description
+                      "We're always looking for talented individuals. "
+                      "Drop us a line if you share our mission."]]]]]]]
 
       [:div.about-footer.group
 

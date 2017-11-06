@@ -63,15 +63,21 @@
                         author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)
                         remove-fn (fn []
                                     (let [alert-data {:icon "/img/ML/trash.svg"
-                                                      :action (if (= "pending" (:status user)) "cancel-invitation" "remove-user")
-                                                      :message (if (= "pending" (:status user)) "Cancel invitation?" "Remove user?")
+                                                      :action
+                                                       (if (= "pending" (:status user))
+                                                        "cancel-invitation"
+                                                        "remove-user")
+                                                      :message
+                                                       (if (= "pending" (:status user))
+                                                        "Cancel invitation?"
+                                                        "Remove user?")
                                                       :link-button-title "No"
                                                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                                       :solid-button-title "Yes"
-                                                      :solid-button-cb #(do
-                                                                          (real-remove-fn author user (:team-id team-data))
-                                                                          (dis/dispatch! [:alert-modal-hide]))
-                                                      }]
+                                                      :solid-button-cb
+                                                       #(do
+                                                         (real-remove-fn author user (:team-id team-data))
+                                                         (dis/dispatch! [:alert-modal-hide]))}]
                                       (dis/dispatch! [:alert-modal-show alert-data])))]]
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
@@ -94,8 +100,10 @@
                         {:on-click (fn []
                                      (let [invitation-type (if (contains? user :slack-id) "slack" "email")
                                            inviting-user (if (= invitation-type "email")
-                                                            (:email user)
-                                                            (select-keys user [:first-name :last-name :slack-id :slack-org-id]))]
+                                                          (:email user)
+                                                          (select-keys
+                                                           user
+                                                           [:first-name :last-name :slack-id :slack-org-id]))]
                                        (dis/dispatch! [:input [:invite-users]
                                                         [{:user inviting-user
                                                           :type invitation-type

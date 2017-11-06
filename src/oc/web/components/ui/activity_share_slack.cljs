@@ -61,18 +61,19 @@
                       [:span.labels "To"]
                       [:div.fields
                         {:class (when (:channel-error slack-data) "error")}
-                        (slack-channels-dropdown {:on-change (fn [team channel]
-                                                               (reset! (::slack-data s)
-                                                                (merge slack-data (merge slack-data
-                                                                                   {:channel {:channel-id (:id channel)
-                                                                                              :channel-name (:name channel)
-                                                                                              :slack-org-id (:slack-org-id team)}
-                                                                                    :channel-error false}))))
-                                                  :on-intermediate-change (fn [_]
-                                                                           (reset! (::slack-data s)
-                                                                            (merge slack-data (merge slack-data {:channel-error false}))))
-                                                  :initial-value ""
-                                                  :disabled false})]]
+                        (slack-channels-dropdown
+                         {:on-change (fn [team channel]
+                                       (reset! (::slack-data s)
+                                        (merge slack-data (merge slack-data
+                                                           {:channel {:channel-id (:id channel)
+                                                                      :channel-name (:name channel)
+                                                                      :slack-org-id (:slack-org-id team)}
+                                                            :channel-error false}))))
+                          :on-intermediate-change (fn [_]
+                                                   (reset! (::slack-data s)
+                                                    (merge slack-data (merge slack-data {:channel-error false}))))
+                          :initial-value ""
+                          :disabled false})]]
                     [:div.medium-row.note.group
                       [:span.labels "Add a note (optional)"]
                       [:div.fields

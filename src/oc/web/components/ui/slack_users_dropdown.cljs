@@ -29,32 +29,41 @@
                                      (drv/drv :team-data)
                                      (drv/drv :team-roster)
                                      {:will-mount (fn [s]
-                                                    (let [initial-value (:initial-value (first (:rum/args s)))]
-                                                       (reset! (::slack-user s) (or initial-value "")))
-                                                    (reset! (::window-click s)
-                                                     (events/listen js/window EventType/CLICK
-                                                       #(when (and @(::show-users-dropdown s)
-                                                                   ; (not (utils/event-inside? % (sel1 [:div.board-edit-slack-channels-dropdown])))
-                                                                   (not (utils/event-inside? % (.-parentElement (sel1 [:input.slack-users-dropdown])))))
-                                                          (reset! (::show-users-dropdown s) false)
-                                                          (let [{:keys [on-blur]} (first (:rum/args s))]
-                                                            (when (fn? on-blur)
-                                                              (on-blur))))))
-                                                    s)
+                                       (let [initial-value (:initial-value (first (:rum/args s)))]
+                                         (reset! (::slack-user s) (or initial-value "")))
+                                       (reset! (::window-click s)
+                                        (events/listen js/window EventType/CLICK
+                                          #(when (and @(::show-users-dropdown s)
+                                                      ; (not
+                                                      ;  (utils/event-inside?
+                                                      ;   %
+                                                      ;   (sel1 [:div.board-edit-slack-channels-dropdown])))
+                                                      (not
+                                                       (utils/event-inside?
+                                                        %
+                                                        (.-parentElement (sel1 [:input.slack-users-dropdown])))))
+                                             (reset! (::show-users-dropdown s) false)
+                                             (let [{:keys [on-blur]} (first (:rum/args s))]
+                                               (when (fn? on-blur)
+                                                 (on-blur))))))
+                                       s)
                                       :before-render (fn [s]
-                                                       (let [teams-load-data @(drv/get-ref s :teams-load)]
-                                                         (when (and (:auth-settings teams-load-data)
-                                                                    (not (:teams-data-requested teams-load-data)))
-                                                           (dis/dispatch! [:teams-get])))
-                                                       s)
+                                       (let [teams-load-data @(drv/get-ref s :teams-load)]
+                                         (when (and (:auth-settings teams-load-data)
+                                                    (not (:teams-data-requested teams-load-data)))
+                                           (dis/dispatch! [:teams-get])))
+                                       s)
                                       :will-unmount (fn [s]
-                                                      (events/unlistenByKey @(::window-click s))
-                                                      s)}
+                                       (events/unlistenByKey @(::window-click s))
+                                       s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change on-focus on-blur] :as data}]
   (let [roster-data (drv/react s :team-roster)
         all-users (filterv #(= (:status %) "uninvited") (:users roster-data))
         team-roster (vals (group-by :slack-org-id all-users))
-        sorted-team-roster (vec (map (fn [team] (vec (sort-by #(str (:first-name %) " " (:last-name %)) team))) team-roster))
+        sorted-team-roster (vec
+                            (map
+                             (fn [team]
+                              (vec (sort-by #(str (:first-name %) " " (:last-name %)) team))) team-roster))
         all-sorted-users (vec (apply concat sorted-team-roster))
         slack-orgs (:slack-orgs (drv/react s :team-data))
         slack-orgs-map (zipmap (map :slack-org-id slack-orgs) (map :name slack-orgs))]
@@ -65,7 +74,9 @@
         {:value @(::slack-user s)
          :on-focus (fn []
                       (when (fn? on-focus) (on-focus))
-                      (utils/after 100 #(do (reset! (::typing s) false) (reset! (::show-users-dropdown s) true))))
+                      (utils/after
+                       100
+                       #(do (reset! (::typing s) false) (reset! (::show-users-dropdown s) true))))
          :on-blur #(when (fn? on-blur) (on-blur))
          :on-change #(do
                        (reset! (::typing s) true)

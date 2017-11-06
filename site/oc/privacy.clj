@@ -22,7 +22,8 @@
       [:h2 "Information we collect and receive"]
       [:p "We collect different kinds of information. Some of it is personally identifiable and some is non-identifying or aggregated. Here are the types of information we collect or receive:"]
       [:ul
-        [:li 
+        [:li
+
           [:strong "Team information. "]
           "When you create a team on OpenCompany, we collect your email address, your company name, OpenCompany domain (ex: carrot.io/your-team-name), your Slack user name, team name, and personal and team avatars. "]
         [:li

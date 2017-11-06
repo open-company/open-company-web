@@ -161,7 +161,10 @@
 
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
-  (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))
+  (let [month (month-string
+               (add-zero (inc (.getMonth js-date)))
+               (when (or (in? flags :short-month) (in? flags :short))
+                [:short]))
         day (.getDate js-date)]
     (str month " " day (when (in? flags :year) (str ", " (.getFullYear js-date))))))
 
@@ -317,7 +320,9 @@
   (let [links (:links board-data)
         read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
-        fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
+        fixed-entries (zipmap
+                       (map :uuid (:entries board-data))
+                       (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
         with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
     with-fixed-entries))
@@ -328,7 +333,9 @@
 (defn fix-all-posts
   "Fix org data coming from the API."
   [all-posts-data]
-  (let [fixed-activities-list (map #(fix-activity % {:slug (:board-slug %) :name (:board-name %)}) (:items all-posts-data))
+  (let [fixed-activities-list (map
+                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
+                               (:items all-posts-data))
         without-items (dissoc all-posts-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
@@ -532,7 +539,12 @@
       (let [day-of-week (cljs-time/day-of-week now)
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date))))
+        (str
+         (cljs-time/year monday-date)
+         "-"
+         (add-zero (cljs-time/month monday-date))
+         "-"
+         (add-zero (cljs-time/day monday-date))))
       ;; Default tp monthly
       (str year "-" (add-zero month)))))
 
@@ -970,7 +982,8 @@
     ;; Generic case
     "fa-file"))
 
-(def generic-network-error "There may be a problem with your network, or with our servers. Please try again later.")
+(def generic-network-error
+ "There may be a problem with your network, or with our servers. Please try again later.")
 
 (defn clean-google-chart-url [gchart-url]
   (if (string? gchart-url)
@@ -1018,7 +1031,8 @@
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
 
-(defn get-24h-time 
+(defn get-24h-time
+
   [js-date]
   (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
 
@@ -1040,7 +1054,14 @@
 
 (defn activity-date-string [js-date hide-time]
   (let [time-string (format-time-string js-date)]
-    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) (when-not hide-time (str " at " time-string)))))
+    (str
+     (full-month-string (inc (.getMonth js-date)))
+     " "
+     (.getDate js-date)
+     ", "
+     (.getFullYear js-date)
+     (when-not hide-time
+      (str " at " time-string)))))
 
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"

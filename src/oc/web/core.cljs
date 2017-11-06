@@ -131,7 +131,12 @@
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     (when (contains? (:query-params params) :login-redirect)
-      (cook/set-cookie! :login-redirect (:login-redirect (:query-params params)) (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+      (cook/set-cookie!
+       :login-redirect
+       (:login-redirect (:query-params params))
+       (* 60 60)
+       "/"
+       ls/jwt-cookie-domain ls/jwt-cookie-secure))
     ; remove om component if mounted to the same node
     (om/detach-root target)
     ;; render component
@@ -149,18 +154,41 @@
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params true)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org board (when entry entry) route])) {:org org :board board :activity entry :query-params query-params :from-all-posts (contains? query-params :ap)})
+    (router/set-route!
+     (vec
+      (remove
+       nil?
+       [org board (when entry entry) route]))
+     {:org org
+      :board board
+      :activity entry
+      :query-params query-params
+      :from-all-posts (contains? query-params :ap)})
     (when board-sort-or-filter
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
-        (cook/set-cookie! (router/last-board-filter-cookie org board) (name board-sort-or-filter) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)))
+        (cook/set-cookie!
+         (router/last-board-filter-cookie org board)
+         (name board-sort-or-filter)
+         (* 60 60 24 30)
+         "/"
+         ls/jwt-cookie-domain
+         ls/jwt-cookie-secure)))
     (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
                                     (jwt/jwt)
-                                    (= (cook/get-cookie (router/should-show-dashboard-tooltips (jwt/get-key :user-id))) "true"))
-          loading (or (and (not (contains? query-params :ap))          ;; if is board page
-                           (not (:fixed-items (dis/board-data))))      ;; if the board data are not present
-                      (and (contains? query-params :ap)                ;; if the all-posts data are not preset
-                           (not (:fixed-items (dis/all-posts-data))))) ;; this latter is used when displaying modal over AP
+                                    (=
+                                     (cook/get-cookie
+                                      (router/should-show-dashboard-tooltips
+                                       (jwt/get-key :user-id)))
+                                     "true"))
+          loading (or (and ;; if is board page
+                           (not (contains? query-params :ap))
+                           ;; if the board data are not present
+                           (not (:fixed-items (dis/board-data))))
+                           ;; if the all-posts data are not preset
+                      (and (contains? query-params :ap)
+                           ;; this latter is used when displaying modal over AP
+                           (not (:fixed-items (dis/all-posts-data)))))
           org-settings (if (and (contains? query-params :org-settings)
                                 (#{:main :team :invite} (keyword (:org-settings query-params))))
                          (keyword (:org-settings query-params))
@@ -181,11 +209,20 @@
         query-params (:query-params params)]
     (pre-routing query-params)
     ;; save the route
-    (router/set-route! (vec (remove nil? [org route secure-id])) {:org org :secure-id secure-id :query-params query-params})
+    (router/set-route!
+     (vec
+      (remove
+       nil?
+       [org route secure-id]))
+     {:org org
+      :secure-id secure-id
+      :query-params query-params})
     ;; do we have the company data already?
-    (when (or (not (dis/board-data))              ;; if the company data are not present
-              (not (:fixed-items (dis/board-data))) ;; or the entries key is missing that means we have only
-                                                    ;; a subset of the company data loaded with a SU
+    (when (or ;; if the company data are not present
+              (not (dis/board-data))
+              ;; or the entries key is missing that means we have only
+              (not (:fixed-items (dis/board-data)))
+              ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
     (post-routing)
@@ -396,21 +433,55 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
+      (board-handler
+       "dashboard"
+       target
+       org-dashboard
+       params
+       (or
+        (keyword
+         (cook/get-cookie
+          (router/last-board-filter-cookie
+           (:org (:params params))
+           (:board (:params params)))))
+        :latest)))
 
     (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
+      (board-handler
+       "dashboard"
+       target
+       org-dashboard
+       params
+       (or
+        (keyword
+         (cook/get-cookie
+          (router/last-board-filter-cookie
+           (:org (:params params))
+           (:board (:params params)))))
+        :latest)))
 
     (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
       (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
-      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
+      (when (=
+             (keyword
+              (cook/get-cookie
+               (router/last-board-filter-cookie
+                (:org (:params params))
+                (:board (:params params)))))
+             :latest)
         (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params :by-topic))
 
     (defroute board-sort-by-topic-slash-route (str (urls/board-sort-by-topic ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-sort-by-topic-slash-route" (str (urls/board-sort-by-topic ":org" ":board") "/"))
-      (when (= (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)
+      (when (=
+             (keyword
+              (cook/get-cookie
+               (router/last-board-filter-cookie
+                (:org (:params params))
+                (:board (:params params)))))
+             :latest)
         (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params :by-topic))
 
@@ -418,8 +489,13 @@
       (timbre/info "Routing board-filter-by-topic-route" (urls/board-filter-by-topic ":org" ":board" ":topic-filter"))
       (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
 
-    (defroute board-filter-by-topic-slash-route (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/") {:as params}
-      (timbre/info "Routing board-filter-by-topic-slash-route" (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/"))
+    (defroute
+     board-filter-by-topic-slash-route
+     (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/")
+     {:as params}
+      (timbre/info
+       "Routing board-filter-by-topic-slash-route"
+       (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/"))
       (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
 
     (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}

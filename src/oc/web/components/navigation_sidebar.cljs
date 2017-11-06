@@ -23,10 +23,16 @@
 (defn new?
   "
   A board is new if:
-  
+
+
+
     user is part of the team (we don't track new for non-team members accessing public boards)
      -and-
-    
+
+
+
+
+
     change-at is newer than seen at
       -or-
     we have a change-at and no seen at
@@ -60,26 +66,29 @@
                                 ;; Mixins
                                 first-render-mixin
                                 {:did-mount (fn [s]
-                                              (when-not (utils/is-test-env?)
-                                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                              (reset! (::window-height s) (.-innerHeight js/window))
-                                              (reset! (::resize-listener s)
-                                               (events/listen js/window EventType/RESIZE #(reset! (::window-height s) (.-innerHeight js/window))))
-                                              s)
+                                  (when-not (utils/is-test-env?)
+                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                  (reset! (::window-height s) (.-innerHeight js/window))
+                                  (reset! (::resize-listener s)
+                                   (events/listen
+                                    js/window
+                                    EventType/RESIZE
+                                    #(reset! (::window-height s) (.-innerHeight js/window))))
+                                  s)
                                  :will-update (fn [s]
-                                                (when @(:first-render-done s)
-                                                  (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
-                                                    (when (not= height @(::content-height s))
-                                                      (reset! (::content-height s) height))))
-                                                s)
+                                  (when @(:first-render-done s)
+                                    (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
+                                      (when (not= height @(::content-height s))
+                                        (reset! (::content-height s) height))))
+                                  s)
                                  :did-update (fn [s]
-                                               (when-not (utils/is-test-env?)
-                                                 (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                              s)
+                                  (when-not (utils/is-test-env?)
+                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                  s)
                                  :will-unmount (fn [s]
-                                                 (when @(::resize-listener s)
-                                                   (events/unlistenByKey @(::resize-listener s)))
-                                                 s)}
+                                  (when @(::resize-listener s)
+                                    (events/unlistenByKey @(::resize-listener s)))
+                                  s)}
   [s]
   (let [org-data (drv/react s :org-data)
         change-data (drv/react s :change-data)
@@ -97,7 +106,15 @@
         show-drafts (pos? (:count drafts-link))
         show-invite-people (and (router/current-org-slug)
                                 (jwt/is-admin? (:team-id org-data)))
-        is-tall-enough? (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))
+        is-tall-enough? (<
+                         @(::content-height s)
+                         (-
+                          @(::window-height s)
+                          sidebar-top-margin
+                          footer-button-height
+                          20
+                          (when show-invite-people
+                            footer-button-height)))
         org-slug (router/current-org-slug)
         board-url-fn #(let [c-val (cook/get-cookie (router/last-board-filter-cookie org-slug %))]
                         (if (= c-val "by-topic")
@@ -145,7 +162,9 @@
                 (when (or (= (:access board) "public")
                           (= (:access board) "private"))
                   [:img
-                    {:src (if (= (:access board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                    {:src (if (= (:access board) "public")
+                           (utils/cdn "/img/ML/board_public.svg")
+                           (utils/cdn "/img/ML/board_private.svg"))
                      :class (if (= (:access board) "public") "public" "private")}])
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
@@ -158,7 +177,10 @@
             (when show-drafts
               (let [board-url (oc-urls/board (:slug drafts-board))]
                 [:a.left-navigation-sidebar-item.hover-item
-                  {:class (when (and (not is-all-posts) (= (router/current-board-slug) (:slug drafts-board))) "item-selected")
+                  {:class (when (and (not is-all-posts)
+                                     (= (router/current-board-slug)
+                                     (:slug drafts-board)))
+                            "item-selected")
                    :data-board (name (:slug drafts-board))
                    :key (str "board-list-" (name (:slug drafts-board)))
                    :href board-url
@@ -166,7 +188,9 @@
                   (when (or (= (:access drafts-board) "public")
                             (= (:access drafts-board) "private"))
                     [:img
-                      {:src (if (= (:access drafts-board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                      {:src (if (= (:access drafts-board) "public")
+                             (utils/cdn "/img/ML/board_public.svg")
+                             (utils/cdn "/img/ML/board_private.svg"))
                        :class (if (= (:access drafts-board) "public") "public" "private")}])
                   [:div.board-name.group
                     {:class (utils/class-set {:public-board (= (:access drafts-board) "public")

@@ -72,7 +72,7 @@
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
-    (let [emojied-headline   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
@@ -137,38 +137,43 @@
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
-                                       (let [entry-editing @(drv/get-ref s :entry-editing)
-                                             board-filters @(drv/get-ref s :board-filters)
-                                             initial-body (if (contains? entry-editing :links) (:body entry-editing) utils/default-body)
-                                             initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
-                                         ;; Load board if it's not already
-                                         (when-not @(drv/get-ref s :entry-edit-topics)
-                                           (dis/dispatch! [:board-get (utils/link-for (:links entry-editing) "up")]))
-                                         (reset! (::initial-body s) initial-body)
-                                         (reset! (::initial-headline s) initial-headline)
-                                         (when (and (string? board-filters)
-                                                    (nil? (:topic-slug entry-editing)))
-                                            (let [topics @(drv/get-ref s :entry-edit-topics)
-                                                  topic (first (filter #(= (:slug %) board-filters) topics))]
-                                              (when topic
-                                                (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
-                                                (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
-                                       s)
+                          (let [entry-editing @(drv/get-ref s :entry-editing)
+                                board-filters @(drv/get-ref s :board-filters)
+                                initial-body (if (contains? entry-editing :links)
+                                              (:body entry-editing)
+                                              utils/default-body)
+                                initial-headline (utils/emojify
+                                                  (if (contains? entry-editing :links)
+                                                   (:headline entry-editing)
+                                                   ""))]
+                            ;; Load board if it's not already
+                            (when-not @(drv/get-ref s :entry-edit-topics)
+                              (dis/dispatch! [:board-get (utils/link-for (:links entry-editing) "up")]))
+                            (reset! (::initial-body s) initial-body)
+                            (reset! (::initial-headline s) initial-headline)
+                            (when (and (string? board-filters)
+                                       (nil? (:topic-slug entry-editing)))
+                              (let [topics @(drv/get-ref s :entry-edit-topics)
+                                    topic (first (filter #(= (:slug %) board-filters) topics))]
+                                (when topic
+                                  (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
+                                  (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
+                          s)
                          :did-mount (fn [s]
-                                      (utils/after 300 #(setup-headline s))
-                                      (utils/to-end-of-content-editable (rum/ref-node s "headline"))
-                                      s)
+                          (utils/after 300 #(setup-headline s))
+                          (utils/to-end-of-content-editable (rum/ref-node s "headline"))
+                          s)
                          :before-render (fn [s]
-                                          (calc-edit-entry-modal-height s)
-                                          s)
+                          (calc-edit-entry-modal-height s)
+                          s)
                          :will-unmount (fn [s]
-                                         (when @(::body-editor s)
-                                           (.destroy @(::body-editor s))
-                                           (reset! (::body-editor s) nil))
-                                         (when @(::headline-input-listener s)
-                                           (events/unlistenByKey @(::headline-input-listener s))
-                                           (reset! (::headline-input-listener s) nil))
-                                         s)}
+                          (when @(::body-editor s)
+                            (.destroy @(::body-editor s))
+                            (reset! (::body-editor s) nil))
+                          (when @(::headline-input-listener s)
+                            (events/unlistenByKey @(::headline-input-listener s))
+                            (reset! (::headline-input-listener s) nil))
+                          s)}
   [s]
   (let [topics            (distinct (drv/react s :entry-edit-topics))
         current-user-data (drv/react s :current-user-data)
@@ -223,7 +228,11 @@
                           :let [selected (= (:topic-name entry-editing) (:name t))]]
                       [:li.selectable.group
                         {:key (str "entry-edit-dd-" (:slug t))
-                         :on-click #(dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-name (:name t) :has-changes true})])
+                         :on-click #(dis/dispatch!
+                                     [:input
+                                      [:entry-editing]
+                                      (merge entry-editing {:topic-name (:name t)
+                                                            :has-changes true})])
                          :class (when selected "select")}
                         [:button.mlb-reset
                           (:name t)]
@@ -231,7 +240,12 @@
                           [:button.mlb-reset.mlb-link.remove
                             {:on-click (fn [e]
                                          (utils/event-stop e)
-                                         (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
+                                         (dis/dispatch!
+                                          [:input
+                                           [:entry-editing]
+                                           (merge entry-editing {:topic-slug nil
+                                                                 :topic-name nil
+                                                                 :has-changes true})]))}
                             "Remove"])])
                     [:li.divider]
                     [:li.entry-edit-new-topic.group

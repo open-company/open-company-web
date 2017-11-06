@@ -27,7 +27,10 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000])
+      (dis/dispatch!
+       [:error-banner-show
+        "An error has occurred while processing the image URL. Please try again."
+        5000])
       (do
         (set! (.-onload node) #(img-on-load url node))
         (set! (.-className node) "hidden")
@@ -37,7 +40,10 @@
 (defn progress-cb [res progress])
 
 (defn error-cb [res error]
-  (dis/dispatch! [:error-banner-show "An error has occurred while processing the image URL. Please try again." 5000]))
+  (dis/dispatch!
+   [:error-banner-show
+    "An error has occurred while processing the image URL. Please try again."
+    5000]))
 
 (defn change! [s k v]
   (reset! (::name-error s) false)
@@ -120,20 +126,25 @@
                           (rum/local false ::password-error)
                           (rum/local false ::current-password-error)
                           {:will-mount (fn [s]
-                                         (dis/dispatch! [:user-profile-reset])
-                                         s)
+                            (dis/dispatch! [:user-profile-reset])
+                            s)
                            ; :after-render (fn [s]
-                           ;                 (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
-                           ;                   (dis/dispatch! [:input [:edit-user-profile :timezone] (.. js/moment -tz guess)]))
-                           ;                 s)
+                           ;  (when (empty?
+                           ;         (:timezone
+                           ;          (:user-data @(drv/get-ref s :edit-user-profile))))
+                           ;    (dis/dispatch!
+                           ;     [:input
+                           ;      [:edit-user-profile :timezone]
+                           ;      (.. js/moment -tz guess)]))
+                           ;  s)
                            :did-remount (fn [old-state new-state]
-                                          (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
-                                            (when (and @(::loading new-state)
-                                                       (not (:has-changes user-data)))
-                                              (reset! (::show-success new-state) true)
-                                              (reset! (::loading new-state) false)
-                                              (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
-                                          new-state)}
+                            (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
+                              (when (and @(::loading new-state)
+                                         (not (:has-changes user-data)))
+                                (reset! (::show-success new-state) true)
+                                (reset! (::loading new-state) false)
+                                (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
+                            new-state)}
   [s]
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
@@ -318,7 +329,8 @@
                             (reset! (::name-error s) false)
                             (reset! (::email-error s) false)
                             (reset! (::password-error s) false)
-                            (reset! (::current-password-error s) false) 
+                            (reset! (::current-password-error s) false)
+
                             (dis/dispatch! [:user-profile-reset]))
                           (real-close-cb orgs current-user-data))}
             "Cancel"]]]))

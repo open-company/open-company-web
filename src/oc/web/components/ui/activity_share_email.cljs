@@ -25,13 +25,16 @@
                                   mixins/no-scroll-mixin
                                   mixins/first-render-mixin
                                   {:will-mount (fn [s]
-                                                 (let [activity-data (:share-data @(drv/get-ref s :activity-share))
-                                                       subject (str (:name (dis/org-data))
-                                                                    (when (seq (:board-name activity-data))) (str " " (:board-name activity-data))
-                                                                    ": " (.text (.html (js/$ "<div />") (:headline activity-data))))]
-                                                   (reset! (::email-data s) {:subject subject
-                                                                             :note ""}))
-                                                 s)}
+                                    (let [activity-data (:share-data @(drv/get-ref s :activity-share))
+                                          subject (str
+                                                   (:name (dis/org-data))
+                                                   (when (seq (:board-name activity-data))
+                                                    (str " " (:board-name activity-data)))
+                                                   ": "
+                                                   (.text (.html (js/$ "<div />") (:headline activity-data))))]
+                                     (reset! (::email-data s) {:subject subject
+                                                               :note ""}))
+                                   s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
         email-data @(::email-data s)
@@ -68,9 +71,14 @@
                                      :split-ptn #"[,|\s]+"
                                      :container-node :div.email-field
                                      :valid-item? utils/valid-email?
-                                     :on-intermediate-change #(reset! (::email-data s) (merge email-data {:to-error false}))
-                                     :on-change (fn [v] (reset! (::email-data s) (merge email-data {:to v
-                                                                                                    :to-error false})))})]]
+                                     :on-intermediate-change #(reset!
+                                                               (::email-data s)
+                                                               (merge email-data {:to-error false}))
+                                     :on-change (fn [v]
+                                                 (reset!
+                                                  (::email-data s)
+                                                  (merge email-data {:to v
+                                                                     :to-error false})))})]]
                     [:div.medium-row.subject.group
                       [:span.labels "Subject"]
                       [:div.fields
@@ -85,7 +93,9 @@
                       [:div.fields
                         [:textarea
                           {:value (:note email-data)
-                           :on-change #(reset! (::email-data s) (merge email-data {:note (.. % -target -value)}))}]]]]]]
+                           :on-change #(reset!
+                                        (::email-data s)
+                                        (merge email-data {:note (.. % -target -value)}))}]]]]]]
               [:div.share-footer.group
                 [:div.buttons
                   [:button.mlb-reset.mlb-black-link

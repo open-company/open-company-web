@@ -71,7 +71,8 @@
         [:li [:strong "Payment."]
           [:ol
             [:li "To the extent you use a Service plan that is made available for a fee, you will be required to select a payment plan and provide accurate information regarding your credit card or other payment instrument. You will promptly update your account information with any changes in your payment information. You agree to pay OpenCompany in accordance with the terms set forth on the Site (currently, "
-              [:a {:href "https://carrot.io/pricing"} "carrot.io/pricing"] 
+              [:a {:href "https://carrot.io/pricing"} "carrot.io/pricing"]
+
               " and related pages) and this TOS, and you authorize OpenCompany or its third-party payment processors to bill your payment instrument in advance on a periodic basis in accordance with such terms."]
             [:li "If you dispute any charges you must let OpenCompany know within sixty (60) days after the date that OpenCompany invoices you. All amounts paid are non-refundable and we reserve the right to change our prices in the future. If we increase our prices for your Service plan, we will provide notice of the change on the Site and in email to you at least 30 days before the change is to take effect. Your continued use of the Service after the price change goes into effect constitutes your agreement to pay the changed amount. OpenCompany may choose to bill you through an invoice, in which case, full payment for invoices issued must be received by the date specified in the invoice. Past due fees are subject to a finance charge of 1.5% per month on any outstanding balance, or the maximum permitted by law, whichever is lower, plus all expenses of collection. You shall be responsible for all taxes associated with Services other than U.S. taxes based on OpenCompany’s net income."]]]
 

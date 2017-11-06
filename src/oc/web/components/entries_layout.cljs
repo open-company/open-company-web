@@ -14,14 +14,20 @@
 (defn new?
   "
   An entry is new if:
-  
+
+
+
     user is part of the team (we don't track new for non-team members accessing public boards)
       -and-
     user is not the post's author
       -and-
     created-at is < 30 days
       -and-
-    
+
+
+
+
+
     created-at of the entry is newer than seen at
       -or-
     no seen at
@@ -62,8 +68,19 @@
         ;; :by-topic
         (= layout-type :by-topic)
         (let [entries (vals (:fixed-items board-data))
-              grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :created-at v))))) (group-by :topic-slug entries)))
-              sorted-topics (vec (reverse (sort #(compare (:created-at (first (get grouped-entries %1))) (:created-at (first (get grouped-entries %2)))) (keys grouped-entries))))]
+              grouped-entries (apply
+                               merge
+                               (map
+                                (fn [[k v]]
+                                 (hash-map k (vec (reverse (sort-by :created-at v)))))
+                                (group-by :topic-slug entries)))
+              sorted-topics (vec
+                             (reverse
+                              (sort
+                               #(compare
+                                 (:created-at (first (get grouped-entries %1)))
+                                 (:created-at (first (get grouped-entries %2))))
+                               (keys grouped-entries))))]
           (for [topic sorted-topics
                 :let [entries-group (get grouped-entries topic)
                       topic-name (:topic-name (first entries-group))
@@ -71,7 +88,9 @@
                       first-line-entries (take 2 entries-group)
                       first-has-headline (some #(seq (:headline %)) first-line-entries)
                       first-has-body (some #(seq (:body %)) first-line-entries)
-                      second-line-entries (if (> (count entries-group) 2) (subvec entries-group 2 (min 4 (count entries-group))) [])
+                      second-line-entries (if (> (count entries-group) 2)
+                                           (subvec entries-group 2 (min 4 (count entries-group)))
+                                           [])
                       second-has-headline (some #(seq (:headline %)) second-line-entries)
                       second-has-body (some #(seq (:body %)) second-line-entries)]]
             [:div.entry-cards-container.by-topic.group
@@ -134,7 +153,10 @@
                   ; If there is only one entry add the empty card placeholder
                   (if (= (count sorted-entries) 1)
                     (let [entry-data (select-keys (first entries) [:board-name :topic-slug :topic-name])
-                          with-board (merge entry-data {:board-slug (:slug board-data) :board-name (:name board-data)})]
+                          with-board (merge
+                                      entry-data
+                                      {:board-slug (:slug board-data)
+                                       :board-name (:name board-data)})]
                       (activity-card-empty with-board (:read-only board-data)))
                     ; If there is only one entry in this row, but it's not the first add the placheolder
                     (when (= (count entries) 1)
@@ -160,6 +182,8 @@
                   (for [entry entries]
                     (rum/with-key (activity-card entry has-headline has-body (new? entry changes))
                       (str "entry-latest-" (:uuid entry))))
-                  ; If the row contains less than 2, add a placeholder div to avoid having the first cover the full width
+                  ; If the row contains less than 2, add a placeholder
+
+                  ; div to avoid having the first cover the full width
                   (when (= (count entries) 1)
                     [:div.entry-card.entry-card-placeholder])]))])))])

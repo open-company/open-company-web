@@ -21,10 +21,17 @@
                           (rum/local false ::email-error)
                           (rum/local false ::password-error)
                           {:will-mount (fn [s]
-                                        (let [signup-with-email @(drv/get-ref s :signup-with-email)]
-                                          (when-not (contains? signup-with-email :email)
-                                            (dis/dispatch! [:input [:signup-with-email] {:email "" :pswd "" :first-name "" :last-name ""}])))
-                                        s)}
+                            (let [signup-with-email @(drv/get-ref s :signup-with-email)]
+                              (when-not (contains? signup-with-email :email)
+                                (dis/dispatch!
+                                 [:input
+                                  [:signup-with-email]
+                                  {:email ""
+                                   :pswd ""
+                                   :first-name ""
+
+                                   :last-name ""}])))
+                            s)}
   [s]
   (let [signup-with-email (drv/react s :signup-with-email)]
     [:div.onboard-lander
@@ -102,19 +109,21 @@
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                                 (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                                 (cook/set-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)) true (* 60 60 24 7))
-                                                 (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
-                                                 s)
+                                    (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
+                                    (cook/set-cookie!
+                                     (router/should-show-dashboard-tooltips
+                                      (jwt/get-key :user-id)) true (* 60 60 24 7))
+                                    (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                    s)
                                    :will-update (fn [s]
-                                                 (when (and @(::saving s)
-                                                            (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
-                                                            (not (:error @(drv/get-ref s :edit-user-profile))))
-                                                    (let [orgs @(drv/get-ref s :orgs)]
-                                                      (if (pos? (count orgs))
-                                                        (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
-                                                        (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
-                                                 s)}
+                                    (when (and @(::saving s)
+                                               (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
+                                               (not (:error @(drv/get-ref s :edit-user-profile))))
+                                      (let [orgs @(drv/get-ref s :orgs)]
+                                        (if (pos? (count orgs))
+                                          (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
+                                          (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
+                                   s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
         user-data (:user-data edit-user-profile)
@@ -190,7 +199,12 @@
                                                  (when (and (empty? (:name org-editing))
                                                             (empty? (:logo-url org-editing))
                                                             (seq teams-data))
-                                                   (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
+                                                   (dis/dispatch!
+                                                    [:input
+                                                     [:org-editing]
+                                                     (select-keys
+                                                      (first teams-data)
+                                                      [:name :logo-url :logo-width :logo-height])])))
                                                s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
@@ -219,7 +233,14 @@
                             (let [url (gobj/get res "url")
                                   img (gdom/createDom "img")]
                               (set! (.-onload img) (fn []
-                                                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
+                                                      (dis/dispatch!
+                                                       [:input
+                                                        [:org-editing]
+                                                        (merge
+                                                         org-editing
+                                                         {:logo-url url
+                                                          :logo-width (.-width img)
+                                                          :logo-height (.-height img)})])
                                                       (gdom/removeNode img)))
                               (set! (.-className img) "hidden")
                               (gdom/append (.-body js/document) img)
@@ -321,7 +342,11 @@
                               (empty? (:last-name user-data)))
                          (empty? (:avatar-url user-data)))
            :on-click #(do
-                        (cook/set-cookie! (router/should-show-dashboard-tooltips (:user-id user-data)) true (* 60 60 24 7))
+                        (cook/set-cookie!
+                         (router/should-show-dashboard-tooltips
+                          (:user-id user-data))
+                         true
+                         (* 60 60 24 7))
                         (reset! (::saving s) true)
                         (dis/dispatch! [:user-profile-save true]))}
           "Sign Up"]]]))
@@ -332,20 +357,25 @@
                                (drv/drv :org-editing)
                                (rum/local false ::saving)
                                {:will-update (fn [s]
-                                               (let [org-editing @(drv/get-ref s :org-editing)
-                                                     teams-data @(drv/get-ref s :teams-data)
-                                                     teams-load @(drv/get-ref s :teams-load)]
-                                                 ;; Load the list of teams if it's not already
-                                                 (when (and (empty? teams-data)
-                                                            (:auth-settings teams-load)
-                                                            (not (:teams-data-requested teams-load)))
-                                                   (dis/dispatch! [:teams-get]))
-                                                 ;; If the team is loaded setup the form
-                                                 (when (and (nil? (:name org-editing))
-                                                            (nil? (:logo-url org-editing))
-                                                            (seq teams-data))
-                                                   (dis/dispatch! [:input [:org-editing] (select-keys (first teams-data) [:name :logo-url :logo-width :logo-height])])))
-                                               s)}
+                                 (let [org-editing @(drv/get-ref s :org-editing)
+                                       teams-data @(drv/get-ref s :teams-data)
+                                       teams-load @(drv/get-ref s :teams-load)]
+                                   ;; Load the list of teams if it's not already
+                                   (when (and (empty? teams-data)
+                                              (:auth-settings teams-load)
+                                              (not (:teams-data-requested teams-load)))
+                                     (dis/dispatch! [:teams-get]))
+                                   ;; If the team is loaded setup the form
+                                   (when (and (nil? (:name org-editing))
+                                              (nil? (:logo-url org-editing))
+                                              (seq teams-data))
+                                     (dis/dispatch!
+                                      [:input
+                                       [:org-editing]
+                                       (select-keys
+                                        (first teams-data)
+                                        [:name :logo-url :logo-width :logo-height])])))
+                                 s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
         _ (drv/react s :teams-load)
@@ -371,7 +401,14 @@
                             (let [url (gobj/get res "url")
                                   img (gdom/createDom "img")]
                               (set! (.-onload img) (fn []
-                                                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
+                                                      (dis/dispatch!
+                                                       [:input
+                                                        [:org-editing]
+                                                        (merge
+                                                         org-editing
+                                                         {:logo-url url
+                                                          :logo-width (.-width img)
+                                                          :logo-height (.-height img)})])
                                                       (gdom/removeNode img)))
                               (set! (.-className img) "hidden")
                               (gdom/append (.-body js/document) img)
@@ -458,17 +495,17 @@
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                                   (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                                    (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
-                                                  s)
+                                      (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
+                                       (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                      s)
                                      :will-update (fn [s]
-                                                    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
-                                                          orgs @(drv/get-ref s :orgs)]
-                                                      (when (and @(::saving s)
-                                                                 (not (:loading (:user-data edit-user-profile)))
-                                                                 (not (:error edit-user-profile)))
-                                                        (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))))
-                                                    s)}
+                                      (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+                                            orgs @(drv/get-ref s :orgs)]
+                                        (when (and @(::saving s)
+                                                   (not (:loading (:user-data edit-user-profile)))
+                                                   (not (:error edit-user-profile)))
+                                          (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))))
+                                      s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
         user-data (:user-data edit-user-profile)

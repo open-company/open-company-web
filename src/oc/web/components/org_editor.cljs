@@ -37,7 +37,11 @@
     ;; using utils/after here because we can't dispatch inside another dispatch.
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
-    (utils/after 1 #(dis/dispatch! [:input [:org-editing] {:name (or (:name team-data) "") :logo-url (or (:logo-url team-data) "")}]))
+    (utils/after 1 #(dis/dispatch!
+                     [:input
+                      [:org-editing]
+                      {:name (or (:name team-data) "")
+                       :logo-url (or (:logo-url team-data) "")}]))
     (when (seq (:name team-data))
       (om/set-state! owner :message "Is this the organization name you’d like to use?"))))
 

@@ -18,7 +18,8 @@
 
 ;; ----- Actions -----
 
-(defn container-watch 
+(defn container-watch
+
   ([]
   (container-watch (conj @board-ids (:uuid (dis/org-data)))))
 

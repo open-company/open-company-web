@@ -51,15 +51,25 @@
         boards (:boards org-data)]
     (if create-link
       (if (> (count boards) 1)
-        "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can create new posts or react and comment on what you read"
-        "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!")
-      "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can react and comment on what you read.")))
+        (str
+         "Boards are where you’ll find the announcements, updates, and stories that help connect "
+         "you with your team. You can create new posts or react and comment on what you read")
+        (str
+         "We’ve created a super helpful welcome board for you - it’s full of ideas on "
+         "how to get the most out of Carrot!"))
+      (str
+       "Boards are where you’ll find the announcements, updates, and stories that help "
+       "connect you with your team. You can react and comment on what you read."))))
 
 (defn get-second-tooltip-message [org-data]
   (let [boards (:boards org-data)]
     (if (> (count boards) 1)
-      "When you need to, you can click here to create new boards for different areas like Sales, Marketing and Product."
-      "When you’re ready, click here and get rolling with your first boards. You can create boards for different areas like Sales, Marketing and Product.")))
+      (str
+       "When you need to, you can click here to create new boards "
+       "for different areas like Sales, Marketing and Product.")
+      (str
+       "When you’re ready, click here and get rolling with your first boards. "
+       "You can create boards for different areas like Sales, Marketing and Product."))))
 
 (defcomponent topics-columns [{:keys [content-loaded
                                       board-data
@@ -73,7 +83,10 @@
     {:show-boards-tooltip (:show-onboard-overlay data)
      :show-plus-tooltip false
      :ww (responsive/ww)
-     :resize-listener (events/listen js/window EventType/RESIZE #(om/set-state! owner :ww (responsive/ww)))})
+     :resize-listener (events/listen
+                       js/window
+                       EventType/RESIZE
+                       #(om/set-state! owner :ww (responsive/ww)))})
 
   ; (will-mount [_]
   ;   (when (and (not (utils/is-test-env?))
@@ -103,7 +116,15 @@
           org-data (dis/org-data)
           sidebar-width (+ responsive/left-navigation-sidebar-width
                            responsive/left-navigation-sidebar-minimum-right-margin)
-          board-container-style {:margin-left (str (max sidebar-width (+ (/ (- ww responsive/board-container-width sidebar-width) 2) sidebar-width)) "px")
+          board-container-style {:margin-left (str
+                                               (max
+                                                sidebar-width
+                                                (+
+                                                 (/
+                                                  (- ww responsive/board-container-width sidebar-width)
+                                                  2)
+                                                 sidebar-width))
+                                               "px")
                                  :left "50%"}
           entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))]
       ;; Topic list
@@ -124,11 +145,17 @@
                            :button-title (if create-link "Next" "Got It!")
                            :big-circle true
                            :on-next-click (fn []
-                                            (om/update-state! owner #(merge % {:show-plus-tooltip (not (not create-link))
-                                                                               :show-boards-tooltip false}))
+                                            (om/update-state!
+                                             owner
+                                             #(merge % {:show-plus-tooltip (not (not create-link))
+                                                        :show-boards-tooltip false}))
                                             (if create-link
-                                              (.addClass (js/$ "button#add-board-button") "active")
-                                              (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)))))}))))
+                                              (.addClass
+                                               (js/$ "button#add-board-button")
+                                               "active")
+                                              (cook/remove-cookie!
+                                               (router/should-show-dashboard-tooltips
+                                                (jwt/get-key :user-id)))))}))))
         (when show-plus-tooltip
           (when-let* [plus-button (js/$ "button#add-board-button")
                       offset (.offset plus-button)
@@ -143,7 +170,9 @@
                          :on-next-click (fn []
                                           (.removeClass (js/$ "button#add-board-button") "active")
                                           (om/set-state! owner :show-plus-tooltip false)
-                                          (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
+                                          (cook/remove-cookie!
+                                           (router/should-show-dashboard-tooltips
+                                            (jwt/get-key :user-id))))})))
         (dom/div {:class "topics-column-container group"
                   :key columns-container-key}
           (when-not (responsive/is-mobile-size?)
@@ -182,9 +211,15 @@
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
                                               topic-data (when (string? board-filters)
-                                                           (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                                           (first
+                                                            (filter
+                                                             #(= (:slug %) board-filters)
+                                                             (:topics board-data))))
                                               with-topic (if (string? board-filters)
-                                                          (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
+                                                          (merge
+                                                           entry-data
+                                                           {:topic-slug (:slug topic-data)
+                                                            :topic-name (:name topic-data)})
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
@@ -204,9 +239,15 @@
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
                                               topic-data (when (string? board-filters)
-                                                           (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                                           (first
+                                                            (filter
+                                                             #(= (:slug %) board-filters)
+                                                             (:topics board-data))))
                                               with-topic (if (string? board-filters)
-                                                          (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
+                                                          (merge
+                                                           entry-data
+                                                           {:topic-slug (:slug topic-data)
+                                                            :topic-name (:name topic-data)})
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})))
@@ -223,7 +264,9 @@
               (empty-org)
               (and is-dashboard
                    is-all-posts)
-              (rum/with-key (all-posts all-posts-data) (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
+              (rum/with-key
+               (all-posts all-posts-data)
+               (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
               (and is-dashboard
                    (not is-mobile-size?)
                    (not current-activity-id)
@@ -232,7 +275,8 @@
               ; for each column key contained in best layout
               :else
               (cond ; REMOVE if we don't end up with entry drafts
-                ;; Drafts 
+                ;; Drafts
+
                 ; (and (= (:type board-data) "story")
                 ;      (= (:slug board-data) "drafts"))
                 ; (drafts-layout board-data)

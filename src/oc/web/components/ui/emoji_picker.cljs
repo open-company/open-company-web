@@ -41,8 +41,24 @@
           unicodes  (clojure.string/split unicode-str #"-")
           unicode-c (clojure.string/join (map utils/unicode-char unicodes))
           shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
-          ; new-html  (str "<img class=\"emojione\" alt=\"" unicode-c "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/" unicode-str ".png?" (googobj/get js/emojione "cacheBustParam") "\"/>")
-          new-html  (str "<img class=\"emojione emojione-" unicode-str "\" data-unicode=\"" unicode-c "\" title=\":" shortname ":\" alt=\"" unicode-c "\" />")]
+          ; new-html  (str
+          ;            "<img class=\"emojione\" alt=\""
+          ;            unicode-c
+          ;            "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/"
+          ;            unicode-str
+          ;            ".png?"
+          ;            (googobj/get js/emojione "cacheBustParam")
+          ;            "\"/>")
+          new-html  (str
+                     "<img class=\"emojione emojione-"
+                     unicode-str
+                     "\" data-unicode=\""
+                     unicode-c
+                     "\" title=\":"
+                     shortname
+                     ":\" alt=\""
+                     unicode-c
+                     "\" />")]
         (js/pasteHtmlAtCaret new-html (.getSelection js/rangy js/window) false))))
 
 (defn check-focus [s _]
@@ -56,29 +72,40 @@
 ;; the current activeElement has the class `emojiable`.
 
 (rum/defcs emoji-picker <
-  
+
+
+
   (rum/local false ::visible)
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
-  
+
+
+
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
                  s)
    :did-mount (fn [s] (when-not (utils/is-test-env?)
-                        (let [click-listener (events/listen (.-body js/document) EventType/CLICK (partial on-click-out s))
+                        (let [click-listener (events/listen
+                                              (.-body js/document)
+                                              EventType/CLICK
+                                              (partial on-click-out s))
                               focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
                               focusout (events/listen js/document EventType/FOCUSOUT (partial check-focus s))]
                           (merge s {::click-listener click-listener
                                     ::focusin-listener focusin
                                     ::focusout-listener focusout}))))
-  
+
+
+
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
-  
+
+
+
   [s {:keys [add-emoji-cb position width height will-show-picker will-hide-picker]
       :or {:position "bottom"
            :width 25
@@ -113,9 +140,11 @@
                  :right "-10px"}}
         (when-not (utils/is-test-env?)
           (react-utils/build js/EmojionePicker {:search ""
-                                                :emojione #js {:sprites true
-                                                               :imageType "png"
-                                                               :spritePath "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png"}
+                                                :emojione
+                                                #js {:sprites true
+                                                     :imageType "png"
+                                                     :spritePath
+                                                      "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png"}
                                                 :onChange (fn [emoji]
                                                            (replace-with-emoji caret-pos emoji)
                                                            (remove-markers s)

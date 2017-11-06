@@ -15,7 +15,11 @@
 (def default-user "")
 (def default-slack-user {})
 (def default-user-role :author)
-(def default-user-row {:type default-user-type :temp-user default-user :user default-user :role default-user-role})
+(def default-user-row
+ {:type default-user-type
+  :temp-user default-user
+  :user default-user
+  :role default-user-role})
 
 (defn valid-user? [user-map]
   (or (and (= (:type user-map) "email")
@@ -142,8 +146,18 @@
                     [:div
                       {:class (when (:error user-data) "error")}
                       (rum/with-key
-                        (slack-users-dropdown {:on-change #(dis/dispatch! [:input [:invite-users i] (merge user-data {:user % :error nil :temp-user nil})])
-                                               :on-intermediate-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user nil :error nil :temp-user %}))])
+                        (slack-users-dropdown {:on-change #(dis/dispatch!
+                                                            [:input
+                                                             [:invite-users i]
+                                                             (merge user-data {:user % :error nil :temp-user nil})])
+                                               :on-intermediate-change
+                                                #(dis/dispatch!
+                                                  [:input
+                                                   [:invite-users]
+                                                   (assoc
+                                                    invite-users
+                                                    i
+                                                    (merge user-data {:user nil :error nil :temp-user %}))])
                                                :initial-value (utils/name-or-email (:user user-data))})
                         (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                     [:input.org-settings-field.email-field
@@ -151,14 +165,27 @@
                        :class (when (:error user-data) "error")
                        :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
                        :placeholder "email@example.com"
-                       :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
+                       :on-change #(dis/dispatch!
+                                    [:input
+                                     [:invite-users]
+                                     (assoc
+                                      invite-users
+                                      i
+                                      (merge user-data {:error nil :user (.. % -target -value)}))])
                        :value (:user user-data)}])]
                 [:td.user-type-field
                   [:div.user-type-dropdown
                     (user-type-dropdown {:user-id (utils/guid)
                                          :user-type (:role user-data)
                                          :hide-admin (not (jwt/is-admin? (:team-id org-data)))
-                                         :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:role % :error nil}))])})]]
+                                         :on-change
+                                          #(dis/dispatch!
+                                            [:input
+                                             [:invite-users]
+                                             (assoc
+                                              invite-users
+                                              i
+                                              (merge user-data {:role % :error nil}))])})]]
                 [:td.user-remove
                   [:button.mlb-reset.remove-user
                     {:on-click #(let [before (subvec invite-users 0 i)
@@ -173,7 +200,13 @@
             [:tr
               [:td
                 [:button.mlb-reset.mlb-default.add-button
-                  {:on-click #(dis/dispatch! [:input [:invite-users] (conj invite-users (assoc default-user-row :type @(::inviting-from s)))])}
+                  {:on-click
+                    #(dis/dispatch!
+                      [:input
+                       [:invite-users]
+                       (conj
+                        invite-users
+                        (assoc default-user-row :type @(::inviting-from s)))])}
                   "+"]]
               [:td]
               [:td]]]]]
@@ -197,6 +230,12 @@
           {:on-click #(if (has-dirty-data? s)
                         (do
                           (reset! (::rand s) (int (rand 10000)))
-                          (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))]))
+                          (dis/dispatch!
+                           [:input
+                            [:invite-users]
+                            (vec
+                             (repeat
+                              default-row-num
+                              (assoc default-user-row :type @(::inviting-from s))))]))
                         (dismiss-settings-cb))}
           "Cancel"]]]))

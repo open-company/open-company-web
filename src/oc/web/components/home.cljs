@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.components.ui.footer :refer (footer)]
             [oc.web.components.home-page :refer (home-page)]))
 
 (rum/defcs home
@@ -11,6 +10,5 @@
   (if (jwt/jwt)
     [:div.home.fullscreen-page
       (when-not (drv/react s :loading)
-        [:div.home-internal]
-        (footer))]
+        [:div.home-internal])]
     (home-page)))

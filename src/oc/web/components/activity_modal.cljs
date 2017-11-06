@@ -52,7 +52,9 @@
                     :solid-button-cb #(do
                                        (let [org-slug (router/current-org-slug)
                                              board-slug (router/current-board-slug)
-                                             last-filter (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)))]
+                                             last-filter (keyword
+                                                          (cook/get-cookie
+                                                           (router/last-board-filter-cookie org-slug board-slug)))]
                                          (if (= last-filter :by-topic)
                                            (router/nav! (oc-urls/board-sort-by-topic))
                                            (router/nav! (oc-urls/board))))
@@ -79,43 +81,49 @@
                             mixins/first-render-mixin
 
                             {:before-render (fn [s]
-                                              (when (and (not @(::animate s))
-                                                       (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
-                                                (reset! (::animate s) true))
-                                              (when-let [activity-modal (sel1 [:div.activity-modal])]
-                                                (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
-                                                  (reset! (::activity-modal-height s) (.-clientHeight activity-modal))))
-                                              s)
+                              (when (and (not @(::animate s))
+                                       (= @(drv/get-ref s :activity-modal-fade-in) (:uuid (first (:rum/args s)))))
+                                (reset! (::animate s) true))
+                              (when-let [activity-modal (sel1 [:div.activity-modal])]
+                                (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
+                                  (reset! (::activity-modal-height s) (.-clientHeight activity-modal))))
+                              s)
                              :will-mount (fn [s]
-                                           (reset! (::esc-key-listener s)
-                                            (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape") (close-clicked s))))
-                                           s)
+                              (reset! (::esc-key-listener s)
+                               (events/listen
+                                js/window
+                                EventType/KEYDOWN
+                                #(when (= (.-key %) "Escape")
+                                  (close-clicked s))))
+                              s)
                              :did-mount (fn [s]
-                                          (let [activity-data (first (:rum/args s))]
-                                            (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
-                                             "show.bs.dropdown"
-                                             (fn [e]
-                                              (reset! (::showing-dropdown s) true)))
-                                            (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
-                                             "hidden.bs.dropdown"
-                                             (fn [e]
-                                              (reset! (::showing-dropdown s) false))))
-                                          s)
+                              (let [activity-data (first (:rum/args s))]
+                                (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
+                                 "show.bs.dropdown"
+                                 (fn [e]
+                                  (reset! (::showing-dropdown s) true)))
+                                (.on (js/$ (str "div.activity-modal-" (:uuid activity-data)))
+                                 "hidden.bs.dropdown"
+                                 (fn [e]
+                                  (reset! (::showing-dropdown s) false))))
+                              s)
                             :will-unmount (fn [s]
-                                            ;; Remove window resize listener
-                                            (when @(::window-resize-listener s)
-                                              (events/unlistenByKey @(::window-resize-listener s))
-                                              (reset! (::window-resize-listener s) nil))
-                                            (when @(::esc-key-listener s)
-                                              (events/unlistenByKey @(::esc-key-listener s))
-                                              (reset! (::esc-key-listener s) nil))
-                                            s)}
+                              ;; Remove window resize listener
+                              (when @(::window-resize-listener s)
+                                (events/unlistenByKey @(::window-resize-listener s))
+                                (reset! (::window-resize-listener s) nil))
+                              (when @(::esc-key-listener s)
+                                (events/unlistenByKey @(::esc-key-listener s))
+                                (reset! (::esc-key-listener s) nil))
+                              s)}
   [s activity-data]
   (let [show-comments? (utils/link-for (:links activity-data) "comments")
         fixed-activity-modal-height (max @(::activity-modal-height s) 330)
         wh (.-innerHeight js/window)]
     [:div.activity-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(:first-render-done s))))
+      {:class (utils/class-set {:will-appear (or @(::dismiss s)
+                                                 (and @(::animate s)
+                                                      (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :no-comments (not show-comments?)})
        :on-click #(when-not (utils/event-inside? % (sel1 [:div.activity-modal]))
@@ -160,17 +168,18 @@
                   (when (or (utils/link-for (:links activity-data) "partial-update")
                             (utils/link-for (:links activity-data) "delete"))
                     (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
-                          same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
+                          same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)
+                          button-id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))]
                       [:div.more-dropdown.dropdown
                         [:button.mlb-reset.activity-modal-more.dropdown-toggle
                           {:type "button"
-                           :id (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))
+                           :id button-id
                            :data-toggle "dropdown"
                            :aria-haspopup true
                            :aria-expanded false
                            :title "More"}]
                         [:div.dropdown-menu
-                          {:aria-labelledby (str "activity-modal-more-" (router/current-board-slug) "-" (:uuid activity-data))}
+                          {:aria-labelledby button-id}
                           [:div.triangle]
                           [:ul.activity-modal-more-menu
                             (when (utils/link-for (:links activity-data) "share")
@@ -210,7 +219,10 @@
                                 {:on-click #(delete-clicked % activity-data)}
                                 "Delete"])]]
                         (when @(::move-activity s)
-                          (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))]]]]
+                          (activity-move {:activity-data activity-data
+                                          :boards-list same-type-boards
+                                          :dismiss-cb #(reset! (::move-activity s) false)
+                                          :on-change #(close-clicked s nil)}))]))]]]]
           (when show-comments?
             [:div.activity-right-column
               [:div.activity-right-column-content

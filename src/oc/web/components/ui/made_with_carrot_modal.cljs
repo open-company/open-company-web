@@ -33,7 +33,8 @@
         [:div.made-wih-carrot-title
           "Waaaaait a darn minute... What’s Carrot?"]
         [:div.made-wih-carrot-subtitle
-          " Carrot highlights team news, ideas and stories that create real transparency and alignment for stakeholders."]
+          " Carrot highlights team news, ideas and stories that create "
+          "real transparency and alignment for stakeholders."]
         [:button.mlb-reset.mlb-default.learn-more
           {:on-click #(router/redirect! "https://carrot.io")}
           "Learn More"]]]])

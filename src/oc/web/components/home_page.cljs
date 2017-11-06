@@ -26,8 +26,7 @@
                                      s)}
   [s]
   [:div
-    [:div {:id "wrap"} ; <!-- used to push footer to the bottom --> 
-        
+    [:div {:id "wrap"} ; <!-- used to push footer to the bottom -->
       (site-header)
       ;; preload slack button as hidden
       [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
@@ -86,7 +85,9 @@
               [:div.title
                 "Simplify stakeholder updates"]
               [:div.subtitle
-                "Create beautiful updates for your company, investors, and advisors in less time. It’s never been easier to keep all stakeholders in the loop."]]]
+                "Create beautiful updates for your company, "
+                "investors, and advisors in less time. It’s never been "
+                "easier to keep all stakeholders in the loop."]]]
 
           [:div.illustration.illustration-3.group
             [:img {:src (utils/cdn "/img/ML/home_page_il_3_355_350.svg")}]
@@ -94,7 +95,10 @@
               [:div.title
                 "Expand your network"]
               [:div.subtitle
-                "Share news with recruits, potential investors and customers to keep them engaged and supportive. It’s an easy way to build trust and grow your business."]]]]
+                "Share news with recruits, potential investors and "
+                "customers to keep them engaged and supportive. "
+                "It’s an easy way to build trust and grow your "
+                "business."]]]]
 
         (comment
           [:div.customers

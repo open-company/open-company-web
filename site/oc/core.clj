@@ -19,7 +19,11 @@
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
    [:title "Carrot - Get everyone aligned"]
    ;; Bootstrap - Latest compiled and minified CSS
-   [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
+   [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+     :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+     :crossorigin "anonymous"}]
    ;; Local css
    [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
    ;; Fallback for the CDN compacted css
@@ -46,10 +50,15 @@
    ;; Static js files
    [:script {:src (pages/cdn "/js/static-js.js")}]
    ;; Bootstrap JavaScript //getf.com/
-   [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]])
+   [:script
+     {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+      :type "text/javascript"
+      :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      :crossorigin "anonymous"}]])
 
 (defn nav
-  "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header and every change here should be reflected there."
+  "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
+   and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
   [:nav.navbar.navbar-default.navbar-static-top
@@ -94,7 +103,8 @@
                 ]]]]]])
 
 (defn footer
-  "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer and every change here should be reflected there."
+  "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
+   and every change here should be reflected there."
   []
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:nav.navbar.navbar-default.navbar-bottom
@@ -117,27 +127,39 @@
 
         [:div.column.column-support
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');"}
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
           [:div.column-item [:a {:href contact-mail-to} "Help"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.column-integration
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');"}
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');")}
             "INTEGRATIONS"]
           [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
 
         [:div.column.column-company
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');"}
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');")}
             "COMPANY"]
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
         [:div.column.column-tour
           [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column:not(.column-tour)').removeClass('expanded');$('nav.navbar-bottom div.column.column-tour').toggleClass('expanded');"}
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-tour)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-tour').toggleClass('expanded');")}
             "TOUR"]
           [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/features"} "Features"]]]]]])

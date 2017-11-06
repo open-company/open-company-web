@@ -31,7 +31,9 @@
       (when (string? board-filters)
         (carrot-close-bt {:width 24
                           :height 24
-                          :on-click #(if (= (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug)) "by-topic")
+                          :on-click #(if (=
+                                          (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug))
+                                          "by-topic")
                                        (router/nav! (oc-urls/board-sort-by-topic))
                                        (router/nav! (oc-urls/board)))}))
       [:button.mlb-reset.filters-dropdown-button.choice
@@ -64,11 +66,22 @@
                           (cond
                             (= (:value t) :latest)
                             (do
-                              (cook/set-cookie! (router/last-board-filter-cookie org-slug board-slug) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (cook/set-cookie!
+                               (router/last-board-filter-cookie org-slug board-slug)
+                               (name :latest)
+                               (* 60 60 24 30)
+                               "/"
+                               ls/jwt-cookie-domain ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board)))
                             (= (:value t) :by-topic)
                             (do
-                              (cook/set-cookie! (router/last-board-filter-cookie org-slug board-slug) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (cook/set-cookie!
+                               (router/last-board-filter-cookie org-slug board-slug)
+                               (name :by-topic)
+                               (* 60 60 24 30)
+                               "/"
+                               ls/jwt-cookie-domain
+                               ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board-sort-by-topic)))
                             :else
                             (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized")))))
