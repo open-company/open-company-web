@@ -253,3 +253,14 @@
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))
+
+(deftask check-sources
+  "Check source files with yagni, eastwood, kibit and bikeshed."
+  []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-yagni)
+    (check/with-eastwood)
+    (check/with-kibit)
+    (check/with-bikeshed :options {:verbose true
+                                   :max-line-length 120})))
