@@ -17,7 +17,7 @@ div.carrot-tip-container {
 
   div.carrot-tip {
     position: absolute;
-    
+
     div.triangle {
       position: absolute;
       top: 160px;
@@ -39,7 +39,6 @@ div.carrot-tip-container {
       padding: 32px 16px 16px;
       width: 346px;
       // height: 265px;
-
 
       div.carrot-tip-title {
         @include avenir_H();
