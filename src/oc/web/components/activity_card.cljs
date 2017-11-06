@@ -44,12 +44,44 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+(def default-body-height 72)
+(def default-all-posts-body-height 144)
+
 (defn- truncate-body [body-sel is-all-posts]
-  (.dotdotdot (js/$ body-sel)
-   #js {:height (* 24 (if is-all-posts 6 3))
-        :wrap "word"
-        :watch true
-        :ellipsis "... "}))
+  (let [$body-els (js/$ (str body-sel ">*"))
+        partial-heights (atom [])
+        found (atom false)]
+    (.each $body-els (fn [idx el]
+     (when-not @found
+       (this-as this
+         (let [$this (js/$ this)
+               el-h (.outerHeight $this true) ;; Include margins in height calculation
+               prev-height (apply + @partial-heights)
+               actual-height (+ prev-height el-h)
+               max-height (if is-all-posts default-all-posts-body-height default-body-height)
+               truncate-height  (cond
+                                  (zero? (- max-height prev-height))
+                                  0
+                                  (<= (- max-height prev-height) 24)
+                                  24
+                                  (<= (- max-height prev-height) (* 24 2))
+                                  (* 24 2)
+                                  (<= (- max-height prev-height) (* 24 3))
+                                  (* 24 3)
+                                  (< (- max-height prev-height) (* 24 4))
+                                  (* 24 4)
+                                  (< (- max-height prev-height) (* 24 5))
+                                  (* 24 5)
+                                  (< (- max-height prev-height) (* 24 6))
+                                  (* 24 6))]
+           (swap! partial-heights #(vec (conj % el-h)))
+           (when (>= actual-height max-height)
+             (reset! found true)
+             (.dotdotdot $this
+               #js {:height truncate-height
+                    :wrap "word"
+                    :watch true
+                    :ellipsis "..."})))))))))
 
 (defn- get-first-body-thumbnail [body is-ap]
   (let [$body (js/$ (str "<div>" body "</div>"))
