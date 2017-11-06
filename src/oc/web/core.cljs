@@ -26,7 +26,6 @@
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
-            [oc.web.components.oc-wall :refer (oc-wall)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
@@ -123,11 +122,6 @@
     (post-routing)
     ;; render component
     (drv-root component target)))
-
-(defn oc-wall-handler [message target params]
-  (pre-routing (:query-params params))
-  (post-routing)
-  (drv-root #(om/component (oc-wall message :login)) target))
 
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing (:query-params params) rewrite-url)
@@ -351,7 +345,7 @@
           (api/get-auth-settings)
           (post-routing)
           (drv-root org-editor target))
-        (oc-wall-handler "Please sign in." target params)))
+        (router/redirect! urls/home)))
 
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
@@ -383,7 +377,7 @@
       (post-routing)
       (if (jwt/jwt)
         (drv-root #(om/component (user-profile)) target)
-        (oc-wall-handler "Please sign in to access this page." target params)))
+        (router/redirect! urls/home)))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
