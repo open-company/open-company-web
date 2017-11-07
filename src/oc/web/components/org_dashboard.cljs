@@ -12,7 +12,7 @@
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.topics-columns :refer (topics-columns)]
+            [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
@@ -111,19 +111,4 @@
               (navbar))
             (dom/div {:class "dashboard-container"}
               (dom/div {:class "topic-list"}
-                (om/build topics-columns
-                  {:loading (:loading data)
-                   :content-loaded (or (:loading board-data) (:loading data))
-                   :org-data org-data
-                   :board-data board-data
-                   :all-posts-data all-posts-data
-                   :force-edit-topic (:force-edit-topic data)
-                   :card-width card-width
-                   :columns-num columns-num
-                   :show-login-overlay (:show-login-overlay data)
-                   :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                   :is-dashboard true
-                   :board-filters (:board-filters data)
-                   :show-onboard-overlay (:show-onboard-overlay data)
-                   :is-all-posts (or (utils/in? (:route @router/path) "all-posts")
-                                     (:from-all-posts @router/path))})))))))))
+                (dashboard-layout)))))))))
