@@ -678,7 +678,7 @@
           (fn [{:keys [status success body]}]
             (dispatcher/dispatch! [:comments-get/finish {:success success
                                                          :error (when-not success body)
-                                                         :body (if (seq body) (json->cljs body) nil)
+                                                         :body (when (seq body) (json->cljs body))
                                                          :activity-uuid (:uuid activity-data)}])))))))
 
 (defn add-comment [activity-data comment-body]
@@ -691,7 +691,7 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:comment-add/finish {:success success
                                                       :error (when-not success body)
-                                                      :body (if (seq body) (json->cljs body) nil)
+                                                      :body (when (seq body) (json->cljs body))
                                                       :activity-uuid (:uuid activity-data)}]))))))
 
 (defn toggle-reaction
@@ -815,7 +815,7 @@
     (storage-http (method-for-link activity-link) (relative-href activity-link)
       {:headers (headers-for-link activity-link)}
       (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) nil)])))))
+        (dispatcher/dispatch! [:activity-get/finish status (when success (json->cljs body))])))))
 
 (defn share-activity [post-data share-data]
   (when post-data

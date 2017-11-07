@@ -38,9 +38,18 @@
               [:div.mobile-only.happy-face.red-happy-face]
               [:div.paragraphs-bg-container.group
                 [:div.paragraph
-                  "Messaging apps are designed for real-time work. They’re great in the moment, but chat gets noisy and conversations disappear, making it difficult to have a big picture view of what’s important across the company."]
+                  (str
+                   "Messaging apps are designed for real-time work. They’re "
+                   "great in the moment, but chat gets noisy and conversations "
+                   "disappear, making it difficult to have a big picture view of "
+                   "what’s important across the company.")]
                 [:div.paragraph
-                  "Carrot provides a birds-eye view of the latest announcements, updates, and stories so you can always see what’s happening in context. A common, shared view of what’s important - and the opportunity to react and ask questions about it - creates real transparency and alignment."]
+                  (str
+                   "Carrot provides a birds-eye view of the latest announcements, "
+                   "updates, and stories so you can always see what’s happening "
+                   "in context. A common, shared view of what’s important - and "
+                   "the opportunity to react and ask questions about it - creates "
+                   "real transparency and alignment.")]
                 [:div.paragraph
                   "It also brings teams closer so they can grow together."]
                 [:div.paragraph
