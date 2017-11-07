@@ -21,6 +21,11 @@ div.emoji-picker {
 
     &.disabled {
       opacity: 0.2;
+
+      &:hover {
+        opacity: 0.2;
+        background-image: cdnUrl("/img/ML/emoji2x.png");
+      }
     }
   }
 

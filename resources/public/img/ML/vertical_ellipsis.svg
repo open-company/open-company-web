@@ -1,25 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="4px" height="14px" viewBox="0 0 4 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
-    <title>ic_more</title>
+<svg width="4px" height="20px" viewBox="0 0 4 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>••• icon copy</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Components-/-Cards-/-Topic-Card-No-Title" transform="translate(-398.000000, -223.000000)" fill="#A3A6AC">
-            <g id="Top-Card">
-                <g>
-                    <g id="Title">
-                        <g id="Components-/-Cards-/-Bookmark-Entry-Card">
-                            <g id="Components-/-Buttons-/-More" transform="translate(392.000000, 222.000000)">
-                                <g id="ic_more">
-                                    <g id="icon">
-                                        <g transform="translate(6.666667, 1.333333)">
-                                            <path d="M1.33333333,2.66666667 C0.596953667,2.66666667 0,2.069713 0,1.33333333 C0,0.596953667 0.596953667,0 1.33333333,0 C2.069713,0 2.66666667,0.596953667 2.66666667,1.33333333 C2.66666667,2.069713 2.069713,2.66666667 1.33333333,2.66666667 Z M1.33333333,8 C0.596953667,8 0,7.40304633 0,6.66666667 C0,5.930287 0.596953667,5.33333333 1.33333333,5.33333333 C2.069713,5.33333333 2.66666667,5.930287 2.66666667,6.66666667 C2.66666667,7.40304633 2.069713,8 1.33333333,8 Z M1.33333333,13.3333333 C0.596953667,13.3333333 0,12.7363797 0,12 C0,11.2636203 0.596953667,10.6666667 1.33333333,10.6666667 C2.069713,10.6666667 2.66666667,11.2636203 2.66666667,12 C2.66666667,12.7363797 2.069713,13.3333333 1.33333333,13.3333333 Z" id="Combined-Shape"></path>
-                                        </g>
-                                    </g>
-                                </g>
-                            </g>
-                        </g>
+    <g id="➡️-Board-Flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.5">
+        <g id="Board:-Grid-(jelly)" transform="translate(-701.000000, -204.000000)">
+            <g id="Group-5" transform="translate(297.000000, 178.000000)">
+                <g id="•••-icon" transform="translate(404.000000, 26.000000)">
+                    <g id="icon">
+                        <rect id="Rectangle-15" fill="#F2F1ED" opacity="0.599999964" x="0" y="0" width="4" height="20"></rect>
+                        <path d="M2,4 C0.8954305,4 0,3.1045695 0,2 C0,0.8954305 0.8954305,0 2,0 C3.1045695,0 4,0.8954305 4,2 C4,3.1045695 3.1045695,4 2,4 Z M2,12 C0.8954305,12 0,11.1045695 0,10 C0,8.8954305 0.8954305,8 2,8 C3.1045695,8 4,8.8954305 4,10 C4,11.1045695 3.1045695,12 2,12 Z M2,20 C0.8954305,20 0,19.1045695 0,18 C0,16.8954305 0.8954305,16 2,16 C3.1045695,16 4,16.8954305 4,18 C4,19.1045695 3.1045695,20 2,20 Z" id="Combined-Shape" fill="#898D93"></path>
                     </g>
                 </g>
             </g>

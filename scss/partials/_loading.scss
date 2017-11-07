@@ -6,7 +6,7 @@ div.oc-loading {
   height: 100%;
   display: none;
   background-color: $oc_gray_8;
-  z-index: #{$navbar_zindex + 1};
+  z-index: #{$navbar_zindex + 3001};
 
   &.active {
     display: inline;

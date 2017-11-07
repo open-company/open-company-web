@@ -230,7 +230,7 @@
                         (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
                                                                                   :logo-width 0
                                                                                   :logo-height 0})])))}
-          (org-avatar org-editing false false true)
+          (org-avatar org-editing false true)
           [:div.add-picture-link
             (if (empty? (:logo-url org-editing))
               "Upload logo"
@@ -382,7 +382,7 @@
                         (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
                                                                                   :logo-width 0
                                                                                   :logo-height 0})])))}
-          (org-avatar org-editing false false true)
+          (org-avatar org-editing false true)
           [:div.add-picture-link
             (if (empty? (:logo-url org-editing))
               "Upload logo"

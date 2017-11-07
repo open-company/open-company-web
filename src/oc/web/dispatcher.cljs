@@ -172,9 +172,6 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
-   :activity-modal-fade-in [[:base]
-                             (fn [base]
-                               (:activity-modal-fade-in base))]
    :error-banner        [[:base]
                           (fn [base]
                             {:error-banner-message (:error-banner-message base)
@@ -200,6 +197,14 @@
                               (:topics board-data)
                               (let [edit-board-slug (:board-slug entry-editing)]
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
+   :modal-data          [[:base :org-data]
+                          (fn [base org-data entry-edit-topics]
+                            {:org-data org-data
+                             :activity-modal-fade-in (:activity-modal-fade-in base)
+                             :board-filters (:board-filters base)
+                             :modal-editing-data (:modal-editing-data base)
+                             :modal-editing (:modal-editing base)
+                             :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]

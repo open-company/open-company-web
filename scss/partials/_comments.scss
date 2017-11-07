@@ -1,4 +1,5 @@
 $comment_avatar_size: 23;
+$gradient_base_color: #fcfdfc; // rgba($carrot_light_gray_2, 0.15)
 
 div.comments {
   width: 100%;
@@ -13,34 +14,24 @@ div.comments {
     height: 40px;
     z-index: 10;
     pointer-events: none;
-    background: -moz-linear-gradient(top,  rgba(241, 242, 237, 1) 0%, rgba(241, 242, 237,0) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, top, bottom, color-stop(0%,rgba(241, 242, 237,0)), color-stop(100%,rgba(241, 242, 237,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(241, 242, 237, 1) 0%,rgba(241, 242, 237,0) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f2ed', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+    background: -moz-linear-gradient(top,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, top, bottom, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$gradient_base_color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
   }
 
   div.comments-internal {
-    padding-bottom: 51px;
-    min-height: 51px;
+    padding-bottom: 143px;
+    min-height: 127px;
     height: 100%;
     width: 100%;
     bottom: 0px;
     left: 0;
     right: 0;
     position: absolute;
-
-    &.empty {
-      transition: 0ms !important;
-      min-height: 100%;
-    }
-
-    &.add-comment-focus {
-      padding-bottom: 127px;
-      min-height: 127px;
-    }
 
     div.comments-internal-scroll {
       overflow-x: hidden;
@@ -49,23 +40,29 @@ div.comments {
       padding: 10px 10px 0px;
     }
 
-    div.comments-internal-empty {
-      text-align: center;
-      @include avenir_M();
-      font-size: 16px;
-      color: $carrot_light_gray;
-      margin-top: 20%;
+    &.empty {
+      min-height: 100%;
+    
+      div.comments-internal-empty {
+        text-align: center;
+        @include avenir_M();
+        font-size: 14px;
+        color: $carrot_light_gray;
+        width: 218px;
+        margin: calc(50% - 62px) auto 0px; //140px
 
-      img {
-        width: 23px;
-        height: 23px;
-      }
+        div.no-comments-placeholder {
+          width: 110px;
+          height: 30px;
+          background-size: 110px 30px;
+          background-repeat: no-repeat;
+          background-position: center;
+          margin: 0 auto;
+          @include image-2x("/img/ML/no_comments_placeholder");
+        }
 
-      div {
-        margin-top: 24px;
-
-        &:last-child {
-          margin-top: 0px;
+        div.no-comments-message {
+          margin-top: 14px;
         }
       }
     }
@@ -123,6 +120,7 @@ div.comments {
         font-weight: 300;
         margin: 0 0 0 #{$comment-avatar-size + 16}px;
         white-space: pre-line;
+        word-wrap: break-word;
 
         .emojione {
           @include emoji-size(13);
@@ -138,9 +136,9 @@ div.comments {
     div.add-comment-box {
       background-color: white;
       border-radius: 4px;
-      border: 1px solid rgba(177, 184, 192, 0.5);
-      padding: 8px;
-      transition: 230ms;
+      border: 1px solid rgba($carrot_light_gray_1, 0.5);
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+      padding: 16px;
       left: 0;
       right: 0;
       position: absolute;
@@ -158,7 +156,7 @@ div.comments {
         @include avenir_H();
         color: white;
         font-size: 12px;
-        top: -65px;
+        top: -40px;
         left: calc(50% - 84px);
         @include no-user-select();
 
@@ -175,90 +173,56 @@ div.comments {
         }
       }
 
-      &.expanded{
-        padding: 8px 8px 2px;
-
-        div.add-comment-internal {
-          width: calc(100% - 42px);
-          float: right;
-          position: relative;
-
-          &:after {
-            display: block;
-            width: calc(100% + 33px);
-            content: "";
-            height: 1px;
-            background-color: rgba($carrot_light_gray_1, 0.3);
-            position: absolute;
-            bottom: 34px;
-            left: -40px;
-          }
-
-          div.add-comment {
-            height: 70px;
-            margin-bottom: 4px;
-            overflow: auto;
-          }
-        }
+      div.add-comment-internal{
+        position: relative;
 
         div.emoji-picker {
           right: unset;
           left: 10px;
         }
-      }
-
-      div.user-avatar-img-container {
-        float: left;
-      }
-
-      @include user-profile(23);
-
-      div.add-comment-internal{
-        margin-left: 16px;
-        width: calc(100% - 68px);
-        float: left;
 
         div.add-comment {
           resize: none;
           width: 100%;
           border: none;
           outline: none;
-          @include avenir_R();
+          @include avenir_M();
           background-color: transparent;
-          color: $oc_gray_5;
-          // height: 18px;
-          font-size: 14px;
-          transition: 230ms;
-          overflow: hidden;
+          color: $carrot_light_gray_3;
+          font-size: 13px;
           cursor: text;
+          height: 58px;
+          margin-bottom: 4px;
+          overflow: auto;
 
           .emojione {
             @include emoji-size(13);
           }
 
           &:empty:before {
-            @include avenir_R();
-            font-size: 14px;
+            @include avenir_M();
+            font-size: 13px;
             content: attr(placeholder);
-            color: $carrot_light_gray_1;
+            color: rgba($carrot_light_gray_3, 0.4);
             cursor: text;
           }
         }
 
         div.add-comment-footer {
-          transition: 230ms;
 
           div.reply-button-container {
             float: right;
             button.reply-btn {
-              float: left;
+              float: right;
               color: $carrot_green;
               @include avenir_H();
               font-size: 14px;
-              padding: 6px 6px 9px 18px; //2px 6px 9px 16px;
+              // padding: 6px 6px 9px 18px;
+              height: 32px;
+              width: 59px;
 
               &:hover {
-                text-decoration: underline;
+                color: white;
               }
             }
           }
@@ -266,24 +230,35 @@ div.comments {
       }
 
       div.emoji-picker {
-        transition: left 230ms;
-        bottom: 10px;
         position: absolute;
-        right: 10px;
+        right: 80px;
+        bottom: 16px;
 
         button.emoji-button {
-          width: 20px;
-          height: 20px;
-          background-size: 20px 20px;
+          width: 32px;
+          height: 32px;
+          background-color: $carrot_green_3;
+          background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          border-radius: 16px;
 
-          img {
-            width: 20px;
-            height: 20px;
+          &:hover {
+            background-color: $carrot_green_2;
+            background-image: cdnUrl("/img/ML/emoji_picker_bt_white.svg");
           }
+
+          &.disabled:hover {
+            background-color: $carrot_green_3;
+            background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg"); 
+          }
+
+          @include preload_image(cdnUrl("/img/ML/emoji_picker_bt_white.svg"), "before");
         }
 
         div.picker-container {
-          right: -240px !important;
+          right: -92px !important;
         }
       }
     }

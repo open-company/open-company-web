@@ -51,9 +51,9 @@
         boards (:boards org-data)]
     (if create-link
       (if (> (count boards) 1)
-        "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can create new posts or react and comment on what you read"
+        "Boards are where you’ll find the announcements, updates and stories that help connect you with your team. You can create new posts or react and comment on what you read"
         "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!")
-      "Boards are where you’ll find the announcements, updates, and stories that help connect you with your team. You can react and comment on what you read.")))
+      "Boards are where you’ll find the announcements, updates and stories that help connect you with your team. You can react and comment on what you read.")))
 
 (defn get-second-tooltip-message [org-data]
   (let [boards (:boards org-data)]
@@ -155,13 +155,11 @@
               ;; Board name and settings button
               (dom/div {:class "board-name"}
                 (when (router/current-board-slug)
-                  (if is-all-posts
-                    (dom/div {:class "all-posts-icon"})
-                    (dom/div {:class "boards-icon"})))
-                (when (router/current-board-slug)
-                  (if is-all-posts
-                    "All Posts"
-                    (:name board-data)))
+                  (dom/span
+                    {:class "board-name-span"
+                     :dangerouslySetInnerHTML (if is-all-posts
+                                                #js {"__html" "All Posts"}
+                                                (utils/emojify (:name board-data)))}))
                 ;; Settings button
                 (when (and (router/current-board-slug)
                            (not is-all-posts)
@@ -188,7 +186,13 @@
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
                   (dom/div {:class "add-to-board-pencil"})
-                  (dom/label {:class "add-to-board-label"}) "New Post"))
+                  (dom/label {:class "add-to-board-label"} "New Post")))
+              ;; Board filters when there is not topic filtering
+              (when (and (not is-mobile-size?)
+                         (not empty-board?)
+                         (not is-all-posts)
+                         (> (count entry-topics) 1))
+                (filters-dropdown))
               ;; Add entry floating button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
@@ -199,7 +203,7 @@
                              :style {:opacity (calc-opacity (document-scroll-top))}
                              :data-placement "left"
                              :data-toggle "tooltip"
-                             :title (str "Create a new update")
+                             :title (str "Start a new post")
                              :on-click (fn [_]
                                         (let [entry-data {:board-slug (:slug board-data)
                                                           :board-name (:name board-data)}
@@ -209,14 +213,7 @@
                                                           (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
                                                           entry-data)]
                                           (dis/dispatch! [:entry-edit with-topic])))}
-                  (dom/div {:class "add-to-board-pencil"})))
-              ;; Board filters dropdown
-              (when (and (router/current-board-slug)
-                         (not is-mobile-size?)
-                         (not empty-board?)
-                         (not is-all-posts)
-                         (> (count entry-topics) 1))
-                (filters-dropdown)))
+                  (dom/div {:class "add-to-board-pencil"}))))
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
               (zero? (count (:boards org-data)))

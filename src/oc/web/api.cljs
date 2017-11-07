@@ -457,12 +457,12 @@
                    (not (s/blank? redirect-url)))
           (router/redirect! redirect-url))))))
 
-(defn create-org [org-name logo-url]
+(defn create-org [org-name logo-url logo-width logo-height]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
         with-logo (if-not (empty? logo-url)
-                    (assoc org-data :logo-url logo-url)
+                    (merge org-data {:logo-url logo-url :logo-width logo-width :logo-height logo-height})
                     org-data)]
     (when (and org-name create-org-link)
       (storage-http (method-for-link create-org-link) (relative-href create-org-link)
@@ -685,7 +685,7 @@
 (def entry-keys [:headline :body :topic-name :attachments :title :board-slug])
 
 (defn create-entry
-  [entry-data temp-uuid]
+  [entry-data]
   (when entry-data
     (let [board-data (dispatcher/board-data)
           create-entry-link (utils/link-for (:links board-data) "create")
@@ -694,10 +694,12 @@
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body headers] :as resp}]
-          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :temp-uuid temp-uuid}]))))))
+          (if success
+            (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug (:slug board-data) :edit-key :entry-editing}])
+            (dispatcher/dispatch! [:entry-save/failed  :entry-editing])))))))
 
 (defn update-entry
-  [entry-data]
+  [entry-data board-slug]
   (when entry-data
     (let [update-entry-link (utils/link-for (:links entry-data) "partial-update")
           cleaned-entry-data (select-keys entry-data entry-keys)]
@@ -705,7 +707,9 @@
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {})}]))))))
+          (if success
+            (dispatcher/dispatch! [:entry-save/finish {:activity-data (if success (json->cljs body) {}) :board-slug board-slug  :edit-key :modal-editing-data}])
+            (dispatcher/dispatch! [:entry-save/failed  :modal-editing-data])))))))
 
 (defn delete-activity [activity-data]
   (when activity-data

@@ -1,7 +1,19 @@
 @mixin default-item(){
   background-color: transparent;
-  .internal, div.all-posts-label {
+  .internal {
     @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    color: $carrot_light_gray_3;
+    text-decoration: none;
+
+    &.new {
+      @include avenir_B();
+    }
+  }
+
+  div.all-posts-label {
+    @include avenir_H();
     font-size: 14px;
     line-height: 1.71;
     color: $carrot_light_gray_3;
@@ -14,9 +26,11 @@
 }
 
 @mixin item-selected(){
-  background-color: rgba($carrot_orange_1, 0.1);
+  background-color: $carrot_light_blue_2;
+  border-top-right-radius: 100px;
+  border-bottom-right-radius: 100px;
   .internal, div.all-posts-label {
-    color: $carrot_orange;
+    color: $carrot_text_blue_3;
     @include avenir_H();
     font-size: 14px;
     line-height: 1.71;
@@ -26,9 +40,23 @@
 
 @mixin item-selected-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
-  .internal, div.all-posts-label {
+  border-top-right-radius: 100px;
+  border-bottom-right-radius: 100px;
+  .internal {
     color: $carrot_dark_gray;
     @include avenir_M();
+    font-size: 14px;
+    line-height: 1.71;
+    text-decoration: none;
+
+    &.new {
+      @include avenir_B();
+    }
+  }
+
+  div.all-posts-label {
+    color: $carrot_dark_gray;
+    @include avenir_H();
     font-size: 14px;
     line-height: 1.71;
     text-decoration: none;
@@ -47,9 +75,9 @@ div.left-navigation-sidebar {
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 138px;
+  top: 118px;
   left: 0px;
-  height: calc(100vh - 138px);
+  height: calc(100vh - 118px);
   @include no-user-select();
 
   div.left-navigation-sidebar-content {
@@ -85,9 +113,8 @@ div.left-navigation-sidebar {
     div.all-posts-label {
       padding: 5px 5px 0 5px;
       width: 148px;
-      margin-left: 19px;
       text-align: left;
-      margin-left: 20px;
+      margin-left: 16px;
     }
 
     div.all-posts-icon {
@@ -113,7 +140,8 @@ div.left-navigation-sidebar {
         font-size: 13px;
         color: $carrot_gray;
         float: left;
-        margin-left: 5px;
+        margin-left: 21px;
+        margin-top: 6px;
         cursor: default;
       }
 
@@ -124,10 +152,7 @@ div.left-navigation-sidebar {
         height: 10px;
         float: left;
         margin-right: 7px;
-        margin-top: 0px;
-      }
-
-      div.boards-icon {
+        margin-top: 6px;
         background-image: cdnUrl("/img/ML/boards_icon.svg");
       }
     }
@@ -136,7 +161,7 @@ div.left-navigation-sidebar {
       width: 20px;
       height: 20px;
       margin-right: 0px;
-      margin-top: -5px;
+      margin-top: 1px;
       float: right;
       padding: 0;
       cursor: pointer;
@@ -146,7 +171,7 @@ div.left-navigation-sidebar {
       background-repeat: no-repeat;
       background-position: 50%;
       background-size: 8px 8px;
-      border-radius: 2px;
+      border-radius: 10px;
       @include avenir_H();
 
       &:hover, &.active {
@@ -173,7 +198,7 @@ div.left-navigation-sidebar {
       margin: 0;
 
       &:last-child {
-        margin-bottom: 16px;
+        margin-bottom: 10px;
       }
 
       &.hover-item {
@@ -241,7 +266,9 @@ div.left-navigation-sidebar {
 
       div.about-carrot-icon {
         background-image: cdnUrl("/img/ML/carrot_grey.svg");
-        background-size: 16px 16px;
+        background-size: auto 16px;
+        background-repeat: no-repeat;
+        background-position: center;
         width: 16px;
         height: 16px;
         margin-right: 5px;
@@ -266,7 +293,9 @@ div.left-navigation-sidebar {
 
       div.invite-people-icon {
         background-image: cdnUrl("/img/ML/invite_people.svg");
-        background-size: 16px 16px;
+        background-size: 16px auto;
+        background-repeat: no-repeat;
+        background-position: center;
         width: 16px;
         height: 16px;
         margin-right: 5px;

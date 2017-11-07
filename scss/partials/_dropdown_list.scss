@@ -36,13 +36,14 @@ div.dropdown-list-container {
       padding: 0;
 
       li.dropdown-list-item {
-        padding: 3px 8px;
+        padding: 5px 12px 3px;
         margin: 3px 0;
         cursor: pointer;
         @include avenir_M();
         font-size: 14px;
         color: $carrot_light_gray_3;
         cursor: pointer;
+        border-radius: 100px;
 
         &.divider-line {
           display: block;
@@ -51,6 +52,7 @@ div.dropdown-list-container {
           padding: 0px;
           margin: 3px 0 3px -8px;
           background-color: rgba(177,184,192,0.50);
+          border-radius: 0px;
 
           &:hover {
             background-color: rgba(177,184,192,0.50);
@@ -58,14 +60,15 @@ div.dropdown-list-container {
         }
 
         &:hover {
-          background-color: rgba($carrot_light_gray_4, 0.2);
+          background-color: $carrot_light_purple;
+          color: $carrot_purple;
         }
 
         &.select {
           @include avenir_H();
-          background-color: rgba($carrot_orange, 0.1);
           text-decoration: none;
-          color: $carrot_orange;
+          background-color: $carrot_light_gray_8;
+          color: $carrot_dark_gray_2;
         }
 
         img.dropdown-list-item-icon {

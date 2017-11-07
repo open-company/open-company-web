@@ -110,3 +110,5 @@ rangy.saveSelection = function(){};
 rangy.removeMarkers = function(){};
 rangy.restoreSelection = function(){};
 rangy.getSelection = function(){};
+// jwt_decode
+var jwt_decode = function(){};

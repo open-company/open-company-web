@@ -53,12 +53,13 @@
       [:div.cta
         [:h1.headline "Grow Together"]
         [:div.subheadline
-          "Announcements, updates, ideas and stories that bring teams closer"]
+          "Announcements, updates and stories that bring teams closer"]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:button.mlb-reset.get-started-centred-bt
           {:id "get-started-centred-bt"}
           "Get started for free"]
         [:div.small-teams
+          {:id "easy-setup-label"}
           "Easy set-up • Free for small teams"]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -361,11 +362,12 @@
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
   [:div.not-found
     [:div
-      [:div.error-page
+      [:div.error-page.not-found-page
         [:img {:src (cdn "/img/ML/carrot_404.svg") :width 338 :height 189}]
         [:h2 "Page Not Found"]
-        [:p "It seems we can't find what you're looking for."]
-        [:p.last "The page may have been moved or removed."]
+        [:p "The page may have been moved or removed,"]
+        [:p.not-logged-in.last "or you may need to " [:a.login {:href "/login"} "login"] "."]
+        [:p.logged-in.last "or you may not have access with this account."]
         [:script {:src "/js/set-path.js"}]]]])
 
 (defn server-error [{contact-mail-to :contact-mail-to contact-email :contact-email}]
@@ -388,7 +390,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Get everyone aligned"]
+          [:title "Carrot - Grow together"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -424,6 +426,8 @@
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
+          ;; JWT decode library
+          [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
           [:script {:type "text/javascript" :src "/lib/tooltip/tooltip.js"}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -475,7 +479,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Get everyone aligned"]
+          [:title "Carrot - Grow together"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -496,7 +500,7 @@
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
-          
+
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection

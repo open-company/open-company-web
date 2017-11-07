@@ -16,12 +16,17 @@
   (let [max-reaction (get-max-count-reaction (:reactions entry-data))]
     (when-not (zero? (:count max-reaction))
       [:div.is-reactions.group
+        {:class (when (:reacted max-reaction) "reacted")}
         [:div.is-reactions-reaction
           (:reaction max-reaction)]
         ; Reactions count
         [:div.is-reactions-summary
-          {:class (str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction))}
-          (:count max-reaction)]])))
+          {:class (utils/class-set {(str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction)) true})}
+          (if (:reacted max-reaction)
+            (if (> (:count max-reaction) 1)
+              (str "You and +" (dec (:count max-reaction)))
+              (str "You reacted to this"))
+            (str "+" (:count max-reaction)))]])))
 
 (rum/defcs comments-summary < rum/static
                               rum/reactive
@@ -56,6 +61,8 @@
   [s entry-data show-zero-comments?]
   [:div.interactions-summary.group
     ;; Reactions
-    (reactions-summary entry-data)
+    (when (seq (:reactions entry-data))
+      (reactions-summary entry-data))
     ; Comments
-    (comments-summary entry-data show-zero-comments?)])
+    (when (utils/link-for (:links entry-data) "comments")
+      (comments-summary entry-data show-zero-comments?))])

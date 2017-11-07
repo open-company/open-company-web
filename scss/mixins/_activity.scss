@@ -24,9 +24,9 @@ $h2_top_margin: 20;
   div.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
-    @include avenir_R();
-    color: rgba($oc_gray_7, 0.5);
-    font-size: 14px;
+    @include avenir_M();
+    color: $carrot_light_gray_3;
+    font-size: 12px;
     white-space: nowrap;
 
     div.tooltip {
@@ -43,11 +43,11 @@ $h2_top_margin: 20;
   div.activity-tag {
     display: inline-block;
     height: 26px;
-    border-radius: 4px;
+    border-radius: 100px;
     @include avenir_B();
     font-size: 12px;
     color: $carrot_light_gray_3;
-    background-color: #E4E3DE;
+    background-color: $carrot_light_gray_7;
     line-height: 14px;
     text-align: center;
     padding: 7px 11px;
@@ -58,10 +58,17 @@ $h2_top_margin: 20;
     max-width: 100%;
     margin-left: 3px;
 
+    &.on-gray {
+      &:hover, &:active, &:focus, &.active {
+        background-color: $carrot_purple !important;
+        color: white;
+        cursor: pointer;
+      }
+    }
 
-    &:hover {
-      background-color: #C7CEFF !important;
-      color: $carrot_text_blue;
+    &:hover, &:active, &:focus, &.active {
+      background-color: $carrot_light_purple !important;
+      color: $carrot_purple;
       cursor: pointer;
     }
 

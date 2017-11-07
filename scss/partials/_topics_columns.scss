@@ -44,23 +44,29 @@ div.topics-columns {
       }
 
       div.board-name {
-        @include avenir_M();
-        font-size: 32px;
-        color: $carrot_gray;
-        margin-bottom: 30px;
         float: left;
         margin-left: 15px;
+
+        span.board-name-span {
+          @include avenir_M();
+          font-size: 32px;
+          color: $carrot_gray;
+
+          .emojione {
+            @include emoji-size(32);
+          }
+        }
 
         button.board-settings-bt {
           float: right;
           background-image: cdnUrl("/img/ML/board_settings.svg");
-          background-size: 12px 12px;
+          background-size: 8px 8px;
           background-repeat: no-repeat;
-          background-position: 50%;
-          width: 12px;
-          height: 12px;
-          margin-top: 15px;
-          margin-left: 10px;
+          background-position: 0px 9px;
+          width: 20px;
+          height: 20px;
+          margin-top: 6px;
+          margin-left: 6px;
           opacity: 0.8;
 
           &:hover {
@@ -105,20 +111,31 @@ div.topics-columns {
 
         &.top-button {
           float: right;
-          width: auto;
+          width: 143px;
           height: 42px;
-          background-color: #FA6654;
-          color: white;
-          border-radius: 4px;
-          padding: 10px 23.5px;
+          background-color: $carrot_orange_light;
+          color: $carrot_orange;
+          border-radius: 100px;
+          padding: 10px 22px;
           margin-right: 16px;
-          @include avenir_H();
+          margin-top: -3px;
           border: 2px solid transparent;
           opacity: 1;
+          transition: 0ms;
+          cursor: pointer;
 
-          &:hover {
-            background-color: #FF7C6C;
+          &:hover, &:active, &:focus {
+            background-color: $carrot_orange;
+            color: white;
             opacity: 1;
+
+            div.add-to-board-pencil {
+              background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+            }
+
+            label.add-to-board-label {
+              color: white;
+            }
           }
 
           &:active, &:focus {
@@ -127,13 +144,14 @@ div.topics-columns {
           }
 
           div.add-to-board-pencil {
-            background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+            background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
             background-size: 14px 14px;
             width: 14px;
             height: 14px;
             margin: 3px 6px 0px 0px;
             padding: 0;
             float: left;
+            cursor: pointer;
           }
 
           label.add-to-board-label {
@@ -141,14 +159,9 @@ div.topics-columns {
             font-size: 16px;
             color: $carrot_orange;
             float: left;
+            cursor: pointer;
           }
         }
-      }
-
-      div.filters-dropdown-name {
-        float: right;
-        margin-right: 24px;
-        margin-top: 8px;
       }
     }
 

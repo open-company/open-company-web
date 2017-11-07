@@ -13,6 +13,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
+            [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -31,7 +32,6 @@
             "Add an update?"]]])])
 
 (defn- delete-clicked [e activity-data]
-  (utils/event-stop e)
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
                     :message "Delete this post?"
@@ -74,12 +74,12 @@
     @found))
 
 (rum/defcs activity-card < rum/reactive
-                        (rum/local false ::hovering-card)
-                        (rum/local false ::showing-dropdown)
+                        (rum/local false ::more-dropdown)
                         (rum/local false ::truncated)
                         (rum/local nil ::first-body-image)
                         (rum/local false ::move-activity)
                         (rum/local nil ::window-click)
+                        (rum/local false ::share-dropdown)
                         (drv/drv :org-data)
                         {:after-render (fn [s]
                                          (let [activity-data (first (:rum/args s))
@@ -110,143 +110,175 @@
                                             (reset! (::truncated s) false)))
                                         s)
                          :did-mount (fn [s]
-                                      (let [activity-data (first (:rum/args s))]
-                                        (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
-                                         "show.bs.dropdown"
-                                         (fn [e]
-                                           (reset! (::showing-dropdown s) true)))
-                                        (.on (js/$ (str "div.activity-card-" (:uuid activity-data)))
-                                         "hidden.bs.dropdown"
-                                         (fn [e]
-                                           (reset! (::showing-dropdown s) false))))
+                                      (let [activity-data (first (:rum/args s))
+                                            activity-card-class (str "div.activity-card-" (:uuid activity-data))]
+                                        (reset! (::window-click s)
+                                         (events/listen js/window EventType/CLICK (fn [e]
+                                                                                    (when (and (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
+                                                                                               (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
+                                                                                      (reset! (::more-dropdown s) false))
+                                                                                    (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
+                                                                                      (reset! (::share-dropdown s) false))))))
                                       s)
                          :will-unmount (fn [s]
                                          (events/unlistenByKey @(::window-click s))
                                          s)}
-  [s activity-data has-headline has-body is-new is-all-posts]
-  [:div.activity-card
-    {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                              :all-posts-card is-all-posts})
-     :on-click #(dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])
-     :on-mouse-enter #(when-not (:read-only activity-data) (reset! (::hovering-card s) true))
-     :on-mouse-leave #(when-not (:read-only activity-data) (reset! (::hovering-card s) false))}
-    ; Card header
-    [:div.activity-card-head.group
-      {:class "entry-card"}
-      ; Card author
-      [:div.activity-card-head-author
-        (user-avatar-image (first (:author activity-data)))
-        [:div.name (:name (first (:author activity-data)))]
-        [:div.time-since
-          (let [t (or (:published-at activity-data) (:created-at activity-data))]
-            [:time
-              {:date-time t
+  [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
+  (let [attachments (utils/get-attachments-from-body (:body activity-data))]
+    [:div.activity-card
+      {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
+                                :dropdown-active (or @(::more-dropdown s)
+                                                     @(::share-dropdown s)
+                                                     @(::move-activity s))
+                                :all-posts-card is-all-posts})
+       :on-click (fn [e]
+                  (when (and (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments])))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button])))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move])))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag])))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit])))
+                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share])))
+                             (not @(::more-dropdown s))
+                             (not @(::move-activity s))
+                             (not @(::share-dropdown s)))
+                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))
+     }
+      ; Card header
+      [:div.activity-card-head.group
+        {:class "entry-card"}
+        ; Card author
+        [:div.activity-card-head-author
+          (user-avatar-image (:publisher activity-data))
+          [:div.name (:name (:publisher activity-data))]
+          [:div.time-since
+            (let [t (or (:published-at activity-data) (:created-at activity-data))]
+              [:time
+                {:date-time t
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :title (utils/activity-date-tooltip activity-data)}
+                (utils/time-since t)])]]
+        ; Card labels
+        [:div.activity-card-head-right
+          (when (or (utils/link-for (:links activity-data) "partial-update")
+                    (utils/link-for (:links activity-data) "delete"))
+            (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))]
+              [:div.more-button
+                [:button.mlb-reset.more-ellipsis
+                  {:type "button"
+                   :on-click (fn [e]
+                               (utils/remove-tooltips)
+                               (reset! (::more-dropdown s) (not @(::more-dropdown s)))
+                               (reset! (::move-activity s) false))
+                   :title "More"
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"}]
+                (when @(::more-dropdown s)
+                  [:div.activity-more-dropdown-menu
+                    [:div.triangle]
+                    [:ul.activity-card-more-menu
+                      (when (and (utils/link-for (:links activity-data) "partial-update")
+                                 (> (count all-boards) 1))
+                        [:li
+                          {:on-click #(do
+                                        (reset! (::more-dropdown s) false)
+                                        (reset! (::move-activity s) true))}
+                          "Move"])
+                      (when (utils/link-for (:links activity-data) "delete")
+                        [:li
+                          {:on-click #(do
+                                        (reset! (::more-dropdown s) false)
+                                        (delete-clicked % activity-data))}
+                          "Delete"])]])
+                (when @(::move-activity s)
+                  (activity-move {:activity-data activity-data :boards-list all-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))
+          (activity-attachments activity-data true)
+          ; Topic tag button
+          (when (:topic-slug activity-data)
+            (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
+              [:div.activity-tag.on-gray
+                {:class (when is-all-posts "double-tag")
+                 :on-click #(do
+                              (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
+                topic-name]))
+          (when is-all-posts
+            [:div.activity-tag
+              {:class (utils/class-set {:board-tag true
+                                        :double-tag (:topic-slug activity-data)})
+               :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
+              (:board-name activity-data)])
+                ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
+                ;;(when is-new [:div.new-tag "New"])
+                ]]
+      [:div.activity-card-content.group
+        ; Headline
+        [:div.activity-card-headline
+          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
+           :class (when has-headline "has-headline")}]
+        ; Body
+        (let [body-without-preview (utils/body-without-preview (:body activity-data))
+              activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
+              emojied-body (utils/emojify body-without-preview)]
+          [:div.activity-card-body
+            {:dangerouslySetInnerHTML emojied-body
+             :class (utils/class-set {:has-body has-body
+                                      :has-headline has-headline
+                                      :has-media-preview @(::first-body-image s)})}])
+        ; Body preview
+        (when @(::first-body-image s)
+          [:div.activity-card-media-preview-container
+            {:class (or (:type @(::first-body-image s)) "image")}
+            [:img
+              {:src (:thumbnail @(::first-body-image s))}]])]
+      [:div.activity-card-footer.group
+        (interactions-summary activity-data)
+        (when share-thoughts
+          [:div.activity-share-thoughts
+            "Share your thoughts"])
+        (when (utils/link-for (:links activity-data) "partial-update")
+          [:button.mlb-reset.post-edit
+            {:title "Edit"
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :class (utils/class-set {:not-hover (and (not @(::move-activity s))
+                                                      (not @(::more-dropdown s))
+                                                      (not @(::share-dropdown s)))})
+             :on-click (fn [e]
+                         (utils/remove-tooltips)
+                         (reset! (::more-dropdown s) false)
+                         (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data) true]))}])
+        (when (utils/link-for (:links activity-data) "share")
+          [:div.activity-share
+            [:button.mlb-reset.activity-share-bt
+              {:title "Share"
                :data-toggle "tooltip"
                :data-placement "top"
-               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :title (utils/activity-date-tooltip activity-data)}
-              (utils/time-since t)])]]
-      ; Card labels
-      [:div.activity-card-head-right
-        ; Topic tag button
-        (when (:topic-slug activity-data)
-          (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
-            [:div.activity-tag
-              {:class (when is-all-posts "double-tag")
-               :on-click #(do
-                            (utils/event-stop %)
-                            (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
-              topic-name]))
-        (when is-all-posts
-          [:div.activity-tag
-            {:class (utils/class-set {:board-tag true
-                                      :double-tag (:topic-slug activity-data)})
-             :on-click #(do
-                          (utils/event-stop %)
-                          (router/nav!
-                            (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie (router/current-org-slug) (:board-slug activity-data)))) :by-topic)
-                                (oc-urls/board-sort-by-topic (:board-slug activity-data))
-                                (oc-urls/board (:board-slug activity-data)))))}
-            (:board-name activity-data)])
-        ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
-        ;;(when is-new [:div.new-tag "New"])
-        ]]
-    [:div.activity-card-content.group
-      ; Headline
-      [:div.activity-card-headline
-        {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-         :class (when has-headline "has-headline")}]
-      ; Body
-      (let [body-without-preview (utils/body-without-preview (:body activity-data))
-            activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
-            emojied-body (utils/emojify body-without-preview)]
-        [:div.activity-card-body
-          {:dangerouslySetInnerHTML emojied-body
-           :class (utils/class-set {:has-body has-body
-                                    :has-headline has-headline
-                                    :has-media-preview @(::first-body-image s)})}])
-      ; Body preview
-      (when @(::first-body-image s)
-        [:div.activity-card-media-preview-container
-          {:class (or (:type @(::first-body-image s)) "image")}
-          [:img
-            {:src (:thumbnail @(::first-body-image s))}]])]
-    [:div.activity-card-footer.group
-      (interactions-summary activity-data)
-      (when (or (utils/link-for (:links activity-data) "partial-update")
-                (utils/link-for (:links activity-data) "delete"))
-        (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))
-            same-type-boards (filter #(= (:type %) (:type activity-data)) all-boards)]
-          [:div.more-button.dropdown
-            [:button.mlb-reset.more-ellipsis.dropdown-toggle
-              {:type "button"
-               :class (utils/class-set {:hidden (and (not @(::move-activity s)) (not @(::hovering-card s)) (not @(::showing-dropdown s)))})
-               :id (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))
-               :on-click #(utils/event-stop %)
-               :title "More"
-               :data-toggle "dropdown"
-               :aria-haspopup true
-               :aria-expanded false}]
-            [:div.dropdown-menu
-              {:aria-labelledby (str "activity-card-more-" (:board-slug activity-data) "-" (:uuid activity-data))}
-              [:div.triangle]
-              [:ul.activity-card-more-menu
-                (when (utils/link-for (:links activity-data) "share")
-                  [:li
+               :data-container "body"
+               :on-click #(reset! (::share-dropdown s) (not @(::share-dropdown s)))}]
+            (when @(::share-dropdown s)
+              [:div.activity-share-dropdown
+                [:div.triangle]
+                [:ul.activity-share-dropdown-list
+                  (when (and (utils/link-for (:links activity-data) "share")
+                             (jwt/team-has-bot? (:team-id (dis/org-data))))
+                    [:li.activity-share-dropdown-item
+                      {:on-click (fn [e]
+                                   (reset! (::share-dropdown s) false)
+                                   ; open the activity-share-modal component
+                                   (dis/dispatch! [:activity-share-show :slack activity-data]))}
+                      "Slack"])
+                  [:li.activity-share-dropdown-item
                     {:on-click (fn [e]
-                                 (utils/event-stop e)
-                                 ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share-show :link activity-data]))}
-                    "Share Link"])
-                (when (utils/link-for (:links activity-data) "share")
-                  [:li
-                    {:on-click (fn [e]
-                                 (utils/event-stop e)
+                                 (reset! (::share-dropdown s) false)
                                  ; open the activity-share-modal component
                                  (dis/dispatch! [:activity-share-show :email activity-data]))}
-                    "Share Email"])
-                (when (and (utils/link-for (:links activity-data) "share")
-                           (jwt/team-has-bot? (:team-id (dis/org-data))))
-                  [:li
+                    "Email"]
+                  [:li.activity-share-dropdown-item
                     {:on-click (fn [e]
-                                 (utils/event-stop e)
+                                 (reset! (::share-dropdown s) false)
                                  ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                    "Share Slack"])
-                (when (utils/link-for (:links activity-data) "partial-update")
-                  [:li
-                    {:on-click (fn [e]
-                                 (utils/event-stop e)
-                                 (dis/dispatch! [:entry-edit activity-data]))}
-                    "Edit"])
-                (when (and (utils/link-for (:links activity-data) "partial-update")
-                           (> (count same-type-boards) 1))
-                  [:li
-                    {:on-click #(do (utils/event-stop %) (reset! (::move-activity s) true))}
-                    "Move"])
-                (when (utils/link-for (:links activity-data) "delete")
-                  [:li
-                    {:on-click #(delete-clicked % activity-data)}
-                    "Delete"])]]
-            (when @(::move-activity s)
-              (activity-move {:activity-data activity-data :boards-list same-type-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))]])
+                                 (dis/dispatch! [:activity-share-show :link activity-data]))}
+                    "Link"]]])])]]))

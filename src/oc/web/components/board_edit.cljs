@@ -23,7 +23,7 @@
 
 (defn board-name-on-change [s board-name-node]
   (let [board-html (.-innerHTML board-name-node)
-        cleaned-board-name (utils/emoji-images-to-unicode (gobj/get (utils/emojify board-html) "__html"))]
+        cleaned-board-name (utils/strip-HTML-tags (utils/emoji-images-to-unicode (gobj/get (utils/emojify board-html) "__html")))]
     (dis/dispatch! [:input [:board-editing :name] cleaned-board-name])))
 
 (rum/defcs board-edit < rum/reactive
@@ -200,7 +200,7 @@
                                (empty? (:access board-editing)))
                  :on-click #(let [board-node (rum/ref-node s "board-name")
                                   inner-html (.-innerHTML board-node)
-                                  board-name (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))]
+                                  board-name (utils/strip-HTML-tags (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html")))]
                               (dis/dispatch! [:input [:board-editing :name] board-name])
                               (dis/dispatch! [:board-edit-save]))}
                 (if new-board? "Create" "Save")]
