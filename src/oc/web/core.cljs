@@ -400,6 +400,14 @@
         (simple-handler mobile-boards-list "boards-list" target params)
         (org-handler "boards-list" target #(om/component) params)))
 
+    (defroute drafts-route (urls/drafts ":org") {:as params}
+      (timbre/info "Routing drafts-route" (urls/drafts ":org"))
+      (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
+
+    (defroute drafts-slash-route (str (urls/drafts ":org") "/") {:as params}
+      (timbre/info "Routing drafts-slash-route" (str (urls/drafts ":org") "/"))
+      (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
+
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
       (board-handler "dashboard" target org-dashboard params (or (keyword (cook/get-cookie (router/last-board-filter-cookie (:org (:params params)) (:board (:params params))))) :latest)))
@@ -489,8 +497,12 @@
                                  ; Secure activity route
                                  secure-activity-route
                                  secure-activity-slash-route
-                                 ;; Boards
+                                 ;; Boards list
                                  boards-list-route
+                                 ;; Drafts
+                                 drafts-route
+                                 drafts-slash-route
+                                 ;; Boards
                                  board-route
                                  board-slash-route
                                  ; ;; Board sorting
