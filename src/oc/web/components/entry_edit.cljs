@@ -229,7 +229,8 @@
         [:div.entry-edit-modal-divider
           {:class (when-not @(::show-divider-line s) "not-visible")}]
         [:div.entry-edit-modal-footer.group
-          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
+          (when-not (js/isIE)
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)}))
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (clean-body)

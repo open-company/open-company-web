@@ -413,7 +413,8 @@
                 (if editing
                   [:div.activity-modal-footer.group
                     {:class (when @(::show-bottom-border s) "scrolling-content")}
-                    (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)})
+                    (when-not (js/isIE)
+                      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)}))
                     [:div.activity-modal-footer-right
                       [:button.mlb-reset.mlb-link-black.cancel-edit
                         {:on-click #(dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))}

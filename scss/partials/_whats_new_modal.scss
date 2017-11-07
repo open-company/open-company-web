@@ -56,7 +56,7 @@ div.whats-new-modal-container {
         margin: 0px auto;
       }
 
-      a {
+      a.about-link {
         @include avenir_H();
         font-size: 28px;
         color: $carrot_dark_blue;
@@ -133,11 +133,13 @@ div.whats-new-modal-container {
               color: rgba($oc_gray_7, 0.5)
             }
 
-            div.news-title {
+            div.news-headline {
               @include avenir_H();
               font-size: 20px;
               color: $carrot_dark_gray;
               margin-top: 16px;
+              display: block;
+              @include activity-headline();
             }
 
             div.news-body {
@@ -145,6 +147,7 @@ div.whats-new-modal-container {
               font-size: 16px;
               color: $carrot_dark_gray;
               margin-top: 16px;
+              @include activity-body();
             }
           }
         }

@@ -50,6 +50,7 @@
                          (when (and (not is-loading) (not read-only-reaction))
                            (when (and (not (:reacted r))
                                       (not (js/isSafari))
+                                      (not (js/isEdge))
                                       (not (js/isIE)))
                              (animate-reaction e s))
                            (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}

@@ -18,8 +18,14 @@ div.container.about {
 @media (min-width: 768px) {
 
   div.container.about {
-    max-width: 1086px;
     text-align: center;
+    width: 100%;
+    max-width: unset;
+
+    div.about-header {
+      background-color: $oc_gray_8;
+      padding: 40px 0px;
+    }
   }
 }
 
@@ -85,13 +91,13 @@ div.ovals-container {
 
       &.face-green {
         background-image: cdnUrl("/img/ML/happy_face_green.svg");
-        bottom: 171px;
+        bottom: 381px;
         right: 21px;
       }
 
       &.face-purple {
         background-image: cdnUrl("/img/ML/happy_face_purple.svg");
-        bottom: 0px;
+        bottom: 90px;
         right: 85px;
       }
     }
@@ -109,7 +115,7 @@ div.ovals-container {
     letter-spacing: 0.2px;
     text-align: center;
     color: $carrot_dark_blue;
-    max-width: 827px;
+    max-width: 657px;
     margin: 0px auto 40px;
     padding-top: 50px;
 
@@ -193,16 +199,12 @@ div.ovals-container {
   }
 
   div.paragraph {
-    @include avenir_M();
+    @include avenir_R();
     font-size: 20px;
-    text-align: center;
+    text-align: left;
     color: $carrot_text_blue_2;
-    max-width: 427px;
+    max-width: 561px;
     margin: 20px auto 50px;
-
-    &:last-child {
-      @include avenir_H();
-    }
 
     @include mobile(){
       width: 100%;
@@ -213,6 +215,13 @@ div.ovals-container {
 div.principles {
   position: relative;
   padding: 0 16px;
+
+  div.principles-headline {
+    color: $carrot_dark_blue;
+    font-size: 28px;
+    @include avenir_O();
+    padding-top: 80px;
+  }
 
   div.principle {
     position: relative;
@@ -278,7 +287,7 @@ div.principles {
 
     div.principle-description {
       color: $carrot_text_blue_2;
-      @include avenir_M();
+      @include avenir_R();
       font-size: 20px;
       max-width: 564px;
       text-align: left;
@@ -294,6 +303,10 @@ div.principles {
 
     &.principle-1 {
 
+      div.principle-title {
+        color: $carrot_orange;
+      }
+
       div.principle-logo {
         background-image: cdnUrl("/img/ML/about_principle_1.svg");
       }
@@ -305,6 +318,10 @@ div.principles {
 
     &.principle-2 {
 
+      div.principle-title {
+        color: $carrot_green;
+      }
+
       div.principle-logo {
         background-image: cdnUrl("/img/ML/about_principle_2.svg");
       }
@@ -315,6 +332,10 @@ div.principles {
     }
 
     &.principle-3 {
+
+      div.principle-title {
+        color: $carrot_text_blue;
+      }
 
       div.principle-logo {
         background-image: cdnUrl("/img/ML/about_principle_3.svg");
@@ -343,7 +364,7 @@ div.about-alignment {
     position: absolute;
     left: 50%;
     margin-left: -540px;
-    margin-top: 27px;
+    margin-top: 77px;
     top: 70px;
     width: 68px;
     height: 49px;
@@ -365,7 +386,7 @@ div.about-alignment {
     font-size: 33px;
     color: white;
     text-align: center;
-    @include avenir_M();
+    @include avenir_BOOK();
 
     @include mobile(){
       width: 100%;

@@ -1,241 +1,119 @@
 (ns oc.terms)
 
 (defn terms [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container.outer.topic.content
-    [:div.row
-     [:div.col-md-12
-      [:h1 "OpenCompany Terms of Service"]
-      [:p "Effective: August 1, 2016"]
-
-      [:ol
-
-        [:li [:strong "Acceptance of Terms."]
-          [:ol
-            [:li "This Terms of Service document, "
-              [:strong "INCLUDING THE BINDING ARBITRATION PROVISION CONTAINED IN topic 10 "]
-              "(the “"
-              [:strong "TOS"]
-              "), is an agreement you must accept in order to use OpenCompany’s Service (as defined below). It is applicable to (a) “"
-              [:strong "Owners"]
-              "” -- those who initially set up the Service (b) Contributors – those who add and edit information, and that can share it with others outside of the company; (“"
-              [:strong "Contributors"]
-              "), and to c) Users – users who are invited to join an existing team that has already been created in the Service by an Owner or Contributor (“"
-              [:strong "Users"]
-              "”). The terms “"
-              [:strong "you"]
-              "” and “"
-              [:strong "users"]
-              "” encompass all users, including both Contributors and Users. This document describes both your rights and your obligations as part of using the Service. It is important that you read it carefully because you will be legally bound to these terms. OpenCompany, LLC (“"
-              [:strong "OpenCompany"]
-              "” “"
-              [:strong "we"]
-              "” “"
-              [:strong "us"]
-              "”) only provides its Service (as defined below) to you subject to this TOS. By accepting this TOS or by accessing or using the Service, you agree to be bound by this TOS (including the Privacy Policy, which is incorporated here by reference)."]
-            [:li "If you are entering into this TOS on behalf of a company or other legal entity, you represent that you have the authority to bind such entity, its Contributors, its Users, and its affiliates to this TOS. In that case, the terms “you” or “your” shall also refer to such entity, its Contributors, its Users, and its affiliates, as applicable. If you do not have such authority, or if you do not agree with this TOS, you may not use the Service. You acknowledge that this TOS is a contract between you and OpenCompany, even though it is electronic and is not physically signed by you and OpenCompany, and it governs your use of the Service."]
-            [:li "As our business evolves, OpenCompany may change this TOS. If we make a material change to the TOS, we may provide you with reasonable notice prior to the changes either by emailing the email address associated with your account or by posting a notice on the Site. You can review the most current version of the TOS at any time by visiting this page. The revised terms and conditions will become effective on the date set forth in our notice, and if you use the Service after that date, your use will constitute acceptance of the revised terms and conditions. If any change to this TOS is not acceptable to you, your only remedy is to cancel your account and stop using the Services through the process provided in the Service."]
-            [:li "You are solely responsible for informing users of the applicable company policies, obtaining any legally required member consent to such policies, and for ensuring that all uses of the Services comply with applicable federal, state and/or international privacy laws, including but not limited to, the Electronic Communications Privacy Act, 18 U.S.C. § 2510 et seq.  Please also see the Privacy Policy for more information on these topics. "]
-            [:li "By accessing or using the Services, you affirm that you are at least 18 years of age (or have reached the age of majority if that is not 18 years of age where you live). You represent that you are fully able and competent to enter into and comply with the terms and conditions in this TOS. The Service is not directed to children under 13, so if you are under 13 years of age, you are not permitted to access or use the Services. If we become aware that you are using the Service even though you are under 13, we will deactivate your account."]]]
-
-        [:li [:strong "Description of Service. "]
-          "The “"
-          [:strong "Service"]
-          "” means (a) OpenCompany’s dashboard and shared updates and related systems and technologies, as well as the website "
-          [:a {:href "https://carrot.io"} "carrot.io"]
-          ", and (b) all software (including the Software, as defined below), applications, data, reports, text, images, and other content made available by or on behalf of OpenCompany through any of the foregoing. The “Service” does not include Your Data (as defined below) or any software application or service that is provided by you or a third party, which you use in connection with the Service, whether or not OpenCompany designates them as “official integrations” (each a “"
-          [:strong "Non-OpenCompany Product"]
-          "”). Any modifications and new features added to the Service are also subject to this TOS. OpenCompany reserves the right to modify or discontinue the Service (or any Service plan) or any feature or functionality thereof at any time without notice to you. All rights, title and interest in and to the Service and its components (including all intellectual property rights) will remain with and belong exclusively to OpenCompany."]
-
-        [:li [:strong "Access and Use of the Service."]
-          [:ol
-            [:li "You may access and use the Service only for lawful, authorized purposes and you shall not misuse the Service in any manner (as determined by OpenCompany, LLC in its sole discretion). See topic 6 for specific provisions outlining prohibited uses of the Service. You shall comply with any codes of conduct, policies, storage limitations, or other notices OpenCompany provides you or publishes in connection with the Service from time to time, but if any of those policies materially change the TOS, we will provide you with reasonable notice as provided in topic 1.3 above. You shall promptly notify OpenCompany if you learn of a security breach related to the Service."]
-            [:li "OpenCompany is an Open Source Software (OSS) project, but may contain proprietary and confidential information that is protected by applicable intellectual property and other laws. Subject to the terms and conditions of this TOS, OpenCompany only grants you a personal, non-sublicensable and non-exclusive license to use the object code of any non OSS solely in connection with the Service. Any rights not expressly granted herein are reserved."]
-            [:li "OpenCompany reserves the right to use your name as a reference for marketing or promotional purposes on the Site and in other communication with existing or potential OpenCompany customers. For example, we might list your company on one of our webpages under lists of OpenCompany customers. We don’t want to list customers who don’t want to be listed, so you may send an email to "
-              [:a {:href contact-mail-to} contact-email]
-              " stating that you do not wish to be used as a reference."]
-            [:li "OpenCompany may make available, in its sole discretion, the OpenCompany Application Programming Interface and related documentation, data, code, and other materials provided with the API (collectively “"
-              [:strong "API"]
-              "”). You undertake use of the API at your own risk, and such use of this API will be governed by this TOS. You hereby agree to be bound by those terms, and acknowledge that violation of OpenCompany’s TOS is grounds for termination of Your Account."]]]
-
-        [:li [:strong "Your Data Rights and Related Responsibilities."]
-          [:ol
-            [:li "“"
-              [:strong "Your Data"]
-              "” means any data and content you upload, post, transmit or otherwise made available via the Services (which may include data you elect to import from Non-OpenCompany Products you use). “"
-              [:strong "Your Data"]
-              "” includes anything you enter or upload into the Service. OpenCompany will make commercially reasonable efforts to ensure that all facilities used to store and process Your Data meet a high standard for security."]
-            [:li "In order for us to provide the Service to you, we require that you grant us certain rights with respect to Your Data. For example, we need to be able to transmit, store and copy Your Data in order to display it to you and your teammates, to index it so you are able to search it, to make backups to prevent data loss, and so on. Your acceptance of this TOS gives us the permission to do so and grants us any such rights necessary to provide the service to you, only for the purpose of providing the service (and for no other purpose). This permission includes allowing us to use third-party service providers (such as Amazon Web Services) in the operation and administration of the Service and the rights granted to us are extended to these third parties to the degree necessary in order for the Service to be provided."]
-            [:li "If any users send us any feedback or suggestions regarding the Service, you grant OpenCompany an unlimited, irrevocable, perpetual, free license to use any such feedback or suggestions for any purpose without any obligation to you."]
-            [:li "You are solely responsible for your conduct (including by and between all users), the content of Your Data, and all communications with others while using the Services. We may choose to review Public Content (as defined below) for compliance with our policies and guidelines, but you acknowledge that OpenCompany has no obligation to monitor any information on the Services. However, OpenCompany may remove or disable any Public Content at any time for any reason or for no reason at all. We are not responsible for the accuracy, appropriateness, or legality of Your Data or any other information you and your users may be able to access using the Services. The Services provide features that allow you and your users to share Your Data and other materials with others or to make it public. Please consider carefully what you allow to be shared or made public."]]]
-
-        [:li [:strong "Payment."]
-          [:ol
-            [:li "To the extent you use a Service plan that is made available for a fee, you will be required to select a payment plan and provide accurate information regarding your credit card or other payment instrument. You will promptly update your account information with any changes in your payment information. You agree to pay OpenCompany in accordance with the terms set forth on the Site (currently, "
-              [:a {:href "https://carrot.io/pricing"} "carrot.io/pricing"]
-
-              " and related pages) and this TOS, and you authorize OpenCompany or its third-party payment processors to bill your payment instrument in advance on a periodic basis in accordance with such terms."]
-            [:li "If you dispute any charges you must let OpenCompany know within sixty (60) days after the date that OpenCompany invoices you. All amounts paid are non-refundable and we reserve the right to change our prices in the future. If we increase our prices for your Service plan, we will provide notice of the change on the Site and in email to you at least 30 days before the change is to take effect. Your continued use of the Service after the price change goes into effect constitutes your agreement to pay the changed amount. OpenCompany may choose to bill you through an invoice, in which case, full payment for invoices issued must be received by the date specified in the invoice. Past due fees are subject to a finance charge of 1.5% per month on any outstanding balance, or the maximum permitted by law, whichever is lower, plus all expenses of collection. You shall be responsible for all taxes associated with Services other than U.S. taxes based on OpenCompany’s net income."]]]
-
-        [:li [:strong "Representations and Warranties. "]
-          "You represent and warrant to OpenCompany that (i) you have full power and authority to enter into this TOS; (ii) you own all Your Data or have obtained all permissions, releases, rights or licenses required to engage in your activities (and allow OpenCompany to perform its obligations) in connection with the Services without obtaining any further releases or consents; and (iii) Your Data and your other activities in connection with the Service, and OpenCompany’s exercise of all rights and license granted by you herein, do not and will not violate, infringe, or misappropriate any third party’s copyright, trademark, right of privacy or publicity, or other personal or proprietary right, nor does Your Data contain any matter that is unlawful or illegal."]
-
-        [:li [:strong "You also agree not to:"]
-          [:ol
-            [:li "upload, post, transmit, or otherwise make available any of Your Data that is unlawful or illegal, including without limitation Data that is libelous, or invasive of another's privacy;"]
-            [:li "use the Service to harm minors in any way;"]
-            [:li "impersonate any person or entity, including, but not limited to, a OpenCompany employee, or other user, or falsely state or otherwise misrepresent your affiliation with a person or entity;"]
-            [:li "manipulate identifiers in order to disguise the origin of any of Your Data;"]
-            [:li "upload, post, transmit, or otherwise make available any of Your Data that you do not have a right to make available under any law or under contractual or fiduciary relationships (such as inside information, proprietary and confidential information learned or disclosed as part of employment relationships or under nondisclosure agreements);"]
-            [:li "upload, post, transmit or otherwise make available any of Your Data in a manner that infringes any patent, trademark, trade secret, copyright or other proprietary rights of any party;"]
-            [:li "sublicense, resell, rent, lease, transfer or assign (except as permitted in topic 16) the Service or its use, or offer the Service on a time share basis to any third party;"]
-            [:li "use the Service to upload, post, transmit, or otherwise make available any unsolicited or unauthorized advertising, promotional materials, \"junk mail,\" \"spam,\" \"chain letters,\" \"pyramid schemes,\" or any other form of solicitation;"]
-            [:li "use the Service to upload, post, transmit, or otherwise make available any software viruses or any other computer code, files or programs designed to interrupt, destroy or limit the functionality of any computer software or hardware;"]
-            [:li "interfere with or disrupt the Service or servers or networks connected to the Service, or disobey any requirements, procedures, policies or regulations of networks connected to the Service, including using any device or software;"]
-            [:li "modify, adapt, or hack the Service, including by using any non-public OpenCompany APIs, or otherwise attempt to gain unauthorized access to the Service or its related systems or networks."]
-            [:li "intentionally or unintentionally violate any applicable local, state, national or international law in connection with your use of the Service, including, but not limited to, any data, privacy, or export control laws, or regulations promulgated by the U.S. Securities and Exchange Commission, any rules of any national or other securities exchange, including, without limitation, the New York Stock Exchange, the American Stock Exchange, or the NASDAQ, and any regulations having the force of law;"]
-            [:li "use the Service to provide material support or resources (or to conceal or disguise the nature, location, source, or ownership of material support or resources) to any organization(s) designated by the United States government as a foreign terrorist organization pursuant to topic 219 of the Immigration and Nationality Act;"]
-            [:li "use the Service to engage in any unlawful or illegal activities; and/or"]
-            [:li "collect or store personal data about other users in connection with any of the prohibited conduct and activities set forth above."]]]
-
-        [:li "You acknowledge that OpenCompany and its designees shall have the right (but not the obligation) in their sole discretion to pre-screen, refuse, or remove any of Your Data that is available via the Service. For example, we may choose to review publically visible content (“"
-          [:strong "Public Content"]
-          "”) posted for compliance with our policies and guidelines. If, for instance, you upload files that do not belong to you and make these files available publicly, we can delete those files. We may also review Your Data transmitted through non-public mechanisms where we deem appropriate, including for violations of this TOS or in response to a user complaint. Without limiting the foregoing, OpenCompany and its designees shall have the right (but not the obligation) to remove any of Your Data that violates the TOS or is otherwise objectionable. You must evaluate, and bear all risks associated with, the use of Your Data, including any reliance on the accuracy, completeness, or usefulness of Your Data."]
-
-        [:li "You acknowledge, consent and agree that OpenCompany may access, preserve and disclose your account information and Your Data if required to do so by law or in a good faith belief that such access preservation or disclosure is reasonably necessary to: (i) comply with legal process; (ii) enforce the TOS; (iii) respond to claims that any of Your Data violates the rights of third parties; (iv) respond to your requests for customer service; or (v) protect the rights, property or personal safety of OpenCompany, its users and the public."]
-
-        [:li [:strong "Term; Termination."]
-          [:ol
-            [:li "This TOS will continue in full effect unless and until your account or this TOS is terminated as described herein. Service plans that are paid monthly will automatically renew for additional months, and Service plans that are paid annually will automatically renew for additional years. You have the right to deactivate your account at any time by using the account deactivation interface in company Settings."]
-            [:li "We reserve the right to deactivate and delete your account (or the access privileges of any Member) and terminate this TOS at any time for any reason, or no reason, with or without notice. Without limiting the foregoing, OpenCompany may, in its sole discretion, publish policies whereby we delete your account for prolonged inactivity. Upon any termination of this TOS, we will have no obligation to maintain or provide Your Data. If your team’s account is deleted, we will delete or destroy all copies of Your Data in our possession or control, in a reasonably expedient way, unless legally prohibited."]
-            [:li "Please see our Privacy Policy at "
-              [:a {:href "https://carrot.io/privacy"} "carrot.io/privacy"]
-              " for more information about the choices you have regarding Your Data."]
-            [:li "All accrued rights to payment and the terms of topic 5 and topics 8 through 20 shall survive termination of this TOS."]]]
-
-        [:li [:strong "Disclaimer of Warranties."]
-          [:ol
-            [:li "The Services may be temporarily unavailable for scheduled maintenance or for unscheduled emergency maintenance, or because of other causes beyond our reasonable control, but OpenCompany shall use reasonable efforts to provide advance notice of any material scheduled service disruption. Further, you understand that Your Data may be transmitted or handled in an unencrypted manner if you choose to use unencrypted gateways to connect to the Service. Additionally, while OpenCompany takes steps to ensure that information provided to its third party vendors and hosting partners is transmitted using reasonable security measures, it does not guarantee that these transmissions will be encrypted. Accordingly, you acknowledge that you bear sole responsibility for adequate security, protection and backup of Your Data. OpenCompany will have no liability to you for any unauthorized access or use of any of Your Data, or any corruption, deletion, destruction or loss of any of Your Data."]
-            [:li "THE SERVICE AND ALL RELATED COMPONENTS AND INFORMATION ARE PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS WITHOUT ANY WARRANTIES OF ANY KIND, AND OPENCOMPANY EXPRESSLY DISCLAIMS ANY AND ALL WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, TITLE, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. YOU ACKNOWLEDGE THAT OpenCompany DOES NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, TIMELY, SECURE, ERROR-FREE OR VIRUS-FREE, NOR DOES IT MAKE ANY WARRANTY AS TO THE RESULTS THAT MAY BE OBTAINED FROM USE OF THE SERVICES, AND NO INFORMATION, ADVICE OR SERVICES OBTAINED BY YOU FROM OpenCompany OR THROUGH THE SERVICE SHALL CREATE ANY WARRANTY NOT EXPRESSLY STATED IN THIS TOS."]]]
-
-        [:li [:strong "Limitation of Liability."]
-          [:ol
-            [:li "UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY (WHETHER IN CONTRACT, TORT, OR OTHERWISE) SHALL OPENCOMPANY BE LIABLE TO YOU OR ANY THIRD PARTY FOR (A) ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL OR PUNITIVE DAMAGES, INCLUDING LOST PROFITS, LOST SALES OR BUSINESS, LOST DATA, OR (B) FOR ANY AMOUNT IN THE AGGREGATE IN EXCESS OF THE FEES ACTUALLY PAID BY YOU IN THE SIX (6) MONTHS PRECEDING THE EVENT GIVING RISE TO YOUR CLAIM OR, IF NO FEES APPLY, FIVE HUNDRED ($500) U.S. DOLLARS, OR (C) ANY MATTER BEYOND OUR REASONABLE CONTROL. THE PROVISIONS OF THIS topic ALLOCATE THE RISKS UNDER THIS TOS BETWEEN THE PARTIES, AND THE PARTIES HAVE RELIED ON THESE LIMITATIONS IN DETERMINING WHETHER TO ENTER INTO THIS TOS."]
-            [:li "Some jurisdictions do not allow the exclusion of implied warranties or limitation of liability for incidental or consequential damages, which means that some of the above limitations may not apply to you. IN THESE JURISDICTIONS, OPENCOMPANY’S LIABILITY WILL BE LIMITED TO THE GREATEST EXTENT PERMITTED BY LAW."]]]
-
-        [:li [:strong "Dispute Resolution/Arbitration."]
-          [:ol
-            [:li [:strong "PLEASE READ THIS topic CAREFULLY – IT MAY SIGNIFICANTLY AFFECT YOUR LEGAL RIGHTS, INCLUDING YOUR RIGHT TO FILE A LAWSUIT IN COURT AND TO HAVE A JURY HEAR YOUR CLAIMS. "]
-              "In order to expedite and control the cost of disputes, you and we agree that any legal or equitable claim arising out of or relating in any way to your use of the Services or these TOS, and the formation, validity, enforceability, scope, or applicability of this TOS, including this topic 10 (referred to as a “"
-              [:strong "Claim"]
-              "”) will be resolved as follows:"]
-            [:li [:strong "Informal Resolution. "]
-              "We will first try to resolve any Claim informally. Accordingly, neither of us may start a formal proceeding (except for Claims described in topic 10.4 below) for at least 30 days after one of us notifies the other of a Claim in writing. Notice of the Claim will include a brief written statement that sets forth the name, address, and contact information of the party giving it, the facts giving rise to the dispute, claim, or controversy and the relief requested. You will send your notice by email to "
-              [:a {:href contact-mail-to} contact-email]
-              "AND to the address listed directly below."
-              [:div.container
-                [:div.row
-                  [:div.col-md-12 "OpenCompany LLC"]]
-                [:div.row
-                  [:div.col-md-12 "8 Lincoln Ln"]]
-                [:div.row
-                  [:div.col-md-12 "Cambridge, MA 02138"]]]]
-            [:li [:strong "Formal Resolution. "]
-              "Except as provided in topic 10.4, if we cannot resolve a Claim informally, any Claim either of us asserts will be resolved "
-              [:strong "only by binding arbitration and not in courts of general jurisdiction. "]
-              "The arbitration will be conducted under the rules of JAMS that are in effect at the time the arbitration is initiated (referred to as the “"
-              [:strong "JAMS Rules"]
-              "”) and under the rules set forth in this TOS. If there is a conflict between JAMS Rules and the rules set forth in this TOS, the rules set forth in this TOS will govern. "
-              [:strong "ARBITRATION MEANS THAT YOU WAIVE YOUR RIGHT TO A JURY TRIAL. "]
-              "You may, in arbitration, seek any and all remedies otherwise available to you pursuant to your state’s law."]
-            [:li "(a) Human Users. If you are an individual user and you decide to initiate arbitration on your own behalf as a living person, we agree to reimburse your arbitration initiation fee, and any additional deposit required by JAMS to initiate your arbitration. We also agree to pay the costs of the arbitration proceeding. Other fees, such as attorney’s fees and expenses of travel to the arbitration, will be paid in accordance with JAMS Rules. The arbitration will be telephonic arbitration. To start an arbitration, you or we must do the following things:"
-              [:p "(1) Write a Demand for Arbitration. The demand must include a description of the Claim and the amount of damages sought to be recovered. You can find a copy of a Demand for Arbitration at "
-                [:a {:href "http://www.jamsadr.com/"} "www.jamsadr.com"]]
-              [:p "(2) Send three copies of the Demand for Arbitration, plus the appropriate filing fee, to:"]
-              [:div.container
-                [:div.row
-                  [:div.col-md-12 [:strong "JAMS"]]]
-                [:div.row
-                  [:div.col-md-12 [:strong "500 North State College Blvd., Suite 600"]]]
-                [:div.row
-                  [:div.col-md-12 [:strong "Orange, CA 92868"]]]
-                [:div.row
-                  [:div.col-md-12 [:strong "1-800-352-5267"]]]]
-              [:p "(3) Send one copy of the demand for arbitration to us at the U.S. mailing address noted above."]]
-            [:li "(b) Legal Entities. If you decide to initiate arbitration on behalf of the company or legal entity you represent, you will be required to pay the arbitration initiation fee as well as any additional deposit required by JAMS to initiate your arbitration. You also agree to pay the costs of the arbitration proceeding. Other fees, such as attorney’s fees and expenses of travel to the arbitration, will be paid in accordance with JAMS Rules. The arbitration will be telephonic arbitration. To start an arbitration, you or we must do the following things:"
-              [:p "(1) Write a Demand for Arbitration. The demand must include a description of the Claim and the amount of damages sought to be recovered. You can find a copy of a Demand for Arbitration at "
-                [:a {:href "http://www.jamsadr.com/"} "www.jamsadr.com"]]
-              [:p "(2) Send three copies of the Demand for Arbitration, plus the appropriate filing fee, to:"]
-              [:div.container
-                [:div.row
-                  [:div.col-md-12 [:strong "JAMS"]]]
-                [:div.row
-                  [:div.col-md-12 [:strong "500 North State College Blvd., Suite 600"]]]
-                [:div.row
-                  [:div.col-md-12 [:strong "Orange, CA 92868"]]]
-                [:div.row
-                  [:div.col-md-12 [:strong "1-800-352-5267"]]]]
-              [:p "(3) Send one copy of the demand for arbitration to us at the U.S. mailing address noted above."]]
-            [:li [:strong "Special Rules. "]
-              "In the arbitration proceeding, the arbitrator has no authority to make errors of law, and any award may be challenged if the arbitrator does so. Otherwise, the arbitrator’s decision is final and binding on all parties and may be enforced in any federal or state court that has jurisdiction. "
-              [:strong "Neither you nor we shall be entitled to join or consolidate claims in arbitration by or against other individuals or entities, or arbitrate any claim as a representative member of a class or in a private attorney general capacity."]
-              "Accordingly, you and we agree that the JAMS Class Action Procedures do not apply to our arbitration. A court may sever any portion of topic 10 that it finds to be unenforceable, except for the prohibition on class, representative and private attorney general arbitration."]
-            [:li [:strong "Exceptions. "]
-              "Notwithstanding the foregoing, the notice and 30-day negotiation period required by this paragraph shall not apply, however, to disputes, claims, or controversies concerning patents, copyrights, moral rights, trademarks, and trade secrets and claims of piracy or unauthorized use of the Service, including disputes involving a violation of the Communications Act of 1934, 47 U.S.C. § 605, or the Digital Millennium Copyright Act, 17 U.S.C. § 1201, or the Electronic Communications Privacy Act, 18 U.S.C. §§ 2510-2521, or any other statement or law governing theft of service, may be decided only by a court of competent jurisdiction. You may also assert an individual action in small claims court in lieu of arbitration."]
-            [:li [:strong "Member Right to Opt Out. "]
-              "If you are a Member, you have the right to opt-out and not be bound by the binding arbitration requirement by sending written notice of your decision to opt-out to the Email address "
-              [:a {:href contact-mail-to} contact-email]
-              " AND by U.S. Mail to OpenCompany LLC, 8 Lincoln Ln, Cambridge, MA 02138. The notice must be sent within the later of 30 days of August 1, 2016 or your first use of the Services, whichever is later. If you opt-out of the binding arbitration requirement, OpenCompany also will not be bound by the requirement. Administrative Users may not opt-out of the binding arbitration requirements."]
-            [:li [:strong "Changes to this topic. "]
-              "OpenCompany will provide 30 days’ notice of any changes to this topic. Changes will become effective on the 30th day, and will apply prospectively only to any claims arising after the 30th day."]]]
-
-        [:li [:strong "STATUTE OF LIMITATIONS. "]
-          "Regardless of any statute or law to the contrary or the applicable dispute resolution process, an informal complaint pertaining to any Claim or cause of action arising out of or related to use of the Service or under the TOS must be filed with OpenCompany within one (1) year after such Claim or cause of action arose or be forever barred. For Claims pursuant to the exceptions identified in topic 10.4, these Claims must be filed with the appropriate court within three (3) years after such claim or cause of action arose or be forever barred."]
-
-        [:li [:strong "NOTICE AND PROCEDURE FOR MAKING CLAIMS OF COPYRIGHT OR INTELLECTUAL PROPERTY INFRINGEMENT."]
-          "We respect the intellectual property of others, and we ask our users to do the same. We may, in appropriate circumstances and at its discretion, disable and/or terminate the accounts of users who may be repeat infringers. If you believe that your work has been copied in a way that constitutes copyright infringement, or your intellectual property rights have been otherwise violated, please provide OpenCompany's Copyright Agent the following information:"
-          [:ol
-            [:li "an electronic or physical signature of the person authorized to act on behalf of the owner of the copyright or other intellectual property interest;"]
-            [:li "a description of the copyrighted work or other intellectual property that you claim has been infringed;"]
-            [:li "a description of where the material that you claim is infringing is located on the site;"]
-            [:li "your address, telephone number, and email address;"]
-            [:li "a statement by you that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law;"]
-            [:li "a statement by you, made under penalty of perjury, that the above information in your notice is accurate and that you are the copyright or intellectual property owner or authorized to act on the copyright or intellectual property owner's behalf."]]
-          [:p "OpenCompany's Agent for Notice of claims of copyright or other intellectual property infringement can be reached as follows:"]
-          [:div.container
-            [:div.row
-              [:div.col-md-12 "By mail:"]]
-            [:div.row
-              [:div.col-md-12 "Copyright Agent"]]
-            [:div.row
-              [:div.col-md-12 "c/o OpenCompany LLC"]]
-            [:div.row
-              [:div.col-md-12 "8 Lincoln Ln"]]
-            [:div.row
-              [:div.col-md-12 "Cambridge, MA 02138"]]]]
-
-        [:li [:strong "Indemnification. "]
-          "You shall defend, indemnify, and hold harmless OpenCompany from and against any claims, actions or demands, including without limitation reasonable legal and accounting fees, arising or resulting from your breach of this TOS, any of Your Data, or your (and your Members’) use or misuse of the Service. OpenCompany shall provide notice to you of any such claim, suit or demand. OpenCompany reserves the right to conduct the exclusive defense and control of any matter that is subject to indemnification under this topic. In such case, you agree to cooperate with any reasonable requests assisting OpenCompany’s defense of such matters."]
-
-        [:li [:strong "Enforceability. "]
-          "If any provision of this TOS is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that this TOS will otherwise remain in full force and effect and enforceable."]
-
-        [:li [:strong "Integration, Modification, and Authority. "]
-          "This TOS is the complete and exclusive statement of the mutual understanding of the parties and supersedes and cancels all previous written and oral agreements, communications and other understandings relating to the subject matter of this TOS. All waivers and modifications to this TOS must be in a writing signed by both parties that expressly by its terms modifies or waives a provision of this TOS, except as otherwise provided herein. No agency, partnership, joint venture, or employment is created as a result of this TOS and you do not have any authority of any kind to bind OpenCompany in any respect whatsoever."]
-
-        [:li [:strong "Assignment. "]
-          "You may not assign this TOS without the prior written consent of OpenCompany, except, if you are a company or other legal entity, you may assign this TOS in connection with a merger, re-organization or acquisition of all or a substantial portion of your assets by another company, but only upon 30-days prior notice to OpenCompany. OpenCompany may assign or transfer this TOS, in whole or in part, without restriction."]
-
-        [:li [:strong "Notices. "]
-          "Except as otherwise set forth herein, all notices under this TOS will be in writing and will be deemed to have been duly given when received, if personally delivered; when receipt is electronically confirmed, if transmitted by facsimile or email; the day after it is sent, if sent for next day delivery by recognized overnight delivery service; and upon receipt, if sent by certified or registered mail, return receipt requested."]
-
-        [:li [:strong "Choice of Law and Forum."]
-          "The TOS and the relationship between the parties shall be governed by the laws of the State of Massachusetts without regard to its conflict of law."]
-
-        [:li [:strong "Waiver and Severability of Terms. "]
-          "The failure of OpenCompany to exercise or enforce any right or provision of the TOS shall not constitute a waiver of such right or provision."]
-
-        [:li [:strong "No Right of Survivorship and Non-Transferability."]
-          "If you are a living person, you agree that your account is non-transferable and your rights to the content within your account terminate upon your death, however the content may thereafter be available and accessible by Administrative Users."]
-
-        [:li [:strong "Government Users. "]
-          "Nothing herein makes OpenCompany a government contractor for any federal, state, local, or foreign government."]]]]])
+  [:div.container
+    [:div.legal-link "Click here to see OpenCompany " [:a {:href "/privacy"} "Privacy Policy"] "."]
+    [:div.readable-content-container
+      [:h1 "Terms of Service"]
+      [:p "PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING THE SERVICES OFFERED BY OPENCOMPANY, LLC. (\"OPENCOMPANY\"), A DELAWARE CORPORATION. THESE TERMS OF USE SET FORTH THE LEGALLY BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE WEBSITE AT HTTPS://CARROT.IO AND THE CARROT SERVICES, FEATURES, CONTENT, APPLICATIONS OR WIDGETS OFFERED BY OPENCOMPANY (COLLECTIVELY THE \"SERVICES\")."]
+      [:p "1. Your Relationship with OpenCompany"]
+      [:p "1.1 Your use of OpenCompany’s Services is subject to the terms of a legal agreement between you and OpenCompany. “OpenCompany” means OpenCompany LLC, whose principal place of business is at 8 Lincoln Ln, Cambridge, MA 02138, United States. This document explains how the agreement is made up, and sets out some of the terms of that agreement."]
+      [:p "1.2 Unless otherwise agreed in writing with OpenCompany, your agreement with OpenCompany will always include, at a minimum, the terms and conditions set out in this document. These are referred to below as the “Universal Terms”."]
+      [:p "1.3 Your agreement with OpenCompany will also include the terms of any Legal Notices applicable to the Services, in addition to the Universal Terms. All of these are referred to below as the “Additional Terms”. Where Additional Terms apply to a Service, these will be accessible for you to read either within, or through your use of, that Service."]
+      [:p "1.4 The Universal Terms, together with the Additional Terms, form a legally binding agreement between you and OpenCompany in relation to your use of the Services. It is important that you take the time to read them carefully. Collectively, this legal agreement is referred to below as the “Terms”."]
+      [:p "1.5 If there is any contradiction between what the Additional Terms say and what the Universal Terms say, then the Additional Terms shall take precedence in relation to that Service."]
+      [:p "2. Accepting the Terms"]
+      [:p "2.1 In order to use the Services, you must first agree to the Terms. You may not use the Services if you do not accept the Terms."]
+      [:p "2.2 You can accept the Terms by:"]
+      [:p "(A) clicking to accept or agree to the Terms, where this option is made available to you by OpenCompany in the user interface for any Service; or"]
+      [:p "(B) registering for and/or using the Services in any manner, including visiting or browsing the website. In this case, you understand and agree that OpenCompany will treat your use of the Services as acceptance of the Terms from that point onwards."]
+      [:p "2.3 You may not use the Services and may not accept the Terms if (a) you are not of legal age to form a binding contract with OpenCompany, or (b) you are a person barred from receiving the Services under the laws of the United States or other countries including the country in which you are resident or from which you use the Services."]
+      [:p "2.4 Before you continue, you should print off or save a local copy of the Universal Terms for your records."]
+      [:p "3. Language of the Terms"]
+      [:p "3.1 Where OpenCompany has provided you with a translation of the English language version of the Terms, then you agree that the translation is provided for your convenience only and that the English language versions of the Terms will govern your relationship with OpenCompany."]
+      [:p "3.2 If there is any contradiction between what the English language version of the Terms says and what a translation says, then the English language version shall take precedence."]
+      [:p "4. Provision of the Services by OpenCompany"]
+      [:p "4.1 OpenCompany may have subsidiaries and affiliated legal entities (the “Affiliates”) that provide the Services to you on behalf of OpenCompany itself. You acknowledge and agree that the Affiliates will be entitled to provide the Services to you."]
+      [:p "4.2 You acknowledge and agree that the form and nature of the Services which OpenCompany provides may change from time to time without prior notice to you."]
+      [:p "4.3 As part of this continuing innovation, you acknowledge and agree that OpenCompany may stop (permanently or temporarily) providing the Services (or any features within the Services) to you or to users generally at OpenCompany’s sole discretion, without prior notice to you. You may stop using the Services at any time. You do not need to specifically inform OpenCompany when you stop using the Services."]
+      [:p "4.4 You acknowledge and agree that if OpenCompany disables access to your account, you may be prevented from accessing the Services, your account details or any files or other content which is contained in your account."]
+      [:p "4.5 You acknowledge and agree that while OpenCompany may not currently have set a fixed upper limit on the number of transmissions you may send or receive through the Services or on the amount of storage space used for the provision of any Service, such fixed upper limits may be set by OpenCompany at any time, at OpenCompany’s discretion."]
+      [:p "4.6 By creating an account, you agree to receive certain communications in connection with the Services. For example, you might receive communications from businesses or receive e-mail newsletters from OpenCompany."]
+      [:p "5. Use of the Services by You"]
+      [:p "5.1 In order to access some of features offered through the Services, you may be required to provide information about yourself (such as identification or contact details) and your organization (such as company name and contact details) as part of the registration process for the Service, or as part of your continued use of the Services. You agree that any registration information you give to OpenCompany will always be accurate, correct and up to date."]
+      [:p "5.2 You agree to use the Services only for purposes that are permitted by (a) the Terms and (b) any applicable law, regulation or generally accepted practices or guidelines in the relevant jurisdictions (including any laws regarding the export of data or software to and from the United States or other relevant countries)."]
+      [:p "5.3 You agree not to access (or attempt to access) any of the Services by any means other than through the interface that is provided by OpenCompany, unless you have been specifically allowed to do so in a separate agreement with OpenCompany. You specifically agree not to access (or attempt to access) any of the Services through any automated means (including use of scripts or web crawlers) and shall ensure that you comply with the instructions set out in any robots.txt file present on the Services."]
+      [:p "5.4 You agree that you will not engage in any activity that interferes with or disrupts the Services (or the servers and networks which are connected to the Services)."]
+      [:p "5.5 You agree that you are solely responsible for (and that OpenCompany has no responsibility to you or to any third party for) any breach of your obligations under the Terms and for the consequences (including any loss or damage which OpenCompany may suffer) of any such breach."]
+      [:p "6. Your Passwords and Account Security"]
+      [:p "6.1 You agree and understand that you are responsible for maintaining the confidentiality of passwords associated with any account you use to access the Services. If you become aware of any unauthorized use of your password or of your account, you agree to notify OpenCompany immediately."]
+      [:p "6.2 Accordingly, you agree that you will be solely responsible to OpenCompany for all activities that occur under your account."]
+      [:p "6.3 In creating or updating information for your business, you must be an authorized representative of the business in question, and you must provide complete and accurate information about yourself and the business you represent. If you are no longer an authorized representative of the business in question, you must terminate your access to the information immediately."]
+      [:p "7. Privacy and Your Personal Information"]
+      [:p "7.1 For information about OpenCompany’s data protection practices, please read OpenCompany's privacy policy at https://carrot.io/privacy. This policy explains how OpenCompany treats your personal information, and protects your privacy, when you use the Services."]
+      [:p "7.2 You agree to the use of your data in accordance with OpenCompany’s privacy policies."]
+      [:p "8. Content in the Services"]
+      [:p "8.1 You understand that all information (such as data files, written text, computer software, music, audio files or other sounds, images, videos, contact information, location data, availability information, and all other forms of data or communications) which you may have access to as part of, or through your use of, the Services are the sole responsibility of the person from which such content originated. All such information is referred to below as the “Content”."]
+      [:p "8.3 You understand that all information posted or transmitted through the Services is the sole responsibility of the person from which such Content originated. OpenCompany will not be liable for any errors or omissions in any Content and cannot guarantee the identity of any other users with whom you may interact in the course of using the Services."]
+      [:p "8.4 OpenCompany shall have no obligation (but reserves the right) to pre-screen, review, flag, filter, modify, refuse or remove any or all publicly accessible Content from any of the Services."]
+      [:p "8.5 You understand that by using the Services you may be exposed to Content that you may find offensive, indecent or objectionable and that, in this respect, you use the Services at your own risk."]
+      [:p "8.6 You agree that you are solely responsible for (and that OpenCompany has no responsibility to you or to any third party for) any Content that you create, transmit or display while using the Services and for the consequences of your actions (including any loss or damage which OpenCompany may suffer) by doing so."]
+      [:p "9. Proprietary rights"]
+      [:p "9.1 You acknowledge and agree that OpenCompany (or OpenCompany’s licensors, successors or assigns) owns all legal right, title and interest in and to the Services, including any intellectual property rights which subsist in the Services (whether those rights happen to be registered or not, and wherever in the world those rights may exist). You further acknowledge that the Services may contain information which is designated confidential by OpenCompany and that you shall not disclose such information without OpenCompany’s prior written consent."]
+      [:p "9.2 Unless you have agreed otherwise in writing with OpenCompany, nothing in the Terms gives you a right to use any of OpenCompany’s trade names, trademarks, service marks, logos, domain names, and other distinctive brand features."]
+      [:p "9.3 If you have been given an explicit right to use any of these brand features in a separate written agreement with OpenCompany, then you agree that your use of such features shall be in compliance with that agreement, any applicable provisions of the Terms."]
+      [:p "9.4 You agree that you shall not remove, obscure, or alter any proprietary rights notices (including copyright and trade mark notices) which may be affixed to or contained within the Services."]
+      [:p "9.5 Unless you have been expressly authorized to do so in writing by OpenCompany, you agree that in using the Services, you will not use any trademark, service mark, trade name, logo of any company or organization in a way that is likely or intended to cause confusion about the owner or authorized user of such marks, names or logos."]
+      [:p "9.6 You agree not to either take any action or upload, download, post, submit or otherwise distribute or facilitate distribution of any Content on or through the Services that (a) infringes any patent, trademark, trade secret, copyright, right of publicity or other right of any other person or entity or violates any law or contractual duty; (b) you know is false, misleading, untruthful or inaccurate; (c) is unlawful, threatening, abusive, harassing, defamatory, libelous, deceptive, fraudulent, invasive of another's privacy, tortious, obscene, vulgar, pornographic, offensive, profane, contains or depicts nudity, contains or depicts sexual activity, or is otherwise inappropriate as determined by OpenCompany in its sole discretion; (c) constitutes unauthorized or unsolicited advertising, junk or bulk e-mail (\"spamming\"); (d) impersonates any person or entity, including any employee or representative of OpenCompany, or the Affiliates, or (e) includes anyone's identification documents or sensitive financial information."]
+      [:p "10. License from OpenCompany"]
+      [:p "10.1 OpenCompany gives you a personal, worldwide, royalty-free, non-assignable and non-exclusive license to use the software provided to you by OpenCompany as part of the Services as provided to you by OpenCompany including any application or widget (referred to as the “Software” below). This license is for the sole purpose of enabling you to use and enjoy the benefit of the Services as provided by OpenCompany, in the manner permitted by the Terms."]
+      [:p "10.2 You may not (and you may not permit anyone else to) copy, modify, create a derivative work of, reverse engineer, decipher, disassemble, decompile or otherwise attempt to extract the source code of the Software or any part thereof, unless this is expressly permitted or required by law, or unless you have been specifically told that you may do so by OpenCompany, in writing."]
+      [:p "10.3 Unless you have been specifically permitted to do so in a separate agreement with OpenCompany, you agree that you will not reproduce, duplicate, copy, sell, trade or resell the Software for any purpose."]
+      [:p "10.4 Unless OpenCompany has given you specific written permission to do so, you may not assign (or grant a sub-license of) your rights to use the Software, grant a security interest in or over your rights to use the Software, or otherwise transfer any part of your rights to use the Software."]
+      [:p "11. Content license from you"]
+      [:p "11.1 Other than the limited license set forth in Section 11.2, OpenCompany acknowledges and agrees that it obtains no right, title or interest from you (or your licensors) under these Terms in or to any Content that you submit, post, transmit or display on, or through, the Services, including any intellectual property rights which subsist in that Content (whether those rights happen to be registered or not, and wherever in the world those rights may exist). Unless you have agreed otherwise in writing with OpenCompany, you agree that you are responsible for protecting and enforcing those rights and that OpenCompany has no obligation to do so on your behalf."]
+      [:p "11.2 By submitting, posting or displaying the Content you give OpenCompany (and its licensees, successors and assigns) a perpetual, irrevocable, worldwide, royalty-free, non-exclusive, fully paid, sublicensable and transferable license to reproduce, adapt, edit, modify, translate, publish, prepare derivative works of or using the Content, publicly perform, publicly display, distribute and otherwise fully exploit any Content which you submit, post or display on or through, the Services."]
+      [:p "11.3 You also give each user of the Services a non-exclusive license to access the Content submitted through the Services, and to use, edit, modify, reproduce, distribute, prepare derivative works of, display and perform such Content."]
+      [:p "11.4 You agree that this license includes a right for OpenCompany to make such Content available to other companies, organizations or individuals with whom OpenCompany has relationships for the provision of the Services, and to use such Content in connection with the provision of the Services."]
+      [:p "11.5 You understand that OpenCompany, in performing the required technical steps to provide the Services to our users, may (a) transmit or distribute your Content over various public networks and in various media; and (b) make such changes to your Content as are necessary to conform and adapt that Content to the technical requirements of connecting networks, devices, services or media. You agree that this license shall permit OpenCompany to take these actions."]
+      [:p "11.6 You confirm and warrant to OpenCompany that you have all the rights, power and authority necessary to grant the above license."]
+      [:p "11.7 By sending OpenCompany any ideas, suggestions, documents or proposals (referred to as the Feedback), you agree that (i) your Feedback does not contain the confidential or proprietary information of third parties, (ii) we are under no obligation of confidentiality, express or implied, with respect to the Feedback, (iii) we may have something similar to the Feedback already under consideration or in development, and (iv) you grant us an irrevocable, non-exclusive, royalty-free, perpetual, worldwide license to use, modify, publish, distribute and sublicense the Feedback."]
+      [:p "12. Software updates"]
+      [:p "12.1 The Software which you use may automatically download and install updates from time to time from OpenCompany. These updates are designed to improve, enhance and further develop the Services and may take the form of bug fixes, enhanced functions, new software modules and completely new versions. You agree to receive such updates (and permit OpenCompany to deliver these to you) as part of your use of the Services."]
+      [:p "13. Ending your relationship with OpenCompany"]
+      [:p "13.1 The Terms will continue to apply until terminated by either you or OpenCompany as set out below."]
+      [:p "13.2 If you want to terminate your legal agreement with OpenCompany, you may do so by (a) notifying OpenCompany at any time and (b) closing your accounts for all of the Services which you use, where OpenCompany has made this option available to you."]
+      [:p "13.3 OpenCompany may at any time, terminate its legal agreement with you with or without cause, with or without notice, effective immediately, which may result in the forfeiture and destruction of all information associated with your account. Any fees paid hereunder are non-refundable."]
+      [:p "13.4 Nothing in this Section shall affect OpenCompany’s rights regarding provision of Services under Section 4 of the Terms."]
+      [:p "13.5 When these Terms come to an end, all of the legal rights, obligations and liabilities that you and OpenCompany have benefited from, been subject to (or which have accrued over time whilst the Terms have been in force) or which are expressed to continue indefinitely, shall be unaffected by this cessation, and the provisions of paragraph 20.7 shall continue to apply to such rights, obligations and liabilities indefinitely."]
+      [:p "14. EXCLUSION OF WARRANTIES"]
+      [:p "14.1 NOTHING IN THESE TERMS, INCLUDING SECTIONS 14 AND 15, SHALL EXCLUDE OR LIMIT OPENCOMPANY’S WARRANTY OR LIABILITY FOR LOSSES WHICH MAY NOT BE LAWFULLY EXCLUDED OR LIMITED BY APPLICABLE LAW. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF CERTAIN WARRANTIES OR CONDITIONS OR THE LIMITATION OR EXCLUSION OF LIABILITY FOR LOSS OR DAMAGE CAUSED BY NEGLIGENCE, BREACH OF CONTRACT OR BREACH OF IMPLIED TERMS, OR INCIDENTAL OR CONSEQUENTIAL DAMAGES. ACCORDINGLY, ONLY THE LIMITATIONS WHICH ARE LAWFUL IN YOUR JURISDICTION WILL APPLY TO YOU AND OUR LIABILITY WILL BE LIMITED TO THE MAXIMUM EXTENT PERMITTED BY LAW."]
+      [:p "14.2 YOU EXPRESSLY UNDERSTAND AND AGREE THAT YOUR USE OF THE SERVICES IS AT YOUR SOLE RISK AND THAT THE SERVICES ARE PROVIDED \"AS IS\" AND “AS AVAILABLE.”"]
+      [:p "14.3 IN PARTICULAR, OPENCOMPANY, ITS SUBSIDIARIES AND AFFILIATES, AND ITS LICENSORS DO NOT REPRESENT OR WARRANT TO YOU THAT:"]
+      [:p "(A) YOUR USE OF THE SERVICES WILL MEET YOUR REQUIREMENTS,"]
+      [:p "(B) YOUR USE OF THE SERVICES WILL BE UNINTERRUPTED, TIMELY, SECURE OR FREE FROM ERROR,"]
+      [:p "(C) ANY INFORMATION OBTAINED BY YOU AS A RESULT OF YOUR USE OF THE SERVICES WILL BE ACCURATE OR RELIABLE, AND"]
+      [:p "(D) THAT DEFECTS IN THE OPERATION OR FUNCTIONALITY OF ANY SOFTWARE PROVIDED TO YOU AS PART OF THE SERVICES WILL BE CORRECTED."]
+      [:p "14.4 ANY MATERIAL DOWNLOADED OR OTHERWISE OBTAINED THROUGH THE USE OF THE SERVICES IS DONE AT YOUR OWN DISCRETION AND RISK AND THAT YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR COMPUTER SYSTEM OR OTHER DEVICE OR LOSS OF DATA THAT RESULTS FROM THE DOWNLOAD OF ANY SUCH MATERIAL."]
+      [:p "14.5 NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED BY YOU FROM OpenCompany OR THROUGH OR FROM THE SERVICES SHALL CREATE ANY WARRANTY NOT EXPRESSLY STATED IN THE TERMS."]
+      [:p "14.6 OPENCOMPANY FURTHER EXPRESSLY DISCLAIMS ALL WARRANTIES AND CONDITIONS OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO THE IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT."]
+      [:p "15. LIMITATION OF LIABILITY"]
+      [:p "15.1 SUBJECT TO OVERALL PROVISION IN PARAGRAPH 14.1 ABOVE, YOU EXPRESSLY UNDERSTAND AND AGREE THAT OPENCOMPANY, ITS SUBSIDIARIES AND AFFILIATES, ITS LICENSORS, ITS DIRECTORS, EMPLOYEES, AGENTS, REPRESENTATIVES, PARTNERS, SUPPLIERS OR CONTENT PROVIDERS, SHALL NOT BE LIABLE TO YOU FOR:"]
+      [:p "(A) ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL CONSEQUENTIAL OR EXEMPLARY DAMAGES WHICH MAY BE INCURRED BY YOU, HOWEVER CAUSED AND UNDER ANY THEORY OF LIABILITY. THIS SHALL INCLUDE, BUT NOT BE LIMITED TO, INDIRECT OR CONSEQUENTIAL LOSSES OR DAMAGES, ANY LOSS OF PROFIT (WHETHER INCURRED DIRECTLY OR INDIRECTLY), ANY LOSS OF GOODWILL OR BUSINESS REPUTATION, ANY LOSS OF DATA SUFFERED, COST OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, LOSS OF ANTICIPATED SAVINGS, WASTED EXPENDITURE, OR OTHER INTANGIBLE LOSS;"]
+      [:p "(B) ANY LOSS OR DAMAGE WHICH MAY BE INCURRED BY YOU, INCLUDING BUT NOT LIMITED TO LOSS OR DAMAGE AS A RESULT OF:"]
+      [:p "(I) ANY RELIANCE PLACED BY YOU ON THE COMPLETENESS, ACCURACY OR EXISTENCE OF ANY ADVERTISING, OR AS A RESULT OF ANY RELATIONSHIP OR TRANSACTION BETWEEN YOU AND ANY ADVERTISER OR SPONSOR WHOSE ADVERTISING APPEARS ON THE SERVICES;"]
+      [:p "(II) ANY CHANGES WHICH OpenCompany MAY MAKE TO THE SERVICES, OR FOR ANY PERMANENT OR TEMPORARY CESSATION IN THE PROVISION OF THE SERVICES (OR ANY FEATURES WITHIN THE SERVICES);"]
+      [:p "(III) THE DELETION OF, CORRUPTION OF, OR FAILURE TO STORE, ANY CONTENT AND OTHER COMMUNICATIONS DATA MAINTAINED OR TRANSMITTED BY OR THROUGH YOUR USE OF THE SERVICES;"]
+      [:p "(IV) YOUR FAILURE TO PROVIDE OpenCompany WITH ACCURATE ACCOUNT INFORMATION;"]
+      [:p "(V) YOUR FAILURE TO KEEP YOUR PASSWORD OR ACCOUNT DETAILS SECURE AND CONFIDENTIAL;"]
+      [:p "15.2 THE LIMITATIONS ON OPENCOMPANY’S LIABILITY TO YOU IN PARAGRAPH 15.1 ABOVE SHALL APPLY WHETHER OR NOT OPENCOMPANY HAS BEEN ADVISED OF OR SHOULD HAVE BEEN AWARE OF THE POSSIBILITY OF ANY SUCH LOSSES ARISING."]
+      [:p "16. INDEMNIFICATION."]
+      [:p "16.1 You shall defend, indemnify, and hold harmless OpenCompany, its affiliates and each of its, and its affiliates employees, contractors, directors, suppliers and representatives from all losses, costs, actions, claims, damages, expenses (including reasonable legal costs) or liabilities, that arise from or relate to your use or misuse of, or access to, the Services, or the Content, violation of these Terms, or infringement by you, or any third party using the your account, of any intellectual property or other right of any person or entity (save to the extent that a court of competent jurisdiction holds that such claim arose due to an act or omission of OpenCompany)."]
+      [:p "16.2 You agree that OpenCompany reserves the right to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you will assist and cooperate with OpenCompany in asserting any available defenses."]
+      [:p "17. Other content"]
+      [:p "18.1 The Services may include hyperlinks to other web sites or content or resources. OpenCompany may have no control over any web sites or resources which are provided by companies or persons other than OpenCompany."]
+      [:p "18.2 You acknowledge and agree that OpenCompany is not responsible for the availability of any such external sites or resources, and does not endorse any advertising, products or other materials on or available from such web sites or resources."]
+      [:p "18.3 You acknowledge and agree that OpenCompany is not liable for any loss or damage which may be incurred by you as a result of the availability of those external sites or resources, or as a result of any reliance placed by you on the completeness, accuracy or existence of any advertising, products or other materials on, or available from, such web sites or resources."]
+      [:p "18. Changes to the Terms"]
+      [:p "19.1 OpenCompany may make changes to the Universal Terms or Additional Terms from time to time. When these changes are made, OpenCompany will make a new copy of the Universal Terms available at " [:a {:href "https://carrot.io/terms"} "https://carrot.io/terms"] " and any new Additional Terms will be made available to you from within, or through, the affected Services."]
+      [:p "19.2 You understand and agree that if you use the Services after the date on which the Universal Terms or Additional Terms have changed, OpenCompany will treat your use as acceptance of the updated Universal Terms or Additional Terms."]
+      [:p "19. General legal terms"]
+      [:p "20.1 Sometimes when you use the Services, you may (as a result of, or through your use of the Services) use a service or download a piece of software, or purchase goods, which are provided by another person or company. Your use of these other services, software or goods may be subject to separate terms between you and the company or person concerned. If so, the Terms do not affect your legal relationship with these other companies or individuals."]
+      [:p "20.2 The Terms constitute the whole legal agreement between you and OpenCompany and govern your use of the Services (but excluding any services which OpenCompany may provide to you under a separate written agreement), and completely replace any prior agreements between you and OpenCompany in relation to the Services."]
+      [:p "20.3 You agree that OpenCompany may provide you with notices, including those regarding changes to the Terms, by email, regular mail, or postings on the Services."]
+      [:p "20.4 You agree that if OpenCompany does not exercise or enforce any legal right or remedy which is contained in the Terms (or which OpenCompany has the benefit of under any applicable law), this will not be taken to be a formal waiver of OpenCompany’s rights and that those rights or remedies will still be available to OpenCompany."]
+      [:p "20.5 If any court of law, having the jurisdiction to decide on this matter, rules that any provision of these Terms is invalid, then that provision will be removed from the Terms without affecting the rest of the Terms. The remaining provisions of the Terms will continue to be valid and enforceable."]
+      [:p "20.6 You acknowledge and agree that each member of the group of companies of which OpenCompany is the parent shall be third party beneficiaries to the Terms and that such other companies shall be entitled to directly enforce, and rely upon, any provision of the Terms which confers a benefit on (or rights in favor of) them. Other than this, no other person or company shall be third party beneficiaries to the Terms."]
+      [:p "20.7 The Terms, and your relationship with OpenCompany under the Terms, shall be governed by the laws of the Commonwealth of Massachusetts without regard to its conflict of laws provisions. You and OpenCompany agree to submit to the exclusive jurisdiction of the courts located within the Middlesex County , Massachusetts to resolve any legal matter arising from the Terms. Notwithstanding this, you agree that OpenCompany shall still be allowed to apply for injunctive remedies (or an equivalent type of urgent legal relief) in any jurisdiction."]
+      
+]])

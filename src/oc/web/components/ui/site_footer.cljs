@@ -2,6 +2,7 @@
   "Component for the site footer. This is copied into oc.core/footer
    and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
@@ -20,6 +21,9 @@
         [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
+(defn navigate-to-your-boards [your-boards-url]
+  (router/redirect! your-boards-url))
+
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]
   ;; <!-- footer -->
@@ -28,9 +32,17 @@
       [:div.left-column
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        ; FIXME: reactivate request early access
-        ; [:div.small-links
-        ;   [:a {:href oc-urls/home-try-it-focus} "Request Free Early Access"]]
+        (when-not (jwt/jwt)
+          [:div.footer-small-links
+            [:a
+              {:href oc-urls/sign-up
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
+              "Get Started"]
+            "|"
+            [:a
+              {:href oc-urls/login
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
+              "Log in"]])
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 
@@ -44,7 +56,8 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Help"]]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href oc-urls/privacy} "Legal"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column.column-integration
@@ -54,8 +67,8 @@
                           (if (= @(::expanded s) :integration)
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :integration)))}
-            "INTEGRATIONS"]
-          [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
+            "DEVELOPERS"]
+          [:div.column-item [:a {:href oc-urls/oc-github} "GitHub"]]]
 
         [:div.column.column-company
           {:class (when (= @(::expanded s) :company) "expanded")}
@@ -65,19 +78,21 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
+          [:div.column-item [:a {:href oc-urls/home} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
-        [:div.column.column-tour
-          {:class (when (= @(::expanded s) :tour) "expanded")}
-          [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :tour)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :tour)))}
-            "TOUR"]
-          [:div.column-item [:a {:href oc-urls/home} "Home"]]
-          [:div.column-item [:a {:href oc-urls/features} "Features"]]]]
+        ; [:div.column.column-tour
+        ;   {:class (when (= @(::expanded s) :tour) "expanded")}
+        ;   [:div.column-title
+        ;     {:on-click #(when (responsive/is-mobile-size?)
+        ;                   (if (= @(::expanded s) :tour)
+        ;                     (reset! (::expanded s) nil)
+        ;                     (reset! (::expanded s) :tour)))}
+        ;     "TOUR"]
+        ;   [:div.column-item [:a {:href oc-urls/home} "Home"]]
+        ;   [:div.column-item [:a {:href oc-urls/features} "Features"]]]
+          ]
 
         (when (responsive/is-mobile-size?)
           (bottom-footer "mobile-footer"))]])

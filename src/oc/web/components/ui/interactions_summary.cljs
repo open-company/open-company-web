@@ -43,7 +43,7 @@
                              first
                              (vals
                               (group-by :user-id (map :author (sort-by :created-at comments-data))))))
-                           (vec (sort-by :created-at (:authors comments-link))))
+                           (reverse (:authors comments-link)))
         comments-count (max (count comments-data) (:count comments-link))]
     (when (and comments-count
                (or show-zero-comments?

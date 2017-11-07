@@ -101,6 +101,7 @@ div.activity-card {
     div.activity-card-content{
 
       div.activity-card-body {
+        max-height: #{24*6}px;
 
         &.has-media-preview {
           width: 100%;
@@ -364,6 +365,7 @@ div.activity-card {
       display: block;
       line-height: 24px;
       max-height: #{24*3}px;
+      overflow: hidden;
 
       &.has-body {
         height: #{24*3}px;

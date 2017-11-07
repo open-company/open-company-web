@@ -43,9 +43,9 @@
           (cond
             (or (= board-filters :by-topic)
                 (string? board-filters))
-            [:span "View by " [:span.filter-highlight "Topic"] " "]
+            [:span "View " [:span.filter-highlight "By topic"] " "]
             :else
-            [:span "View by " [:span.filter-highlight "Recent"] " "])
+            [:span "View " [:span.filter-highlight "Recent"] " "])
           [:i.fa.fa-caret-down]])
       (let [sorted-topics (sort
                            #(compare-topic-names (:topics board-data) %1 %2)

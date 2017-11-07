@@ -11,7 +11,9 @@
     {:class (when-not draft "empty-draft")
      :key (str "draft-" (:created-at draft))
      :on-click #(when draft
-                  (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug draft) (:uuid draft))))}
+                  ; TODO: Fix draft editing
+                  ; (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug draft) (:uuid draft)))
+                  )}
     (when draft
       [:div.draft-card-inner
         (when (:banner-url draft)
