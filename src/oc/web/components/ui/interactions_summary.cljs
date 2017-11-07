@@ -61,7 +61,7 @@
   [s entry-data show-zero-comments?]
   [:div.interactions-summary.group
     ;; Reactions
-    (when (:reactions entry-data)
+    (when (seq (:reactions entry-data))
       (reactions-summary entry-data))
     ; Comments
     (when (utils/link-for (:links entry-data) "comments")
