@@ -39,7 +39,7 @@
     (.restoreSelection js/rangy @caret-pos)
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
-          unicode-c (apply str (map utils/unicode-char unicodes))]
+          unicode-c (clojure.string/join (map utils/unicode-char unicodes))]
         (js/pasteHtmlAtCaret unicode-c (.getSelection js/rangy js/window) false))))
 
 (defn check-focus [s _]

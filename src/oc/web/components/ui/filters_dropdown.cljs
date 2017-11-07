@@ -49,7 +49,7 @@
           [:i.fa.fa-caret-down]])
       (let [sorted-topics (sort
                            #(compare-topic-names (:topics board-data) %1 %2)
-                           (remove #(empty? %) (keys topic-groups)))
+                           (remove empty? (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
             default-options [{:label "Recent" :value :latest} {:label "By topic" :value :by-topic}]

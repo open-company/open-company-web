@@ -1183,7 +1183,7 @@
       {:slug "all-posts"}
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (if board
+        (or
           ; Get the last accessed board from the saved cookie
           board
           (let [sorted-boards (vec (sort-by :name boards))]

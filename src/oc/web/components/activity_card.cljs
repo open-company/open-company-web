@@ -225,7 +225,7 @@
                              (oc-urls/board-filter-by-topic
                               (router/current-org-slug)
                               (:board-slug activity-data)
-                              (:topic-slug activity-data))))}
+                              (:topic-slug activity-data)))}
                 topic-name]))
           (when is-all-posts
             [:div.activity-tag

@@ -19,10 +19,18 @@
 (def news
   [{:created-at "2017-09-22T12:38:30.021Z"
     :title "New updates to Boards. Now faster and more beautiful than ever before"
-    :body "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus, lectus sed vehicula auctor, orci eros ultrices augue, vitae tincidunt sem turpis nec massa. Integer lacinia dignissim ante, et feugiat enim fringilla aliquet..."}
+    :body (str
+           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus, "
+           "lectus sed vehicula auctor, orci eros ultrices augue, vitae tincidunt sem "
+           "turpis nec massa. Integer lacinia dignissim ante, et feugiat enim fringilla aliquet..."}
    {:created-at "2017-09-01T14:38:30.021Z"
-    :title "Donec pellentesque sollicitudin turpis, non bibendum ligula viverra non. Praesent vehicula, nibh nec bibendum"
-    :body "Aliquam eget porttitor ex. Nam pellentesque vitae nunc eget ultrices. Proin fermentum elit id tortor viverra aliquam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla dolor ligula..."}])
+    :title (str
+            "Donec pellentesque sollicitudin turpis, non bibendum ligula "
+            "viverra non. Praesent vehicula, nibh nec bibendum")
+    :body (str
+           "Aliquam eget porttitor ex. Nam pellentesque vitae nunc eget ultrices. Proin fermentum "
+           "elit id tortor viverra aliquam. Pellentesque habitant morbi tristique senectus et netus "
+           "et malesuada fames ac turpis egestas. Nulla dolor ligula...")}])
 
 (rum/defcs about-carrot-modal < rum/static
                                 ;; Locals
@@ -44,7 +52,9 @@
         [:div.about-links
           [:a.about-link
             {:href oc-urls/about
-             :on-click #(do (utils/event-stop %) (dis/dispatch! [:about-carrot-modal-hide]) (router/nav! oc-urls/about))}
+             :on-click #(do
+                         (utils/event-stop %)
+                         (dis/dispatch! [:about-carrot-modal-hide]) (router/nav! oc-urls/about))}
             "Company"]
           [:a.about-link
             {:href oc-urls/help}

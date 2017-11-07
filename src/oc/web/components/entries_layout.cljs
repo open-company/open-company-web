@@ -135,7 +135,12 @@
                    :data-toggle "tooltip"
                    :data-placement "right"
                    :data-container "body"
-                   :on-click #(dis/dispatch! [:entry-edit {:topic-slug topic-slug :topic-name topic-name :board-slug (:slug board-data) :board-name (:name board-data)}])}]
+                   :on-click #(dis/dispatch!
+                               [:entry-edit
+                                {:topic-slug topic-slug
+                                 :topic-name topic-name
+                                 :board-slug (:slug board-data)
+                                 :board-name (:name board-data)}])}]
                 ; If there are more than 4 add the button to show all of them
                 (when (> (count entries-group) 4)
                   [:a.view-all-updates.mlb-reset
@@ -166,8 +171,9 @@
                     (for [entry (subvec entries-group 2 (min 4 (count entries-group)))
                           :let [is-new (new? entry changes)
                                 share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
-                      (rum/with-key (activity-card entry second-has-headline second-has-body is-new false share-thoughts)
-                        (str "entry-by-topic-" topic "-" (:uuid entry)))))
+                      (rum/with-key
+                       (activity-card entry second-has-headline second-has-body is-new false share-thoughts)
+                       (str "entry-by-topic-" topic "-" (:uuid entry)))))
                   ; If the total entries are 3 add a placeholder to avoid taking the full width
                   (when (= (count entries-group) 3)
                     [:div.entry-card.entry-card-placeholder])])]))

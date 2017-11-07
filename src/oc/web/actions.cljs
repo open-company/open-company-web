@@ -1128,9 +1128,9 @@
         next-board-data (assoc board-data :topics next-topics)
         next-db (assoc-in db board-key next-board-data)]
     (if edit-key
-      (assoc next-db edit-key (merge (edit-key next-db) {:topic-slug (:slug topic-map)
-                                                         :topic-name (:name topic-map)
-                                                         :has-changes true}))
+      (update-in next-db [edit-key] merge {:topic-slug (:slug topic-map)
+                                           :topic-name (:name topic-map)
+                                           :has-changes true})
       next-db)))
 
 (defn author-data [current-user-data as-of]
@@ -1449,8 +1449,14 @@
       (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug))))
     (let [org-slug (router/current-org-slug)
           board-slug (router/current-board-slug)
-          activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
-          fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+          activity-key (if board-slug
+                        (dispatcher/activity-key org-slug board-slug activity-uuid)
+                        (dispatcher/secure-activity-key org-slug activity-uuid))
+          fixed-activity-data (utils/fix-entry
+                               activity-data
+                               {:slug (or (:board-slug activity-data) board-slug)
+                                :name (:board-name activity-data)}
+                               nil)]
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
           (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
