@@ -44,58 +44,57 @@
       (let [orgs (:items collection)]
         (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
           (api/get-whats-new whats-new-link))
-        (cond
-          (and (:slack-lander-check-team-redirect db)
-               (zero? (count orgs)))
-          (router/nav! oc-urls/slack-lander-team)
-          (and (:email-lander-check-team-redirect db)
-               (zero? (count orgs)))
-          (router/nav! oc-urls/sign-up-team)
-          ; If I have the secure-id i need to load the activity only
-          (router/current-secure-activity-id)
-          (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
-          ; If i have an org slug let's load the org data
-          (router/current-org-slug)
-          (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
-            (api/get-org org-data)
-            (router/redirect-404!))
-          ; In password reset flow, when the token is exchanged and the user is authed
-          ; i reload the entry point to get the list of orgs
-          ; and redirect the user to its first organization
-          ; if he has no orgs to the user profile page
-          (and (or (utils/in? (:route @router/path) "password-reset")
-                   (utils/in? (:route @router/path) "email-verification"))
-               (:first-org-redirect db))
-          (let [to-org (utils/get-default-org orgs)]
-            (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))
-          ; If not redirect the user to the first useful org or to the create org UI
-          (and (jwt/jwt)
-               (not (utils/in? (:route @router/path) "create-org"))
-               (not (utils/in? (:route @router/path) "user-profile"))
-               (not (utils/in? (:route @router/path) "email-verification"))
-               (not (utils/in? (:route @router/path) "about"))
-               (not (utils/in? (:route @router/path) "features"))
-               (not (utils/in? (:route @router/path) "email-wall"))
-               (not (utils/in? (:route @router/path) "sign-up"))
-               (not (utils/in? (:route @router/path) "confirm-invitation")))
-          (let [login-redirect (cook/get-cookie :login-redirect)]
-            (cond
-              ; redirect to create-company if the user has no companies
-              (zero? (count orgs))
-              (let [user-data (if (contains? db :current-user-data)
-                                (:current-user-data db)
-                                (jwt/get-contents))]
-                (if (or (and (empty? (:first-name user-data))
-                             (empty? (:last-name user-data)))
-                        (empty? (:avatar-url user-data)))
-                  (router/nav! oc-urls/sign-up-profile)
-                  (router/nav! oc-urls/sign-up-team)))
-              ; if there is a login-redirect use it
-              (and (jwt/jwt) login-redirect)  (do
-                                                (cook/remove-cookie! :login-redirect)
-                                                (router/redirect! login-redirect))
-              ; if the user has only one company, send him to the company dashboard
-              (pos? (count orgs))        (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))
+        ;; Skip all the checks below if looking at the secure page
+        (when-not (router/current-secure-activity-id)
+          (cond
+            (and (:slack-lander-check-team-redirect db)
+                 (zero? (count orgs)))
+            (router/nav! oc-urls/slack-lander-team)
+            (and (:email-lander-check-team-redirect db)
+                 (zero? (count orgs)))
+            (router/nav! oc-urls/sign-up-team)
+            ; If i have an org slug let's load the org data
+            (router/current-org-slug)
+            (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
+              (api/get-org org-data)
+              (router/redirect-404!))
+            ; In password reset flow, when the token is exchanged and the user is authed
+            ; i reload the entry point to get the list of orgs
+            ; and redirect the user to its first organization
+            ; if he has no orgs to the user profile page
+            (and (or (utils/in? (:route @router/path) "password-reset")
+                     (utils/in? (:route @router/path) "email-verification"))
+                 (:first-org-redirect db))
+            (let [to-org (utils/get-default-org orgs)]
+              (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))
+            ; If not redirect the user to the first useful org or to the create org UI
+            (and (jwt/jwt)
+                 (not (utils/in? (:route @router/path) "create-org"))
+                 (not (utils/in? (:route @router/path) "user-profile"))
+                 (not (utils/in? (:route @router/path) "email-verification"))
+                 (not (utils/in? (:route @router/path) "about"))
+                 (not (utils/in? (:route @router/path) "features"))
+                 (not (utils/in? (:route @router/path) "email-wall"))
+                 (not (utils/in? (:route @router/path) "sign-up"))
+                 (not (utils/in? (:route @router/path) "confirm-invitation")))
+            (let [login-redirect (cook/get-cookie :login-redirect)]
+              (cond
+                ; redirect to create-company if the user has no companies
+                (zero? (count orgs))
+                (let [user-data (if (contains? db :current-user-data)
+                                  (:current-user-data db)
+                                  (jwt/get-contents))]
+                  (if (or (and (empty? (:first-name user-data))
+                               (empty? (:last-name user-data)))
+                          (empty? (:avatar-url user-data)))
+                    (router/nav! oc-urls/sign-up-profile)
+                    (router/nav! oc-urls/sign-up-team)))
+                ; if there is a login-redirect use it
+                (and (jwt/jwt) login-redirect)  (do
+                                                  (cook/remove-cookie! :login-redirect)
+                                                  (router/redirect! login-redirect))
+                ; if the user has only one company, send him to the company dashboard
+                (pos? (count orgs))        (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))
         (-> next-db
             (dissoc :loading)
             (assoc :orgs orgs)
@@ -944,21 +943,17 @@
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
               sorted-comments-data (vec (sort-by :created-at new-comments-data))
               comments-key (dispatcher/activity-comments-key org-slug board-slug fixed-activity-uuid)
-              current-user-id (jwt/get-key :user-id)
-              is-current-user (= current-user-id (:user-id (:author comment-data)))
               ; update the comments link of the entry
               comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
               with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
               old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
-              new-author (assoc (select-keys (:current-user-data db) [:user-id :avatar-url :name]) :created-at (utils/as-of-now))
-              new-authors (if (and old-authors (first (filter #(= (:user-id %) current-user-id) old-authors)))
+              new-author (:author comment-data)
+              new-authors (if (and old-authors (first (filter #(= (:user-id %) (:user-id new-author)) old-authors)))
                             old-authors
-                            (conj old-authors new-author))
+                            (concat [new-author] old-authors))
               with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
-          ;; Refresh the topic data if the action coming in is from the current user
-          ;; to get the new links to interact with
-          (when is-current-user
-            (api/get-entry entry-data))
+          ;; Refresh the entry data to get the new links to interact with
+          (api/get-entry entry-data)
           ; ;; Animate the comments count if we don't have already the same number of comments locally
           ; (when (not= (count all-old-comments-data) (count new-comments-data))
           ;   (utils/pulse-comments-count fixed-activity-uuid))
@@ -1379,16 +1374,31 @@
   [db [_]]
   (dissoc db :made-with-carrot-modal))
 
+(defmethod dispatcher/action :secure-activity-get
+  [db [_]]
+  (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
+  db)
+
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status {:keys [activity-uuid activity-data]}]]
+  [db [_ status activity-data]]
   (let [next-db (if (= status 404)
                   (dissoc db :latest-entry-point)
                   db)]
     (when (= status 404)
-      (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug))))
-    (let [org-slug (router/current-org-slug)
+      ; (router/redirect-404!)
+      (if (router/current-secure-activity-id)
+        (router/redirect-404!)
+        (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug)))))
+    (when (and (router/current-secure-activity-id)
+             (jwt/jwt)
+             (jwt/user-is-part-of-the-team (:team-id activity-data)))
+      (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
+    (let [activity-uuid (:uuid activity-data)
+          org-slug (router/current-org-slug)
           board-slug (router/current-board-slug)
-          activity-key (if board-slug (dispatcher/activity-key org-slug board-slug activity-uuid) (dispatcher/secure-activity-key org-slug activity-uuid))
+          activity-key (if (router/current-secure-activity-id)
+                         (dispatcher/secure-activity-key org-slug (router/current-secure-activity-id))
+                         (dispatcher/activity-key org-slug board-slug activity-uuid))
           fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]

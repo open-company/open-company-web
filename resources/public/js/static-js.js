@@ -60,11 +60,13 @@ $(document).ready(function(){
     $("#site-header-login-item").hide();
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
+    // Hide the try it box at the bottom of the homepage
+    $("div.try-it").css({"display": "none"});
     // Remove the label below it too
     $("#easy-setup-label").css({"display": "none"});
     // Top right corner became Your Boards
     $("#site-header-signup-item").text( "Your Boards" );
-    var url = "/login",
+    var your_board_url = "/login",
         decoded_jwt;
     if ( typeof jwt_decode === "function" ) {
       var decoded_jwt = jwt_decode(jwt),
@@ -79,25 +81,28 @@ $(document).ready(function(){
             board_slug = getCookie(cookieName("last-board-" + user_id + "-" + org_slug))
             if ( board_slug ){
               if ( getCookie(cookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
-                url = "/" + org_slug + "/" + board_slug + "/by-topic";
+                your_board_url = "/" + org_slug + "/" + board_slug + "/by-topic";
               } else {
-                url = "/" + org_slug + "/" + board_slug;
+                your_board_url = "/" + org_slug + "/" + board_slug;
               }
             } else {
-              url = "/" + org_slug;
+              your_board_url = "/" + org_slug;
             }
           }
         }
       }
     }
-    $("#site-header-signup-item").attr("onClick", "window.location = \"" + url + "\";");
+    $("#site-header-signup-item").attr("onClick", "window.location = \"" + your_board_url + "\";");
     // If in 404 page show error message for logged in users
     $("div.error-page.not-found-page p.not-logged-in").hide();
+    // Footer links
+    $("div.footer-small-links").hide();
 
   }else{ // No logged in user
-    // Show Get started for free button linked to signup with Slack
-    $("#get-started-centred-bt").text( "Get started for free" );
-    $("#get-started-centred-bt").attr("onClick", "window.location = \"/login?slack\"");
+    // Show Get started for free button in the center
+    $("#get-started-centred-bt").text( "Get started for free");
+    // link all get started button to signup with Slack
+    $(".get-started-button").attr("onClick", "window.location = \"/login?slack\"");
     // Top right corner button
     $("#site-header-signup-item").text("Get Started");
     $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
@@ -131,10 +136,20 @@ function isSafari(){
   }
 }
 
+function isEdge(){
+  if (navigator.appName == 'Microsoft Internet Explorer' ||
+      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
+  {
+    return true;
+  }else{
+    return false;
+  }
+}
+
 function isIE(){
   if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)) ||
-      (typeof $.browser !== "undefined" && $.browser.msie == 1))
+      !!(navigator.userAgent.match(/Trident/) ||
+         navigator.userAgent.match(/rv:11/)))
   {
     return true;
   }else{

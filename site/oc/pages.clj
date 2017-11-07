@@ -51,11 +51,11 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
-        [:h1.headline "Grow Together"]
+        [:h1.headline "Teams need the big picture"]
         [:div.subheadline
-          "Announcements, updates and stories that bring teams closer"]
+          "Make key announcements, updates, and plans stand out to create greater transparency and alignment."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-        [:button.mlb-reset.get-started-centred-bt
+        [:button.mlb-reset.get-started-button
           {:id "get-started-centred-bt"}
           "Get started for free"]
         [:div.small-teams
@@ -68,38 +68,105 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        ;; FIXME: Remove the carrot screenshot for the initial onboarding period
-        (comment
-          [:img.homepage-screenshot
-            {:src (cdn "/img/ML/home_page_screenshot.png")
-             :width 756
-             :height 511}])]
+        [:div.homepage-screenshot]]
 
 
       [:div.illustrations.group
-
         [:div.illustration.illustration-1.group
-          [:img {:src (cdn "/img/ML/home_page_il_1_412_385.svg")}]
+          [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_1_572_438.png")
+               :src-set (str (cdn "/img/ML/home_page_il_1_572_438@2x.png") " 2x")}]
           [:div.description.group
             [:div.title
-              "Get your team aligned"]
+              "Keep your team informed and aligned"]
             [:div.subtitle
-              "Whether your team is local or distributed, keep everyone focused on what’s most important."]]]
+              "Check out what’s new this past week, or get new employees up to speed - it’s never been easier to get caught up."]]]
 
         [:div.illustration.illustration-2.group
-          [:img {:src (cdn "/img/ML/home_page_il_2_444_414.svg")}]
+          [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_2_521_385.png")
+               :src-set (str (cdn "/img/ML/home_page_il_2_521_385@2x.png") " 2x")}]
           [:div.description.group
             [:div.title
-              "Simplify stakeholder updates"]
+              "Keep stakeholders in the loop, too"]
             [:div.subtitle
-              "Create beautiful updates for your company, investors, and advisors in less time. It’s never been easier to keep all stakeholders in the loop."]]]
+              "Share updates with your investors and advisors, or the latest news with your customers and partners. Carrot keeps it all organized in one place."]]]]
 
-        [:div.illustration.illustration-3.group
-          [:img {:src (cdn "/img/ML/home_page_il_3_355_350.svg")}]
-          [:div.description.group
+      [:div.home-section.second-section
+        [:div.illustrations-title
+          [:div.why-carrot
+            "Why Carrot?"]
+          [:div.why-carrot-description
+            "Growing teams need a place to rise above the noise of real-time conversations to see what’s really happening across the company."]]
+        [:div.illustrations.group
+
+          [:div.illustration.illustration-3.group
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_3_450_349.png")
+               :src-set (str (cdn "/img/ML/home_page_il_3_450_349@2x.png") " 2x")}]
+            [:div.description.group
+              [:div.title
+                "Visibility"]
+              [:div.subtitle
+                "Unlike chat streams and wikis, Carrot creates a birds-eye view of the latest news that’s quick and easy to read. The big picture pulls everyone closer."]]]
+
+          [:div.illustration.illustration-4.group
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_4_521_283.png")
+               :src-set (str (cdn "/img/ML/home_page_il_4_521_283@2x.png") " 2x")}]
+            [:div.description.group
+              [:div.title
+                "Easy alignment"]
+              [:div.subtitle
+                "Whether you’re adding a quick team update, or writing an overview that covers many topics, or adding a guide for new employees, getting started is simple and fast."]]]
+
+          [:div.illustration.illustration-5.group
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_5_424_329.png")
+               :src-set (str (cdn "/img/ML/home_page_il_5_424_329@2x.png") " 2x")}]
+            [:div.description.group
+              [:div.title
+                "Feedback loops"]
+              [:div.subtitle
+                "Getting on the same page is easier when everyone can react and add comments - great for distributed teams. It’s more fun, too! 💥✌"]]]
+
+          [:div.illustration.illustration-6.group
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_6_346_321.png")
+               :src-set (str (cdn "/img/ML/home_page_il_6_346_321@2x.png") " 2x")}]
+            [:div.description.group
+              [:div.title
+                "Works with Slack"]
+              [:div.subtitle
+                "With Slack single sign-on and our Slack bot, posts are automatically shared to the right channels. Discussions about posts can happen in Slack or Carrot - everything is kept in sync. " [:a {:href "/about"} "Learn More"]]]]
+
+          [:div.illustration.illustration-7.group
+            [:img.illustration-image
+              {:src (cdn "/img/ML/home_page_il_7_333_274.png")
+               :src-set (str (cdn "/img/ML/home_page_il_7_333_274@2x.png") " 2x")}]
+            [:div.description.group
+              [:div.title
+                "Stay private or go public"]
+              [:div.subtitle
+                "Boards can be private and invite-only, or can be made public - ideal for crowdfunded ventures, social enterprises, and startups interested in full transparency."]]]]]
+
+      [:div.home-section.third-section
+        [:div.illustrations-title
+          [:div.why-carrot
+            "Don’t forget your extended team"]
+          [:div.why-carrot-description
+            "Investors, advisors and other stakeholders stay engaged when you keep them in the loop. With Carrot, it’s never been easier."]
+          [:div.centred-screenshot]]
+        [:div.third-section-footer.group
+          [:div.left-copy
             [:div.title
-              "Expand your network"]
-            [:div.subtitle
+              "Simplify investor updates"]
+            [:div.description
+              "Create a Carrot board specifically for investors and advisors in no time. All of your updates will stay organized in one place so it’s easy to know what you’ve sent them in the past. Also ideal for keeping friends and family in the loop."]]
+          [:div.right-copy
+            [:div.title
+              "Build a bigger network"]
+            [:div.description
               "Share news with recruits, potential investors and customers to keep them engaged and supportive. It’s an easy way to build trust and grow your business."]]]]
 
       (comment
@@ -119,17 +186,15 @@
               [:button.mlb-reset.right-arrow-bt
                 {:disabled true}]]]])
 
-      ; [:div.try-it
-      ;   {:id "mc_embed_signup"}
-      ;   [:div.try-it-title
-      ;     {:id "thank-you-bottom"}
-      ;     "Request early access"]
-      ;   [:div.try-it-subtitle
-      ;     "Easy set-up • Free for small teams"]
-      ;   [:div
-      ;     (try-it-form "try-it-form-bottom" "try-it-combo-field-bottom")]
-      ;   (carrot-box-thanks "carrot-box-thanks-bottom")]
-        ]])
+      [:div.try-it
+        {:id "mc_embed_signup"}
+        [:div.try-it-title
+          {:id "thank-you-bottom"}
+          "Request early access"]
+        [:div.try-it-subtitle
+          "Easy set-up • Free for small teams"]
+        [:button.get-started-button
+          "Get Started"]]]])
 
 (defn features [options]
   [:div.container.main.features
@@ -236,57 +301,65 @@
   [options]
   [:div
     [:div.container.main.about
+      [:div.about-header
+        [:h1.about "About"]
 
-      [:h1.about "About"]
+        [:div.divider-line]
 
-      [:div.divider-line]
+        [:div.ovals-container
 
-      [:div.ovals-container
+          [:div.ovals-container-face.face-red]
+          [:div.ovals-container-face.face-yellow]
+          [:div.ovals-container-face.face-blue]
+          [:div.ovals-container-face.face-green]
+          [:div.ovals-container-face.face-purple]
 
-        [:div.ovals-container-face.face-red]
-        [:div.ovals-container-face.face-yellow]
-        [:div.ovals-container-face.face-blue]
-        [:div.ovals-container-face.face-green]
-        [:div.ovals-container-face.face-purple]
-
-        [:div.about-subline
-          "People are hyper-connected in the moment, but still struggle to know what’s really happening across the company."]
-        [:div.paragraphs-container.group
-          [:div.mobile-only.happy-face.yellow-happy-face]
-          [:div.mobile-only.happy-face.red-happy-face]
-          [:div.paragraphs-bg-container.group
-            [:div.paragraph
-              "The solution is surprisingly simple and effective - great company updates that build transparency and alignment."]
-            [:div.paragraph
-              "With that in mind we designed Carrot based on three principles:"]]
-          [:div.mobile-only.happy-face.blue-happy-face]
-          [:div.mobile-only.happy-face.purple-happy-face]
-          [:div.mobile-only.happy-face.green-happy-face]]]
+          [:div.about-subline
+            "Growing companies struggle to keep everyone on the same page. They grow apart."]
+          [:div.paragraphs-container.group
+            [:div.mobile-only.happy-face.yellow-happy-face]
+            [:div.mobile-only.happy-face.red-happy-face]
+            [:div.paragraphs-bg-container.group
+              [:div.paragraph
+                "Messaging apps are designed for real-time work. They’re great in the moment, but chat gets noisy and conversations disappear, making it difficult to have a big picture view of what’s important across the company."]
+              [:div.paragraph
+                "Carrot provides a birds-eye view of the latest announcements, updates, and stories so you can always see what’s happening in context. A common, shared view of what’s important - and the opportunity to react and ask questions about it - creates real transparency and alignment."]
+              [:div.paragraph
+                "It also brings teams closer so they can grow together."]
+              [:div.paragraph
+                "Carrot on!"]]
+            [:div.mobile-only.happy-face.blue-happy-face]
+            [:div.mobile-only.happy-face.purple-happy-face]
+            [:div.mobile-only.happy-face.green-happy-face]]]]
 
       [:div.principles.group
+
+        [:div.principles-headline
+          "We designed Carrot based on 3 principles:"]
+
         [:div.principle.principle-1
           [:div.principle-oval-bg]
           [:div.principle-logo]
-          [:div.principle-title "It has to be easy or no one will play"]
-          [:div.principle-description "Alignment might be essential for success, but achieving it has never been easy or fun. We’re changing that. With a simple structure and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
+          [:div.principle-title "Alignment should be simple."]
+          [:div.principle-description "Alignment might be essential for success, but achieving it has never been simple or fun. We’re changing that. With a simple structure, and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
 
         [:div.principle.principle-2
           [:div.principle-oval-bg]
           [:div.principle-logo]
-          [:div.principle-title "The “big picture” should always be visible"]
-          [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant view of what’s happening across the company anytime."]]
+          [:div.principle-title "The “big picture” should always be visible."]
+          [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant, birds-eye view of what’s happening across the company anytime."]]
 
         [:div.principle.principle-3
           [:div.principle-oval-bg]
           [:div.principle-logo]
-          [:div.principle-title "Alignment is valuable beyond the team, too"]
-          [:div.principle-description "Sharing beautiful updates with recruits, investors,  customers and other outside stakeholders is the surest way to keep them engaged and supportive. It’s an easy way to expand your network and grow your business."]]]
+          [:div.principle-title "Alignment is valuable beyond the team, too."]
+          [:div.principle-description "Make it simple to share the latest updates with investors, advisors, customers and other outside stakeholders as well. It’s the surest way to keep them engaged and supportive, and an easy way to expand your network and grow your business."]]]
 
     ] ;<!-- main -->
 
     [:div.about-alignment
       [:div.quote]
-      [:div.about-alignment-description "Company alignment requires real openness and transparency."]]
+      [:div.about-alignment-description "Company alignment requires real openness and transparency. Carrot makes it simple and fun for your team to get started."]]
 
     [:div.about-team.group
       [:div.about-team-inner.group
@@ -421,7 +494,10 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
           ;; MediumEditorMediaPicker
           [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
-          [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]]
+          [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
+          ;; Automatically load the needed polyfill depending on
+          ;; the browser user agent and the available features
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
@@ -495,7 +571,10 @@
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]]
+          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          ;; Automatically load the needed polyfill depending on
+          ;; the browser user agent and the available features
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
    :body [:body.small-footer
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]

@@ -75,9 +75,9 @@
           ; [:li
           ;   {:class (if (= active-page "pricing") "active" "")}
           ;   [:a.navbar-item {:href "/pricing"} "Pricing"]]
-          [:li
-            {:class (if (= active-page "features") "active" "")}
-            [:a.navbar-item {:href "/features"} "Features"]]
+          ; [:li
+          ;   {:class (if (= active-page "features") "active" "")}
+          ;   [:a.navbar-item {:href "/features"} "Features"]]
           [:li
             {:class (if (= active-page "about") "active" "")}
             [:a.navbar-item {:href "/about"} "About"]]
@@ -104,9 +104,10 @@
       [:div.left-column
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        ; FIXME: reactivate request early access
-        ; [:div.small-links
-        ;   [:a {:href "/?tif"} "Request Free Early Access"]]
+        [:div.footer-small-links
+          [:a {:href "/sign-up"} "Get Started"]
+          "|"
+          [:a {:href "/login"} "Log in"]]
         [:div.small-logos
           [:a.twitter
             {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
@@ -121,28 +122,31 @@
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');"}
             "SUPPORT"]
-          [:div.column-item [:a {:href contact-mail-to} "Help"]]
+          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "/privacy"} "Legal"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.column-integration
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');"}
-            "INTEGRATIONS"]
-          [:div.column-item [:a {:href "https://github.com/open-company"} "Developers"]]]
+            "DEVELOPERS"]
+          [:div.column-item [:a {:href "https://github.com/open-company"} "GitHub"]]]
 
         [:div.column.column-company
           [:div.column-title
             {:onClick "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');"}
             "COMPANY"]
+          [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
-        [:div.column.column-tour
-          [:div.column-title
-            {:onClick "$('nav.navbar-bottom div.column:not(.column-tour)').removeClass('expanded');$('nav.navbar-bottom div.column.column-tour').toggleClass('expanded');"}
-            "TOUR"]
-          [:div.column-item [:a {:href "/"} "Home"]]
-          [:div.column-item [:a {:href "/features"} "Features"]]]]]])
+        ; [:div.column.column-tour
+        ;   [:div.column-title
+        ;     {:onClick "$('nav.navbar-bottom div.column:not(.column-tour)').removeClass('expanded');$('nav.navbar-bottom div.column.column-tour').toggleClass('expanded');"}
+        ;     "TOUR"]
+        ;   [:div.column-item [:a {:href "/"} "Home"]]
+        ;   [:div.column-item [:a {:href "/features"} "Features"]]]
+          ]]])
 
 
 (defn read-edn [entry]

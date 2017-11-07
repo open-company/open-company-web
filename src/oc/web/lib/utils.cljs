@@ -275,11 +275,6 @@
         delete (link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defn readonly-story? [links]
-  (let [partial-update (link-for links "partial-update")
-        delete (link-for links "delete")]
-    (and (nil? partial-update) (nil? delete))))
-
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
@@ -1194,3 +1189,16 @@
                                                :createdat (.data $item "createdat")
                                                :url (.attr $item "href")}))))))
     @atch-map))
+
+(defn your-boards-url []
+  (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
+    (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
+      (get-board-url org-slug board-slug)
+      (oc-urls/org org-slug))
+    oc-urls/login))
+
+(defn storage-url-org-slug [storage-url]
+  (let [parts (s/split storage-url "/")]
+    (if (s/starts-with? storage-url "http")
+      (nth parts 4)
+      (nth parts 2))))

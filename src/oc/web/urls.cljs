@@ -18,7 +18,7 @@
 
 (def contact "/contact")
 
-(def help "https://help.carrot.io")
+(def help "http://help.carrot.io")
 
 (def home-try-it-focus (str home "?tif"))
 
@@ -38,6 +38,10 @@
 (def logout "/logout")
 
 (def pricing "/pricing")
+
+(def terms "/terms")
+
+(def privacy "/privacy")
 
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
@@ -152,26 +156,10 @@
   ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
   ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/post/" (name entry-uuid))))
 
-;; Stories
-
-(defn story
-  "Story url"
-  ([] (story (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
-  ([story-uuid] (story (router/current-org-slug) (router/current-board-slug) story-uuid))
-  ([board-slug story-uuid] (story (router/current-org-slug) board-slug story-uuid))
-  ([org-slug board-slug story-uuid] (str (board org-slug board-slug) "/story/" (name story-uuid))))
-
-(defn story-edit
-  "Edit an already created story."
-  ([] (story-edit (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
-  ([story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
-  ([board-slug story-uuid] (story-edit (router/current-org-slug) (router/current-board-slug) story-uuid))
-  ([org-slug board-slug story-uuid] (str (story org-slug board-slug story-uuid) "/edit")))
-
 ;; Secure activities
 
 (defn secure-activity
-  "Secure url for story to show readonly view."
+  "Secure url for activity to show readonly view."
   ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
   ([secure-id] (secure-activity (router/current-org-slug) secure-id))
   ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))

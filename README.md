@@ -194,6 +194,7 @@ provided in the table below:
 |  ------ | ------ | ------ |
 |  :activity-delete | UI | Delete the selected entry. |
 |  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
+|  :activity-get/finish | API | Activity (secure or not) loaded from API. |
 |  :activity-modal-edit | UI | Activate editing in modal. |
 |  :activity-move | UI | Move an activity from a board to another. |
 |  :alert-modal-hide | UI | Hide the alert modal view. |
@@ -273,6 +274,7 @@ provided in the table below:
 |  :pswd-collect | UI | Start the request to save the new user password on password request. |
 |  :pswd-collect/finish | API | Collect password request finished. |
 |  :reaction-toggle | UI | Toggle a reaction, temporarily change it in the local state then starts the request to save it server side. |
+|  :secure-activity-get | UI | Load an activity using the secure uuid. |
 |  :signup-with-email | UI | Show the signup with email overlay. |
 |  :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
 |  :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |

@@ -41,57 +41,62 @@
         [:div.title
           "Get Started"]]
       [:div.onboard-form
-        [:div.field-label
-          "Enter email"
-          (cond
-            (= (:error signup-with-email) 409)
-            [:span.error "Email already exists"]
-            @(::email-error s)
-            [:span.error "Email is not valid"])]
-        [:input.field
-          {:type "email"
-           :class (when (= (:error signup-with-email) 409) "error")
-           :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
-           :value (:email signup-with-email)
-           :on-change #(do
-                         (reset! (::password-error s) false)
-                         (reset! (::email-error s) false)
-                         (dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)]))}]
-        [:div.field-label
-          "Password"
-          (when @(::password-error s)
-            [:span.error
-              "Minimum 8 characters"])]
-        [:input.field
-          {:type "password"
-           :pattern ".{8,}"
-           :value (:pswd signup-with-email)
-           :placeholder "Minimum 8 characters"
-           :on-change #(do
-                         (reset! (::password-error s) false)
-                         (reset! (::email-error s) false)
-                         (dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)]))}]
-        [:div.field-description
-          "By signing up you are agreeing to our "
-          [:a
-            "terms of service"]
-          " and "
-          [:a
-            "privacy policy"]
-          "."]
-        [:button.continue
-          {:class (when (or (not (utils/valid-email? (:email signup-with-email)))
-                            (<= (count (:pswd signup-with-email)) 7))
-                    "disabled")
-           :on-click #(if (or (not (utils/valid-email? (:email signup-with-email)))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.field-label
+            "Enter email"
+            (cond
+              (= (:error signup-with-email) 409)
+              [:span.error "Email already exists"]
+              @(::email-error s)
+              [:span.error "Email is not valid"])]
+          [:input.field
+            {:type "email"
+             :class (when (= (:error signup-with-email) 409) "error")
+             :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+             :value (:email signup-with-email)
+             :on-change #(do
+                           (reset! (::password-error s) false)
+                           (reset! (::email-error s) false)
+                           (dis/dispatch! [:input [:signup-with-email :email] (.. % -target -value)]))}]
+          [:div.field-label
+            "Password"
+            (when @(::password-error s)
+              [:span.error
+                "Minimum 8 characters"])]
+          [:input.field
+            {:type "password"
+             :pattern ".{8,}"
+             :value (:pswd signup-with-email)
+             :placeholder "Minimum 8 characters"
+             :on-change #(do
+                           (reset! (::password-error s) false)
+                           (reset! (::email-error s) false)
+                           (dis/dispatch! [:input [:signup-with-email :pswd] (.. % -target -value)]))}]
+          [:div.field-description
+            "By signing up you are agreeing to our "
+            [:a
+              {:href oc-urls/terms}
+              "terms of service"]
+            " and "
+            [:a
+              {:href oc-urls/privacy}
+              "privacy policy"]
+            "."]
+          [:button.continue
+            {:class (when (or (not (utils/valid-email? (:email signup-with-email)))
                               (<= (count (:pswd signup-with-email)) 7))
-                        (do
-                          (when (not (utils/valid-email? (:email signup-with-email)))
-                            (reset! (::email-error s) true))
-                          (when (<= (count (:pswd signup-with-email)) 7)
-                            (reset! (::password-error s) true)))
-                        (dis/dispatch! [:signup-with-email]))}
-          "Continue"]
+                      "disabled")
+             :on-click #(if (or (not (utils/valid-email? (:email signup-with-email)))
+                                (<= (count (:pswd signup-with-email)) 7))
+                          (do
+                            (when (not (utils/valid-email? (:email signup-with-email)))
+                              (reset! (::email-error s) true))
+                            (when (<= (count (:pswd signup-with-email)) 7)
+                              (reset! (::password-error s) true)))
+                          (dis/dispatch! [:signup-with-email]))}
+            "Continue"]]
         [:div.footer-link
           "Already have an account?"
           [:a {:href oc-urls/login} "Login here"]]]]))
@@ -141,44 +146,47 @@
           [:div.subtitle.error
             "An error occurred while saving your data, please try again"])]
       [:div.onboard-form
-        [:div.logo-upload-container
-          {:on-click (fn []
-                      (when (not= (:avatar-url user-data) temp-user-avatar)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                      (iu/upload! {:accept "image/*"
-                                   :transformations {
-                                     :crop {
-                                       :aspectRatio 1}}}
-                        (fn [res]
-                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                        nil
-                        (fn [_])
-                        nil))}
-          (user-avatar-image fixed-user-data)
-          [:div.add-picture-link
-            "Change photo"]
-          [:div.add-picture-link-subtitle
-            "A 160x160 PNG or JPG works best"]]
-        [:div.field-label
-          "First name"]
-        [:input.field
-          {:type "text"
-           :value (:first-name user-data)
-           :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-        [:div.field-label
-          "Last name"]
-        [:input.field
-          {:type "text"
-           :value (:last-name user-data)
-           :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-        [:button.continue
-          {:disabled (or (and (empty? (:first-name user-data))
-                              (empty? (:last-name user-data)))
-                         (empty? (:avatar-url user-data)))
-           :on-click #(do
-                        (reset! (::saving s) true)
-                        (dis/dispatch! [:user-profile-save]))}
-          "Continue"]]]))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.logo-upload-container
+            {:on-click (fn []
+                        (when (not= (:avatar-url user-data) temp-user-avatar)
+                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
+                        (iu/upload! {:accept "image/*"
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}}
+                          (fn [res]
+                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                          nil
+                          (fn [_])
+                          nil))}
+            (user-avatar-image fixed-user-data)
+            [:div.add-picture-link
+              "Change photo"]
+            [:div.add-picture-link-subtitle
+              "A 160x160 PNG or JPG works best"]]
+          [:div.field-label
+            "First name"]
+          [:input.field
+            {:type "text"
+             :value (:first-name user-data)
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+          [:div.field-label
+            "Last name"]
+          [:input.field
+            {:type "text"
+             :value (:last-name user-data)
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+          [:button.continue
+            {:disabled (or (and (empty? (:first-name user-data))
+                                (empty? (:last-name user-data)))
+                           (empty? (:avatar-url user-data)))
+             :on-click #(do
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:user-profile-save]))}
+            "Continue"]]]]))
 
 (rum/defcs email-lander-team < rum/reactive
                                (drv/drv :teams-data)
@@ -211,42 +219,45 @@
         [:div.subtitle
           "How your company will appear on Carrot"]]
       [:div.onboard-form
-        [:div.logo-upload-container.org-logo
-          {:on-click (fn [_]
-                      (if (empty? (:logo-url org-editing))
-                        (iu/upload! {:accept "image/*"}
-                          (fn [res]
-                            (let [url (gobj/get res "url")
-                                  img (gdom/createDom "img")]
-                              (set! (.-onload img) (fn []
-                                                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
-                                                      (gdom/removeNode img)))
-                              (set! (.-className img) "hidden")
-                              (gdom/append (.-body js/document) img)
-                              (set! (.-src img) url)))
-                          nil
-                          (fn [_])
-                          nil)
-                        (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
-                                                                                  :logo-width 0
-                                                                                  :logo-height 0})])))}
-          (org-avatar org-editing false true)
-          [:div.add-picture-link
-            (if (empty? (:logo-url org-editing))
-              "Upload logo"
-              "Delete logo")]
-          [:div.add-picture-link-subtitle
-            "A transparent background PNG works best"]]
-        [:div.field-label
-          "Team name"]
-        [:input.field
-          {:type "text"
-           :value (:name org-editing)
-           :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
-        [:button.continue
-          {:disabled (empty? (:name org-editing))
-           :on-click #(dis/dispatch! [:org-create])}
-          "Create my team"]]]))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.logo-upload-container.org-logo
+            {:on-click (fn [_]
+                        (if (empty? (:logo-url org-editing))
+                          (iu/upload! {:accept "image/*"}
+                            (fn [res]
+                              (let [url (gobj/get res "url")
+                                    img (gdom/createDom "img")]
+                                (set! (.-onload img) (fn []
+                                                        (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
+                                                        (gdom/removeNode img)))
+                                (set! (.-className img) "hidden")
+                                (gdom/append (.-body js/document) img)
+                                (set! (.-src img) url)))
+                            nil
+                            (fn [_])
+                            nil)
+                          (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
+                                                                                    :logo-width 0
+                                                                                    :logo-height 0})])))}
+            (org-avatar org-editing false true)
+            [:div.add-picture-link
+              (if (empty? (:logo-url org-editing))
+                "Upload logo"
+                "Delete logo")]
+            [:div.add-picture-link-subtitle
+              "A transparent background PNG works best"]]
+          [:div.field-label
+            "Team name"]
+          [:input.field
+            {:type "text"
+             :value (:name org-editing)
+             :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
+          [:button.continue
+            {:disabled (empty? (:name org-editing))
+             :on-click #(dis/dispatch! [:org-create])}
+            "Create my team"]]]]))
 
 (rum/defcs slack-lander < rum/reactive
                           (drv/drv :edit-user-profile)
@@ -286,45 +297,48 @@
         [:div.subtitle
           "This information will be visible to your team"]]
       [:div.onboard-form
-        [:div.logo-upload-container
-          {:on-click (fn []
-                      (when (not= (:avatar-url user-data) temp-user-avatar)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                      (iu/upload! {:accept "image/*"
-                                   :transformations {
-                                     :crop {
-                                       :aspectRatio 1}}}
-                        (fn [res]
-                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                        nil
-                        (fn [_])
-                        nil))}
-          (user-avatar-image fixed-user-data)
-          [:div.add-picture-link
-            "Change photo"]
-          [:div.add-picture-link-subtitle
-            "A 160x160 PNG or JPG works best"]]
-        [:div.field-label
-          "First name"]
-        [:input.field
-          {:type "text"
-           :value (:first-name user-data)
-           :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-        [:div.field-label
-          "Last name"]
-        [:input.field
-          {:type "text"
-           :value (:last-name user-data)
-           :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-        [:button.continue
-          {:disabled (or (and (empty? (:first-name user-data))
-                              (empty? (:last-name user-data)))
-                         (empty? (:avatar-url user-data)))
-           :on-click #(do
-                        (cook/set-cookie! (router/should-show-dashboard-tooltips (:user-id user-data)) true (* 60 60 24 7))
-                        (reset! (::saving s) true)
-                        (dis/dispatch! [:user-profile-save true]))}
-          "Sign Up"]]]))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.logo-upload-container
+            {:on-click (fn []
+                        (when (not= (:avatar-url user-data) temp-user-avatar)
+                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
+                        (iu/upload! {:accept "image/*"
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}}
+                          (fn [res]
+                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                          nil
+                          (fn [_])
+                          nil))}
+            (user-avatar-image fixed-user-data)
+            [:div.add-picture-link
+              "Change photo"]
+            [:div.add-picture-link-subtitle
+              "A 160x160 PNG or JPG works best"]]
+          [:div.field-label
+            "First name"]
+          [:input.field
+            {:type "text"
+             :value (:first-name user-data)
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+          [:div.field-label
+            "Last name"]
+          [:input.field
+            {:type "text"
+             :value (:last-name user-data)
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+          [:button.continue
+            {:disabled (or (and (empty? (:first-name user-data))
+                                (empty? (:last-name user-data)))
+                           (empty? (:avatar-url user-data)))
+             :on-click #(do
+                          (cook/set-cookie! (router/should-show-dashboard-tooltips (:user-id user-data)) true (* 60 60 24 7))
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:user-profile-save true]))}
+            "Sign Up"]]]]))
 
 (rum/defcs slack-lander-team < rum/reactive
                                (drv/drv :teams-load)
@@ -363,42 +377,45 @@
         [:div.subtitle
           "How your company will appear on Carrot"]]
       [:div.onboard-form
-        [:div.logo-upload-container.org-logo
-          {:on-click (fn [_]
-                      (if (empty? (:logo-url org-editing))
-                        (iu/upload! {:accept "image/*"}
-                          (fn [res]
-                            (let [url (gobj/get res "url")
-                                  img (gdom/createDom "img")]
-                              (set! (.-onload img) (fn []
-                                                      (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
-                                                      (gdom/removeNode img)))
-                              (set! (.-className img) "hidden")
-                              (gdom/append (.-body js/document) img)
-                              (set! (.-src img) url)))
-                          nil
-                          (fn [_])
-                          nil)
-                        (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
-                                                                                  :logo-width 0
-                                                                                  :logo-height 0})])))}
-          (org-avatar org-editing false true)
-          [:div.add-picture-link
-            (if (empty? (:logo-url org-editing))
-              "Upload logo"
-              "Delete logo")]
-          [:div.add-picture-link-subtitle
-            "A transparent background PNG works best"]]
-        [:div.field-label
-          "Team name"]
-        [:input.field
-          {:type "text"
-           :value (:name org-editing)
-           :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
-        [:button.continue
-          {:disabled (empty? (:name org-editing))
-           :on-click #(dis/dispatch! [:org-create])}
-          "Create my team"]]]))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.logo-upload-container.org-logo
+            {:on-click (fn [_]
+                        (if (empty? (:logo-url org-editing))
+                          (iu/upload! {:accept "image/*"}
+                            (fn [res]
+                              (let [url (gobj/get res "url")
+                                    img (gdom/createDom "img")]
+                                (set! (.-onload img) (fn []
+                                                        (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url url :logo-width (.-width img) :logo-height (.-height img)})])
+                                                        (gdom/removeNode img)))
+                                (set! (.-className img) "hidden")
+                                (gdom/append (.-body js/document) img)
+                                (set! (.-src img) url)))
+                            nil
+                            (fn [_])
+                            nil)
+                          (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
+                                                                                    :logo-width 0
+                                                                                    :logo-height 0})])))}
+            (org-avatar org-editing false true)
+            [:div.add-picture-link
+              (if (empty? (:logo-url org-editing))
+                "Upload logo"
+                "Delete logo")]
+            [:div.add-picture-link-subtitle
+              "A transparent background PNG works best"]]
+          [:div.field-label
+            "Team name"]
+          [:input.field
+            {:type "text"
+             :value (:name org-editing)
+             :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
+          [:button.continue
+            {:disabled (empty? (:name org-editing))
+             :on-click #(dis/dispatch! [:org-create])}
+            "Create my team"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
@@ -422,35 +439,40 @@
         [:div.subtitle
           "Signing up as " [:span.email-address (:email jwt)]]]
       [:div.onboard-form
-        [:div.field-label
-          "Password"
-          (when collect-pswd-error
-            [:span.error "An error occurred, please try again."])
-          (when @(::password-error s)
-            [:span.error "Minimum 8 characters"])]
-        [:input.field
-          {:type "password"
-           :class (when collect-pswd-error "error")
-           :value (or (:pswd collect-pswd) "")
-           :on-change #(do
-                         (reset! (::password-error s) false)
-                         (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
-           :placeholder "Minimum 8 characters"
-           :pattern ".{8,}"}]
-        [:div.description
-          "By signing up you are agreeing to our "
-          [:a
-            "terms of service"]
-          " and "
-          [:a
-            "privacy policy"]
-          "."]
-        [:button.continue
-          {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
-           :on-click #(if (< (count (:pswd collect-pswd)) 8)
-                        (reset! (::password-error s) true)
-                        (dis/dispatch! [:pswd-collect]))}
-          "Continue"]]]))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.field-label
+            "Password"
+            (when collect-pswd-error
+              [:span.error "An error occurred, please try again."])
+            (when @(::password-error s)
+              [:span.error "Minimum 8 characters"])]
+          [:input.field
+            {:type "password"
+             :class (when collect-pswd-error "error")
+             :value (or (:pswd collect-pswd) "")
+             :on-change #(do
+                           (reset! (::password-error s) false)
+                           (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
+             :placeholder "Minimum 8 characters"
+             :pattern ".{8,}"}]
+          [:div.description
+            "By signing up you are agreeing to our "
+            [:a
+              {:href oc-urls/terms}
+              "terms of service"]
+            " and "
+            [:a
+              {:href oc-urls/privacy}
+              "privacy policy"]
+            "."]
+          [:button.continue
+            {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
+             :on-click #(if (< (count (:pswd collect-pswd)) 8)
+                          (reset! (::password-error s) true)
+                          (dis/dispatch! [:pswd-collect]))}
+            "Continue"]]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
                                     (drv/drv :edit-user-profile)
@@ -492,44 +514,47 @@
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]
       [:div.onboard-form
-        [:div.logo-upload-container
-          {:on-click (fn []
-                      (when (not= (:avatar-url user-data) temp-user-avatar)
-                        (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                      (iu/upload! {:accept "image/*"
-                                   :transformations {
-                                     :crop {
-                                       :aspectRatio 1}}}
-                        (fn [res]
-                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                        nil
-                        (fn [_])
-                        nil))}
-          (user-avatar-image fixed-user-data)
-          [:div.add-picture-link
-            "Change photo"]
-          [:div.add-picture-link-subtitle
-            "A 160x160 PNG or JPG works best"]]
-        [:div.field-label
-          "First name"]
-        [:input.field
-          {:type "text"
-           :value (:first-name user-data)
-           :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-        [:div.field-label
-          "Last name"]
-        [:input.field
-          {:type "text"
-           :value (:last-name user-data)
-           :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-        [:button.continue
-          {:disabled (or (and (empty? (:first-name user-data))
-                              (empty? (:last-name user-data)))
-                         (empty? (:avatar-url user-data)))
-           :on-click #(do
-                        (reset! (::saving s) true)
-                        (dis/dispatch! [:user-profile-save]))}
-          "Continue"]]]))
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.logo-upload-container
+            {:on-click (fn []
+                        (when (not= (:avatar-url user-data) temp-user-avatar)
+                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
+                        (iu/upload! {:accept "image/*"
+                                     :transformations {
+                                       :crop {
+                                         :aspectRatio 1}}}
+                          (fn [res]
+                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
+                          nil
+                          (fn [_])
+                          nil))}
+            (user-avatar-image fixed-user-data)
+            [:div.add-picture-link
+              "Change photo"]
+            [:div.add-picture-link-subtitle
+              "A 160x160 PNG or JPG works best"]]
+          [:div.field-label
+            "First name"]
+          [:input.field
+            {:type "text"
+             :value (:first-name user-data)
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+          [:div.field-label
+            "Last name"]
+          [:input.field
+            {:type "text"
+             :value (:last-name user-data)
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+          [:button.continue
+            {:disabled (or (and (empty? (:first-name user-data))
+                                (empty? (:last-name user-data)))
+                           (empty? (:avatar-url user-data)))
+             :on-click #(do
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:user-profile-save]))}
+            "Continue"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]

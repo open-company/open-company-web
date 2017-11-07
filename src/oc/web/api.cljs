@@ -743,23 +743,6 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:calendar-get/finish {:org (router/current-org-slug) :body (if success (json->cljs body) nil)}]))))))
 
-(defn get-story [story-uuid story-link]
-  (when story-link
-    (storage-http (method-for-link story-link) (relative-href story-link)
-      {:headers (headers-for-link story-link)}
-      (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:story-get/finish status {:story-uuid story-uuid :story-data (if success (json->cljs body) nil)}])))))
-
-(defn create-story [board-data & [story-data]]
-  (when board-data
-    (let [create-story-link (utils/link-for (:links board-data) "create")]
-      (when create-story-link
-        (storage-http (method-for-link create-story-link) (relative-href create-story-link)
-          {:headers (headers-for-link create-story-link)
-           :json-params (cljs->json (or story-data {}))}
-          (fn [{:keys [status success body]}]
-            (dispatcher/dispatch! [:story-create/finish (:slug board-data) (if success (json->cljs body) nil)])))))))
-
 (defn autosave-draft [story-data share-data]
   (when story-data
     (let [autosave-link (utils/link-for (:links story-data) "partial-update")
@@ -770,24 +753,12 @@
         (fn [{:keys [success status body]}]
           (dispatcher/dispatch! [:draft-autosave/finish share-data]))))))
 
-(defn share-story [story-data share-data]
-  (when story-data
-    (let [publish-link (utils/link-for (:links story-data) (if (= (:status story-data) "draft") "publish" "share"))
-          headers {:headers (headers-for-link publish-link)}
-          with-json-params (if (pos? (count share-data))
-                             (assoc headers :json-params (cljs->json share-data))
-                             headers)]
-      (storage-http (method-for-link publish-link) (relative-href publish-link)
-        with-json-params
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:story-share/finish (if success (json->cljs body) nil)]))))))
-
 (defn get-activity [activity-uuid activity-link]
   (when activity-link
     (storage-http (method-for-link activity-link) (relative-href activity-link)
       {:headers (headers-for-link activity-link)}
       (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:activity-get/finish status {:activity-uuid activity-uuid :activity-data (if success (json->cljs body) nil)}])))))
+        (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) nil)])))))
 
 (defn share-activity [post-data share-data]
   (when post-data
@@ -799,14 +770,6 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-share/finish (if success (json->cljs body) nil)]))))))
 
-(defn get-secure-story [org-slug secure-story-id]
- (when secure-story-id
-    (let [story-link {:href (str "/orgs/" org-slug "/stories/" secure-story-id) :method "GET" :rel ""}]
-      (storage-http (method-for-link story-link) (relative-href story-link)
-        {:headers (headers-for-link story-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:story-get/finish status {:story-uuid (router/current-secure-activity-id) :story-data (if success (json->cljs body) {})}]))))))
-
 (defn get-secure-activity [org-slug secure-activity-id]
  (when secure-activity-id
     (let [activity-link {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)
@@ -816,7 +779,7 @@
       (storage-http (method-for-link activity-link) (relative-href activity-link)
         {:headers (headers-for-link activity-link)}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:activity-get/finish status {:activity-uuid (router/current-secure-activity-id) :activity-data (if success (json->cljs body) {})}]))))))
+          (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) {})]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)

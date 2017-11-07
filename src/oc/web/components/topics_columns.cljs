@@ -40,11 +40,7 @@
   (let [entry-floating (js/$ "#new-entry-floating-btn")]
     (when (pos? (.-length entry-floating))
       (let [scroll-top (document-scroll-top)]
-        (.css entry-floating #js {:opacity (calc-opacity scroll-top)}))))
-  (let [story-floating (js/$ "#new-story-floating-btn")]
-    (when (pos? (.-length story-floating))
-      (let [scroll-top (document-scroll-top)]
-        (.css story-floating #js {:opacity (calc-opacity scroll-top)})))))
+        (.css entry-floating #js {:opacity (calc-opacity scroll-top)})))))
 
 (defn get-first-tooltip-message [org-data]
   (let [create-link (utils/link-for (:links org-data) "create")
@@ -191,7 +187,7 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
-                         (> (count entry-topics) 1))
+                         (or (string? board-filters) (> (count entry-topics) 1)))
                 (filters-dropdown))
               ;; Add entry floating button
               (when (and (not is-all-posts)
