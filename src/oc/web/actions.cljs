@@ -1385,7 +1385,6 @@
                   (dissoc db :latest-entry-point)
                   db)]
     (when (= status 404)
-      ; (router/redirect-404!)
       (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug))))
     (let [org-slug (router/current-org-slug)
           board-slug (router/current-board-slug)
