@@ -97,9 +97,6 @@
   (pre-routing (:query-params params) true)
   ;; save route
   (router/set-route! ["home"] {:query-params (:query-params params)})
-  ; (when (jwt/jwt)
-  ;   ;; load data from api
-  ;   (swap! dis/app-state assoc :loading true))
   (post-routing)
   ;; render component
   (drv-root #(om/component (home-page)) target))
