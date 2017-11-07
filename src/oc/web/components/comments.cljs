@@ -6,9 +6,9 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.components.ui.mixins :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -38,16 +38,20 @@
         final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
     final-text))
 
-(defn add-emoji-cb [s]
-  (reset! (::keep-expanded s) false))
+(defn enable-add-comment? [s]
+  (let [add-comment-div (rum/ref-node s "add-comment")
+        comment-text (add-comment-content add-comment-div)
+        next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
+    (when (not= next-add-bt-disabled @(::add-button-disabled s))
+      (reset! (::add-button-disabled s) next-add-bt-disabled))))
 
-(rum/defcs add-comment < (rum/local false ::expanded)
-                         (rum/local false ::keep-expanded)
-                         (rum/local false ::show-successful)
+(rum/defcs add-comment < (rum/local false ::show-successful)
                          rum/reactive
                          (drv/drv :current-user-data)
                          (drv/drv :comment-add-finish)
+                         (rum/local true ::add-button-disabled)
                          rum/static
+                         first-render-mixin
                          {:did-mount (fn [s]
                                        (utils/after 2500 #(js/emojiAutocomplete))
                                        s)
@@ -60,48 +64,34 @@
                                                (dis/dispatch! [:input [:comment-add-finish] false])
                                                (reset! (::show-successful s) false))))))
                                           s)}
-  [s activity-data did-expand-cb]
-  (let [show-footer (::expanded s)
-        fixed-show-footer @show-footer
-        current-user-data (drv/react s :current-user-data)]
+  [s activity-data]
+  (let [current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box
-      {:class (if fixed-show-footer "expanded" "")}
       (when @(::show-successful s)
         [:div.successfully-posted
           "Comment was posted successfully!"])
-      (user-avatar-image current-user-data)
       [:div.add-comment-internal
         [:div.add-comment.emoji-autocomplete.emojiable
           {:ref "add-comment"
            :content-editable true
-           :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
-           :on-focus (fn [_]
-                       (reset! show-footer true)
-                       (when (fn? did-expand-cb) (did-expand-cb true)))
-           :on-blur #(when (empty? (.-innerHTML (rum/ref-node s "add-comment")))
-                      (utils/after 100
-                       (fn []
-                         (when-not @(::keep-expanded s)
-                           (reset! show-footer false)
-                           (when (fn? did-expand-cb)
-                             (did-expand-cb false))))))
-           :placeholder "Add a comment..."}]
+           :on-key-up #(enable-add-comment? s)
+           :on-focus #(enable-add-comment? s)
+           :on-blur #(enable-add-comment? s)
+           :on-paste #(do
+                        (js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
+                        (enable-add-comment? s))
+           :placeholder "Share your thoughts..."}]
         [:div.add-comment-footer.group
-          {:style {:display (if fixed-show-footer "block" "none")}}
           [:div.reply-button-container
-            [:button.btn-reset.reply-btn
+            [:button.mlb-reset.mlb-default.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
                             (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                            (set! (.-innerHTML add-comment-div) "")
-                            (reset! show-footer false)
-                            (when (fn? did-expand-cb)
-                              (did-expand-cb false)))}
-              "Post"]]]]
-      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                     :width 20
-                     :height 20
-                     :will-show-picker #(reset! (::keep-expanded s) true)
-                     :will-hidepicker #(reset! (::keep-expanded s) false)})]))
+                            (set! (.-innerHTML add-comment-div) ""))
+               :disabled @(::add-button-disabled s)}
+              "Add"]]]]
+      (emoji-picker {:width 32
+                     :height 32
+                     :add-emoji-cb #(enable-add-comment? s)})]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
@@ -109,11 +99,6 @@
     ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
     (when comments-internal-scroll
       (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
-
-(defn add-comment-expand-cb [s expanding?]
-  (reset! (::add-comment-focus s) expanding?)
-  (when expanding?
-    (utils/after 200 #(scroll-to-bottom s))))
 
 (defn load-comments-if-needed [s]
   (let [activity-data (first (:rum/args s))]
@@ -167,8 +152,6 @@
                 (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
             (when-not @(::add-comment-focus s)
               [:div.comments-internal-empty
-                [:img {:src (utils/cdn "/img/ML/comments_empty.png")}]
-                [:div "No comments yet"]
-                [:div "Jump in and let everybody know"]
-                [:div "what you think!"]]))
-          (add-comment activity-data (partial add-comment-expand-cb s))]])))
+                [:div.no-comments-placeholder]
+                [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]]))
+          (add-comment activity-data)]])))

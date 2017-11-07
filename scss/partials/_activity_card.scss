@@ -7,8 +7,36 @@ div.activity-card {
   margin: 12px;
   position: relative;
 
-  &:hover {
+  &:hover, &.dropdown-active {
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+
+    div.activity-card-head.entry-card {
+      background-color: $carrot_light_gray_5;
+    }
+
+    div.activity-card-head div.activity-card-head-right {
+      div.activity-tag {
+        background-color: $carrot_light_gray_6;
+      }
+
+      div.more-button {
+        button.more-ellipsis {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    div.activity-card-footer {
+      button.post-edit {
+        opacity: 0.8;
+      }
+
+      div.activity-share {
+        button.activity-share-bt {
+          opacity: 1;
+        }
+      }
+    }
   }
 
   &.activity-card-placeholder {
@@ -60,6 +88,16 @@ div.activity-card {
   }
 
   &.all-posts-card {
+    div.activity-card-head {
+      div.activity-card-head-author {
+        width: 45%;
+      }
+
+      div.activity-card-head-right {
+        width: 55%;
+      }
+    }
+
     div.activity-card-content{
 
       div.activity-card-body {
@@ -114,12 +152,6 @@ div.activity-card {
     }
   }
 
-  &:hover {
-    div.activity-card-head.entry-card {
-      background-color: $carrot_light_gray_5;
-    }
-  }
-
   div.activity-card-head {
     width: 100%;
     padding: 16px 24px;
@@ -133,7 +165,7 @@ div.activity-card {
 
     div.activity-card-head-author {
       float: left;
-      width: 58%;
+      width: 55%;
       padding-right: 20px;
       overflow: hidden;
 
@@ -143,8 +175,12 @@ div.activity-card {
     div.activity-card-head-right {
       float: right;
       position: relative;
-      width: 42%;
+      width: 45%;
       margin-top: 8px;
+
+      div.activity-attachments {
+        float: right;
+      }
 
       div.new-tag {
         @include avenir_B();
@@ -164,6 +200,7 @@ div.activity-card {
         max-width: 100%;
         text-overflow: ellipsis;
         overflow: hidden;
+        margin-right: 8px;
 
         &.double-tag {
           max-width: 50%;
@@ -171,13 +208,86 @@ div.activity-card {
       }
 
       @include activity-tag();
-    }
-  }
 
-  &:hover {
-    div.activity-card-head div.activity-card-head-right {
-      div.activity-tag {
-        background-color: $carrot_light_gray_6;
+      div.more-button {
+        float: right;
+        position: relative;
+        margin-right: -6px;
+
+        button.more-ellipsis {
+          width: 24px;
+          height: 24px;
+          padding: 2px 10px;
+          display: block;
+          background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+          background-position: center;
+          background-size: 4px 20px;
+          background-repeat: no-repeat;
+          opacity: 0;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        div.activity-move {
+          position: absolute;
+          top: 36px;
+          left: unset;
+          right: -10px;
+        }
+
+        div.activity-more-dropdown-menu {
+          position: absolute;
+          top: 36px;
+          right: -10px;
+          left: calc(100% - 100px + 10px);
+          min-width: 100px;
+          height: auto;
+          border: none;
+          outline: none;
+          box-shadow: none;
+          background-color: transparent;
+          overflow: visible;
+          z-index: 100;
+
+          div.triangle {
+            position: absolute;
+            top: -7px;
+            left: calc(100% - 30px);
+            background-color: white;
+            border-top: 1px solid rgba(177,184,192,0.50);
+            border-left: 1px solid rgba(177,184,192,0.50);
+            transform: rotate(45deg);
+            width: 15px;
+            height: 15px;
+          }
+
+          ul.activity-card-more-menu {
+            background-color: white;
+            border: 1px solid rgba(177,184,192,0.50);
+            box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+            border-radius: 5px;
+            margin: 0px;
+            padding: 10px 13px 6px 8px;
+            min-height: 50px;
+            list-style-type: none;
+            width: 100%;
+
+            li {
+              padding: 3px 8px;
+              @include avenir_M();
+              font-size: 14px;
+              color: $carrot_light_gray_3;
+              cursor: pointer;
+              background-color: transparent;
+
+              &:hover {
+                background-color: rgba($carrot_light_gray_4, 0.2);
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -216,15 +326,12 @@ div.activity-card {
       background-size: cover;
       border-radius: 4px;
       position: relative;
+      cursor: pointer;
 
       img {
         max-width: 72px;
         max-height: 54px;
         margin-top: 9px;
-      }
-
-      &:hover {
-        cursor: pointer;
       }
 
       &:after {
@@ -324,66 +431,78 @@ div.activity-card {
     height: 72px;
     padding: 24px 24px 24px 32px;
 
-    div.more-button {
+    div.activity-share-thoughts {
+      background-color: $carrot_green_3;
+      height: 32px;
+      padding: 8px 16px 8px 32px;
+      border-radius: 100px;
+      @include avenir_H();
+      font-size: 12px;
+      color: $carrot_green_1;
+      background-image: cdnUrl("/img/ML/share_thoughts.svg");
+      background-position: 16px 10px;
+      background-size: 12px 12px;
+      background-repeat: no-repeat;
+      float: left;
+      cursor: pointer;
+    }
+
+    div.activity-share {
       float: right;
       position: relative;
-      margin-right: -6px;
+      margin-right: 8px;
+      margin-top: 4px;
 
-      button.more-ellipsis {
+      button.activity-share-bt {
         width: 24px;
         height: 24px;
-        padding: 8px;
-        display: block;
-        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-        background-position: center;
-        background-size: 6px 16px;
+        background-image: cdnUrl("/img/ML/foc_share_icon.svg");
         background-repeat: no-repeat;
+        background-position: center;
+        background-size: 24px 24px;
+        padding: 0;
+        margin: 0px;
+        opacity: 0;
       }
 
-      div.activity-move {
+      div.activity-share-dropdown {
         position: absolute;
-        top: -104px;
-        left: -301px;
-      }
-
-      div.dropdown-menu {
-        position: absolute;
-        top: unset;
-        bottom: -20px;
-        left: -132px;
-        width: 130px;
-        min-width: 130px;
+        bottom: 42px;
+        right: -10px;
+        left: calc(100% - 100px + 10px);
+        min-width: 100px;
         height: auto;
         border: none;
         outline: none;
         box-shadow: none;
         background-color: transparent;
         overflow: visible;
+        z-index: 100;
 
         div.triangle {
           position: absolute;
-          bottom: 25px;
-          right: -7px;
+          bottom: -7px;
+          left: calc(100% - 30px);
           background-color: white;
           border-top: 1px solid rgba(177,184,192,0.50);
           border-left: 1px solid rgba(177,184,192,0.50);
-          transform: rotate(135deg);
+          transform: rotate(225deg);
           width: 15px;
           height: 15px;
         }
 
-        ul.activity-card-more-menu {
+        ul.activity-share-dropdown-list {
           background-color: white;
           border: 1px solid rgba(177,184,192,0.50);
           box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
           border-radius: 5px;
-          margin: 8px 0;
+          margin: 0px;
           padding: 10px 13px 6px 8px;
           min-height: 50px;
           list-style-type: none;
           width: 100%;
 
-          li {
+          li.activity-share-dropdown-item {
             padding: 3px 8px;
             @include avenir_M();
             font-size: 14px;
@@ -396,6 +515,23 @@ div.activity-card {
             }
           }
         }
+      }
+    }
+
+    button.post-edit {
+      float: right;
+      margin-right: -6px;
+      margin-top: 4px;
+      width: 24px;
+      height: 24px;
+      background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
+      background-position: center;
+      background-size: 14px 14px;
+      background-repeat: no-repeat;
+      opacity: 0;
+
+      &:hover {
+        opacity: 1;
       }
     }
   }

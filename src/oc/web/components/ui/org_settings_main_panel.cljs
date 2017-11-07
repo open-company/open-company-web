@@ -114,7 +114,7 @@
              :data-toggle "tooltip"
              :data-container "body"
              :data-position "top"}
-            (org-avatar org-editing false false true)]
+            (org-avatar org-editing false true)]
           [:div.org-logo-label
             [:div.cta
               (if (empty? (:logo-url org-editing))

@@ -6,6 +6,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -22,6 +23,14 @@
     (if (or force-collapse (.hasClass body body-class))
       (.removeClass body body-class)
       (.addClass body body-class))))
+
+(defn navigate-to-your-boards [s]
+  (router/redirect!
+    (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
+      (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
+        (utils/get-board-url org-slug board-slug)
+        (oc-urls/org org-slug))
+      oc-urls/login)))
 
 (rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)}
   [s]
@@ -76,7 +85,9 @@
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               (if (jwt/jwt)
-                [:button.mlb-reset.mlb-get-started {:on-click #(router/nav! oc-urls/login)} "Your Boards"]
+                [:button.mlb-reset.mlb-get-started
+                  {:on-click #(navigate-to-your-boards s)}
+                    "Your Boards"]
                 [:button.mlb-reset.mlb-get-started
                   {:on-click #(if (utils/in? (:route @router/path) "login")
                                 (dis/dispatch! [:login-overlay-show :signup-with-slack])

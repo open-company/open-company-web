@@ -3,28 +3,34 @@ div.reactions {
   float: left;
 
   button.reaction-btn {
-    border: 1px solid rgba(78,90,107,1);
-    color: rgba(78,90,107,1);
-    font-size: 14px;
-    font-weight: 300;
-    border-radius: 4px;
-    padding: .35em .9em;
     margin-right: 5px;
     float: left;
     outline: none;
-    background-color: transparent;
     opacity: 0.6;
     position: relative;
-    height: 26px;
+    height: 32px;
     cursor: default;
+    border-radius: 100px;
+    background-color: $carrot_light_gray_2;
+    padding: 0px 16px;
+    // padding: .35em .9em;
+    color: $carrot_light_gray_3;
+    @include avenir_H();
+    font-size: 12px;
+
+    span.reaction {
+      font-size: 20px;
+      top: 3px;
+      position: relative;
+    }
 
     &.has-reactions {
       opacity: 1;
     }
 
     div.count {
-      color: rgba(78,90,107,0.7);
       margin-left: 5px;
+      // margin-top: -3px;
       display: inline-block;
     }
 
@@ -32,23 +38,18 @@ div.reactions {
       cursor: pointer;
       &:hover {
         opacity: 1;
-
-        div.count {
-          color: rgba(78,90,107,1);
-        }
       }
     }
 
     &.reacted {
-      border: 1px solid rgba(77,103,255,1);
-      background-color: rgba(228,232,255,1);
+      background-color: $carrot_light_yellow;
 
       &:hover {
-        opacity: 1;
+        opacity: 0.8;
       }
 
       div.count {
-        color: rgba(78,90,107,1);
+        color: $carrot_yellow;
       }
     }
   }

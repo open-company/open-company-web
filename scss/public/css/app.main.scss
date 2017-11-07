@@ -4,6 +4,7 @@
 @import "vars/main";
 // Mixins
 @import "mixins/_base";
+@import "mixins/_reusable";
 // Material design Bootstrap reset
 @import "vendor/_materialdesign";
 // General stuff
@@ -30,7 +31,6 @@
 @import "partials/_menu";
 @import "partials/_atomic";
 @import "partials/_topics_columns";
-@import "partials/_home";
 @import "partials/_list_boards";
 @import "partials/_emoji_picker";
 @import "partials/_site_header";
@@ -84,4 +84,6 @@
 @import "partials/_activity_move";
 @import "partials/_onboard_overlay";
 @import "partials/_made_with_carrot_modal";
+@import "partials/_activity_attachments";
 @import "partials/_empty_org";
+@import "partials/_topics_dropdown";

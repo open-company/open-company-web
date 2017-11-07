@@ -7,7 +7,7 @@ div.entry-edit-modal-container {
   top: 0px;
   left: 0px;
   background-color: $carrot_modal_bg;
-  z-index: #{$navbar_zindex + 101};
+  z-index: #{$navbar_zindex + 105};
   transition: opacity 180ms ease-in;
 
   &.will-appear {
@@ -61,178 +61,6 @@ div.entry-edit-modal-container {
             color: $carrot_dark_gray;
           }
         }
-
-        div.entry-card-dd-container {
-          position: relative;
-          float: right;
-          display: inline-block;
-          max-width: 50%;
-
-          button.dropdown-toggle {
-            color: #999999;
-            font-size: 15px;
-            @include avenir_H();
-            max-width: 100%;
-
-            &.has-topic {
-              margin: 0;
-              padding: 0;
-              @include activity-tag();
-            }
-          }
-
-          div.entry-edit-topics-dd {
-            position: absolute;
-            top: 30px;
-            left: calc(50% - 130px);
-            width: 260px;
-            border: none;
-            outline: none;
-            box-shadow: none;
-            background-color: transparent;
-
-            div.triangle {
-              position: absolute;
-              top: 3px;
-              left: 120px;
-              background-color: white;
-              border-top: 1px solid rgba(177,184,192,0.50);
-              border-left: 1px solid rgba(177,184,192,0.50);
-              transform: rotate(45deg);
-              width: 20px;
-              height: 20px;
-            }
-
-            div.entry-dropdown-list-content {
-              background-color: white;
-              border: 1px solid rgba(177,184,192,0.50);
-              box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-              border-radius: 5px;
-              margin: 8px 0;
-              padding: 10px 0 6px 8px;
-              min-height: 50px;
-
-              ul {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-                padding-right: 8px;
-                overflow-x: hidden;
-                overflow-y: auto;
-
-                li.selectable {
-                  padding: 3px 8px;
-                  cursor: pointer;
-
-                  &:hover {
-                    background-color: rgba($carrot_light_gray_4, 0.2);
-                  }
-
-                  &.select {
-                    background-color: rgba($carrot_orange, 0.1);
-
-                    button {
-                      @include avenir_H();
-                      color: $carrot_orange;
-                    }
-                  }
-
-                  button {
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $oc_gray_7;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    max-width: 60%;
-                    margin: 0;
-                    padding: 0;
-                  }
-
-                  button.remove {
-                    color: $carrot_light_gray;
-                    @include avenir_R();
-                    font-size: 12px;
-                    margin: 0;
-                    padding: 0;
-                    margin-left: 17px;
-
-                    &:hover {
-                      text-decoration: underline;
-                    }
-                  }
-                }
-
-                li.divider {
-                  border-top: 1px solid rgba($carrot_light_gray, 0.5);
-                  width: calc(100% + 16px);
-                  cursor: default;
-                  margin: 12px 0 12px -16px;
-                  min-height: initial;
-
-                  &:hover {
-                    border-top: 1px solid rgba($carrot_light_gray, 0.5);
-                    min-height: initial;
-                    background-color: transparent;
-                    color: transparent;
-                  }
-                }
-
-                li.entry-edit-new-topic {
-
-                  &:hover {
-                    background-color: initial;
-                  }
-
-                  button.entry-edit-new-topic-plus {
-                    width: 20px;
-                    height: 20px;
-                    padding: 0;
-                    float: left;
-                    margin-right: 10px;
-                    margin-top: 3px;
-                    cursor: pointer;
-                    transition: $add_media_animation;
-                    background-color: #F0EFEA;
-                    background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-                    background-repeat: no-repeat;
-                    background-position: 50%;
-                    background-size: 8px 8px;
-                    border-radius: 2px;
-                    float: left;
-
-                    &:hover {
-                      background-color: $carrot_green_2;
-                      background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
-                    }
-                  }
-
-                  button.entry-edit-new-topic-create {
-                    float: left;
-                    margin-left: 10px;
-                    height: 26px;
-                    font-size: 14px;
-                  }
-
-                  input.entry-edit-new-topic-field {
-                    float: left;
-                    border: none;
-                    outline: none;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $carrot_dark_gray;
-                    margin: 0.3rem 0;
-                    padding: 0;
-
-                    @include placeholder(){
-                      color: $carrot_light_gray;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
       }
 
       div.entry-edit-modal-divider {
@@ -241,6 +69,10 @@ div.entry-edit-modal-container {
         height: 1px;
         background-color: $carrot_light_gray_1;
         opacity: 0.3;
+
+        &.not-visible {
+          opacity: 0;
+        }
       }
 
       div.entry-edit-modal-body {
@@ -264,7 +96,7 @@ div.entry-edit-modal-container {
           &:empty:before {
             content: attr(placeholder);
             display: block;
-            color: $carrot_light_gray_1 !important;
+            color: #8A8E94 !important;
             font-style: none;
           }
         }
@@ -293,7 +125,7 @@ div.entry-edit-modal-container {
             @include activity-attachment(true);
 
             &.medium-editor-placeholder:after {
-              color: $carrot_dark_gray !important;
+              color: #8A8E94 !important;
             }
 
             * {

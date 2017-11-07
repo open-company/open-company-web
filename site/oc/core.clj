@@ -17,7 +17,7 @@
    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
    [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-   [:title "Carrot - Get everyone aligned"]
+   [:title "Carrot - Grow together"]
    ;; Bootstrap - Latest compiled and minified CSS
    [:link
     {:rel "stylesheet"
@@ -54,7 +54,9 @@
      {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
       :type "text/javascript"
       :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-      :crossorigin "anonymous"}]])
+      :crossorigin "anonymous"}]
+   ;; jQuery textcomplete needed by Emoji One autocomplete
+   [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header

@@ -46,7 +46,7 @@
             [:div.step-illustration-right
               "Sales Update"]]
           [:div.onboard-overlay-step-description
-            "It’s simple to post announcements, updates, and stories that bring everyone together."]]
+            "It’s simple to post announcements, updates and stories that bring everyone together."]]
         3
         [:div.onboard-overlay-step.step-3
           [:div.empty-line]

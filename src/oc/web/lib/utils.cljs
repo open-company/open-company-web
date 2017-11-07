@@ -13,6 +13,7 @@
             [goog.object :as gobj]
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
+            [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
@@ -677,21 +678,24 @@
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
   [text & [plain-text]]
-  ;; use an SVG sprite map
-  (set! (.-imageType js/emojione) "png")
-  (set! (.-sprites js/emojione) true)
-  (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png")
-  ;; convert ascii emoji's (like  :) and :D) into emojis
-  (set! (.-ascii js/emojione) true)
-  (let [text-string (or text "") ; handle nil
-        unicode-string (.toImage js/emojione text-string)
-        r (js/RegExp "<span " "ig")
-        with-img (.replace unicode-string r "<img ")
-        without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
+  ; ;; use an SVG sprite map
+  ; (set! (.-imageType js/emojione) "png")
+  ; (set! (.-sprites js/emojione) true)
+  ; (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png")
+  ; ;; convert ascii emoji's (like  :) and :D) into emojis
+  ; (set! (.-ascii js/emojione) true)
+  ; (let [text-string (or text "") ; handle nil
+  ;       unicode-string (.toImage js/emojione text-string)
+  ;       r (js/RegExp "<span " "ig")
+  ;       with-img (.replace unicode-string r "<img ")
+  ;       without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
 
-    (if plain-text
-      without-span
-      #js {"__html" without-span})))
+  ;   (if plain-text
+  ;     without-span
+  ;     #js {"__html" without-span}))
+  (if plain-text
+    text
+    #js {"__html" text}))
 
 (defn strip-HTML-tags [text]
   (when text
@@ -1095,7 +1099,7 @@
       "just now")))
 
 (defn entry-date-tooltip [entry-data]
-  (let [created-at (js-date (:created-at entry-data))
+  (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
         updated-at (js-date (:updated-at entry-data))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]
@@ -1169,6 +1173,27 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
+;; Get the board to show counting the last accessed and the last created
+
+(def default-board "welcome")
+
+(defn get-default-board [org-data]
+  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
+    (if (= last-board-slug "all-posts")
+      {:slug "all-posts"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (if board
+          ; Get the last accessed board from the saved cookie
+          board
+          (let [sorted-boards (vec (sort-by :name boards))]
+            (first sorted-boards)))))))
+
+(defn get-board-url [org-slug board-slug]
+  (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug))) :by-topic)
+    (oc-urls/board-sort-by-topic org-slug board-slug)
+    (oc-urls/board org-slug board-slug)))
+
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
@@ -1176,3 +1201,17 @@
         cleaned-html (.html $container)
         _ (.detach $container)]
     (emoji-images-to-unicode (gobj/get (emojify cleaned-html) "__html"))))
+
+(defn get-attachments-from-body [body]
+  (let [$body (.html (js/$ "<div/>") body)
+        attachments (js/$ "a.media-attachment" $body)
+        atch-map (atom [])]
+    (.each attachments (fn [idx item]
+      (let [$item (js/$ item)]
+        (reset! atch-map (vec (conj @atch-map {:name (.data $item "name")
+                                               :size (.data $item "size")
+                                               :mimetype (.data $item "mimetype")
+                                               :author (.data $item "author")
+                                               :createdat (.data $item "createdat")
+                                               :url (.attr $item "href")}))))))
+    @atch-map))

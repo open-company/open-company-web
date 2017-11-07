@@ -22,187 +22,205 @@ div.activity-modal-container {
     }
   }
 
+  &.editing {
+    div.modal-wrapper {
+      div.activity-modal {
+        div.activity-modal-header {
+          div.activity-modal-header-right {
+            div.activity-attachments {
+              opacity: 0;
+            }
+          }
+        }
+        div.activity-modal-columns {
+          div.activity-left-column {
+            div.activity-left-column-content {
+              div.activity-modal-content {
+                div.activity-modal-content-headline {
+                  border: none;
+                  outline: none;
+                  cursor: text;
+                  @include avenir_H();
+                  font-size: 20px;
+                  color: $carrot_dark_gray;
+
+                  &:empty:before {
+                    content: attr(placeholder);
+                    display: block;
+                    color: #8A8E94 !important;
+                    font-style: none;
+                  }
+                }
+              }
+              div.activity-modal-footer {
+                div.emoji-picker {
+                  float: left;
+                  margin-top: 4px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   div.modal-wrapper {
-    width: 946px;
+    width: 1029px;
     max-height: 100vh;
-    min-height: 330px;
+    min-height: 450px;
     position: relative;
     margin: 0px auto;
 
     div.activity-modal {
-      width: 918px;
+      width: 1001px;
       margin: 0px 0px 0px 28px;
       position: relative;
       overflow: visible;
       box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-      border-radius: 8px;
+      border-radius: 4px;
       background-color: white;
-      display: flex;
-      flex-direction: row;
 
-      div.activity-left-column {
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: 617px;
-        width: 617px;
-        max-height: 100vh;
-        min-height: 200px;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
+      div.activity-modal-header{
+        padding: 16px 24px 0px 24px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        background-color: $carrot_light_gray_2;
+        height: 72px;
 
-        div.activity-left-column-content {
+        div.activity-modal-header-left {
+          float: left;
+          width: 50%;
+          @include activity-author();
+        }
 
-          div.activity-modal-head{
-            padding: 24px 16px 0px 32px;
+        div.activity-modal-header-right {
+          float: right;
+          width: 50%;
 
-            div.activity-modal-head-left {
-              float: left;
-              max-width: 50%;
-              @include activity-author();
+          div.activity-tag {
+            float: right;
+            margin-top: 7px;
+            max-width: 100%;
+            margin-right: 8px;
+          }
+
+          div.entry-card-dd-container {
+            button.entry-card-dd-button:not(.has-topic) {
+              margin-top: 7px;
             }
-
-            div.activity-modal-head-right {
-              float: right;
-              max-width: 50%;
-              div.activity-tag {
-                float: right;
-                margin-top: 7px;
-                max-width: 100%;
-              }
-
-              @include activity-tag();
+            div.entry-edit-topics-dd {
+              margin-top: 7px;
             }
           }
 
-          div.activity-modal-content {
-            padding: 0px 16px 40px 32px;
-            float: none;
-            width: 100%;
-            position: relative;
-            overflow-y: auto;
-            max-height: calc(100vh - 65px - 74px);
-            min-height: 148px;
+          div.activity-attachments {
+            float: right;
+            margin-top: 7px;
 
-            div.activity-modal-content-title {
-              margin-top: 24px;
-              @include activity-title();
+            div.attachments-dropdown {
+              top: 36px;
+              left: calc(100% - 600px - 38px);
+
+              div.attachments-dropdown-list {
+                max-height: calc(100vh - 160px);
+              }
+            }
+          }
+
+          @include activity-tag();
+
+          div.more-dropdown {
+            float: right;
+            margin-left: 10px;
+            width: 24px;
+            height: 26px;
+            margin-top: 7px;
+
+            div.activity-move {
+              position: absolute;
+              top: 60px;
+              left: unset;
+              right: 14px;
             }
 
-            div.activity-modal-content-headline {
-              margin-top: 24px;
-              @include activity-headline();
+            button.activity-modal-more {
+              width: 24px;
+              height: 26px;
+              padding: 2px 10px;
+              display: block;
+              background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+              background-position: center;
+              background-size: 4px 20px;
+              background-repeat: no-repeat;
+              opacity: 0.8;
+
+              &:hover {
+                opacity: 1;
+              }
+
+              &.not-hover {
+                opacity: 0;
+              }
             }
 
-            div.activity-modal-content-body {
-              margin-top: 24px;
+            div.activity-modal-dropdown-menu {
+              position: absolute;
+              top: 60px;
+              left: calc(100% - 130px - 13px);
+              width: 130px;
+              min-width: 130px;
               border: none;
               outline: none;
-              color: $carrot_dark_gray;
-              @include avenir_R();
-              font-size: 16px;
-              min-height: 85px;
-              @include activity-body();
+              box-shadow: none;
+              background-color: transparent;
+              padding: 0 0 .3em;
+              overflow: visible;
+              margin: 0px;
+              z-index: 100;
 
-              @include activity-attachment();
-
-              &.medium-editor-placeholder:after {
-                color: $carrot_dark_gray !important;
+              div.triangle {
+                position: absolute;
+                top: -7px;
+                left: calc(100% - 30px);
+                background-color: white;
+                border-top: 1px solid rgba(177,184,192,0.50);
+                border-left: 1px solid rgba(177,184,192,0.50);
+                transform: rotate(45deg);
+                width: 15px;
+                height: 15px;
+                z-index: 1001;
               }
 
-              * {
-                color: $carrot_dark_gray;
-              }
-
-              &:after {
+              ul.activity-modal-more-menu {
+                background-color: white;
+                border: 1px solid rgba(177,184,192,0.50);
+                box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                border-radius: 5px;
                 margin: 0;
-              }
-            }
-          }
+                padding: 10px 13px 6px 8px;
+                min-height: 50px;
+                list-style-type: none;
+                width: 100%;
 
-          div.activity-modal-footer {
-            padding: 24px 20px 22px 32px;
-            height: 74px;
-
-            &.scrolling-content {
-              border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
-            }
-
-            div.activity-modal-footer-right {
-              float: right;
-
-              div.more-dropdown {
-                float: right;
-                margin-left: 10px;
-                width: 32px;
-                height: 32px;
-
-                div.activity-move {
-                  position: absolute;
-                  top: -104px;
-                  left: -301px;
-                }
-
-                button.activity-modal-more {
-                  width: 32px;
-                  height: 32px;
-                  padding: 8px;
-                  display: block;
-                  background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-                  background-position: center;
-                  background-size: 6px 16px;
-                  background-repeat: no-repeat;
-                  margin-left: 6px;
-                }
-
-                div.dropdown-menu {
-                  position: absolute;
-                  top: unset;
-                  bottom: -17px;
-                  left: -121px;
-                  width: 130px;
-                  min-width: 130px;
-                  border: none;
-                  outline: none;
-                  box-shadow: none;
+                li {
+                  padding: 3px 8px;
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $carrot_light_gray_3;
+                  cursor: pointer;
                   background-color: transparent;
-                  padding: 0 0 .3em;
-                  overflow: visible;
 
-                  div.triangle {
-                    position: absolute;
-                    bottom: 25px;
-                    right: -7px;
-                    background-color: white;
-                    border-top: 1px solid rgba(177,184,192,0.50);
-                    border-left: 1px solid rgba(177,184,192,0.50);
-                    transform: rotate(135deg);
-                    width: 15px;
-                    height: 15px;
+                  &.disabled {
+                    opacity: 0.4;
+
+                    &:hover {
+                      background-color: transparent;
+                    }
                   }
 
-                  ul.activity-modal-more-menu {
-                    background-color: white;
-                    border: 1px solid rgba(177,184,192,0.50);
-                    box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-                    border-radius: 5px;
-                    margin: 8px 0;
-                    padding: 10px 13px 6px 8px;
-                    min-height: 50px;
-                    list-style-type: none;
-                    width: 100%;
-
-                    li {
-                      padding: 3px 8px;
-                      @include avenir_M();
-                      font-size: 14px;
-                      color: $carrot_light_gray_3;
-                      cursor: pointer;
-                      background-color: transparent;
-
-                      &:hover {
-                        background-color: rgba($carrot_light_gray_4, 0.2);
-                      }
-                    }
+                  &:hover {
+                    background-color: rgba($carrot_light_gray_4, 0.2);
                   }
                 }
               }
@@ -211,24 +229,246 @@ div.activity-modal-container {
         }
       }
 
-      div.activity-right-column {
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: 301px;
-        width: 301px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        background-color: $carrot_light_gray_2;
-        position: relative;
+      div.activity-modal-columns {
+        display: flex;
+        flex-direction: row;
 
-        div.activity-right-column-content {
-          padding: 24px 32px 24px 16px;
-          overflow-x: hidden;
-          overflow-y: auto;
-          position: absolute;
-          bottom: 0px;
-          width: 100%;
-          height: 100%;
+        div.activity-left-column {
+          flex-grow: 0;
+          flex-shrink: 0;
+          flex-basis: 700px;
+          width: 700px;
+          max-height: calc(100vh - 72px);
+          min-height: 378px;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+
+          div.activity-left-column-content {
+
+            div.activity-modal-content {
+              padding: 0 50px;
+              float: none;
+              width: 100%;
+              position: relative;
+              overflow-y: auto;
+              max-height: calc(100vh - 72px - 96px); // Total window height less the header and the footer
+              min-height: 304px;
+
+              div.activity-modal-content-title {
+                margin-top: 32px;
+                @include activity-title();
+              }
+
+              div.activity-modal-content-headline {
+                margin-top: 32px;
+                cursor: text;
+                @include activity-headline();
+              }
+
+              div.rich-body-editor-container {
+                position: relative;
+                overflow: visible;
+
+                div.medium-editor-media-picker {
+                  margin-top: 0px;
+                  margin-left: -26px;
+                  top: 0px;
+                }
+
+                div.rich-body-editor {
+                  border: none;
+                  outline: none;
+                  color: $carrot_dark_gray;
+                  @include avenir_R();
+                  font-size: 16px;
+                  margin: 32px 0;
+                  cursor: text;
+                  min-height: 85px;
+                  @include activity-body();
+
+                  @include activity-attachment(true);
+
+                  &.medium-editor-placeholder:after {
+                    color: #8A8E94 !important;
+                  }
+
+                  * {
+                    color: $carrot_dark_gray;
+                  }
+
+                  &:after {
+                    margin: 0;
+                  }
+                }
+              }
+
+              div.activity-modal-content-body {
+                margin: 32px 0px;
+                border: none;
+                outline: none;
+                color: $carrot_dark_gray;
+                cursor: text;
+                @include avenir_R();
+                font-size: 16px;
+                min-height: 85px;
+                @include activity-body();
+
+                @include activity-attachment();
+
+                &.medium-editor-placeholder:after {
+                  color: $carrot_dark_gray !important;
+                }
+
+                * {
+                  color: $carrot_dark_gray;
+                }
+
+                &:after {
+                  margin: 0;
+                }
+              }
+            }
+
+            div.activity-modal-footer {
+              padding: 24px 20px 22px 32px;
+              height: 96px;
+
+              &.scrolling-content {
+                border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
+              }
+
+              div.activity-modal-footer-right {
+                float: right;
+
+                button.cancel-edit {
+                  margin-right: 16px;
+                }
+
+                button.post-edit {
+                  float: right;
+                  margin-right: -6px;
+                  width: 84px;
+                  height: 32px;
+                  border-radius: 100px;
+                  background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
+                  background-size: 18px 18px;
+                  background-repeat: no-repeat;
+                  background-position: 15px 7px;
+                  padding: 9px 20px 11px 40px;
+                  @include avenir_H();
+                  font-size: 12px;
+                  color: $carrot_light_gray_3;
+                  background-color: #F5F4F1;
+                  opacity: 0.7;
+
+                  &:hover {
+                    opacity: 1;
+                  }
+                }
+
+                div.activity-modal-share {
+                  float: right;
+                  position: relative;
+                  margin-right: 8px;
+
+                  button.share-button {
+                    width: 84px;
+                    height: 32px;
+                    border-radius: 100px;
+                    // background-image: cdnUrl("/img/ML/share_icon.svg");
+                    background-image: cdnUrl("/img/ML/foc_share_icon.svg");
+                    background-size: 20px 20px;
+                    background-repeat: no-repeat;
+                    background-position: 14px 6px;
+                    padding: 9px 20px 11px 40px;
+                    @include avenir_H();
+                    font-size: 12px;
+                    color: $carrot_light_gray_3;
+                    background-color: #F5F4F1;
+                    opacity: 0.7;
+
+                    &:hover {
+                      opacity: 1;
+                    }
+                  }
+
+                  div.share-dropdown {
+                    position: absolute;
+                    bottom: 42px;
+                    left: calc(50% - 50px);
+                    width: 100px;
+                    min-width: 100px;
+                    border: none;
+                    outline: none;
+                    box-shadow: none;
+                    background-color: transparent;
+                    padding: 0 0 .3em;
+                    overflow: visible;
+                    margin: 0px;
+                    z-index: 100;
+
+                    div.triangle {
+                      position: absolute;
+                      bottom: -2px;
+                      right: calc(50% - 7px);
+                      background-color: white;
+                      border-top: 1px solid rgba(177,184,192,0.50);
+                      border-left: 1px solid rgba(177,184,192,0.50);
+                      transform: rotate(225deg);
+                      width: 15px;
+                      height: 15px;
+                      z-index: 1001;
+                    }
+
+                    ul.share-dropdown-menu {
+                      background-color: white;
+                      border: 1px solid rgba(177,184,192,0.50);
+                      box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+                      border-radius: 5px;
+                      margin: 0;
+                      padding: 10px 13px 6px 8px;
+                      min-height: 50px;
+                      list-style-type: none;
+                      width: 100%;
+
+                      li.share-dropdown-item {
+                        padding: 3px 8px;
+                        @include avenir_M();
+                        font-size: 14px;
+                        color: $carrot_light_gray_3;
+                        cursor: pointer;
+                        background-color: transparent;
+
+                        &:hover {
+                          background-color: rgba($carrot_light_gray_4, 0.2);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        div.activity-right-column {
+          flex-grow: 0;
+          flex-shrink: 0;
+          flex-basis: 301px;
+          width: 301px;
+          background-color: rgba($carrot_light_gray_2, 0.15);
+          position: relative;
+          border-left: 1px solid rgba(#E4E3DE, 0.5);
+
+          div.activity-right-column-content {
+            padding: 24px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: absolute;
+            bottom: 0px;
+            width: 100%;
+            height: 100%;
+          }
         }
       }
     }

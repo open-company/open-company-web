@@ -5,15 +5,15 @@ div.activity-move {
 
   div.triangle {
     position: absolute;
-    top: 110px;
-    left: 300px;
+    top: -7px;
+    left: calc(100% - 30px);
     background-color: white;
     border-top: 1px solid rgba(177,184,192,0.50);
     border-left: 1px solid rgba(177,184,192,0.50);
-    transform: rotate(135deg);
-    width: 20px;
-    height: 20px;
-    z-index: 1001;
+    transform: rotate(45deg);
+    width: 15px;
+    height: 15px;
+    z-index: 1001
   }
 
   div.move-post-inner {

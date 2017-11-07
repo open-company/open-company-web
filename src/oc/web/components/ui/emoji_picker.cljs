@@ -39,27 +39,8 @@
     (.restoreSelection js/rangy @caret-pos)
     (let [unicode-str (googobj/get emoji "unicode")
           unicodes  (clojure.string/split unicode-str #"-")
-          unicode-c (clojure.string/join (map utils/unicode-char unicodes))
-          shortname (subs (googobj/get emoji "shortname") 1 (dec (count (googobj/get emoji "shortname"))))
-          ; new-html  (str
-          ;            "<img class=\"emojione\" alt=\""
-          ;            unicode-c
-          ;            "\" src=\"//cdn.jsdelivr.net/emojione/assets/png/"
-          ;            unicode-str
-          ;            ".png?"
-          ;            (googobj/get js/emojione "cacheBustParam")
-          ;            "\"/>")
-          new-html  (str
-                     "<img class=\"emojione emojione-"
-                     unicode-str
-                     "\" data-unicode=\""
-                     unicode-c
-                     "\" title=\":"
-                     shortname
-                     ":\" alt=\""
-                     unicode-c
-                     "\" />")]
-        (js/pasteHtmlAtCaret new-html (.getSelection js/rangy js/window) false))))
+          unicode-c (apply str (map utils/unicode-char unicodes))]
+        (js/pasteHtmlAtCaret unicode-c (.getSelection js/rangy js/window) false))))
 
 (defn check-focus [s _]
   (let [active-element (googobj/get js/document "activeElement")]
@@ -150,5 +131,5 @@
                                                            (remove-markers s)
                                                            (reset! visible false)
                                                            (.focus @last-active-element)
-                                                           (when add-emoji-cb
+                                                           (when (fn? add-emoji-cb)
                                                               (add-emoji-cb @last-active-element emoji)))}))]]))

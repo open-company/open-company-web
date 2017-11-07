@@ -13,53 +13,6 @@ div.org-avatar {
     }
   }
 
-  div.org-avatar-container {
-
-    div.org-avatar-border {
-      height: 42px;
-      text-align: center;
-      white-space: nowrap;
-
-      img.org-avatar-img{
-        max-width: 126px;
-        max-height: 42px;
-        vertical-align: middle;
-      }
-
-      .helper {
-        display: inline-block;
-        height: 100%;
-        vertical-align: middle;
-      }
-    }
-
-    span.org-name {
-      font-weight: 700;
-      font-size: 22px;
-      line-height: 1.2;
-      color: $oc_gray_5;
-      margin-top: -34px;
-      margin-left: 54px;
-      float: left;
-      white-space: pre;
-
-      @include mobile(){
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-
-      &.no-logo {
-        @include mobile(){
-          margin-left: 9px;
-          margin-top: 13px;
-        }
-
-        @include big_web(){
-          margin-top: 15px;
-          margin-left: 1px;
-        }
-
-      }
-    }
-  }
+  @include org-avatar();
+  
 }

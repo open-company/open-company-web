@@ -8,25 +8,60 @@ div.entries-layout {
     }
 
     div.by-topic-header {
-      div.by-topic-header-title{
+      a.by-topic-header-title{
+        display: block;
+        height: 32px;
+        border-radius: 100px;
         @include avenir_H();
-        font-size: 24px;
-        color: $oc_gray_7;
+        font-size: 12px;
+        color: $carrot_light_gray_3;
+        background-color: $carrot_light_gray_7;
+        padding: 8px 16px;
         margin-left: 16px;
+        margin-right: 16px;
         float: left;
+        cursor: pointer;
+
+        &:hover {
+          color: $carrot_purple;
+          background-color: $carrot_light_purple;
+        }
 
         span.oblique {
           @include avenir_HO();
         }
       }
 
-      button.view-all-updates {
-        font-size: 13px;
-        color: $oc_gray_7;
-        @include avenir_B();
+      button.add-entry-to-topic {
+        float: left;
+        width: 20px;
+        height: 20px;
+        margin-top: 6px;
+        background-image: cdnUrl("/img/ML/add_topic_bt.svg");
+        background-size: 8px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: $carrot_light_gray_7;
+        border-radius: 10px;
+
+        &:hover {
+          background-color: $carrot_green_2;
+          background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
+        }
+      }
+
+      a.view-all-updates {
+        display: block;
+        font-size: 15px;
+        color: $carrot_light_gray_3;
+        @include avenir_M();
         float: right;
         margin-top: 10px;
         margin-right: 12px;
+
+        span.topic-name.no-topic {
+          @include avenir_MO();
+        }
 
         &:hover {
           text-decoration: underline;

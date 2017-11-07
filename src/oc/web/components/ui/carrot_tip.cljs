@@ -69,7 +69,7 @@
                      (small-oval (.-innerWidth js/window) (.-innerHeight js/window) (- x 170) (+ y 60)))}]]]]]]
     [:div.carrot-tip
       {:style {:left (str (+ x (if big-circle 50 -50)) "px")
-               :top (str (+ y (if big-circle 0 -50)) "px")}}
+               :top (str (+ y (if big-circle 50 0)) "px")}}
       [:div.triangle]
       [:div.carrot-tip-inner
         [:div.carrot-tip-title

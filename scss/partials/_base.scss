@@ -235,6 +235,11 @@ div.not-found, div.server-error{
       @include avenir_B();
     }
 
+    a.login {
+      text-decoration: underline;
+      color: $carrot_orange;
+    }
+
     @media screen and (max-width: 768px) {
       padding: 50px 16px;
       img {
