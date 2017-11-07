@@ -13,7 +13,7 @@
      :on-click #(when draft
                   ; TODO: Fix draft editing
                   ; (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug draft) (:uuid draft)))
-                  )}
+                  (dis/dispatch! [:entry-edit draft]))}
     (when draft
       [:div.draft-card-inner
         (when (:banner-url draft)
