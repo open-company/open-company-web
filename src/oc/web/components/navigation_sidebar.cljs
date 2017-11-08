@@ -194,7 +194,7 @@
                                               :team-board (= (:access drafts-board) "team")})}
                     [:div.internal
                       {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
-                       :dangerouslySetInnerHTML (utils/emojify (or (:name drafts-board) (:slug drafts-board)))}]]]))])]
+                       :dangerouslySetInnerHTML (utils/emojify (str (or (:name drafts-board) (:slug drafts-board)) " (" (:count drafts-link) ")"))}]]]))])]
       [:div.left-navigation-sidebar-footer
         {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people
