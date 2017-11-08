@@ -104,6 +104,7 @@
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
+   :show-onboard-overlay [[:base] (fn [base] (:show-onboard-overlay base))]
    :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
    :whats-new-modal     [[:base] (fn [base] (:whats-new-modal base))]
    :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
