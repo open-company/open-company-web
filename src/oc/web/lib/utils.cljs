@@ -305,6 +305,7 @@
   [entry-body board-data topics-data]
   (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
     (-> entry-body
+      (assoc :content-type "entry")
       (assoc :read-only (readonly-entry? (:links entry-body)))
       (assoc :board-slug (:slug board-data))
       (assoc :board-name (:name board-data))
