@@ -18,7 +18,7 @@
             [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entries-layout :refer (entries-layout)]
-            ; [oc.web.components.drafts-layout :refer (drafts-layout)]
+            [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.events :as events]
@@ -267,12 +267,11 @@
               (empty-board)
               ; for each column key contained in best layout
               :else
-              (cond ; REMOVE if we don't end up with entry drafts
+              (cond
                 ;; Drafts
-
-                ; (and (= (:type board-data) "story")
-                ;      (= (:slug board-data) "drafts"))
-                ; (drafts-layout board-data)
+                (and (= (:type board-data) "story")
+                     (= (:slug board-data) "drafts"))
+                (drafts-layout board-data)
                 ;; Entries
                 :else
                 (entries-layout board-data board-filters)))))))))
