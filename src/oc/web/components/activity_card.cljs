@@ -259,9 +259,8 @@
                               (:topic-slug activity-data)))}
                 topic-name]))
           (when is-all-posts
-            [:div.activity-tag
-              {:class (utils/class-set {:board-tag true
-                                        :double-tag (:topic-slug activity-data)})
+            [:div.activity-tag.on-gray
+              {:class (utils/class-set {:double-tag (:topic-slug activity-data)})
                :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
               (:board-name activity-data)])
                 ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes

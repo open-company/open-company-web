@@ -71,24 +71,6 @@ $h2_top_margin: 20;
       color: $carrot_purple;
       cursor: pointer;
     }
-
-    &.board-tag {
-
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/boards_icon_blue.png");
-      }
-
-      &:before {
-        display: inline-block;
-        margin-right: 4px;
-        content: "";
-        background-image: cdnUrl("/img/ML/boards_icon_gray.png");
-        background-size: 12px 10px;
-        background-repeat: no-repeat;
-        width: 12px;
-        height: 10px;
-      }
-    }
   }
 }
 
