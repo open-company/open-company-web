@@ -26,10 +26,10 @@
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (rum/defcs reactions
-  [s entry-data]
-  (when (seq (:reactions entry-data))
-    (let [reactions-data (:reactions entry-data)
-          reactions-loading (:reactions-loading entry-data)]
+  [s item-data]
+  (when (seq (:reactions item-data))
+    (let [reactions-data (:reactions item-data)
+          reactions-loading (:reactions-loading item-data)]
       [:div.reactions
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
@@ -42,7 +42,7 @@
                                               :reacted (not (:reacted reaction-data))})
                         reaction-data)]]
           [:button.reaction-btn.btn-reset
-            {:key (str "-entry-" (:uuid entry-data) "-" idx)
+            {:key (str "-entry-" (:uuid item-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
                                       :can-react (not read-only-reaction)
                                       :has-reactions (pos? (:count r))})
@@ -53,7 +53,7 @@
                                       (not (js/isEdge))
                                       (not (js/isIE)))
                              (animate-reaction e s))
-                           (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}
+                           (dis/dispatch! [:reaction-toggle item-data r])))}
             [:span.reaction (:reaction r)]
             [:div.count
               (str "+" (:count r))]])])))
