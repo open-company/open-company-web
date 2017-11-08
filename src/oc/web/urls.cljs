@@ -139,13 +139,13 @@
   ([org-slug board-slug topic-slug]
     (str (board org-slug board-slug) "/topic/" (name topic-slug))))
 
-; ;; Drafts
+;; Drafts
 
-; (defn drafts
-;   ([]
-;     (drafts (router/current-org-slug)))
-;   ([org-slug]
-;     (str (org org-slug) "/drafts")))
+(defn drafts
+  ([]
+    (drafts (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/drafts")))
 
 ;; Entries
 

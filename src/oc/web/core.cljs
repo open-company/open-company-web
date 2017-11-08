@@ -406,6 +406,14 @@
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
       (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
 
+    (defroute drafts-route (str (urls/drafts ":org") "/") {:as params}
+      (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
+      (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
+
+    (defroute drafts-route (urls/drafts ":org") {:as params}
+      (timbre/info "Routing board-route" (urls/drafts ":org"))
+      (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
+
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
@@ -517,6 +525,9 @@
                                  ; org-settings-team-slash-route
                                  ; org-settings-invite-route
                                  ; org-settings-invite-slash-route
+                                 ; Drafts board
+                                 drafts-route
+                                 drafts-slash-route
                                  ; Secure activity route
                                  secure-activity-route
                                  secure-activity-slash-route
