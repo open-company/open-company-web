@@ -129,8 +129,6 @@
            (not (utils/in? (:route @router/path) "org-settings-team"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "email-verification"))
-           ;; Drafts
-           ; (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
@@ -238,11 +236,7 @@
     (when is-currently-shown
 
       (when (and (router/current-activity-id)
-                 (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-                 ;; Drafts
-                 ; (or (not (utils/in? (:route @router/path) "story-edit"))
-                 ;     (= (:slug board-data) "drafts"))
-                 )
+                 (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id))))
         (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
 
       (when (and (string? (:board-filters db))
@@ -269,19 +263,9 @@
                                      (:entry-editing db))
                               old-board-data
                               fixed-board-data)
-          ;; Drafts
-          ; story-editing (when (and (utils/in? (:route @router/path) "story-edit")
-          ;                          is-currently-shown
-          ;                          (router/current-activity-id)
-          ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-          ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
           next-db (assoc-in db-loading
                    (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data)))
                    with-current-edit)
-          ;; Drafts
-          ; with-story-editing (if story-editing
-          ;                       (assoc next-db :story-editing story-editing)
-          ;                       next-db)
           without-loading (if is-currently-shown
                             (dissoc next-db :loading)
                             next-db)]
@@ -1189,10 +1173,6 @@
 
 (defmethod dispatcher/action :activity-delete/finish
   [db [_]]
-  ;; Drafts
-  ; (if (utils/in? (:route @router/path) "story-edit")
-  ;   (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
-  ;   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
   db)
 
