@@ -1134,7 +1134,9 @@
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)]
-    (api/create-entry entry-data)
+    (if (:links entry-data)
+      (api/update-entry entry-data (if (= (:status entry-data) "published") (router/current-board-slug) "drafts"))
+      (api/create-entry entry-data))
     (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
@@ -1158,6 +1160,32 @@
   (-> db
     (update-in [edit-key] dissoc :loading)
     (update-in [edit-key] assoc :error true)))
+
+(defmethod dispatcher/action :entry-publish
+  [db [_]]
+  (let [entry-data (:entry-editing db)]
+    (api/publish-entry entry-data)
+    (assoc-in db [:entry-editing :publishing] true)))
+
+(defmethod dispatcher/action :entry-publish/finish
+  [db [_ {:keys [activity-data edit-key]}]]
+  (let [board-slug (:board-slug activity-data)]
+    (utils/after 10
+     #(router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
+    ; Add the new activity into the board
+    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+          board-data (get-in db board-key)
+          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
+      (-> db
+        (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
+        (update-in [edit-key] dissoc :loading)))))
+
+(defmethod dispatcher/action :entry-publish/failed
+  [db [_]]
+  (-> db
+    (update-in [:entry-editing] dissoc :loading)
+    (update-in [:entry-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]

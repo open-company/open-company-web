@@ -241,6 +241,9 @@ provided in the table below:
 |  :entry-modal-save | UI | Save editing from modal. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
 |  :entry-point-get | UI | Load the storage entry point passing some flags to add to the app-state. |
+|  :entry-publish | UI | Publish the edited entry. |
+|  :entry-publish/failed | API | Publish entry reuqest finish but failed. |
+|  :entry-publish/finish | API | Publish entry reuqest finish, refresh the board data. |
 |  :entry-save | UI | Save the edited entry. |
 |  :entry-save/failed | API | Save entry reuqest finish but failed. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
