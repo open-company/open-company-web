@@ -243,8 +243,7 @@
                           (clean-body)
                           (reset! (::publishing s) true)
                           (dis/dispatch! [:entry-publish]))
-             :disabled (or @(::publishing s)
-                           (not (:has-changes entry-editing)))}
+             :disabled @(::publishing s)}
             (when @(::publishing s)
               (small-loading))
             "Publish"]
