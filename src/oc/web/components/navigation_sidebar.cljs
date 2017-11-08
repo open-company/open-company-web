@@ -126,9 +126,8 @@
             {:class (when is-all-posts "item-selected")
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
-            [:div.all-posts-icon]
             [:div.all-posts-label
-                "All Posts"]])
+              "All Posts"]])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
