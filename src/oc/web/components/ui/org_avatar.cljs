@@ -14,7 +14,8 @@
         [:img.org-avatar-img
           {:src (:logo-url org-data)
            :style #js {:height (str (:logo-height org-data) "px")
-                       :marginTop (when (< (:logo-height org-data) fixed-max-logo-height) (str (/ (- fixed-max-logo-height (:logo-height org-data)) 2) "px"))}
+                       :marginTop (when (< (:logo-height org-data) fixed-max-logo-height)
+                                   (str (/ (- fixed-max-logo-height (:logo-height org-data)) 2) "px"))}
            :on-error #(reset! (::img-load-failed s) true)}])
       (when show-org-name?
         [:span.org-name
@@ -29,7 +30,7 @@
       {:class (when (empty? org-logo) "missing-logo")}
       (when org-data
         (let [org-slug (:slug org-data)
-              has-name (not (empty? (:name org-data)))
+              has-name (seq (:name org-data))
               org-name (if has-name
                           (:name org-data)
                           (utils/camel-case-str org-slug))

@@ -47,7 +47,9 @@
             :else
             [:span "View " [:span.filter-highlight "Recent"] " "])
           [:i.fa.fa-caret-down]])
-      (let [sorted-topics (sort #(compare-topic-names (:topics board-data) %1 %2) (remove #(empty? %) (keys topic-groups)))
+      (let [sorted-topics (sort
+                           #(compare-topic-names (:topics board-data) %1 %2)
+                           (remove empty? (keys topic-groups)))
             selected-topics (filter #(utils/in? sorted-topics (:slug %)) (med/distinct-by :slug (:topics board-data)))
             topics (vec (map #(clojure.set/rename-keys % {:name :label :slug :value}) selected-topics))
             default-options [{:label "Recent" :value :latest} {:label "By topic" :value :by-topic}]
@@ -63,11 +65,22 @@
                           (cond
                             (= (:value t) :latest)
                             (do
-                              (cook/set-cookie! (router/last-board-filter-cookie org-slug board-slug) (name :latest) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (cook/set-cookie!
+                               (router/last-board-filter-cookie org-slug board-slug)
+                               (name :latest)
+                               (* 60 60 24 30)
+                               "/"
+                               ls/jwt-cookie-domain ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board)))
                             (= (:value t) :by-topic)
                             (do
-                              (cook/set-cookie! (router/last-board-filter-cookie org-slug board-slug) (name :by-topic) (* 60 60 24 30) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                              (cook/set-cookie!
+                               (router/last-board-filter-cookie org-slug board-slug)
+                               (name :by-topic)
+                               (* 60 60 24 30)
+                               "/"
+                               ls/jwt-cookie-domain
+                               ls/jwt-cookie-secure)
                               (router/nav! (oc-urls/board-sort-by-topic)))
                             :else
                             (router/nav! (oc-urls/board-filter-by-topic (or (:value t) "uncategorized")))))

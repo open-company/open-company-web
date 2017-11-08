@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.site-header
-  "Component for the site header. This is copied into oc.core/nav and every change here should be reflected there and vice versa."
+  "Component for the site header. This is copied into oc.core/nav
+   and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.urls :as oc-urls]
@@ -46,10 +47,14 @@
         [:ul.nav.navbar-nav.navbar-right.navbar-top
           [:li.mobile-only
             {:class (if (utils/in? (:route @router/path) "home") "active" "")}
-            [:a.navbar-item {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))} "Home"]]
+            [:a.navbar-item
+              {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
+              "Home"]]
           ; [:li
           ;   {:class (if (utils/in? (:route @router/path) "pricing") "active" "")}
-          ;   [:a.navbar-item {:href oc-urls/pricing :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
+          ;   [:a.navbar-item
+          ;     {:href oc-urls/pricing
+          ;      :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
           ; [:li
           ;   {:class (if (utils/in? (:route @router/path) "features") "active" "")}
           ;   [:a.navbar-item
@@ -67,7 +72,10 @@
           (when-not (jwt/jwt)
             [:li
               [:a.navbar-item {:href oc-urls/login
-                               :on-click #(do (utils/event-stop %) (dis/dispatch! [:login-overlay-show :login-with-slack]))} "Login"]])
+                               :on-click
+                                #(do
+                                  (utils/event-stop %)
+                                  (dis/dispatch! [:login-overlay-show :login-with-slack]))} "Login"]])
           [:li.get-started-item
             [:div.get-started-button.navbar-item
               (if (jwt/jwt)

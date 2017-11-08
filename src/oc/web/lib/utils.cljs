@@ -69,7 +69,7 @@
   (some #(= elm %) coll))
 
 (defn vec-dissoc [coll elem]
-  (vec (filter #(not= elem %) coll)))
+  (filterv #(not= elem %) coll))
 
 (defn full-month-string
   [month]
@@ -162,7 +162,10 @@
 
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
-  (let [month (month-string (add-zero (inc (.getMonth js-date))) (when (or (in? flags :short-month) (in? flags :short)) [:short]))
+  (let [month (month-string
+               (add-zero (inc (.getMonth js-date)))
+               (when (or (in? flags :short-month) (in? flags :short))
+                [:short]))
         day (.getDate js-date)]
     (str month " " day (when (in? flags :year) (str ", " (.getFullYear js-date))))))
 
@@ -224,7 +227,7 @@
 
 (defn current-finance-period []
   (let [date (js/Date.)
-        fixed-date (js/Date. (.setMonth date (- (.getMonth date) 1)))
+        fixed-date (js/Date. (.setMonth date (dec (.getMonth date))))
         month (inc (.getMonth fixed-date))
         month-str (str (when (< month 10) "0") month)
         cur-period (str (.getFullYear fixed-date) "-" month-str)]
@@ -313,7 +316,9 @@
   (let [links (:links board-data)
         read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
-        fixed-entries (zipmap (map :uuid (:entries board-data)) (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
+        fixed-entries (zipmap
+                       (map :uuid (:entries board-data))
+                       (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
         with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
     with-fixed-entries))
@@ -324,7 +329,9 @@
 (defn fix-all-posts
   "Fix org data coming from the API."
   [all-posts-data]
-  (let [fixed-activities-list (map #(fix-activity % {:slug (:board-slug %) :name (:board-name %)}) (:items all-posts-data))
+  (let [fixed-activities-list (map
+                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
+                               (:items all-posts-data))
         without-items (dissoc all-posts-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
@@ -528,7 +535,12 @@
       (let [day-of-week (cljs-time/day-of-week now)
             to-monday (dec day-of-week)
             monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str (cljs-time/year monday-date) "-" (add-zero (cljs-time/month monday-date)) "-" (add-zero (cljs-time/day monday-date))))
+        (str
+         (cljs-time/year monday-date)
+         "-"
+         (add-zero (cljs-time/month monday-date))
+         "-"
+         (add-zero (cljs-time/day monday-date))))
       ;; Default tp monthly
       (str year "-" (add-zero month)))))
 
@@ -711,7 +723,7 @@
   []
   (.substring
     (.toString
-      (.floor js/Math (* (+ 1 (.random js/Math)) 0x10000)) 16) 1))
+      (.floor js/Math (* (inc (.random js/Math)) 0x10000)) 16) 1))
 
 (defn guid
   "Generate v4 GUID based on this http://stackoverflow.com/a/2117523"
@@ -776,7 +788,7 @@
             (hidePlaceholder editor-el)))))))
 
 (defn filter-placeholder-topics [topics company-data]
-  (vec (filter #(let [sd (->> % keyword (get company-data))] (and sd (not (:placeholder sd)))) topics)))
+  (filterv #(let [sd (->> % keyword (get company-data))] (and sd (not (:placeholder sd)))) topics))
 
 (defn su-date-from-created-at [created-at]
   (let [from-js-date (cljs-time/date-time (js-date created-at))]
@@ -805,8 +817,8 @@
   [body-el]
   (when-not (is-test-env?)
     (while (and (pos? (.-length (.find (js/$ body-el) ">p:last-child")))
-                (= (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))) 0)
-                (= (.-length (.find (js/$ body-el) ">p:last-child img")) 0))
+                (zero? (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))))
+                (zero? (.-length (.find (js/$ body-el) ">p:last-child img"))))
       (.remove (js/$ ">p:last-child" (js/$ body-el))))))
 
 (defn data-topic-has-data [topic topic-data]
@@ -910,14 +922,14 @@
         first-name (:first-name user)
         last-name (:last-name user)]
     (cond
-      (and (not (empty? first-name))
-           (not (empty? last-name)))
+      (and (seq first-name)
+           (seq last-name))
       (str first-name " " last-name)
-      (not (empty? first-name))
+      (seq first-name)
       first-name
-      (not (empty? last-name))
+      (seq last-name)
       last-name
-      (not (empty? user-name))
+      (seq user-name)
       user-name
       :else
       (:email user))))
@@ -927,8 +939,8 @@
    original-url
    team-id
    (str
-    (when-not (empty? team-id) (str team-id ":"))
-    (when-not (empty? user-id) (str user-id ":"))
+    (when (seq team-id) (str team-id ":"))
+    (when (seq user-id) (str user-id ":"))
     redirect)))
 
 (defn icon-for-mimetype
@@ -969,7 +981,8 @@
     ;; Generic case
     "fa-file"))
 
-(def generic-network-error "There may be a problem with your network, or with our servers. Please try again later.")
+(def generic-network-error
+ "There may be a problem with your network, or with our servers. Please try again later.")
 
 (defn clean-google-chart-url [gchart-url]
   (if (string? gchart-url)
@@ -1017,7 +1030,8 @@
 (defn rgb-with-opacity [rgb opacity]
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
 
-(defn get-24h-time 
+(defn get-24h-time
+
   [js-date]
   (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
 
@@ -1027,19 +1041,26 @@
         minutes (add-zero (.getMinutes js-date))
         ampm (if (>= hours 12) " p.m." " a.m.")
         hours (mod hours 12)
-        hours (if (= hours 0) 12 hours)]
+        hours (if (zero? hours) 12 hours)]
     (str hours ":" minutes ampm)))
 
 (defn format-time-string [js-date]
   (let [r (js/RegExp "am|pm" "i")
-        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (.toString js-date) r))]
+        h12 (or (.match (.toLocaleTimeString js-date) r) (.match (str js-date) r))]
     (if h12
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
 (defn activity-date-string [js-date hide-time]
   (let [time-string (format-time-string js-date)]
-    (str (full-month-string (inc (.getMonth js-date))) " " (.getDate js-date) ", " (.getFullYear js-date) (when-not hide-time (str " at " time-string)))))
+    (str
+     (full-month-string (inc (.getMonth js-date)))
+     " "
+     (.getDate js-date)
+     ", "
+     (.getFullYear js-date)
+     (when-not hide-time
+      (str " at " time-string)))))
 
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"
@@ -1140,7 +1161,7 @@
 (defn get-default-org [orgs]
   (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
     (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
-      (if last-org
+      (or
         ; Get the last accessed board from the saved cookie
         last-org
         ; Fallback to the newest board if the saved board was not found
@@ -1157,7 +1178,7 @@
       {:slug "all-posts"}
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (if board
+        (or
           ; Get the last accessed board from the saved cookie
           board
           (let [sorted-boards (vec (sort-by :name boards))]

@@ -9,7 +9,8 @@
 
 (rum/defcs pricing < rum/reactive [s]
   [:div
-    [:div.pricing-wrap {:id "wrap"} ; <!-- used to push footer to the bottom --> 
+    [:div.pricing-wrap {:id "wrap"} ; <!-- used to push footer to the bottom -->
+
 
       (site-header)
       (login-overlays-handler)

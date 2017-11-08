@@ -122,7 +122,15 @@
     (when (or (not @ch-state)
               (not (:open? @@ch-state))
               (not= @current-board-path ws-board-path))
-      (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state "current board:" @current-board-path)
+      (timbre/debug
+       "Reconnect for"
+       (:href ws-link)
+       "and"
+       uid
+       "current state:"
+       @ch-state
+       "current board:"
+       @current-board-path)
       ; if the path is different it means
       (when (and @ch-state
                  (:open? @@ch-state))

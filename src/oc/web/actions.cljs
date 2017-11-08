@@ -134,7 +134,7 @@
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
-      
+
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
@@ -147,7 +147,7 @@
                    (utils/get-board-url (:slug org-data) (:slug board-to))
                    (oc-urls/all-posts (:slug org-data))))))))))
 
-  ;; Change service connection 
+  ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
       (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))))
@@ -236,7 +236,7 @@
                      (dissoc db :loading)
                      db)]
     (when is-currently-shown
-      
+
       (when (and (router/current-activity-id)
                  (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                  ;; Drafts
@@ -244,18 +244,18 @@
                  ;     (= (:slug board-data) "drafts"))
                  )
         (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
-      
+
       (when (and (string? (:board-filters db))
                  (not= (:board-filters db) "uncategorized")
                  (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
         (router/redirect-404!))
-      
+
       ;; Follow the interactions link to connect to the Interaction service WebSocket to watch for comment/reaction
       ;; changes, this will also disconnect prior connection if we were watching another board already
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links board-data) "interactions")]
           (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-      
+
       ;; Tell the container service that we are seeing this board,
       ;; and update change-data to reflect that we are seeing this board
       (when-let [board-uuid (:uuid fixed-board-data)]
@@ -263,7 +263,7 @@
 
       ;; Load the other boards
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
-    
+
     (let [old-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))))
           with-current-edit (if (and is-currently-shown
                                      (:entry-editing db))
@@ -275,7 +275,9 @@
           ;                          (router/current-activity-id)
           ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
           ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
-          next-db (assoc-in db-loading (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data))) with-current-edit)
+          next-db (assoc-in db-loading
+                   (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data)))
+                   with-current-edit)
           ;; Drafts
           ; with-story-editing (if story-editing
           ;                       (assoc next-db :story-editing story-editing)
@@ -314,9 +316,13 @@
 
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
   (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        board-key (if is-all-posts (dispatcher/all-posts-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
+        board-key (if is-all-posts
+                   (dispatcher/all-posts-key (router/current-org-slug))
+                   (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get db board-key)
-        new-entries (assoc (get board-data :fixed-items) entry-uuid (utils/fix-entry body board-data (:topics board-data)))
+        new-entries (assoc (get board-data :fixed-items)
+                     entry-uuid
+                     (utils/fix-entry body board-data (:topics board-data)))
         new-board-data (assoc board-data :fixed-items new-entries)]
   (assoc db board-key new-board-data)))
 
@@ -368,7 +374,10 @@
   [db [_]]
   (let [current (router/get-token)
         auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})
-        auth-url-with-redirect (utils/slack-link-with-state (:href auth-url) nil "open-company-auth" oc-urls/slack-lander-check)]
+        auth-url-with-redirect (utils/slack-link-with-state
+                                (:href auth-url)
+                                nil
+                                "open-company-auth" oc-urls/slack-lander-check)]
     (when (and (not (.startsWith current oc-urls/login))
                (not (.startsWith current oc-urls/sign-up))
                (not (cook/get-cookie :login-redirect)))
@@ -431,7 +440,11 @@
 
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
-  (api/signup-with-email (or (:firstname (:signup-with-email db)) "") (or (:lastname (:signup-with-email db)) "") (:email (:signup-with-email db)) (:pswd (:signup-with-email db)))
+  (api/signup-with-email
+   (or (:firstname (:signup-with-email db)) "")
+   (or (:lastname (:signup-with-email db)) "")
+   (:email (:signup-with-email db))
+   (:pswd (:signup-with-email db)))
   (dissoc db :signup-with-email-error :latest-auth-settings :latest-entry-point))
 
 (defmethod dispatcher/action :signup-with-email/failed
@@ -446,17 +459,16 @@
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
       db)
     (= status 200) ;; Valid login, not signup, redirect to home
-    (do
-      (if (or (and (empty? (:first-name jwt))
-                   (empty? (:last-name jwt)))
-              (empty? (:avatar-url jwt)))
-        (do
-          (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-          (api/get-entry-point)
-          db)
-        (do
-          (api/get-entry-point)
-          (assoc db :email-lander-check-team-redirect true))))
+    (if (or
+          (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
+          (empty? (:avatar-url jwt)))
+      (do
+        (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
+        (api/get-entry-point)
+        db)
+      (do
+        (api/get-entry-point)
+        (assoc db :email-lander-check-team-redirect true)))
     :else ;; Valid signup let's collect user data
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
@@ -549,18 +561,26 @@
             first-name (cond
                         (and (= invite-from "email") (= name-size 1)) email-name
                         (and (= invite-from "email") splittable-name?) (first splitted-name)
-                        (and (= invite-from "slack") (not (empty? (:first-name slack-user)))) (:first-name slack-user)
+                        (and (= invite-from "slack") (seq (:first-name slack-user))) (:first-name slack-user)
                         :else "")
             last-name (cond
                         (and (= invite-from "email") splittable-name?) (second splitted-name)
-                        (and (= invite-from "slack") (not (empty? (:last-name slack-user)))) (:last-name slack-user)
+                        (and (= invite-from "slack") (seq (:last-name slack-user))) (:last-name slack-user)
                         :else "")]
         ;; If the user is already in the list
         ;; but the type changed we need to change the user type too
         (when (and user
                   (not= old-user-type user-type))
-          (api/switch-user-type invite-data old-user-type user-type user (utils/get-author (:user-id user) (:authors org-data))))
-        (api/send-invitation invite-data (if (= invite-from "email") email-address slack-user) invite-from user-type first-name last-name)
+          (api/switch-user-type
+           invite-data
+           old-user-type
+           user-type
+           user
+           (utils/get-author (:user-id user) (:authors org-data))))
+        (api/send-invitation
+         invite-data
+         (if (= invite-from "email") email-address slack-user)
+         invite-from user-type first-name last-name)
         {:success true})
       {:error "User already active" :success false})))
 
@@ -601,7 +621,7 @@
                             (merge user {:error "Duplicated email address" :success false})
                             :else
                             (dissoc user :error))))
-        cleaned-invite-users (vec (filter #(not (:error %)) checked-users))]
+        cleaned-invite-users (filterv #(not (:error %)) checked-users)]
     (when (= (count cleaned-invite-users) (count invite-users))
       (doseq [user cleaned-invite-users]
         (invite-user org-data team-data user)))
@@ -671,8 +691,7 @@
            (<= status 299))
     (do
       (cook/remove-cookie! :show-login-overlay)
-      (-> (update-user-data db user-data)
-          (dissoc :show-login-overlay)))
+      (dissoc (update-user-data db user-data) :show-login-overlay))
     (assoc db :collect-name-password-error status)))
 
 (defmethod dispatcher/action :pswd-collect
@@ -699,7 +718,7 @@
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
   (if (responsive/is-mobile-size?)
-    (assoc db :mobile-menu-open (not (:mobile-menu-open db)))
+    (update-in db [:mobile-menu-open] not)
     db))
 
 (defn sort-reactions [entry]
@@ -757,7 +776,11 @@
         team-data (dispatcher/team-data team-id)
         user-data (:current-user-data db)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-        fixed-add-slack-team-link (utils/slack-link-with-state (:href add-slack-team-link) (:user-id user-data) team-id (router/get-token))]
+        fixed-add-slack-team-link (utils/slack-link-with-state
+                                   (:href add-slack-team-link)
+                                   (:user-id user-data)
+                                   team-id
+                                   (router/get-token))]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link)))
   db)
@@ -784,10 +807,10 @@
         authors (:authors board-data)
         new-viewers (if (= user-type :viewer)
                       (conj viewers {:user-id user-id :loading true})
-                      (vec (filter #(not= (:user-id %) user-id) viewers)))
+                      (filterv #(not= (:user-id %) user-id) viewers))
         new-authors (if (= user-type :author)
                       (conj authors {:user-id user-id :loading true})
-                      (vec (filter #(not= (:user-id %) user-id) authors)))
+                      (filterv #(not= (:user-id %) user-id) authors))
         new-board-data (merge board-data {:viewers new-viewers
                                           :authors new-authors})]
     (api/add-private-board board-data user-id user-type)
@@ -803,10 +826,10 @@
                 (first (filter #(= (:user-id %) user-id) viewers))
                 (first (filter #(= (:user-id %) user-id) authors)))
         new-viewers (if (= user-type :viewer)
-                      (conj (vec (filter #(= (:user-id %) user-id) viewers)) (assoc user :loading true))
+                      (conj (filterv #(= (:user-id %) user-id) viewers) (assoc user :loading true))
                       viewers)
         new-authors (if (= user-type :authors)
-                      (conj (vec (filter #(= (:user-id %) user-id) authors)) (assoc user :loading true))
+                      (conj (filterv #(= (:user-id %) user-id) authors) (assoc user :loading true))
                       authors)
         new-board-data (merge board-data {:viewers new-viewers
                                           :authors new-authors})]
@@ -831,7 +854,7 @@
   [db [_ error-message error-time]]
   (if (empty? error-message)
     (-> db (dissoc :error-banner-message) (dissoc :error-banner-time))
-    (if (not (:error-banner db))
+    (if-not (:error-banner db)
       (-> db
        (assoc :error-banner-message error-message)
        (assoc :error-banner-time error-time))
@@ -853,7 +876,9 @@
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
   (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
-        comments-key (dispatcher/activity-comments-key (router/current-org-slug) (router/current-board-slug) fixed-activity-uuid)
+        comments-key (dispatcher/activity-comments-key
+                      (router/current-org-slug)
+                      (router/current-board-slug) fixed-activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (-> db
       (assoc-in comments-key sorted-comments)
@@ -882,7 +907,9 @@
   [db [_ activity-uuid reaction-data]]
   (let [is-all-posts (:from-all-posts @router/path)
         org-slug (router/current-org-slug)
-        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts
+                   (dispatcher/all-posts-key org-slug)
+                   (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         entry-data (get (get board-data :fixed-items) activity-uuid)
         old-reactions-loading (or (:reactions-loading entry-data) [])
@@ -896,7 +923,9 @@
   [db [_ activity-uuid reaction reaction-data]]
   (let [is-all-posts (:from-all-posts @router/path)
         org-slug (router/current-org-slug)
-        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts
+                   (dispatcher/all-posts-key org-slug)
+                   (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         entry-data (get-in board-data [:fixed-items activity-uuid])
         next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
@@ -920,12 +949,15 @@
         board-slug (router/current-board-slug)
         is-all-posts (:from-all-posts @router/path)
         activity-uuid (:resource-uuid interaction-data)
-        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug (router/current-board-slug)))
+        board-key (if is-all-posts
+                   (dispatcher/all-posts-key org-slug)
+                   (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
         is-secure-activity (router/current-secure-activity-id)
-        secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        secure-activity-data (when is-secure-activity
+                              (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
     ;; If looking at a secure activity discard all events for other activities
@@ -938,13 +970,15 @@
               comment-data (:interaction interaction-data)
               created-at (:created-at comment-data)
               all-old-comments-data (dispatcher/activity-comments-data fixed-activity-uuid)
-              old-comments-data (vec (filter :links all-old-comments-data))
+              old-comments-data (filterv :links all-old-comments-data)
               ; Add the new comment to the comments list, make sure it's not present already
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
               sorted-comments-data (vec (sort-by :created-at new-comments-data))
               comments-key (dispatcher/activity-comments-key org-slug board-slug fixed-activity-uuid)
               ; update the comments link of the entry
-              comments-link-idx (utils/index-of (:links entry-data) #(and (= (:rel %) "comments") (= (:method %) "GET")))
+              comments-link-idx (utils/index-of
+                                 (:links entry-data)
+                                 #(and (= (:rel %) "comments") (= (:method %) "GET")))
               with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
               old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
               new-author (:author comment-data)
@@ -980,15 +1014,16 @@
         board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug board-slug))
         board-data (get-in db board-key)
         ; Entry data
-        fixed-activity-uuid (if (router/current-secure-activity-id) (router/current-secure-activity-id) activity-uuid)
+        fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
         is-secure-activity (router/current-secure-activity-id)
-        secure-activity-data (when is-secure-activity (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
+        secure-activity-data (when is-secure-activity
+                              (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
         entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
         entry-data (get-in db entry-key)]
     (if (and is-secure-activity
              (not= (:uuid secure-activity-data) activity-uuid))
       db
-      (if (and entry-data (not (empty? (:reactions entry-data))))
+      (if (and entry-data (seq (:reactions entry-data)))
         ; If the entry is present in the local state and it has reactions
         (let [reaction-data (:interaction interaction-data)
               old-reactions-data (:reactions entry-data)
@@ -999,7 +1034,7 @@
                               (assoc new-reaction-data :reacted add-event?)
                               new-reaction-data)
               ; Update the reactions data with the new reaction
-              new-reactions-data (assoc old-reactions-data reaction-idx (merge (get old-reactions-data reaction-idx) with-reacted))
+              new-reactions-data (update-in old-reactions-data [reaction-idx] merge with-reacted)
               ; Update the entry with the new reaction
               updated-entry-data (assoc entry-data :reactions new-reactions-data)]
           ;; Refresh the topic data if the action coming in is from the current user
@@ -1051,7 +1086,9 @@
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
     (utils/after 1 #(let [board-filters (:board-filters db)
-                          from-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+                          from-all-posts (or
+                                          (:from-all-posts @router/path)
+                                          (= (router/current-board-slug) "all-posts"))
                           board-url (utils/get-board-url (router/current-org-slug) (router/current-board-slug))]
                       (router/nav!
                         (cond
@@ -1060,7 +1097,10 @@
                           (oc-urls/all-posts (router/current-org-slug))
                           ; Board with topic filter
                           (string? board-filters)
-                          (oc-urls/board-filter-by-topic (router/current-org-slug) (router/current-board-slug) board-filters)
+                          (oc-urls/board-filter-by-topic
+                           (router/current-org-slug)
+                           (router/current-board-slug)
+                           board-filters)
                           ;; Board most recent or by topic
                           :else
                           board-url)))))
@@ -1078,9 +1118,9 @@
         next-board-data (assoc board-data :topics next-topics)
         next-db (assoc-in db board-key next-board-data)]
     (if edit-key
-      (assoc next-db edit-key (merge (edit-key next-db) {:topic-slug (:slug topic-map)
-                                                         :topic-name (:name topic-map)
-                                                         :has-changes true}))
+      (update-in next-db [edit-key] merge {:topic-slug (:slug topic-map)
+                                           :topic-name (:name topic-map)
+                                           :has-changes true})
       next-db)))
 
 (defn author-data [current-user-data as-of]
@@ -1136,7 +1176,9 @@
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
   (let [is-all-posts (utils/in? (:route @router/path) "all-posts")
-        board-key (if is-all-posts (dispatcher/all-posts-key (router/current-org-slug)) (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
+        board-key (if is-all-posts
+                   (dispatcher/all-posts-key (router/current-org-slug))
+                   (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
         board-data (get-in db board-key)
         next-fixed-items (dissoc (:fixed-items board-data) (:uuid activity-data))
         next-board-data (assoc board-data :fixed-items next-fixed-items)]
@@ -1166,9 +1208,9 @@
 
 (defmethod dispatcher/action :board-edit
   [db [_ initial-board-data]]
-  (let [fixed-board-data (if initial-board-data
-                            initial-board-data
-                            {:name "" :slug "" :access "team"})]
+  (let [fixed-board-data (or
+                           initial-board-data
+                           {:name "" :slug "" :access "team"})]
     (assoc db :board-editing fixed-board-data)))
 
 (defmethod dispatcher/action :board-edit-save
@@ -1252,7 +1294,10 @@
     (let [all-posts-key (dispatcher/all-posts-key org)
           fixed-all-posts (utils/fix-all-posts (:collection body))
           old-all-posts (get-in db all-posts-key)
-          next-links (vec (remove #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous")) (:links fixed-all-posts)))
+          next-links (vec
+                      (remove
+                       #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
+                       (:links fixed-all-posts)))
           link-to-move (if (= direction :up)
                           (utils/link-for (:links old-all-posts) "next")
                           (utils/link-for (:links old-all-posts) "previous"))
@@ -1301,10 +1346,19 @@
         fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
     (api/update-entry fixed-activity-data (:slug board-data))
     (if is-all-posts
-      (let [next-activity-data-key (dispatcher/activity-key (router/current-org-slug) :all-posts (:uuid activity-data))]
+      (let [next-activity-data-key (dispatcher/activity-key
+                                    (router/current-org-slug)
+                                    :all-posts
+                                    (:uuid activity-data))]
         (assoc-in db next-activity-data-key fixed-activity-data))
-      (let [activity-data-key (dispatcher/activity-key (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
-            next-activity-data-key (dispatcher/activity-key (router/current-org-slug) (:slug board-data) (:uuid activity-data))]
+      (let [activity-data-key (dispatcher/activity-key
+                               (router/current-org-slug)
+                               (:board-slug activity-data)
+                               (:uuid activity-data))
+            next-activity-data-key (dispatcher/activity-key
+                                    (router/current-org-slug)
+                                    (:slug board-data)
+                                    (:uuid activity-data))]
         (-> db
           (update-in (butlast activity-data-key) dissoc (last activity-data-key))
           (assoc-in next-activity-data-key fixed-activity-data))))))
@@ -1317,8 +1371,10 @@
         status-by-uuid (group-by :container-id status-data)
         clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
                                                           vals
-                                                          (map first) ; remove the sequence of 1 from group-by
-                                                          (map #(assoc % :nav-at (:seen-at %))))) ; dup seen-at as nav-at
+                                                          ; remove the sequence of 1 from group-by
+                                                          (map first)
+                                                          ; dup seen-at as nav-at
+                                                          (map #(assoc % :nav-at (:seen-at %)))))
         new-status-data (merge old-status-data clean-status-data)]
     (timbre/debug "Change status data:" new-status-data)
     (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
@@ -1399,7 +1455,10 @@
           activity-key (if (router/current-secure-activity-id)
                          (dispatcher/secure-activity-key org-slug (router/current-secure-activity-id))
                          (dispatcher/activity-key org-slug board-slug activity-uuid))
-          fixed-activity-data (utils/fix-entry activity-data {:slug (or (:board-slug activity-data) board-slug) :name (:board-name activity-data)} nil)]
+          fixed-activity-data (utils/fix-entry
+                               activity-data
+                               {:slug (or (:board-slug activity-data) board-slug)
+                                :name (:board-name activity-data)} nil)]
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
           (ws-ic/reconnect ws-link (jwt/get-key :user-id))))

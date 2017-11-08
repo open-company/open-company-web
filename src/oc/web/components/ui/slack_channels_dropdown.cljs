@@ -13,7 +13,7 @@
                    (if (string/starts-with? s "#")
                      (string/strip-prefix s "#")
                      s))]
-    (vec (filter #(string/includes? (string/lower (:name %)) look-for) channels))))
+    (filterv #(string/includes? (string/lower (:name %)) look-for) channels)))
 
 (rum/defcs slack-channels-dropdown < (rum/local nil ::show-channels-dropdown)
                                      (rum/local nil ::field-value)
@@ -25,37 +25,46 @@
                                      (drv/drv :team-data)
                                      (drv/drv :team-channels)
                                      {:will-mount (fn [s]
-                                                    (let [initial-value (:initial-value (nth (:rum/args s) 0))]
-                                                       (reset! (::slack-channel s) initial-value))
-                                                    (when (and (not @(drv/get-ref s :team-channels))
-                                                               (not @(::team-channels-requested s)))
-                                                      (when-let [team-data @(drv/get-ref s :team-data)]
-                                                        (reset! (::team-channels-requested s) true)
-                                                        (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                                    (reset! (::window-click s)
-                                                     (events/listen js/window EventType/CLICK
-                                                       #(when (and @(::show-channels-dropdown s)
-                                                                   (not (utils/event-inside? % (sel1 [:div.board-edit-slack-channels-dropdown])))
-                                                                   (not (utils/event-inside? % (sel1 [:input.board-edit-slack-channel]))))
-                                                          (reset! (::show-channels-dropdown s) false))))
-                                                    s)
+                                       (let [initial-value (:initial-value (nth (:rum/args s) 0))]
+                                          (reset! (::slack-channel s) initial-value))
+                                       (when (and (not @(drv/get-ref s :team-channels))
+                                                  (not @(::team-channels-requested s)))
+                                         (when-let [team-data @(drv/get-ref s :team-data)]
+                                           (reset! (::team-channels-requested s) true)
+                                           (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
+                                       (reset! (::window-click s)
+                                        (events/listen js/window EventType/CLICK
+                                          #(when (and @(::show-channels-dropdown s)
+                                                      (not
+                                                       (utils/event-inside?
+                                                        %
+                                                        (sel1 [:div.board-edit-slack-channels-dropdown])))
+                                                      (not
+                                                       (utils/event-inside?
+                                                        %
+                                                        (sel1 [:input.board-edit-slack-channel]))))
+                                             (reset! (::show-channels-dropdown s) false))))
+                                       s)
                                       :did-remount (fn [o s]
-                                                     (when (and (not @(drv/get-ref s :team-channels))
-                                                                (not @(::team-channels-requested s)))
-                                                       (when-let [team-data @(drv/get-ref s :team-data)]
-                                                         (reset! (::team-channels-requested s) true)
-                                                         (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                                     s)
+                                       (when (and (not @(drv/get-ref s :team-channels))
+                                                  (not @(::team-channels-requested s)))
+                                         (when-let [team-data @(drv/get-ref s :team-data)]
+                                           (reset! (::team-channels-requested s) true)
+                                           (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
+                                       s)
                                       :will-unmount (fn [s]
-                                                      (events/unlistenByKey @(::window-click s))
-                                                      s)}
+                                       (events/unlistenByKey @(::window-click s))
+                                       s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change] :as data}]
   (let [slack-teams (drv/react s :team-channels)]
     [:div.slack-channels-dropdown
       {:class (if disabled "disabled" "")}
       [:input.board-edit-slack-channel
         {:value @(::slack-channel s)
-         :on-focus (fn [] (utils/after 100 #(do (reset! (::typing s) false) (reset! (::show-channels-dropdown s) true))))
+         :on-focus (fn []
+                    (utils/after
+                     100
+                     #(do (reset! (::typing s) false) (reset! (::show-channels-dropdown s) true))))
          :on-change #(do
                        (reset! (::typing s) true)
                        (when (fn? on-intermediate-change)

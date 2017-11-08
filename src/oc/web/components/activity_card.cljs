@@ -114,47 +114,57 @@
                         (rum/local false ::share-dropdown)
                         (drv/drv :org-data)
                         {:after-render (fn [s]
-                                         (let [activity-data (first (:rum/args s))
-                                               body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
-                                               body-a-sel (str body-sel " a")
-                                               is-all-posts (nth (:rum/args s) 4 false)]
-                                           ; Prevent body links in FoC
-                                           (.click (js/$ body-a-sel) #(.stopPropagation %))
-                                           ; Truncate body text with dotdotdot
-                                           (when (compare-and-set! (::truncated s) false true)
-                                             (truncate-body body-sel is-all-posts)
-                                             (utils/after 10 #(do
-                                                                (.trigger (js/$ body-sel) "destroy")
-                                                                (truncate-body body-sel is-all-posts)))))
-                                         s)
+                          (let [activity-data (first (:rum/args s))
+                                body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
+                                body-a-sel (str body-sel " a")
+                                is-all-posts (nth (:rum/args s) 4 false)]
+                            ; Prevent body links in FoC
+                            (.click (js/$ body-a-sel) #(.stopPropagation %))
+                            ; Truncate body text with dotdotdot
+                            (when (compare-and-set! (::truncated s) false true)
+                              (truncate-body body-sel is-all-posts)
+                              (utils/after 10 #(do
+                                                 (.trigger (js/$ body-sel) "destroy")
+                                                 (truncate-body body-sel is-all-posts)))))
+                          s)
                          :will-mount (fn [s]
-                                       (let [activity-data (first (:rum/args s))
-                                             is-all-posts (nth (:rum/args s) 4 false)]
-                                         (reset! (::first-body-image s) (get-first-body-thumbnail (:body activity-data) is-all-posts)))
-                                       s)
+                          (let [activity-data (first (:rum/args s))
+                                is-all-posts (nth (:rum/args s) 4 false)]
+                            (reset!
+                             (::first-body-image s)
+                             (get-first-body-thumbnail (:body activity-data) is-all-posts)))
+                          s)
                          :did-remount (fn [o s]
-                                        (let [old-activity-data (first (:rum/args o))
-                                              new-activity-data (first (:rum/args s))
-                                              is-all-posts (nth (:rum/args s) 4 false)]
-                                          (when (not= (:body old-activity-data) (:body new-activity-data))
-                                            (reset! (::first-body-image s) (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
-                                            (.trigger (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body")) "destroy")
-                                            (reset! (::truncated s) false)))
-                                        s)
+                          (let [old-activity-data (first (:rum/args o))
+                                new-activity-data (first (:rum/args s))
+                                is-all-posts (nth (:rum/args s) 4 false)]
+                            (when (not= (:body old-activity-data) (:body new-activity-data))
+                              (reset!
+                               (::first-body-image s)
+                               (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
+                              (.trigger
+                               (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body"))
+                               "destroy")
+                              (reset! (::truncated s) false)))
+                          s)
                          :did-mount (fn [s]
-                                      (let [activity-data (first (:rum/args s))
-                                            activity-card-class (str "div.activity-card-" (:uuid activity-data))]
-                                        (reset! (::window-click s)
-                                         (events/listen js/window EventType/CLICK (fn [e]
-                                                                                    (when (and (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
-                                                                                               (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
-                                                                                      (reset! (::more-dropdown s) false))
-                                                                                    (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
-                                                                                      (reset! (::share-dropdown s) false))))))
-                                      s)
+                          (let [activity-data (first (:rum/args s))
+                                activity-card-class (str "div.activity-card-" (:uuid activity-data))]
+                            (reset! (::window-click s)
+                             (events/listen
+                              js/window
+                              EventType/CLICK
+                              (fn [e]
+                                (when (and
+                                       (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
+                                       (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
+                                  (reset! (::more-dropdown s) false))
+                                (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
+                                  (reset! (::share-dropdown s) false))))))
+                          s)
                          :will-unmount (fn [s]
-                                         (events/unlistenByKey @(::window-click s))
-                                         s)}
+                          (events/unlistenByKey @(::window-click s))
+                          s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))]
     [:div.activity-card
@@ -164,16 +174,24 @@
                                                      @(::move-activity s))
                                 :all-posts-card is-all-posts})
        :on-click (fn [e]
-                  (when (and (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit])))
-                             (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share])))
-                             (not @(::more-dropdown s))
-                             (not @(::move-activity s))
-                             (not @(::share-dropdown s)))
-                    (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data)])))
+                  (let [ev-in? (partial utils/event-inside? e)]
+                    (when
+                     (or
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
+                      @(::more-dropdown s)
+                      @(::move-activity s)
+                      @(::share-dropdown s))
+
+                      (dis/dispatch!
+                       [:activity-modal-fade-in
+                        (:board-slug activity-data)
+                        (:uuid activity-data)
+                        (:type activity-data)]))))
      }
       ; Card header
       [:div.activity-card-head.group
@@ -225,15 +243,21 @@
                                         (delete-clicked % activity-data))}
                           "Delete"])]])
                 (when @(::move-activity s)
-                  (activity-move {:activity-data activity-data :boards-list all-boards :dismiss-cb #(reset! (::move-activity s) false)}))]))
+                  (activity-move
+                   {:activity-data activity-data
+                    :boards-list all-boards
+                    :dismiss-cb #(reset! (::move-activity s) false)}))]))
           (activity-attachments activity-data true)
           ; Topic tag button
           (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
-                 :on-click #(do
-                              (router/nav! (oc-urls/board-filter-by-topic (router/current-org-slug) (:board-slug activity-data) (:topic-slug activity-data))))}
+                 :on-click #(router/nav!
+                             (oc-urls/board-filter-by-topic
+                              (router/current-org-slug)
+                              (:board-slug activity-data)
+                              (:topic-slug activity-data)))}
                 topic-name]))
           (when is-all-posts
             [:div.activity-tag
@@ -281,7 +305,12 @@
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch! [:activity-modal-fade-in (:board-slug activity-data) (:uuid activity-data) (:type activity-data) true]))}])
+                         (dis/dispatch!
+                          [:activity-modal-fade-in
+                           (:board-slug activity-data)
+                           (:uuid activity-data)
+                           (:type activity-data)
+                           true]))}])
         (when (utils/link-for (:links activity-data) "share")
           [:div.activity-share
             [:button.mlb-reset.activity-share-bt

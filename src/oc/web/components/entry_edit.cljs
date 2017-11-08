@@ -38,7 +38,7 @@
 
 (defn real-close [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal)))
+  (utils/after 180 dismiss-modal))
 
 (defn cancel-clicked [s]
   (if @(::uploading-media s)
@@ -73,7 +73,7 @@
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.entry-edit-headline])]
-    (let [emojied-headline   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
 
@@ -129,47 +129,48 @@
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
-                                       (let [entry-editing @(drv/get-ref s :entry-editing)
-                                             board-filters @(drv/get-ref s :board-filters)
-                                             initial-body (if (contains? entry-editing :links) (:body entry-editing) utils/default-body)
-                                             initial-headline (utils/emojify (if (contains? entry-editing :links) (:headline entry-editing) ""))]
-                                         (reset! (::initial-body s) initial-body)
-                                         (reset! (::initial-headline s) initial-headline)
-                                         (when (and (string? board-filters)
-                                                    (nil? (:topic-slug entry-editing)))
-                                            (let [topics @(drv/get-ref s :entry-edit-topics)
-                                                  topic (first (filter #(= (:slug %) board-filters) topics))]
-                                              (when topic
-                                                (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
-                                                (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
-                                       s)
+                          (let [entry-editing @(drv/get-ref s :entry-editing)
+                                board-filters @(drv/get-ref s :board-filters)
+                                initial-body (if (contains? entry-editing :links)
+                                              (:body entry-editing)
+                                              utils/default-body)
+                                initial-headline (utils/emojify
+                                                  (if (contains? entry-editing :links)
+                                                   (:headline entry-editing)
+                                                   ""))]
+                            (reset! (::initial-body s) initial-body)
+                            (reset! (::initial-headline s) initial-headline)
+                            (when (and (string? board-filters)
+                                       (nil? (:topic-slug entry-editing)))
+                               (let [topics @(drv/get-ref s :entry-edit-topics)
+                                     topic (first (filter #(= (:slug %) board-filters) topics))]
+                                 (when topic
+                                   (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
+                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
+                          s)
                          :did-mount (fn [s]
-                                      (utils/after 300 #(setup-headline s))
-                                      (when-let [headline-el (rum/ref-node s "headline")]
-                                        (utils/to-end-of-content-editable headline-el))
-                                      s)
-                         :before-render (fn [s]
-                                          (calc-edit-entry-modal-height s)
-                                          s)
-                         :after-render  (fn [s]
-                                          (should-show-divider-line s)
-                                          s)
+                          (utils/after 300 #(setup-headline s))
+                          (when-let [headline-el (rum/ref-node s "headline")]
+                            (utils/to-end-of-content-editable headline-el))
+                          s)
+                         :before-render (fn [s] (calc-edit-entry-modal-height s) s)
+                         :after-render  (fn [s] (should-show-divider-line s) s)
                          :did-remount (fn [s]
-                                        (when @(::saving s)
-                                          (let [entry-editing @(drv/get-ref s :entry-editing)]
-                                            (when (not (:loading entry-editing))
-                                              (reset! (::saving s) false)
-                                              (when-not (:error entry-editing)
-                                                (real-close s)))))
-                                        s)
+                          (when @(::saving s)
+                            (let [entry-editing @(drv/get-ref s :entry-editing)]
+                              (when (not (:loading entry-editing))
+                                (reset! (::saving s) false)
+                                (when-not (:error entry-editing)
+                                  (real-close s)))))
+                          s)
                          :will-unmount (fn [s]
-                                         (when @(::body-editor s)
-                                           (.destroy @(::body-editor s))
-                                           (reset! (::body-editor s) nil))
-                                         (when @(::headline-input-listener s)
-                                           (events/unlistenByKey @(::headline-input-listener s))
-                                           (reset! (::headline-input-listener s) nil))
-                                         s)}
+                          (when @(::body-editor s)
+                            (.destroy @(::body-editor s))
+                            (reset! (::body-editor s) nil))
+                          (when @(::headline-input-listener s)
+                            (events/unlistenByKey @(::headline-input-listener s))
+                            (reset! (::headline-input-listener s) nil))
+                          s)}
   [s]
   (let [current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)

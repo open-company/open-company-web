@@ -27,7 +27,8 @@
   (str js/window.location.pathname js/window.location.search))
 
 ; this is needed as of this
-; https://code.google.com/p/closure-library/source/detail?spec=svn88dc096badf091f380b4c2b4a6514184511de657&r=88dc096badf091f380b4c2b4a6514184511de657
+; https://code.google.com/p/closure-library/source/detail?spec=svn
+; 88dc096badf091f380b4c2b4a6514184511de657&r=88dc096badf091f380b4c2b4a6514184511de657
 ; setToken doen't replace the query string, it only attach it at the end
 ; solution here: https://github.com/Sparrho/supper/blob/master/src-cljs/supper/history.cljs
 (defn build-transformer

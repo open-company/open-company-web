@@ -18,7 +18,8 @@
 
 ;; ----- Actions -----
 
-(defn container-watch 
+(defn container-watch
+
   ([]
   (container-watch (conj @board-ids (:uuid (dis/org-data)))))
 
@@ -137,9 +138,9 @@
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
             (reset! ch-state state)
-            (start-router!))))
+            (start-router!)))
 
       ;; already connected, make sure we're watching all the current boards
       (do
         (reset! board-ids boards)
-        (container-watch))))
+        (container-watch)))))

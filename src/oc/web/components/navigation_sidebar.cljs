@@ -9,13 +9,12 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.mixins :refer (first-render-mixin)]
-            [oc.web.components.ui.popover :refer (add-popover hide-popover)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
 
 (defn sort-boards [boards]
-  (into [] (sort-by :name boards)))
+  (vec (sort-by :name boards)))
 
 (defn anchor-nav! [e url]
   (utils/event-stop e)
@@ -24,10 +23,16 @@
 (defn new?
   "
   A board is new if:
-  
+
+
+
     user is part of the team (we don't track new for non-team members accessing public boards)
      -and-
-    
+
+
+
+
+
     change-at is newer than seen at
       -or-
     we have a change-at and no seen at
@@ -61,32 +66,35 @@
                                 ;; Mixins
                                 first-render-mixin
                                 {:did-mount (fn [s]
-                                              (when-not (utils/is-test-env?)
-                                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                              (reset! (::window-height s) (.-innerHeight js/window))
-                                              (reset! (::resize-listener s)
-                                               (events/listen js/window EventType/RESIZE #(reset! (::window-height s) (.-innerHeight js/window))))
-                                              s)
+                                  (when-not (utils/is-test-env?)
+                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                  (reset! (::window-height s) (.-innerHeight js/window))
+                                  (reset! (::resize-listener s)
+                                   (events/listen
+                                    js/window
+                                    EventType/RESIZE
+                                    #(reset! (::window-height s) (.-innerHeight js/window))))
+                                  s)
                                  :will-update (fn [s]
-                                                (when @(:first-render-done s)
-                                                  (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
-                                                    (when (not= height @(::content-height s))
-                                                      (reset! (::content-height s) height))))
-                                                s)
+                                  (when @(:first-render-done s)
+                                    (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
+                                      (when (not= height @(::content-height s))
+                                        (reset! (::content-height s) height))))
+                                  s)
                                  :did-update (fn [s]
-                                               (when-not (utils/is-test-env?)
-                                                 (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                              s)
+                                  (when-not (utils/is-test-env?)
+                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                  s)
                                  :will-unmount (fn [s]
-                                                 (when @(::resize-listener s)
-                                                   (events/unlistenByKey @(::resize-listener s)))
-                                                 s)}
+                                  (when @(::resize-listener s)
+                                    (events/unlistenByKey @(::resize-listener s)))
+                                  s)}
   [s]
   (let [org-data (drv/react s :org-data)
         change-data (drv/react s :change-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        boards (vec (filter #(not= (:slug %) "drafts") all-boards))
+        boards (filterv #(not= (:slug %) "drafts") all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
@@ -100,7 +108,15 @@
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
                                 (jwt/is-admin? (:team-id org-data)))
-        is-tall-enough? (< @(::content-height s) (- @(::window-height s) sidebar-top-margin footer-button-height 20 (when show-invite-people footer-button-height)))]
+        is-tall-enough? (<
+                         @(::content-height s)
+                         (-
+                          @(::window-height s)
+                          sidebar-top-margin
+                          footer-button-height
+                          20
+                          (when show-invite-people
+                           footer-button-height)))]
     [:div.left-navigation-sidebar.group
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -142,7 +158,9 @@
                 (when (or (= (:access board) "public")
                           (= (:access board) "private"))
                   [:img
-                    {:src (if (= (:access board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                    {:src (if (= (:access board) "public")
+                           (utils/cdn "/img/ML/board_public.svg")
+                           (utils/cdn "/img/ML/board_private.svg"))
                      :class (if (= (:access board) "public") "public" "private")}])
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
@@ -155,7 +173,10 @@
             (when show-drafts
               (let [board-url (oc-urls/board (:slug drafts-board))]
                 [:a.left-navigation-sidebar-item.hover-item
-                  {:class (when (and (not is-all-posts) (= (router/current-board-slug) (:slug drafts-board))) "item-selected")
+                  {:class (when (and (not is-all-posts)
+                                     (= (router/current-board-slug)
+                                     (:slug drafts-board)))
+                            "item-selected")
                    :data-board (name (:slug drafts-board))
                    :key (str "board-list-" (name (:slug drafts-board)))
                    :href board-url
@@ -163,7 +184,9 @@
                   (when (or (= (:access drafts-board) "public")
                             (= (:access drafts-board) "private"))
                     [:img
-                      {:src (if (= (:access drafts-board) "public") (utils/cdn "/img/ML/board_public.svg") (utils/cdn "/img/ML/board_private.svg"))
+                      {:src (if (= (:access drafts-board) "public")
+                             (utils/cdn "/img/ML/board_public.svg")
+                             (utils/cdn "/img/ML/board_private.svg"))
                        :class (if (= (:access drafts-board) "public") "public" "private")}])
                   [:div.board-name.group
                     {:class (utils/class-set {:public-board (= (:access drafts-board) "public")

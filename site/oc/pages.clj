@@ -297,7 +297,8 @@
      ]])
 
 (defn about
-  "About page. This is a copy of oc.web.components.about and every change here should be reflected there and vice versa."
+  "About page. This is a copy of oc.web.components.about and
+   every change here should be reflected there and vice versa."
   [options]
   [:div
     [:div.container.main.about
@@ -340,26 +341,47 @@
         [:div.principle.principle-1
           [:div.principle-oval-bg]
           [:div.principle-logo]
-          [:div.principle-title "Alignment should be simple."]
-          [:div.principle-description "Alignment might be essential for success, but achieving it has never been simple or fun. We’re changing that. With a simple structure, and beautiful writing experience, it can’t be easier. Just say what’s going on, we’ll take care of the rest."]]
+          [:div.principle-title
+            "Alignment should be simple."]
+          [:div.principle-description
+            (str
+             "Alignment might be essential for success, but achieving it has "
+             "never been simple or fun. We’re changing that. With a simple "
+             "structure, and beautiful writing experience, it can’t be easier. "
+             "Just say what’s going on, we’ll take care of the rest.")]]
 
         [:div.principle.principle-2
           [:div.principle-oval-bg]
           [:div.principle-logo]
-          [:div.principle-title "The “big picture” should always be visible."]
-          [:div.principle-description "No one wants to look through folders and documents to understand what’s going on, or search through chat messages to find something. It should be easy to get an instant, birds-eye view of what’s happening across the company anytime."]]
+          [:div.principle-title
+            "The “big picture” should always be visible."]
+          [:div.principle-description
+            (str
+             "No one wants to look through folders and documents to "
+             "understand what’s going on, or search through chat messages "
+             "to find something. It should be easy to get an instant, birds-eye view of "
+             "what’s happening across the company anytime.")]]
 
         [:div.principle.principle-3
           [:div.principle-oval-bg]
           [:div.principle-logo]
-          [:div.principle-title "Alignment is valuable beyond the team, too."]
-          [:div.principle-description "Make it simple to share the latest updates with investors, advisors, customers and other outside stakeholders as well. It’s the surest way to keep them engaged and supportive, and an easy way to expand your network and grow your business."]]]
+          [:div.principle-title
+            "Alignment is valuable beyond the team, too."]
+          [:div.principle-description
+            (str
+             "Make it simple to share the latest updates with investors, "
+             "advisors, customers and other outside stakeholders as well. It’s "
+             "the surest way to keep them engaged and supportive, and an "
+             "easy way to expand your network and grow your business.")]]]
 
     ] ;<!-- main -->
 
     [:div.about-alignment
       [:div.quote]
-      [:div.about-alignment-description "Company alignment requires real openness and transparency. Carrot makes it simple and fun for your team to get started."]]
+      [:div.about-alignment-description
+        (str
+         "Company alignment requires real openness and transparency. "
+         "Carrot makes it simple and fun for your team to get started.")]]
 
     [:div.about-team.group
       [:div.about-team-inner.group
@@ -375,7 +397,12 @@
               [:div.team-member
                 [:div.team-name "Stuart Levinson"]
                 [:div.team-title "CEO and cofounder"]
-                [:div.team-description "Prior to Carrot, Stuart started two venture-backed startups - Venetica (acquired by IBM) and TalkTo (acquired by Path). Those experiences, pre- and post-acquisitions, inspired a passion for transparency and its effect on overall alignment."]
+                [:div.team-description
+                  "Prior to Carrot, Stuart started two venture-"
+                  "backed startups - Venetica (acquired by IBM) and "
+                  "TalkTo (acquired by Path). Those experiences, "
+                  "pre- and post-acquisitions, inspired a passion for "
+                  "transparency and its effect on overall alignment."]
                 [:div.team-media-links
                   [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]
                   [:a.twitter {:href "https://twitter.com/stuartlevinson"}]]]]
@@ -385,7 +412,9 @@
                 [:img {:src "http://www.gravatar.com/avatar/0224b757acf053e02d8cdf807620417c?s=64"}]]
               [:div.team-member
                 [:div.team-name "Iacopo Carraro"]
-                [:div.team-description "Iacopo is a full-stack engineer with lots of remote team and startup experience."]
+                [:div.team-description
+                  "Iacopo is a full-stack engineer with lots of remote "
+                  "team and startup experience."]
                 [:div.team-media-links
                   [:a.linkedin {:href "https://www.linkedin.com/pub/iacopo-carraro/21/ba2/5ab"}]
                   [:a.twitter {:href "http://twitter.com/bago2k4"}]
@@ -399,7 +428,10 @@
               [:div.team-member
                 [:div.team-name "Sean Johnson"]
                 [:div.team-title "CTO and cofounder"]
-                [:div.team-description "As a serial startup CTO and engineer, Sean has over 20 years experience building products and startup engineering teams."]
+                [:div.team-description
+                  "As a serial startup CTO and engineer, Sean has "
+                  "over 20 years experience building products and "
+                  "startup engineering teams."]
                 [:div.team-media-links
                   [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]
                   [:a.twitter {:href "http://twitter.com/belucid"}]
@@ -409,7 +441,9 @@
               [:div.team-avatar]
                 [:div.team-member
                   [:div.team-name "You?"]
-                  [:div.team-description "We're always looking for talented individuals. Drop us a line if you share our mission."]]]]]]]
+                  [:div.team-description
+                    "We're always looking for talented individuals. "
+                    "Drop us a line if you share our mission."]]]]]]]
 
     [:div.about-footer.group
 
@@ -457,7 +491,9 @@
   {:head [:head
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
-          [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
+          [:meta
+            {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+             :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
@@ -467,7 +503,11 @@
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
+          [:link
+            {:rel "stylesheet"
+             :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+             :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+             :crossorigin "anonymous"}]
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
           [:link {:rel "stylesheet" :href "/css/normalize.css"}]
@@ -476,7 +516,9 @@
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
-          [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
+          [:link
+            {:rel "stylesheet"
+             :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
           ;; Google fonts Muli
@@ -493,13 +535,20 @@
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
           ;; MediumEditorMediaPicker
-          [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
+          [:link
+            {:type "text/css"
+             :rel "stylesheet"
+             :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]]
    :body [:body.small-footer
-          [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
+          [:div#app
+            [:div.oc-loading.active
+              [:div.oc-loading-inner
+                [:div.oc-loading-heart]
+                [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; JWT decode library
@@ -515,7 +564,9 @@
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-selectionsaverestore.js"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
-          [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
+          [:script
+            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
+             :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; jQuery scrollTo plugin
@@ -525,7 +576,11 @@
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           ;; Bootstrap JavaScript //getf.com/
-          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
+          [:script
+            {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+             :type "text/javascript"
+             :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+             :crossorigin "anonymous"}]
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
@@ -549,7 +604,9 @@
   {:head [:head
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
-          [:meta {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no", :name "viewport"}]
+          [:meta
+            {:content "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+             :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
@@ -559,11 +616,17 @@
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" :crossorigin "anonymous"}]
+          [:link
+            {:rel "stylesheet"
+             :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+             :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+             :crossorigin "anonymous"}]
           ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
           [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
           ;; jQuery UI CSS
-          [:link {:rel "stylesheet" :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
+          [:link
+            {:rel "stylesheet"
+             :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
           ;; Google fonts Muli
@@ -579,9 +642,10 @@
           [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
-
           ;; jQuery textcomplete needed by Emoji One autocomplete
-          [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js" :type "text/javascript"}]
+          [:script
+            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
+             :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; jQuery UI
@@ -589,7 +653,11 @@
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           ;; Bootstrap JavaScript //getf.com/
-          [:script {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" :type "text/javascript" :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" :crossorigin "anonymous"}]
+          [:script
+            {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+             :type "text/javascript"
+             :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+             :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assents

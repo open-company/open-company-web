@@ -41,7 +41,7 @@
         @include avenir_M();
         font-size: 13px;
 
-        a {          
+        a {
           margin: 5px;
           color: white;
           @include avenir_M();
@@ -132,7 +132,8 @@
           height: auto;
 
           div.column-title:after {
-            content: "\f077"; 
+            content: "\f077";
+
           }
         }
 
