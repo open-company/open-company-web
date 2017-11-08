@@ -175,7 +175,7 @@
                                 :all-posts-card is-all-posts})
        :on-click (fn [e]
                   (let [ev-in? (partial utils/event-inside? e)]
-                    (when
+                    (when-not
                      (or
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button]))
@@ -191,8 +191,7 @@
                        [:activity-modal-fade-in
                         (:board-slug activity-data)
                         (:uuid activity-data)
-                        (:type activity-data)]))))
-     }
+                        (:type activity-data)]))))}
       ; Card header
       [:div.activity-card-head.group
         {:class "entry-card"}
