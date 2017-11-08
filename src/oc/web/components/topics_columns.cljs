@@ -222,7 +222,7 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
-                         (or (string? board-filters) (> (count entry-topics) 1)))
+                         (or (not board-filters) (not= board-filters :latest) (> (count entry-topics) 1)))
                 (filters-dropdown))
               ;; Add entry floating button
               (when (and (not is-all-posts)
