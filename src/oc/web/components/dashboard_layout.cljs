@@ -61,7 +61,6 @@
                               (drv/drv :org-data)
                               (drv/drv :board-data)
                               (drv/drv :board-filters)
-                              ; (drv/drv :loading)
                               (drv/drv :show-onboard-overlay)
                               ;; Locals
                               (rum/local nil ::show-boards-tooltip)
@@ -104,7 +103,6 @@
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         board-filters (drv/react s :board-filters)
-        ; content-loaded (or (drv/react s :loading) (:loading board-data))
         show-onboard-overlay (drv/react s :show-onboard-overlay)
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
@@ -119,7 +117,6 @@
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))]
       ;; Topic list
       [:div.dashboard-layout.group
-        ; {:class (when content-loaded "content-loaded")}
         (when (and @(::show-boards-tooltip s)
                    (not show-onboard-overlay))
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
