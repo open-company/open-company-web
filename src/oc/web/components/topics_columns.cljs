@@ -269,8 +269,7 @@
               :else
               (cond
                 ;; Drafts
-                (and (= (:type board-data) "story")
-                     (= (:slug board-data) "drafts"))
+                (= (:slug board-data) "drafts")
                 (drafts-layout board-data)
                 ;; Entries
                 :else
