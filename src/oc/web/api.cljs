@@ -717,7 +717,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-name :attachments :title :board-slug])
+(def entry-keys [:headline :body :topic-name :attachments :board-slug])
 
 (defn create-entry
   [entry-data]
@@ -737,6 +737,23 @@
                :edit-key :entry-editing}])
             (dispatcher/dispatch! [:entry-save/failed  :entry-editing])))))))
 
+(defn publish-entry
+  [entry-data]
+  (when (and entry-data
+             (not= (:status entry-data) "published"))
+    (let [publish-entry-link (utils/link-for (:links entry-data) "publish")
+          cleaned-entry-data (select-keys entry-data entry-keys)]
+      (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
+        {:headers (headers-for-link publish-entry-link)
+         :json-params (cljs->json cleaned-entry-data)}
+        (fn [{:keys [status success body]}]
+          (if success
+            (dispatcher/dispatch!
+             [:entry-publish/finish
+              {:activity-data (if success (json->cljs body) {})
+               :edit-key :modal-editing-data}])
+            (dispatcher/dispatch! [:entry-publish/failed  :modal-editing-data])))))))
+
 (defn update-entry
   [entry-data board-slug]
   (when entry-data
@@ -751,7 +768,7 @@
              [:entry-save/finish
               {:activity-data (if success (json->cljs body) {})
                :board-slug board-slug
-                :edit-key :modal-editing-data}])
+               :edit-key :modal-editing-data}])
             (dispatcher/dispatch! [:entry-save/failed  :modal-editing-data])))))))
 
 (defn delete-activity [activity-data]
