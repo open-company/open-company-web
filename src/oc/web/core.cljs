@@ -432,56 +432,18 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (board-handler
-       "dashboard"
-       target
-       org-dashboard
-       params
-       (or
-        (keyword
-         (cook/get-cookie
-          (router/last-board-filter-cookie
-           (:org (:params params))
-           (:board (:params params)))))
-        :latest)))
+      (board-handler "dashboard" target org-dashboard params :latest))
 
     (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (board-handler
-       "dashboard"
-       target
-       org-dashboard
-       params
-       (or
-        (keyword
-         (cook/get-cookie
-          (router/last-board-filter-cookie
-           (:org (:params params))
-           (:board (:params params)))))
-        :latest)))
+      (board-handler "dashboard" target org-dashboard params :latest))
 
     (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
       (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
-      (when (=
-             (keyword
-              (cook/get-cookie
-               (router/last-board-filter-cookie
-                (:org (:params params))
-                (:board (:params params)))))
-             :latest)
-        (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params :by-topic))
 
     (defroute board-sort-by-topic-slash-route (str (urls/board-sort-by-topic ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-sort-by-topic-slash-route" (str (urls/board-sort-by-topic ":org" ":board") "/"))
-      (when (=
-             (keyword
-              (cook/get-cookie
-               (router/last-board-filter-cookie
-                (:org (:params params))
-                (:board (:params params)))))
-             :latest)
-        (router/redirect! (urls/board (:org (:params params)) (:board (:params params)))))
       (board-handler "dashboard" target org-dashboard params :by-topic))
 
     (defroute board-filter-by-topic-route (urls/board-filter-by-topic ":org" ":board" ":topic-filter") {:as params}
