@@ -60,33 +60,27 @@ $h2_top_margin: 20;
 
     &.on-gray {
       &:hover, &:active, &:focus, &.active {
-        background-color: $carrot_purple !important;
+        background-color: $carrot_purple;
         color: white;
         cursor: pointer;
+
+        &.board-tag {
+          background-color: $carrot_text_blue_3;
+          color: white;
+          cursor: pointer;
+        }
       }
     }
 
     &:hover, &:active, &:focus, &.active {
-      background-color: $carrot_light_purple !important;
+      background-color: $carrot_light_purple;
       color: $carrot_purple;
       cursor: pointer;
-    }
 
-    &.board-tag {
-
-      &:hover:before {
-        background-image: cdnUrl("/img/ML/boards_icon_blue.png");
-      }
-
-      &:before {
-        display: inline-block;
-        margin-right: 4px;
-        content: "";
-        background-image: cdnUrl("/img/ML/boards_icon_gray.png");
-        background-size: 12px 10px;
-        background-repeat: no-repeat;
-        width: 12px;
-        height: 10px;
+      &.board-tag {
+        color: $carrot_text_blue_3;
+        background-color: $carrot_light_blue_2;
+        cursor: pointer;
       }
     }
   }
