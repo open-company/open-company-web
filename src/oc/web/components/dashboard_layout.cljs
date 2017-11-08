@@ -45,21 +45,33 @@
         boards (:boards org-data)]
     (if create-link
       (if (> (count boards) 1)
-        "Boards are where you’ll find the announcements, updates and stories that help connect you with your team. You can create new posts or react and comment on what you read"
-        "We’ve created a super helpful welcome board for you - it’s full of ideas on how to get the most out of Carrot!")
-      "Boards are where you’ll find the announcements, updates and stories that help connect you with your team. You can react and comment on what you read.")))
+        (str
+         "Boards are where you’ll find the announcements, updates "
+         "and stories that help connect you with your team. "
+         "You can create new posts or react and comment on what you read")
+        (str
+         "We’ve created a super helpful welcome board for you - it’s "
+         "full of ideas on how to get the most out of Carrot!"))
+      (str
+       "Boards are where you’ll find the announcements, updates and stories "
+       "that help connect you with your team. You can react and comment on what you read."))))
 
 (defn get-second-tooltip-message [org-data]
   (let [boards (:boards org-data)]
     (if (> (count boards) 1)
-      "When you need to, you can click here to create new boards for different areas like Sales, Marketing and Product."
-      "When you’re ready, click here and get rolling with your first boards. You can create boards for different areas like Sales, Marketing and Product.")))
+      (str
+       "When you need to, you can click here to create new boards "
+       "for different areas like Sales, Marketing and Product.")
+      (str
+       "When you’re ready, click here and get rolling with your first boards. "
+       "You can create boards for different areas like Sales, Marketing and Product."))))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :board-data)
+                              (drv/drv :all-posts)
                               (drv/drv :board-filters)
                               (drv/drv :show-onboard-overlay)
                               ;; Locals
@@ -99,6 +111,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
+        all-posts-data (drv/react s :all-posts)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
@@ -107,13 +120,20 @@
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
         dashboard-layout-container-key (if current-activity-id
-                                        (str "dashboard-layout-selected-topic-" current-activity-id)
-                                        (s/join "-" (map :slug (:topics board-data))))
+                                        (str "dashboard-layout-activity-" current-activity-id)
+                                        (str "dashboard-layout-" (if is-all-posts "all-posts" (:slug board-data))))
         empty-board? (zero? (count (:fixed-items board-data)))
         org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:marginLeft (str (max sidebar-width (+ (/ (- @(::ww s) responsive/board-container-width sidebar-width) 2) sidebar-width)) "px")}
+        board-container-style {:marginLeft (str
+                                            (max
+                                             sidebar-width
+                                             (+
+                                              (/
+                                               (- @(::ww s) responsive/board-container-width sidebar-width)
+                                               2)
+                                              sidebar-width)) "px")}
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))]
       ;; Topic list
       [:div.dashboard-layout.group
@@ -131,13 +151,13 @@
                            :button-title (if create-link "Next" "Got It!")
                            :big-circle true
                            :on-next-click (fn []
-                                            ; (om/update-state! owner #(merge % {:show-plus-tooltip (not (not create-link))
-                                            ;                                    :show-boards-tooltip false}))
                                             (reset! (::show-plus-tooltip s) (not (not create-link)))
                                             (reset! (::show-boards-tooltip s) false)
                                             (if create-link
                                               (.addClass (js/$ "button#add-board-button") "active")
-                                              (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id)))))}))))
+                                              (cook/remove-cookie!
+                                               (router/should-show-dashboard-tooltips
+                                                (jwt/get-key :user-id)))))}))))
         (when @(::show-plus-tooltip s)
           (when-let* [plus-button (js/$ "button#add-board-button")
                       offset (.offset plus-button)
@@ -151,9 +171,10 @@
                          :big-circle false
                          :on-next-click (fn []
                                           (.removeClass (js/$ "button#add-board-button") "active")
-                                          ; (om/set-state! owner :show-plus-tooltip false)
                                           (reset! (::show-plus-tooltip s) false)
-                                          (cook/remove-cookie! (router/should-show-dashboard-tooltips (jwt/get-key :user-id))))})))
+                                          (cook/remove-cookie!
+                                           (router/should-show-dashboard-tooltips
+                                            (jwt/get-key :user-id))))})))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
           (when-not is-mobile-size?
@@ -191,7 +212,10 @@
                                     topic-data (when (string? board-filters)
                                                  (first (filter #(= (:slug %) board-filters) (:topics board-data))))
                                     with-topic (if (string? board-filters)
-                                                (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
+                                                (merge
+                                                 entry-data
+                                                 {:topic-slug (:slug topic-data)
+                                                  :topic-name (:name topic-data)})
                                                 entry-data)]
                                 (dis/dispatch! [:entry-edit with-topic])))}
                   [:div.add-to-board-pencil]
@@ -220,7 +244,10 @@
                                     topic-data (when (string? board-filters)
                                                  (first (filter #(= (:slug %) board-filters) (:topics board-data))))
                                     with-topic (if (string? board-filters)
-                                                (merge entry-data {:topic-slug (:slug topic-data) :topic-name (:name topic-data)})
+                                                (merge
+                                                 entry-data
+                                                 {:topic-slug (:slug topic-data)
+                                                  :topic-name (:name topic-data)})
                                                 entry-data)]
                                 (dis/dispatch! [:entry-edit with-topic])))}
                   [:div.add-to-board-pencil]])]
@@ -232,8 +259,8 @@
               ;; All Posts
               is-all-posts
               (rum/with-key
-               (all-posts board-data)
-               (str "all-posts-" (apply str (keys (:fixed-items board-data)))))
+               (all-posts all-posts-data)
+               (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
               ;; Empty board
               (and (not is-mobile-size?)
                    (not current-activity-id)
@@ -241,8 +268,8 @@
               (empty-board)
               ;; Layout boards activities
               :else
-              (cond ; REMOVE if we don't end up with entry drafts
-                ;; Drafts 
+              (cond
+                ;; Drafts
                 (= (:slug board-data) "drafts")
                 (drafts-layout board-data)
                 ;; Entries
