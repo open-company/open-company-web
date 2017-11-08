@@ -165,7 +165,10 @@
                           (get-in base (comments-key org-slug board-slug)))]
    :activity-comments-data [[:base :org-slug :board-slug :activity-uuid :secure-id]
                            (fn [base org-slug board-slug activity-uuid secure-id]
-                              (get-in base (butlast (activity-comments-key org-slug board-slug (or activity-uuid secure-id)))))]
+                              (get-in
+                               base
+                               (butlast
+                                (activity-comments-key org-slug board-slug (or activity-uuid secure-id)))))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
@@ -339,9 +342,16 @@
 
 (defn activity-comments-data
   ([]
-    (activity-comments-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
+    (activity-comments-data
+     (router/current-org-slug)
+     (router/current-board-slug)
+     (router/current-activity-id)
+     @app-state))
   ([activity-uuid]
-    (activity-comments-data (router/current-org-slug) (router/current-board-slug) activity-uuid @app-state))
+    (activity-comments-data
+     (router/current-org-slug)
+     (router/current-board-slug)
+     activity-uuid @app-state))
   ([org-slug board-slug activity-uuid]
     (activity-comments-data org-slug board-slug activity-uuid @app-state))
   ([org-slug board-slug activity-uuid data]
@@ -387,25 +397,46 @@
   (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
 
 (defn print-board-data []
-  (js/console.log (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
+  (js/console.log
+   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activities-data []
-  (js/console.log (get-in @app-state (conj (board-data-key (router/current-org-slug) (router/current-board-slug)) :fixed-items))))
+  (js/console.log
+   (get-in
+    @app-state
+    (conj (board-data-key (router/current-org-slug) (router/current-board-slug)) :fixed-items))))
 
 (defn print-activity-data []
-  (js/console.log (get-in @app-state (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+  (js/console.log
+   (get-in
+    @app-state
+    (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (defn print-secure-activity-data []
-  (js/console.log (get-in @app-state (secure-activity-key (router/current-org-slug) (router/current-secure-activity-id)))))
+  (js/console.log
+   (get-in
+    @app-state
+    (secure-activity-key (router/current-org-slug) (router/current-secure-activity-id)))))
 
 (defn print-reactions-data []
-  (js/console.log (get-in @app-state (conj (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)) :reactions))))
+  (js/console.log
+   (get-in
+    @app-state
+    (conj
+     (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id))
+     :reactions))))
 
 (defn print-comments-data []
-  (js/console.log (get-in @app-state (comments-key (router/current-org-slug) (router/current-board-slug)))))
+  (js/console.log
+   (get-in
+    @app-state
+    (comments-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-comments-data []
-  (js/console.log (get-in @app-state (activity-comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+  (js/console.log
+   (get-in
+    @app-state
+    (activity-comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
 
 (defn print-entry-editing-data []
   (js/console.log (get @app-state :entry-editing)))

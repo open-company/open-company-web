@@ -55,8 +55,10 @@
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
-                    :solid-button-cb #(do
-                                       (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug)))
+                    :solid-button-cb #(let [org-slug (router/current-org-slug)
+                                            board-slug (router/current-board-slug)
+                                            board-url (utils/get-board-url org-slug board-slug)]
+                                       (router/nav! board-url)
                                        (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
@@ -69,7 +71,7 @@
 
 (defn- headline-on-change [state]
   (when-let [headline (sel1 [:div.activity-modal-content-headline])]
-    (let [emojied-headline   (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:modal-editing-data :headline] emojied-headline])
       (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))))
 
@@ -207,79 +209,88 @@
                             mixins/first-render-mixin
 
                             {:before-render (fn [s]
-                                              (let [modal-data @(drv/get-ref s :modal-data)]
-                                                (when (and (not @(::animate s))
-                                                         (= (:activity-modal-fade-in modal-data) (:uuid (first (:rum/args s)))))
-                                                  (reset! (::animate s) true))
-                                                (when-let [activity-modal (sel1 [:div.activity-modal])]
-                                                  (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
-                                                    (reset! (::activity-modal-height s) (.-clientHeight activity-modal)))))
-                                              s)
+                              (let [modal-data @(drv/get-ref s :modal-data)]
+                                (when (and (not @(::animate s))
+                                         (= (:activity-modal-fade-in modal-data) (:uuid (first (:rum/args s)))))
+                                  (reset! (::animate s) true))
+                                (when-let [activity-modal (sel1 [:div.activity-modal])]
+                                  (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
+                                    (reset! (::activity-modal-height s) (.-clientHeight activity-modal)))))
+                              s)
                              :will-mount (fn [s]
-                                           (reset! (::esc-key-listener s)
-                                            (events/listen js/window EventType/KEYDOWN #(when (= (.-key %) "Escape")
-                                                                                          (let [modal-data @(drv/get-ref s :modal-data)]
-                                                                                            (if (and (:modal-editing modal-data)
-                                                                                                     (not @(::uploading-media s)))
-                                                                                              (dismiss-editing? s true)
-                                                                                              (close-clicked s))))))
-                                           (let [modal-data @(drv/get-ref s :modal-data)
-                                                 activity-data (first (:rum/args s))
-                                                 initial-body (:body activity-data)
-                                                 initial-headline (utils/emojify (:headline activity-data))]
-                                             (reset! (::editing s) (:modal-editing modal-data))
-                                             (reset! (::initial-body s) initial-body)
-                                             (reset! (::initial-headline s) initial-headline))
-                                           s)
+                              (reset! (::esc-key-listener s)
+                               (events/listen
+                                js/window
+                                EventType/KEYDOWN
+                                #(when (= (.-key %) "Escape")
+                                   (let [modal-data @(drv/get-ref s :modal-data)]
+                                     (if (and (:modal-editing modal-data)
+                                              (not @(::uploading-media s)))
+                                       (dismiss-editing? s true)
+                                       (close-clicked s))))))
+                              (let [modal-data @(drv/get-ref s :modal-data)
+                                    activity-data (first (:rum/args s))
+                                    initial-body (:body activity-data)
+                                    initial-headline (utils/emojify (:headline activity-data))]
+                                (reset! (::editing s) (:modal-editing modal-data))
+                                (reset! (::initial-body s) initial-body)
+                                (reset! (::initial-headline s) initial-headline))
+                              s)
                              :did-mount (fn [s]
-                                          (reset! (::window-click s)
-                                           (events/listen js/window EventType/CLICK (fn [e]
-                                                                                      (when (and (not (utils/event-inside? e (sel1 [:div.activity-modal :div.more-dropdown])))
-                                                                                                 (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-move]))))
-                                                                                        (reset! (::showing-dropdown s) false))
-                                                                                      (when (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-modal-share])))
-                                                                                        (reset! (::share-dropdown s) false)))))
-                                          (let [modal-data @(drv/get-ref s :modal-data)]
-                                            (when (:modal-editing modal-data)
-                                              (utils/after 1000
-                                                #(real-start-editing s :headline))))
-                                          s)
-                            :after-render (fn [s]
-                                            (when @(:first-render-done s)
-                                              (let [wh (.-innerHeight js/window)
-                                                    activity-modal (rum/ref-node s "activity-modal")
-                                                    next-show-bottom-border (>= (.-clientHeight activity-modal) wh)]
-                                                (when (not= @(::show-bottom-border s) next-show-bottom-border)
-                                                  (reset! (::show-bottom-border s) next-show-bottom-border))))
-                                            s)
-                            :will-unmount (fn [s]
-                                            ;; Remove window resize listener
-                                            (when @(::window-resize-listener s)
-                                              (events/unlistenByKey @(::window-resize-listener s))
-                                              (reset! (::window-resize-listener s) nil))
-                                            (when @(::window-click s)
-                                              (events/unlistenByKey @(::window-click s))
-                                              (reset! (::window-click s) nil))
-                                            (when @(::esc-key-listener s)
-                                              (events/unlistenByKey @(::esc-key-listener s))
-                                              (reset! (::esc-key-listener s) nil))
-                                            s)
-                            :did-remount (fn [_ s]
-                                           (let [activity-data (first (:rum/args s))
-                                                 initial-body (:body activity-data)
-                                                 initial-headline (utils/emojify (:headline activity-data))]
-                                             (reset! (::initial-headline s) initial-headline)
-                                             (reset! (::initial-body s) initial-body))
-                                           (let [modal-data @(drv/get-ref s :modal-data)]
-                                             (when (and (:modal-editing modal-data)
-                                                        @(::entry-saving s))
-                                               (let [entry-edit (:modal-editing-data modal-data)]
-                                                 (when-not (:loading entry-edit)
-                                                   (when-not (:error entry-edit)
-                                                     (stop-editing s))
-                                                   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
-                                                   (reset! (::entry-saving s) false)))))
-                                           s)}
+                              (reset! (::window-click s)
+                               (events/listen
+                                js/window
+                                EventType/CLICK
+                                (fn [e]
+                                  (when (and (not
+                                              (utils/event-inside? e (sel1 [:div.activity-modal :div.more-dropdown])))
+                                             (not
+                                              (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-move]))))
+                                    (reset! (::showing-dropdown s) false))
+                                  (when
+                                   (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-modal-share])))
+                                    (reset! (::share-dropdown s) false)))))
+                              (let [modal-data @(drv/get-ref s :modal-data)]
+                                (when (:modal-editing modal-data)
+                                  (utils/after 1000
+                                    #(real-start-editing s :headline))))
+                              s)
+                             :after-render (fn [s]
+                              (when @(:first-render-done s)
+                                (let [wh (.-innerHeight js/window)
+                                      activity-modal (rum/ref-node s "activity-modal")
+                                      next-show-bottom-border (>= (.-clientHeight activity-modal) wh)]
+                                  (when (not= @(::show-bottom-border s) next-show-bottom-border)
+                                    (reset! (::show-bottom-border s) next-show-bottom-border))))
+                              s)
+                             :will-unmount (fn [s]
+                              ;; Remove window resize listener
+                              (when @(::window-resize-listener s)
+                                (events/unlistenByKey @(::window-resize-listener s))
+                                (reset! (::window-resize-listener s) nil))
+                              (when @(::window-click s)
+                                (events/unlistenByKey @(::window-click s))
+                                (reset! (::window-click s) nil))
+                              (when @(::esc-key-listener s)
+                                (events/unlistenByKey @(::esc-key-listener s))
+                                (reset! (::esc-key-listener s) nil))
+                              s)
+                             :did-remount (fn [_ s]
+                              (let [activity-data (first (:rum/args s))
+                                    initial-body (:body activity-data)
+                                    initial-headline (utils/emojify (:headline activity-data))]
+                                (reset! (::initial-headline s) initial-headline)
+                                (reset! (::initial-body s) initial-body))
+                              (let [modal-data @(drv/get-ref s :modal-data)]
+                                (when (and (:modal-editing modal-data)
+                                           @(::entry-saving s))
+                                  (let [entry-edit (:modal-editing-data modal-data)]
+                                    (when-not (:loading entry-edit)
+                                      (when-not (:error entry-edit)
+                                        (stop-editing s))
+                                      (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
+                                      (reset! (::entry-saving s) false)))))
+                              s)}
   [s activity-data]
   (let [show-comments? (utils/link-for (:links activity-data) "comments")
         fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
@@ -287,7 +298,9 @@
         modal-data (drv/react s :modal-data)
         editing @(::editing s)]
     [:div.activity-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (and @(::animate s) (not @(:first-render-done s))))
+      {:class (utils/class-set {:will-appear (or @(::dismiss s)
+                                                 (and @(::animate s)
+                                                      (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :no-comments (not show-comments?)
                                 :editing editing})
@@ -348,7 +361,10 @@
                                             (delete-clicked % activity-data))}
                               "Delete"])]])
                     (when @(::move-activity s)
-                      (activity-move {:activity-data activity-data :boards-list all-boards :dismiss-cb #(reset! (::move-activity s) false) :on-change #(close-clicked s nil)}))]))
+                      (activity-move {:activity-data activity-data
+                                      :boards-list all-boards
+                                      :dismiss-cb #(reset! (::move-activity s) false)
+                                      :on-change #(close-clicked s nil)}))]))
               (activity-attachments activity-data false)
               (if editing
                 (topics-dropdown (:modal-editing-data modal-data) :modal-editing-data)

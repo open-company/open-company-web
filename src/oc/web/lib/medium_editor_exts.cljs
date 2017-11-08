@@ -15,7 +15,9 @@
   (assoc-in config-map [:extensions btn-name] btn))
 
 (def hl-btn
-  (new js/MediumButton #js {:label "<i class=\"fa fa-paint-brush\"></i>" :start "<mark>" :end "</mark>"}))
+  (new js/MediumButton #js {:label "<i class=\"fa fa-paint-brush\"></i>"
+                            :start "<mark>"
+                            :end "</mark>"}))
 
 (def highlight-btn
   {:name "highlight"
@@ -52,7 +54,14 @@
                     (gstyle/setStyle el #js {:position "absolute"
                                              :display "block"
                                              :opacity 1
-                                             :top (str (- (+ top-v (:top bt-offset)) (when scrolling-el (.-top (.offset (js/$ scrolling-el))))) "px")
+                                             :top (str
+                                                   (-
+                                                    (+
+                                                     top-v
+                                                     (:top bt-offset))
+                                                    (when scrolling-el
+                                                     (.-top (.offset (js/$ scrolling-el)))))
+                                                   "px")
                                              :left (str (+ 6 (:left bt-offset)) "px")})))
         show-btn (fn [event]
                    (this-as this

@@ -125,7 +125,9 @@
               "The email or password you entered is incorrect."
               [:br]
               "Please try again, or "
-              [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "reset your password"]
+              [:a.underline.red
+                {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])}
+                "reset your password"]
               "."]
             :else
             [:span.small-caps.red
@@ -164,7 +166,12 @@
             [:div.right
               [:button.mlb-reset.mlb-default
                 {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
-                               (nil? (utils/link-for (:links (:auth-settings (rum/react dis/app-state))) "authenticate" "GET" {:auth-source "email"})))
+                               (nil?
+                                (utils/link-for
+                                 (:links (:auth-settings (rum/react dis/app-state)))
+                                 "authenticate"
+                                 "GET"
+                                 {:auth-source "email"})))
                  :on-click #(do
                               (.preventDefault %)
                               (dis/dispatch! [:login-with-email]))}
@@ -198,10 +205,14 @@
 ;             (= (:signup-with-email-error (rum/react dis/app-state)) 409)
 ;             [:span.small-caps.red
 ;               "This email address already has an account. "
-;               [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])} "Would you like to sign in with that account?"]
+;               [:a.underline.red
+;                 {:on-click #(dis/dispatch! [:login-overlay-show :login-with-email])}
+;                 "Would you like to sign in with that account?"]
 ;               [:br]
 ;               "Please try again, or "
-;               [:a.underline.red {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "reset your password"]
+;               [:a.underline.red
+;                 {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])}
+;                 "reset your password"]
 ;               "."]
 ;             (= (:signup-with-email-error (rum/react dis/app-state)) 400)
 ;             [:span.small-caps.red
@@ -224,7 +235,10 @@
 ;               {:value (:firstname (:signup-with-email (rum/react dis/app-state)))
 ;                :id "sign-up-firstname"
 ;                :auto-focus true
-;                :on-change #(dis/dispatch! [:input [:signup-with-email :firstname] (.-value (sel1 [:input.firstname]))])
+;                :on-change #(dis/dispatch!
+;                             [:input
+;                              [:signup-with-email :firstname]
+;                              (.-value (sel1 [:input.firstname]))])
 ;                :placeholder "First name"
 ;                :type "text"
 ;                :tabIndex 1
@@ -232,7 +246,10 @@
 ;             [:input.sign-in-field.lastname.half.right
 ;               {:value (:lastname (:signup-with-email (rum/react dis/app-state)))
 ;                :id "sign-up-lastname"
-;                :on-change #(dis/dispatch! [:input [:signup-with-email :lastname] (.-value (sel1 [:input.lastname]))])
+;                :on-change #(dis/dispatch!
+;                             [:input
+;                              [:signup-with-email :lastname]
+;                              (.-value (sel1 [:input.lastname]))])
 ;                :placeholder "Last name"
 ;                :type "text"
 ;                :tabIndex 2
@@ -338,13 +355,20 @@
                                    dont-scroll
                                    no-scroll-mixin
                                    {:did-mount (fn [s]
-                                                 ; initialise the keys to string to avoid jumps in UI focus
-                                                 (utils/after 500
-                                                  #(dis/dispatch! [:input [:collect-name-pswd] {:firstname (or (:first-name (:current-user-data @dis/app-state)) "")
-                                                                                                :lastname (or (:last-name (:current-user-data @dis/app-state)) "")
-                                                                                                :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
-                                                 (utils/after 100 #(.focus (sel1 [:input.firstname])))
-                                                 s)}
+                                     ; initialise the keys to string to avoid jumps in UI focus
+                                     (utils/after 500
+                                      #(dis/dispatch!
+                                        [:input
+                                         [:collect-name-pswd]
+                                         {:firstname (or
+                                                      (:first-name (:current-user-data @dis/app-state))
+                                                      "")
+                                          :lastname (or
+                                                     (:last-name (:current-user-data @dis/app-state))
+                                                     "")
+                                          :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
+                                     (utils/after 100 #(.focus (sel1 [:input.firstname])))
+                                     s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click #(utils/event-stop %)}
@@ -408,12 +432,15 @@
                               dont-scroll
                               no-scroll-mixin
                               {:did-mount (fn [s]
-                                            ; initialise the keys to string to avoid jumps in UI focus
-                                            (utils/after 500
-                                             #(dis/dispatch! [:input [:collect-pswd] {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
-                                            (utils/after 1000 #(when-let [pswd-el (sel1 [:input.sign-in-field.pswd])]
-                                                                 (.focus pswd-el)))
-                                            s)}
+                                ; initialise the keys to string to avoid jumps in UI focus
+                                (utils/after 500
+                                 #(dis/dispatch!
+                                   [:input
+                                    [:collect-pswd]
+                                    {:pswd (or (:pswd (:collect-pswd @dis/app-state)) "")}]))
+                                (utils/after 1000 #(when-let [pswd-el (sel1 [:input.sign-in-field.pswd])]
+                                                     (.focus pswd-el)))
+                                s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click #(utils/event-stop %)}

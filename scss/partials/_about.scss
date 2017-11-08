@@ -1,6 +1,7 @@
 /***** About ******/
 
-@media (min-width: 768px) { 
+@media (min-width: 768px) {
+
   div#wrap.about-wrap {
     min-height: calc(100vh - 40px);
   }
@@ -14,7 +15,8 @@ div.container.about {
   text-align: center;
 }
 
-@media (min-width: 768px) { 
+@media (min-width: 768px) {
+
   div.container.about {
     text-align: center;
     width: 100%;
@@ -357,7 +359,7 @@ div.about-alignment {
     width: 100%;
     padding: 115px 16px;
   }
-  
+
   div.quote {
     position: absolute;
     left: 50%;
@@ -547,7 +549,7 @@ div.about-team {
               background-image: cdnUrl("/img/ML/about_twitter.svg");
               background-size: 20px 17.5px;
               background-repeat: no-repeat;
-            } 
+            }
 
             &.linkedin {
               background-image: cdnUrl("/img/ML/about_linkedin.svg");
@@ -664,7 +666,6 @@ div.about-footer {
     }
   }
 }
-
 
 div.container p {
   @include avenir_M();

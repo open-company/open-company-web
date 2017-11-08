@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.site-footer
-  "Component for the site footer. This is copied into oc.core/footer and every change here should be reflected there and vice versa."
+  "Component for the site footer. This is copied into oc.core/footer
+   and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]

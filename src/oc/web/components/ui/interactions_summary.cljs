@@ -34,11 +34,15 @@
   [s entry-data show-zero-comments?]
   (let [all-comments-data (drv/react s :comments-data)
         _comments-data (get all-comments-data (:uuid entry-data))
-        comments-data (if (sequential? _comments-data) _comments-data nil)
+        comments-data (when (sequential? _comments-data) _comments-data)
         comments-link (utils/link-for (:links entry-data) "comments")
         has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
         comments-authors (if has-comments-data
-                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at comments-data))))))
+                           (vec
+                            (map
+                             first
+                             (vals
+                              (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (reverse (:authors comments-link)))
         comments-count (max (count comments-data) (:count comments-link))]
     (when (and comments-count

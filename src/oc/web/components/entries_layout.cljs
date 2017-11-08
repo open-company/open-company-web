@@ -15,14 +15,20 @@
 (defn new?
   "
   An entry is new if:
-  
+
+
+
     user is part of the team (we don't track new for non-team members accessing public boards)
       -and-
     user is not the post's author
       -and-
     created-at is < 30 days
       -and-
-    
+
+
+
+
+
     created-at of the entry is newer than seen at
       -or-
     no seen at
@@ -84,19 +90,32 @@
         ;; :by-topic
         (= layout-type :by-topic)
         (let [entries (vals (:fixed-items board-data))
-              grouped-entries (apply merge (map (fn [[k v]] (hash-map k (vec (reverse (sort-by :created-at v))))) (group-by :topic-slug entries)))
-              sorted-topics (vec (reverse (sort #(compare (:created-at (first (get grouped-entries %1))) (:created-at (first (get grouped-entries %2)))) (keys grouped-entries))))]
+              grouped-entries (apply
+                               merge
+                               (map
+                                (fn [[k v]]
+                                 (hash-map k (vec (reverse (sort-by :created-at v)))))
+                                (group-by :topic-slug entries)))
+              sorted-topics (vec
+                             (reverse
+                              (sort
+                               #(compare
+                                 (:created-at (first (get grouped-entries %1)))
+                                 (:created-at (first (get grouped-entries %2))))
+                               (keys grouped-entries))))]
           (for [topic sorted-topics
                 :let [entries-group (get grouped-entries topic)
                       topic-name (:topic-name (first entries-group))
                       topic-slug (:topic-slug (first entries-group))
                       board-url (oc-urls/board-filter-by-topic (or topic-slug "uncategorized"))
                       first-line-entries (take 2 entries-group)
-                      first-has-headline (some #(not (empty? (:headline %))) first-line-entries)
-                      first-has-body (some #(not (empty? (:body %))) first-line-entries)
-                      second-line-entries (if (> (count entries-group) 2) (subvec entries-group 2 (min 4 (count entries-group))) [])
-                      second-has-headline (some #(not (empty? (:headline %))) second-line-entries)
-                      second-has-body (some #(not (empty? (:body %))) second-line-entries)]]
+                      first-has-headline (some #(seq (:headline %)) first-line-entries)
+                      first-has-body (some #(seq (:body %)) first-line-entries)
+                      second-line-entries (if (> (count entries-group) 2)
+                                           (subvec entries-group 2 (min 4 (count entries-group)))
+                                           [])
+                      second-has-headline (some #(seq (:headline %)) second-line-entries)
+                      second-has-body (some #(seq (:body %)) second-line-entries)]]
             [:div.entry-cards-container.by-topic.group
               {:key (str "entries-topic-group-" (or topic "uncategorized"))}
               ; Title of the topic group
@@ -116,7 +135,12 @@
                    :data-toggle "tooltip"
                    :data-placement "right"
                    :data-container "body"
-                   :on-click #(dis/dispatch! [:entry-edit {:topic-slug topic-slug :topic-name topic-name :board-slug (:slug board-data) :board-name (:name board-data)}])}]
+                   :on-click #(dis/dispatch!
+                               [:entry-edit
+                                {:topic-slug topic-slug
+                                 :topic-name topic-name
+                                 :board-slug (:slug board-data)
+                                 :board-name (:name board-data)}])}]
                 ; If there are more than 4 add the button to show all of them
                 (when (> (count entries-group) 4)
                   [:a.view-all-updates.mlb-reset
@@ -147,8 +171,9 @@
                     (for [entry (subvec entries-group 2 (min 4 (count entries-group)))
                           :let [is-new (new? entry changes)
                                 share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
-                      (rum/with-key (activity-card entry second-has-headline second-has-body is-new false share-thoughts)
-                        (str "entry-by-topic-" topic "-" (:uuid entry)))))
+                      (rum/with-key
+                       (activity-card entry second-has-headline second-has-body is-new false share-thoughts)
+                       (str "entry-by-topic-" topic "-" (:uuid entry)))))
                   ; If the total entries are 3 add a placeholder to avoid taking the full width
                   (when (= (count entries-group) 3)
                     [:div.entry-card.entry-card-placeholder])])]))
@@ -156,8 +181,8 @@
         (string? layout-type)
         (let [entries (vals (:fixed-items board-data))
               filtered-entries (if (= layout-type "uncategorized")
-                                  (vec (filter #(empty? (:topic-slug %)) entries))
-                                  (vec (filter #(= (:topic-slug %) layout-type) entries)))
+                                  (filterv #(empty? (:topic-slug %)) entries)
+                                  (filterv #(= (:topic-slug %) layout-type) entries))
               sorted-entries (vec (reverse (sort-by :created-at filtered-entries)))]
           [:div.entry-cards-container.by-specific-topic.group
             ; Calc the number of pairs
@@ -168,8 +193,8 @@
                     :let [start (* idx 2)
                           end (min (+ start 2) (count sorted-entries))
                           entries (subvec sorted-entries start end)
-                          has-headline (some #(not (empty? (:headline %))) entries)
-                          has-body (some #(not (empty? (:body %))) entries)]]
+                          has-headline (some #(seq (:headline %)) entries)
+                          has-body (some #(seq (:body %)) entries)]]
                 [:div.entries-cards-container-row.group
                   {:key (str "entries-row-" idx)}
                   ; Render the entries in the row
@@ -181,7 +206,10 @@
                   ; If there is only one entry add the empty card placeholder
                   (if (= (count sorted-entries) 1)
                     (let [entry-data (select-keys (first entries) [:board-name :topic-slug :topic-name])
-                          with-board (merge entry-data {:board-slug (:slug board-data) :board-name (:name board-data)})]
+                          with-board (merge
+                                      entry-data
+                                      {:board-slug (:slug board-data)
+                                       :board-name (:name board-data)})]
                       (activity-card-empty with-board (:read-only board-data)))
                     ; If there is only one entry in this row, but it's not the first add the placheolder
                     (when (= (count entries) 1)
@@ -199,8 +227,8 @@
                     :let [start (* idx 2)
                           end (min (+ start 2) (count sorted-entries))
                           entries (subvec sorted-entries start end)
-                          has-headline (some #(not (empty? (:headline %))) entries)
-                          has-body (some #(not (empty? (:body %))) entries)]]
+                          has-headline (some #(seq (:headline %)) entries)
+                          has-body (some #(seq (:body %)) entries)]]
                 ; Renteder the entries in thisnrow
                 [:div.entries-cards-container-row.group
                   {:key (str "entries-row-" idx)}
@@ -209,6 +237,8 @@
                               share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
                     (rum/with-key (activity-card entry has-headline has-body is-new false share-thoughts)
                       (str "entry-latest-" (:uuid entry))))
-                  ; If the row contains less than 2, add a placeholder div to avoid having the first cover the full width
+                  ; If the row contains less than 2, add a placeholder
+
+                  ; div to avoid having the first cover the full width
                   (when (= (count entries) 1)
                     [:div.entry-card.entry-card-placeholder])]))])))])

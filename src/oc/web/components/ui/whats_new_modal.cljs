@@ -57,13 +57,14 @@
             [:a.about-link.medium
               {:href oc-urls/blog}
               ""]]
-          (when (not (empty? whats-new-data))
+          (when (seq whats-new-data)
             [:div.news-list-container
               [:div.news-list
                   (let [sorted-whats-new (reverse (sort-by :published-at (vals whats-new-data)))]
                     (for [n sorted-whats-new
                           :let [self-link (utils/link-for (:links n) "self")
-                                secure-url (oc-urls/secure-activity (utils/storage-url-org-slug (:href self-link)) (:secure-uuid n))]]
+                                secure-url (oc-urls/secure-activity
+                                            (utils/storage-url-org-slug (:href self-link)) (:secure-uuid n))]]
                       [:div.news
                         {:key (str "about-news-" (:uuid n))}
                         [:div.news-date

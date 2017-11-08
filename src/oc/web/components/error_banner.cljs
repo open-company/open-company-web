@@ -18,7 +18,7 @@
                                    showing @(::showing s)
                                    banner-el (sel1 [:div.error-banner])]
                                (when (and (not showing)
-                                          (not (empty? message)))
+                                          (seq message))
                                   (reset! (::showing s) true)
                                   ;; dismiss the message only if required
                                   (when (pos? showing-time)

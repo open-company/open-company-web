@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.user-type-picker :refer (user-type-dropdown)]
+            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
 
 (def default-user-type "email")
@@ -15,7 +15,11 @@
 (def default-user "")
 (def default-slack-user {})
 (def default-user-role :author)
-(def default-user-row {:type default-user-type :temp-user default-user :user default-user :role default-user-role})
+(def default-user-row
+ {:type default-user-type
+  :temp-user default-user
+  :user default-user
+  :role default-user-role})
 
 (defn valid-user? [user-map]
   (or (and (= (:type user-map) "email")
@@ -45,7 +49,7 @@
 (defn has-dirty-data? [s]
   (let [invite-users-data @(drv/get-ref s :invite-users)
         invite-users (:invite-users invite-users-data)]
-    (some #(not (empty? (:user %))) invite-users)))
+    (some #(seq (:user %)) invite-users)))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
@@ -66,7 +70,7 @@
                    (let [sending @(::sending s)]
                      (when (pos? sending)
                        (let [invite-drv @(drv/get-ref s :invite-users)
-                             no-error-invites (vec (filter #(not (:error %)) (:invite-users invite-drv)))]
+                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))]
                          (reset! (::sending s) (count no-error-invites))
                          (when (zero? (count no-error-invites))
                            (utils/after 1000
@@ -84,7 +88,7 @@
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         team-roster (:team-roster invite-users-data)
-        uninvited-users (vec (filter #(= (:status %) "uninvited") (:users team-roster)))]
+        uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
     [:div.org-settings-panel.org-settings-invite-panel
       [:div.org-settings-panel-row.invite-from.group
         [:div.invite-from-label "Invite with:"]
@@ -119,7 +123,7 @@
             [:tr
               [:th "Invitee"
                 [:span.error
-                  (when-let [first-error-user (first (filter #(:error %) invite-users))]
+                  (when-let [first-error-user (first (filter :error invite-users))]
                     (cond
                       (string? (:error first-error-user))
                       (:error first-error-user)
@@ -142,8 +146,18 @@
                     [:div
                       {:class (when (:error user-data) "error")}
                       (rum/with-key
-                        (slack-users-dropdown {:on-change #(dis/dispatch! [:input [:invite-users i] (merge user-data {:user % :error nil :temp-user nil})])
-                                               :on-intermediate-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:user nil :error nil :temp-user %}))])
+                        (slack-users-dropdown {:on-change #(dis/dispatch!
+                                                            [:input
+                                                             [:invite-users i]
+                                                             (merge user-data {:user % :error nil :temp-user nil})])
+                                               :on-intermediate-change
+                                                #(dis/dispatch!
+                                                  [:input
+                                                   [:invite-users]
+                                                   (assoc
+                                                    invite-users
+                                                    i
+                                                    (merge user-data {:user nil :error nil :temp-user %}))])
                                                :initial-value (utils/name-or-email (:user user-data))})
                         (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                     [:input.org-settings-field.email-field
@@ -151,14 +165,27 @@
                        :class (when (:error user-data) "error")
                        :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
                        :placeholder "email@example.com"
-                       :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
+                       :on-change #(dis/dispatch!
+                                    [:input
+                                     [:invite-users]
+                                     (assoc
+                                      invite-users
+                                      i
+                                      (merge user-data {:error nil :user (.. % -target -value)}))])
                        :value (:user user-data)}])]
                 [:td.user-type-field
                   [:div.user-type-dropdown
                     (user-type-dropdown {:user-id (utils/guid)
                                          :user-type (:role user-data)
                                          :hide-admin (not (jwt/is-admin? (:team-id org-data)))
-                                         :on-change #(dis/dispatch! [:input [:invite-users] (assoc invite-users i (merge user-data {:role % :error nil}))])})]]
+                                         :on-change
+                                          #(dis/dispatch!
+                                            [:input
+                                             [:invite-users]
+                                             (assoc
+                                              invite-users
+                                              i
+                                              (merge user-data {:role % :error nil}))])})]]
                 [:td.user-remove
                   [:button.mlb-reset.remove-user
                     {:on-click #(let [before (subvec invite-users 0 i)
@@ -173,7 +200,13 @@
             [:tr
               [:td
                 [:button.mlb-reset.mlb-default.add-button
-                  {:on-click #(dis/dispatch! [:input [:invite-users] (conj invite-users (assoc default-user-row :type @(::inviting-from s)))])}
+                  {:on-click
+                    #(dis/dispatch!
+                      [:input
+                       [:invite-users]
+                       (conj
+                        invite-users
+                        (assoc default-user-row :type @(::inviting-from s)))])}
                   "+"]]
               [:td]
               [:td]]]]]
@@ -181,13 +214,13 @@
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(do
-                        (reset! (::sending s) (count (vec (filter valid-user? invite-users))))
+                        (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
                         (dis/dispatch! [:invite-users]))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}
-          (let [valid-users-count (count (vec (filter valid-user? invite-users)))
+          (let [valid-users-count (count (filterv valid-user? invite-users))
                 needs-plural (> valid-users-count 1)
                 send-cta @(::send-bt-cta s)]
             (if (zero? valid-users-count)
@@ -197,6 +230,12 @@
           {:on-click #(if (has-dirty-data? s)
                         (do
                           (reset! (::rand s) (int (rand 10000)))
-                          (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))]))
+                          (dis/dispatch!
+                           [:input
+                            [:invite-users]
+                            (vec
+                             (repeat
+                              default-row-num
+                              (assoc default-user-row :type @(::inviting-from s))))]))
                         (dismiss-settings-cb))}
           "Cancel"]]]))

@@ -9,7 +9,10 @@
 
 (defn submit-try-it-form [e try-it-form-id form-submit-success-cb]
   (.preventDefault e)
-  (js/mailchimpApiSubmit e (js/$ (str "#" try-it-form-id)) #(when (fn? form-submit-success-cb) (form-submit-success-cb)) nil))
+  (js/mailchimpApiSubmit
+   e
+   (js/$ (str "#" try-it-form-id))
+   #(when (fn? form-submit-success-cb) (form-submit-success-cb)) nil))
 
 (rum/defcs try-it-form < (rum/local "" ::email-value)
   [s try-it-form-id form-submit-success-cb]

@@ -7,8 +7,8 @@
 (rum/defcs carrot-close-bt < rum/static
                              (rum/local false ::hovering)
   [s {:keys [on-click width height]}]
-  (let [fixed-width (if width width default-size)
-        fixed-height (if height height default-size)
+  (let [fixed-width (or width default-size)
+        fixed-height (or height default-size)
         image-width (js/Math.round (/ fixed-width 2.7))
         image-height (js/Math.round (/ fixed-height 2.7))]
     [:button.carrot-close-bt.mlb-reset

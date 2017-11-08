@@ -373,7 +373,7 @@ div.onboard-lander {
       position: relative;
       @include avenir_R();
       font-size: 16px;
-      color: $carrot_dark_gray;      
+      color: $carrot_dark_gray;
 
       @include placeholder() {
         @include avenir_R();

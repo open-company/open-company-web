@@ -122,7 +122,9 @@
                                       s)
                        :after-render (fn [s]
                                        (let [comments-internal-scroll (js/$ ".comments-internal-scroll")
-                                             next-needs-gradient (> (.prop comments-internal-scroll "scrollHeight") (.height comments-internal-scroll))]
+                                             next-needs-gradient (>
+                                                                  (.prop comments-internal-scroll "scrollHeight")
+                                                                  (.height comments-internal-scroll))]
                                          ;; Show the gradient at the top only if there are at least 5 comments
                                          ;; or the container has some scroll
                                          (when (not= @(::needs-gradient s) next-needs-gradient)

@@ -20,7 +20,7 @@
   (some-> (jwt) decode (js->clj :keywordize-keys true)))
 
 (defn get-key [k]
-  (-> (get-contents) (get k)))
+  (get (get-contents) k))
 
 (defn expired? []
   (let [expire (gdt/fromTimestamp (get-key :expire))]

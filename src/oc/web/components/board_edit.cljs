@@ -19,11 +19,12 @@
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal)))
+  (utils/after 180 dismiss-modal))
 
 (defn board-name-on-change [s board-name-node]
   (let [board-html (.-innerHTML board-name-node)
-        cleaned-board-name (utils/strip-HTML-tags (utils/emoji-images-to-unicode (gobj/get (utils/emojify board-html) "__html")))]
+        cleaned-board-name (utils/strip-HTML-tags
+                            (utils/emoji-images-to-unicode (gobj/get (utils/emojify board-html) "__html")))]
     (dis/dispatch! [:input [:board-editing :name] cleaned-board-name])))
 
 (rum/defcs board-edit < rum/reactive
@@ -48,65 +49,65 @@
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
-                                      (dis/dispatch! [:teams-get])
-                                      (let [board-data @(drv/get-ref s :board-editing)]
-                                        (reset! (::slack-enabled s) (:slack-mirror board-data))
-                                        (reset! (::initial-board-name s) (:name board-data)))
-                                      (when (and (not @(drv/get-ref s :team-channels))
-                                                 (not @(::team-channels-requested s)))
-                                        (when-let [team-data @(drv/get-ref s :team-data)]
-                                          (reset! (::team-channels-requested s) true)
-                                          (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                      s)
+                          (dis/dispatch! [:teams-get])
+                          (let [board-data @(drv/get-ref s :board-editing)]
+                            (reset! (::slack-enabled s) (:slack-mirror board-data))
+                            (reset! (::initial-board-name s) (:name board-data)))
+                          (when (and (not @(drv/get-ref s :team-channels))
+                                     (not @(::team-channels-requested s)))
+                            (when-let [team-data @(drv/get-ref s :team-data)]
+                              (reset! (::team-channels-requested s) true)
+                              (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
+                          s)
                          :did-mount (fn [s]
-                                      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                                      (utils/after 100 #(utils/remove-tooltips))
-                                      (js/emojiAutocomplete)
-                                      (let [board-name-node (rum/ref-node s "board-name")]
-                                        (utils/to-end-of-content-editable board-name-node)
-                                        (reset! (::input-event s)
-                                         (events/listen board-name-node EventType/INPUT
-                                          #(board-name-on-change s board-name-node)))
-                                        (reset! (::dom-add-event s)
-                                         (events/listen board-name-node EventType/DOMNODEINSERTED
-                                          #(board-name-on-change s board-name-node)))
-                                        (reset! (::dom-remove-event s)
-                                         (events/listen board-name-node EventType/DOMNODEREMOVED
-                                          #(board-name-on-change s board-name-node)))
-                                        (reset! (::char-data-mod-event s)
-                                         (events/listen board-name-node EventType/DOMCHARACTERDATAMODIFIED
-                                          #(board-name-on-change s board-name-node))))
-                                      s)
+                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                          (utils/after 100 #(utils/remove-tooltips))
+                          (js/emojiAutocomplete)
+                          (let [board-name-node (rum/ref-node s "board-name")]
+                            (utils/to-end-of-content-editable board-name-node)
+                            (reset! (::input-event s)
+                             (events/listen board-name-node EventType/INPUT
+                              #(board-name-on-change s board-name-node)))
+                            (reset! (::dom-add-event s)
+                             (events/listen board-name-node EventType/DOMNODEINSERTED
+                              #(board-name-on-change s board-name-node)))
+                            (reset! (::dom-remove-event s)
+                             (events/listen board-name-node EventType/DOMNODEREMOVED
+                              #(board-name-on-change s board-name-node)))
+                            (reset! (::char-data-mod-event s)
+                             (events/listen board-name-node EventType/DOMCHARACTERDATAMODIFIED
+                              #(board-name-on-change s board-name-node))))
+                          s)
                          :did-remount (fn [o s]
-                                        ;; Dismiss animated since the board-editing was removed
-                                        (when (nil? @(drv/get-ref s :board-editing))
-                                          (close-clicked s))
-                                        (when (and (not @(drv/get-ref s :team-channels))
-                                                   (not @(::team-channels-requested s)))
-                                          (when-let [team-data @(drv/get-ref s :team-data)]
-                                            (reset! (::team-channels-requested s) true)
-                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                        s)
+                          ;; Dismiss animated since the board-editing was removed
+                          (when (nil? @(drv/get-ref s :board-editing))
+                            (close-clicked s))
+                          (when (and (not @(drv/get-ref s :team-channels))
+                                     (not @(::team-channels-requested s)))
+                            (when-let [team-data @(drv/get-ref s :team-data)]
+                              (reset! (::team-channels-requested s) true)
+                              (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
+                          s)
                          :will-unmount (fn [s]
-                                         (when @(::input-event s)
-                                            (events/unlistenByKey @(::input-event s))
-                                            (reset! (::input-event s) nil))
-                                         (when @(::dom-add-event s)
-                                            (events/unlistenByKey @(::dom-add-event s))
-                                            (reset! (::dom-add-event s) nil))
-                                         (when @(::dom-remove-event s)
-                                            (events/unlistenByKey @(::dom-remove-event s))
-                                            (reset! (::dom-remove-event s) nil))
-                                         (when @(::char-data-mod-event s)
-                                            (events/unlistenByKey @(::char-data-mod-event s))
-                                            (reset! (::char-data-mod-event s) nil))
-                                         s)}
+                          (when @(::input-event s)
+                            (events/unlistenByKey @(::input-event s))
+                            (reset! (::input-event s) nil))
+                          (when @(::dom-add-event s)
+                            (events/unlistenByKey @(::dom-add-event s))
+                            (reset! (::dom-add-event s) nil))
+                          (when @(::dom-remove-event s)
+                            (events/unlistenByKey @(::dom-remove-event s))
+                            (reset! (::dom-remove-event s) nil))
+                          (when @(::char-data-mod-event s)
+                            (events/unlistenByKey @(::char-data-mod-event s))
+                            (reset! (::char-data-mod-event s) nil))
+                          s)}
   [s]
   (let [current-user-data (drv/react s :current-user-data)
         board-editing (drv/react s :board-editing)
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
-        show-slack-channels? (and (not (empty? (:slug board-editing)))
+        show-slack-channels? (and (seq (:slug board-editing))
                                   (pos? (apply + (map #(-> % :channels count) slack-teams))))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
@@ -120,7 +121,9 @@
             (user-avatar-image current-user-data)
             (if new-board?
               [:div.title "Creating a new Board"]
-              [:div.title "Editing " [:span.board-name {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
+              [:div.title "Editing "
+                [:span.board-name
+                  {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
           [:div.board-edit-divider]
           [:div.board-edit-body
             [:div.board-edit-name-label-container.group
@@ -169,16 +172,26 @@
                                   :did-change-cb #(do
                                                     (reset! (::slack-enabled s) %)
                                                     (when-not %
-                                                      (dis/dispatch! [:input [:board-editing :slack-mirror] nil])))})]
+                                                      (dis/dispatch!
+                                                       [:input
+                                                        [:board-editing :slack-mirror]
+                                                        nil])))})]
               (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
-                                        :initial-value (or (str "#" (:channel-name (:slack-mirror (drv/react s :board-data)))) "")
+                                        :initial-value (or
+                                                        (str
+                                                         "#"
+                                                         (:channel-name (:slack-mirror (drv/react s :board-data))))
+                                                        "")
                                         :on-change (fn [team channel]
-                                                     (dis/dispatch! [:input [:board-editing :slack-mirror ] {:channel-id (:id channel)
-                                                                                                             :channel-name (:name channel)
-                                                                                                             :slack-org-id (:slack-org-id team)}]))})])
+                                                     (dis/dispatch!
+                                                      [:input
+                                                       [:board-editing :slack-mirror]
+                                                       {:channel-id (:id channel)
+                                                        :channel-name (:name channel)
+                                                        :slack-org-id (:slack-org-id team)}]))})])
           [:div.board-edit-footer
             [:div.board-edit-footer-left
-              (when (and (not (empty? (:slug board-editing)))
+              (when (and (seq (:slug board-editing))
                          (utils/link-for (:links board-editing) "delete"))
                 [:button.mlb-reset.mlb-link-black.delete-board
                   {:on-click (fn []
@@ -189,8 +202,11 @@
                                                                  :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                                                  :solid-button-title "Yes"
                                                                  :solid-button-cb (fn []
-                                                                                    (dis/dispatch! [:board-delete (:slug board-editing)])
-                                                                                    (dis/dispatch! [:alert-modal-hide])
+                                                                                    (dis/dispatch!
+                                                                                     [:board-delete
+                                                                                     (:slug board-editing)])
+                                                                                    (dis/dispatch!
+                                                                                     [:alert-modal-hide])
                                                                                     (close-clicked s))}]))}
                   "Delete"])]
             [:div.board-edit-footer-right.group
@@ -200,7 +216,9 @@
                                (empty? (:access board-editing)))
                  :on-click #(let [board-node (rum/ref-node s "board-name")
                                   inner-html (.-innerHTML board-node)
-                                  board-name (utils/strip-HTML-tags (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html")))]
+                                  board-name (utils/strip-HTML-tags
+                                              (utils/emoji-images-to-unicode
+                                               (gobj/get (utils/emojify inner-html) "__html")))]
                               (dis/dispatch! [:input [:board-editing :name] board-name])
                               (dis/dispatch! [:board-edit-save]))}
                 (if new-board? "Create" "Save")]

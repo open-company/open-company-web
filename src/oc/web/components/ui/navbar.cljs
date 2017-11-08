@@ -30,11 +30,13 @@
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
                                 :has-prior-updates (and (router/current-org-slug)
-                                                        (pos? (:count (utils/link-for (:links org-data) "collection" "GET"))))
+                                                        (pos?
+                                                         (:count
+                                                          (utils/link-for (:links org-data) "collection" "GET"))))
                                 :can-edit-board (and (router/current-org-slug)
                                                      (not (:read-only org-data)))
                                 :jwt (jwt/jwt)})}
-      (when (not (utils/is-test-env?))
+      (when-not (utils/is-test-env?)
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
@@ -49,7 +51,9 @@
                 (if (jwt/jwt)
                   [:div.group
                     [:div.dropdown.right
-                      (user-avatar {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle")) :disable-menu disabled-user-menu})
+                      (user-avatar
+                       {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle"))
+                        :disable-menu disabled-user-menu})
                       (when-not disabled-user-menu
                         (menu))]
                     (comment ; FIXME: Remove the notification bell until we enable it.

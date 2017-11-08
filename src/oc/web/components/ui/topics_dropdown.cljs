@@ -14,7 +14,7 @@
     @slug))
 
 (defn- create-new-topic [s]
-  (when-not (empty? @(::new-topic s))
+  (when (seq @(::new-topic s))
     (let [topics @(drv/get-ref s :entry-edit-topics)
           topic-name (s/trim @(::new-topic s))
           topic-slug (unique-slug topics topic-name)
@@ -37,8 +37,11 @@
                                s)
                               :did-mount (fn [s]
                                 (reset! (::window-click s)
-                                 (events/listen js/window EventType/CLICK #(when (not (utils/event-inside? % (rum/dom-node s)))
-                                                                             (reset! (::showing-dropdown s) false))))
+                                 (events/listen
+                                  js/window
+                                  EventType/CLICK
+                                  #(when (not (utils/event-inside? % (rum/dom-node s)))
+                                    (reset! (::showing-dropdown s) false))))
                                 s)
                               :will-unmount (fn [s]
                                 (when @(::window-click s)
@@ -68,7 +71,10 @@
                   {:key (str "entry-edit-dd-" (:slug t))
                    :on-click #(do
                                (reset! (::showing-dropdown s) false)
-                               (dis/dispatch! [:input [edit-key] (merge entry-editing {:topic-name (:name t) :has-changes true})]))
+                               (dis/dispatch!
+                                [:input
+                                 [edit-key]
+                                 (merge entry-editing {:topic-name (:name t) :has-changes true})]))
                    :class (when selected "select")}
                   [:button.mlb-reset
                     (:name t)]
@@ -77,7 +83,10 @@
                       {:on-click (fn [e]
                                    (utils/event-stop e)
                                    (reset! (::showing-dropdown s) false)
-                                   (dis/dispatch! [:input [edit-key] (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
+                                   (dis/dispatch!
+                                    [:input
+                                     [edit-key]
+                                     (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
                       "Remove"])])
               [:li.divider]
               [:li.entry-edit-new-topic.group

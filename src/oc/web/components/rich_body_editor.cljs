@@ -76,7 +76,14 @@
 ;; Chart
 
 (defn get-chart-thumbnail [chart-id oid]
-  (str "https://docs.google.com/spreadsheets/d/" chart-id "/embed/oimg?id=" chart-id "&oid=" oid "&disposition=ATTACHMENT&bo=false&zx=sohupy30u1p"))
+  (str
+   "https://docs.google.com/spreadsheets/d/"
+   chart-id
+   "/embed/oimg?id="
+   chart-id
+   "&oid="
+   oid
+   "&disposition=ATTACHMENT&bo=false&zx=sohupy30u1p"))
 
 (defn media-chart-add [s editable chart-url]
   (if (nil? chart-url)
@@ -109,7 +116,12 @@
 (defn media-video-add [s editable video-data]
   (if (= :dismiss video-data)
     (.addVideo editable nil nil nil nil)
-    (.addVideo editable (get-video-src video-data) (name (:type video-data)) (:id video-data) (get-video-thumbnail video-data))))
+    (.addVideo
+     editable
+     (get-video-src video-data)
+     (name (:type video-data))
+     (:id video-data)
+     (get-video-thumbnail video-data))))
 
 ;; Photo
 
@@ -220,7 +232,7 @@
     (add-attachment s editable)))
 
 (defn body-on-change [state]
-  (when (not @(::did-change state))
+  (when-not @(::did-change state)
     (reset! (::did-change state) true))
   (let [options (first (:rum/args state))
         on-change (:on-change options)]
@@ -282,41 +294,41 @@
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
                                {:did-mount (fn [s]
-                                             (utils/after 300 #(do
-                                              (setup-editor s)
-                                              (let [classes (:classes (first (:rum/args s)))]
-                                                (when (string/includes? classes "emoji-autocomplete")
-                                                  (js/emojiAutocomplete)))))
-                                             s)
+                                 (utils/after 300 #(do
+                                  (setup-editor s)
+                                  (let [classes (:classes (first (:rum/args s)))]
+                                    (when (string/includes? classes "emoji-autocomplete")
+                                      (js/emojiAutocomplete)))))
+                                 s)
                                 :will-update (fn [s]
-                                               (let [data @(drv/get-ref s :media-input)
-                                                     video-data (:media-video data)
-                                                     chart-data (:media-chart data)]
-                                                  (when (and @(::media-video s)
-                                                             (or (= video-data :dismiss)
-                                                                 (map? video-data)))
-                                                    (when (or (= video-data :dismiss)
-                                                              (map? video-data))
-                                                      (reset! (::media-video s) false)
-                                                      (dis/dispatch! [:input [:media-input :media-video] nil]))
-                                                    (if (map? video-data)
-                                                      (media-video-add s @(::media-picker-ext s) video-data)
-                                                      (media-video-add s @(::media-picker-ext s) nil)))
-                                                  (when (and @(::media-chart s)
-                                                             (or (= chart-data :dismiss)
-                                                                 (string? chart-data)))
-                                                    (when (or (= chart-data :dismiss)
-                                                              (string? chart-data))
-                                                      (reset! (::media-chart s) false)
-                                                      (dis/dispatch! [:input [:media-input :media-chart] nil]))
-                                                    (if (string? chart-data)
-                                                      (media-chart-add s @(::media-picker-ext s) chart-data)
-                                                      (media-chart-add s @(::media-picker-ext s) nil))))
-                                               s)
+                                 (let [data @(drv/get-ref s :media-input)
+                                       video-data (:media-video data)
+                                       chart-data (:media-chart data)]
+                                    (when (and @(::media-video s)
+                                               (or (= video-data :dismiss)
+                                                   (map? video-data)))
+                                      (when (or (= video-data :dismiss)
+                                                (map? video-data))
+                                        (reset! (::media-video s) false)
+                                        (dis/dispatch! [:input [:media-input :media-video] nil]))
+                                      (if (map? video-data)
+                                        (media-video-add s @(::media-picker-ext s) video-data)
+                                        (media-video-add s @(::media-picker-ext s) nil)))
+                                    (when (and @(::media-chart s)
+                                               (or (= chart-data :dismiss)
+                                                   (string? chart-data)))
+                                      (when (or (= chart-data :dismiss)
+                                                (string? chart-data))
+                                        (reset! (::media-chart s) false)
+                                        (dis/dispatch! [:input [:media-input :media-chart] nil]))
+                                      (if (string? chart-data)
+                                        (media-chart-add s @(::media-picker-ext s) chart-data)
+                                        (media-chart-add s @(::media-picker-ext s) nil))))
+                                 s)
                                 :will-unmount (fn [s]
-                                                (when @(::editor s)
-                                                  (.destroy @(::editor s)))
-                                                s)}
+                                 (when @(::editor s)
+                                   (.destroy @(::editor s)))
+                                 s)}
   [s {:keys [initial-body on-change classes show-placeholder upload-progress-cb]}]
   [:div.rich-body-editor-container
     [:div.rich-body-editor

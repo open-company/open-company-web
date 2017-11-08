@@ -28,7 +28,13 @@
         (when (drv/react s :made-with-carrot-modal)
           (made-with-carrot-modal))
         [:div.activity-header.group
-          (org-avatar (clojure.set/rename-keys activity-data {:org-logo-height :logo-height :org-logo-width :logo-width :org-logo-url :logo-url :org-name :name :org-slug :slug}))]
+          (org-avatar (clojure.set/rename-keys
+                       activity-data
+                       {:org-logo-height :logo-height
+                        :org-logo-width :logo-width
+                        :org-logo-url :logo-url
+                        :org-name :name
+                        :org-slug :slug}))]
         [:div.activity-content-outer
           [:div.activity-content
             (when (:headline activity-data)
@@ -38,7 +44,11 @@
               [:div.activity-author-inner.group
                 (user-avatar-image activity-author)
                 [:div.posted-by
-                  (str "Posted by " (:name activity-author) " " (utils/activity-date (utils/js-date (:published-at activity-data)) true) ".")]]]
+                  (str
+                   "Posted by "
+                   (:name activity-author)
+                   " "
+                   (utils/activity-date (utils/js-date (:published-at activity-data)) true) ".")]]]
             (when (:body activity-data)
               [:div.activity-body
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])]]

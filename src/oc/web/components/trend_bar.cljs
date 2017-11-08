@@ -53,19 +53,21 @@
                        (rum/local 0 ::last-scroll-top)
                        (rum/local nil ::scroll-listener)
                        {:did-mount (fn [s]
-                                     ; start listenings for scrolling events
-                                     (utils/after 1000 #(when (router/current-org-slug) (dis/dispatch! [:trend-bar-status :collapsed])))
-                                     (let [scroll-listener (events/listen js/window EventType/SCROLL #(scrolled % s))]
-                                       (reset! (::scroll-listener s) scroll-listener))
-                                     s)
+                         ; start listenings for scrolling events
+                         (utils/after
+                          1000
+                          #(when (router/current-org-slug) (dis/dispatch! [:trend-bar-status :collapsed])))
+                         (let [scroll-listener (events/listen js/window EventType/SCROLL #(scrolled % s))]
+                           (reset! (::scroll-listener s) scroll-listener))
+                         s)
                         :will-unmount (fn [s]
-                                        ; remove the scroll listener when the components in unmounted
-                                        (events/unlistenByKey @(::scroll-listener s))
-                                        s)
+                         ; remove the scroll listener when the components in unmounted
+                         (events/unlistenByKey @(::scroll-listener s))
+                         s)
                         :after-render (fn [s]
-                                        ; update the body classes after the each render
-                                        (update-body-class @(drv/get-ref s :trend-bar-status))
-                                        s)}
+                         ; update the body classes after the each render
+                         (update-body-class @(drv/get-ref s :trend-bar-status))
+                         s)}
   [s org-name]
   (when (router/current-org-slug)
     (let [trend-bar-status (drv/react s :trend-bar-status)]
@@ -83,7 +85,9 @@
           [:button.mlb-reset.toggle-trend-bt
             {:on-click #(do
                           (reset! (::hovering s) false)
-                          (dis/dispatch! [:trend-bar-status (if (not= trend-bar-status :trending) :trending :expanded)]))}
+                          (dis/dispatch!
+                           [:trend-bar-status
+                            (if (not= trend-bar-status :trending) :trending :expanded)]))}
             (if (not= trend-bar-status :trending) "Expand" "Hide")]
           [:div.trending-org
             (str "Trending in " org-name)]

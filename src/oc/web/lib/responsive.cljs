@@ -91,7 +91,7 @@
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies
-  (if (not (not (.-_phantom js/window)))
+  (if (.-_phantom js/window)
     false
     (or (= (gobj/get js/WURFL "form_factor") "Tablet")
         (= (gobj/get js/WURFL "form_factor") "Smartphone")
@@ -112,5 +112,5 @@
        topic-list-right-margin
        (if (is-tablet-or-mobile?) 0 left-navigation-sidebar-width)))) ; the left side panel with the topics list
 
-(when (not (.-_phantom js/window))
-  (events/listen js/window EventType/RESIZE #(set-browser-type!)))
+(when-not (.-_phantom js/window)
+  (events/listen js/window EventType/RESIZE set-browser-type!))
