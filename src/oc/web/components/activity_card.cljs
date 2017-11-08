@@ -259,7 +259,7 @@
                               (:topic-slug activity-data)))}
                 topic-name]))
           (when is-all-posts
-            [:div.activity-tag.on-gray
+            [:div.activity-tag.board-tag.on-gray
               {:class (utils/class-set {:double-tag (:topic-slug activity-data)})
                :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
               (:board-name activity-data)])
