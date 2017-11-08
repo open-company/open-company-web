@@ -20,7 +20,7 @@
                          :height (str (min 234 (* (/ (:banner-height draft) (:banner-width draft)) 430)) "px")}}])
         [:div.draft-card-title
           {:dangerouslySetInnerHTML
-            (utils/emojify (utils/strip-HTML-tags (if (empty? (:title draft)) "Untitled Draft" (:title draft))))}]
+            (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft)) "Untitled Draft" (:headline draft))))}]
         (let [fixed-body (utils/body-without-preview (:body draft))
               empty-body? (empty? (utils/strip-HTML-tags fixed-body))
               final-body (utils/emojify (if empty-body? "Say something..." fixed-body))]
