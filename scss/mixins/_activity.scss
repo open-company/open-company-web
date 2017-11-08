@@ -29,6 +29,17 @@ $h2_top_margin: 20;
     font-size: 12px;
     white-space: nowrap;
 
+    time a.board-name {
+      text-decoration: none;
+      @include avenir_H();
+      color: $carrot_light_gray_3;
+      font-size: 12px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
     div.tooltip {
       .tooltip-inner {
         white-space:pre-wrap;
