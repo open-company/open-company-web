@@ -10,18 +10,18 @@ div.activity-card {
   &:hover, &.dropdown-active {
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
 
-    div.activity-card-head.entry-card {
+    div.activity-card-head {
       background-color: $carrot_light_gray_5;
-    }
 
-    div.activity-card-head div.activity-card-head-right {
-      div.activity-tag {
-        background-color: $carrot_light_gray_6;
-      }
+      div.activity-card-head-right {
+        div.activity-tag {
+          background-color: $carrot_light_gray_6;
+        }
 
-      div.more-button {
-        button.more-ellipsis {
-          opacity: 0.8;
+        div.more-button {
+          button.more-ellipsis {
+            opacity: 0.8;
+          }
         }
       }
     }
@@ -157,12 +157,9 @@ div.activity-card {
     width: 100%;
     padding: 16px 24px;
     height: 72px;
-
-    &.entry-card {
-      background-color: $carrot_light_gray_2;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-    }
+    background-color: $carrot_light_gray_2;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 
     div.activity-card-head-author {
       float: left;
@@ -202,10 +199,6 @@ div.activity-card {
         text-overflow: ellipsis;
         overflow: hidden;
         margin-right: 8px;
-
-        &.double-tag {
-          max-width: 50%;
-        }
       }
 
       @include activity-tag();

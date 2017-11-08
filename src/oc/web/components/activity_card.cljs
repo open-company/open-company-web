@@ -191,11 +191,9 @@
                        [:activity-modal-fade-in
                         (:board-slug activity-data)
                         (:uuid activity-data)
-                        (:type activity-data)]))))
-     }
+                        (:type activity-data)]))))}
       ; Card header
-      [:div.activity-card-head.group
-        {:class "entry-card"}
+      [:div.activity-card-head.entry-card.group
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (:publisher activity-data))
@@ -208,7 +206,14 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
+                (utils/time-since t)
+                (when is-all-posts
+                  [" in "
+                   (let [board-url (utils/get-board-url (router/current-org-slug) (:board-slug activity-data))]
+                     [:a.board-name
+                       {:href board-url
+                        :on-click #(do (utils/event-stop %) (router/nav! board-url))}
+                       (:board-name activity-data)])])])]]
         ; Card labels
         [:div.activity-card-head-right
           (when (or (utils/link-for (:links activity-data) "partial-update")
@@ -252,22 +257,15 @@
           (when (:topic-slug activity-data)
             (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
-                {:class (when is-all-posts "double-tag")
-                 :on-click #(router/nav!
+                {:on-click #(router/nav!
                              (oc-urls/board-filter-by-topic
                               (router/current-org-slug)
                               (:board-slug activity-data)
                               (:topic-slug activity-data)))}
                 topic-name]))
-          (when is-all-posts
-            [:div.activity-tag
-              {:class (utils/class-set {:board-tag true
-                                        :double-tag (:topic-slug activity-data)})
-               :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
-              (:board-name activity-data)])
-                ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
-                ;;(when is-new [:div.new-tag "New"])
-                ]]
+          ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
+          ;;(when is-new [:div.new-tag "New"])
+          ]]
       [:div.activity-card-content.group
         ; Headline
         [:div.activity-card-headline
