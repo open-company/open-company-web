@@ -905,9 +905,11 @@
 
 (defmethod dispatcher/action :reaction-toggle
   [db [_ activity-uuid reaction-data]]
-  (let [is-all-posts (:from-all-posts @router/path)
-        org-slug (router/current-org-slug)
+  (let [org-slug (router/current-org-slug)
+        is-all-posts (:from-all-posts @router/path)
+        ;; if we are coming from all-posts
         board-key (if is-all-posts
+                   ;; We need to update the entry in all-posts data, not in the board data
                    (dispatcher/all-posts-key org-slug)
                    (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
