@@ -124,6 +124,7 @@
                         (rum/local nil ::uploading-media)
                         (rum/local false ::show-divider-line)
                         (rum/local false ::saving)
+                        (rum/local false ::publishing)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -160,6 +161,12 @@
                             (let [entry-editing @(drv/get-ref s :entry-editing)]
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
+                                (when-not (:error entry-editing)
+                                  (real-close s)))))
+                          (when @(::publishing s)
+                            (let [entry-editing @(drv/get-ref s :entry-editing)]
+                              (when (not (:publishing entry-editing))
+                                (reset! (::publishing s) false)
                                 (when-not (:error entry-editing)
                                   (real-close s)))))
                           s)
@@ -234,12 +241,20 @@
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (clean-body)
-                          (reset! (::saving s) true)
-                          (dis/dispatch! [:entry-save]))
-             :disabled (not (:has-changes entry-editing))}
-             (when @(::saving s)
-               (small-loading))
-            (if new-entry? "Post" "Save")]
+                          (reset! (::publishing s) true)
+                          (dis/dispatch! [:entry-publish]))
+             :disabled (or @(::publishing s)
+                           (not (:has-changes entry-editing)))}
+            (when @(::publishing s)
+              (small-loading))
+            "Publish"]
           [:button.mlb-reset.mlb-link-black.form-action-bt
-            {:on-click #(cancel-clicked s)}
-            "Cancel"]]]]]))
+            {:disabled (or @(::saving s)
+                           (not (:has-changes entry-editing)))
+             :on-click #(do
+                          (clean-body)
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:entry-save]))}
+            (when @(::saving s)
+              (small-loading))
+            "Save draft"]]]]]))
