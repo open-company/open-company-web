@@ -46,10 +46,21 @@
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
           all-posts-data (dis/all-posts-data data)]
-      (if (or (not org-data)
+      ;; Show loading if
+      (if (or ;; the org data are not loaded yet
+              (not org-data)
+              ;; No board specified
+              (and (not (router/current-board-slug))
+                   ;; but there are some
+                   (pos? (count (:boards org-data))))
+              ;; Board specified
               (and (router/current-board-slug)
-                   (not board-data)
-                   (not all-posts-data)))
+                       ;; But the data are not loaded yet
+                   (or (and (not= (router/current-board-slug) "all-posts")
+                            (not board-data))
+                       ;; Or the all-posts data
+                       (and (= (router/current-board-slug) "all-posts")
+                            (not all-posts-data)))))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
