@@ -1146,6 +1146,7 @@
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+    (api/get-org (dispatcher/org-data))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
@@ -1170,6 +1171,7 @@
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ {:keys [activity-data edit-key]}]]
   (let [board-slug (:board-slug activity-data)]
+    (api/get-org (dispatcher/org-data))
     (utils/after 10
      #(router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
     ; Add the new activity into the board
