@@ -1179,7 +1179,7 @@
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [edit-key] dissoc :loading)))))
+        (update-in [edit-key] dissoc :publishing)))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
