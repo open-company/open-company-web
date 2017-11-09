@@ -174,7 +174,12 @@
                             (let [entry-editing @(drv/get-ref s :entry-editing)]
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
-                                (utils/after 180 #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))
+                                ;; Redirect to the publishing board if the slug is available
+                                (when (seq (:board-slug entry-editing))
+                                  (utils/after
+                                   180
+                                   #(router/nav!
+                                     (oc-urls/board (router/current-org-slug) (:board-slug entry-editing)))))
                                 (when-not (:error entry-editing)
                                   (real-close s)))))
                           s)
