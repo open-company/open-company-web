@@ -1135,8 +1135,13 @@
   [db [_]]
   (let [entry-data (:entry-editing db)]
     (if (:links entry-data)
-      (api/update-entry entry-data (if (= (:status entry-data) "published") (router/current-board-slug) "drafts"))
-      (api/create-entry entry-data))
+      (let [redirect-board-slug (if (= (:status entry-data) "published") (router/current-board-slug) "drafts")]
+        (api/update-entry entry-data redirect-board-slug))
+      (let [org-slug (router/current-org-slug)
+            entry-board-key (dispatcher/board-data-key org-slug (:board-slug entry-data))
+            entry-board-data (get-in db entry-board-key)
+            entry-create-link (utils/link-for (:links entry-board-data) "create")]
+        (api/create-entry entry-data entry-create-link)))
     (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
@@ -1164,8 +1169,16 @@
 
 (defmethod dispatcher/action :entry-publish
   [db [_]]
-  (let [entry-data (:entry-editing db)]
-    (api/publish-entry entry-data)
+  (let [entry-data (:entry-editing db)
+        entry-exists? (seq (:links entry-data))
+        board-data-key (dispatcher/board-data-key (router/current-org-slug) (:board-slug entry-data))
+        board-data (get-in db board-data-key)
+        publish-entry-link (if entry-exists?
+                            ;; If the entry already exists use the publish link in it
+                            (utils/link-for (:links entry-data) "publish")
+                            ;; If the entry is new, use
+                            (utils/link-for (:links board-data) "create"))]
+    (api/publish-entry entry-data publish-entry-link)
     (assoc-in db [:entry-editing :publishing] true)))
 
 (defmethod dispatcher/action :entry-publish/finish
