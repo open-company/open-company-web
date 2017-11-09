@@ -122,7 +122,8 @@
                                                  sidebar-width))
                                                "px")
                                  :left "50%"}
-          entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))]
+          entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
+          is-drafts-board (= (:slug board-data) "drafts")]
       ;; Topic list
       (dom/div {:class (utils/class-set {:topics-columns true
                                          :group true
@@ -222,6 +223,7 @@
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
+                         (not is-drafts-board)
                          (or (not board-filters) (not= board-filters :latest) (> (count entry-topics) 1)))
                 (filters-dropdown))
               ;; Add entry floating button
@@ -269,7 +271,7 @@
               :else
               (cond
                 ;; Drafts
-                (= (:slug board-data) "drafts")
+                is-drafts-board
                 (drafts-layout board-data)
                 ;; Entries
                 :else
