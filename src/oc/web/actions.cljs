@@ -1184,7 +1184,7 @@
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
   (-> db
-    (update-in [:entry-editing] dissoc :loading)
+    (update-in [:entry-editing] dissoc :publishing)
     (update-in [:entry-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
