@@ -25,6 +25,17 @@
          (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
+(defn reaction-display-helper
+  "Display is different if reaction is on an entry vs a comment."
+  [item-data r]
+  (let [count (:count r)]
+    (if (= (:content-type item-data) "entry")
+      (str "+" count)
+      (case count
+        0 (str "Agree")
+        1 (str count " person agreed")
+        (str count " people agreed")))))
+
 (rum/defcs reactions
   [s item-data]
   (when (seq (:reactions item-data))
@@ -56,4 +67,4 @@
                            (dis/dispatch! [:reaction-toggle item-data r])))}
             [:span.reaction (:reaction r)]
             [:div.count
-              (str "+" (:count r))]])])))
+              (reaction-display-helper item-data r)]])])))
