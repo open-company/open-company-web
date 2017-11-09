@@ -1169,7 +1169,7 @@
     (assoc-in db [:entry-editing :publishing] true)))
 
 (defmethod dispatcher/action :entry-publish/finish
-  [db [_ {:keys [activity-data edit-key]}]]
+  [db [_ {:keys [activity-data]}]]
   (let [board-slug (:board-slug activity-data)]
     (api/get-org (dispatcher/org-data))
     ; Add the new activity into the board
@@ -1179,7 +1179,7 @@
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [edit-key] dissoc :publishing)))))
+        (update-in [:entry-editing] dissoc :publishing)))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
