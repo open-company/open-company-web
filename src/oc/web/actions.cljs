@@ -1215,6 +1215,23 @@
 (defmethod dispatcher/action :activity-delete/finish
   [db [_]]
   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
+  ;; Reload the org to update the number of drafts in the navigation
+  (when (= (router/current-board-slug) "drafts")
+    (api/get-org (dispatcher/org-data))
+    (let [org-slug (router/current-org-slug)
+          org-data (dispatcher/org-data)
+          boards-no-draft (sort-by :name (filterv #(not= (:slug %) "drafts") (:boards org-data)))
+          board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+          board-data (get-in db board-key)]
+      (when (zero? (count (:fixed-items board-data)))
+        (utils/after
+         100
+         #(router/nav!
+            (if (pos? (count boards-no-draft))
+              ;; If there is at least one board redirect to it
+              (utils/get-board-url org-slug (:slug (first boards-no-draft)))
+              ;; If not boards are available redirect to the empty org
+              (oc-urls/org org-slug)))))))
   db)
 
 (defmethod dispatcher/action :alert-modal-show
