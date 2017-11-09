@@ -31,14 +31,22 @@
        (.-scrollTop (.-body js/document))))
 
 (defn calc-opacity [scroll-top]
-  (let [fixed-scroll-top (* (- (min scroll-top max-scroll) 50) 100 (/ 1 (- max-scroll min-scroll)))]
+  (let [fixed-scroll-top (/
+                          (*
+                           (- (min scroll-top max-scroll) 50)
+                           100)
+                          (- max-scroll min-scroll))]
     (max 0 (min (/ fixed-scroll-top 100) 1))))
 
-(defn did-scroll [e]
-  (let [entry-floating (js/$ "#new-entry-floating-btn")]
+(defn did-scroll [e s]
+  (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
     (when (pos? (.-length entry-floating))
-      (let [scroll-top (document-scroll-top)]
-        (.css entry-floating #js {:opacity (calc-opacity scroll-top)})))))
+      (let [scroll-top (document-scroll-top)
+            opacity (if @(::show-floating-boards-dropdown s)
+                      1
+                      (calc-opacity scroll-top))]
+        (.css entry-floating #js {:opacity opacity
+                                 :display (if (pos? opacity) "block" "none")})))))
 
 (defn get-first-tooltip-message [org-data]
   (let [create-link (utils/link-for (:links org-data) "create")
@@ -74,6 +82,7 @@
                               (drv/drv :all-posts)
                               (drv/drv :board-filters)
                               (drv/drv :show-onboard-overlay)
+                              (drv/drv :editable-boards)
                               ;; Locals
                               (rum/local nil ::show-boards-tooltip)
                               (rum/local false ::show-plus-tooltip)
@@ -81,10 +90,9 @@
                               (rum/local nil ::ww)
                               (rum/local nil ::resize-listener)
                               (rum/local nil ::scroll-listener)
-                              {;:init (fn [s]
-                                ;
-                                ;s)
-                               :will-mount (fn [s]
+                              (rum/local nil ::show-top-boards-dropdown)
+                              (rum/local nil ::show-floating-boards-dropdown)
+                              {:will-mount (fn [s]
                                 (let [show-onboard-overlay @(drv/get-ref s :show-onboard-overlay)]
                                   (reset! (::show-boards-tooltip s) show-onboard-overlay))
                                 ;; Get current window width
@@ -97,7 +105,7 @@
                                 (when-not (utils/is-test-env?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
-                                   (events/listen js/window EventType/SCROLL #(did-scroll %))))
+                                   (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 ; (when @(::show-boards-tooltip s)
                                 ;   (utils/after 1000 #(reset! (::force-update s) true)))
                                 s)
@@ -135,7 +143,8 @@
                                                2)
                                               sidebar-width)) "px")}
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
-        is-drafts-board (= (:slug board-data) "drafts")]
+        is-drafts-board (= (:slug board-data) "drafts")
+        all-boards (drv/react s :editable-boards)]
       ;; Topic list
       [:div.dashboard-layout.group
         (when (and @(::show-boards-tooltip s)
@@ -205,54 +214,48 @@
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
                          (not (responsive/is-tablet-or-mobile?))
-                         (utils/link-for (:links board-data) "create"))
-                [:button.mlb-reset.mlb-default.add-to-board-btn.top-button.group
-                  {:on-click (fn [_]
-                              (let [entry-data {:board-slug (:slug board-data)
-                                                :board-name (:name board-data)}
-                                    topic-data (when (string? board-filters)
-                                                 (first (filter #(= (:slug %) board-filters) (:topics board-data))))
-                                    with-topic (if (string? board-filters)
-                                                (merge
-                                                 entry-data
-                                                 {:topic-slug (:slug topic-data)
-                                                  :topic-name (:name topic-data)})
-                                                entry-data)]
-                                (dis/dispatch! [:entry-edit with-topic])))}
-                  [:div.add-to-board-pencil]
-                  [:label.add-to-board-label
-                    "New Post"]])
+                         (or (utils/link-for (:links board-data) "create")
+                             is-drafts-board))
+                [:div.new-post-top-dropdown-container.group
+                  [:button.mlb-reset.mlb-default.add-to-board-top-button.group
+                    {:class (when @(::show-top-boards-dropdown s) "active")
+                     :on-click (fn [_]
+                                (if is-drafts-board
+                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                  (let [entry-data {:board-slug (:slug board-data)
+                                                    :board-name (:name board-data)}
+                                        topic-data (when (string? board-filters)
+                                                     (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                        with-topic (if (string? board-filters)
+                                                    (merge
+                                                     entry-data
+                                                     {:topic-slug (:slug topic-data)
+                                                      :topic-name (:name topic-data)})
+                                                    entry-data)]
+                                    (dis/dispatch! [:entry-edit with-topic]))))}
+                    [:div.add-to-board-pencil]
+                    [:label.add-to-board-label
+                      "New Post"]]
+                  (when @(::show-top-boards-dropdown s)
+                    (dropdown-list
+                     {:items (map
+                              #(-> %
+                                (select-keys [:name :slug])
+                                (clojure.set/rename-keys {:name :label :slug :value}))
+                              (vals all-boards))
+                      :value ""
+                      :on-blur #(reset! (::show-top-boards-dropdown s) false)
+                      :on-change (fn [item]
+                                   (reset! (::show-top-boards-dropdown s) false)
+                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
+                                                                :board-name (:label item)}]))}))])
               ;; Board filters when there is not topic filtering
               (when (and (not is-mobile-size?)
                          (not empty-board?)
                          (not is-all-posts)
                          (not is-drafts-board)
                          (or (string? board-filters) (> (count entry-topics) 1)))
-                (filters-dropdown))
-              ;; Add entry floating button
-              (when (and (not is-all-posts)
-                         (not (:read-only org-data))
-                         (not (responsive/is-tablet-or-mobile?))
-                         (utils/link-for (:links board-data) "create"))
-                [:button.mlb-reset.mlb-default.add-to-board-btn.floating-button
-                  {:id "new-entry-floating-btn"
-                   :style {:opacity (calc-opacity (document-scroll-top))}
-                   :data-placement "left"
-                   :data-toggle "tooltip"
-                   :title (str "Start a new post")
-                   :on-click (fn [_]
-                              (let [entry-data {:board-slug (:slug board-data)
-                                                :board-name (:name board-data)}
-                                    topic-data (when (string? board-filters)
-                                                 (first (filter #(= (:slug %) board-filters) (:topics board-data))))
-                                    with-topic (if (string? board-filters)
-                                                (merge
-                                                 entry-data
-                                                 {:topic-slug (:slug topic-data)
-                                                  :topic-name (:name topic-data)})
-                                                entry-data)]
-                                (dis/dispatch! [:entry-edit with-topic])))}
-                  [:div.add-to-board-pencil]])]
+                (filters-dropdown))]
             ;; Board content: empty board, add topic, topic view or topic cards
             (cond
               ;; No boards
@@ -276,4 +279,52 @@
                 (drafts-layout board-data)
                 ;; Entries
                 :else
-                (entries-layout board-data board-filters)))]]]))
+                (entries-layout board-data board-filters)))
+            ;; Add entry floating button
+            (when (and (not is-all-posts)
+                       (not (:read-only org-data))
+                       (not (responsive/is-tablet-or-mobile?))
+                       (or (utils/link-for (:links board-data) "create")
+                           is-drafts-board))
+              (let [opacity (if @(::show-floating-boards-dropdown s)
+                              1
+                              (calc-opacity (document-scroll-top)))]
+                [:div.new-post-floating-dropdown-container.group
+                  {:id "new-entry-floating-btn-container"
+                   :style {:opacity opacity
+                           :display (if (pos? opacity) "block" "none")}}
+                  [:button.mlb-reset.mlb-default.add-to-board-floating-button
+                    {:class (when @(::show-floating-boards-dropdown s) "active")
+                     :data-placement "left"
+                     :data-container "body"
+                     :data-toggle "tooltip"
+                     :title "Start a new post"
+                     :on-click (fn [_]
+                                (utils/remove-tooltips)
+                                (if is-drafts-board
+                                  (reset! (::show-floating-boards-dropdown s) (not @(::show-floating-boards-dropdown s)))
+                                  (let [entry-data {:board-slug (:slug board-data)
+                                                    :board-name (:name board-data)}
+                                        topic-data (when (string? board-filters)
+                                                     (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                        with-topic (if (string? board-filters)
+                                                    (merge
+                                                     entry-data
+                                                     {:topic-slug (:slug topic-data)
+                                                      :topic-name (:name topic-data)})
+                                                    entry-data)]
+                                    (dis/dispatch! [:entry-edit with-topic]))))}
+                    [:div.add-to-board-pencil]]
+                  (when @(::show-floating-boards-dropdown s)
+                    (dropdown-list
+                     {:items (map
+                              #(-> %
+                                (select-keys [:name :slug])
+                                (clojure.set/rename-keys {:name :label :slug :value}))
+                              (vals all-boards))
+                      :value ""
+                      :on-blur #(reset! (::show-floating-boards-dropdown s) false)
+                      :on-change (fn [item]
+                                   (reset! (::show-floating-boards-dropdown s) false)
+                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
+                                                                :board-name (:label item)}]))}))]))]]]))

@@ -47,42 +47,11 @@ div.dashboard-layout {
         }
       }
 
-      button.add-to-board-btn {
-        &.floating-button {
-          position: absolute;
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          width: 66px;
-          height: 66px;
-          border-radius: 33px;
-          background-color: #FA6654;
-          z-index: 1000;
-          box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
-          opacity: 1;
+      div.new-post-top-dropdown-container {
+        position: relative;
+        float: right;
 
-          &:hover {
-            background-color: #FF7C6C;
-            opacity: 1;
-          }
-
-          &:active, &:focus {
-            background-color: #ED4F3B;
-            opacity: 1;
-          }
-
-          div.add-to-board-pencil {
-            background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-            background-size: 24px 24px;
-            width: 24px;
-            height: 24px;
-            margin-left: 6px;
-            margin-top: 2px;
-          }
-        }
-
-        &.top-button {
-          float: right;
+        button.add-to-board-top-button {
           width: 143px;
           height: 42px;
           background-color: $carrot_orange_light;
@@ -96,7 +65,7 @@ div.dashboard-layout {
           transition: 0ms;
           cursor: pointer;
 
-          &:hover, &:active, &:focus {
+          &:hover, &:active, &:focus, &.active {
             background-color: $carrot_orange;
             color: white;
             opacity: 1;
@@ -133,6 +102,65 @@ div.dashboard-layout {
             float: left;
             cursor: pointer;
           }
+        }
+
+        div.dropdown-list-container {
+          top: 46px;
+          width: 200px;
+          left: -26px;
+        }
+      }
+    }
+
+    div.new-post-floating-dropdown-container {
+      position: relative;
+      position: absolute;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+
+      button.add-to-board-floating-button {
+        width: 66px;
+        height: 66px;
+        border-radius: 33px;
+        background-color: #FA6654;
+        z-index: 1000;
+        box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
+        opacity: 1;
+
+        &:hover, &.active {
+          background-color: #FF7C6C;
+          opacity: 1;
+        }
+
+        &:active, &:focus {
+          background-color: #ED4F3B;
+          opacity: 1;
+        }
+
+        div.add-to-board-pencil {
+          background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+          background-size: 24px 24px;
+          width: 24px;
+          height: 24px;
+          margin-left: 6px;
+          margin-top: 2px;
+        }
+      }
+
+      div.dropdown-list-container {
+        top: unset;
+        bottom: 0px;
+        width: 200px;
+        left: -220px;
+        z-index: 100;
+
+        div.triangle {
+          transform: rotate(135deg);
+          top: unset;
+          bottom: 20px;
+          left: unset;
+          right: -10px;
         }
       }
     }
