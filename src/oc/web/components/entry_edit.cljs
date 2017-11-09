@@ -4,6 +4,8 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
@@ -157,16 +159,22 @@
                          :before-render (fn [s] (calc-edit-entry-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :did-remount (fn [s]
+                          ;; Entry is saving
                           (when @(::saving s)
                             (let [entry-editing @(drv/get-ref s :entry-editing)]
+                              ;: Save request finished
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
+                                ;; If it's not published already redirect to drafts board
+                                (when (not= (:status entry-editing) "published")
+                                  (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
                                 (when-not (:error entry-editing)
                                   (real-close s)))))
                           (when @(::publishing s)
                             (let [entry-editing @(drv/get-ref s :entry-editing)]
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
+                                (utils/after 180 #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))
                                 (when-not (:error entry-editing)
                                   (real-close s)))))
                           s)
