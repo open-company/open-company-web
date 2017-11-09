@@ -62,12 +62,25 @@ div.drafts-layout {
             color: $carrot_green;
           }
 
+          button.delete-draft {
+            float: right;
+            width: 20px;
+            height: 26px;
+            background-image: cdnUrl("/img/ML/trash.svg");
+            background-size: 20px 26px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-top: -4px;
+            float: right;
+          }
+
           span.last-edit {
             float: right;
             color: $carrot_green;
             @include avenir_O();
             font-size: 14px;
             opacity: 0.5;
+            margin-right: 8px;
           }
         }
 

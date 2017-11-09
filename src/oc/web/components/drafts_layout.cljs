@@ -27,12 +27,26 @@
           [:div
             [:div.draft-card-body
               {:class (utils/class-set {:empty-body empty-body?})
-               :dangerouslySetInnerHTML final-body}]
-            ; (when (> (count fixed-body) 50)
-            ;   [:div.bottom-gradient])
-            ])
+               :dangerouslySetInnerHTML final-body}]])
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
+          (when (utils/link-for (:links draft) "delete")
+            [:button.delete-draft.mlb-reset
+              {:title "Delete draft"
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (let [alert-data {:icon "/img/ML/trash.svg"
+                                             :action "delete-entry"
+                                             :message "Delete this draft?"
+                                             :link-button-title "No"
+                                             :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                             :solid-button-title "Yes"
+                                             :solid-button-cb #(do
+                                                                (dis/dispatch! [:activity-delete draft])
+                                                                (dis/dispatch! [:alert-modal-hide]))}]
+                            (dis/dispatch! [:alert-modal-show alert-data])))}])
           [:span.last-edit (str "Last edited " (utils/time-since (:updated-at draft)))]]
         ; [:div.draft-card-footer.group
         ;   [:div.draft-card-footer-left
