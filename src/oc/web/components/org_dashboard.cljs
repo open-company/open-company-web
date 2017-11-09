@@ -12,7 +12,7 @@
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.topics-columns :refer (topics-columns)]
+            [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
@@ -46,10 +46,21 @@
           board-slug (keyword (router/current-board-slug))
           board-data (dis/board-data data)
           all-posts-data (dis/all-posts-data data)]
-      (if (or (not org-data)
+      ;; Show loading if
+      (if (or ;; the org data are not loaded yet
+              (not org-data)
+              ;; No board specified
+              (and (not (router/current-board-slug))
+                   ;; but there are some
+                   (pos? (count (:boards org-data))))
+              ;; Board specified
               (and (router/current-board-slug)
-                   (not board-data)
-                   (not all-posts-data)))
+                       ;; But the data are not loaded yet
+                   (or (and (not= (router/current-board-slug) "all-posts")
+                            (not board-data))
+                       ;; Or the all-posts data
+                       (and (= (router/current-board-slug) "all-posts")
+                            (not all-posts-data)))))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
           (om/build loading {:loading true}))
@@ -116,19 +127,4 @@
               (navbar))
             (dom/div {:class "dashboard-container"}
               (dom/div {:class "topic-list"}
-                (om/build topics-columns
-                  {:loading (:loading data)
-                   :content-loaded (or (:loading board-data) (:loading data))
-                   :org-data org-data
-                   :board-data board-data
-                   :all-posts-data all-posts-data
-                   :force-edit-topic (:force-edit-topic data)
-                   :card-width card-width
-                   :columns-num columns-num
-                   :show-login-overlay (:show-login-overlay data)
-                   :prevent-topic-not-found-navigation (:prevent-topic-not-found-navigation data)
-                   :is-dashboard true
-                   :board-filters (:board-filters data)
-                   :show-onboard-overlay (:show-onboard-overlay data)
-                   :is-all-posts (or (utils/in? (:route @router/path) "all-posts")
-                                     (:from-all-posts @router/path))})))))))))
+                (dashboard-layout)))))))))
