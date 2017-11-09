@@ -306,8 +306,8 @@
   (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :board-slug (:slug board-data))
-      (assoc :board-name (:name board-data))
+      (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
+      (assoc :board-name (or (:board-name entry-body) (:name board-data)))
       (assoc :topic-name topic-name))))
 
 (defn fix-board
