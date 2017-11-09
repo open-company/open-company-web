@@ -218,7 +218,6 @@
                           {:slug (:topic-slug entry-editing)
                            :name (:topic-name entry-editing)})))
                        (:topics entry-board))]
-    (js/console.log "entry-edit/render" board-topics)
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
@@ -247,11 +246,10 @@
                   (dropdown-list
                    {:items (map
                             #(clojure.set/rename-keys % {:name :label :slug :value})
-                            (filterv #(not= (:slug %) "drafts") (:boards org-data)))
+                            (vals all-boards))
                     :value (:board-slug entry-editing)
                     :on-blur #(reset! (::show-boards-dropdown s) false)
                     :on-change (fn [item]
-                                 (js/console.log "  - board-dropdown/on-change" item)
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                  (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
