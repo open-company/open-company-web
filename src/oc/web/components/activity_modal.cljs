@@ -367,7 +367,10 @@
                                       :on-change #(close-clicked s nil)}))]))
               (activity-attachments activity-data false)
               (if editing
-                (topics-dropdown (:modal-editing-data modal-data) :modal-editing-data)
+                (topics-dropdown
+                 (distinct (:entry-edit-topics modal-data))
+                 (:modal-editing-data modal-data)
+                 :modal-editing-data)
                 (when (:topic-slug activity-data)
                   (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                     [:div.activity-tag.on-gray
