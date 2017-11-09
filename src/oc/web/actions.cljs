@@ -903,64 +903,87 @@
   (api/get-comments activity-uuid)
   (assoc db :comment-add-finish true))
 
+(defn- current-board-key
+  "Find the board key for db based on the current path."
+  []
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)]
+        ;; if we are coming from all-posts
+        (if (:from-all-posts @router/path)
+          ;; We need to update the entry in all-posts data, not in the board data
+          (dispatcher/all-posts-key org-slug)
+          (dispatcher/board-data-key org-slug board-slug))))
+
+(defn- handle-reaction-to-entry
+  "Update the data in db to reflect the reaction toggle on an entry."
+  [db item-uuid reaction-data]
+  (let [board-key (current-board-key)
+        board-data (get-in db board-key)
+        entry-data (get (get board-data :fixed-items) item-uuid)
+        old-reactions-loading (or (:reactions-loading entry-data) [])
+        next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
+        updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
+        entry-key (concat board-key [:fixed-items item-uuid])]
+    (assoc-in db entry-key updated-entry-data)))
+
+(defn- handle-reaction-to-comment
+  "Update the data in db to refleact reaction toggle on a comment."
+  [db item-uuid reaction-data]
+  (let [activity-id (router/current-activity-id)
+        org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-id)
+        comments-data (get-in db comments-key)]
+    (assoc-in db comments-key comments-data)))
+
 (defmethod dispatcher/action :reaction-toggle
   [db [_ item-data reaction-data]]
-  (let [org-slug (router/current-org-slug)
-        is-all-posts (:from-all-posts @router/path)
-        board-slug (router/current-board-slug)
-        ;; if we are coming from all-posts
-        board-key (if is-all-posts
-                   ;; We need to update the entry in all-posts data, not in the board data
-                   (dispatcher/all-posts-key org-slug)
-                   (dispatcher/board-data-key org-slug board-slug))
-        board-data (get-in db board-key)
-        item-uuid (:uuid item-data)]
+  (let [item-uuid (:uuid item-data)]
     (api/toggle-reaction item-data reaction-data)
     (if (= (:content-type item-data) "entry")
-      (let [entry-data (get (get board-data :fixed-items) item-uuid)
-            old-reactions-loading (or (:reactions-loading entry-data) [])
-            next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
-            updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
-            entry-key (concat board-key [:fixed-items item-uuid])]
+      (handle-reaction-to-entry db item-uuid reaction-data)
+      (handle-reaction-to-comment db item-uuid reaction-data))))
+
+(defn- handle-reaction-to-entry-finish
+  "Update an entry with the reaction data from the API."
+  [db item-data reaction reaction-data]
+  (let [board-key (current-board-key)
+        board-data (get-in db board-key)
+        activity-uuid (:uuid item-data)
+        entry-data (get-in board-data [:fixed-items activity-uuid])
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
+        entry-key (concat board-key [:fixed-items activity-uuid])]
+    (if (nil? reaction-data)
+      (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)]
         (assoc-in db entry-key updated-entry-data))
-      (let [activity-id (router/current-activity-id)
-            comments-key (dispatcher/activity-comments-key org-slug board-slug activity-id)
-            comments-data (get-in db comments-key)]
-        (assoc-in db comments-key comments-data)))))
+      (let [reaction (first (keys reaction-data))
+            next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
+            reactions-data (:reactions entry-data)
+            reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
+            updated-entry-data (-> entry-data
+                                   (assoc :reactions-loading next-reactions-loading)
+                                   (assoc-in [:reactions reaction-idx] next-reaction-data))]
+        (assoc-in db entry-key updated-entry-data)))))
+
+(defn- handle-reaction-to-comment-finish
+  "Update comment data with the reaction data from the API."
+  [db]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (router/current-activity-id)
+        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-data (get-in db board-key)
+        activity-data (get-in board-data [:fixed-items activity-uuid])
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)]
+    (api/get-comments activity-data)
+    (assoc-in db comments-key comments-data)))
 
 (defmethod dispatcher/action :reaction-toggle/finish
   [db [_ item-data reaction reaction-data]]
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)]
-    (if (= (:content-type item-data) "entry")
-      (let [is-all-posts (:from-all-posts @router/path)
-            board-key (if is-all-posts
-                        (dispatcher/all-posts-key org-slug)
-                        (dispatcher/board-data-key org-slug board-slug))
-            board-data (get-in db board-key)
-            activity-uuid (:uuid item-data)
-            entry-data (get-in board-data [:fixed-items activity-uuid])
-            next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
-            entry-key (concat board-key [:fixed-items activity-uuid])]
-        (if (nil? reaction-data)
-          (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)]
-            (assoc-in db entry-key updated-entry-data))
-          (let [reaction (first (keys reaction-data))
-                next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
-                reactions-data (:reactions entry-data)
-                reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
-                updated-entry-data (-> entry-data
-                                       (assoc :reactions-loading next-reactions-loading)
-                                       (assoc-in [:reactions reaction-idx] next-reaction-data))]
-            (assoc-in db entry-key updated-entry-data))))
-      (let [activity-uuid (router/current-activity-id)
-            board-key (dispatcher/board-data-key org-slug board-slug)
-            board-data (get-in db board-key)
-            activity-data (get-in board-data [:fixed-items activity-uuid])
-            comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
-            comments-data (get-in db comments-key)]
-        (api/get-comments activity-data)
-        (assoc-in db comments-key comments-data)))))
+  (if (= (:content-type item-data) "entry")
+    (handle-reaction-to-entry-finish db item-data reaction reaction-data)
+    (handle-reaction-to-comment-finish db)))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
@@ -970,8 +993,8 @@
         is-all-posts (:from-all-posts @router/path)
         activity-uuid (:resource-uuid interaction-data)
         board-key (if is-all-posts
-                   (dispatcher/all-posts-key org-slug)
-                   (dispatcher/board-data-key org-slug (router/current-board-slug)))
+                    (dispatcher/all-posts-key org-slug)
+                    (dispatcher/board-data-key org-slug (router/current-board-slug)))
         board-data (get-in db board-key)
         ; Entry data
         fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
