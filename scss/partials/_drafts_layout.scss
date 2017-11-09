@@ -3,8 +3,6 @@ div.drafts-layout {
 
   div.draft-cards-container {
     width: 888px;
-    // div.draft-card-row {
-    //   display: flex;
     div.draft-card-column {
       width: 432px;
       float: left;
@@ -14,7 +12,6 @@ div.drafts-layout {
       }
 
       div.draft-card {
-        // flex: 1;
         width: 432px;
         max-height: 438px;
         background-color: white;
@@ -22,9 +19,9 @@ div.drafts-layout {
         border: solid 0.5px rgba(177, 184, 192, 0.24);
         border-radius: 8px;
         min-height: 100px;
-        // padding-bottom: 48px;
         position: relative;
         margin-top: 24px;
+        cursor: pointer;
 
         div.draft-banner {
           background-repeat: no-repeat;
@@ -65,13 +62,14 @@ div.drafts-layout {
           button.delete-draft {
             float: right;
             width: 20px;
-            height: 26px;
-            background-image: cdnUrl("/img/ML/trash.svg");
-            background-size: 20px 26px;
-            background-repeat: no-repeat;
-            background-position: center;
-            margin-top: -4px;
+            height: 20px;
+            padding: 0;
+            color: $carrot_green;
             float: right;
+
+            i.mdi:before {
+              font-size: 21px;
+            }
           }
 
           span.last-edit {
@@ -90,7 +88,6 @@ div.drafts-layout {
           font-size: 16px;
           color: $oc_gray_7;
           outline: none;
-          cursor: text;
           padding: 16px;
           position: relative;
           overflow: hidden;

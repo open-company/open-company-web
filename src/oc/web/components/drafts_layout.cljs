@@ -46,7 +46,8 @@
                                              :solid-button-cb #(do
                                                                 (dis/dispatch! [:activity-delete draft])
                                                                 (dis/dispatch! [:alert-modal-hide]))}]
-                            (dis/dispatch! [:alert-modal-show alert-data])))}])
+                            (dis/dispatch! [:alert-modal-show alert-data])))}
+              [:i.mdi..mdi-delete]])
           [:span.last-edit (str "Last edited " (utils/time-since (:updated-at draft)))]]
         ; [:div.draft-card-footer.group
         ;   [:div.draft-card-footer-left
