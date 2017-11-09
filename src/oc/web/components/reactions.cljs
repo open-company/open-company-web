@@ -25,6 +25,11 @@
          (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
+(defn reaction-class-helper
+  [item-data r]
+  (when (not (= (:content-type item-data) "entry"))
+    (utils/class-set {:no-reactions (not (pos? (:count r)))})))
+
 (defn reaction-display-helper
   "Display is different if reaction is on an entry vs a comment."
   [item-data r]
@@ -65,6 +70,8 @@
                                       (not (js/isIE)))
                              (animate-reaction e s))
                            (dis/dispatch! [:reaction-toggle item-data r])))}
-            [:span.reaction (:reaction r)]
+            [:span.reaction
+              {:class (reaction-class-helper item-data r)}
+              (:reaction r)]
             [:div.count
               (reaction-display-helper item-data r)]])])))
