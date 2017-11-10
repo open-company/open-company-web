@@ -58,8 +58,7 @@ div#wrap {
         font-size: 24px;
         padding: 0 16px;
         @include avenir_R();
-        line-height: 32px;
-        max-width: 650px;
+        max-width: 620px;
         margin: 20px auto 0px;
 
         &.second-line {
@@ -76,6 +75,23 @@ div#wrap {
         font-size: 14px;
         @include avenir_H();
         margin-top: 16px;
+      }
+
+      div.homepage-main-screenshot {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 756px 511px;
+        @include image-2x("/img/ML/home_main_screenshot");
+        width: 756px;
+        height: 511px;
+        margin: 48px auto 0px;
+        padding: 0 16px;
+        // box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
+        border: 1px solid rgba($oc_gray_5, 0.05);
+
+        @include mobile(){
+          display: none;
+        }
       }
 
       div.homepage-screenshot {
@@ -116,7 +132,7 @@ div#wrap {
           }
 
           @include big_web(){
-            max-width: 475px;
+            max-width: 455px;
           }
 
           div.title {
@@ -125,14 +141,26 @@ div#wrap {
             font-size: 36px;
             letter-spacing: 0.1px;
             text-align: left;
+
+            &.title-right {
+              text-align: right;
+            }
           }
 
           div.subtitle {
             color: $carrot_dark_blue;
-            @include avenir_M();
+            @include avenir_R();
             font-size: 20px;
             line-height: 1.7;
             text-align: left;
+
+            &.subtitle-right {
+              text-align: right;
+            }
+
+            &.second-line {
+              margin-top: 20px;
+            }
 
             a {
               color: #4C67FC;
@@ -164,7 +192,7 @@ div#wrap {
           div.description {
             float: right;
             text-align: left;
-            margin-top: 90px;
+            margin-top: 75px;
             margin-right: 50px;
           }
         }
@@ -214,7 +242,7 @@ div#wrap {
           div.description {
             float: right;
             text-align: left;
-            margin-top: 45px;
+            margin-top: 80px;
             margin-right: 50px;
           }
         }
@@ -238,7 +266,7 @@ div#wrap {
             float: left;
             text-align: left;
             margin-left: 50px;
-            margin-top: 70px;
+            margin-top: 50px;
             max-width: 455px;
           }
         }
@@ -311,8 +339,8 @@ div#wrap {
           div.description {
             float: right;
             text-align: left;
-            margin-right: 30px;
-            margin-top: 40px;
+            margin-right: 40px;
+            margin-top: 20px;
           }
         }
       }
@@ -323,7 +351,7 @@ div#wrap {
 
       div.illustrations-title {
         margin-bottom: 60px;
-        max-width: 720px;
+        max-width: 770px;
         text-align: center;
         margin: 0 auto;
         padding: 0px 32px;
@@ -354,7 +382,7 @@ div#wrap {
 
     div.third-section {
       div.illustrations-title {
-        max-width: 830px;
+        max-width: 700px;
         
         div.centred-screenshot {
           width: 471px;
@@ -407,7 +435,7 @@ div#wrap {
 
         div.description {
           color: #3B3D41;
-          @include avenir_M();
+          @include avenir_R();
           font-size: 20px;
           line-height: 1.7;
           text-align: left;

@@ -39,9 +39,12 @@
       [:div.main.home-page
         ; Hope page header
         [:div.cta
-          [:h1.headline "Teams need the big picture"]
+          [:h1.headline
+            "Above the noise"]
           [:div.subheadline
-            "Make key announcements, updates, and plans stand out to create greater transparency and alignment."]
+            (str
+             "Elevate key announcements, updates and decisions "
+             "to give your team a clear view of what’s most important")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -51,10 +54,6 @@
                             (dis/dispatch! [:login-overlay-show :signup-with-slack])
                             (router/nav! oc-urls/sign-up-with-slack))}
             "Get started for free"])
-          (when-not (jwt/jwt)
-            [:div.small-teams
-              {:id "easy-setup-label"}
-              "Easy set-up • Free for small teams"])
           (when (and (not @(::confirm s))
                      @(::thanks-box-top s))
             (carrot-box-thanks))
@@ -64,7 +63,7 @@
                 [:div.thanks-headline "You are Confirmed!"]
                 [:div.thanks-subheadline "Thank you for subscribing."]]])
 
-          [:div.homepage-screenshot]]
+          [:div.homepage-main-screenshot]]
 
 
         [:div.illustrations.group
@@ -73,24 +72,29 @@
             [:img.illustration-image
               (retina-src "/img/ML/home_page_il_1_572_438")]
             [:div.description.group
-              [:h1.headline "When teams have more to say"]
-            [:div.subheadline
-              (str
-               "Not everything fits in a chat message. Elevate your team "
-               "mission, announcements and updates to create transparency "
-               "and alignment.")]]]
-
-          [:div.illustration.illustration-2.group
-            [:img.illustration-image
-              (retina-src "/img/ML/home_page_il_2_521_385")]
-            [:div.description.group
               [:div.title
-                "Keep stakeholders in the loop, too"]
+                "Stay on the same page"]
               [:div.subtitle
                 (str
-                 "Share updates with your investors and advisors, or "
-                 "the latest news with your customers and partners. "
-                 "Carrot keeps it all organized in one place.")]]]]
+                 "Chat apps simplify real-time work, but constant "
+                 "chatter makes it easy to miss key information "
+                 "everyone should know.")]
+              [:div.subtitle.second-line
+                (str
+                 "Carrot provides a lasting view of what’s important "
+                 "so everyone stays engaged and aligned.")]]]]
+
+          ; [:div.illustration.illustration-2.group
+          ;   [:img.illustration-image
+          ;     (retina-src "/img/ML/home_page_il_2_521_385")]
+          ;   [:div.description.group
+          ;     [:div.title
+          ;       "Keep stakeholders in the loop, too"]
+          ;     [:div.subtitle
+          ;       (str
+          ;        "Share updates with your investors and advisors, or "
+          ;        "the latest news with your customers and partners. "
+          ;        "Carrot keeps it all organized in one place.")]]]]
 
         [:div.home-section.second-section
           [:div.illustrations-title
@@ -98,8 +102,8 @@
               "Why Carrot?"]
             [:div.why-carrot-description
               (str
-               "Growing teams need a place to rise above the noise of real-time "
-               "conversations to see what’s really happening across the company.")]]
+               "Growing teams need a place to rise above the noise of real-time conversations "
+               "to see what’s really happening across the company.")]]
 
           [:div.illustrations.group
             [:div.illustration.illustration-3.group
@@ -110,22 +114,21 @@
                   "Visibility"]
                 [:div.subtitle
                   (str
-                   "Unlike chat streams and wikis, Carrot creates a "
-                   "birds-eye view of the latest news that’s quick and "
-                   "easy to read. The big picture pulls everyone closer.")]]]
+                   "Carrot creates a bird’s-eye view of essential "
+                   "information that’s quick and easy to read. Greater "
+                   "transparency pulls your team closer.")]]]
 
             [:div.illustration.illustration-4.group
               [:img.illustration-image
                 (retina-src "/img/ML/home_page_il_4_521_283")]
               [:div.description.group
                 [:div.title
-                  "Easy alignment"]
+                  "Simplicity"]
                 [:div.subtitle
                   (str
-                   "Whether you’re adding a quick team update, or "
-                   "writing an overview that covers many topics, or "
-                   "adding a guide for new employees, getting "
-                   "started is simple and fast.")]]]
+                   "If you’re adding a quick team update, or writing "
+                   "an overview for the next all-hands, getting started "
+                   "is simple and fast.")]]]
 
             [:div.illustration.illustration-5.group
               [:img.illustration-image
@@ -147,10 +150,10 @@
                   "Works with Slack"]
                 [:div.subtitle
                   (str
-                   "With Slack single sign-on and our Slack bot, posts "
-                   "are automatically shared to the right channels. "
-                   "Discussions about posts can happen in Slack or "
-                   "Carrot - everything is kept in sync. ")
+                   "Posts are automatically shared to the right "
+                   "channels. Discussions about posts happen in Slack "
+                   "and Carrot - everything is kept in sync. ")]
+                [:div.subtitle
                   [:a
                     {:href "/about"}
                     "Learn More"]]]]
@@ -160,22 +163,23 @@
                 (retina-src "/img/ML/home_page_il_7_333_274")]
               [:div.description.group
                 [:div.title
-                  "Stay private or go public"]
+                  "Private"]
                 [:div.subtitle
-                  (str
-                   "Boards can be private and invite-only, or can be "
-                   "made public - ideal for crowdfunded ventures, social "
-                   "enterprises, and startups interested in full "
-                   "transparency.")]]]]]
+                  "Sensitive information can be invite-only."]
+                [:div.title.title-right
+                  "... or Public"]
+                [:div.subtitle.subtitle-right
+                  "Ideal for crowdfunded ventures, social enterprises, "
+                  "and startups interested in full transparency."]]]]]
 
         [:div.home-section.third-section
           [:div.illustrations-title
             [:div.why-carrot
-              "Don’t forget your extended team"]
+              "Beyond the team"]
             [:div.why-carrot-description
               (str
-               "Investors, advisors and other stakeholders stay engaged when you keep them in the "
-               "loop. With Carrot, it’s never been easier.")]
+               "Share a clear view of what’s important with external stakeholders, too. "
+               "It’s an easy way to build trust and grow your business.")]
             [:div.centred-screenshot]]
           [:div.third-section-footer.group
             [:div.left-copy
@@ -183,19 +187,16 @@
                 "Simplify investor updates"]
               [:div.description
                 (str
-                 "Create a Carrot board specifically for investors and "
-                 "advisors in no time. All of your updates will stay "
-                 "organized in one place so it’s easy to know what "
-                 "you’ve sent them in the past. Also ideal for keeping "
-                 "friends and family in the loop.")]]
+                 "Create beautiful updates in a snap, and keep them "
+                 "organized in one place. Also ideal for keeping friends "
+                 "and family in the loop.")]]
             [:div.right-copy
               [:div.title
-                "Build a bigger network"]
+                "Expand your network"]
               [:div.description
                 (str
                  "Share news with recruits, potential investors and "
-                 "customers to keep them engaged and supportive. It’s "
-                 "an easy way to build trust and grow your business.")]]]]
+                 "customers to keep them engaged and supportive.")]]]]
 
         (comment
           [:div.customers
