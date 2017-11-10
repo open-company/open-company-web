@@ -166,20 +166,19 @@
                           s)
                          :before-render (fn [s] (calc-edit-entry-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
-                         :did-remount (fn [s]
-                          ;; Entry is saving
-                          (when @(::saving s)
-                            (let [entry-editing @(drv/get-ref s :entry-editing)]
+                         :did-remount (fn [_ s]
+                          (let [entry-editing @(drv/get-ref s :entry-editing)]
+                            ;; Entry is saving
+                            (when @(::saving s)
                               ;: Save request finished
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
-                                ;; If it's not published already redirect to drafts board
-                                (when (not= (:status entry-editing) "published")
-                                  (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
                                 (when-not (:error entry-editing)
-                                  (real-close s)))))
-                          (when @(::publishing s)
-                            (let [entry-editing @(drv/get-ref s :entry-editing)]
+                                  ;; If it's not published already redirect to drafts board
+                                  (when (not= (:status entry-editing) "published")
+                                    (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
+                                  (real-close s))))
+                            (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
                                 ;; Redirect to the publishing board if the slug is available
