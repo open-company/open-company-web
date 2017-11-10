@@ -323,11 +323,11 @@
               [:div.name (:name (first (:author activity-data)))]
               [:div.time-since
                 [:time
-                  {:date-time (:created-at activity-data)
+                  {:date-time (:published-at activity-data)
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :title (utils/activity-date-tooltip activity-data)}
-                  (utils/time-since (:created-at activity-data))]]]
+                  (utils/time-since (:published-at activity-data))]]]
             [:div.activity-modal-header-right
               (when (or (utils/link-for (:links activity-data) "partial-update")
                         (utils/link-for (:links activity-data) "delete"))
