@@ -42,9 +42,7 @@
           [:h1.headline
             "Above the noise"]
           [:div.subheadline
-            (str
-             "Elevate key announcements, updates and decisions "
-             "to give your team a clear view of what’s most important")]
+            "Give your team a clear view of what’s most important"]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
