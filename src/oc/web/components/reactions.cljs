@@ -28,7 +28,8 @@
 (defn reaction-class-helper
   [item-data r]
   (when (not (= (:content-type item-data) "entry"))
-    (utils/class-set {:no-reactions (not (pos? (:count r)))})))
+    (utils/class-set {:no-reactions (not (pos? (:count r)))
+                      :comment true})))
 
 (defn reaction-display-helper
   "Display is different if reaction is on an entry vs a comment."
