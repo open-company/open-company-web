@@ -186,9 +186,7 @@
           [:div.why-carrot
             "Beyond the team"]
           [:div.why-carrot-description
-            (str
-             "Share a clear view of what’s important with external stakeholders, too. "
-             "It’s an easy way to build trust and grow your business.")]
+            "Share a clear view of what’s important with external stakeholders, too."]
           [:div.centred-screenshot]]
         [:div.third-section-footer.group
           [:div.left-copy
@@ -205,7 +203,10 @@
             [:div.description
               (str
                "Share news with recruits, potential investors and "
-               "customers to keep them engaged and supportive.")]]]]
+               "customers to keep them engaged and supportive.")]
+            [:div.description
+              (str
+               "It’s an easy way to build trust and grow your business.")]]]]
 
       (comment
         [:div.customers
