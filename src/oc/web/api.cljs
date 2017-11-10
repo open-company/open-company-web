@@ -717,7 +717,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-name :attachments :board-slug])
+(def entry-keys [:headline :body :topic-name :topic-slug :attachments :board-slug])
 
 (defn create-entry
   [entry-data create-entry-link]
@@ -752,7 +752,7 @@
             (dispatcher/dispatch! [:entry-publish/failed  :modal-editing-data])))))))
 
 (defn update-entry
-  [entry-data board-slug]
+  [entry-data board-slug edit-key]
   (when entry-data
     (let [update-entry-link (utils/link-for (:links entry-data) "partial-update")
           cleaned-entry-data (select-keys entry-data entry-keys)]
@@ -765,8 +765,8 @@
              [:entry-save/finish
               {:activity-data (if success (json->cljs body) {})
                :board-slug board-slug
-               :edit-key :modal-editing-data}])
-            (dispatcher/dispatch! [:entry-save/failed  :modal-editing-data])))))))
+               :edit-key edit-key}])
+            (dispatcher/dispatch! [:entry-save/failed  edit-key])))))))
 
 (defn delete-activity [activity-data]
   (when activity-data
