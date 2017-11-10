@@ -126,6 +126,9 @@
                               (utils/after 10 #(do
                                                  (.trigger (js/$ body-sel) "destroy")
                                                  (truncate-body body-sel is-all-posts)))))
+                          (doto (js/$ "[data-toggle=\"tooltip\"]")
+                            (.tooltip "fixTitle")
+                            (.tooltip "hide"))
                           s)
                          :will-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
