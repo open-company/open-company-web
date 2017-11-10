@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.jwt :as jwt]
             [cljsjs.web-animations]))
 
 (defn animate-reaction [e s]
@@ -25,17 +26,23 @@
          (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
-(defn is-comment-reaction?
+(defn- is-comment-reaction?
   [item-data]
   (not (= (:content-type item-data) "entry")))
 
-(defn reaction-class-helper
+(defn- read-only?
+  [item-data reaction-data]
+  (if (is-comment-reaction? item-data)
+    (= (jwt/user-id) (:user-id (:author item-data)))
+    (not (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"]))))
+
+(defn- reaction-class-helper
   [item-data r]
   (when (is-comment-reaction? item-data)
     (utils/class-set {:no-reactions (not (pos? (:count r)))
                       :comment true})))
 
-(defn reaction-display-helper
+(defn- reaction-display-helper
   "Display is different if reaction is on an entry vs a comment."
   [item-data r]
   (let [count (:count r)]
@@ -55,7 +62,7 @@
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
-                    read-only-reaction (not (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"]))
+                    read-only-reaction (read-only? item-data reaction-data)
                     r (if is-loading
                         (merge reaction-data {:count (if (:reacted reaction-data)
                                                       (dec (:count reaction-data))

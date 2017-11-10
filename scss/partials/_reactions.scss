@@ -22,11 +22,6 @@ div.reactions {
       height: 24px;
     }
 
-    &:hover .reaction.no-reactions {
-      -webkit-filter: grayscale(0%);
-      filter: grayscale(0%);
-    }
-
     span.reaction {
       font-size: 20px;
       top: 3px;
@@ -58,6 +53,10 @@ div.reactions {
       cursor: pointer;
       &:hover {
         opacity: 1;
+      }
+      &:hover .no-reactions {
+        -webkit-filter: grayscale(0%);
+        filter: grayscale(0%);
       }
     }
 
