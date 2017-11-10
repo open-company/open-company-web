@@ -23,6 +23,10 @@ div.reactions {
       top: 3px;
       position: relative;
 
+      &.comment {
+        font-size: 12px;
+      }
+
       &.no-reactions {
         -webkit-filter: grayscale(100%);
         filter: grayscale(100%);
