@@ -144,7 +144,8 @@
                                               sidebar-width)) "px")}
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
         is-drafts-board (= (:slug board-data) "drafts")
-        all-boards (drv/react s :editable-boards)]
+        all-boards (drv/react s :editable-boards)
+        topics (:topics board-data)]
       ;; Topic list
       [:div.dashboard-layout.group
         (when (and @(::show-boards-tooltip s)
@@ -225,7 +226,7 @@
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}
                                         topic-data (when (string? board-filters)
-                                                     (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                                     (first (filter #(= (:slug %) board-filters) topics)))
                                         with-topic (if (string? board-filters)
                                                     (merge
                                                      entry-data
@@ -302,11 +303,13 @@
                      :on-click (fn [_]
                                 (utils/remove-tooltips)
                                 (if is-drafts-board
-                                  (reset! (::show-floating-boards-dropdown s) (not @(::show-floating-boards-dropdown s)))
+                                  (reset!
+                                   (::show-floating-boards-dropdown s)
+                                   (not @(::show-floating-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}
                                         topic-data (when (string? board-filters)
-                                                     (first (filter #(= (:slug %) board-filters) (:topics board-data))))
+                                                     (first (filter #(= (:slug %) board-filters) topics)))
                                         with-topic (if (string? board-filters)
                                                     (merge
                                                      entry-data

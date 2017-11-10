@@ -305,9 +305,8 @@
   [entry-body board-data topics-data]
   (let [topic (if (seq (:topic-slug entry-body))
                 (get-topic topics-data :slug (:topic-slug entry-body))
-                (if (seq (:topic-name entry-body))
-                  (get-topic topics-data :name (:topic-name entry-body))
-                  nil))]
+                (when (seq (:topic-name entry-body))
+                  (get-topic topics-data :name (:topic-name entry-body))))]
     (-> entry-body
       (assoc :read-only (readonly-entry? (:links entry-body)))
       (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
