@@ -18,23 +18,29 @@ div.reactions {
     @include avenir_H();
     font-size: 12px;
 
+    &.comment {
+      height: 24px;
+    }
+
+    &:hover .reaction.no-reactions {
+      -webkit-filter: grayscale(0%);
+      filter: grayscale(0%);
+    }
+
     span.reaction {
       font-size: 20px;
       top: 3px;
       position: relative;
 
       &.comment {
+        top: 1px;
+        padding-right: 3px;
         font-size: 12px;
       }
 
       &.no-reactions {
         -webkit-filter: grayscale(100%);
         filter: grayscale(100%);
-
-        &:hover {
-          -webkit-filter: grayscale(0%);
-          filter: grayscale(0%);
-        }
       }
     }
 

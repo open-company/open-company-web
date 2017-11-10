@@ -25,9 +25,13 @@
          (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
+(defn is-comment-reaction?
+  [item-data]
+  (not (= (:content-type item-data) "entry")))
+
 (defn reaction-class-helper
   [item-data r]
-  (when (not (= (:content-type item-data) "entry"))
+  (when (is-comment-reaction? item-data)
     (utils/class-set {:no-reactions (not (pos? (:count r)))
                       :comment true})))
 
@@ -35,7 +39,7 @@
   "Display is different if reaction is on an entry vs a comment."
   [item-data r]
   (let [count (:count r)]
-    (if (= (:content-type item-data) "entry")
+    (if (not (is-comment-reaction? item-data))
       (str "+" count)
       (case count
         0 (str "Agree")
@@ -62,7 +66,8 @@
             {:key (str "-entry-" (:uuid item-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
                                       :can-react (not read-only-reaction)
-                                      :has-reactions (pos? (:count r))})
+                                      :has-reactions (pos? (:count r))
+                                      :comment (is-comment-reaction? item-data)})
              :on-click (fn [e]
                          (when (and (not is-loading) (not read-only-reaction))
                            (when (and (not (:reacted r))
