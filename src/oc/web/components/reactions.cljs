@@ -45,13 +45,17 @@
 (defn- reaction-display-helper
   "Display is different if reaction is on an entry vs a comment."
   [item-data r]
-  (let [count (:count r)]
+  (let [count (:count r)
+        reacted (:reacted r)]
     (if (not (is-comment-reaction? item-data))
       (str "+" count)
-      (case count
-        0 (str "Agree")
-        1 (str count " person agreed")
-        (str count " people agreed")))))
+      (if (pos? count)
+        (if reacted
+          (str "You"
+               (when (> count 1) (str " and +" count))
+               " agreed")
+          (str "+" count " agreed"))
+        (str "Agree")))))
 
 (rum/defcs reactions
   [s item-data]
