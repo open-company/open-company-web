@@ -233,6 +233,8 @@ provided in the table below:
 |  :channels-enumerate/success | API | Slack channels loaded, it saves them in the proper place of the app-state. |
 |  :comment-add | UI | Add a comment to an entry. |
 |  :comment-add/finish | API | Request to add a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
+|  :comment-delete | UI | Delete a comment to an entry. |
+|  :comment-delete/finish | API | Request to delete a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
 |  :comments-get | UI | Starts the request to load the comments given an entry UUID. |
 |  :comments-get/finish | API | Request to load the comments for an entry finished, could be it failed though. |
 |  :container/change | WS | Notice from change service with change info for a board |
