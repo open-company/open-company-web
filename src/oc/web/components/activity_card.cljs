@@ -111,7 +111,6 @@
                         (rum/local nil ::first-body-image)
                         (rum/local false ::move-activity)
                         (rum/local nil ::window-click)
-                        (rum/local false ::share-dropdown)
                         (drv/drv :org-data)
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
@@ -158,19 +157,17 @@
                                 (when (and
                                        (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
                                        (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
-                                  (reset! (::more-dropdown s) false))
-                                (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
-                                  (reset! (::share-dropdown s) false))))))
+                                  (reset! (::more-dropdown s) false))))))
                           s)
                          :will-unmount (fn [s]
                           (events/unlistenByKey @(::window-click s))
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
-  (let [attachments (utils/get-attachments-from-body (:body activity-data))]
+  (let [attachments (utils/get-attachments-from-body (:body activity-data))
+        share-link (utils/link-for (:links activity-data) "share")]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
-                                                     @(::share-dropdown s)
                                                      @(::move-activity s))
                                 :all-posts-card is-all-posts})
        :on-click (fn [e]
@@ -184,8 +181,7 @@
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
                       @(::more-dropdown s)
-                      @(::move-activity s)
-                      @(::share-dropdown s))
+                      @(::move-activity s))
 
                       (dis/dispatch!
                        [:activity-modal-fade-in
@@ -228,6 +224,12 @@
                   [:div.activity-more-dropdown-menu
                     [:div.triangle]
                     [:ul.activity-card-more-menu
+                      (when share-link
+                        [:li
+                          {:on-click #(do
+                                        (reset! (::more-dropdown s) false)
+                                        (dis/dispatch! [:activity-share-show activity-data]))}
+                          "Share"])
                       (when (and (utils/link-for (:links activity-data) "partial-update")
                                  (> (count all-boards) 1))
                         [:li
@@ -298,8 +300,7 @@
              :data-placement "top"
              :data-container "body"
              :class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                      (not @(::more-dropdown s))
-                                                      (not @(::share-dropdown s)))})
+                                                      (not @(::more-dropdown s)))})
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
@@ -308,36 +309,4 @@
                            (:board-slug activity-data)
                            (:uuid activity-data)
                            (:type activity-data)
-                           true]))}])
-        (when (utils/link-for (:links activity-data) "share")
-          [:div.activity-share
-            [:button.mlb-reset.activity-share-bt
-              {:title "Share"
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :on-click #(reset! (::share-dropdown s) (not @(::share-dropdown s)))}]
-            (when @(::share-dropdown s)
-              [:div.activity-share-dropdown
-                [:div.triangle]
-                [:ul.activity-share-dropdown-list
-                  (when (and (utils/link-for (:links activity-data) "share")
-                             (jwt/team-has-bot? (:team-id (dis/org-data))))
-                    [:li.activity-share-dropdown-item
-                      {:on-click (fn [e]
-                                   (reset! (::share-dropdown s) false)
-                                   ; open the activity-share-modal component
-                                   (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                      "Slack"])
-                  [:li.activity-share-dropdown-item
-                    {:on-click (fn [e]
-                                 (reset! (::share-dropdown s) false)
-                                 ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share-show :email activity-data]))}
-                    "Email"]
-                  [:li.activity-share-dropdown-item
-                    {:on-click (fn [e]
-                                 (reset! (::share-dropdown s) false)
-                                 ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share-show :link activity-data]))}
-                    "Link"]]])])]]))
+                           true]))}])]]))
