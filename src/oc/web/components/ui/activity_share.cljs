@@ -19,6 +19,18 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss))
 
+(defn- has-bot?
+  "Check if the current team has a bot associated."
+  [org-data]
+  (jwt/team-has-bot? (:team-id org-data)))
+
+(defn- show-slack-tooltip?
+  "Show the Slack tooltip only if the user signed in with Slack
+  and there our bot was added to the team."
+  [org-data]
+  (and (jwt/is-slack-org?)
+       (has-bot? org-data)))
+
 (rum/defcs activity-share < rum/reactive
                             ;; Derivatives
                             (drv/drv :org-data)
@@ -48,7 +60,7 @@
                               (.select (sel1 :input#activity-share-modal-shared-url))
                               (let [slack-button (rum/ref-node s "slack-button")
                                     org-data @(drv/get-ref s :org-data)]
-                                (when (jwt/team-has-bot? (:team-id org-data))
+                                (when (show-slack-tooltip? org-data)
                                   (.tooltip
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
@@ -93,7 +105,8 @@
               {:class (when (= @(::medium s) :email) "selected")
                :on-click #(reset! (::medium s) :email)}
               "Email"]
-            (let [slack-disabled (jwt/team-has-bot? (:team-id org-data))]
+            (let [slack-disabled (has-bot? org-data)
+                  show-slack-tooltip? (show-slack-tooltip? org-data)]
               [:div.activity-share-medium-selector
                 {:class (utils/class-set {:selected (= @(::medium s) :slack)
                                           :medium-selector-disabled slack-disabled})
@@ -104,11 +117,12 @@
                  :on-click (fn [e]
                              (utils/event-stop e)
                              (if slack-disabled
-                               (let [$this (js/$ (rum/ref-node s "slack-button"))]
-                                 (.tooltip $this "show")
-                                 (utils/after
-                                  2000
-                                  #(.tooltip $this "hide")))
+                               (when show-slack-tooltip?
+                                 (let [$this (js/$ (rum/ref-node s "slack-button"))]
+                                   (.tooltip $this "show")
+                                   (utils/after
+                                    2000
+                                    #(.tooltip $this "hide"))))
                                (reset! (::medium s) :slack)))}
                 "Slack"])]
           [:div.activity-share-divider-line]
