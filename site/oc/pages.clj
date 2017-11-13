@@ -182,7 +182,7 @@
           [:div.why-carrot
             "Beyond the team"]
           [:div.why-carrot-description
-            "Keep external stakeholders engaged and up to date"]
+            "Stakeholder updates made simple"]
           [:div.centred-screenshot]]
         [:div.third-section-footer.group
           [:div.left-copy
@@ -401,7 +401,7 @@
             (str
              "No one wants to look through folders and documents to "
              "understand what’s going on, or search through chat messages "
-             "to find something. It should be easy to get an instant, birds-eye view of "
+             "to find something. It should be easy to get an instant, bird’s-eye view of "
              "what’s happening across the company anytime.")]]
 
         [:div.principle.principle-3

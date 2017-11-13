@@ -171,7 +171,7 @@
             [:div.why-carrot
               "Beyond the team"]
             [:div.why-carrot-description
-              "Keep external stakeholders engaged and up to date"]
+              "Stakeholder updates made simple"]
             [:div.centred-screenshot]]
           [:div.third-section-footer.group
             [:div.left-copy
