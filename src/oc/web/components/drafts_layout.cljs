@@ -3,31 +3,63 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.activity-utils :as au]))
 
-(rum/defc draft-card < rum/static
-  [draft]
+(rum/defcs draft-card < (rum/local nil ::first-body-image)
+                        (rum/local false ::truncated)
+                        {:will-mount (fn [s]
+                          (let [draft-data (first (:rum/args s))]
+                            (reset!
+                             (::first-body-image s)
+                             (au/get-first-body-thumbnail (:body draft-data))))
+                          s)
+                         :after-render (fn [s]
+                          (let [draft-data (first (:rum/args s))
+                                body-sel (str "div.draft-card-" (:uuid draft-data) " div.draft-card-body")
+                                body-a-sel (str body-sel " a")]
+                            ; Prevent body links in FoC
+                            (.click (js/$ body-a-sel) #(.stopPropagation %))
+                            ; Truncate body text with dotdotdot
+                            (when (compare-and-set! (::truncated s) false true)
+                              (au/truncate-body body-sel false)
+                              (utils/after 10 #(do
+                                                 (.trigger (js/$ body-sel) "destroy")
+                                                 (au/truncate-body body-sel false)))))
+                          s)
+                         :did-remount (fn [o s]
+                          (let [old-draft-data (first (:rum/args o))
+                                new-draft-data (first (:rum/args s))]
+                            (when (not= (:body old-draft-data) (:body new-draft-data))
+                              (reset!
+                               (::first-body-image s)
+                               (au/get-first-body-thumbnail (:body new-draft-data)))))
+                          s)}
+  [s draft]
   [:div.draft-card
-    {:class (when-not draft "empty-draft")
+    {:class (utils/class-set {:empty-draft (not draft)
+                              (str "draft-card-" (:uuid draft)) true})
      :key (str "draft-" (:created-at draft))
      :on-click #(when draft
                   (dis/dispatch! [:entry-edit draft]))}
     (when draft
       [:div.draft-card-inner
-        (when (:banner-url draft)
-          [:div.draft-banner
-            {:style #js {:backgroundImage (str "url(\"" (:banner-url draft) "\")")
-                         :height (str (min 234 (* (/ (:banner-height draft) (:banner-width draft)) 430)) "px")}}])
-        [:div.draft-card-title
-          {:dangerouslySetInnerHTML
-            (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft)) "Untitled Draft" (:headline draft))))}]
-        (let [fixed-body (utils/body-without-preview (:body draft))
-              empty-body? (empty? (utils/strip-HTML-tags fixed-body))
-              final-body (utils/emojify (if empty-body? "Say something..." fixed-body))]
-          [:div
+        [:div.draft-card-content.group
+          [:div.draft-card-title
+            {:dangerouslySetInnerHTML
+              (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft)) "Untitled Draft" (:headline draft))))}]
+          (let [fixed-body (utils/body-without-preview (:body draft))
+                empty-body? (empty? (utils/strip-HTML-tags fixed-body))]
             [:div.draft-card-body
-              {:class (utils/class-set {:empty-body empty-body?})
-               :dangerouslySetInnerHTML final-body}]])
+              {:class (utils/class-set {:empty-body empty-body?
+                                        :has-media-preview @(::first-body-image s)})
+               :dangerouslySetInnerHTML (utils/emojify fixed-body)}])
+          ; Body preview
+          (when @(::first-body-image s)
+            [:div.media-preview-container
+              {:class (or (:type @(::first-body-image s)) "image")}
+              [:img
+                {:src (:thumbnail @(::first-body-image s))}]])]
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
           (when (utils/link-for (:links draft) "delete")
