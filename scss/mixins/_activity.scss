@@ -277,3 +277,49 @@ $h2_top_margin: 20;
     }
   }
 }
+
+@mixin activity-media-preview(){
+  div.media-preview-container {
+    width: 72px;
+    height: 72px;
+    float: right;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    background-position: 50%;
+    background-size: cover;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+
+    img {
+      max-width: 72px;
+      max-height: 54px;
+      margin-top: 9px;
+    }
+
+    &:after {
+      position: absolute;
+      font-family: FontAwesome;
+      font-size: 20px;
+      color: white;
+      opacity: 0.5;
+      top: 50%;
+      left: 50%;
+    }
+
+    &:hover {
+      &:after {
+        opacity: 0.8;
+      }
+    }
+
+    &.video {
+      &:after {
+        content: "\f04b";
+        margin-left: -8px;
+        margin-top: -14px;
+      }
+    }
+  }
+}
