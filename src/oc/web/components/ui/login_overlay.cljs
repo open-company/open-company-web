@@ -10,9 +10,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as occ]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.icon :as i]
-            [oc.web.components.ui.mixins :refer (no-scroll-mixin)]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn close-overlay [e]

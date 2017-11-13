@@ -12,7 +12,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.ui.mixins :as mixins]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]

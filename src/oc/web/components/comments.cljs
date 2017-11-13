@@ -6,7 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
-            [oc.web.components.ui.mixins :refer (first-render-mixin)]
+            [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [goog.object :as gobj]

@@ -8,7 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.mixins :refer (first-render-mixin)]
+            [oc.web.mixins.ui :refer (first-render-mixin)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
