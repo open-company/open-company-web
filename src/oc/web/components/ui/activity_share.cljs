@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -20,6 +21,7 @@
 
 (rum/defcs activity-share < rum/reactive
                             ;; Derivatives
+                            (drv/drv :org-data)
                             (drv/drv :activity-share)
                             (drv/drv :activity-shared-data)
                             ;; Locals
@@ -32,8 +34,9 @@
                             {:will-mount (fn [s]
                               (dis/dispatch! [:teams-get])
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
+                                    org-data @(drv/get-ref s :org-data)
                                     subject (str
-                                             (:name (dis/org-data))
+                                             (:name org-data)
                                              (when (seq (:board-name activity-data))
                                               (str " " (:board-name activity-data)))
                                              ": "
@@ -43,13 +46,24 @@
                              s)
                              :did-mount (fn [s]
                               (.select (sel1 :input#activity-share-modal-shared-url))
+                              (let [slack-button (rum/ref-node s "slack-button")
+                                    org-data @(drv/get-ref s :org-data)]
+                                (when (jwt/team-has-bot? (:team-id org-data))
+                                  (.tooltip
+                                   (js/$ slack-button)
+                                   #js {:trigger "manual"})))
+                              s)
+                             :did-remount (fn [o s]
+                              (let [shared-data @(drv/get-ref s :activity-shared-data)]
+                                (when shared-data
+                                  (close-clicked s)))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
+        org-data (drv/react s :org-data)
         email-data @(::email-data s)
         slack-data @(::slack-data s)
         shared-data (drv/react s :activity-shared-data)
-        shared? (seq (:secure-uuid shared-data))
         secure-uuid (or (:secure-uuid shared-data) (:secure-uuid activity-data))]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
@@ -59,10 +73,12 @@
             {:on-click #(close-clicked s)}]
         [:div.activity-share-modal
           [:div.activity-share-title
-            "Share post via..."]
+            "Share "
+            [:span
+              {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]
           [:div.activity-share-divider-line]
           [:div.activity-share-subheadline
-            "Anyone outside your Carrot team won't see comments."]
+            "People outside your Carrot team cannot see comments."]
           [:div.activity-share-medium-selector-container
             [:div.activity-share-medium-selector
               {:class (when (= @(::medium s) :url) "selected")
@@ -77,10 +93,24 @@
               {:class (when (= @(::medium s) :email) "selected")
                :on-click #(reset! (::medium s) :email)}
               "Email"]
-            [:div.activity-share-medium-selector
-              {:class (when (= @(::medium s) :slack) "selected")
-               :on-click #(reset! (::medium s) :slack)}
-              "Slack"]]
+            (let [slack-disabled (jwt/team-has-bot? (:team-id org-data))]
+              [:div.activity-share-medium-selector
+                {:class (utils/class-set {:selected (= @(::medium s) :slack)
+                                          :medium-selector-disabled slack-disabled})
+                 :data-placement "top"
+                 :data-container "body"
+                 :title "Enable the Slack bot in Settings"
+                 :ref "slack-button"
+                 :on-click (fn [e]
+                             (utils/event-stop e)
+                             (if slack-disabled
+                               (let [$this (js/$ (rum/ref-node s "slack-button"))]
+                                 (.tooltip $this "show")
+                                 (utils/after
+                                  2000
+                                  #(.tooltip $this "hide")))
+                               (reset! (::medium s) :slack)))}
+                "Slack"])]
           [:div.activity-share-divider-line]
           (when (= @(::medium s) :email)
             [:div.activity-share-share
@@ -141,8 +171,6 @@
                     "Share"]]]])
           (when (= @(::medium s) :url)
             [:div.activity-share-modal-shared.group
-              [:div.share-headline
-                "SHARE THIS LINK"]
               (let [share-url (str
                                "http"
                                (when ls/jwt-cookie-secure
@@ -160,10 +188,7 @@
                 {:on-click (fn [_]
                             (.select (sel1 :input#activity-share-modal-shared-url))
                             (utils/copy-to-clipboard))}
-                "Copy URL"]
-              ; [:div.shared-subheadline
-              ;   "You can provide anyone with this link to your update."]
-                ])
+                "Copy URL"]])
           (when (= @(::medium s) :slack)
             [:div.activity-share-share
               [:div.mediums-box
@@ -212,4 +237,3 @@
                                     (dis/dispatch! [:activity-share [slack-share]])))
                      :class (when (empty? (:channel slack-data)) "disabled")}
                     "Share"]]]])]]]))
-

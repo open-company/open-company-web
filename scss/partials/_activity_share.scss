@@ -43,22 +43,8 @@ div.activity-share-modal-container {
         @include avenir_H();
         font-size: 20px;
         color: $carrot_dark_gray;
-        text-align: center;
         position: relative;
         padding-bottom: 32px;
-
-        &:before {
-          @include image-2x("/img/ML/share_activity_icon");
-          background-size: 18px 18px;
-          background-repeat: no-repeat;
-          background-position: center;
-          width: 18px;
-          height: 18px;
-          content: "";
-          position: absolute;
-          top: 3px;
-          left: 136px;
-        }
       }
 
       div.activity-share-divider-line {
@@ -75,19 +61,6 @@ div.activity-share-modal-container {
         text-align: center;
         position: relative;
         padding-bottom: 24px;
-
-        &:before {
-          @include image-2x("/img/ML/share_activity_sub_icon");
-          background-size: 24px 25px;
-          background-repeat: no-repeat;
-          background-position: center;
-          width: 24px;
-          height: 25px;
-          content: "";
-          position: absolute;
-          top: -2px;
-          left: 20px;
-        }
       }
 
       div.activity-share-medium-selector-container {
@@ -107,6 +80,10 @@ div.activity-share-modal-container {
           color: $carrot_light_gray_3;
           float: left;
           cursor: pointer;
+
+          &.medium-selector-disabled {
+            opacity: 0.5;
+          }
 
           &.selected {
             background-color: $carrot_light_gray_9;
@@ -308,7 +285,7 @@ div.activity-share-modal-container {
       }
 
       div.activity-share-modal-shared {
-        margin-top: 16px;
+        margin-top: 32px;
 
         div.share-headline {
           @include avenir_H();
@@ -322,6 +299,8 @@ div.activity-share-modal-container {
           font-size: 12px;
           color: $carrot_dark_gray_1;
           margin-top: 8px;
+          display: block;
+          float: left;
         }
 
         div.shared-url-container {
