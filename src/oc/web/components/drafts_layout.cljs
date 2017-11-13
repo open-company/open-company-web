@@ -4,36 +4,17 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.activity-utils :as au]))
+            [oc.web.lib.activity-utils :as au]
+            [oc.web.mixins.activity :as am]))
 
-(rum/defcs draft-card < (rum/local nil ::first-body-image)
-                        (rum/local false ::truncated)
-                        {:will-mount (fn [s]
-                          (let [draft-data (first (:rum/args s))]
-                            (reset!
-                             (::first-body-image s)
-                             (au/get-first-body-thumbnail (:body draft-data))))
-                          s)
-                         :after-render (fn [s]
+(rum/defcs draft-card < am/truncate-body-mixin
+                        am/body-thumbnail-mixin
+                        {:after-render (fn [s]
                           (let [draft-data (first (:rum/args s))
                                 body-sel (str "div.draft-card-" (:uuid draft-data) " div.draft-card-body")
                                 body-a-sel (str body-sel " a")]
                             ; Prevent body links in FoC
-                            (.click (js/$ body-a-sel) #(.stopPropagation %))
-                            ; Truncate body text with dotdotdot
-                            (when (compare-and-set! (::truncated s) false true)
-                              (au/truncate-body body-sel false)
-                              (utils/after 10 #(do
-                                                 (.trigger (js/$ body-sel) "destroy")
-                                                 (au/truncate-body body-sel false)))))
-                          s)
-                         :did-remount (fn [o s]
-                          (let [old-draft-data (first (:rum/args o))
-                                new-draft-data (first (:rum/args s))]
-                            (when (not= (:body old-draft-data) (:body new-draft-data))
-                              (reset!
-                               (::first-body-image s)
-                               (au/get-first-body-thumbnail (:body new-draft-data)))))
+                            (.click (js/$ body-a-sel) #(.stopPropagation %)))
                           s)}
   [s draft]
   [:div.draft-card
@@ -52,14 +33,15 @@
                 empty-body? (empty? (utils/strip-HTML-tags fixed-body))]
             [:div.draft-card-body
               {:class (utils/class-set {:empty-body empty-body?
-                                        :has-media-preview @(::first-body-image s)})
+                                        :has-media-preview @(:body-thumbnail s)})
+               :ref "activity-body"
                :dangerouslySetInnerHTML (utils/emojify fixed-body)}])
           ; Body preview
-          (when @(::first-body-image s)
+          (when @(:body-thumbnail s)
             [:div.media-preview-container
-              {:class (or (:type @(::first-body-image s)) "image")}
+              {:class (or (:type @(:body-thumbnail s)) "image")}
               [:img
-                {:src (:thumbnail @(::first-body-image s))}]])]
+                {:src (:thumbnail @(:body-thumbnail s))}]])]
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
           (when (utils/link-for (:links draft) "delete")
