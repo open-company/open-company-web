@@ -140,28 +140,27 @@
                      :class (when (empty? (:to email-data)) "disabled")}
                     "Share"]]]])
           (when (= @(::medium s) :url)
-            [:div.activity-share-modal-shared
+            [:div.activity-share-modal-shared.group
               [:div.share-headline
-                "CREATE NEW TOPIC"]
+                "SHARE THIS LINK"]
               (let [share-url (str
                                "http"
                                (when ls/jwt-cookie-secure
                                 "s")
                                "://"
                                ls/web-server
-                               (oc-urls/secure-activity
-                                (router/current-org-slug) secure-uuid))]
+                               (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
                 [:div.shared-url-container.group
                   [:input
                     {:value share-url
                      :read-only true
                      :on-click #(.select (sel1 :input#activity-share-modal-shared-url))
-                     :id "activity-share-modal-shared-url"}]
-                  [:button.mlb-reset.mlb-default.copy-btn
-                    {:on-click (fn [_]
-                                (.select (sel1 :input#activity-share-modal-shared-url))
-                                (utils/copy-to-clipboard))}
-                    "Copy"]])
+                     :id "activity-share-modal-shared-url"}]])
+              [:button.mlb-reset.mlb-default.copy-btn
+                {:on-click (fn [_]
+                            (.select (sel1 :input#activity-share-modal-shared-url))
+                            (utils/copy-to-clipboard))}
+                "Copy URL"]
               ; [:div.shared-subheadline
               ;   "You can provide anyone with this link to your update."]
                 ])

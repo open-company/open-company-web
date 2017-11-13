@@ -328,31 +328,31 @@ div.activity-share-modal-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.6);
           padding: 7px 4px 7px 8px;
           border-radius: 4px;
-          width: 368px;
+          width: 333px;
           height: 40px;
+          float: left;
 
           input {
             border: none;
             outline: none;
             padding: 0.3rem;
             margin: 0;
-            width: 288px;
+            width: 100%;
             @include avenir_R();
             color: $carrot_dark_gray;
             font-size: 14px;
-            float: left;
           }
+        }
 
-          button.copy-btn {
-            width: 56px;
-            height: 26px;
-            text-align: center;
-            padding: 0;
-            margin: 0;
-            @include avenir_H();
-            font-size: 12px;
-            float: right;
-          }
+        button.copy-btn {
+          height: 40px;
+          text-align: center;
+          padding: 4px 16px;
+          margin: 0;
+          @include avenir_H();
+          font-size: 12px;
+          float: left;
+          margin-left: 16px;
         }
 
         button.done-btn {
