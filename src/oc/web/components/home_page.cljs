@@ -171,7 +171,7 @@
             [:div.why-carrot
               "Beyond the team"]
             [:div.why-carrot-description
-              "Stakeholder updates made simple"]
+              "Create awesome stakeholder updates in less time"]
             [:div.centred-screenshot]]
           [:div.third-section-footer.group
             [:div.left-copy

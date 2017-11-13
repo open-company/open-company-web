@@ -369,7 +369,7 @@ div#wrap {
 
         div.why-carrot-description {
           @include avenir_R();
-          font-size: 20px;
+          font-size: 24px;
           color: #4D4D4D;
         }
       }
@@ -428,7 +428,7 @@ div#wrap {
         div.title {
           color: $carrot_dark_blue;
           @include avenir_H();
-          font-size: 36px;
+          font-size: 32px;
           letter-spacing: 0.1px;
           text-align: left;
         }
