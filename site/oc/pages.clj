@@ -77,17 +77,12 @@
               {:src (cdn "/img/ML/home_page_il_1_572_438.png")
                :src-set (str (cdn "/img/ML/home_page_il_1_572_438@2x.png") " 2x")}]
           [:div.description.group
-            [:div.title
-              "Stay on the same page"]
             [:div.subtitle
               (str
                "Chat apps simplify real-time work, but constant "
-               "chatter makes it easy to miss key information "
-               "everyone should know.")]
+               "chatter makes it easy to miss key information.")]
             [:div.subtitle.second-line
-              (str
-               "Carrot provides a lasting view of what’s important "
-               "so everyone stays engaged and aligned.")]]]]
+              "Carrot provides a lasting view of what’s important."]]]]
 
         ; [:div.illustration.illustration-2.group
         ;   [:img.illustration-image
@@ -119,9 +114,8 @@
                 "Visibility"]
               [:div.subtitle
                 (str
-                 "Carrot creates a bird’s-eye view of essential "
-                 "information that’s quick and easy to read. Greater "
-                 "transparency pulls your team closer.")]]]
+                 "A bird’s eye view of essential information is easy "
+                 "to read and creates real transparency.")]]]
 
           [:div.illustration.illustration-4.group
             [:img.illustration-image
@@ -186,7 +180,7 @@
           [:div.why-carrot
             "Beyond the team"]
           [:div.why-carrot-description
-            "Share a clear view of what’s important with external stakeholders, too."]
+            "Keep external stakeholders engaged and up to date"]
           [:div.centred-screenshot]]
         [:div.third-section-footer.group
           [:div.left-copy
@@ -230,8 +224,6 @@
         [:div.try-it-title
           {:id "thank-you-bottom"}
           "Request early access"]
-        [:div.try-it-subtitle
-          "Easy set-up • Free for small teams"]
         [:button.get-started-button
           "Get Started"]]]])
 
@@ -361,9 +353,18 @@
             [:div.mobile-only.happy-face.red-happy-face]
             [:div.paragraphs-bg-container.group
               [:div.paragraph
-                "Messaging apps are designed for real-time work. They’re great in the moment, but chat gets noisy and conversations disappear, making it difficult to have a big picture view of what’s important across the company."]
+                (str
+                 "Messaging apps are designed for real-time work. They’re "
+                 "great in the moment, but chat gets noisy and conversations "
+                 "disappear, making it difficult to have a big picture view of "
+                 "what’s important across the company.")]
               [:div.paragraph
-                "Carrot provides a birds-eye view of the latest announcements, updates, and stories so you can always see what’s happening in context. A common, shared view of what’s important - and the opportunity to react and ask questions about it - creates real transparency and alignment."]
+                (str
+                 "Carrot provides an easy to read view of the latest announcements, "
+                 "updates, and stories so you can always see what’s happening "
+                 "in context. A common, shared view of what’s important - and "
+                 "the opportunity to react and ask questions about it - creates "
+                 "real transparency and alignment.")]
               [:div.paragraph
                 "It also brings teams closer so they can grow together."]
               [:div.paragraph
@@ -418,9 +419,7 @@
     [:div.about-alignment
       [:div.quote]
       [:div.about-alignment-description
-        (str
-         "Company alignment requires real openness and transparency. "
-         "Carrot makes it simple and fun for your team to get started.")]]
+        "Company alignment requires real openness and transparency."]]
 
     [:div.about-team.group
       [:div.about-team-inner.group

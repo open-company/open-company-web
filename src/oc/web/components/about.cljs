@@ -45,7 +45,7 @@
                    "what’s important across the company.")]
                 [:div.paragraph
                   (str
-                   "Carrot provides a birds-eye view of the latest announcements, "
+                   "Carrot provides an easy to read view of the latest announcements, "
                    "updates, and stories so you can always see what’s happening "
                    "in context. A common, shared view of what’s important - and "
                    "the opportunity to react and ask questions about it - creates "
@@ -104,9 +104,7 @@
       [:div.about-alignment
         [:div.quote]
         [:div.about-alignment-description
-          (str
-           "Company alignment requires real openness and transparency. "
-           "Carrot makes it simple and fun for your team to get started.")]]
+          "Company alignment requires real openness and transparency."]]
 
       [:div.about-team.group
         [:div.about-team-inner.group
