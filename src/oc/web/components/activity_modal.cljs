@@ -18,7 +18,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
