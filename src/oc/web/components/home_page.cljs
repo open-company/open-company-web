@@ -70,17 +70,12 @@
             [:img.illustration-image
               (retina-src "/img/ML/home_page_il_1_572_438")]
             [:div.description.group
-              [:div.title
-                "Stay on the same page"]
               [:div.subtitle
                 (str
                  "Chat apps simplify real-time work, but constant "
-                 "chatter makes it easy to miss key information "
-                 "everyone should know.")]
+                 "chatter makes it easy to miss key information.")]
               [:div.subtitle.second-line
-                (str
-                 "Carrot provides a lasting view of what’s important "
-                 "so everyone stays engaged and aligned.")]]]]
+                "Carrot provides a lasting view of what’s important."]]]]
 
           ; [:div.illustration.illustration-2.group
           ;   [:img.illustration-image
@@ -112,9 +107,8 @@
                   "Visibility"]
                 [:div.subtitle
                   (str
-                   "Carrot creates a bird’s-eye view of essential "
-                   "information that’s quick and easy to read. Greater "
-                   "transparency pulls your team closer.")]]]
+                   "A bird’s eye view of essential information is easy "
+                   "to read and creates real transparency.")]]]
 
             [:div.illustration.illustration-4.group
               [:img.illustration-image
@@ -175,7 +169,7 @@
             [:div.why-carrot
               "Beyond the team"]
             [:div.why-carrot-description
-              "Share a clear view of what’s important with external stakeholders, too."]
+              "Keep external stakeholders engaged and up to date"]
             [:div.centred-screenshot]]
           [:div.third-section-footer.group
             [:div.left-copy
@@ -220,8 +214,6 @@
             [:div.try-it-title
               {:id "thank-you-bottom"}
               "Request early access"]
-            [:div.try-it-subtitle
-              "Easy set-up • Free for small teams"]
             [:button.get-started-button
               "Get Started"]])
 

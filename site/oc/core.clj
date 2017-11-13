@@ -128,25 +128,6 @@
         [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column
 
-        [:div.column.column-support
-          [:div.column-title
-            {:onClick
-              (str
-               "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
-               "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
-            "SUPPORT"]
-          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href "/privacy"} "Legal"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
-
-        [:div.column.column-integration
-          [:div.column-title
-            {:onClick (str
-                       "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');"
-                       "$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');")}
-            "DEVELOPERS"]
-          [:div.column-item [:a {:href "https://github.com/open-company"} "GitHub"]]]
-
         [:div.column.column-company
           [:div.column-title
             {:onClick
@@ -156,7 +137,27 @@
             "COMPANY"]
           [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
-          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]]]])
+          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
+
+        [:div.column.column-integration
+          [:div.column-title
+            {:onClick (str
+                       "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');"
+                       "$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');")}
+            "RESOURCES"]
+          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
+          [:div.column-item [:a {:href "/privacy"} "Privacy Policy"]]
+          [:div.column-item [:a {:href "/terms"} "Terms of Use"]]]
+
+        [:div.column.column-support
+          [:div.column-title
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
+            "SUPPORT"]
+          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]]])
 
 
 (defn read-edn [entry]
