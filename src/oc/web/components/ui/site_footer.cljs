@@ -48,28 +48,6 @@
 
       [:div.right-column
 
-        [:div.column.column-support
-          {:class (when (= @(::expanded s) :support) "expanded")}
-          [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :support)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :support)))}
-            "SUPPORT"]
-          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href oc-urls/privacy} "Legal"]]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
-
-        [:div.column.column-integration
-          {:class (when (= @(::expanded s) :integration) "expanded")}
-          [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :integration)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :integration)))}
-            "DEVELOPERS"]
-          [:div.column-item [:a {:href oc-urls/oc-github} "GitHub"]]]
-
         [:div.column.column-company
           {:class (when (= @(::expanded s) :company) "expanded")}
           [:div.column-title
@@ -81,6 +59,29 @@
           [:div.column-item [:a {:href oc-urls/home} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
+
+        [:div.column.column-integration
+          {:class (when (= @(::expanded s) :integration) "expanded")}
+          [:div.column-title
+            {:on-click #(when (responsive/is-mobile-size?)
+                          (if (= @(::expanded s) :integration)
+                            (reset! (::expanded s) nil)
+                            (reset! (::expanded s) :integration)))}
+            "RESOURCES"]
+          [:div.column-item [:a {:href oc-urls/oc-github :target "_blank"} "GitHub"]]
+          [:div.column-item [:a {:href oc-urls/privacy} "Privacy Policy"]]
+          [:div.column-item [:a {:href oc-urls/terms} "Terms of Use"]]]
+
+        [:div.column.column-support
+          {:class (when (= @(::expanded s) :support) "expanded")}
+          [:div.column-title
+            {:on-click #(when (responsive/is-mobile-size?)
+                          (if (= @(::expanded s) :support)
+                            (reset! (::expanded s) nil)
+                            (reset! (::expanded s) :support)))}
+            "SUPPORT"]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         ; [:div.column.column-tour
         ;   {:class (when (= @(::expanded s) :tour) "expanded")}
