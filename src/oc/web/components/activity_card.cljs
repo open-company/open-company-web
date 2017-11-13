@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.activity-utils :as au]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
@@ -44,67 +45,6 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(def default-body-height 72)
-(def default-all-posts-body-height 144)
-
-(defn- truncate-body [body-sel is-all-posts]
-  (let [$body-els (js/$ (str body-sel ">*"))
-        partial-heights (atom [])
-        found (atom false)]
-    (.each $body-els (fn [idx el]
-     (when-not @found
-       (this-as this
-         (let [$this (js/$ this)
-               el-h (.outerHeight $this true) ;; Include margins in height calculation
-               prev-height (apply + @partial-heights)
-               actual-height (+ prev-height el-h)
-               max-height (if is-all-posts default-all-posts-body-height default-body-height)
-               truncate-height  (cond
-                                  (zero? (- max-height prev-height))
-                                  0
-                                  (<= (- max-height prev-height) 24)
-                                  24
-                                  (<= (- max-height prev-height) (* 24 2))
-                                  (* 24 2)
-                                  (<= (- max-height prev-height) (* 24 3))
-                                  (* 24 3)
-                                  (< (- max-height prev-height) (* 24 4))
-                                  (* 24 4)
-                                  (< (- max-height prev-height) (* 24 5))
-                                  (* 24 5)
-                                  (< (- max-height prev-height) (* 24 6))
-                                  (* 24 6))]
-           (swap! partial-heights #(vec (conj % el-h)))
-           (when (>= actual-height max-height)
-             (reset! found true)
-             (.dotdotdot $this
-               #js {:height truncate-height
-                    :wrap "word"
-                    :watch true
-                    :ellipsis "..."})))))))))
-
-(defn- get-first-body-thumbnail [body is-ap]
-  (let [$body (js/$ (str "<div>" body "</div>"))
-        thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
-        found (atom nil)]
-    (dotimes [el-num (.-length thumb-els)]
-      (let [el (aget thumb-els el-num)
-            $el (js/$ el)]
-        (when-not @found
-          (if (= (s/lower (.-tagName el)) "img")
-            (let [width (.attr $el "width")
-                  height (.attr $el "height")]
-              (when (and (not @found)
-                         (or (<= width (* height 2))
-                             (<= height (* width 2))))
-                (reset! found
-                  {:type "image"
-                   :thumbnail (if (and (not is-ap) (.data $el "thumbnail"))
-                                (.data $el "thumbnail")
-                                (.attr $el "src"))})))
-            (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
-    @found))
-
 (rum/defcs activity-card < rum/reactive
                         (rum/local false ::more-dropdown)
                         (rum/local false ::truncated)
@@ -122,29 +62,33 @@
                             (.click (js/$ body-a-sel) #(.stopPropagation %))
                             ; Truncate body text with dotdotdot
                             (when (compare-and-set! (::truncated s) false true)
-                              (truncate-body body-sel is-all-posts)
+                              (au/truncate-body body-sel is-all-posts)
                               (utils/after 10 #(do
                                                  (.trigger (js/$ body-sel) "destroy")
-                                                 (truncate-body body-sel is-all-posts)))))
+                                                 (au/truncate-body body-sel is-all-posts)))))
                           (doto (js/$ "[data-toggle=\"tooltip\"]")
                             (.tooltip "fixTitle")
                             (.tooltip "hide"))
                           s)
                          :will-mount (fn [s]
+                          ;; Get the thumbnail if any
                           (let [activity-data (first (:rum/args s))
                                 is-all-posts (nth (:rum/args s) 4 false)]
                             (reset!
                              (::first-body-image s)
-                             (get-first-body-thumbnail (:body activity-data) is-all-posts)))
+                             (au/get-first-body-thumbnail (:body activity-data) is-all-posts)))
                           s)
                          :did-remount (fn [o s]
                           (let [old-activity-data (first (:rum/args o))
                                 new-activity-data (first (:rum/args s))
                                 is-all-posts (nth (:rum/args s) 4 false)]
+                            ;; If the body changed
                             (when (not= (:body old-activity-data) (:body new-activity-data))
+                              ;; get the thumbnail if any
                               (reset!
                                (::first-body-image s)
-                               (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
+                               (au/get-first-body-thumbnail (:body new-activity-data) is-all-posts))
+                              ;; body truncation reset
                               (.trigger
                                (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body"))
                                "destroy")
@@ -285,7 +229,7 @@
                                       :has-media-preview @(::first-body-image s)})}])
         ; Body preview
         (when @(::first-body-image s)
-          [:div.activity-card-media-preview-container
+          [:div.media-preview-container
             {:class (or (:type @(::first-body-image s)) "image")}
             [:img
               {:src (:thumbnail @(::first-body-image s))}]])]
