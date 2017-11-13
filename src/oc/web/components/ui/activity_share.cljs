@@ -29,7 +29,7 @@
   and there our bot was added to the team."
   [org-data]
   (and (jwt/is-slack-org?)
-       (has-bot? org-data)))
+       (not (has-bot? org-data))))
 
 (rum/defcs activity-share < rum/reactive
                             ;; Derivatives
