@@ -11,8 +11,9 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.activity-utils :as au]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.mixins.activity :as am]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
@@ -46,53 +47,26 @@
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (rum/defcs activity-card < rum/reactive
+                        ;; Locals
                         (rum/local false ::more-dropdown)
-                        (rum/local false ::truncated)
-                        (rum/local nil ::first-body-image)
                         (rum/local false ::move-activity)
                         (rum/local nil ::window-click)
                         (rum/local false ::share-dropdown)
+                        ;; Derivatives
                         (drv/drv :org-data)
+                        ;; Mixins
+                        am/truncate-body-mixin
+                        am/body-thumbnail-mixin
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                 body-a-sel (str body-sel " a")
                                 is-all-posts (nth (:rum/args s) 4 false)]
                             ; Prevent body links in FoC
-                            (.click (js/$ body-a-sel) #(.stopPropagation %))
-                            ; Truncate body text with dotdotdot
-                            (when (compare-and-set! (::truncated s) false true)
-                              (au/truncate-body body-sel is-all-posts)
-                              (utils/after 10 #(do
-                                                 (.trigger (js/$ body-sel) "destroy")
-                                                 (au/truncate-body body-sel is-all-posts)))))
+                            (.click (js/$ body-a-sel) #(.stopPropagation %)))
                           (doto (js/$ "[data-toggle=\"tooltip\"]")
                             (.tooltip "fixTitle")
                             (.tooltip "hide"))
-                          s)
-                         :will-mount (fn [s]
-                          ;; Get the thumbnail if any
-                          (let [activity-data (first (:rum/args s))
-                                is-all-posts (nth (:rum/args s) 4 false)]
-                            (reset!
-                             (::first-body-image s)
-                             (au/get-first-body-thumbnail (:body activity-data) is-all-posts)))
-                          s)
-                         :did-remount (fn [o s]
-                          (let [old-activity-data (first (:rum/args o))
-                                new-activity-data (first (:rum/args s))
-                                is-all-posts (nth (:rum/args s) 4 false)]
-                            ;; If the body changed
-                            (when (not= (:body old-activity-data) (:body new-activity-data))
-                              ;; get the thumbnail if any
-                              (reset!
-                               (::first-body-image s)
-                               (au/get-first-body-thumbnail (:body new-activity-data) is-all-posts))
-                              ;; body truncation reset
-                              (.trigger
-                               (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body"))
-                               "destroy")
-                              (reset! (::truncated s) false)))
                           s)
                          :did-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
@@ -224,15 +198,16 @@
               emojied-body (utils/emojify body-without-preview)]
           [:div.activity-card-body
             {:dangerouslySetInnerHTML emojied-body
+             :ref "activity-body"
              :class (utils/class-set {:has-body has-body
                                       :has-headline has-headline
-                                      :has-media-preview @(::first-body-image s)})}])
+                                      :has-media-preview @(:body-thumbnail s)})}])
         ; Body preview
-        (when @(::first-body-image s)
+        (when @(:body-thumbnail s)
           [:div.media-preview-container
-            {:class (or (:type @(::first-body-image s)) "image")}
+            {:class (or (:type @(:body-thumbnail s)) "image")}
             [:img
-              {:src (:thumbnail @(::first-body-image s))}]])]
+              {:src (:thumbnail @(:body-thumbnail s))}]])]
       [:div.activity-card-footer.group
         (interactions-summary activity-data)
         (when share-thoughts
