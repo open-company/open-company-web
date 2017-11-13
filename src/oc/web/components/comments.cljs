@@ -100,7 +100,7 @@
   (when-let* [dom-node (utils/rum-dom-node s)
               comments-internal-scroll (sel1 dom-node :div.comments-internal-scroll)]
     ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
-    (when comments-internal-scroll
+    (when (and comments-internal-scroll @(::scroll-bottom-after-render s))
       (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
 
 (defn load-comments-if-needed [s]
@@ -111,16 +111,20 @@
       (utils/after 10 #(dis/dispatch! [:comments-get activity-data])))))
 
 (rum/defcs comments < (drv/drv :activity-comments-data)
+                      (drv/drv :comment-add-finish)
                       rum/reactive
                       rum/static
                       (rum/local false ::add-comment-focus)
                       (rum/local false ::needs-gradient)
                       (rum/local false ::comments-requested)
+                      (rum/local true  ::scroll-bottom-after-render)
                       {:will-mount (fn [s]
                                     (load-comments-if-needed s)
                                     s)
                        :did-remount (fn [o s]
                                       (load-comments-if-needed s)
+                                      (when @(drv/get-ref s :comment-add-finish)
+                                        (reset! (::scroll-bottom-after-render s) true))
                                       s)
                        :after-render (fn [s]
                                        (let [comments-internal-scroll (js/$ ".comments-internal-scroll")
@@ -151,6 +155,15 @@
                                     :empty (zero? (count sorted-comments))})}
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
+             {:on-scroll (fn [e]
+                           (let [comments-internal-scroll (js/$ ".comments-internal-scroll")]
+                             ;; when a user scrolls up,
+                             ;; turn off the scroll to bottom after render
+                             (when (and (> (.data comments-internal-scroll "lastScrollTop")
+                                           (.scrollTop comments-internal-scroll))
+                                        @(::scroll-bottom-after-render s))
+                               (reset! (::scroll-bottom-after-render s) false))
+                             (.data comments-internal-scroll "lastScrollTop" (.scrollTop comments-internal-scroll))))}
               (for [c sorted-comments]
                 (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
             (when-not @(::add-comment-focus s)
