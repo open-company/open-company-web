@@ -75,7 +75,9 @@
                  "Chat apps simplify real-time work, but constant "
                  "chatter makes it easy to miss key information.")]
               [:div.subtitle.second-line
-                "Carrot provides a lasting view of what’s important."]]]]
+                (str
+                 "Carrot provides a lasting view of what’s important "
+                 "to keep everyone on the same page.")]]]]
 
           ; [:div.illustration.illustration-2.group
           ;   [:img.illustration-image
