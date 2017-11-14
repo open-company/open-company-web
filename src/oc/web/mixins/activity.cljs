@@ -7,9 +7,9 @@
   {:init (fn [s]
     (assoc s :truncated (atom false)))
    :after-render (fn [s]
-    (when-let [body-el (rum/ref-node s "activity-body")]
-      ; Truncate body text with dotdotdot
-      (when (compare-and-set! (:truncated s) false true)
+    ; Truncate body text with dotdotdot
+    (when (compare-and-set! (:truncated s) false true)
+      (when-let [body-el (rum/ref-node s "activity-body")]
         (au/truncate-body body-el)))
     s)
    :did-remount (fn [o s]
@@ -25,16 +25,16 @@
   {:init (fn [s]
     (assoc s :body-thumbnail (atom nil)))
    :will-mount (fn [s]
-    (let [draft-data (first (:rum/args s))]
+    (let [activity-data (first (:rum/args s))]
       (reset!
        (:body-thumbnail s)
-       (au/get-first-body-thumbnail (:body draft-data))))
+       (au/get-first-body-thumbnail (:body activity-data))))
     s)
    :did-remount (fn [o s]
-    (let [old-draft-data (first (:rum/args o))
-          new-draft-data (first (:rum/args s))]
-      (when (not= (:body old-draft-data) (:body new-draft-data))
+    (let [old-activity-data (first (:rum/args o))
+          new-activity-data (first (:rum/args s))]
+      (when (not= (:body old-activity-data) (:body new-activity-data))
         (reset!
          (:body-thumbnail s)
-         (au/get-first-body-thumbnail (:body new-draft-data)))))
+         (au/get-first-body-thumbnail (:body new-activity-data)))))
     s)})
