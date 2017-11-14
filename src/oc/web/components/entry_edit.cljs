@@ -237,7 +237,9 @@
             (user-avatar-image current-user-data)
             [:div.posting-in
               [:span
-                "Draft for "]
+                (if (:uuid entry-editing)
+                  "Draft for "
+                  "Posting in ")]
               [:div.boards-dropdown-caret
                 {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
                 (:board-name entry-editing)
