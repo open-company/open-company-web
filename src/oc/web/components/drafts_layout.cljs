@@ -28,7 +28,9 @@
         [:div.draft-card-content.group
           [:div.draft-card-title
             {:dangerouslySetInnerHTML
-              (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft)) "Untitled Draft" (:headline draft))))}]
+              (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft))
+                                                     "Untitled Draft"
+                                                     (:headline draft))))}]
           (let [fixed-body (utils/body-without-preview (:body draft))
                 empty-body? (empty? (utils/strip-HTML-tags fixed-body))]
             [:div.draft-card-body
