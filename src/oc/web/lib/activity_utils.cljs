@@ -32,7 +32,10 @@
 (defn reset-truncate-body
   "Reset dotdotdot for the give body element."
   [body-el]
-  (.trigger (js/$ body-el) "destroy"))
+  (let [$body-els (js/$ ">*" body-el)]
+    (.each $body-els (fn [idx el]
+      (this-as this
+        (.trigger (js/$ this) "destroy"))))))
 
 (def default-body-height 72)
 (def default-all-posts-body-height 144)
