@@ -54,7 +54,6 @@
                             (rum/local {:note ""} ::slack-data)
                             (rum/local :url ::medium)
                             (rum/local false ::dismiss)
-                            ; (rum/local false ::tooltip-ini)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
