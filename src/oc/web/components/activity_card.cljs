@@ -52,29 +52,18 @@
                         (rum/local false ::move-activity)
                         (rum/local nil ::window-click)
                         (rum/local false ::share-dropdown)
-                        (rum/local nil ::truncated)
-                        (rum/local nil :body-thumbnail)
                         ;; Derivatives
                         (drv/drv :org-data)
                         ;; Mixins
-                        ; am/truncate-body-mixin
-                        ; am/body-thumbnail-mixin
-                        {:will-mount (fn [s]
-                          (let [activity-data (first (:rum/args s))]
-                            (reset!
-                             (:body-thumbnail s)
-                             (au/get-first-body-thumbnail (:body activity-data))))
-                          s)
-                         :after-render (fn [s]
+                        am/truncate-body-mixin
+                        am/body-thumbnail-mixin
+                        {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                 body-a-sel (str body-sel " a")
                                 is-all-posts (nth (:rum/args s) 4 false)]
                             ; Prevent body links in FoC
-                            (.click (js/$ body-a-sel) #(.stopPropagation %))
-                            (when (compare-and-set! (::truncated s) false true)
-                              (when-let [body-el (rum/ref-node s "activity-body")]
-                                (au/truncate-body body-el))))
+                            (.click (js/$ body-a-sel) #(.stopPropagation %)))
                           (doto (js/$ "[data-toggle=\"tooltip\"]")
                             (.tooltip "fixTitle")
                             (.tooltip "hide"))
@@ -93,18 +82,6 @@
                                   (reset! (::more-dropdown s) false))
                                 (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
                                   (reset! (::share-dropdown s) false))))))
-                          s)
-                         :did-remount (fn [o s]
-                          (let [old-activity-data (first (:rum/args o))
-                                new-activity-data (first (:rum/args s))]
-                            ;; If the body changed
-                            (when (not= (:body old-activity-data) (:body new-activity-data))
-                              ;; Force the truncate algorithm to re-run
-                              (reset! (::truncated s) false)
-                              ;; Force refresh of the body thumbnail
-                              (reset!
-                               (:body-thumbnail s)
-                               (au/get-first-body-thumbnail (:body new-activity-data)))))
                           s)
                          :will-unmount (fn [s]
                           (events/unlistenByKey @(::window-click s))
