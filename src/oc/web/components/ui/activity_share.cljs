@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.components.ui.mixins :as mixins]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
@@ -34,15 +35,8 @@
 (defn- highlight-url
   "Select the whole content of the share link filed."
   [s]
-  (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
+  (when-let [url-field (rum/ref-node s "activity-share-url-field")]
     (.select url-field)))
-
-(defn- initialize-copied-tooltip
-  "Setup the bootstrap tooltip on the share url field.
-  Do it only if the url field is currently rendered."
-  [s]
-  (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
-    (.tooltip (js/$ url-field) #js {:trigger "manual" :title "Copied"})))
 
 (rum/defcs activity-share < rum/reactive
                             ;; Derivatives
@@ -54,6 +48,9 @@
                             (rum/local {:note ""} ::slack-data)
                             (rum/local :url ::medium)
                             (rum/local false ::dismiss)
+                            (rum/local false ::copied)
+                            (rum/local false ::sharing)
+                            (rum/local false ::shared)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -77,33 +74,40 @@
                                   (.tooltip
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
-                              (initialize-copied-tooltip s)
-                              s)
-                             :did-update (fn [s]
-                              (initialize-copied-tooltip s)
                               s)
                              :did-remount (fn [o s]
-                              (let [shared-data @(drv/get-ref s :activity-shared-data)]
-                                (when shared-data
-                                  (close-clicked s)))
+                              ;; When we have a sharing response
+                              (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
+                                (when (compare-and-set! (::sharing s) true false)
+                                  (reset! (::shared s) true)
+                                  (utils/after
+                                   2000
+                                   (fn []
+                                    (reset! (::shared s) false)
+                                    (dis/dispatch! [:activity-share-reset])))))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
         org-data (drv/react s :org-data)
         email-data @(::email-data s)
         slack-data @(::slack-data s)
-        shared-data (drv/react s :activity-shared-data)
-        secure-uuid (or (:secure-uuid shared-data) (:secure-uuid activity-data))]
+        secure-uuid (:secure-uuid activity-data)
+        ;; Make sure it gets remounted when share request finishes
+        _ (drv/react s :activity-shared-data)]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})
+       :on-click (fn [e]
+                  (when-not (utils/event-inside? e (rum/ref-node s "activity-share-modal-wrapper"))
+                    (close-clicked s)))}
       [:div.modal-wrapper
+        {:ref "activity-share-modal-wrapper"}
         [:button.carrot-modal-close.mlb-reset
             {:on-click #(close-clicked s)}]
         [:div.activity-share-modal
-          [:div.activity-share-title
-            "Share "
-            [:span
+          [:div.activity-share-main-cta
+            [:span "Share "]
+            [:span.activity-share-post-title
               {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]
           [:div.activity-share-divider-line]
           [:div.activity-share-subheadline
@@ -112,16 +116,18 @@
             [:div.activity-share-medium-selector
               {:class (when (= @(::medium s) :url) "selected")
                :on-click (fn [_]
-                          (reset! (::medium s) :url)
-                          (utils/after
-                           500
-                           #(highlight-url s)))}
+                          (when-not @(::sharing s)
+                            (reset! (::medium s) :url)
+                            (utils/after
+                             500
+                             #(highlight-url s))))}
               "URL"]
             [:div.activity-share-medium-selector
               {:class (when (= @(::medium s) :email) "selected")
-               :on-click #(reset! (::medium s) :email)}
+               :on-click #(when-not @(::sharing s)
+                           (reset! (::medium s) :email))}
               "Email"]
-            (let [slack-disabled (has-bot? org-data)
+            (let [slack-disabled (not (has-bot? org-data))
                   show-slack-tooltip? (show-slack-tooltip? org-data)]
               [:div.activity-share-medium-selector
                 {:class (utils/class-set {:selected (= @(::medium s) :slack)
@@ -132,14 +138,15 @@
                  :ref "slack-button"
                  :on-click (fn [e]
                              (utils/event-stop e)
-                             (if slack-disabled
-                               (when show-slack-tooltip?
-                                 (let [$this (js/$ (rum/ref-node s "slack-button"))]
-                                   (.tooltip $this "show")
-                                   (utils/after
-                                    2000
-                                    #(.tooltip $this "hide"))))
-                               (reset! (::medium s) :slack)))}
+                             (when-not @(::sharing s)
+                               (if slack-disabled
+                                 (when show-slack-tooltip?
+                                   (let [$this (js/$ (rum/ref-node s "slack-button"))]
+                                     (.tooltip $this "show")
+                                     (utils/after
+                                      2000
+                                      #(.tooltip $this "hide"))))
+                                 (reset! (::medium s) :slack))))}
                 "Slack"])]
           [:div.activity-share-divider-line]
           (when (= @(::medium s) :email)
@@ -196,9 +203,15 @@
                                                    :to (:to email-data)}]
                                   (if (empty? (:to email-data))
                                     (reset! (::email-data s) (merge email-data {:to-error true}))
-                                    (dis/dispatch! [:activity-share [email-share]])))
+                                    (do
+                                      (reset! (::sharing s) true)
+                                      (dis/dispatch! [:activity-share [email-share]]))))
                      :class (when (empty? (:to email-data)) "disabled")}
-                    "Share"]]]])
+                    (if @(::shared s)
+                      "Shared!"
+                      [(when @(::sharing s)
+                        (small-loading))
+                       "Share"])]]]])
           (when (= @(::medium s) :url)
             [:div.activity-share-modal-shared.group
               (let [share-url (str
@@ -213,19 +226,21 @@
                     {:value share-url
                      :read-only true
                      :on-click #(highlight-url s)
-                     :ref "activity-share-modal-shared-url"
+                     :ref "activity-share-url-field"
                      :data-placement "top"}]])
               [:button.mlb-reset.mlb-default.copy-btn
-                {:on-click (fn [e]
+                {:ref "activity-share-url-copy-btn"
+                 :on-click (fn [e]
                             (utils/event-stop e)
                             (highlight-url s)
                             (when (utils/copy-to-clipboard)
-                              (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
-                                (let [$url-field (js/$ url-field)]
-                                  (.tooltip $url-field "show")
-                                  (utils/after 2000
-                                   #(.tooltip $url-field "hide"))))))}
-                "Copy URL"]])
+                              (reset! (::copied s) true)
+                              (utils/after
+                               2000
+                               #(reset! (::copied s) false))))}
+                (if @(::copied s)
+                  "Copied!"
+                  "Copy URL")]])
           (when (= @(::medium s) :slack)
             [:div.activity-share-share
               [:div.mediums-box
@@ -271,6 +286,12 @@
                                   (if (empty? (:channel slack-data))
                                     (when (empty? (:channel slack-data))
                                       (reset! (::slack-data s) (merge slack-data {:channel-error true})))
-                                    (dis/dispatch! [:activity-share [slack-share]])))
+                                    (do
+                                      (reset! (::sharing s) true)
+                                      (dis/dispatch! [:activity-share [slack-share]]))))
                      :class (when (empty? (:channel slack-data)) "disabled")}
-                    "Share"]]]])]]]))
+                    (if @(::shared s)
+                      "Shared!"
+                      [(when @(::sharing s)
+                        (small-loading))
+                       "Share"])]]]])]]]))

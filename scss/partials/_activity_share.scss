@@ -39,12 +39,20 @@ div.activity-share-modal-container {
         text-align: center;
       }
 
-      div.activity-share-title {
+      div.activity-share-main-cta {
         @include avenir_H();
         font-size: 20px;
         color: $carrot_dark_gray;
         position: relative;
         padding-bottom: 32px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        span.activity-share-post-title {
+          @include avenir_BOOK();
+        }
       }
 
       div.activity-share-divider-line {
