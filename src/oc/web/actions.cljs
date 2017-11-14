@@ -1415,6 +1415,10 @@
   [db [_ activity-data]]
   (dissoc db :activity-share))
 
+(defmethod dispatcher/action :activity-share-reset
+  [db [_]]
+  (dissoc db :activity-shared-data))
+
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]
   (api/share-activity (:share-data (:activity-share db)) share-data)
