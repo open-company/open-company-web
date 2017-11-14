@@ -31,6 +31,12 @@
   (and (jwt/is-slack-org?)
        (not (has-bot? org-data))))
 
+(defn- highlight-url
+  "Select the whole content of the share link filed."
+  [s]
+  (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
+    (.select url-field)))
+
 (rum/defcs activity-share < rum/reactive
                             ;; Derivatives
                             (drv/drv :org-data)
@@ -41,6 +47,8 @@
                             (rum/local {:note ""} ::slack-data)
                             (rum/local :url ::medium)
                             (rum/local false ::dismiss)
+                            ; (rum/local false ::tooltip-ini)
+                            ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
                             {:will-mount (fn [s]
@@ -57,13 +65,16 @@
                                                          :note ""}))
                              s)
                              :did-mount (fn [s]
-                              (.select (sel1 :input#activity-share-modal-shared-url))
                               (let [slack-button (rum/ref-node s "slack-button")
                                     org-data @(drv/get-ref s :org-data)]
                                 (when (show-slack-tooltip? org-data)
                                   (.tooltip
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
+                              (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
+                                (.tooltip
+                                 (js/$ url-field)
+                                 #js {:trigger "manual" :title "Copied"}))
                               s)
                              :did-remount (fn [o s]
                               (let [shared-data @(drv/get-ref s :activity-shared-data)]
@@ -98,8 +109,7 @@
                           (reset! (::medium s) :url)
                           (utils/after
                            500
-                           #(when-let [activity-shared-url (sel1 :input#activity-share-modal-shared-url)]
-                             (.select activity-shared-url))))}
+                           #(highlight-url s)))}
               "URL"]
             [:div.activity-share-medium-selector
               {:class (when (= @(::medium s) :email) "selected")
@@ -196,12 +206,19 @@
                   [:input
                     {:value share-url
                      :read-only true
-                     :on-click #(.select (sel1 :input#activity-share-modal-shared-url))
-                     :id "activity-share-modal-shared-url"}]])
+                     :on-click #(highlight-url s)
+                     :ref "activity-share-modal-shared-url"
+                     :data-placement "top"}]])
               [:button.mlb-reset.mlb-default.copy-btn
-                {:on-click (fn [_]
-                            (.select (sel1 :input#activity-share-modal-shared-url))
-                            (utils/copy-to-clipboard))}
+                {:on-click (fn [e]
+                            (utils/event-stop e)
+                            (highlight-url s)
+                            (when (utils/copy-to-clipboard)
+                              (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
+                                (let [$url-field (js/$ url-field)]
+                                  (.tooltip $url-field "show")
+                                  (utils/after 2000
+                                   #(.tooltip $url-field "hide"))))))}
                 "Copy URL"]])
           (when (= @(::medium s) :slack)
             [:div.activity-share-share
