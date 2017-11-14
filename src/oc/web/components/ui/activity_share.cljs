@@ -37,6 +37,13 @@
   (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
     (.select url-field)))
 
+(defn- initialize-copied-tooltip
+  "Setup the bootstrap tooltip on the share url field.
+  Do it only if the url field is currently rendered."
+  [s]
+  (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
+    (.tooltip (js/$ url-field) #js {:trigger "manual" :title "Copied"})))
+
 (rum/defcs activity-share < rum/reactive
                             ;; Derivatives
                             (drv/drv :org-data)
@@ -71,10 +78,10 @@
                                   (.tooltip
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
-                              (when-let [url-field (rum/ref-node s "activity-share-modal-shared-url")]
-                                (.tooltip
-                                 (js/$ url-field)
-                                 #js {:trigger "manual" :title "Copied"}))
+                              (initialize-copied-tooltip s)
+                              s)
+                             :did-update (fn [s]
+                              (initialize-copied-tooltip s)
                               s)
                              :did-remount (fn [o s]
                               (let [shared-data @(drv/get-ref s :activity-shared-data)]
