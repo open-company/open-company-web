@@ -304,10 +304,11 @@
                     (close-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
-        [:button.carrot-modal-close.mlb-reset
-          {:on-click #(if editing
-                        (dismiss-editing? s true)
-                        (close-clicked s))}]
+        (when-not (:activity-share modal-data)
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(if editing
+                          (dismiss-editing? s true)
+                          (close-clicked s))}])
         [:div.activity-modal.group
           {:ref "activity-modal"
            :class (str "activity-modal-" (:uuid activity-data))}
