@@ -111,7 +111,7 @@
               {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]
           [:div.activity-share-divider-line]
           [:div.activity-share-subheadline
-            "People outside your Carrot team cannot see comments."]
+            "People outside your Carrot team will not see comments."]
           [:div.activity-share-medium-selector-container
             [:div.activity-share-medium-selector
               {:class (when (= @(::medium s) :url) "selected")
