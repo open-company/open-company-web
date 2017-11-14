@@ -1108,7 +1108,8 @@
 (defn copy-to-clipboard []
   (try
     (.execCommand js/document "copy")
-    (catch :default e)))
+    (catch :default e
+      false)))
 
 (defn ordinal-suffix [i]
   (let [j (mod i 10)
