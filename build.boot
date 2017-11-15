@@ -113,12 +113,6 @@
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/css/emojione.min.css"
                         "public/css/emojione.min.css"]
-                       ['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.png"
-                        "public/img/emojione.sprites.png"]
-                       ['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
-                        "public/img/emojione.sprites.svg"]
                        ['cljsjs/emoji-mart
                         "cljsjs/emoji-mart/common/emoji-mart.css"
                         "public/css/emoji-mart.css"]
