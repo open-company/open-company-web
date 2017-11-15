@@ -52,17 +52,33 @@
       (if (pos? count)
         (if reacted
           (str "You"
-               (when (> count 1) (str " and +" count))
+               (when (> count 1) (str " and +" (dec count)))
                " agreed")
           (str "+" count " agreed"))
         (str "Agree")))))
+
+(defn- display-reactions?
+  "
+   We want to skip the reactions display if the data is a comment,
+   and there are no reactions and the owner of the comment is the current user.
+  "
+  [item-data]
+  (let [reactions-data (:reactions item-data)
+        reaction (when (= (count reactions-data) 1)
+                   (first reactions-data))
+        owner? (= (jwt/user-id) (:user-id (:author item-data)))
+        skip? (when (is-comment-reaction? item-data)
+                (when (and owner? (zero? (:count reaction)))
+                  true))]
+    (not skip?)))
 
 (rum/defcs reactions
   [s item-data]
   (when (seq (:reactions item-data))
     (let [reactions-data (:reactions item-data)
           reactions-loading (:reactions-loading item-data)]
-      [:div.reactions
+      (when (display-reactions? item-data)
+       [:div.reactions
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
@@ -91,4 +107,4 @@
               {:class (reaction-class-helper item-data r)}
               (:reaction r)]
             [:div.count
-              (reaction-display-helper item-data r)]])])))
+              (reaction-display-helper item-data r)]])]))))

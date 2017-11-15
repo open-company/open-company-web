@@ -946,8 +946,8 @@
             with-new-link (assoc reaction-data :links [new-link])
             with-new-reacted (assoc with-new-link :reacted reacted?)
             new-count (if reacted?
-                        (+ (:count reaction-data) 1)
-                        (- (:count reaction-data) 1))
+                        (inc (:count reaction-data))
+                        (dec (:count reaction-data)))
             new-reaction-data (assoc with-new-reacted :count new-count)
             new-reactions-data (assoc reactions-data reaction-idx new-reaction-data)
             new-comment-data (assoc comment-data :reactions new-reactions-data)
