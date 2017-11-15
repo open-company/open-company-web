@@ -568,10 +568,6 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css"}]
           ;; Emojione CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css"}]
-          ;; EmojionePicker css from cljsjs
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione-picker.css"}]
-          ;; Emojone Sprites CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.sprites.css"}]
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-mart.css"}]
           ;; CarrotKit Font
@@ -639,8 +635,7 @@
           ;; MediumEditorCustomBold
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorCustomBold/CustomBold.js"}]
           ;; Static js files
-          [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
-          [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
+          [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]]})
 
 (def prod-app-shell
   {:head [:head
@@ -705,5 +700,4 @@
           ;; Compiled assents
           [:script {:src (cdn "/oc_assets.js")}]
           ;; Static js files
-          [:script {:src (cdn "/js/static-js.js")}]
-          [:div.hidden [:img {:src (cdn "/img/emojione.sprites.png")}]]]})
+          [:script {:src (cdn "/js/static-js.js")}]]})
