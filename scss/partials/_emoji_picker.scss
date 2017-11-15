@@ -1,3 +1,6 @@
+$picker_height: 421;
+$picker_width: 338;
+
 div.emoji-picker {
   button.emoji-button{
     padding: 1px 0 0 0;
@@ -31,6 +34,23 @@ div.emoji-picker {
 
   .emoji-dialog .modifiers {
     display: none;
+  }
+
+  div.picker-container {
+    position: absolute;
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+
+    &.top {
+      top: -#{$picker_height + 10}px;
+    }
+
+    &.bottom {
+      top: 0px;
+    }
   }
 }
 
