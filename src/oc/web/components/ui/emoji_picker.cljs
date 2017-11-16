@@ -22,11 +22,7 @@
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
     (remove-markers s)
-    (let [prior-value @(::visible s)]
-      (reset! (::visible s) false)
-      (let [will-hide-picker (:will-hide-picker (first (:rum/args s)))]
-        (when (and prior-value (fn? will-hide-picker))
-          (will-hide-picker))))))
+    (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
   (remove-markers s)
@@ -88,7 +84,7 @@
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
-  [s {:keys [add-emoji-cb position width height will-show-picker will-hide-picker container-selector]
+  [s {:keys [add-emoji-cb position width height container-selector]
       :as arg
       :or {position "top"
            width 25
@@ -108,17 +104,11 @@
          :data-container "body"
          :data-toggle "tooltip"
          :disabled @(::disabled s)
-         :on-mouse-down #(if @(::disabled s)
-                          (remove-markers s)
-                          (save-caret-position s))
-         :on-click #(do
-                      (.preventDefault %)
-                      (let [vis (and @caret-pos (not @visible))]
-                        (when (and vis (fn? will-show-picker))
-                          (will-show-picker))
-                        (when (and vis (fn? will-hide-picker))
-                          (will-hide-picker))
-                        (reset! visible vis)))}]
+         :on-mouse-down #(when-not @(::disabled s)
+                           (save-caret-position s)
+                             (let [vis (and @caret-pos
+                                            (not @visible))]
+                               (reset! visible vis)))}]
       [:div.picker-container
         {:class (utils/class-set {position true
                                   :visible @visible})}
