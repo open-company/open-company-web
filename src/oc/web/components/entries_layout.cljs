@@ -15,26 +15,18 @@
 (defn new?
   "
   An entry is new if:
-
-
-
     user is part of the team (we don't track new for non-team members accessing public boards)
       -and-
     user is not the post's author
       -and-
-    created-at is < 30 days
+    published-at is < 30 days
       -and-
-
-
-
-
-
-    created-at of the entry is newer than seen at
+    published-at of the entry is newer than seen at
       -or-
     no seen at
   "
   [entry changes]
-  (let [created-at (:created-at entry)
+  (let [published-at (:published-at entry)
         too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
         seen-at (:seen-at changes)
         user-id (jwt/get-key :user-id)
@@ -42,19 +34,19 @@
         in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
         new? (and in-team?
                   (not= author-id user-id)
-                  (> created-at too-old)
-                  (or (> created-at seen-at)
+                  (> published-at too-old)
+                  (or (> published-at seen-at)
                       (nil? seen-at)))]
     (timbre/debug "New'ness in board test for:" (:uuid entry)
                   "in-team?:" in-team?
                   "user-id / author-id:" user-id author-id
-                  "created:" created-at
+                  "created:" published-at
                   "seen:" seen-at
                   "new?:" new?)
     new?))
 
 (defn is-share-thoughts? [entry changes]
-  (let [entry-js-date (utils/js-date (:created-at entry))
+  (let [entry-js-date (utils/js-date (:published-at entry))
         now (utils/js-date)
         thirty-days (* 1000 60 60 24 30)
         user-id (jwt/get-key :user-id)
@@ -70,7 +62,7 @@
 
 (defn find-share-thoughts-uuid [board-data changes]
   (let [entries (vals (:fixed-items board-data))
-        sorted-entries (reverse (sort-by :created-at entries))]
+        sorted-entries (reverse (sort-by :published-at entries))]
     (some #(when (is-share-thoughts? % changes) (:uuid %)) sorted-entries)))
 
 (rum/defcs entries-layout < rum/reactive
@@ -94,14 +86,14 @@
                                merge
                                (map
                                 (fn [[k v]]
-                                 (hash-map k (vec (reverse (sort-by :created-at v)))))
+                                 (hash-map k (vec (reverse (sort-by :published-at v)))))
                                 (group-by :topic-slug entries)))
               sorted-topics (vec
                              (reverse
                               (sort
                                #(compare
-                                 (:created-at (first (get grouped-entries %1)))
-                                 (:created-at (first (get grouped-entries %2))))
+                                 (:published-at (first (get grouped-entries %1)))
+                                 (:published-at (first (get grouped-entries %2))))
                                (keys grouped-entries))))]
           (for [topic sorted-topics
                 :let [entries-group (get grouped-entries topic)
@@ -183,7 +175,7 @@
               filtered-entries (if (= layout-type "uncategorized")
                                   (filterv #(empty? (:topic-slug %)) entries)
                                   (filterv #(= (:topic-slug %) layout-type) entries))
-              sorted-entries (vec (reverse (sort-by :created-at filtered-entries)))]
+              sorted-entries (vec (reverse (sort-by :published-at filtered-entries)))]
           [:div.entry-cards-container.by-specific-topic.group
             ; Calc the number of pairs
             (let [top-index (js/Math.ceil (/ (count sorted-entries) 2))]
@@ -217,7 +209,7 @@
         ;; :latest layout
         :else
         (let [entries (vals (:fixed-items board-data))
-              sorted-entries (vec (reverse (sort-by :created-at entries)))]
+              sorted-entries (vec (reverse (sort-by :published-at entries)))]
           [:div.entry-cards-container.group
             ; Get the max number of pairs
             (let [top-index (js/Math.ceil (/ (count sorted-entries) 2))]

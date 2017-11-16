@@ -19,8 +19,11 @@
 (defn org-data-key [org-slug]
   (vec (conj (org-key org-slug) :org-data)))
 
+(defn boards-key [org-slug]
+  (vec (conj (org-key org-slug) :boards)))
+
 (defn all-posts-key [org-slug]
-  (vec (concat (org-key org-slug) [:boards :all-posts])))
+  (vec (conj (boards-key org-slug) :all-posts)))
 
 (defn calendar-key [org-slug]
   (vec (conj (org-key org-slug) :calendar)))
@@ -29,7 +32,7 @@
   (vec (conj (org-key org-slug) :change-data)))
 
 (defn board-key [org-slug board-slug]
-  (vec (concat (org-key org-slug) [:boards (keyword board-slug)])))
+  (vec (conj (boards-key org-slug) (keyword board-slug))))
 
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
@@ -150,6 +153,18 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (change-data-key org-slug))))]
+   :editable-boards     [[:base :org-slug]
+                          (fn [base org-slug]
+                            (let [boards-key (boards-key org-slug)
+                                  boards (get-in base boards-key)
+                                  filtered-boards (filterv
+                                                   (fn [board]
+                                                      (let [links (-> board :board-data :links)]
+                                                        (some #(when (= (:rel %) "create") %) links)))
+                                                   (vals boards))]
+                              (zipmap
+                               (map #(-> % :board-data :slug) filtered-boards)
+                               (map :board-data filtered-boards))))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
@@ -201,14 +216,15 @@
                               (:topics board-data)
                               (let [edit-board-slug (:board-slug entry-editing)]
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
-   :modal-data          [[:base :org-data]
+   :modal-data          [[:base :org-data :entry-edit-topics]
                           (fn [base org-data entry-edit-topics]
                             {:org-data org-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
                              :board-filters (:board-filters base)
                              :modal-editing-data (:modal-editing-data base)
                              :modal-editing (:modal-editing base)
-                             :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)})]
+                             :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
+                             :entry-edit-topics entry-edit-topics})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]

@@ -6,7 +6,14 @@
             [goog.events.EventType :as EventType]))
 
 (rum/defc dropdown-list
-  "Component to create a dropdown list. Elements should be passed in a vector with this format:
+  "Component to create a dropdown list. Accept a map with these keys:
+   :items - the list of items map to render, see below for the format to use
+   :value - current value, add the class selected to the corresponing value li
+   :on-change - fn callback for changes
+   :on-blur - fn called on click out of the dropdown cb
+   :selected-icon - full url of an icon to show besides the selected item, ignored if empty
+   :selected-icon - full url of an icon to show besides the unselected item, ignored if empty
+  Elements should be passed in a vector with this format:
   {:value \"the value\" :label \"The label to show\"}.
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."

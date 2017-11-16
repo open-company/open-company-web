@@ -5,8 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.lib.logging :as logging]
-            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.ui.loading :refer (rloading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
@@ -15,7 +15,7 @@
             [goog.object :as gobj]))
 
 (defn get-activity-date [activity]
-  (or (:published-at activity) (:created-at activity)))
+  (or (:published-at activity) (:published-at activity)))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 5)

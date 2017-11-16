@@ -6,7 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.mixins :as mixins]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]

@@ -6,8 +6,8 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
-            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
