@@ -1424,14 +1424,18 @@
   (dissoc db :show-onboard-overlay))
 
 (defmethod dispatcher/action :activity-share-show
-  [db [_ medium activity-data]]
+  [db [_ activity-data]]
   (-> db
-    (assoc :activity-share {:medium medium :share-data activity-data})
+    (assoc :activity-share {:share-data activity-data})
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_ activity-data]]
   (dissoc db :activity-share))
+
+(defmethod dispatcher/action :activity-share-reset
+  [db [_]]
+  (dissoc db :activity-shared-data))
 
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]

@@ -18,9 +18,7 @@
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
-            [oc.web.components.ui.activity-share-link :refer (activity-share-link)]
-            [oc.web.components.ui.activity-share-email :refer (activity-share-email)]
-            [oc.web.components.ui.activity-share-slack :refer (activity-share-slack)]
+            [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data []
@@ -102,13 +100,7 @@
                 data))))
           ;; Activity share modal
           (when (:activity-share data)
-            (cond
-              (= (:medium (:activity-share data)) :email)
-              (activity-share-email)
-              (= (:medium (:activity-share data)) :slack)
-              (activity-share-slack)
-              (= (:medium (:activity-share data)) :link)
-              (activity-share-link)))
+            (activity-share))
           ;; Alert modal
           (when (:alert-modal data)
             (alert-modal))
