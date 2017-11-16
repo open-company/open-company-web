@@ -188,7 +188,6 @@
                             (rum/local false ::dismiss)
                             (rum/local false ::animate)
                             (rum/local false ::showing-dropdown)
-                            (rum/local nil ::window-resize-listener)
                             (rum/local nil ::esc-key-listener)
                             (rum/local false ::move-activity)
                             (rum/local default-min-modal-height ::activity-modal-height)
@@ -258,10 +257,6 @@
                                     (reset! (::show-bottom-border s) next-show-bottom-border))))
                               s)
                              :will-unmount (fn [s]
-                              ;; Remove window resize listener
-                              (when @(::window-resize-listener s)
-                                (events/unlistenByKey @(::window-resize-listener s))
-                                (reset! (::window-resize-listener s) nil))
                               (when @(::window-click s)
                                 (events/unlistenByKey @(::window-click s))
                                 (reset! (::window-click s) nil))
