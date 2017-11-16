@@ -1,5 +1,91 @@
 /* Header */
 
+nav.site-navbar {
+  height: 72px;
+  background-color: white;
+
+  div.site-navbar-container {
+    height: 72px;
+    padding: 15px 32px;
+    position: relative;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+
+    a {
+      @include avenir_M();
+      color: #70674B;
+      font-size: 14px;
+      margin: 0px 8px;
+      display: inline-block;
+      height: 30px;
+      margin-top: 12px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    div.site-navbar-left {
+      // float: left;
+      // height: 42px;
+      // margin-top: -10px;
+      // vertical-align: middle;
+      position: absolute;
+      top: 15px;
+      left: 16px;
+      height: 42px;
+    }
+
+    div.site-navbar-right {
+      // float: right;
+      // height: 42px;
+      // margin-top: -10px;
+      // vertical-align: middle;
+      position: absolute;
+      top: 15px;
+      right: 16px;
+      height: 42px;
+
+      // a {
+      //   height: 30px;
+      //   margin-top: 10px;
+      // }
+
+      a.login {
+        width: 96px;
+        height: 42px;
+        border-radius: 100px;
+        background-color: $carrot_orange_light;
+        color: #FA6654;
+        @include avenir_H();
+        font-size: 16px;
+        padding: 10px 8px;
+        text-align: center;
+        margin-top: 0px;
+
+        &:hover {
+          background-color: #FA6654;
+          color: white;
+          text-decoration: none;
+        }
+      }
+    }
+
+    a.navbar-brand-center {
+      position: relative;
+      left: 50%;
+      top: 7px;
+      margin: 0px 0px 0px -57px;
+      width: 115px;
+      height: 28px;
+      background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
+      background-size: 115px 28px;
+      background-repeat: no-repeat;
+      padding: 0;
+      display: block;
+    }
+  }
+}
+
 @include mobile() {
   .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:active{
     background-color: transparent;

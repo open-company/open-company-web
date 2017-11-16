@@ -63,46 +63,24 @@
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.navbar.navbar-default.navbar-static-top
-    [:div.container-fluid
-      [:div.navbar-header
-        [:a.navbar-brand {:href "/"}]
-        [:button.navbar-toggle.collapsed
-          {:type "button"
-           :data-toggle "collapse"
-           :data-target "#oc-navbar-collapse"
-           :onClick "$(document.body).toggleClass('mobile-menu-expanded');"}
-            [:span.sr-only "Toggle navigation"]
-            [:span.icon-bar]
-            [:span.icon-bar]
-            [:span.icon-bar]]]
-      [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
-        [:ul.nav.navbar-nav.navbar-right.navbar-top
-          [:li.mobile-only
-            {:class (if (= active-page "index") "active" "")}
-            [:a.navbar-item {:href "/"} "Home"]]
-          ; [:li
-          ;   {:class (if (= active-page "pricing") "active" "")}
-          ;   [:a.navbar-item {:href "/pricing"} "Pricing"]]
-          ; [:li
-          ;   {:class (if (= active-page "features") "active" "")}
-          ;   [:a.navbar-item {:href "/features"} "Features"]]
-          [:li
-            {:class (if (= active-page "about") "active" "")}
-            [:a.navbar-item {:href "/about"} "About"]]
-          [:li
-            [:a.navbar-item {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
-          [:li
-            {:id "site-header-login-item"}
-            [:a.navbar-item {:href "/login"} "Login"]]
-          [:li.get-started-item
-            [:div.get-started-button.navbar-item
-              [:button.mlb-reset.mlb-get-started
-                {:id "site-header-signup-item"}
-                "Get Started"]
-              ; [:div.mobile-already-account
-              ;   [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]
-                ]]]]]])
+  [:nav.site-navbar
+    [:div.site-navbar-container
+      [:a.navbar-brand-center
+        {:href "/"}]
+      [:div.site-navbar-left
+        [:a
+          {:href "/about"}
+          "About"]
+        [:a
+          {:href "http://blog.carrot.io"}
+          "Blog"]]
+      [:div.site-navbar-right
+        [:a
+          {:href "/login?slack"}
+          "Get Started"]
+        [:a.login
+          {:href "/login"}
+          "Login"]]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
