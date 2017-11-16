@@ -5,19 +5,22 @@
             [oc.web.lib.react-utils :as react-utils]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [goog.object :as googobj]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]))
 
 (def emojiable-class "emojiable")
 
+(defn emojiable-active?
+  []
+  (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0))
+
 (defn remove-markers [s]
   (when @(::caret-pos s)
     (.removeMarkers js/rangy @(::caret-pos s))))
 
 (defn on-click-out [s e]
-  (when-not (utils/event-inside? e (sel1 [:div.emoji-picker]))
+  (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
     (remove-markers s)
     (let [prior-value @(::visible s)]
       (reset! (::visible s) false)
@@ -28,7 +31,7 @@
 (defn save-caret-position [s]
   (remove-markers s)
   (let [caret-pos (::caret-pos s)]
-    (if (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0)
+    (if (emojiable-active?)
       (do
         (reset! (::last-active-element s) (.-activeElement js/document))
         (reset! caret-pos (.saveSelection js/rangy js/window)))
@@ -37,11 +40,11 @@
 (defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
     (.restoreSelection js/rangy @caret-pos)
-    (js/pasteHtmlAtCaret (googobj/get emoji "native") (.getSelection js/rangy js/window) false)))
+    (js/pasteHtmlAtCaret (.-native emoji) (.getSelection js/rangy js/window) false)))
 
 (defn check-focus [s _]
-  (let [active-element (googobj/get js/document "activeElement")]
-    (reset! (::disabled s) (neg? (.indexOf (.-className active-element) emojiable-class)))))
+  (when-let [active-element (.-activeElement js/document)]
+    (reset! (::disabled s) (not (emojiable-active?)))))
 
 ;; ===== D3 Chart Component =====
 
@@ -60,7 +63,7 @@
                  s)
    :did-mount (fn [s] (when-not (utils/is-test-env?)
                         (let [click-listener (events/listen
-                                              (.-body js/document)
+                                              js/window
                                               EventType/CLICK
                                               (partial on-click-out s))
                               focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
@@ -82,7 +85,8 @@
         last-active-element (::last-active-element s)
         disabled (::disabled s)]
     [:div.emoji-picker.relative
-      {:style {:width (str width "px")
+      {:ref "emoji-picker"
+       :style {:width (str width "px")
                :z-index 1132
                :height (str height "px")}}
       [:button
@@ -108,7 +112,6 @@
           (react-utils/build (.-Picker js/EmojiMart)
            {:native true
             :onClick (fn [emoji event]
-                       (js/console.log "Picker/onClick" emoji)
                        (replace-with-emoji caret-pos emoji)
                        (remove-markers s)
                        (reset! visible false)
