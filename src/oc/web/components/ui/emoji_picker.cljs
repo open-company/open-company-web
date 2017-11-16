@@ -6,9 +6,9 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as googobj]
-            [cljsjs.emojione-picker]
             [cljsjs.react]
-            [cljsjs.react.dom]))
+            [cljsjs.react.dom]
+            [cljsjs.emoji-mart]))
 
 (def emojiable-class "emojiable")
 
@@ -37,10 +37,7 @@
 (defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
     (.restoreSelection js/rangy @caret-pos)
-    (let [unicode-str (googobj/get emoji "unicode")
-          unicodes  (clojure.string/split unicode-str #"-")
-          unicode-c (clojure.string/join (map utils/unicode-char unicodes))]
-        (js/pasteHtmlAtCaret unicode-c (.getSelection js/rangy js/window) false))))
+    (js/pasteHtmlAtCaret (googobj/get emoji "native") (.getSelection js/rangy js/window) false)))
 
 (defn check-focus [s _]
   (let [active-element (googobj/get js/document "activeElement")]
@@ -53,16 +50,10 @@
 ;; the current activeElement has the class `emojiable`.
 
 (rum/defcs emoji-picker <
-
-
-
   (rum/local false ::visible)
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
-
-
-
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
@@ -77,20 +68,15 @@
                           (merge s {::click-listener click-listener
                                     ::focusin-listener focusin
                                     ::focusout-listener focusout}))))
-
-
-
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
-
-
-
   [s {:keys [add-emoji-cb position width height will-show-picker will-hide-picker]
-      :or {:position "bottom"
-           :width 25
-           :height 25}}]
+      :as arg
+      :or {position "top"
+           width 25
+           height 25}}]
   (let [visible (::visible s)
         caret-pos (::caret-pos s)
         last-active-element (::last-active-element s)
@@ -115,21 +101,17 @@
                         (when (and vis (fn? will-hide-picker))
                           (will-hide-picker))
                         (reset! visible vis)))}]
-      [:div.picker-container.absolute
-        {:style {:display (if @visible "block" "none")
-                 :top (if (= position "bottom") (str height "px") "-220px")
-                 :right "-10px"}}
+      [:div.picker-container
+        {:class (utils/class-set {position true
+                                  :visible @visible})}
         (when-not (utils/is-test-env?)
-          (react-utils/build js/EmojionePicker {:search ""
-                                                :emojione
-                                                #js {:sprites true
-                                                     :imageType "png"
-                                                     :spritePath
-                                                      "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png"}
-                                                :onChange (fn [emoji]
-                                                           (replace-with-emoji caret-pos emoji)
-                                                           (remove-markers s)
-                                                           (reset! visible false)
-                                                           (.focus @last-active-element)
-                                                           (when (fn? add-emoji-cb)
-                                                              (add-emoji-cb @last-active-element emoji)))}))]]))
+          (react-utils/build (.-Picker js/EmojiMart)
+           {:native true
+            :onClick (fn [emoji event]
+                       (js/console.log "Picker/onClick" emoji)
+                       (replace-with-emoji caret-pos emoji)
+                       (remove-markers s)
+                       (reset! visible false)
+                       (.focus @last-active-element)
+                       (when (fn? add-emoji-cb)
+                          (add-emoji-cb @last-active-element emoji)))}))]]))
