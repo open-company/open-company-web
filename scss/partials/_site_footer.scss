@@ -56,7 +56,7 @@
       }
 
       div.small-logos {
-        margin-top: 73px;
+        margin-top: 40px;
 
         @include mobile(){
           margin-bottom: 20px;
@@ -98,7 +98,7 @@
       }
 
       div.column {
-        float: right;
+        float: left;
         margin-right: 30px;
         width: 100px;
 
@@ -137,14 +137,14 @@
           }
         }
 
-        &:first-child {
+        &:last-child {
           margin-right: 0px;
         }
 
         div.column-title {
           @include avenir_B();
           color: white;
-          font-size: 13px;
+          font-size: 14px;
           opacity: 0.5;
           text-transform: uppercase;
 
@@ -175,7 +175,7 @@
             @include avenir_M();
             color: white;
             opacity: 0.9;
-            font-size: 13px;
+            font-size: 14px;
 
             &:hover {
               text-decoration: underline;
