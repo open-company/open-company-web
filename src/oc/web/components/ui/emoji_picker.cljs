@@ -87,7 +87,6 @@
     [:div.emoji-picker.relative
       {:ref "emoji-picker"
        :style {:width (str width "px")
-               :z-index 1132
                :height (str height "px")}}
       [:button
         {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
