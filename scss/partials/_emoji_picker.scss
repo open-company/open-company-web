@@ -24,13 +24,13 @@ div.emoji-picker {
       background-image: cdnUrl("/img/ML/emoji_blue2x.png");
     }
 
-    &.disabled {
+    &:disabled {
       opacity: 0.2;
 
-      &:hover {
-        opacity: 0.2;
-        background-image: cdnUrl("/img/ML/emoji2x.png");
-      }
+      // &:hover {
+      //   opacity: 0.2;
+      //   background-image: cdnUrl("/img/ML/emoji2x.png");
+      // }
     }
   }
 
