@@ -1,4 +1,9 @@
+$picker_height: 421;
+$picker_width: 338;
+
 div.emoji-picker {
+  z-index: 1234;
+
   button.emoji-button{
     padding: 1px 0 0 0;
     width: 25px;
@@ -19,18 +24,30 @@ div.emoji-picker {
       background-image: cdnUrl("/img/ML/emoji_blue2x.png");
     }
 
-    &.disabled {
+    &:disabled {
       opacity: 0.2;
-
-      &:hover {
-        opacity: 0.2;
-        background-image: cdnUrl("/img/ML/emoji2x.png");
-      }
     }
   }
 
   .emoji-dialog .modifiers {
     display: none;
+  }
+
+  div.picker-container {
+    position: absolute;
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+
+    &.top {
+      top: -#{$picker_height + 10}px;
+    }
+
+    &.bottom {
+      top: 0px;
+    }
   }
 }
 
@@ -41,4 +58,13 @@ div.emoji-picker {
   height: 64px;
   zoom: 0.35;
   -moz-transform: scale(0.35);
+}
+
+
+div.emoji-mart {
+  div.emoji-mart-preview {
+    div.emoji-mart-preview-data span.emoji-mart-title-label {
+      display: none;
+    }
+  }
 }
