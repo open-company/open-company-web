@@ -43,8 +43,15 @@
     (js/pasteHtmlAtCaret (.-native emoji) (.getSelection js/rangy js/window) false)))
 
 (defn check-focus [s _]
-  (when-let [active-element (.-activeElement js/document)]
-    (reset! (::disabled s) (not (emojiable-active?)))))
+  (let [container-selector (or (:container-selector (first (:rum/args s))) "document.body")
+        container-node (.querySelector js/document container-selector)
+        active-element (.-activeElement js/document)]
+    ;; Enabled when:
+    ;; active element is emojiable and active element is descendant of container
+    (reset! (::disabled s)
+     (or (not (emojiable-active?))
+         (not container-node)
+         (not (.contains container-node active-element))))))
 
 ;; ===== D3 Chart Component =====
 
@@ -66,8 +73,14 @@
                                               js/window
                                               EventType/CLICK
                                               (partial on-click-out s))
-                              focusin (events/listen js/document EventType/FOCUSIN (partial check-focus s))
-                              focusout (events/listen js/document EventType/FOCUSOUT (partial check-focus s))]
+                              focusin (events/listen
+                                       js/document
+                                       EventType/FOCUSIN
+                                       (partial check-focus s))
+                              focusout (events/listen
+                                        js/document
+                                        EventType/FOCUSOUT
+                                        (partial check-focus s))]
                           (merge s {::click-listener click-listener
                                     ::focusin-listener focusin
                                     ::focusout-listener focusout}))))
@@ -75,7 +88,7 @@
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
                          (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
-  [s {:keys [add-emoji-cb position width height will-show-picker will-hide-picker]
+  [s {:keys [add-emoji-cb position width height will-show-picker will-hide-picker container-selector]
       :as arg
       :or {position "top"
            width 25
@@ -88,14 +101,16 @@
       {:ref "emoji-picker"
        :style {:width (str width "px")
                :height (str height "px")}}
-      [:button
-        {:class (str "emoji-button btn-reset" (when @disabled " disabled"))
-         :type "button"
+      [:button.emoji-button.btn-reset
+        {:type "button"
          :title "Insert emoji"
          :data-placement "top"
          :data-container "body"
          :data-toggle "tooltip"
-         :on-mouse-down #(save-caret-position s)
+         :disabled @(::disabled s)
+         :on-mouse-down #(if @(::disabled s)
+                          (remove-markers s)
+                          (save-caret-position s))
          :on-click #(do
                       (.preventDefault %)
                       (let [vis (and @caret-pos (not @visible))]

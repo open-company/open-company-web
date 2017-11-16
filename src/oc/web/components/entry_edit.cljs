@@ -286,7 +286,8 @@
           {:class (when-not @(::show-divider-line s) "not-visible")}]
         [:div.entry-edit-modal-footer.group
           (when-not (js/isIE)
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)}))
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :container-selector "div.entry-edit-modal"}))
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (clean-body)
