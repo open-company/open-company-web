@@ -259,6 +259,7 @@
    :media-input           [[:base]
                             (fn [base]
                               (:media-input base))]
+   :add-comment-focus     [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish    [[:base] (fn [base] (:comment-add-finish base))]})
 
 ;; Action Loop =================================================================
