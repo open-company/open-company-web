@@ -40,18 +40,17 @@
         ; Hope page header
         [:div.cta
           [:h1.headline
-            "Above the noise"]
+            "Get above the noise"]
           [:div.subheadline
-            "Give your team a clear view of what’s most important"]
+            "Give your team a clear view of what’s most important."]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
-          (when-not (jwt/jwt)
-            [:button.mlb-reset.get-started-button
-              {:on-click #(if (utils/in? (:route @router/path) "login")
-                            (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                            (router/nav! oc-urls/sign-up-with-slack))}
-            "Get started for free"])
+          [:button.mlb-reset.get-started-button
+            {:on-click #(if (utils/in? (:route @router/path) "login")
+                          (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                          (router/nav! oc-urls/sign-up-with-slack))}
+            "Get started for free"]
           (when (and (not @(::confirm s))
                      @(::thanks-box-top s))
             (carrot-box-thanks))
@@ -61,35 +60,11 @@
                 [:div.thanks-headline "You are Confirmed!"]
                 [:div.thanks-subheadline "Thank you for subscribing."]]])
 
-          [:div.homepage-main-screenshot]]
-
-
-        [:div.illustrations.group
-
-          [:div.illustration.illustration-1.group
-            [:img.illustration-image
-              (retina-src "/img/ML/home_page_il_1_572_438")]
-            [:div.description.group
-              [:div.subtitle
-                (str
-                 "Chat apps simplify real-time work, but constant "
-                 "chatter makes it easy to miss key information.")]
-              [:div.subtitle.second-line
-                (str
-                 "Carrot provides a lasting view of what’s important "
-                 "to keep everyone on the same page.")]]]]
-
-          ; [:div.illustration.illustration-2.group
-          ;   [:img.illustration-image
-          ;     (retina-src "/img/ML/home_page_il_2_521_385")]
-          ;   [:div.description.group
-          ;     [:div.title
-          ;       "Keep stakeholders in the loop, too"]
-          ;     [:div.subtitle
-          ;       (str
-          ;        "Share updates with your investors and advisors, or "
-          ;        "the latest news with your customers and partners. "
-          ;        "Carrot keeps it all organized in one place.")]]]]
+          [:div.homepage-main-screenshot]
+          [:div.homepage-screenshot-bubble
+            (str
+             "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
+             "Carrot provides a high-level narrative that keeps everyone on the same page.")]]
 
         [:div.home-section.second-section
           [:div.illustrations-title
@@ -192,23 +167,6 @@
               [:div.description
                 (str
                  "It’s an easy way to build trust and grow your business.")]]]]
-
-        (comment
-          [:div.customers
-            [:div.customers-title
-              [:img {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
-              "Our happy clients"]
-            [:div.customers-cards.group
-              [:div.left-arrow
-                [:button.mlb-reset.left-arrow-bt
-                  {:disabled true}]]
-              [:div.customers-cards-scroll
-                [:div.customers-card]
-                [:div.customers-card]
-                [:div.customers-card]]
-              [:div.right-arrow
-                [:button.mlb-reset.right-arrow-bt
-                  {:disabled true}]]]])
 
         (when-not (jwt/jwt)
           [:div.try-it

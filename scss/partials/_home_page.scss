@@ -1,19 +1,29 @@
 $illustration_min_width: 1247;
 
 button.get-started-button {
-  max-width: 320px;
+  width: 280px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 100px;
   background-color: $carrot_text_blue;
   color: white;
-  padding: 3px 56px;
   @include avenir_H();
   font-size: 18px;
-  margin: 20px 16px 0;
-  opacity: 0.9;
+  margin: 48px 16px 0;
+  padding: 0px 42px;
+  position: relative;
+  text-align: left;
 
-  &:hover {
-    opacity: 1;
+  &:after {
+    @include image-2x("/img/ML/get_started_arrow");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    content: "";
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 14px;
+    right: 42px;
   }
 }
 
@@ -23,14 +33,11 @@ div#wrap {
     width: 100%;
 
     @include big_web(){
-      background-image: cdnUrl("/img/ML/home_page_swoosh.svg");
-      background-position: 0px -159px;
-      background-size: 100% auto;
-      background-repeat: no-repeat;
+      background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
     }
 
     div.cta {
-      padding-top: 116px;
+      padding-top: 102px;
       padding-bottom: 50px;
       text-align: center;
 
@@ -40,11 +47,11 @@ div#wrap {
 
       h1.headline {
         font-size: 48px;
-        @include avenir_B();
-        color: $carrot_dark_blue;
+        @include avenir_H();
+        color: #373F4F;
         padding: 0 16px;
         max-width: 800px;
-        margin: 0 auto 20px;
+        margin: 0 auto;
         line-height: 60px;
 
         @include mobile() {
@@ -54,12 +61,12 @@ div#wrap {
       }
 
       div.subheadline {
-        color: #4D4D4D;
-        font-size: 24px;
+        color: #70674B;
+        font-size: 20px;
         padding: 0 16px;
         @include avenir_R();
         max-width: 620px;
-        margin: 20px auto 0px;
+        margin: 4px auto 0px;
 
         &.second-line {
           margin: 0px auto 40px;
@@ -80,11 +87,11 @@ div#wrap {
       div.homepage-main-screenshot {
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 756px 511px;
-        @include image-2x("/img/ML/home_main_screenshot");
-        width: 756px;
-        height: 511px;
-        margin: 48px auto 0px;
+        background-size: 940px 762px;
+        @include image-2x("/img/ML/new_homepage_screenshot");
+        width: 940px;
+        height: 762px;
+        margin: 106px auto 0px;
         padding: 0 16px;
         // box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
         border: 1px solid rgba($oc_gray_5, 0.05);
@@ -101,12 +108,28 @@ div#wrap {
         @include image-2x("/img/ML/home_page_screenshot");
         width: 756px;
         height: 511px;
-        margin: 48px auto 0px;
+        margin: 106px auto 0px;
         padding: 0 16px;
 
         @include mobile(){
           display: none;
         }
+      }
+
+      div.homepage-screenshot-bubble {
+        @include image-2x("/img/ML/screenshot_bubble");
+        background-size: 997px 345px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 997px;
+        height: 345px;
+        margin: -282px auto 0px;
+
+        @include avenir_H();
+        color: white;
+        font-size: 20px;
+        text-align: center;
+        padding: 150px 50px 0px;
       }
     }
 
@@ -168,57 +191,6 @@ div#wrap {
                 text-decoration: underline;
               }
             }
-          }
-        }
-
-        // 1st illustration
-        &.illustration-1 {
-
-          img.illustration-image {
-            float: left;
-            width: 572px;
-            height: 438px;
-            margin-left: 40px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-top: 75px;
-            margin-right: 50px;
-          }
-        }
-
-        // 2nd illustration
-        &.illustration-2 {
-
-          img.illustration-image {
-            float: right;
-            width: 521px;
-            height: 385px;
-            margin-right: 90px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: left;
-            text-align: right;
-            margin-top: 90px;
           }
         }
 
