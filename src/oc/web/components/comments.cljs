@@ -100,12 +100,12 @@
                             (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
                             (set! (.-innerHTML add-comment-div) ""))
                :disabled @(::add-button-disabled s)}
-              "Add"]]]]
-      (when (and (not (js/isIE)) @(::show-buttons s))
-        (emoji-picker {:width 32
-                       :height 32
-                       :add-emoji-cb #(enable-add-comment? s)
-                       :container-selector "div.add-comment-box"}))])))
+              "Add"]]])]
+     (when (and (not (js/isIE)) @(::show-buttons s))
+       (emoji-picker {:width 32
+                      :height 32
+                      :add-emoji-cb #(enable-add-comment? s)
+                      :container-selector "div.add-comment-box"}))]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
