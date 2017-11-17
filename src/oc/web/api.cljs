@@ -839,7 +839,7 @@
       (storage-http (method-for-link share-link) (relative-href share-link)
         with-json-params
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:activity-share/finish (when success (json->cljs body))]))))))
+          (dispatcher/dispatch! [:activity-share/finish success (when success (json->cljs body))]))))))
 
 (defn get-secure-activity [org-slug secure-activity-id]
  (when secure-activity-id
