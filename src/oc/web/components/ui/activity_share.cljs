@@ -51,6 +51,9 @@
                             (rum/local false ::copied)
                             (rum/local false ::sharing)
                             (rum/local false ::shared)
+                            (rum/local "" ::email-subject)
+                            (rum/local (rand 1000) ::item-input-key)
+                            (rum/local (rand 1000) ::slack-channels-dropdown-key)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -64,6 +67,7 @@
                                               (str " " (:board-name activity-data)))
                                              ": "
                                              (.text (.html (js/$ "<div />") (:headline activity-data))))]
+                               (reset! (::email-subject s) subject)
                                (reset! (::email-data s) {:subject subject
                                                          :note ""}))
                              s)
@@ -79,7 +83,21 @@
                               ;; When we have a sharing response
                               (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
                                 (when (compare-and-set! (::sharing s) true false)
-                                  (reset! (::shared s) true)
+                                  (reset!
+                                   (::shared s)
+                                   (if (:error shared-data) :error :shared))
+                                  ;; If share succeeded reset share fields
+                                  (when-not (:error shared-data)
+                                    (cond
+                                      (= @(::medium s) :email)
+                                      (do
+                                        (reset! (::item-input-key s) (rand 1000))
+                                        (reset! (::email-data s) {:subject @(::email-subject s)
+                                                                  :note ""}))
+                                      (= @(::medium s) :slack)
+                                      (do
+                                        (reset! (::slack-channels-dropdown-key s) (rand 1000))
+                                        (reset! (::slack-data s) {:note ""}))))
                                   (utils/after
                                    2000
                                    (fn []
@@ -158,12 +176,15 @@
                       [:div.labels
                         "TO"]
                       [:div.fields
-                        {:class (when (:to-error email-data) "error")}
+                        {:class (when (:to-error email-data) "error")
+                         ;; Set the key to force remount a new component with empty value
+                         :key (str "email-share-item-input-" @(::item-input-key s))}
                         (item-input {:item-render email-item
                                      :match-ptn #"(\S+)[,|\s]+"
                                      :split-ptn #"[,|\s]+"
                                      :container-node :div.email-field
                                      :valid-item? utils/valid-email?
+                                     :items (:to email-data)
                                      :on-intermediate-change #(reset!
                                                                (::email-data s)
                                                                (merge email-data {:to-error false}))
@@ -208,7 +229,9 @@
                                       (dis/dispatch! [:activity-share [email-share]]))))
                      :class (when (empty? (:to email-data)) "disabled")}
                     (if @(::shared s)
-                      "Shared!"
+                      (if (= @(::shared s) :shared)
+                        "Shared!"
+                        "Ops...")
                       [(when @(::sharing s)
                         (small-loading))
                        "Share"])]]]])
@@ -249,7 +272,8 @@
                     [:div.medium-row.group
                       [:div.labels "TO"]
                       [:div.fields
-                        {:class (when (:channel-error slack-data) "error")}
+                        {:class (when (:channel-error slack-data) "error")
+                         :key (str "slack-share-channels-dropdown-" @(::slack-channels-dropdown-key s))}
                         (slack-channels-dropdown
                          {:on-change (fn [team channel]
                                        (reset! (::slack-data s)
@@ -291,7 +315,9 @@
                                       (dis/dispatch! [:activity-share [slack-share]]))))
                      :class (when (empty? (:channel slack-data)) "disabled")}
                     (if @(::shared s)
-                      "Shared!"
+                      (if (= @(::shared s) :shared)
+                        "Shared!"
+                        "Ops...")
                       [(when @(::sharing s)
                         (small-loading))
                        "Share"])]]]])]]]))

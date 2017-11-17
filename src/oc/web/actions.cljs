@@ -1504,8 +1504,11 @@
   (assoc db :activity-share-data share-data))
 
 (defmethod dispatcher/action :activity-share/finish
-  [db [_ shared-data]]
-  (assoc db :activity-shared-data (utils/fix-entry shared-data (:board-slug shared-data) nil)))
+  [db [_ success shared-data]]
+  (assoc db :activity-shared-data
+    (if success
+      (utils/fix-entry shared-data (:board-slug shared-data) nil)
+      {:error true})))
 
 (defmethod dispatcher/action :made-with-carrot-modal-show
   [db [_]]
