@@ -52,7 +52,7 @@
     {:id "wrap"}
     [:div.main.home-page
       ; Hope page header
-      [:div.cta
+      [:section.cta
         [:div.balloon.big-yellow]
         [:div.balloon.big-red]
         [:div.balloon.big-purple]
@@ -80,13 +80,13 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:div.homepage-main-screenshot]
+        [:figure.homepage-main-screenshot]
         [:div.homepage-screenshot-bubble
           (str
            "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
            "Carrot provides the big picture that keeps everyone on the same page.")]]
 
-      [:div.home-section.second-section
+      [:section.second-section
         [:div.why-balloon.big-red]
         [:div.why-balloon.big-purple]
         [:div.why-balloon.big-yellow]
@@ -149,7 +149,7 @@
           [:button.mlb-reset.slack-btn
             "Learn More"]]]
 
-      [:div.home-section.third-section.group
+      [:section.third-section.group
         [:div.illustrations-title
           [:div.why-carrot
             "Share the big picture with stakeholders"]
@@ -172,7 +172,7 @@
                "Share news with recruits, potential investors and customers to keep them "
                "engaged and supportive. Build trust and grow your business.")]]]]
 
-      [:div.home-section.fourth-section
+      [:section.fourth-section
         [:div.above-noise-container
           [:div.above-noise-title
             "Get above the noise"]

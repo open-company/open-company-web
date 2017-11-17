@@ -36,7 +36,7 @@ div#wrap {
       background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
     }
 
-    div.cta {
+    section.cta {
       padding-top: 142px;
       padding-bottom: 50px;
       text-align: center;
@@ -232,7 +232,7 @@ div#wrap {
         position: relative;
       }
 
-      div.homepage-main-screenshot {
+      figure.homepage-main-screenshot {
         background-repeat: no-repeat;
         background-position: center;
         background-size: 940px 762px;
@@ -251,7 +251,7 @@ div#wrap {
         }
       }
 
-      div.homepage-screenshot {
+      figure.homepage-screenshot {
         background-repeat: no-repeat;
         background-position: center;
         background-size: 756px 511px;
@@ -268,7 +268,7 @@ div#wrap {
         }
       }
 
-      div.homepage-screenshot-bubble {
+      figure.homepage-screenshot-bubble {
         @include image-2x("/img/ML/screenshot_bubble");
         background-size: 997px 345px;
         background-repeat: no-repeat;
@@ -286,12 +286,7 @@ div#wrap {
       }
     }
 
-    div.home-section {
-
-      
-    }
-
-    div.home-section.second-section {
+    section.second-section {
       padding: 120px 0px 0px;
       position: relative;
 
@@ -483,7 +478,7 @@ div#wrap {
       }
     }
 
-    div.home-section.third-section {
+    section.third-section {
       background-color: #F6F5F1;
       padding: 60px 0px 100px;
 
@@ -552,7 +547,7 @@ div#wrap {
       }
     }
 
-    div.home-section.fourth-section {
+    section.fourth-section {
       text-align: center;
       padding: 60px 0px;
 
