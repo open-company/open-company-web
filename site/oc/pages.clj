@@ -53,13 +53,25 @@
     [:div.main.home-page
       ; Hope page header
       [:div.cta
+        [:div.balloon.big-yellow]
+        [:div.balloon.big-red]
+        [:div.balloon.big-purple]
+        [:div.balloon.big-green]
+        [:div.balloon.small-green]
+        [:div.balloon.small-purple-face]
+        [:div.balloon.small-red]
+        [:div.balloon.small-yellow-face]
+        [:div.balloon.small-red-face]
+        [:div.balloon.small-green-face]
+        [:div.balloon.small-blue-face]
+        [:div.balloon.small-yellow-1]
+        [:div.balloon.small-yellow-2]
         [:h1.headline
-          "Above the noise"]
+          "Get above the noise"]
         [:div.subheadline
-          "Give your team a clear view of what’s most important"]
+          "Give your team a clear view of what’s most important."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:button.mlb-reset.get-started-button
-          {:id "get-started-centred-bt"}
           "Get started for free"]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -68,166 +80,116 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:div.homepage-main-screenshot]]
-
-
-      [:div.illustrations.group
-        [:div.illustration.illustration-1.group
-          [:img.illustration-image
-              {:src (cdn "/img/ML/home_page_il_1_572_438.png")
-               :src-set (str (cdn "/img/ML/home_page_il_1_572_438@2x.png") " 2x")}]
-          [:div.description.group
-            [:div.subtitle
-              (str
-               "Chat apps simplify real-time work, but constant "
-               "chatter makes it easy to miss key information.")]
-            [:div.subtitle.second-line
-              (str
-               "Carrot provides a lasting view of what’s important "
-               "to keep everyone on the same page.")]]]]
-
-        ; [:div.illustration.illustration-2.group
-        ;   [:img.illustration-image
-        ;       {:src (cdn "/img/ML/home_page_il_2_521_385.png")
-        ;        :src-set (str (cdn "/img/ML/home_page_il_2_521_385@2x.png") " 2x")}]
-        ;   [:div.description.group
-        ;     [:div.title
-        ;       "Keep stakeholders in the loop, too"]
-        ;     [:div.subtitle
-        ;       "Share updates with your investors and advisors, or the latest news with your customers and partners. Carrot keeps it all organized in one place."]]]]
+        [:div.homepage-main-screenshot]
+        [:div.homepage-screenshot-bubble
+          (str
+           "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
+           "Carrot provides a high-level narrative that keeps everyone on the same page.")]]
 
       [:div.home-section.second-section
+        [:div.why-balloon.big-red]
+        [:div.why-balloon.big-purple]
+        [:div.why-balloon.big-yellow]
+        [:div.why-balloon.big-green]
+        [:div.why-balloon.small-purple]
+        [:div.why-balloon.small-yellow]
         [:div.illustrations-title
           [:div.why-carrot
             "Why Carrot?"]
           [:div.why-carrot-description
             (str
-             "Growing teams need a place to rise above the noise of real-time conversations "
-             "to see what’s really happening across the company.")]]
+             "Growing teams need a place to rise above the noise of real-time conversations to see "
+             "what’s really happening across the company.")]]
 
         [:div.illustrations.group
-
-          [:div.illustration.illustration-3.group
-            [:img.illustration-image
-              {:src (cdn "/img/ML/home_page_il_3_450_349.png")
-               :src-set (str (cdn "/img/ML/home_page_il_3_450_349@2x.png") " 2x")}]
-            [:div.description.group
+          [:div.illustration
+            [:div.description
               [:div.title
-                "Visibility"]
+                "Transparency"]
               [:div.subtitle
                 (str
-                 "A bird’s eye view of essential information is easy "
-                 "to read and creates real transparency.")]]]
-
-          [:div.illustration.illustration-4.group
-            [:img.illustration-image
-              {:src (cdn "/img/ML/home_page_il_4_521_283.png")
-               :src-set (str (cdn "/img/ML/home_page_il_4_521_283@2x.png") " 2x")}]
-            [:div.description.group
+                 "A bird’s-eye view of important "
+                 "information that’s easy to find for "
+                 "current and new employees.")]]]
+          [:div.illustration.right
+            [:div.description
               [:div.title
                 "Simplicity"]
               [:div.subtitle
                 (str
-                 "If you’re adding a quick team update, or writing "
-                 "an overview for the next all-hands, getting started "
-                 "is simple and fast.")]]]
-
-          [:div.illustration.illustration-5.group
-            [:img.illustration-image
-              {:src (cdn "/img/ML/home_page_il_5_424_329.png")
-               :src-set (str (cdn "/img/ML/home_page_il_5_424_329@2x.png") " 2x")}]
-            [:div.description.group
+                 "If you’re adding a quick team update, or "
+                 "writing an overview for the next all-"
+                 "hands, Carrot is simple and fast.")]]]
+          [:div.illustration
+            [:div.description
               [:div.title
-                "Feedback loops"]
+                "Feedback & engagement"]
               [:div.subtitle
                 (str
-                 "Getting on the same page is easier when everyone "
-                 "can react and add comments - great for distributed "
-                 "teams. It’s more fun, too! 💥✌")]]]
-
-          [:div.illustration.illustration-6.group
-            [:img.illustration-image
-              {:src (cdn "/img/ML/home_page_il_6_346_321.png")
-               :src-set (str (cdn "/img/ML/home_page_il_6_346_321@2x.png") " 2x")}]
-            [:div.description.group
+                 "Capture team sentiment and reactions "
+                 "to key communications. It’s fun and "
+                 "great for distributed teams too!")]]]
+          [:div.illustration.right
+            [:div.description
               [:div.title
-                "Works with Slack"]
+                "Privacy"]
               [:div.subtitle
                 (str
-                 "Posts are automatically shared to the right "
-                 "channels. Discussions about posts happen in Slack "
-                 "and Carrot - everything is kept in sync. ")]
-              [:div.subtitle
-                [:a
-                  {:href "/about"}
-                  "Learn More"]]]]
+                 "Privacy settings mean sensitive "
+                 "information can be invite-only, and "
+                 "public information can be fully open.")]]]]
+        [:div.slack-section
+          [:div.slack-logo]
+          [:div.slack-title
+            "Did we mention our Slack integration?"]
+          [:div.slack-description
+            (str
+             "Posts can be automatically shared to the right channels. Discussions about posts happen "
+             "in Slack and Carrot - everything is kept in sync.")]
+          [:button.mlb-reset.slack-btn
+            "Learn More"]]]
 
-          [:div.illustration.illustration-7.group
-            [:img.illustration-image
-              {:src (cdn "/img/ML/home_page_il_7_333_274.png")
-               :src-set (str (cdn "/img/ML/home_page_il_7_333_274@2x.png") " 2x")}]
-            [:div.description.group
-              [:div.title
-                "Private"]
-              [:div.subtitle
-                "Sensitive information can be invite-only."]
-              [:div.title.title-right
-                "... or Public"]
-              [:div.subtitle.subtitle-right
-                "Ideal for crowdfunded ventures, social enterprises, "
-                "and startups interested in full transparency."]]]]]
-
-      [:div.home-section.third-section
+      [:div.home-section.third-section.group
         [:div.illustrations-title
           [:div.why-carrot
-            "Beyond the team"]
+            "Going beyond the team"]
           [:div.why-carrot-description
-            "Create awesome stakeholder updates in less time"]
-          [:div.centred-screenshot]]
+            "Create and organize stakeholder updates in less time"]]
         [:div.third-section-footer.group
-          [:div.left-copy
+          [:div.copy
             [:div.title
               "Simplify investor updates"]
             [:div.description
               (str
-               "Create beautiful updates in a snap, and keep them "
-               "organized in one place. Also ideal for keeping friends "
-               "and family in the loop.")]]
-          [:div.right-copy
+               "Create beautiful updates in a snap, and keep them organized in one place. Also "
+               "ideal for keeping friends and family in the loop.")]]
+          [:div.copy-separator]
+          [:div.copy
             [:div.title
               "Expand your network"]
             [:div.description
               (str
-               "Share news with recruits, potential investors and "
-               "customers to keep them engaged and supportive.")]
-            [:div.description
-              (str
-               "It’s an easy way to build trust and grow your business.")]]]]
+               "Share news with recruits, potential investors and customers to keep them "
+               "engaged and supportive. Build trust and grow your business.")]]]]
+
+      [:div.home-section.fourth-section
+        [:div.above-noise-container
+          [:div.above-noise-title
+            "Get above the noise"]
+          [:div.above-noise-description
+            "Give your team a clear view of what’s most important."]
+          [:button.mlb-reset.get-started-button
+            "Get started for free"]]]
 
       (comment
-        [:div.customers
-          [:div.customers-title
-            [:img {:src (cdn "/img/ML/user_avatar_yellow.svg")}]
-            "Our happy clients"]
-          [:div.customers-cards.group
-            [:div.left-arrow
-              [:button.mlb-reset.left-arrow-bt
-                {:disabled true}]]
-            [:div.customers-cards-scroll
-              [:div.customers-card]
-              [:div.customers-card]
-              [:div.customers-card]]
-            [:div.right-arrow
-              [:button.mlb-reset.right-arrow-bt
-                {:disabled true}]]]])
-
-      [:div.try-it
-        {:id "mc_embed_signup"}
-        [:div.try-it-title
-          {:id "thank-you-bottom"}
-          "Request early access"]
-        [:button.get-started-button
-          "Get Started"]]]])
+        [:div.try-it
+          {:id "mc_embed_signup"}
+          [:div.try-it-title
+            {:id "thank-you-bottom"}
+            "Request early access"]
+          [:button.get-started-button
+            "Get Started"]])
+          ]])
 
 (defn features [options]
   [:div.container.main.features

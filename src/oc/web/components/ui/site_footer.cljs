@@ -31,7 +31,7 @@
     [:div.container-fluid.group
       [:div.left-column
         [:img.logo
-          {:src (utils/cdn "/img/ML/carrot_wordmark_white.svg")}]
+          {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
         (when-not (jwt/jwt)
           [:div.footer-small-links
             [:a
