@@ -24,7 +24,7 @@ div.comments {
   }
 
   div.comments-internal {
-    padding-bottom: 103px;
+    padding-bottom: 123px;
     min-height: 127px;
     height: 100%;
     width: 100%;
@@ -32,6 +32,7 @@ div.comments {
     bottom: 8px;
     left: 0;
     right: 0;
+    top: 0;
 
     div.comments-internal-scroll {
       overflow-x: hidden;
@@ -142,8 +143,9 @@ div.comments {
       position: relative;
       left: 0;
       right: 0;
-      bottom: 8px;
+      bottom: 12px;
       width: 100%;
+      margin-top: 16px;
 
       div.successfully-posted {
         width: 168px;
