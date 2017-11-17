@@ -87,11 +87,11 @@
    and every change here should be reflected there."
   []
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
-  [:nav.navbar.navbar-default.navbar-bottom
+  [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
       [:div.left-column
         [:img.logo
-          {:src (pages/cdn "/img/ML/carrot_wordmark_white.svg")}]
+          {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-small-links
           [:a {:href "/sign-up"} "Get Started"]
           "|"

@@ -36,9 +36,9 @@ div#wrap {
       background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
     }
 
-    div.cta {
+    section.cta {
       padding-top: 142px;
-      padding-bottom: 50px;
+      padding-bottom: 0px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -86,37 +86,22 @@ div#wrap {
           margin-left: -534px;
         }
 
-        &.small-green {
-          @include image-2x("/img/ML/balloon_small_green");
-          background-size: 24px 24px;
-          width: 24px;
-          height: 24px;
-          top: 160px;
-          left: 9.64%;
-          // left: 50%;
-          // margin-left: -564px;
-        }
-
         &.small-purple-face {
           @include image-2x("/img/ML/balloon_small_purple_face");
           background-size: 48px 48px;
           width: 48px;
           height: 48px;
-          top: 179px;
-          left: 20.43%;
-          // left: 50%;
-          // margin-left: -414px;
+          top: 118px;
+          left: 5.78%;
         }
 
         &.small-red {
           @include image-2x("/img/ML/balloon_small_red");
-          background-size: 32px 30px;
-          width: 32px;
-          height: 30px;
-          top: 62px;
-          left: 59.28%;
-          // left: 50%;
-          // margin-left: 130px;
+          background-size: 15px 17px;
+          width: 15px;
+          height: 17px;
+          top: 103px;
+          left: 13.71%;
         }
 
         &.small-yellow-face {
@@ -124,10 +109,17 @@ div#wrap {
           background-size: 48px 48px;
           width: 48px;
           height: 48px;
-          top: 153px;
-          left: 77.21%;
-          // left: 50%;
-          // margin-left: 381px;
+          top: 119px;
+          left: 78.57%;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/balloon_small_yellow");
+          background-size: 15px 15px;
+          width: 15px;
+          height: 15px;
+          top: 179px;
+          left: 86.36%;
         }
 
         &.small-red-face {
@@ -137,19 +129,17 @@ div#wrap {
           height: 48px;
           top: 404px;
           left: 50%;
-          margin-left: -188px;
+          margin-left: -278px;
           z-index: 11;
         }
 
-        &.small-green-face {
-          @include image-2x("/img/ML/balloon_small_green_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 310px;
-          left: 86.43%;
-          // left: 50%;
-          // margin-left: 510px;
+        &.small-purple {
+          @include image-2x("/img/ML/balloon_small_purple");
+          background-size: 23px 21px;
+          width: 23px;
+          height: 21px;
+          top: 330px;
+          left: 23.64%;
         }
 
         &.small-blue-face {
@@ -157,32 +147,35 @@ div#wrap {
           background-size: 42px 42px;
           width: 42px;
           height: 42px;
-          top: 1080px;
-          left: 9.21%;
-          // left: 50%;
-          // margin-left: -571px;
+          top: 1140px;
+          left: 7.07%;
+        }
+
+        &.small-red-1 {
+          @include image-2x("/img/ML/balloon_small_red_1");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 1203px;
+          left: 9.71%;
         }
 
         &.small-yellow-1 {
           @include image-2x("/img/ML/balloon_small_yellow_1");
-          background-size: 24px 24px;
-          width: 24px;
-          height: 24px;
-          top: 765px;
-          left: 85.86%;
-          // left: 50%;
-          // margin-left: 502px;
-        }
-
-        &.small-yellow-2 {
-          @include image-2x("/img/ML/balloon_small_yellow_2");
           background-size: 25px 25px;
           width: 25px;
           height: 25px;
-          top: 1048px;
-          left: 87.64%;
-          // left: 50%;
-          // margin-left: 527px;
+          top: 765px;
+          left: 85.86%;
+        }
+
+        &.small-green-face {
+          @include image-2x("/img/ML/balloon_small_green_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 686px;
+          left: 82.14%;
         }
 
       }
@@ -190,11 +183,13 @@ div#wrap {
       h1.headline {
         font-size: 48px;
         @include avenir_H();
-        color: $carrot_dark_brown;
+        color: $carrot_dark_brown_1;
         padding: 0 16px;
         max-width: 800px;
         margin: 0 auto;
         line-height: 60px;
+        z-index: 2;
+        position: relative;
 
         @include mobile() {
           font-size: 32px;
@@ -209,6 +204,8 @@ div#wrap {
         @include avenir_R();
         max-width: 620px;
         margin: 4px auto 0px;
+        z-index: 2;
+        position: relative;
 
         &.second-line {
           margin: 0px auto 40px;
@@ -224,36 +221,21 @@ div#wrap {
         font-size: 14px;
         @include avenir_H();
         margin-top: 16px;
+        z-index: 2;
+        position: relative;
       }
 
-      div.homepage-main-screenshot {
+      figure.homepage-main-screenshot {
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 940px 762px;
+        background-size: 940px 763px;
         @include image-2x("/img/ML/new_homepage_screenshot");
         width: 940px;
-        height: 762px;
+        height: 763px;
         margin: 106px auto 0px;
-        padding: 0 16px;
+        padding: 0;
         // box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
         border: 1px solid rgba($oc_gray_5, 0.05);
-        z-index: 10;
-        position: relative;
-
-        @include mobile(){
-          display: none;
-        }
-      }
-
-      div.homepage-screenshot {
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 756px 511px;
-        @include image-2x("/img/ML/home_page_screenshot");
-        width: 756px;
-        height: 511px;
-        margin: 106px auto 0px;
-        padding: 0 16px;
         z-index: 10;
         position: relative;
 
@@ -280,13 +262,8 @@ div#wrap {
       }
     }
 
-    div.home-section {
-
-      
-    }
-
-    div.home-section.second-section {
-      padding: 120px 0px 0px;
+    section.second-section {
+      padding: 0px;
       position: relative;
 
       div.why-balloon {
@@ -300,52 +277,8 @@ div#wrap {
           background-size: 192px 199px;
           width: 192px;
           height: 199px;
-          top: 313px;
+          top: 199px;
           left: -83px;
-        }
-
-        &.big-purple {
-          @include image-2x("/img/ML/why_balloon_big_purple");
-          background-size: 110px 111px;
-          width: 110px;
-          height: 111px;
-          top: 202px;
-          left: 83.07%;
-          // left: 50%;
-          // margin-left: 463px;
-        }
-
-        &.big-yellow {
-          @include image-2x("/img/ML/why_balloon_big_yellow");
-          background-size: 217px 216px;
-          width: 217px;
-          height: 216px;
-          top: 639px;
-          // left: 78.57%;
-          left: 50%;
-          margin-left: 400px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/why_balloon_big_green");
-          background-size: 132px 132px;
-          width: 132px;
-          height: 132px;
-          top: 855px;
-          // left: 11.71%;
-          left: 50%;
-          margin-left: -536px;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/why_balloon_small_purple");
-          background-size: 33px 30px;
-          width: 33px;
-          height: 30px;
-          top: 584px;
-          left: 11.91%;
-          // left: 50%;
-          // margin-left: -533px;
         }
 
         &.small-yellow {
@@ -353,19 +286,63 @@ div#wrap {
           background-size: 25px 25px;
           width: 25px;
           height: 25px;
-          top: 855px;
-          left: 12%;
-          // left: 50%;
-          // margin-left: -532px;
+          top: 17px;
+          left: 83%;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/why_balloon_big_purple");
+          background-size: 110px 111px;
+          width: 110px;
+          height: 111px;
+          top: 48px;
+          left: 85.93%;
+        }
+
+        &.small-purple {
+          @include image-2x("/img/ML/why_balloon_small_purple");
+          background-size: 33px 30px;
+          width: 33px;
+          height: 30px;
+          top: 482px;
+          left: 11.93%;
+        }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/why_balloon_big_yellow");
+          background-size: 217px 216px;
+          width: 217px;
+          height: 216px;
+          top: 537px;
+          left: 78.57%;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/why_balloon_big_green");
+          background-size: 132px 132px;
+          width: 132px;
+          height: 132px;
+          top: 989px;
+          left: 12.21%;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/why_balloon_small_yellow");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 999px;
+          left: 11.93%;
+          z-index: 2;
         }
       }
 
       div.illustrations-title {
         margin-bottom: 60px;
-        max-width: 770px;
+        max-width: 940px;
         text-align: center;
         margin: 0 auto;
-        padding: 0px 32px;
+        padding: 0px;
 
         @include mobile(){
           text-align: left;
@@ -375,13 +352,84 @@ div#wrap {
           @include avenir_H();
           font-size: 48px;
           color: $carrot_dark_brown;
-          margin-bottom: 24px;
+          margin-bottom: 12px;
+          z-index: 2;
+          position: relative;
         }
 
         div.why-carrot-description {
           @include avenir_R();
           font-size: 20px;
+          line-height: 30px;
           color: $carrot_dark_brown;
+          z-index: 2;
+          position: relative;
+        }
+      }
+
+      div.illustrations {
+        width: 980px;
+        margin: 54px auto;
+        position: relative;
+        z-index: 10;
+
+        div.illustration-container {
+          margin: 20px;
+          width: 450px;
+          height: 400px;
+          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+          padding: 40px 50px;
+          background-color: white;
+          float: left;
+          text-align: center;
+
+          &.right {
+            float: right;
+          }
+
+          div.illustration {
+            width: 350px;
+            height: 160px;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            &.illustration-1 {
+              @include image-2x("/img/ML/why_illustration_1_246_151");
+              background-size: 246px 151px;
+            }
+
+            &.illustration-2 {
+              @include image-2x("/img/ML/why_illustration_2_235_150");
+              background-size: 235px 150px;
+            }
+
+            &.illustration-3 {
+              @include image-2x("/img/ML/why_illustration_3_225_151");
+              background-size: 225px 151px;
+            }
+
+            &.illustration-4 {
+              @include image-2x("/img/ML/why_illustration_4_165_160");
+              background-size: 165px 160px;
+            }
+          }
+
+          div.description {
+            margin-top: 24px;
+
+            div.title {
+              color: $carrot_dark_brown;
+              @include avenir_H();
+              font-size: 26px;
+            }
+
+            div.subtitle {
+              color: $carrot_dark_brown;
+              @include avenir_R();
+              font-size: 20px;
+              margin: 10px auto;
+            }
+          }
         }
       }
 
@@ -412,7 +460,9 @@ div#wrap {
           color: $carrot_dark_brown;
           @include avenir_R();
           font-size: 20px;
-          margin-top: 16px;
+          margin-top: 20px;
+          line-height: 30px;
+          opacity: 0.8;
         }
 
         button.mlb-reset.slack-btn {
@@ -425,7 +475,7 @@ div#wrap {
           font-size: 16px;
           padding: 10px 8px;
           text-align: center;
-          margin: 16px auto 0px;
+          margin: 32px auto 0px;
 
           &:hover {
             background-color: #FA6654;
@@ -434,48 +484,11 @@ div#wrap {
           }
         }
       }
-
-      div.illustrations {
-        width: 980px;
-        margin: 59px auto;
-        position: relative;
-        z-index: 10;
-
-        div.illustration {
-          margin: 20px;
-          width: 450px;
-          height: 253px;
-          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
-          padding: 60px 50px;
-          background-color: white;
-          float: left;
-          text-align: center;
-
-          &.right {
-            float: right;
-          }
-
-          div.description {
-            div.title {
-              color: $carrot_dark_brown;
-              @include avenir_H();
-              font-size: 26px;
-            }
-
-            div.subtitle {
-              color: $carrot_dark_brown;
-              @include avenir_R();
-              font-size: 20px;
-              margin: 10px auto;
-            }
-          }
-        }
-      }
     }
 
-    div.home-section.third-section {
-      background-color: #F6F5F1;
-      padding: 60px 0px 100px;
+    section.third-section {
+      background-color: #FFF3CD;
+      padding: 72px 0px 100px;
 
       div.illustrations-title {
         margin-bottom: 60px;
@@ -490,9 +503,10 @@ div#wrap {
 
         div.why-carrot {
           @include avenir_H();
-          font-size: 26px;
+          font-size: 48px;
           color: $carrot_dark_brown;
           margin-bottom: 24px;
+          line-height: 60px;
         }
 
         div.why-carrot-description {
@@ -509,10 +523,10 @@ div#wrap {
         margin: 60px auto 0px;
         border-radius: 8px;
         box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
-        padding: 40px;
+        padding: 40px 48px;
 
         div.copy-separator {
-          margin-top: 16px;
+          margin-top: 26px;
           width: calc(100% + 80px);
           height: 1px;
           margin-left: -40px;
@@ -523,26 +537,51 @@ div#wrap {
           &:first-child {
             margin-top: 0px;
           }
-          margin-top: 16px;
-        }
+          margin-top: 26px;
 
-        div.title {
-          color: $carrot_dark_brown;
-          @include avenir_H();
-          font-size: 26px;
-          text-align: left;
-        }
+          div.copy-icon {
+            float: left;
+            width: 70px;
+            height: 70px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-top: 16px;
 
-        div.description {
-          color: $carrot_dark_brown;
-          @include avenir_R();
-          font-size: 20px;
-          text-align: left;
+            &.copy-simplify {
+              @include image-2x("/img/ML/homepage_illustration_simplify");
+              background-size: 66px 65px;
+            }
+
+            &.copy-expand {
+              @include image-2x("/img/ML/homepage_illustration_expand");
+              background-size: 66px 65px;
+            }
+          }
+
+          div.title {
+            color: $carrot_dark_brown;
+            @include avenir_H();
+            font-size: 26px;
+            text-align: left;
+            margin-left: 110px;
+            letter-spacing: 0.18;
+            line-height: 36px;
+          }
+
+          div.description {
+            color: $carrot_dark_brown;
+            @include avenir_R();
+            font-size: 20px;
+            line-height: 30px;
+            text-align: left;
+            margin-left: 110px;
+            margin-top: 8px;
+          }
         }
       }
     }
 
-    div.home-section.fourth-section {
+    section.fourth-section {
       text-align: center;
       padding: 60px 0px;
 

@@ -52,20 +52,22 @@
     {:id "wrap"}
     [:div.main.home-page
       ; Hope page header
-      [:div.cta
+      [:section.cta
         [:div.balloon.big-yellow]
         [:div.balloon.big-red]
         [:div.balloon.big-purple]
         [:div.balloon.big-green]
-        [:div.balloon.small-green]
         [:div.balloon.small-purple-face]
         [:div.balloon.small-red]
         [:div.balloon.small-yellow-face]
+        [:div.balloon.small-yellow]
         [:div.balloon.small-red-face]
-        [:div.balloon.small-green-face]
+        [:div.balloon.small-purple]
         [:div.balloon.small-blue-face]
+        [:div.balloon.small-red-1]
         [:div.balloon.small-yellow-1]
-        [:div.balloon.small-yellow-2]
+        [:div.balloon.small-green-face]
+
         [:h1.headline
           "Get above the noise"]
         [:div.subheadline
@@ -80,19 +82,21 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:div.homepage-main-screenshot]
+        [:figure.homepage-main-screenshot]
         [:div.homepage-screenshot-bubble
           (str
            "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
-           "Carrot provides a high-level narrative that keeps everyone on the same page.")]]
+           "Carrot provides the big picture that keeps everyone on the same page.")]]
 
-      [:div.home-section.second-section
+      [:section.second-section
         [:div.why-balloon.big-red]
-        [:div.why-balloon.big-purple]
-        [:div.why-balloon.big-yellow]
-        [:div.why-balloon.big-green]
-        [:div.why-balloon.small-purple]
         [:div.why-balloon.small-yellow]
+        [:div.why-balloon.big-purple]
+        [:div.why-balloon.small-purple]
+        [:div.why-balloon.big-yellow]
+        [:div.why-balloon.small-yellow]
+        [:div.why-balloon.big-green]
+
         [:div.illustrations-title
           [:div.why-carrot
             "Why Carrot?"]
@@ -102,25 +106,28 @@
              "what’s really happening across the company.")]]
 
         [:div.illustrations.group
-          [:div.illustration
+          [:div.illustration-container
+            [:div.illustration.illustration-1]
             [:div.description
               [:div.title
-                "Transparency"]
+                "Visibility"]
               [:div.subtitle
                 (str
-                 "A bird’s-eye view of important "
-                 "information that’s easy to find for "
-                 "current and new employees.")]]]
-          [:div.illustration.right
+                 "A bird’s-eye view of essential "
+                 "information that’s easy to read and "
+                 "creates real transparency.")]]]
+          [:div.illustration-container.right
+            [:div.illustration.illustration-2]
             [:div.description
               [:div.title
-                "Simplicity"]
+                "In context"]
               [:div.subtitle
                 (str
-                 "If you’re adding a quick team update, or "
-                 "writing an overview for the next all-"
-                 "hands, Carrot is simple and fast.")]]]
-          [:div.illustration
+                 "Related information stays organized to "
+                 "have the most impact. Great for current "
+                 "and new employees.")]]]
+          [:div.illustration-container
+            [:div.illustration.illustration-3]
             [:div.description
               [:div.title
                 "Feedback & engagement"]
@@ -129,15 +136,17 @@
                  "Capture team sentiment and reactions "
                  "to key communications. It’s fun and "
                  "great for distributed teams too!")]]]
-          [:div.illustration.right
+          [:div.illustration-container.right
+            [:div.illustration.illustration-4]
             [:div.description
               [:div.title
-                "Privacy"]
+                "All together"]
               [:div.subtitle
                 (str
-                 "Privacy settings mean sensitive "
-                 "information can be invite-only, and "
-                 "public information can be fully open.")]]]]
+                 "Daily or weekly digest reinforces "
+                 "big picture content so everyone has "
+                 "the same information.")]]]]
+
         [:div.slack-section
           [:div.slack-logo]
           [:div.slack-title
@@ -149,14 +158,15 @@
           [:button.mlb-reset.slack-btn
             "Learn More"]]]
 
-      [:div.home-section.third-section.group
+      [:section.third-section.group
         [:div.illustrations-title
           [:div.why-carrot
-            "Going beyond the team"]
+            "Share the big picture with stakeholders"]
           [:div.why-carrot-description
             "Create and organize stakeholder updates in less time"]]
         [:div.third-section-footer.group
           [:div.copy
+            [:div.copy-icon.copy-simplify]
             [:div.title
               "Simplify investor updates"]
             [:div.description
@@ -165,6 +175,7 @@
                "ideal for keeping friends and family in the loop.")]]
           [:div.copy-separator]
           [:div.copy
+            [:div.copy-icon.copy-expand]
             [:div.title
               "Expand your network"]
             [:div.description
@@ -172,7 +183,7 @@
                "Share news with recruits, potential investors and customers to keep them "
                "engaged and supportive. Build trust and grow your business.")]]]]
 
-      [:div.home-section.fourth-section
+      [:section.fourth-section
         [:div.above-noise-container
           [:div.above-noise-title
             "Get above the noise"]

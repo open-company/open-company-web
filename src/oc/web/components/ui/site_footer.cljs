@@ -27,7 +27,7 @@
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]
   ;; <!-- footer -->
-  [:nav.navbar.navbar-default.navbar-bottom
+  [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
       [:div.left-column
         [:img.logo
