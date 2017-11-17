@@ -1,4 +1,4 @@
-(ns oc.web.components.ui.mixins
+(ns oc.web.mixins.ui
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]))
 

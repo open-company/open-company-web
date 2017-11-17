@@ -4,7 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.mixins :refer (first-render-mixin)]))
+            [oc.web.mixins.ui :refer (first-render-mixin)]))
 
 (defn dismiss-modal [s]
   (dis/dispatch! [:input [:media-input :media-video] :dismiss]))

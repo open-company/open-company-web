@@ -12,7 +12,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.ui.mixins :as mixins]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -313,11 +313,11 @@
               [:div.name (:name (first (:author activity-data)))]
               [:div.time-since
                 [:time
-                  {:date-time (:created-at activity-data)
+                  {:date-time (:published-at activity-data)
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :title (utils/activity-date-tooltip activity-data)}
-                  (utils/time-since (:created-at activity-data))]]]
+                  (utils/time-since (:published-at activity-data))]]]
             [:div.activity-modal-header-right
               (when (or (utils/link-for (:links activity-data) "partial-update")
                         (utils/link-for (:links activity-data) "delete"))
@@ -357,7 +357,10 @@
                                       :on-change #(close-clicked s nil)}))]))
               (activity-attachments activity-data false)
               (if editing
-                (topics-dropdown (:modal-editing-data modal-data) :modal-editing-data)
+                (topics-dropdown
+                 (distinct (:entry-edit-topics modal-data))
+                 (:modal-editing-data modal-data)
+                 :modal-editing-data)
                 (when (:topic-slug activity-data)
                   (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                     [:div.activity-tag.on-gray
@@ -404,7 +407,8 @@
                   [:div.activity-modal-footer.group
                     {:class (when @(::show-bottom-border s) "scrolling-content")}
                     (when-not (js/isIE)
-                      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)}))
+                      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                                     :container-selector "div.activity-modal-content"}))
                     [:div.activity-modal-footer-right
                       [:button.mlb-reset.mlb-link-black.cancel-edit
                         {:on-click #(dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))}

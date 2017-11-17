@@ -8,7 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.mixins :refer (first-render-mixin)]
+            [oc.web.mixins.ui :refer (first-render-mixin)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -23,16 +23,8 @@
 (defn new?
   "
   A board is new if:
-
-
-
     user is part of the team (we don't track new for non-team members accessing public boards)
      -and-
-
-
-
-
-
     change-at is newer than seen at
       -or-
     we have a change-at and no seen at
@@ -172,7 +164,7 @@
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])
             (when show-drafts
               (let [board-url (oc-urls/board (:slug drafts-board))]
-                [:a.left-navigation-sidebar-item.hover-item
+                [:a.left-navigation-sidebar-item.drafts-board.hover-item
                   {:class (when (and (not is-all-posts)
                                      (= (router/current-board-slug)
                                      (:slug drafts-board)))
@@ -194,7 +186,11 @@
                                               :team-board (= (:access drafts-board) "team")})}
                     [:div.internal
                       {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
-                       :dangerouslySetInnerHTML (utils/emojify (or (:name drafts-board) (:slug drafts-board)))}]]]))])]
+                       :dangerouslySetInnerHTML
+                        (utils/emojify
+                         (str
+                          (or (:name drafts-board) (:slug drafts-board))
+                          " (" (:count drafts-link) ")"))}]]]))])]
       [:div.left-navigation-sidebar-footer
         {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people

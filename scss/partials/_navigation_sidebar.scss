@@ -186,10 +186,6 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-items{
 
-    // div.left-navigation-sidebar-draft {
-    //   margin-top: 24px;
-    // }
-
     a.left-navigation-sidebar-item {
       display: block;
       cursor: default;
@@ -197,6 +193,10 @@ div.left-navigation-sidebar {
       border-bottom-right-radius: 3px;
       padding-left: 24px;
       margin: 0;
+
+      &.drafts-board {
+        margin-top: 24px;
+      }
 
       &:last-child {
         margin-bottom: 10px;
