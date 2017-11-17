@@ -57,15 +57,17 @@
         [:div.balloon.big-red]
         [:div.balloon.big-purple]
         [:div.balloon.big-green]
-        [:div.balloon.small-green]
         [:div.balloon.small-purple-face]
         [:div.balloon.small-red]
         [:div.balloon.small-yellow-face]
+        [:div.balloon.small-yellow]
         [:div.balloon.small-red-face]
-        [:div.balloon.small-green-face]
+        [:div.balloon.small-purple]
         [:div.balloon.small-blue-face]
+        [:div.balloon.small-red-1]
         [:div.balloon.small-yellow-1]
-        [:div.balloon.small-yellow-2]
+        [:div.balloon.small-green-face]
+
         [:h1.headline
           "Get above the noise"]
         [:div.subheadline
@@ -88,11 +90,13 @@
 
       [:section.second-section
         [:div.why-balloon.big-red]
-        [:div.why-balloon.big-purple]
-        [:div.why-balloon.big-yellow]
-        [:div.why-balloon.big-green]
-        [:div.why-balloon.small-purple]
         [:div.why-balloon.small-yellow]
+        [:div.why-balloon.big-purple]
+        [:div.why-balloon.small-purple]
+        [:div.why-balloon.big-yellow]
+        [:div.why-balloon.small-yellow]
+        [:div.why-balloon.big-green]
+
         [:div.illustrations-title
           [:div.why-carrot
             "Why Carrot?"]
@@ -102,7 +106,8 @@
              "what’s really happening across the company.")]]
 
         [:div.illustrations.group
-          [:div.illustration
+          [:div.illustration-container
+            [:div.illustration.illustration-1]
             [:div.description
               [:div.title
                 "Visibility"]
@@ -111,7 +116,8 @@
                  "A bird’s-eye view of essential "
                  "information that’s easy to read and "
                  "creates real transparency.")]]]
-          [:div.illustration.right
+          [:div.illustration-container.right
+            [:div.illustration.illustration-2]
             [:div.description
               [:div.title
                 "In context"]
@@ -120,7 +126,8 @@
                  "Related information stays organized to "
                  "have the most impact. Great for current "
                  "and new employees.")]]]
-          [:div.illustration
+          [:div.illustration-container
+            [:div.illustration.illustration-3]
             [:div.description
               [:div.title
                 "Feedback & engagement"]
@@ -129,7 +136,8 @@
                  "Capture team sentiment and reactions "
                  "to key communications. It’s fun and "
                  "great for distributed teams too!")]]]
-          [:div.illustration.right
+          [:div.illustration-container.right
+            [:div.illustration.illustration-4]
             [:div.description
               [:div.title
                 "All together"]
@@ -138,6 +146,7 @@
                  "Daily or weekly digest reinforces "
                  "big picture content so everyone has "
                  "the same information.")]]]]
+
         [:div.slack-section
           [:div.slack-logo]
           [:div.slack-title
@@ -157,6 +166,7 @@
             "Create and organize stakeholder updates in less time"]]
         [:div.third-section-footer.group
           [:div.copy
+            [:div.copy-icon.copy-simplify]
             [:div.title
               "Simplify investor updates"]
             [:div.description
@@ -165,6 +175,7 @@
                "ideal for keeping friends and family in the loop.")]]
           [:div.copy-separator]
           [:div.copy
+            [:div.copy-icon.copy-expand]
             [:div.title
               "Expand your network"]
             [:div.description
