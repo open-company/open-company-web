@@ -37,9 +37,155 @@ div#wrap {
     }
 
     div.cta {
-      padding-top: 102px;
+      padding-top: 142px;
       padding-bottom: 50px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+
+      div.balloon {
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow");
+          background-size: 172px 172px;
+          width: 172px;
+          height: 172px;
+          top: -46px;
+          left: -57px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/balloon_big_purple");
+          background-size: 111px 111px;
+          width: 111px;
+          height: 111px;
+          top: -64px;
+          right: 118px;
+        }
+
+        &.big-red {
+          @include image-2x("/img/ML/balloon_big_red");
+          background-size: 226px 208px;
+          width: 226px;
+          height: 208px;
+          top: -82px;
+          right: -55px;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/balloon_big_green");
+          background-size: 200px 172px;
+          width: 200px;
+          height: 172px;
+          top: 358px;
+          left: 50%;
+          margin-left: -534px;
+        }
+
+        &.small-green {
+          @include image-2x("/img/ML/balloon_small_green");
+          background-size: 24px 24px;
+          width: 24px;
+          height: 24px;
+          top: 160px;
+          // left: 9.64%;
+          left: 50%;
+          margin-left: -564px;
+        }
+
+        &.small-purple-face {
+          @include image-2x("/img/ML/balloon_small_purple_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 179px;
+          // left: 20.43%;
+          left: 50%;
+          margin-left: -414px;
+        }
+
+        &.small-red {
+          @include image-2x("/img/ML/balloon_small_red");
+          background-size: 32px 30px;
+          width: 32px;
+          height: 30px;
+          top: 62px;
+          // left: 59.28%;
+          left: 50%;
+          margin-left: 130px;
+        }
+
+        &.small-yellow-face {
+          @include image-2x("/img/ML/balloon_small_yellow_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 153px;
+          // left: 77.21%;
+          left: 50%;
+          margin-left: 381px;
+        }
+
+        &.small-red-face {
+          @include image-2x("/img/ML/balloon_small_red_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 404px;
+          left: 50%;
+          margin-left: -188px;
+          z-index: 11;
+        }
+
+        &.small-green-face {
+          @include image-2x("/img/ML/balloon_small_green_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 310px;
+          // left: 86.43%;
+          left: 50%;
+          margin-left: 510px;
+        }
+
+        &.small-blue-face {
+          @include image-2x("/img/ML/balloon_small_blue_face");
+          background-size: 42px 42px;
+          width: 42px;
+          height: 42px;
+          top: 1080px;
+          // left: 9.21%;
+          left: 50%;
+          margin-left: -571px;
+        }
+
+        &.small-yellow-1 {
+          @include image-2x("/img/ML/balloon_small_yellow_1");
+          background-size: 24px 24px;
+          width: 24px;
+          height: 24px;
+          top: 765px;
+          // left: 85.86%;
+          left: 50%;
+          margin-left: 502px;
+        }
+
+        &.small-yellow-2 {
+          @include image-2x("/img/ML/balloon_small_yellow_2");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 1048px;
+          // left: 87.64%;
+          left: 50%;
+          margin-left: 527px;
+        }
+
+      }
 
       @include mobile(){
         padding-top: 46px;
@@ -48,7 +194,7 @@ div#wrap {
       h1.headline {
         font-size: 48px;
         @include avenir_H();
-        color: #373F4F;
+        color: $carrot_dark_brown;
         padding: 0 16px;
         max-width: 800px;
         margin: 0 auto;
@@ -61,7 +207,7 @@ div#wrap {
       }
 
       div.subheadline {
-        color: #70674B;
+        color: $carrot_dark_brown;
         font-size: 20px;
         padding: 0 16px;
         @include avenir_R();
@@ -95,6 +241,8 @@ div#wrap {
         padding: 0 16px;
         // box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
         border: 1px solid rgba($oc_gray_5, 0.05);
+        z-index: 10;
+        position: relative;
 
         @include mobile(){
           display: none;
@@ -110,6 +258,8 @@ div#wrap {
         height: 511px;
         margin: 106px auto 0px;
         padding: 0 16px;
+        z-index: 10;
+        position: relative;
 
         @include mobile(){
           display: none;
@@ -124,202 +274,95 @@ div#wrap {
         width: 997px;
         height: 345px;
         margin: -282px auto 0px;
-
         @include avenir_H();
         color: white;
         font-size: 20px;
         text-align: center;
-        padding: 150px 50px 0px;
-      }
-    }
-
-    div.illustrations {
-      text-align: center;
-      padding-bottom: 80px;
-
-      div.illustration {
-        margin: 60px auto;
-        padding: 0 16px;
-
-        @include big_web(){
-          width: #{$illustration_min_width}px;
-        }
-
-        div.description {
-          @include mobile(){
-            margin-top: 60px;
-            padding: 0 16px;
-            max-width: 500px;
-            float: unset;
-            margin: 60px auto 0 !important;
-          }
-
-          @include big_web(){
-            max-width: 455px;
-          }
-
-          div.title {
-            color: $carrot_dark_blue;
-            @include avenir_H();
-            font-size: 36px;
-            letter-spacing: 0.1px;
-            text-align: left;
-
-            &.title-right {
-              text-align: right;
-            }
-          }
-
-          div.subtitle {
-            color: $carrot_dark_blue;
-            @include avenir_R();
-            font-size: 20px;
-            line-height: 1.7;
-            text-align: left;
-
-            &.subtitle-right {
-              text-align: right;
-            }
-
-            &.second-line {
-              margin-top: 20px;
-            }
-
-            a {
-              color: #4C67FC;
-              &:hover {
-                text-decoration: underline;
-              }
-            }
-          }
-        }
-
-        // 3rd illustration
-        &.illustration-3 {
-          img.illustration-image {
-            float: left;
-            width: 450px;
-            height: 349px;
-            margin-left: 90px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-top: 80px;
-            margin-right: 50px;
-          }
-        }
-
-        &.illustration-4 {
-          img.illustration-image {
-            float: right;
-            width: 521px;
-            height: 283px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: left;
-            text-align: left;
-            margin-left: 50px;
-            margin-top: 50px;
-            max-width: 455px;
-          }
-        }
-
-        &.illustration-5 {
-          img.illustration-image {
-            float: left;
-            width: 424px;
-            height: 329px;
-            margin-left: 70px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-top: 70px;
-            margin-right: 30px;
-          }
-        }
-
-        &.illustration-6 {
-          margin-top: 20px;
-          img.illustration-image {
-            float: right;
-            width: 346px;
-            height: 321px;
-            margin-right: 170px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: left;
-            text-align: left;
-            margin-left: 40px;
-            margin-top: 90px;
-          }
-        }
-
-        &.illustration-7 {
-          img.illustration-image {
-            float: left;
-            width: 333px;
-            height: 274px;
-            margin-left: 70px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-right: 40px;
-            margin-top: 20px;
-          }
-        }
+        padding: 160px 50px 0px;
+        z-index: 12;
+        position: relative;
       }
     }
 
     div.home-section {
-      padding: 120px 0px;
+
+      
+    }
+
+    div.home-section.second-section {
+      padding: 120px 0px 0px;
+      position: relative;
+
+      div.why-balloon {
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+
+        &.big-red {
+          @include image-2x("/img/ML/why_balloon_big_red");
+          background-size: 192px 199px;
+          width: 192px;
+          height: 199px;
+          top: 313px;
+          left: -83px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/why_balloon_big_purple");
+          background-size: 110px 111px;
+          width: 110px;
+          height: 111px;
+          top: 202px;
+          // left: 83.07%;
+          left: 50%;
+          margin-left: 463px;
+        }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/why_balloon_big_yellow");
+          background-size: 217px 216px;
+          width: 217px;
+          height: 216px;
+          top: 639px;
+          // left: 78.57%;
+          left: 50%;
+          margin-left: 400px;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/why_balloon_big_green");
+          background-size: 132px 132px;
+          width: 132px;
+          height: 132px;
+          top: 855px;
+          // left: 11.71%;
+          left: 50%;
+          margin-left: -536px;
+        }
+
+        &.small-purple {
+          @include image-2x("/img/ML/why_balloon_small_purple");
+          background-size: 33px 30px;
+          width: 33px;
+          height: 30px;
+          top: 584px;
+          // left: 11.91%;
+          left: 50%;
+          margin-left: -533px;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/why_balloon_small_yellow");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 855px;
+          // left: 12%;
+          left: 50%;
+          margin-left: -532px;
+        }
+      }
 
       div.illustrations-title {
         margin-bottom: 60px;
@@ -335,238 +378,242 @@ div#wrap {
         div.why-carrot {
           @include avenir_H();
           font-size: 48px;
-          color: $carrot_dark_blue;
+          color: $carrot_dark_brown;
           margin-bottom: 24px;
         }
 
         div.why-carrot-description {
           @include avenir_R();
-          font-size: 24px;
-          color: #4D4D4D;
+          font-size: 20px;
+          color: $carrot_dark_brown;
+        }
+      }
+
+      div.slack-section {
+        width: 800px;
+        height: 293px;
+        text-align: center;
+        margin: 40px auto;
+
+        div.slack-logo {
+          @include image-2x("/img/ML/homepage_slack_logo");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 80px 80px;
+          width: 80px;
+          height: 80px;
+          margin: 0 auto;
+        }
+
+        div.slack-title {
+          color: $carrot_dark_brown;
+          @include avenir_H();
+          font-size: 26px;
+          margin-top: 16px;
+        }
+
+        div.slack-description {
+          color: $carrot_dark_brown;
+          @include avenir_R();
+          font-size: 20px;
+          margin-top: 16px;
+        }
+
+        button.mlb-reset.slack-btn {
+          width: 160px;
+          height: 48px;
+          border-radius: 100px;
+          background-color: $carrot_orange_light;
+          color: #FA6654;
+          @include avenir_H();
+          font-size: 16px;
+          padding: 10px 8px;
+          text-align: center;
+          margin: 16px auto 0px;
+
+          &:hover {
+            background-color: #FA6654;
+            color: white;
+            text-decoration: none;
+          }
+        }
+      }
+
+      div.illustrations {
+        width: 980px;
+        margin: 59px auto;
+        position: relative;
+        z-index: 10;
+
+        div.illustration {
+          margin: 20px;
+          width: 450px;
+          height: 253px;
+          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+          padding: 60px 50px;
+          background-color: white;
+          float: left;
+          text-align: center;
+
+          &.right {
+            float: right;
+          }
+
+          div.description {
+            div.title {
+              color: $carrot_dark_brown;
+              @include avenir_H();
+              font-size: 26px;
+            }
+
+            div.subtitle {
+              color: $carrot_dark_brown;
+              @include avenir_R();
+              font-size: 20px;
+              margin: 10px auto;
+            }
+          }
         }
       }
     }
 
-    div.second-section {
-      background-color: $oc_gray_8;
-      padding: 120px 0px 0px;
-    }
+    div.home-section.third-section {
+      background-color: #F6F5F1;
+      padding: 60px 0px 100px;
 
-    div.third-section {
       div.illustrations-title {
-        max-width: 700px;
-        
-        div.centred-screenshot {
-          width: 471px;
-          height: 319px;
-          margin: 64px auto;
-          background-size: 471px 319px;
-          background-repeat: no-repeat;
-          background-position: center;
-          @include image-2x("/img/ML/home_page_screenshot");
+        margin-bottom: 60px;
+        max-width: 770px;
+        text-align: center;
+        margin: 0 auto;
+        padding: 0px 32px;
 
-          @include mobile(){
-            display: none;
-          }
+        @include mobile(){
+          text-align: left;
+        }
+
+        div.why-carrot {
+          @include avenir_H();
+          font-size: 26px;
+          color: $carrot_dark_brown;
+          margin-bottom: 24px;
+        }
+
+        div.why-carrot-description {
+          @include avenir_R();
+          font-size: 20px;
+          color: $carrot_dark_brown;
         }
       }
 
       div.third-section-footer {
-        max-width: 1074px;
-        margin: 60px auto;
+        width: 940px;
+        height: 336px;
+        background-color: white;
+        margin: 60px auto 0px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
+        padding: 40px;
 
-        div.left-copy {
-          float: left;
-          width: 489px;
-
-          @include mobile(){
-            float: unset;
-            max-width: 100%;
-            padding: 0px 32px;
-          }
+        div.copy-separator {
+          margin-top: 16px;
+          width: calc(100% + 80px);
+          height: 1px;
+          margin-left: -40px;
+          background-color: rgba(#E4E3DE,0.5);
         }
 
-        div.right-copy {
-          float: right;
-          width: 489px;
-
-          @include mobile(){
-            float: unset;
-            max-width: 100%;
-            padding: 32px 32px;
+        div.copy {
+          &:first-child {
+            margin-top: 0px;
           }
+          margin-top: 16px;
         }
 
         div.title {
-          color: $carrot_dark_blue;
+          color: $carrot_dark_brown;
           @include avenir_H();
-          font-size: 32px;
-          letter-spacing: 0.1px;
+          font-size: 26px;
           text-align: left;
         }
 
         div.description {
-          color: #3B3D41;
+          color: $carrot_dark_brown;
           @include avenir_R();
           font-size: 20px;
-          line-height: 1.7;
           text-align: left;
         }
       }
     }
 
-    div.customers {
-      width: 100%;
-      margin: 50px auto 0;
-      background-color: $carrot_dark_blue;
-      padding: 60px 0;
+    div.home-section.fourth-section {
       text-align: center;
+      padding: 60px 0px;
 
-      div.customers-title {
-        padding: 0 16px;
-        font-size: 36px;
-        @include avenir_H();
-        color: white;
+      div.above-noise-container {
+        width: 1053px;
+        height: 254px;
+        @include image-2x("/img/ML/homepage_footer_balloons");
+        background-size: 1053px 254px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin: 0px auto;
 
-        @include mobile() {
-          font-size: 28px;
+        div.above-noise-title {
+          color: $carrot_dark_brown;
+          @include avenir_H();
+          font-size: 48px;
+          margin-top: 16px;
         }
 
-        img {
-          width: 40px;
-          height: 40px;
-          margin-right: 20px;
-          margin-top: -4px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-      }
-
-      div.customers-cards {
-        margin: 60px auto;
-        width: 1246px;
-
-        div.left-arrow {
-          height: 200px;
-          width: 48px;
-          float: left;
-
-          @include mobile(){
-            display: none;
-          }
-
-          button {
-            margin-top: 50px;
-            background-image: cdnUrl("/img/ML/home_page_left_arrow.png");
-            background-size: 48px 96px;
-            width: 48px;
-            height: 96px;
-            opacity: 0.9;
-
-            &:hover {
-              opacity: 1;
-            }
-
-            &:disabled {
-              opacity: 0.4;
-            }
-          }
-        }
-
-        div.customers-cards-scroll {
-          width: 1110px;
-          height: 200px;
-          overflow-x: hidden;
-          overflow-y: hidden;
-          margin: 0 20px;
-          float: left;
-          display: inline-block;
-
-          div.customers-card {
-            margin-right: 15px;
-            width: 360px;
-            height: 200px;
-            border-radius: 10px;
-            background-color: white;
-            box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
-            float: left;
-
-            &:last-child {
-              margin-right: 0px;
-            }
-          }
-        }
-
-        div.right-arrow {
-          height: 200px;
-          width: 48px;
-          float: right;
-
-          @include mobile(){
-            display: none;
-          }
-
-          button {
-            margin-top: 50px;
-            background-image: cdnUrl("/img/ML/home_page_right_arrow.png");
-            background-size: 48px 96px;
-            width: 48px;
-            height: 96px;
-            opacity: 0.9;
-
-            &:hover {
-              opacity: 1;
-            }
-
-            &:disabled {
-              opacity: 0.4;
-            }
-          }
+        div.above-noise-description {
+          color: $carrot_dark_brown;
+          @include avenir_R();
+          font-size: 20px;
+          margin-top: 16px;
         }
       }
     }
 
-    div.try-it {
-      width: 100%;
-      margin: 0 auto;
-      padding: 56px 0 86px;
-      background-image: linear-gradient(252deg, #f7c144, #f2558f);
-      text-align: center;
+    // div.try-it {
+    //   width: 100%;
+    //   margin: 0 auto;
+    //   padding: 56px 0 86px;
+    //   background-image: linear-gradient(252deg, #f7c144, #f2558f);
+    //   text-align: center;
 
-      button.get-started-button {
-        border: none;
-        outline: none;
-        background-color: #2E405A;
-      }
+    //   button.get-started-button {
+    //     border: none;
+    //     outline: none;
+    //     background-color: #2E405A;
+    //   }
 
-      div.try-it-title {
-        @include avenir_H();
-        font-size: 36px;
-        letter-spacing: 0.1px;
-        color: white;
-      }
+    //   div.try-it-title {
+    //     @include avenir_H();
+    //     font-size: 36px;
+    //     letter-spacing: 0.1px;
+    //     color: white;
+    //   }
 
-      div.try-it-subtitle {
-        color: #592121;
-        @include avenir_H();
-        font-size: 16px;
-        line-height: 1.75;
-      }
+    //   div.try-it-subtitle {
+    //     color: #592121;
+    //     @include avenir_H();
+    //     font-size: 16px;
+    //     line-height: 1.75;
+    //   }
 
-      div.try-it-combo-field button.try-it-get-started {
-        background-color: $carrot_dark_blue;
-      }
+    //   div.try-it-combo-field button.try-it-get-started {
+    //     background-color: $carrot_dark_blue;
+    //   }
 
-      div.carrot-box-container {
-        color: #592121 !important;
-        padding: 0;
+    //   div.carrot-box-container {
+    //     color: #592121 !important;
+    //     padding: 0;
 
-        div.thanks-headline {
-          color: white !important;
-        }
-      }
-    }
+    //     div.thanks-headline {
+    //       color: white !important;
+    //     }
+    //   }
+    // }
   }
 }
