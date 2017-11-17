@@ -1424,14 +1424,18 @@
   (dissoc db :show-onboard-overlay))
 
 (defmethod dispatcher/action :activity-share-show
-  [db [_ medium activity-data]]
+  [db [_ activity-data]]
   (-> db
-    (assoc :activity-share {:medium medium :share-data activity-data})
+    (assoc :activity-share {:share-data activity-data})
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_ activity-data]]
   (dissoc db :activity-share))
+
+(defmethod dispatcher/action :activity-share-reset
+  [db [_]]
+  (dissoc db :activity-shared-data))
 
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]
@@ -1439,8 +1443,11 @@
   (assoc db :activity-share-data share-data))
 
 (defmethod dispatcher/action :activity-share/finish
-  [db [_ shared-data]]
-  (assoc db :activity-shared-data (utils/fix-entry shared-data (:board-slug shared-data) nil)))
+  [db [_ success shared-data]]
+  (assoc db :activity-shared-data
+    (if success
+      (utils/fix-entry shared-data (:board-slug shared-data) nil)
+      {:error true})))
 
 (defmethod dispatcher/action :made-with-carrot-modal-show
   [db [_]]
