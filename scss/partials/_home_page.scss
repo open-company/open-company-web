@@ -195,6 +195,8 @@ div#wrap {
         max-width: 800px;
         margin: 0 auto;
         line-height: 60px;
+        z-index: 2;
+        position: relative;
 
         @include mobile() {
           font-size: 32px;
@@ -209,6 +211,8 @@ div#wrap {
         @include avenir_R();
         max-width: 620px;
         margin: 4px auto 0px;
+        z-index: 2;
+        position: relative;
 
         &.second-line {
           margin: 0px auto 40px;
@@ -224,6 +228,8 @@ div#wrap {
         font-size: 14px;
         @include avenir_H();
         margin-top: 16px;
+        z-index: 2;
+        position: relative;
       }
 
       div.homepage-main-screenshot {
@@ -376,12 +382,16 @@ div#wrap {
           font-size: 48px;
           color: $carrot_dark_brown;
           margin-bottom: 24px;
+          z-index: 2;
+          position: relative;
         }
 
         div.why-carrot-description {
           @include avenir_R();
           font-size: 20px;
           color: $carrot_dark_brown;
+          z-index: 2;
+          position: relative;
         }
       }
 

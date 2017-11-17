@@ -84,7 +84,7 @@
         [:div.homepage-screenshot-bubble
           (str
            "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
-           "Carrot provides a high-level narrative that keeps everyone on the same page.")]]
+           "Carrot provides the big picture that keeps everyone on the same page.")]]
 
       [:div.home-section.second-section
         [:div.why-balloon.big-red]
@@ -105,21 +105,21 @@
           [:div.illustration
             [:div.description
               [:div.title
-                "Transparency"]
+                "Visibility"]
               [:div.subtitle
                 (str
-                 "A bird’s-eye view of important "
-                 "information that’s easy to find for "
-                 "current and new employees.")]]]
+                 "A bird’s-eye view of essential "
+                 "information that’s easy to read and "
+                 "creates real transparency.")]]]
           [:div.illustration.right
             [:div.description
               [:div.title
-                "Simplicity"]
+                "In context"]
               [:div.subtitle
                 (str
-                 "If you’re adding a quick team update, or "
-                 "writing an overview for the next all-"
-                 "hands, Carrot is simple and fast.")]]]
+                 "Related information stays organized to "
+                 "have the most impact. Great for current "
+                 "and new employees.")]]]
           [:div.illustration
             [:div.description
               [:div.title
@@ -132,12 +132,12 @@
           [:div.illustration.right
             [:div.description
               [:div.title
-                "Privacy"]
+                "All together"]
               [:div.subtitle
                 (str
-                 "Privacy settings mean sensitive "
-                 "information can be invite-only, and "
-                 "public information can be fully open.")]]]]
+                 "Daily or weekly digest reinforces "
+                 "big picture content so everyone has "
+                 "the same information.")]]]]
         [:div.slack-section
           [:div.slack-logo]
           [:div.slack-title
@@ -152,7 +152,7 @@
       [:div.home-section.third-section.group
         [:div.illustrations-title
           [:div.why-carrot
-            "Going beyond the team"]
+            "Share the big picture with stakeholders"]
           [:div.why-carrot-description
             "Create and organize stakeholder updates in less time"]]
         [:div.third-section-footer.group
