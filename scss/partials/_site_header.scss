@@ -3,6 +3,7 @@
 nav.site-navbar {
   height: 72px;
   background-color: white;
+  z-index: 10;
 
   div.site-navbar-container {
     height: 72px;
@@ -12,7 +13,7 @@ nav.site-navbar {
 
     a {
       @include avenir_M();
-      color: #70674B;
+      color: $carrot_dark_brown;
       font-size: 14px;
       margin: 0px 8px;
       display: inline-block;
@@ -25,10 +26,6 @@ nav.site-navbar {
     }
 
     div.site-navbar-left {
-      // float: left;
-      // height: 42px;
-      // margin-top: -10px;
-      // vertical-align: middle;
       position: absolute;
       top: 15px;
       left: 16px;
@@ -36,19 +33,10 @@ nav.site-navbar {
     }
 
     div.site-navbar-right {
-      // float: right;
-      // height: 42px;
-      // margin-top: -10px;
-      // vertical-align: middle;
       position: absolute;
       top: 15px;
       right: 16px;
       height: 42px;
-
-      // a {
-      //   height: 30px;
-      //   margin-top: 10px;
-      // }
 
       a.login {
         width: 96px;
