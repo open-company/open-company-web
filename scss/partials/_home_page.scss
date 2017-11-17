@@ -364,6 +364,8 @@ div#wrap {
           color: $carrot_dark_brown;
           z-index: 2;
           position: relative;
+          width: 720px;
+          margin: 0 auto;
         }
       }
 
@@ -492,10 +494,10 @@ div#wrap {
 
       div.illustrations-title {
         margin-bottom: 60px;
-        max-width: 770px;
+        max-width: 940px;
         text-align: center;
         margin: 0 auto;
-        padding: 0px 32px;
+        padding: 0px;
 
         @include mobile(){
           text-align: left;

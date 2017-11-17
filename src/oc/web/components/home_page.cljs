@@ -154,7 +154,7 @@
         [:section.third-section.group
           [:div.illustrations-title
             [:div.why-carrot
-              "Share the big picture with stakeholders"]
+              "Share your big picture with stakeholders"]
             [:div.why-carrot-description
               "Create and organize stakeholder updates in less time"]]
           [:div.third-section-footer.group
