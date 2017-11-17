@@ -1,5 +1,5 @@
 .navbar-bottom {
-  background-color: $carrot_dark_blue !important;
+  background-color: $carrot_light_gray_7 !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
@@ -37,13 +37,13 @@
 
       div.footer-small-links {
         margin-top: 15px;
-        color: white;
+        color: $carrot_dark_brown;
         @include avenir_M();
         font-size: 13px;
 
         a {
           margin: 5px;
-          color: white;
+          color: $carrot_dark_brown;
           @include avenir_M();
           font-size: 13px;
           text-decoration: underline;
@@ -80,7 +80,7 @@
 
       div.copyright {
         font-size: 12px;
-        color: white;
+        color: $carrot_dark_brown;
         margin-top: 50px;
         opacity: 0.8;
       }
@@ -142,9 +142,9 @@
         }
 
         div.column-title {
-          @include avenir_B();
-          color: white;
-          font-size: 14px;
+          @include avenir_H();
+          color: $carrot_dark_brown;
+          font-size: 13px;
           opacity: 0.5;
           text-transform: uppercase;
 
@@ -166,6 +166,9 @@
         }
 
         div.column-item {
+          @include avenir_R();
+          color: $carrot_dark_brown;
+          font-size: 13px;
           margin-top: 10px;
           @include mobile(){
             padding: 0 15px;
@@ -173,7 +176,7 @@
 
           a {
             @include avenir_M();
-            color: white;
+            color: $carrot_dark_brown;
             opacity: 0.9;
             font-size: 14px;
 
