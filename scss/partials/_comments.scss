@@ -24,14 +24,14 @@ div.comments {
   }
 
   div.comments-internal {
-    padding-bottom: 143px;
+    padding-bottom: 103px;
     min-height: 127px;
     height: 100%;
     width: 100%;
+    position: relative;
     bottom: 0px;
     left: 0;
     right: 0;
-    position: absolute;
 
     div.comments-internal-scroll {
       overflow-x: hidden;
@@ -139,10 +139,10 @@ div.comments {
       border: 1px solid rgba($carrot_light_gray_1, 0.5);
       box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
       padding: 16px;
+      position: relative;
       left: 0;
       right: 0;
-      position: absolute;
-      bottom: 0px;
+      bottom: 16px;
       width: 100%;
 
       div.successfully-posted {
