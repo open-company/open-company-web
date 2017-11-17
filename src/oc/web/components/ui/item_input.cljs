@@ -25,7 +25,19 @@
   :input-node (default :input) Provide a different node for the input field
   :auto-focus (default false) If you want this field to autofocus when it's added
   :placholder (default ) The placeholder of the input field"
-  < (rum/local true ::show-input?) (rum/local [] ::items) (rum/local "" ::input)
+  < ;; Showing the input field
+    (rum/local true ::show-input?)
+    ;; List of items added
+    (rum/local [] ::items)
+    ;; Value of the input field
+    (rum/local "" ::input)
+    {:will-mount (fn [s]
+      (let [{:keys [items input]} (first (:rum/args s))]
+        (when (sequential? items)
+          (reset! (::items s) items))
+        (when (string? input)
+          (reset! (::input s) input)))
+      s)}
   [s {:keys [item-render on-change match-ptn split-ptn tab-index
              valid-item? container-node input-node placeholder auto-focus
              on-intermediate-change]
