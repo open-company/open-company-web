@@ -29,22 +29,6 @@
   ;; <!-- footer -->
   [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
-      [:div.left-column
-        [:img.logo
-          {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
-        (when-not (jwt/jwt)
-          [:div.footer-small-links
-            [:a
-              {:href oc-urls/sign-up
-               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
-              "Get Started"]
-            "|"
-            [:a
-              {:href oc-urls/login
-               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
-              "Log in"]])
-        (when-not (responsive/is-mobile-size?)
-          (bottom-footer "big-web-footer"))]
 
       [:div.right-column
 
@@ -94,6 +78,23 @@
         ;   [:div.column-item [:a {:href oc-urls/home} "Home"]]
         ;   [:div.column-item [:a {:href oc-urls/features} "Features"]]]
           ]
+
+      [:div.left-column
+        [:img.logo
+          {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
+        (when-not (jwt/jwt)
+          [:div.footer-small-links
+            [:a
+              {:href oc-urls/sign-up
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
+              "Get Started"]
+            "|"
+            [:a
+              {:href oc-urls/login
+               :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
+              "Log in"]])
+        (when-not (responsive/is-mobile-size?)
+          (bottom-footer "big-web-footer"))]
 
         (when (responsive/is-mobile-size?)
           (bottom-footer "mobile-footer"))]])

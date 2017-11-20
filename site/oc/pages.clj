@@ -52,7 +52,7 @@
     {:id "wrap"}
     [:div.main.home-page
       ; Hope page header
-      [:section.cta
+      [:section.cta.group
         [:div.balloon.big-yellow]
         [:div.balloon.big-red]
         [:div.balloon.big-purple]
@@ -73,8 +73,9 @@
         [:div.subheadline
           "Give your team a clear view of what’s most important."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-        [:button.mlb-reset.get-started-button
-          "Get started for free"]
+        [:div.get-started-button-container
+          [:button.mlb-reset.get-started-button
+            "Get started for free"]]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style #js {:display "none"}}
@@ -82,20 +83,25 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:figure.homepage-main-screenshot]
+        [:img.homepage-main-screenshot
+          {:src (cdn "/img/ML/new_homepage_screenshot.png")
+           :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
         [:div.homepage-screenshot-bubble
           (str
            "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
            "Carrot provides the big picture that keeps everyone on the same page.")]]
 
-      [:section.second-section
+      [:section.second-section.group
         [:div.why-balloon.big-red]
+        ; [:div.why-balloon.big-blue]
         [:div.why-balloon.small-yellow]
         [:div.why-balloon.big-purple]
         [:div.why-balloon.small-purple]
         [:div.why-balloon.big-yellow]
         [:div.why-balloon.small-yellow]
         [:div.why-balloon.big-green]
+        [:div.why-balloon.small-red]
+        [:div.why-balloon.small-purple-face]
 
         [:div.illustrations-title
           [:div.why-carrot
@@ -183,7 +189,7 @@
                "Share news with recruits, potential investors and customers to keep them "
                "engaged and supportive. Build trust and grow your business.")]]]]
 
-      [:section.fourth-section
+      [:section.fourth-section.group
         [:div.above-noise-container
           [:div.above-noise-title
             "Get above the noise"]

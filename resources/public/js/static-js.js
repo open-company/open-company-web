@@ -93,8 +93,6 @@ $(document).ready(function(){
     $("#site-header-signup-item").attr("onClick", "window.location = \"" + your_board_url + "\";");
     // If in 404 page show error message for logged in users
     $("div.error-page.not-found-page p.not-logged-in").hide();
-    // Footer links
-    $("div.footer-small-links").hide();
 
   }else{ // No logged in user
     // link all get started button to signup with Slack
