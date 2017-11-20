@@ -286,6 +286,7 @@ provided in the table below:
 |  :signup-with-email | UI | Show the signup with email overlay. |
 |  :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
 |  :signup-with-email/success | API | Signup with email succeeded. Save the JWT received in the cookie and remove the signup overlay. Load the entry point to redirect the user to the proper org/place. |
+|  :site-menu-toggle | UI | Collapse and expand the site menu for mobile. |
 |  :slack-team-add | UI | Start the request to add a Slack team to the current team. |
 |  :slack-token-refresh | UI | Refresh the data of the user signed in with Slack. |
 |  :story-get | UI | Load a story. |

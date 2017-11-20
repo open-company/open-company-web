@@ -58,6 +58,39 @@
    ;; jQuery textcomplete needed by Emoji One autocomplete
    [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
 
+(defn mobile-menu
+  "Mobile menu used to show the collapsable menu in the marketing site."
+  [active-page]
+  [:div.site-mobile-menu.mobile-only.hidden
+    [:div.site-mobile-menu-container
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/"
+           :class (when (= active-page "home") "active")}
+          "Home"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/pricing"
+           :class (when (= active-page "pricing") "active")}
+          "Pricing"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/about"
+           :class (when (= active-page "home") "about")}
+          "About"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "http://blog.carrot.io"
+           :target "_blank"}
+          "Blog"]]]
+    [:div.site-mobile-menu-footer
+      [:button.mlb-reset.mlb-default
+        {:onClick "javascript:window.location='/login';"}
+        "Log In"]
+      [:button.mlb-reset.get-started-button
+        {:onClick "javascript:window.location='/sign-up';"}
+        "Get started for free"]]])
+
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
    and every change here should be reflected there."
@@ -81,7 +114,8 @@
         [:a.login
           {:href "/login"}
           "Login"]]
-      [:div.mobile-ham-menu.mobile-only]]])
+      [:div.mobile-ham-menu.mobile-only
+        {:onClick "javascript:siteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
@@ -155,7 +189,8 @@
                  {:class "gradient"}
                  [:div
                   {:class "outer header"}
-                  (nav (name page))]]
+                  (nav (name page))
+                  (mobile-menu (name page))]]
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)

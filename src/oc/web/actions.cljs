@@ -705,6 +705,12 @@
     (update-in db [:mobile-menu-open] not)
     db))
 
+(defmethod dispatcher/action :site-menu-toggle
+  [db [_]]
+  (if (responsive/is-mobile-size?)
+    (update-in db [:site-menu-open] not)
+    db))
+
 (defn sort-reactions [entry]
   (let [reactions (:reactions entry)
         sorted-reactions (vec (sort-by :reaction reactions))]

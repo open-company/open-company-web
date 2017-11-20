@@ -150,3 +150,15 @@ function isIE(){
     return false;
   }
 }
+
+function siteMobileMenuToggle(){
+  var menuClass = "mobile-menu-expanded";
+  var body = document.body;
+  if (body.classList.contains(menuClass)) {
+    body.querySelector("div.site-mobile-menu").classList.add("hidden");
+    body.classList.remove(menuClass);
+  } else {
+    body.querySelector("div.site-mobile-menu").classList.remove("hidden");
+    body.classList.add(menuClass);
+  }
+}

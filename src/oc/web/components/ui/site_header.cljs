@@ -3,6 +3,7 @@
    and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -12,17 +13,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.try-it-form :refer (get-started-button)]))
-
-(def body-class "mobile-menu-expanded")
-
-(defn toggle-menu
-  "Helper function called every time this component is mounted, remounted or the menu button is clicked"
-  [force-collapse]
-  (let [body (js/$ (.-body js/document))]
-    ;; If it's forcing the collapse or the menu is already open
-    (if (or force-collapse (.hasClass body body-class))
-      (.removeClass body body-class)
-      (.addClass body body-class))))
 
 (defn navigate-to-your-boards []
   (router/redirect! (utils/your-boards-url)))
@@ -48,7 +38,8 @@
         [:a.login
           {:href "/login"}
           "Login"]]
-      [:div.mobile-ham-menu.mobile-only]]])
+      [:div.mobile-ham-menu.mobile-only
+        {:on-click #(dis/dispatch! [:site-menu-toggle])}]]])
 
 ;; Keep the old header since it still needs the mobile work: expand collapse menu etc.
 (comment

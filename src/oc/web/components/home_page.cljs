@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.site-header :refer (site-header)]
+            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.try-it-form :refer (try-it-form)]
             [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
@@ -32,6 +33,7 @@
   [:div
     [:div {:id "wrap"} ; <!-- used to push footer to the bottom -->
       (site-header)
+      (site-mobile-menu)
       ;; preload slack button as hidden
       [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
       (login-overlays-handler)
