@@ -13,6 +13,12 @@ button.get-started-button {
   position: relative;
   text-align: left;
 
+  @include mobile(){
+    width: 100%;
+    max-width: 280px;
+    margin: 16px auto;
+  }
+
   &:after {
     @include image-2x("/img/ML/get_started_arrow");
     background-size: 20px 20px;
@@ -32,9 +38,10 @@ div#wrap {
 
   div.main.home-page {
     width: 100%;
+    background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
 
-    @include big_web(){
-      background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
+    @include mobile() {
+      padding: 0 16px;
     }
 
     section.cta {
@@ -44,11 +51,20 @@ div#wrap {
       position: relative;
       overflow: hidden;
 
+      @include mobile() {
+        width: 100%;
+        padding-top: 80px;
+      }
+
       div.balloon {
         position: absolute;
         background-position: center;
         background-repeat: no-repeat;
         z-index: 1;
+
+        @include mobile() {
+          display: none;
+        }
 
         &.big-yellow {
           @include image-2x("/img/ML/balloon_big_yellow");
@@ -193,8 +209,7 @@ div#wrap {
         position: relative;
 
         @include mobile() {
-          font-size: 32px;
-          line-height: 45px;
+          max-width: 280px
         }
       }
 
@@ -208,6 +223,12 @@ div#wrap {
         z-index: 2;
         position: relative;
 
+        @include mobile(){
+          margin-top: 16px;
+          font-size: 24px;
+          max-width: 330px
+        }
+
         &.second-line {
           margin: 0px auto 40px;
 
@@ -215,6 +236,10 @@ div#wrap {
             margin-top: 20px;
           }
         }
+      }
+
+      div.get-started-button-container {
+        margin: 0 auto;
       }
 
       div.small-teams {
@@ -226,22 +251,19 @@ div#wrap {
         position: relative;
       }
 
-      figure.homepage-main-screenshot {
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 940px 763px;
-        @include image-2x("/img/ML/new_homepage_screenshot");
+      img.homepage-main-screenshot {
         width: 940px;
         height: 763px;
         margin: 106px auto 0px;
         padding: 0;
-        // box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
         border: 1px solid rgba($oc_gray_5, 0.05);
         z-index: 10;
         position: relative;
 
         @include mobile(){
-          display: none;
+          width: 100%;
+          height: auto;
+          margin: 80px auto 0px;
         }
       }
 
@@ -260,6 +282,17 @@ div#wrap {
         padding: 160px 50px 0px;
         z-index: 12;
         position: relative;
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+          background: none;
+          max-width: 100%;
+          margin: 24px auto;
+          padding: 16px;
+          background-color: $carrot_text_blue;
+          border-radius: 8px;
+        }
       }
     }
 
@@ -273,6 +306,9 @@ div#wrap {
         background-repeat: no-repeat;
         z-index: 1;
 
+        @include mobile() {
+          display: none;
+        }
 
         &.big-red {
           @include image-2x("/img/ML/why_balloon_big_red");
@@ -385,6 +421,13 @@ div#wrap {
           margin-bottom: 12px;
           z-index: 2;
           position: relative;
+
+          @include mobile() {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+          }
         }
 
         div.why-carrot-description {
@@ -396,6 +439,12 @@ div#wrap {
           position: relative;
           width: 720px;
           margin: 0 auto;
+
+          @include mobile() {
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+          }
         }
       }
 
@@ -404,6 +453,11 @@ div#wrap {
         margin: 54px auto;
         position: relative;
         z-index: 10;
+
+        @include mobile() {
+          width: calc(100% + 32px);
+          margin-left: -16px;
+        }
 
         div.illustration-container {
           margin: 20px;
@@ -415,8 +469,20 @@ div#wrap {
           float: left;
           text-align: center;
 
+          @include mobile() {
+            width: 100%;
+            height: auto;
+            float: unset;
+            margin: 16px 0px 0px;
+            padding: 30px 16px;
+          }
+
           &.right {
             float: right;
+
+            @include mobile(){
+              float: unset;
+            }
           }
 
           div.illustration {
@@ -424,6 +490,11 @@ div#wrap {
             height: 160px;
             background-repeat: no-repeat;
             background-position: center;
+
+            @include mobile() {
+              width: auto;
+              margin: 0 auto;
+            }
 
             &.illustration-1 {
               @include image-2x("/img/ML/why_illustration_1_246_151");
@@ -470,6 +541,12 @@ div#wrap {
         height: 293px;
         text-align: center;
         margin: 40px auto 100px;
+
+        @include mobile(){
+          width: 100%;
+          height: auto;
+          text-align: center;
+        }
 
         div.slack-logo {
           @include image-2x("/img/ML/carrot_plus_slack");
@@ -522,6 +599,13 @@ div#wrap {
       background-color: #FFF3CD;
       padding: 72px 0px 100px;
 
+      @include mobile(){
+        width: calc(100% + 32px);
+        margin-left: -16px;
+        padding: 32px 16px 50px;
+        text-align: center;
+      }
+
       div.illustrations-title {
         margin-bottom: 60px;
         max-width: 940px;
@@ -530,7 +614,7 @@ div#wrap {
         padding: 0px;
 
         @include mobile(){
-          text-align: left;
+          text-align: center;
         }
 
         div.why-carrot {
@@ -557,12 +641,23 @@ div#wrap {
         box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
         padding: 40px 24px;
 
+        @include mobile() {
+          width: calc(100% + 32px);
+          margin-left: -16px;
+          height: auto;
+        }
+
         div.copy-separator {
           margin-top: 26px;
           width: calc(100% + 48px);
           height: 1px;
           margin-left: -24px;
           background-color: rgba($carrot_light_gray_7,0.5);
+
+          @include mobile(){
+            width: 100%;
+            margin-left: 0px;
+          }
         }
 
         div.copy {
@@ -578,6 +673,12 @@ div#wrap {
             background-repeat: no-repeat;
             background-position: center;
             margin-top: -6px;
+
+            @include mobile (){
+              float: unset;
+              text-align: center;
+              margin: 0px auto;
+            }
 
             &.copy-simplify {
               @include image-2x("/img/ML/homepage_illustration_simplify");
@@ -598,6 +699,11 @@ div#wrap {
             margin-left: 138px;
             letter-spacing: 0.18;
             line-height: 36px;
+
+            @include mobile (){
+              margin: 16px 0px;
+              text-align: center;
+            }
           }
 
           div.description {
@@ -608,6 +714,11 @@ div#wrap {
             text-align: left;
             margin-left: 138px;
             margin-top: 8px;
+
+            @include mobile (){
+              margin: 16px 0px 0px;
+              text-align: center;
+            }
           }
         }
       }
@@ -621,6 +732,12 @@ div#wrap {
         width: 1053px;
         height: 254px;
         margin: 0px auto;
+
+        @include mobile(){
+          width: 100%;
+          height: auto;
+          text-align: center;
+        }
 
         div.above-noise-title {
           color: $carrot_dark_brown_1;

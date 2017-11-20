@@ -73,8 +73,9 @@
         [:div.subheadline
           "Give your team a clear view of what’s most important."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-        [:button.mlb-reset.get-started-button
-          "Get started for free"]
+        [:div.get-started-button-container
+          [:button.mlb-reset.get-started-button
+            "Get started for free"]]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style #js {:display "none"}}
@@ -82,7 +83,9 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:figure.homepage-main-screenshot]
+        [:img.homepage-main-screenshot
+          {:src (cdn "/img/ML/new_homepage_screenshot.png")
+           :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
         [:div.homepage-screenshot-bubble
           (str
            "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
