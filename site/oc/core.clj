@@ -67,20 +67,21 @@
     [:div.site-navbar-container
       [:a.navbar-brand-center
         {:href "/"}]
-      [:div.site-navbar-left
+      [:div.site-navbar-left.big-web-only
         [:a
           {:href "/about"}
           "About"]
         [:a
           {:href "http://blog.carrot.io"}
           "Blog"]]
-      [:div.site-navbar-right
+      [:div.site-navbar-right.big-web-only
         [:a
           {:href "/login?slack"}
           "Get Started"]
         [:a.login
           {:href "/login"}
-          "Login"]]]])
+          "Login"]]
+      [:div.mobile-ham-menu.mobile-only]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
@@ -89,21 +90,6 @@
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
-      [:div.left-column
-        [:img.logo
-          {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
-        [:div.footer-small-links
-          [:a {:href "/sign-up"} "Get Started"]
-          "|"
-          [:a {:href "/login"} "Log in"]]
-        [:div.small-logos
-          [:a.twitter
-            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
-            [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
-          [:a.medium
-            {:target "_blank" :href "https://blog.carrot.io" :title "Carrot on Medium"}
-            [:img {:src (pages/cdn "/img/ML/home_page_medium.svg")}]]]
-        [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column
 
         [:div.column.column-company
@@ -135,7 +121,22 @@
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
           [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]]])
+          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]
+      [:div.left-column
+        [:img.logo
+          {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
+        [:div.footer-small-links
+          [:a {:href "/sign-up"} "Get Started"]
+          "|"
+          [:a {:href "/login"} "Log in"]]
+        [:div.small-logos
+          [:a.twitter
+            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
+            [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
+          [:a.medium
+            {:target "_blank" :href "https://blog.carrot.io" :title "Carrot on Medium"}
+            [:img {:src (pages/cdn "/img/ML/home_page_medium.svg")}]]]
+        [:div.copyright "© Copyright 2017. All rights reserved"]]]])
 
 
 (defn read-edn [entry]
