@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.site-header :refer (site-header)]
+            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
@@ -15,6 +16,7 @@
 
 
       (site-header)
+      (site-mobile-menu)
       (login-overlays-handler)
 
       [:div.container.main.about
