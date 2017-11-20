@@ -28,6 +28,7 @@ button.get-started-button {
 }
 
 div#wrap {
+  background-color: $oc_gray_8;
 
   div.main.home-page {
     width: 100%;
@@ -272,6 +273,7 @@ div#wrap {
         background-repeat: no-repeat;
         z-index: 1;
 
+
         &.big-red {
           @include image-2x("/img/ML/why_balloon_big_red");
           background-size: 192px 199px;
@@ -280,6 +282,16 @@ div#wrap {
           top: 199px;
           left: -83px;
         }
+
+
+        // &.big-blue {
+        //   @include image-2x("/img/ML/why_balloon_big_blue");
+        //   background-size: 121px 125px;
+        //   width: 121px;
+        //   height: 125px;
+        //   top: 38px;
+        //   left: 65px;
+        // }
 
         &.small-yellow {
           @include image-2x("/img/ML/why_balloon_small_yellow");
@@ -334,6 +346,24 @@ div#wrap {
           top: 999px;
           left: 11.93%;
           z-index: 2;
+        }
+
+        &.small-red {
+          @include image-2x("/img/ML/why_balloon_small_red");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 1353px;
+          left: 86%;
+        }
+
+        &.small-purple-face {
+          @include image-2x("/img/ML/why_balloon_small_purple_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 1384px;
+          left: 82%;
         }
       }
 
@@ -439,15 +469,15 @@ div#wrap {
         width: 800px;
         height: 293px;
         text-align: center;
-        margin: 40px auto;
+        margin: 40px auto 100px;
 
         div.slack-logo {
-          @include image-2x("/img/ML/homepage_slack_logo");
+          @include image-2x("/img/ML/carrot_plus_slack");
           background-repeat: no-repeat;
           background-position: center;
-          background-size: 80px 80px;
-          width: 80px;
-          height: 80px;
+          background-size: 254px 100px;
+          width: 254px;
+          height: 100px;
           margin: 0 auto;
         }
 
@@ -525,14 +555,14 @@ div#wrap {
         margin: 60px auto 0px;
         border-radius: 8px;
         box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
-        padding: 40px 48px;
+        padding: 40px 24px;
 
         div.copy-separator {
           margin-top: 26px;
-          width: calc(100% + 80px);
+          width: calc(100% + 48px);
           height: 1px;
-          margin-left: -40px;
-          background-color: rgba(#E4E3DE,0.5);
+          margin-left: -24px;
+          background-color: rgba($carrot_light_gray_7,0.5);
         }
 
         div.copy {
@@ -543,20 +573,20 @@ div#wrap {
 
           div.copy-icon {
             float: left;
-            width: 70px;
-            height: 70px;
+            width: 114px;
+            height: 114px;
             background-repeat: no-repeat;
             background-position: center;
-            margin-top: 16px;
+            margin-top: -6px;
 
             &.copy-simplify {
               @include image-2x("/img/ML/homepage_illustration_simplify");
-              background-size: 66px 65px;
+              background-size: 108px 108px;
             }
 
             &.copy-expand {
               @include image-2x("/img/ML/homepage_illustration_expand");
-              background-size: 66px 65px;
+              background-size: 110px 114px;
             }
           }
 
@@ -565,7 +595,7 @@ div#wrap {
             @include avenir_H();
             font-size: 26px;
             text-align: left;
-            margin-left: 110px;
+            margin-left: 138px;
             letter-spacing: 0.18;
             line-height: 36px;
           }
@@ -576,7 +606,7 @@ div#wrap {
             font-size: 20px;
             line-height: 30px;
             text-align: left;
-            margin-left: 110px;
+            margin-left: 138px;
             margin-top: 8px;
           }
         }
@@ -590,14 +620,10 @@ div#wrap {
       div.above-noise-container {
         width: 1053px;
         height: 254px;
-        @include image-2x("/img/ML/homepage_footer_balloons");
-        background-size: 1053px 254px;
-        background-repeat: no-repeat;
-        background-position: center;
         margin: 0px auto;
 
         div.above-noise-title {
-          color: $carrot_dark_brown;
+          color: $carrot_dark_brown_1;
           @include avenir_H();
           font-size: 48px;
           margin-top: 16px;
