@@ -277,9 +277,9 @@ div#wrap {
         margin: -282px auto 0px;
         @include avenir_H();
         color: white;
-        font-size: 20px;
+        font-size: 24px;
         text-align: center;
-        padding: 160px 50px 0px;
+        padding: 170px 50px 0px;
         z-index: 12;
         position: relative;
 
@@ -412,6 +412,7 @@ div#wrap {
 
         @include mobile(){
           text-align: left;
+          margin-top: 40px;
         }
 
         div.why-carrot {

@@ -87,9 +87,7 @@
           {:src (cdn "/img/ML/new_homepage_screenshot.png")
            :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
         [:div.homepage-screenshot-bubble
-          (str
-           "Chat apps simplify real-time work, but constant chatter makes it easy to miss key information. "
-           "Carrot provides the big picture that keeps everyone on the same page.")]]
+          "Carrot provides the big picture that keeps everyone on the same page."]]
 
       [:section.second-section.group
         [:div.why-balloon.big-red]
