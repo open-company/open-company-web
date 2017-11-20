@@ -250,9 +250,10 @@
                               s)
                              :after-render (fn [s]
                               (when @(:first-render-done s)
-                                (let [wh (.-innerHeight js/window)
-                                      activity-modal (rum/ref-node s "activity-modal")
-                                      next-show-bottom-border (>= (.-clientHeight activity-modal) wh)]
+                                (let [activity-modal-content (sel1 [:div.activity-modal-content])
+                                      scroll-height (.-scrollHeight activity-modal-content)
+                                      client-height (.-clientHeight activity-modal-content)
+                                      next-show-bottom-border (> scroll-height client-height)]
                                   (when (not= @(::show-bottom-border s) next-show-bottom-border)
                                     (reset! (::show-bottom-border s) next-show-bottom-border))))
                               s)

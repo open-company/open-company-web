@@ -24,14 +24,15 @@ div.comments {
   }
 
   div.comments-internal {
-    padding-bottom: 143px;
+    padding-bottom: 123px;
     min-height: 127px;
     height: 100%;
     width: 100%;
-    bottom: 0px;
+    position: relative;
+    bottom: 8px;
     left: 0;
     right: 0;
-    position: absolute;
+    top: 0;
 
     div.comments-internal-scroll {
       overflow-x: hidden;
@@ -42,7 +43,13 @@ div.comments {
 
     &.empty {
       min-height: 100%;
-    
+      padding-bottom: 0px;
+
+      div.add-comment-box {
+          top: 45px;
+          bottom: 0px;
+      }
+
       div.comments-internal-empty {
         text-align: center;
         @include avenir_M();
@@ -139,11 +146,12 @@ div.comments {
       border: 1px solid rgba($carrot_light_gray_1, 0.5);
       box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
       padding: 16px;
+      position: relative;
       left: 0;
       right: 0;
-      position: absolute;
-      bottom: 0px;
+      bottom: 12px;
       width: 100%;
+      margin-top: 16px;
 
       div.successfully-posted {
         width: 168px;
