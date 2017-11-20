@@ -28,11 +28,15 @@
       @include mobile(){
         width: 100%;
         float: none;
+        text-align: center;
       }
 
       img.logo {
         width: 82px;
         height: 20px;
+        @include mobile(){
+          margin: 0 auto;
+        }
       }
 
       div.footer-small-links {
@@ -40,6 +44,10 @@
         color: $carrot_dark_brown;
         @include avenir_M();
         font-size: 13px;
+
+        @include mobile(){
+          margin: 16px auto;
+        }
 
         a {
           margin: 5px;
@@ -59,7 +67,7 @@
         margin-top: 40px;
 
         @include mobile(){
-          margin-bottom: 20px;
+          margin: 20px auto;
         }
 
         a.twitter {
@@ -83,6 +91,10 @@
         color: $carrot_dark_brown;
         margin-top: 50px;
         opacity: 0.8;
+
+        @include mobile(){
+          text-align: center;
+        }
       }
     }
 
@@ -121,20 +133,9 @@
           margin-right: 0px;
           width: 100%;
           margin-bottom: 20px;
-          height: 24px;
           overflow: hidden;
-          transition: height 230ms;
-          width: calc(100% + 30px);
-          margin-left: -15px;
-        }
-
-        &.expanded {
+          text-align: center;
           height: auto;
-
-          div.column-title:after {
-            content: "\f077";
-
-          }
         }
 
         &:last-child {
@@ -151,17 +152,7 @@
           @include mobile(){
             border-bottom: 1px solid rgba(255,255,255,0.5);
             padding: 2px 15px;
-          }
-
-          &:after {
-            @include mobile(){
-              font-family: FontAwesome;
-              content: "\f078";
-              font-size: 14px;
-              color: rgba(255,255,255,0.5);
-              float: right;
-              margin-top: -7px;
-            }
+            margin-top: 24px;
           }
         }
 
@@ -170,8 +161,10 @@
           color: $carrot_dark_brown;
           font-size: 13px;
           margin-top: 10px;
+
           @include mobile(){
             padding: 0 15px;
+            margin-top: 16px;
           }
 
           a {
