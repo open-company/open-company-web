@@ -95,7 +95,7 @@
                       (dis/dispatch!
                        [:input
                         [:org-editing]
-                        (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0})])
+                        (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
                       (iu/upload! {:accept "image/*"}
                         (fn [res]
                           (let [url (gobj/get res "url")
