@@ -68,11 +68,11 @@
           {:href "/"
            :class (when (= active-page "home") "active")}
           "Home"]]
-      [:div.site-mobile-menu-item
-        [:a
-          {:href "/pricing"
-           :class (when (= active-page "pricing") "active")}
-          "Pricing"]]
+      ; [:div.site-mobile-menu-item
+      ;   [:a
+      ;     {:href "/pricing"
+      ;      :class (when (= active-page "pricing") "active")}
+      ;     "Pricing"]]
       [:div.site-mobile-menu-item
         [:a
           {:href "/about"
