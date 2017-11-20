@@ -382,12 +382,26 @@
                                    (when (and (nil? (:name org-editing))
                                               (nil? (:logo-url org-editing))
                                               (seq teams-data))
-                                     (dis/dispatch!
-                                      [:input
-                                       [:org-editing]
-                                       (select-keys
-                                        (first teams-data)
-                                        [:name :logo-url :logo-width :logo-height])])))
+                                     (let [first-team (select-keys
+                                                       (first teams-data)
+                                                       [:name :logo-url :logo-width :logo-height])]
+                                       (dis/dispatch!
+                                        [:input
+                                         [:org-editing]
+                                         first-team])
+                                       (when-not (:logo-height first-team)
+                                         (let [img (gdom/createDom "img")]
+                                           (set! (.-onload img)
+                                            #(do
+                                              (dis/dispatch!
+                                               [:input
+                                                [:org-editing]
+                                                (merge @(drv/get-ref s :org-editing)
+                                                 {:logo-width (.-width img)
+                                                  :logo-height (.-height img)})])
+                                              (gdom/removeNode img)))
+                                           (gdom/append (.-body js/document) img)
+                                           (set! (.-src img) (:logo-url first-team)))))))
                                  s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
