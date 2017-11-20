@@ -34,20 +34,21 @@
     [:div.site-navbar-container
       [:a.navbar-brand-center
         {:href "/"}]
-      [:div.site-navbar-left
+      [:div.site-navbar-left.big-web-only
         [:a
           {:href "/about"}
           "About"]
-        [:a
+        [:a.big-web-only
           {:href "http://blog.carrot.io"}
           "Blog"]]
-      [:div.site-navbar-right
+      [:div.site-navbar-right.big-web-only
         [:a
           {:href "/login?slack"}
           "Get Started"]
         [:a.login
           {:href "/login"}
-          "Login"]]]])
+          "Login"]]
+      [:div.mobile-ham-menu.mobile-only]]])
 
 ;; Keep the old header since it still needs the mobile work: expand collapse menu etc.
 (comment
