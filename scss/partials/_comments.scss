@@ -43,7 +43,13 @@ div.comments {
 
     &.empty {
       min-height: 100%;
-    
+      padding-bottom: 0px;
+
+      div.add-comment-box {
+          top: 45px;
+          bottom: 0px;
+      }
+
       div.comments-internal-empty {
         text-align: center;
         @include avenir_M();
