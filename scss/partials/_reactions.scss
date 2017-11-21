@@ -2,55 +2,89 @@ div.reactions {
   height: 25px;
   float: left;
 
-  button.reaction-btn {
-    margin-right: 5px;
-    float: left;
-    outline: none;
-    opacity: 0.6;
-    position: relative;
-    height: 32px;
-    cursor: default;
-    border-radius: 100px;
-    background-color: $carrot_light_gray_2;
-    padding: 0px 16px;
-    // padding: .35em .9em;
-    color: $carrot_light_gray_3;
-    @include avenir_H();
-    font-size: 12px;
+  div.reactions-list {
 
-    span.reaction {
-      font-size: 20px;
-      top: 3px;
+    button.reaction-btn {
+      float: left;
+      outline: none;
       position: relative;
-    }
+      height: 32px;
+      margin-left: 1px;
+      cursor: default;
+      background-color: $carrot_light_gray_2;
+      padding: 0px 14px;
+      color: $carrot_light_gray_3;
+      @include avenir_H();
+      font-size: 14px;
 
-    &.has-reactions {
-      opacity: 1;
-    }
-
-    div.count {
-      margin-left: 5px;
-      // margin-top: -3px;
-      display: inline-block;
-    }
-
-    &.can-react {
-      cursor: pointer;
-      &:hover {
-        opacity: 1;
+      &:first-child {
+        border-top-left-radius: 100px;
+        border-bottom-left-radius: 100px;
       }
-    }
 
-    &.reacted {
-      background-color: $carrot_light_yellow;
+      &:last-child {
+        border-top-right-radius: 100px;
+        border-bottom-right-radius: 100px;
+      }
 
-      &:hover {
-        opacity: 0.8;
+      span.reaction {
+        font-size: 15px;
+        top: 3px;
+        position: relative;
+        display: inline-block;
+        filter: grayscale(100%);
       }
 
       div.count {
-        color: $carrot_yellow;
+        margin-left: 5px;
+        padding-top: 1px;
+        display: inline-block;
+        color: $carrot_light_gray_3;
+        vertical-align: bottom;
       }
+
+      &.can-react {
+        cursor: pointer;
+
+        &:hover {
+          span.reaction {
+            filter: grayscale(0%);
+          }
+        }
+      }
+
+      &.reacted {
+        background-color: $carrot_light_yellow;
+
+        span.reaction {
+          filter: grayscale(0%);
+        }
+
+        div.count {
+          color: #FDAB1D;
+        }
+      }
+
+      &.reaction-picker {
+        div.count {
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+  div.reactions-picker-container {
+    position: relative;
+    display: none;
+    z-index: 1234;
+
+    &.visible {
+      display: block;
+    }
+
+    div.emoji-mart {
+      position: absolute;
+      bottom: -31px;
     }
   }
 }
