@@ -893,21 +893,10 @@
   (api/get-comments activity-uuid)
   (assoc db :comment-add-finish true))
 
-(defn- current-board-key
-  "Find the board key for db based on the current path."
-  []
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)]
-        ;; if we are coming from all-posts
-        (if (:from-all-posts @router/path)
-          ;; We need to update the entry in all-posts data, not in the board data
-          (dispatcher/all-posts-key org-slug)
-          (dispatcher/board-data-key org-slug board-slug))))
-
 (defn- handle-reaction-to-entry
   "Update the data in db to reflect the reaction toggle on an entry."
   [db item-uuid reaction-data]
-  (let [board-key (current-board-key)
+  (let [board-key (dispatcher/current-board-key)
         board-data (get-in db board-key)
         entry-data (get (get board-data :fixed-items) item-uuid)
         old-reactions-loading (or (:reactions-loading entry-data) [])
@@ -925,6 +914,8 @@
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-id)
         comments-data (get-in db comments-key)
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
+    ;; the comment has yet to be stored locally in app state so ignore and
+    ;; wait for server side reaction
     (if comment-idx
       (let [comment-data (nth comments-data comment-idx)
             reactions-data (:reactions comment-data)
@@ -956,12 +947,11 @@
 (defn- handle-reaction-to-entry-finish
   "Update an entry with the reaction data from the API."
   [db item-data reaction reaction-data]
-  (let [board-key (current-board-key)
-        board-data (get-in db board-key)
+  (let [board-data (get-in db (dispatcher/current-board-key))
         activity-uuid (:uuid item-data)
         entry-data (get-in board-data [:fixed-items activity-uuid])
         next-reactions-loading (utils/vec-dissoc (:reactions-loading entry-data) reaction)
-        entry-key (concat board-key [:fixed-items activity-uuid])]
+        entry-key (concat (dispatcher/current-board-key) [:fixed-items activity-uuid])]
     (if (nil? reaction-data)
       (let [updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)]
         (assoc-in db entry-key updated-entry-data))
@@ -1053,11 +1043,10 @@
           (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
           db)))))
 
-(defn- update-reaction
-  "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
+(defn- update-entry-reaction
+    "Need to update the local state with the data we have, if the interaction is from the actual unchecked-short
    we need to refresh the entry since we don't have the links to delete/add the reaction."
-  [db interaction-data add-event?]
-  (timbre/debug interaction-data)
+    [db interaction-data add-event?]
   (let [; Get the current router data
         org-slug (router/current-org-slug)
         is-all-posts (:from-all-posts @router/path)
@@ -1104,6 +1093,40 @@
           ;; force refresh of topic
           (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
           db)))))
+
+(defn- update-comment-reaction
+  [db interaction-data add-event?]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (router/current-activity-id)
+        item-uuid (:resource-uuid interaction-data)
+        reaction-data (:interaction interaction-data)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
+    ;; the comment has yet to be stored locally in app state so ignore and
+    ;; wait for server side reaction
+    (when comment-idx
+      (let [comment-data (nth comments-data comment-idx)
+            reactions-data (:reactions comment-data)
+            reaction (:reaction reaction-data)
+            reaction-data-with-count (assoc reaction-data :count (:count interaction-data))
+            is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+            with-reacted (if is-current-user
+                           (assoc reaction-data-with-count :reacted add-event?)
+                           reaction-data-with-count)
+            reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
+            new-reactions-data (assoc reactions-data reaction-idx with-reacted)
+            new-comment-data (assoc comment-data :reactions new-reactions-data)
+            new-comments-data (assoc comments-data comment-idx new-comment-data)]
+        (assoc-in db comments-key new-comments-data)))))
+
+(defn- update-reaction
+  [db interaction-data add-event?]
+  (let [comment (update-comment-reaction db interaction-data add-event?)]
+    (if comment
+      comment
+      (update-entry-reaction db interaction-data add-event?))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
   [db [_ interaction-data]]

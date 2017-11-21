@@ -65,6 +65,17 @@
 
 (def whats-new-key [:whats-new-data])
 
+(defn current-board-key
+  "Find the board key for db based on the current path."
+  []
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)]
+        ;; if we are coming from all-posts
+        (if (:from-all-posts @router/path)
+          ;; We need to update the entry in all-posts data, not in the board data
+          (all-posts-key org-slug)
+          (board-data-key org-slug board-slug))))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
