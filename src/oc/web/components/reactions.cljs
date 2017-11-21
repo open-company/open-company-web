@@ -50,7 +50,7 @@
                            (reset! (::window-click s) nil))
                          s)}
   [s entry-data]
-  (let [reactions-data (:reactions entry-data)
+  (let [reactions-data (vec (:reactions entry-data))
         reactions-loading (:reactions-loading entry-data)
         react-link (utils/link-for (:links entry-data) "react")
         should-show-picker? (and react-link
