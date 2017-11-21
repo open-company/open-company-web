@@ -12,13 +12,12 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.components.ui.mixins :as mixins]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
@@ -125,7 +124,6 @@
     (when (and (utils/link-for (:links activity-data) "partial-update")
                (not @(::showing-dropdown state))
                (not @(::move-activity state))
-               (not @(::share-dropdown state))
                (not (.contains (.-classList (.-activeElement js/document)) "add-comment")))
       (real-start-editing state focus))))
 
@@ -190,11 +188,9 @@
                             (rum/local false ::dismiss)
                             (rum/local false ::animate)
                             (rum/local false ::showing-dropdown)
-                            (rum/local nil ::window-resize-listener)
                             (rum/local nil ::esc-key-listener)
                             (rum/local false ::move-activity)
                             (rum/local default-min-modal-height ::activity-modal-height)
-                            (rum/local false ::share-dropdown)
                             (rum/local nil ::window-click)
                             (rum/local false ::show-bottom-border)
                             ;; Editing locals
@@ -246,10 +242,7 @@
                                               (utils/event-inside? e (sel1 [:div.activity-modal :div.more-dropdown])))
                                              (not
                                               (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-move]))))
-                                    (reset! (::showing-dropdown s) false))
-                                  (when
-                                   (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-modal-share])))
-                                    (reset! (::share-dropdown s) false)))))
+                                    (reset! (::showing-dropdown s) false)))))
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (when (:modal-editing modal-data)
                                   (utils/after 1000
@@ -264,10 +257,6 @@
                                     (reset! (::show-bottom-border s) next-show-bottom-border))))
                               s)
                              :will-unmount (fn [s]
-                              ;; Remove window resize listener
-                              (when @(::window-resize-listener s)
-                                (events/unlistenByKey @(::window-resize-listener s))
-                                (reset! (::window-resize-listener s) nil))
                               (when @(::window-click s)
                                 (events/unlistenByKey @(::window-click s))
                                 (reset! (::window-click s) nil))
@@ -310,10 +299,11 @@
                     (close-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
-        [:button.carrot-modal-close.mlb-reset
-          {:on-click #(if editing
-                        (dismiss-editing? s true)
-                        (close-clicked s))}]
+        (when-not (:activity-share modal-data)
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(if editing
+                          (dismiss-editing? s true)
+                          (close-clicked s))}])
         [:div.activity-modal.group
           {:ref "activity-modal"
            :class (str "activity-modal-" (:uuid activity-data))}
@@ -323,11 +313,11 @@
               [:div.name (:name (first (:author activity-data)))]
               [:div.time-since
                 [:time
-                  {:date-time (:created-at activity-data)
+                  {:date-time (:published-at activity-data)
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :title (utils/activity-date-tooltip activity-data)}
-                  (utils/time-since (:created-at activity-data))]]]
+                  (utils/time-since (:published-at activity-data))]]]
             [:div.activity-modal-header-right
               (when (or (utils/link-for (:links activity-data) "partial-update")
                         (utils/link-for (:links activity-data) "delete"))
@@ -367,7 +357,10 @@
                                       :on-change #(close-clicked s nil)}))]))
               (activity-attachments activity-data false)
               (if editing
-                (topics-dropdown (:modal-editing-data modal-data) :modal-editing-data)
+                (topics-dropdown
+                 (distinct (:entry-edit-topics modal-data))
+                 (:modal-editing-data modal-data)
+                 :modal-editing-data)
                 (when (:topic-slug activity-data)
                   (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                     [:div.activity-tag.on-gray
@@ -414,7 +407,8 @@
                   [:div.activity-modal-footer.group
                     {:class (when @(::show-bottom-border s) "scrolling-content")}
                     (when-not (js/isIE)
-                      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)}))
+                      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                                     :container-selector "div.activity-modal-content"}))
                     [:div.activity-modal-footer-right
                       [:button.mlb-reset.mlb-link-black.cancel-edit
                         {:on-click #(dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))}
@@ -432,40 +426,15 @@
                       (when (utils/link-for (:links activity-data) "partial-update")
                         [:button.mlb-reset.post-edit
                           {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                                    (not @(::showing-dropdown s))
-                                                                    (not @(::share-dropdown s)))})
+                                                                    (not @(::showing-dropdown s)))})
                            :on-click (fn [e]
                                        (utils/remove-tooltips)
                                        (real-start-editing s :headline))}
                           "Edit"])
                       (when (utils/link-for (:links activity-data) "share")
                         [:div.activity-modal-share
-                          (when @(::share-dropdown s)
-                            [:div.share-dropdown
-                              [:div.triangle]
-                              [:ul.share-dropdown-menu
-                                (when (jwt/team-has-bot? (:team-id (dis/org-data)))
-                                  [:li.share-dropdown-item
-                                    {:on-click (fn [e]
-                                                 (reset! (::share-dropdown s) false)
-                                                 ; open the activity-share-modal component
-                                                 (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                                    "Slack"])
-                                [:li.share-dropdown-item
-                                  {:on-click (fn [e]
-                                               (reset! (::share-dropdown s) false)
-                                               ; open the activity-share-modal component
-                                               (dis/dispatch! [:activity-share-show :email activity-data]))}
-                                  "Email"]
-                                [:li.share-dropdown-item
-                                  {:on-click (fn [e]
-                                               (reset! (::share-dropdown s) false)
-                                               ; open the activity-share-modal component
-                                               (dis/dispatch! [:activity-share-show :link activity-data]))}
-                                  "Link"]]])
                           [:button.mlb-reset.share-button
-                            {:on-click #(do
-                                         (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
+                            {:on-click #(dis/dispatch! [:activity-share-show activity-data])}
                             "Share"]])]])]]
             ;; Right column
             (when show-comments?

@@ -9,9 +9,11 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.activity-utils :as au]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.mixins.activity :as am]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
@@ -44,108 +46,26 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(def default-body-height 72)
-(def default-all-posts-body-height 144)
-
-(defn- truncate-body [body-sel is-all-posts]
-  (let [$body-els (js/$ (str body-sel ">*"))
-        partial-heights (atom [])
-        found (atom false)]
-    (.each $body-els (fn [idx el]
-     (when-not @found
-       (this-as this
-         (let [$this (js/$ this)
-               el-h (.outerHeight $this true) ;; Include margins in height calculation
-               prev-height (apply + @partial-heights)
-               actual-height (+ prev-height el-h)
-               max-height (if is-all-posts default-all-posts-body-height default-body-height)
-               truncate-height  (cond
-                                  (zero? (- max-height prev-height))
-                                  0
-                                  (<= (- max-height prev-height) 24)
-                                  24
-                                  (<= (- max-height prev-height) (* 24 2))
-                                  (* 24 2)
-                                  (<= (- max-height prev-height) (* 24 3))
-                                  (* 24 3)
-                                  (< (- max-height prev-height) (* 24 4))
-                                  (* 24 4)
-                                  (< (- max-height prev-height) (* 24 5))
-                                  (* 24 5)
-                                  (< (- max-height prev-height) (* 24 6))
-                                  (* 24 6))]
-           (swap! partial-heights #(vec (conj % el-h)))
-           (when (>= actual-height max-height)
-             (reset! found true)
-             (.dotdotdot $this
-               #js {:height truncate-height
-                    :wrap "word"
-                    :watch true
-                    :ellipsis "..."})))))))))
-
-(defn- get-first-body-thumbnail [body is-ap]
-  (let [$body (js/$ (str "<div>" body "</div>"))
-        thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
-        found (atom nil)]
-    (dotimes [el-num (.-length thumb-els)]
-      (let [el (aget thumb-els el-num)
-            $el (js/$ el)]
-        (when-not @found
-          (if (= (s/lower (.-tagName el)) "img")
-            (let [width (.attr $el "width")
-                  height (.attr $el "height")]
-              (when (and (not @found)
-                         (or (<= width (* height 2))
-                             (<= height (* width 2))))
-                (reset! found
-                  {:type "image"
-                   :thumbnail (if (and (not is-ap) (.data $el "thumbnail"))
-                                (.data $el "thumbnail")
-                                (.attr $el "src"))})))
-            (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
-    @found))
-
 (rum/defcs activity-card < rum/reactive
+                        ;; Locals
                         (rum/local false ::more-dropdown)
-                        (rum/local false ::truncated)
-                        (rum/local nil ::first-body-image)
                         (rum/local false ::move-activity)
                         (rum/local nil ::window-click)
-                        (rum/local false ::share-dropdown)
+                        ;; Derivatives
                         (drv/drv :org-data)
+                        ;; Mixins
+                        am/truncate-body-mixin
+                        am/body-thumbnail-mixin
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
                                 body-a-sel (str body-sel " a")
                                 is-all-posts (nth (:rum/args s) 4 false)]
                             ; Prevent body links in FoC
-                            (.click (js/$ body-a-sel) #(.stopPropagation %))
-                            ; Truncate body text with dotdotdot
-                            (when (compare-and-set! (::truncated s) false true)
-                              (truncate-body body-sel is-all-posts)
-                              (utils/after 10 #(do
-                                                 (.trigger (js/$ body-sel) "destroy")
-                                                 (truncate-body body-sel is-all-posts)))))
-                          s)
-                         :will-mount (fn [s]
-                          (let [activity-data (first (:rum/args s))
-                                is-all-posts (nth (:rum/args s) 4 false)]
-                            (reset!
-                             (::first-body-image s)
-                             (get-first-body-thumbnail (:body activity-data) is-all-posts)))
-                          s)
-                         :did-remount (fn [o s]
-                          (let [old-activity-data (first (:rum/args o))
-                                new-activity-data (first (:rum/args s))
-                                is-all-posts (nth (:rum/args s) 4 false)]
-                            (when (not= (:body old-activity-data) (:body new-activity-data))
-                              (reset!
-                               (::first-body-image s)
-                               (get-first-body-thumbnail (:body new-activity-data) is-all-posts))
-                              (.trigger
-                               (js/$ (str "div.activity-card-" (:uuid old-activity-data) " div.activity-card-body"))
-                               "destroy")
-                              (reset! (::truncated s) false)))
+                            (.click (js/$ body-a-sel) #(.stopPropagation %)))
+                          (doto (js/$ "[data-toggle=\"tooltip\"]")
+                            (.tooltip "fixTitle")
+                            (.tooltip "hide"))
                           s)
                          :did-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
@@ -158,19 +78,17 @@
                                 (when (and
                                        (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
                                        (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
-                                  (reset! (::more-dropdown s) false))
-                                (when (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-share]])))
-                                  (reset! (::share-dropdown s) false))))))
+                                  (reset! (::more-dropdown s) false))))))
                           s)
                          :will-unmount (fn [s]
                           (events/unlistenByKey @(::window-click s))
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
-  (let [attachments (utils/get-attachments-from-body (:body activity-data))]
+  (let [attachments (utils/get-attachments-from-body (:body activity-data))
+        share-link (utils/link-for (:links activity-data) "share")]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
-                                                     @(::share-dropdown s)
                                                      @(::move-activity s))
                                 :all-posts-card is-all-posts})
        :on-click (fn [e]
@@ -184,8 +102,7 @@
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
                       @(::more-dropdown s)
-                      @(::move-activity s)
-                      @(::share-dropdown s))
+                      @(::move-activity s))
 
                       (dis/dispatch!
                        [:activity-modal-fade-in
@@ -228,6 +145,12 @@
                   [:div.activity-more-dropdown-menu
                     [:div.triangle]
                     [:ul.activity-card-more-menu
+                      (when share-link
+                        [:li
+                          {:on-click #(do
+                                        (reset! (::more-dropdown s) false)
+                                        (dis/dispatch! [:activity-share-show activity-data]))}
+                          "Share"])
                       (when (and (utils/link-for (:links activity-data) "partial-update")
                                  (> (count all-boards) 1))
                         [:li
@@ -277,15 +200,16 @@
               emojied-body (utils/emojify body-without-preview)]
           [:div.activity-card-body
             {:dangerouslySetInnerHTML emojied-body
+             :ref "activity-body"
              :class (utils/class-set {:has-body has-body
                                       :has-headline has-headline
-                                      :has-media-preview @(::first-body-image s)})}])
+                                      :has-media-preview @(:body-thumbnail s)})}])
         ; Body preview
-        (when @(::first-body-image s)
-          [:div.activity-card-media-preview-container
-            {:class (or (:type @(::first-body-image s)) "image")}
+        (when @(:body-thumbnail s)
+          [:div.media-preview-container
+            {:class (or (:type @(:body-thumbnail s)) "image")}
             [:img
-              {:src (:thumbnail @(::first-body-image s))}]])]
+              {:src (:thumbnail @(:body-thumbnail s))}]])]
       [:div.activity-card-footer.group
         (interactions-summary activity-data)
         (when share-thoughts
@@ -298,8 +222,7 @@
              :data-placement "top"
              :data-container "body"
              :class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                      (not @(::more-dropdown s))
-                                                      (not @(::share-dropdown s)))})
+                                                      (not @(::more-dropdown s)))})
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
@@ -308,36 +231,4 @@
                            (:board-slug activity-data)
                            (:uuid activity-data)
                            (:type activity-data)
-                           true]))}])
-        (when (utils/link-for (:links activity-data) "share")
-          [:div.activity-share
-            [:button.mlb-reset.activity-share-bt
-              {:title "Share"
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :on-click #(reset! (::share-dropdown s) (not @(::share-dropdown s)))}]
-            (when @(::share-dropdown s)
-              [:div.activity-share-dropdown
-                [:div.triangle]
-                [:ul.activity-share-dropdown-list
-                  (when (and (utils/link-for (:links activity-data) "share")
-                             (jwt/team-has-bot? (:team-id (dis/org-data))))
-                    [:li.activity-share-dropdown-item
-                      {:on-click (fn [e]
-                                   (reset! (::share-dropdown s) false)
-                                   ; open the activity-share-modal component
-                                   (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                      "Slack"])
-                  [:li.activity-share-dropdown-item
-                    {:on-click (fn [e]
-                                 (reset! (::share-dropdown s) false)
-                                 ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share-show :email activity-data]))}
-                    "Email"]
-                  [:li.activity-share-dropdown-item
-                    {:on-click (fn [e]
-                                 (reset! (::share-dropdown s) false)
-                                 ; open the activity-share-modal component
-                                 (dis/dispatch! [:activity-share-show :link activity-data]))}
-                    "Link"]]])])]]))
+                           true]))}])]]))

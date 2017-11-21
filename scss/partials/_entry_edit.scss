@@ -57,8 +57,40 @@ div.entry-edit-modal-container {
           margin-top: 5px;
 
           span {
+            float: left;
+          }
+
+          div.boards-dropdown-caret {
             @include avenir_H();
             color: $carrot_dark_gray;
+            float: left;
+            margin-left: 6px;
+            cursor: pointer;
+            position: relative;
+
+            &:after {
+              float: right;
+              content: "";
+              background-image: cdnUrl("/img/ML/board_settings.svg");
+              background-size: 8px 8px;
+              background-repeat: no-repeat;
+              background-position: 0px 9px;
+              width: 20px;
+              height: 20px;
+              margin-top: -3px;
+              margin-left: 6px;
+              opacity: 0.8;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+
+            div.dropdown-list-container {
+              top: 20px;
+              left: -44px;
+              width: 200px;
+            }
           }
         }
       }
@@ -175,7 +207,8 @@ div.entry-edit-modal-container {
           margin-left: 15px;
           float: right;
           height: 40px;
-          width: 96px;
+          width: auto;
+          min-width: 90px;
         }
       }
     }

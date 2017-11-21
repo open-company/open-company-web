@@ -358,7 +358,7 @@ div.activity-modal-container {
                   @include avenir_H();
                   font-size: 12px;
                   color: $carrot_light_gray_3;
-                  background-color: #F5F4F1;
+                  background-color: $carrot_light_gray_9;
                   opacity: 0.7;
 
                   &:hover {
@@ -384,7 +384,7 @@ div.activity-modal-container {
                     @include avenir_H();
                     font-size: 12px;
                     color: $carrot_light_gray_3;
-                    background-color: #F5F4F1;
+                    background-color: $carrot_light_gray_9;
                     opacity: 0.7;
 
                     &:hover {
@@ -462,8 +462,6 @@ div.activity-modal-container {
 
           div.activity-right-column-content {
             padding: 24px;
-            overflow-x: hidden;
-            overflow-y: auto;
             position: absolute;
             bottom: 0px;
             width: 100%;

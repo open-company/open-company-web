@@ -28,7 +28,7 @@
         org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         topic-data (when (string? board-filters)
-                     (utils/get-topic (:topics board-data) board-filters))]
+                     (utils/get-topic (:topics board-data) :slug board-filters))]
     [:div.filters-dropdown.group
       (if (string? board-filters)
         [:div.topic-filter-center.group

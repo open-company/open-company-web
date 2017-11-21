@@ -6,7 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
-            [oc.web.components.ui.mixins :refer (first-render-mixin)]
+            [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.reactions :as reactions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -94,7 +94,8 @@
       (when-not (js/isIE)
         (emoji-picker {:width 32
                        :height 32
-                       :add-emoji-cb #(enable-add-comment? s)}))]))
+                       :add-emoji-cb #(enable-add-comment? s)
+                       :container-selector "div.add-comment-box"}))]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)

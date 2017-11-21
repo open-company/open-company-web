@@ -297,19 +297,23 @@
         blue (take 2 (drop 4 colors))]
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
-(defn get-topic [topics-data topic-slug]
-  (some #(when (= (:slug %) topic-slug) %) topics-data))
+(defn get-topic [topics-data k v]
+  (some #(when (= (get % k) v) %) topics-data))
 
 (defn fix-entry
   "Add `:read-only` and `:topic-name` keys to the entry map"
   [entry-body board-data topics-data]
-  (let [topic-name (or (:topic-name entry-body) (:name (get-topic topics-data (:topic-slug entry-body))))]
+  (let [topic (if (seq (:topic-slug entry-body))
+                (get-topic topics-data :slug (:topic-slug entry-body))
+                (when (seq (:topic-name entry-body))
+                  (get-topic topics-data :name (:topic-name entry-body))))]
     (-> entry-body
       (assoc :content-type "entry")
       (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :board-slug (:slug board-data))
-      (assoc :board-name (:name board-data))
-      (assoc :topic-name topic-name))))
+      (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
+      (assoc :board-name (or (:board-name entry-body) (:name board-data)))
+      (assoc :topic-slug (or (:topic-slug entry-body) (:slug topic)))
+      (assoc :topic-name (or (:topic-name entry-body) (:name topic))))))
 
 (defn fix-board
   "Add topic name in each topic and a topic sorter"
@@ -344,32 +348,6 @@
   (let [links (:links org-data)
         read-only (readonly-org? links)]
     (assoc org-data :read-only read-only)))
-
-(defn sort-entries [entries]
-  (let [sort-pred (fn [a b] (compare (:created-at b) (:created-at a)))]
-    (vec (sort sort-pred entries))))
-
-(defn entry-next
-  "Return the first future entry"
-  [entries as-of]
-  (when (pos? (count entries))
-    (first (remove nil? (map
-                          (fn [r]
-                            (when (= (:created-at r) as-of)
-                              (let [idx (.indexOf (to-array entries) r)]
-                                (get entries (inc idx)))))
-                          entries)))))
-
-(defn entry-prev
-  "Return the first future entry"
-  [entries as-of]
-  (when (pos? (count entries))
-    (first (remove nil? (map
-                          (fn [r]
-                            (when (= (:created-at r) as-of)
-                              (let [idx (.indexOf (to-array entries) r)]
-                                (get entries (dec idx)))))
-                          entries)))))
 
 (defn px [n]
   (str n "px"))
@@ -1109,7 +1087,8 @@
 (defn copy-to-clipboard []
   (try
     (.execCommand js/document "copy")
-    (catch :default e)))
+    (catch :default e
+      false)))
 
 (defn ordinal-suffix [i]
   (let [j (mod i 10)

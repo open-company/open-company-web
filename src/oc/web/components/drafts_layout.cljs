@@ -3,38 +3,67 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.activity-utils :as au]
+            [oc.web.mixins.activity :as am]))
 
-(rum/defc draft-card < rum/static
-  [draft]
+(rum/defcs draft-card < am/truncate-body-mixin
+                        am/body-thumbnail-mixin
+                        {:after-render (fn [s]
+                          (let [draft-data (first (:rum/args s))
+                                body-sel (str "div.draft-card-" (:uuid draft-data) " div.draft-card-body")
+                                body-a-sel (str body-sel " a")]
+                            ; Prevent body links in FoC
+                            (.click (js/$ body-a-sel) #(.stopPropagation %)))
+                          s)}
+  [s draft]
   [:div.draft-card
-    {:class (when-not draft "empty-draft")
+    {:class (utils/class-set {:empty-draft (not draft)
+                              (str "draft-card-" (:uuid draft)) true})
      :key (str "draft-" (:created-at draft))
      :on-click #(when draft
-                  ; TODO: Fix draft editing
-                  ; (router/nav! (oc-urls/story-edit (router/current-org-slug) (:board-slug draft) (:uuid draft)))
-                  )}
+                  (dis/dispatch! [:entry-edit draft]))}
     (when draft
       [:div.draft-card-inner
-        (when (:banner-url draft)
-          [:div.draft-banner
-            {:style #js {:backgroundImage (str "url(\"" (:banner-url draft) "\")")
-                         :height (str (min 234 (* (/ (:banner-height draft) (:banner-width draft)) 430)) "px")}}])
-        [:div.draft-card-title
-          {:dangerouslySetInnerHTML
-            (utils/emojify (utils/strip-HTML-tags (if (empty? (:title draft)) "Untitled Draft" (:title draft))))}]
-        (let [fixed-body (utils/body-without-preview (:body draft))
-              empty-body? (empty? (utils/strip-HTML-tags fixed-body))
-              final-body (utils/emojify (if empty-body? "Say something..." fixed-body))]
-          [:div
+        [:div.draft-card-content.group
+          [:div.draft-card-title
+            {:dangerouslySetInnerHTML
+              (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft))
+                                                     "Untitled Draft"
+                                                     (:headline draft))))}]
+          (let [fixed-body (utils/body-without-preview (:body draft))
+                empty-body? (empty? (utils/strip-HTML-tags fixed-body))]
             [:div.draft-card-body
-              {:class (utils/class-set {:empty-body empty-body?})
-               :dangerouslySetInnerHTML final-body}]
-            ; (when (> (count fixed-body) 50)
-            ;   [:div.bottom-gradient])
-            ])
+              {:class (utils/class-set {:empty-body empty-body?
+                                        :has-media-preview @(:body-thumbnail s)})
+               :ref "activity-body"
+               :dangerouslySetInnerHTML (utils/emojify fixed-body)}])
+          ; Body preview
+          (when @(:body-thumbnail s)
+            [:div.media-preview-container
+              {:class (or (:type @(:body-thumbnail s)) "image")}
+              [:img
+                {:src (:thumbnail @(:body-thumbnail s))}]])]
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
+          (when (utils/link-for (:links draft) "delete")
+            [:button.delete-draft.mlb-reset
+              {:title "Delete draft"
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (let [alert-data {:icon "/img/ML/trash.svg"
+                                             :action "delete-entry"
+                                             :message "Delete this draft?"
+                                             :link-button-title "No"
+                                             :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                             :solid-button-title "Yes"
+                                             :solid-button-cb #(do
+                                                                (dis/dispatch! [:activity-delete draft])
+                                                                (dis/dispatch! [:alert-modal-hide]))}]
+                            (dis/dispatch! [:alert-modal-show alert-data])))}
+              [:i.mdi..mdi-delete]])
           [:span.last-edit (str "Last edited " (utils/time-since (:updated-at draft)))]]
         ; [:div.draft-card-footer.group
         ;   [:div.draft-card-footer-left

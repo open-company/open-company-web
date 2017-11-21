@@ -49,6 +49,7 @@
     [cljsjs/web-animations "2.1.4-0"] ; JavaScript implementation of the Web Animations API https://github.com/web-animations/web-animations-js
     [cljsjs/moment-timezone "0.5.11-0"] ; Timezone support for moment.js https://github.com/moment/moment-timezone/
     [cljsjs/filestack "0.9.9-0"] ; Filestack image manipulatino and storing https://github.com/filestack/filestack-js
+    [cljsjs/emoji-mart "2.2.1-0"] ; EmojiMart picker for native emoji picking https://github.com/missive/emoji-mart
 
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
@@ -112,20 +113,9 @@
                        ['cljsjs/emojione
                         "cljsjs/emojione/common/css/emojione.min.css"
                         "public/css/emojione.min.css"]
-                       ;; We have a local copy of the sprites css
-                       ;; to make sure it's loaded from our CDN
-                       ; ['cljsjs/emojione
-                       ;   "cljsjs/emojione/common/sprites/emojione.sprites.css"
-                       ;   "public/css/emojione.sprites.css"]
-                       ['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.png"
-                        "public/img/emojione.sprites.png"]
-                       ['cljsjs/emojione
-                        "cljsjs/emojione/common/sprites/emojione.sprites.svg"
-                        "public/img/emojione.sprites.svg"]
-                       ['cljsjs/emojione-picker
-                        "cljsjs/emojione-picker/common/emojione-picker.css"
-                        "public/css/emojione-picker.css"]
+                       ['cljsjs/emoji-mart
+                        "cljsjs/emoji-mart/common/emoji-mart.css"
+                        "public/css/emoji-mart.css"]
                        ;; MediumEditor default theme
                        ['cljsjs/medium-editor
                         "cljsjs/medium_editor/common/medium-editor.css"

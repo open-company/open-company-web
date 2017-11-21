@@ -197,6 +197,11 @@ provided in the table below:
 |  :activity-get/finish | API | Activity (secure or not) loaded from API. |
 |  :activity-modal-edit | UI | Activate editing in modal. |
 |  :activity-move | UI | Move an activity from a board to another. |
+|  :activity-share-hide | UI | Hide the share modal. |
+|  :activity-share-reset | UI | Reset the shared data to start a new share. |
+|  :activity-share-show | UI | Show the share modal. |
+|  :activity-share | UI | Start share request with the passed medium and data. |
+|  :activity-share/finish | API | Share request finished. |
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |
@@ -241,6 +246,9 @@ provided in the table below:
 |  :entry-modal-save | UI | Save editing from modal. |
 |  :entry-point | API | Read the Api entry point and save the data in the app state. |
 |  :entry-point-get | UI | Load the storage entry point passing some flags to add to the app-state. |
+|  :entry-publish | UI | Publish the edited entry. |
+|  :entry-publish/failed | API | Publish entry reuqest finish but failed. |
+|  :entry-publish/finish | API | Publish entry reuqest finish, refresh the board data. |
 |  :entry-save | UI | Save the edited entry. |
 |  :entry-save/failed | API | Save entry reuqest finish but failed. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |

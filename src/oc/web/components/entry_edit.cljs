@@ -4,17 +4,20 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
-            [oc.web.components.ui.mixins :as mixins]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -107,11 +110,18 @@
     (let [raw-html (.-innerHTML body-el)]
       (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
 
+(defn- is-publishable? [entry-editing]
+  (and (seq (:board-slug entry-editing))
+       (or (seq (:headline entry-editing))
+           (seq (:body entry-editing)))))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
+                        (drv/drv :org-data)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :board-filters)
+                        (drv/drv :editable-boards)
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         ;; Locals
@@ -124,6 +134,8 @@
                         (rum/local nil ::uploading-media)
                         (rum/local false ::show-divider-line)
                         (rum/local false ::saving)
+                        (rum/local false ::publishing)
+                        (rum/local false ::show-boards-dropdown)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -142,8 +154,7 @@
                             (reset! (::initial-headline s) initial-headline)
                             (when (and (string? board-filters)
                                        (nil? (:topic-slug entry-editing)))
-                               (let [topics @(drv/get-ref s :entry-edit-topics)
-                                     topic (first (filter #(= (:slug %) board-filters) topics))]
+                               (let [topic (first (filter #(= (:slug %) board-filters) (:topics-list entry-editing)))]
                                  (when topic
                                    (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
                                    (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
@@ -155,11 +166,27 @@
                           s)
                          :before-render (fn [s] (calc-edit-entry-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
-                         :did-remount (fn [s]
-                          (when @(::saving s)
-                            (let [entry-editing @(drv/get-ref s :entry-editing)]
+                         :did-remount (fn [_ s]
+                          (let [entry-editing @(drv/get-ref s :entry-editing)]
+                            ;; Entry is saving
+                            (when @(::saving s)
+                              ;: Save request finished
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
+                                (when-not (:error entry-editing)
+                                  ;; If it's not published already redirect to drafts board
+                                  (when (not= (:status entry-editing) "published")
+                                    (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
+                                  (real-close s))))
+                            (when @(::publishing s)
+                              (when (not (:publishing entry-editing))
+                                (reset! (::publishing s) false)
+                                ;; Redirect to the publishing board if the slug is available
+                                (when (seq (:board-slug entry-editing))
+                                  (utils/after
+                                   180
+                                   #(router/nav!
+                                     (oc-urls/board (router/current-org-slug) (:board-slug entry-editing)))))
                                 (when-not (:error entry-editing)
                                   (real-close s)))))
                           s)
@@ -172,13 +199,24 @@
                             (reset! (::headline-input-listener s) nil))
                           s)}
   [s]
-  (let [current-user-data (drv/react s :current-user-data)
+  (let [org-data          (drv/react s :org-data)
+        current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
         alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
         wh (.-innerHeight js/window)
-        media-input (drv/react s :media-input)]
+        media-input (drv/react s :media-input)
+        all-boards (drv/react s :editable-boards)
+        entry-board (get all-boards (:board-slug entry-editing))
+        board-topics (if (seq (:topic-slug entry-editing))
+                       (distinct
+                        (vec
+                         (conj
+                          (:topics entry-board)
+                          {:slug (:topic-slug entry-editing)
+                           :name (:topic-name entry-editing)})))
+                       (:topics entry-board))]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
@@ -197,8 +235,26 @@
           {:ref "entry-edit-modal"}
           [:div.entry-edit-modal-header.group
             (user-avatar-image current-user-data)
-            [:div.posting-in (if new-entry? "Posting" "Posted") " in " [:span (:board-name entry-editing)]]
-            (topics-dropdown entry-editing :entry-editing)]
+            [:div.posting-in
+              [:span
+                (if (:uuid entry-editing)
+                  "Draft for "
+                  "Posting in ")]
+              [:div.boards-dropdown-caret
+                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
+                (:board-name entry-editing)
+                (when @(::show-boards-dropdown s)
+                  (dropdown-list
+                   {:items (map
+                            #(clojure.set/rename-keys % {:name :label :slug :value})
+                            (vals all-boards))
+                    :value (:board-slug entry-editing)
+                    :on-blur #(reset! (::show-boards-dropdown s) false)
+                    :on-change (fn [item]
+                                 (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                                 (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
+                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
+            (topics-dropdown board-topics entry-editing :entry-editing)]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
@@ -230,16 +286,25 @@
           {:class (when-not @(::show-divider-line s) "not-visible")}]
         [:div.entry-edit-modal-footer.group
           (when-not (js/isIE)
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)}))
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :container-selector "div.entry-edit-modal"}))
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (clean-body)
-                          (reset! (::saving s) true)
-                          (dis/dispatch! [:entry-save]))
-             :disabled (not (:has-changes entry-editing))}
-             (when @(::saving s)
-               (small-loading))
-            (if new-entry? "Post" "Save")]
+                          (reset! (::publishing s) true)
+                          (dis/dispatch! [:entry-publish]))
+             :disabled (or @(::publishing s)
+                           (not (is-publishable? entry-editing)))}
+            (when @(::publishing s)
+              (small-loading))
+            "Post"]
           [:button.mlb-reset.mlb-link-black.form-action-bt
-            {:on-click #(cancel-clicked s)}
-            "Cancel"]]]]]))
+            {:disabled (or @(::saving s)
+                           (not (:has-changes entry-editing)))
+             :on-click #(do
+                          (clean-body)
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:entry-save]))}
+            (when @(::saving s)
+              (small-loading))
+            "Save draft"]]]]]))

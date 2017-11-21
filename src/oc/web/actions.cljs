@@ -129,8 +129,6 @@
            (not (utils/in? (:route @router/path) "org-settings-team"))
            (not (utils/in? (:route @router/path) "org-settings"))
            (not (utils/in? (:route @router/path) "email-verification"))
-           ;; Drafts
-           ; (not (utils/in? (:route @router/path) "story-edit"))
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation")))
@@ -238,11 +236,7 @@
     (when is-currently-shown
 
       (when (and (router/current-activity-id)
-                 (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-                 ;; Drafts
-                 ; (or (not (utils/in? (:route @router/path) "story-edit"))
-                 ;     (= (:slug board-data) "drafts"))
-                 )
+                 (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id))))
         (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
 
       (when (and (string? (:board-filters db))
@@ -269,19 +263,9 @@
                                      (:entry-editing db))
                               old-board-data
                               fixed-board-data)
-          ;; Drafts
-          ; story-editing (when (and (utils/in? (:route @router/path) "story-edit")
-          ;                          is-currently-shown
-          ;                          (router/current-activity-id)
-          ;                          (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
-          ;                 (get (:fixed-items fixed-board-data) (router/current-activity-id)))
           next-db (assoc-in db-loading
                    (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug board-data)))
                    with-current-edit)
-          ;; Drafts
-          ; with-story-editing (if story-editing
-          ;                       (assoc next-db :story-editing story-editing)
-          ;                       next-db)
           without-loading (if is-currently-shown
                             (dissoc next-db :loading)
                             next-db)]
@@ -1186,32 +1170,17 @@
                                            :has-changes true})
       next-db)))
 
-(defn author-data [current-user-data as-of]
-  {:avatar-url (:avatar-url current-user-data)
-   :name (str (:first-name current-user-data) " " (:last-name current-user-data))
-   :user-id (:user-id current-user-data)
-   :updated-at as-of})
-
-(defn new-entry-fixed-data [entry-data board-data current-user-data as-of]
-  (utils/fix-entry (merge entry-data {:author [(author-data current-user-data as-of)]
-                                      :created-at as-of
-                                      :updated-at as-of
-                                      :reactions []
-                                      :uuid (utils/activity-uuid)})
-                   board-data
-                   (:topics board-data)))
-
-(defn entry-fixed-data [entry-data current-user-data as-of]
-  (let [new-author (author-data current-user-data as-of)]
-    (merge entry-data {:updated-at as-of
-                       :author (if (sequential? (:author entry-data))
-                                 (conj (:author entry-data) new-author)
-                                 [(:author entry-data) new-author])})))
-
 (defmethod dispatcher/action :entry-save
   [db [_]]
   (let [entry-data (:entry-editing db)]
-    (api/create-entry entry-data)
+    (if (:links entry-data)
+      (let [redirect-board-slug (if (= (:status entry-data) "published") (router/current-board-slug) "drafts")]
+        (api/update-entry entry-data redirect-board-slug :entry-editing))
+      (let [org-slug (router/current-org-slug)
+            entry-board-key (dispatcher/board-data-key org-slug (:board-slug entry-data))
+            entry-board-data (get-in db entry-board-key)
+            entry-create-link (utils/link-for (:links entry-board-data) "create")]
+        (api/create-entry entry-data entry-create-link)))
     (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
@@ -1221,6 +1190,42 @@
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
+    (api/get-org (dispatcher/org-data))
+    ; Add the new activity into the board
+    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+          board-data (get-in db board-key)
+          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
+          next-db (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)
+          with-edited-key (if edit-key
+                            (update-in next-db [edit-key] dissoc :loading)
+                            next-db)]
+      with-edited-key)))
+
+(defmethod dispatcher/action :entry-save/failed
+  [db [_ edit-key]]
+  (-> db
+    (update-in [edit-key] dissoc :loading)
+    (update-in [edit-key] assoc :error true)))
+
+(defmethod dispatcher/action :entry-publish
+  [db [_]]
+  (let [entry-data (:entry-editing db)
+        entry-exists? (seq (:links entry-data))
+        board-data-key (dispatcher/board-data-key (router/current-org-slug) (:board-slug entry-data))
+        board-data (get-in db board-data-key)
+        publish-entry-link (if entry-exists?
+                            ;; If the entry already exists use the publish link in it
+                            (utils/link-for (:links entry-data) "publish")
+                            ;; If the entry is new, use
+                            (utils/link-for (:links board-data) "create"))]
+    (api/publish-entry entry-data publish-entry-link)
+    (assoc-in db [:entry-editing :publishing] true)))
+
+(defmethod dispatcher/action :entry-publish/finish
+  [db [_ {:keys [activity-data]}]]
+  (let [board-slug (:board-slug activity-data)]
+    (api/get-org (dispatcher/org-data))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
@@ -1228,13 +1233,13 @@
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [edit-key] dissoc :loading)))))
+        (update-in [:entry-editing] dissoc :publishing)))))
 
-(defmethod dispatcher/action :entry-save/failed
-  [db [_ edit-key]]
+(defmethod dispatcher/action :entry-publish/failed
+  [db [_]]
   (-> db
-    (update-in [edit-key] dissoc :loading)
-    (update-in [edit-key] assoc :error true)))
+    (update-in [:entry-editing] dissoc :publishing)
+    (update-in [:entry-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1250,11 +1255,24 @@
 
 (defmethod dispatcher/action :activity-delete/finish
   [db [_]]
-  ;; Drafts
-  ; (if (utils/in? (:route @router/path) "story-edit")
-  ;   (router/nav! (oc-urls/board (router/current-org-slug) "drafts"))
-  ;   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
+  ;; Reload the org to update the number of drafts in the navigation
+  (when (= (router/current-board-slug) "drafts")
+    (api/get-org (dispatcher/org-data))
+    (let [org-slug (router/current-org-slug)
+          org-data (dispatcher/org-data)
+          boards-no-draft (sort-by :name (filterv #(not= (:slug %) "drafts") (:boards org-data)))
+          board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+          board-data (get-in db board-key)]
+      (when (zero? (count (:fixed-items board-data)))
+        (utils/after
+         100
+         #(router/nav!
+            (if (pos? (count boards-no-draft))
+              ;; If there is at least one board redirect to it
+              (utils/get-board-url org-slug (:slug (first boards-no-draft)))
+              ;; If not boards are available redirect to the empty org
+              (oc-urls/org org-slug)))))))
   db)
 
 (defmethod dispatcher/action :alert-modal-show
@@ -1407,7 +1425,7 @@
   [db [_ activity-data board-data]]
   (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
         fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
-    (api/update-entry fixed-activity-data (:slug board-data))
+    (api/update-entry fixed-activity-data (:slug board-data) nil)
     (if is-all-posts
       (let [next-activity-data-key (dispatcher/activity-key
                                     (router/current-org-slug)
@@ -1467,14 +1485,18 @@
   (dissoc db :show-onboard-overlay))
 
 (defmethod dispatcher/action :activity-share-show
-  [db [_ medium activity-data]]
+  [db [_ activity-data]]
   (-> db
-    (assoc :activity-share {:medium medium :share-data activity-data})
+    (assoc :activity-share {:share-data activity-data})
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_ activity-data]]
   (dissoc db :activity-share))
+
+(defmethod dispatcher/action :activity-share-reset
+  [db [_]]
+  (dissoc db :activity-shared-data))
 
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]
@@ -1482,8 +1504,11 @@
   (assoc db :activity-share-data share-data))
 
 (defmethod dispatcher/action :activity-share/finish
-  [db [_ shared-data]]
-  (assoc db :activity-shared-data (utils/fix-entry shared-data (:board-slug shared-data) nil)))
+  [db [_ success shared-data]]
+  (assoc db :activity-shared-data
+    (if success
+      (utils/fix-entry shared-data (:board-slug shared-data) nil)
+      {:error true})))
 
 (defmethod dispatcher/action :made-with-carrot-modal-show
   [db [_]]
@@ -1532,7 +1557,7 @@
 (defmethod dispatcher/action :entry-modal-save
   [db [_ board-slug]]
   (let [entry-data (:modal-editing-data db)]
-    (api/update-entry entry-data board-slug)
+    (api/update-entry entry-data board-slug :modal-editing-data)
     (assoc-in db [:modal-editing-data :loading] true)))
 
 (defmethod dispatcher/action :activity-modal-edit
