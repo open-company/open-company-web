@@ -1629,7 +1629,7 @@
           activity-key (dispatcher/activity-key org-slug board-slug activity-uuid)
           activity-from-db (get-in db activity-key)
           reaction-idx (utils/index-of (:reactions activity-from-db) #(= (:reaction %) reaction))
-          new-reaction-data (assoc reaction :reaction reaction)
+          new-reaction-data (assoc reaction-data :reaction reaction)
           updated-reactions (if reaction-idx
                               (assoc (:reactions activity-from-db) reaction-idx new-reaction-data)
                               (assoc (:reactions activity-from-db) (count activity-from-db) new-reaction-data))]
