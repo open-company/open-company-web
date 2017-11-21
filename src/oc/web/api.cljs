@@ -852,6 +852,17 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) {})]))))))
 
+(defn react-from-picker
+  "Given the link to react with an arbitrary emoji and the emoji, post it to the interaction service"
+  [activity-data emoji]
+  (when activity-data
+    (when-let [react-link (utils/link-for (:links activity-data) "react")]
+      (interaction-http (method-for-link react-link) (relative-href react-link)
+        {:headers (headers-for-link react-link)
+         :body emoji}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch! [:react-from-picker/finish status activity-data (if success (json->cljs body) {})]))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go
