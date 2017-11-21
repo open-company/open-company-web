@@ -1021,10 +1021,10 @@
                                 (assoc new-reaction-data :reacted add-event?)
                                 new-reaction-data)
                   new-reactions-data (if (zero? (:count with-reacted))
-                                     ;; If the count is 0 remove the reaction from the list
-                                     (filter #(not= (:reaction %) (:reaction with-reacted)) old-reactions-data)
-                                     ;; If the count is positive update the reaction
-                                     (update-in old-reactions-data [reaction-idx] merge with-reacted))
+                                       ;; If the count is 0 remove the reaction from the list
+                                       (vec (filter #(not= (:reaction %) (:reaction with-reacted)) old-reactions-data))
+                                       ;; If the count is positive update the reaction
+                                       (update-in old-reactions-data [reaction-idx] merge with-reacted))
                   ; Update the entry with the new reaction
                   updated-entry-data (assoc entry-data :reactions new-reactions-data)]
               ;; Refresh the topic data if the action coming in is from the current user
