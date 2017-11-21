@@ -1104,8 +1104,13 @@
       (let [comment-data (nth comments-data comment-idx)
             reactions-data (:reactions comment-data)
             reaction (:reaction reaction-data)
+            reaction-data-with-count (assoc reaction-data :count (:count interaction-data))
+            is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+            with-reacted (if is-current-user
+                           (assoc reaction-data-with-count :reacted add-event?)
+                           reaction-data-with-count)
             reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
-            new-reactions-data (assoc reactions-data reaction-idx reaction-data)
+            new-reactions-data (assoc reactions-data reaction-idx with-reacted)
             new-comment-data (assoc comment-data :reactions new-reactions-data)
             new-comments-data (assoc comments-data comment-idx new-comment-data)]
         (assoc-in db comments-key new-comments-data)))))
