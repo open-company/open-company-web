@@ -1069,25 +1069,33 @@
         ; If the entry is present in the local state and it has reactions
         (let [reaction-data (:interaction interaction-data)
               old-reactions-data (:reactions entry-data)
-              reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
-              new-reaction-data {:count (:count interaction-data)}
-              is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
-              with-reacted (if is-current-user
-                              (assoc new-reaction-data :reacted add-event?)
-                              new-reaction-data)
-              ; Update the reactions data with the new reaction
-              new-reactions-data (update-in old-reactions-data [reaction-idx] merge with-reacted)
-              ; Update the entry with the new reaction
-              updated-entry-data (assoc entry-data :reactions new-reactions-data)]
-          ;; Refresh the topic data if the action coming in is from the current user
-          ;; to get the new links to interact with
-          (when is-current-user
-            (api/get-entry entry-data))
-          ; ;; Animate the interaction count
-          ; (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
-          ;   (utils/pulse-reaction-count fixed-activity-uuid (:reaction reaction-data)))
-          ; Update the entry in the local state with the new reaction
-          (assoc-in db entry-key updated-entry-data))
+              reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))]
+          (if reaction-idx
+            (let [new-reaction-data {:count (:count interaction-data)}
+                  is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+                  with-reacted (if is-current-user
+                                (assoc new-reaction-data :reacted add-event?)
+                                new-reaction-data)
+                  new-reactions-data (if (zero? (:count with-reacted))
+                                     ;; If the count is 0 remove the reaction from the list
+                                     (filter #(not= (:reaction %) (:reaction with-reacted)) old-reactions-data)
+                                     ;; If the count is positive update the reaction
+                                     (update-in old-reactions-data [reaction-idx] merge with-reacted))
+                  ; Update the entry with the new reaction
+                  updated-entry-data (assoc entry-data :reactions new-reactions-data)]
+              ;; Refresh the topic data if the action coming in is from the current user
+              ;; to get the new links to interact with
+              (when is-current-user
+                (api/get-entry entry-data))
+              ; ;; Animate the interaction count
+              ; (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
+              ;   (utils/pulse-reaction-count fixed-activity-uuid (:reaction reaction-data)))
+              ; Update the entry in the local state with the new reaction
+              (assoc-in db entry-key updated-entry-data))
+            ;; The reaction is not present, refresh the entry to get the links
+            (do
+              (api/get-entry entry-data)
+              db)))
         ;; the entry is not present, refresh the full topic
         (do
           ;; force refresh of topic
@@ -1598,4 +1606,33 @@
   (if whats-new-data
     (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
       (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
+    db))
+
+(defmethod dispatcher/action :react-from-picker
+  [db [_ activity-data emoji]]
+  (when (and emoji
+             (utils/link-for (:links activity-data) "react"))
+    (api/react-from-picker activity-data emoji))
+  db)
+
+(defmethod dispatcher/action :react-from-picker/finish
+  [db [_ status activity-data reaction-data]]
+  (api/get-entry activity-data)
+  (if (and (>= status 200)
+           (< status 300))
+    ;; Update the reactions in the app-state if the api call succeeded
+    (let [reaction (first (keys reaction-data))
+          reaction-data (get reaction-data reaction)
+          org-slug (router/current-org-slug)
+          board-slug (:board-slug activity-data)
+          activity-uuid (:uuid activity-data)
+          activity-key (dispatcher/activity-key org-slug board-slug activity-uuid)
+          activity-from-db (get-in db activity-key)
+          reaction-idx (utils/index-of (:reactions activity-from-db) #(= (:reaction %) reaction))
+          new-reaction-data (assoc reaction :reaction reaction)
+          updated-reactions (if reaction-idx
+                              (assoc (:reactions activity-from-db) reaction-idx new-reaction-data)
+                              (assoc (:reactions activity-from-db) (count activity-from-db) new-reaction-data))]
+      (assoc-in db (conj activity-key :reactions) updated-reactions))
+    ;; Wait for the entry refresh if it didn't
     db))
