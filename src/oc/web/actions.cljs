@@ -1117,10 +1117,8 @@
 
 (defn- update-reaction
   [db interaction-data add-event?]
-  (let [comment (update-comment-reaction db interaction-data add-event?)]
-    (if comment
-      comment
-      (update-entry-reaction db interaction-data add-event?))))
+  (let [with-updated-comment (update-comment-reaction db interaction-data add-event?)]
+    (or with-updated-comment (update-entry-reaction db interaction-data add-event?))))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
   [db [_ interaction-data]]
