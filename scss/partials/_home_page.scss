@@ -17,6 +17,7 @@ button.get-started-button {
     width: 100%;
     max-width: 280px;
     margin: 16px auto;
+    padding: 0px 32px;
   }
 
   &:after {
@@ -30,6 +31,10 @@ button.get-started-button {
     position: absolute;
     top: 14px;
     right: 42px;
+
+    @include mobile(){
+      right: 32px
+    }
   }
 }
 
@@ -39,9 +44,10 @@ div#wrap {
   div.main.home-page {
     width: 100%;
     background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
+    margin-top: 1px;
 
     @include mobile() {
-      padding: 0 16px;
+      padding: 0 32px;
     }
 
     section.cta {
@@ -209,7 +215,8 @@ div#wrap {
         position: relative;
 
         @include mobile() {
-          max-width: 280px
+          max-width: 280px;
+          padding: 0px;
         }
       }
 
@@ -253,7 +260,6 @@ div#wrap {
 
       img.homepage-main-screenshot {
         width: 940px;
-        height: 763px;
         margin: 106px auto 0px;
         padding: 0;
         border: 1px solid rgba($oc_gray_5, 0.05);
@@ -289,7 +295,7 @@ div#wrap {
           background: none;
           max-width: 100%;
           margin: 24px auto;
-          padding: 16px;
+          padding: 16px 32px;
           background-color: $carrot_text_blue;
           border-radius: 8px;
         }
@@ -418,7 +424,7 @@ div#wrap {
         div.why-carrot {
           @include avenir_H();
           font-size: 48px;
-          color: $carrot_dark_brown;
+          color: $carrot_dark_brown_1;
           margin-bottom: 12px;
           z-index: 2;
           position: relative;
@@ -456,8 +462,8 @@ div#wrap {
         z-index: 10;
 
         @include mobile() {
-          width: calc(100% + 32px);
-          margin-left: -16px;
+          width: calc(100% + 64px);
+          margin-left: -32px;
         }
 
         div.illustration-container {
@@ -475,7 +481,7 @@ div#wrap {
             height: auto;
             float: unset;
             margin: 16px 0px 0px;
-            padding: 30px 16px;
+            padding: 30px 32px;
           }
 
           &.right {
@@ -597,13 +603,13 @@ div#wrap {
     }
 
     section.third-section {
-      background-color: #FFF3CD;
+      background-color: $carrot_light_yellow_1;
       padding: 72px 0px 100px;
 
       @include mobile(){
-        width: calc(100% + 32px);
-        margin-left: -16px;
-        padding: 32px 16px 50px;
+        width: calc(100% + 64px);
+        margin-left: -32px;
+        padding: 32px 32px 50px;
         text-align: center;
       }
 
@@ -643,8 +649,8 @@ div#wrap {
         padding: 40px 24px;
 
         @include mobile() {
-          width: calc(100% + 32px);
-          margin-left: -16px;
+          width: calc(100% + 64px);
+          margin-left: -32px;
           height: auto;
         }
 
@@ -725,37 +731,6 @@ div#wrap {
       }
     }
 
-    section.fourth-section {
-      text-align: center;
-      padding: 60px 0px;
-
-      div.above-noise-container {
-        width: 1053px;
-        height: 254px;
-        margin: 0px auto;
-
-        @include mobile(){
-          width: 100%;
-          height: auto;
-          text-align: center;
-        }
-
-        div.above-noise-title {
-          color: $carrot_dark_brown_1;
-          @include avenir_H();
-          font-size: 48px;
-          margin-top: 16px;
-        }
-
-        div.above-noise-description {
-          color: $carrot_dark_brown;
-          @include avenir_R();
-          font-size: 20px;
-          margin-top: 16px;
-        }
-      }
-    }
-
     // div.try-it {
     //   width: 100%;
     //   margin: 0 auto;
@@ -797,4 +772,38 @@ div#wrap {
     //   }
     // }
   }
+}
+
+div.main.home-page, div.about {
+  section.fourth-section {
+    text-align: center;
+    padding: 60px 0px;
+
+    div.above-noise-container {
+      width: 1053px;
+      height: 254px;
+      margin: 0px auto;
+
+      @include mobile(){
+        width: 100%;
+        height: auto;
+        text-align: center;
+      }
+
+      div.above-noise-title {
+        color: $carrot_dark_brown_1;
+        @include avenir_H();
+        font-size: 48px;
+        margin-top: 16px;
+      }
+
+      div.above-noise-description {
+        color: $carrot_dark_brown;
+        @include avenir_R();
+        font-size: 20px;
+        margin-top: 16px;
+      }
+    }
+  }
+
 }

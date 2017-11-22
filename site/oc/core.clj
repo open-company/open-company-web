@@ -66,7 +66,7 @@
       [:div.site-mobile-menu-item
         [:a
           {:href "/"
-           :class (when (= active-page "home") "active")}
+           :class (when (= active-page "index") "active")}
           "Home"]]
       ; [:div.site-mobile-menu-item
       ;   [:a
@@ -76,7 +76,7 @@
       [:div.site-mobile-menu-item
         [:a
           {:href "/about"
-           :class (when (= active-page "home") "about")}
+           :class (when (= active-page "about") "active")}
           "About"]]
       [:div.site-mobile-menu-item
         [:a
@@ -161,7 +161,7 @@
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-small-links
           [:a {:href "/sign-up"} "Get Started"]
-          "|"
+          "or"
           [:a {:href "/login"} "Log in"]]
         [:div.small-logos
           [:a.twitter
@@ -186,11 +186,9 @@
                (head)
                [:body
                 [:div
-                 {:class "gradient"}
-                 [:div
-                  {:class "outer header"}
-                  (nav (name page))
-                  (mobile-menu (name page))]]
+                 {:class "outer header"}
+                 (nav (name page))
+                 (mobile-menu (name page))]
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)

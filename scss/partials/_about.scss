@@ -1,678 +1,560 @@
 /***** About ******/
 
-@media (min-width: 768px) {
-
-  div#wrap.about-wrap {
-    min-height: calc(100vh - 40px);
-  }
-}
-
-div.container.about {
-  padding-left: 0px;
-  padding-right: 0px;
-  margin-top: 50px;
-  margin-bottom: 50px;
-  text-align: center;
-}
-
-@media (min-width: 768px) {
-
-  div.container.about {
+div#wrap {
+  div.main.about {
     text-align: center;
     width: 100%;
-    max-width: unset;
+    background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
+    margin-top: 1px;
 
-    div.about-header {
-      background-color: $oc_gray_8;
-      padding: 40px 0px;
-    }
-  }
-}
-
-h1.about {
-  @include avenir_H();
-  font-size: 40px;
-  letter-spacing: 0.3px;
-  color: $carrot_dark_blue;
-  margin: 47px auto 0;
-  padding: 0 16px;
-  max-width: 575px;
-  text-align: center;
-}
-
-div.divider-line {
-  margin-top: 32px;
-  width: 82px;
-  height: 6px;
-  background-color: $carrot_orange;
-  left: 50%;
-  margin-left: -41px;
-  position: relative;
-}
-
-div.ovals-container {
-  max-width: 1086px;
-  margin: 30px auto 0;
-  padding: 0 16px;
-  position: relative;
-
-  @include mobile(){
-    div.ovals-container-face {
-      display: none;
-    }
-  }
-
-  @include big_web(){
-    div.ovals-container-face {
-      position: absolute;
-      background-repeat: no-repeat;
-      background-position: 50%;
-      width: 48px;
-      height: 48px;
-      background-size: 48px 48px;
-
-      &.face-red {
-        background-image: cdnUrl("/img/ML/happy_face_red.svg");
-        top: 0px;
-        left: 83px;
-      }
-
-      &.face-yellow {
-        background-image: cdnUrl("/img/ML/happy_face_yellow.svg");
-        top: 156px;
-        left: 0px;
-      }
-
-      &.face-blue {
-        background-image: cdnUrl("/img/ML/happy_face_blue.svg");
-        top: 247px;
-        left: 89px;
-      }
-
-      &.face-green {
-        background-image: cdnUrl("/img/ML/happy_face_green.svg");
-        bottom: 381px;
-        right: 21px;
-      }
-
-      &.face-purple {
-        background-image: cdnUrl("/img/ML/happy_face_purple.svg");
-        bottom: 90px;
-        right: 85px;
-      }
-    }
-  }
-
-  @include mobile(){
-    width: 100%;
-    background-image: none;
-    height: auto;
-  }
-
-  div.about-subline {
-    @include avenir_H();
-    font-size: 28px;
-    letter-spacing: 0.2px;
-    text-align: center;
-    color: $carrot_dark_blue;
-    max-width: 657px;
-    margin: 0px auto 40px;
-    padding-top: 50px;
-
-    @include mobile(){
-      width: 100%;
-      margin: 20px auto 0;
-      font-size: 22px;
-    }
-  }
-
-  @include mobile(){
-    div.paragraphs-container {
+    section.about-header {
+      padding-top: 88px;
+      padding-bottom: 0px;
+      text-align: center;
       position: relative;
-      padding: 100px 0;
+      overflow: hidden;
 
-      div.happy-face {
+      div.balloon {
         position: absolute;
-        background-size: 43px 43px;
-        width: 43px;
-        height: 43px;
-      }
-
-      div.red-happy-face {
-        background-image: cdnUrl("/img/ML/happy_face_red.svg");
-        left: 43px;
-        top: 43px;
-      }
-
-      div.yellow-happy-face {
-        background-image: cdnUrl("/img/ML/happy_face_yellow.svg");
-        left: 0px;
-        top: 0px;
-      }
-
-      div.blue-happy-face {
-        background-image: cdnUrl("/img/ML/happy_face_blue.svg");
-        left: 33px;
-        bottom: 43px;
-      }
-
-      div.green-happy-face {
-        background-image: cdnUrl("/img/ML/happy_face_green.svg");
-        right: 53px;
-        bottom: 43px;
-      }
-
-      div.purple-happy-face {
-        background-image: cdnUrl("/img/ML/happy_face_purple.svg");
-        right: 0px;
-        bottom: 0px;
-      }
-    }
-  }
-
-  div.paragraphs-bg-container {
-
-    @include mobile(){
-      background-image: cdnUrl("/img/ML/about_mobile_oval_bg.svg");
-      background-repeat: no-repeat;
-      height: auto;
-      background-position: 50% 0%;
-      background-size: 100%;
-      padding: 30px 50px;
-      width: 100%;
-      max-width: 350px;
-      margin: 0 auto;
-    }
-
-    @media screen and (max-width: 320px) {
-      padding: 10px 0;
-      margin: 0px auto;
-    }
-
-    @include big_web(){
-      background-image: cdnUrl("/img/ML/about_oval_bg.svg");
-      background-repeat: no-repeat;
-      background-position: 50%;
-      background-size: contain;
-      padding: 40px 0;
-    }
-  }
-
-  div.paragraph {
-    @include avenir_R();
-    font-size: 20px;
-    text-align: left;
-    color: $carrot_text_blue_2;
-    max-width: 561px;
-    margin: 20px auto 50px;
-
-    @include mobile(){
-      width: 100%;
-    }
-  }
-}
-
-div.principles {
-  position: relative;
-  padding: 0 16px;
-
-  div.principles-headline {
-    color: $carrot_dark_blue;
-    font-size: 28px;
-    @include avenir_O();
-    padding-top: 80px;
-  }
-
-  div.principle {
-    position: relative;
-    max-width: 746px;
-    margin: 76px auto 0;
-
-    @include mobile(){
-      text-align: center;
-      width: 100%;
-      text-align: center;
-    }
-
-    div.principle-logo {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 80px;
-      height: 80px;
-
-      @include mobile(){
-        position: relative;
-        left: 50%;
-        text-align: center;
-        margin-left: -40px;
-        margin-top: 20px;
-      }
-    }
-
-    div.principle-oval-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 251px;
-      height: 251px;
-      background-repeat: no-repeat;
-
-      @include mobile(){
-        width: 100%;
-        height: 100%;
-        margin-top: -30px;
-        background-position: 50% 0%;
-      }
-    }
-
-    div.principle-title {
-      padding-top: 90px;
-      font-size: 36px;
-      @include avenir_H();
-      max-width: 564px;
-      text-align: left;
-      margin-left: 160px;
-      color: #383b41;
-
-      @include mobile(){
-        width: 100%;
-        margin-left: 0px;
-        text-align: center;
-        padding-top: 30px;
-        font-size: 28px;
-        max-width: initial;
-      }
-    }
-
-    div.principle-description {
-      color: $carrot_text_blue_2;
-      @include avenir_R();
-      font-size: 20px;
-      max-width: 564px;
-      text-align: left;
-      margin-left: 160px;
-      margin-top: 23px;
-
-      @include mobile(){
-        width: 100%;
-        margin-left: 0px;
-        max-width: initial;
-      }
-    }
-
-    &.principle-1 {
-
-      div.principle-title {
-        color: $carrot_orange;
-      }
-
-      div.principle-logo {
-        background-image: cdnUrl("/img/ML/about_principle_1.svg");
-      }
-
-      div.principle-oval-bg {
-        background-image: cdnUrl("/img/ML/about_principle_1_oval.svg");
-      }
-    }
-
-    &.principle-2 {
-
-      div.principle-title {
-        color: $carrot_green;
-      }
-
-      div.principle-logo {
-        background-image: cdnUrl("/img/ML/about_principle_2.svg");
-      }
-
-      div.principle-oval-bg {
-        background-image: cdnUrl("/img/ML/about_principle_2_oval.svg");
-      }
-    }
-
-    &.principle-3 {
-
-      div.principle-title {
-        color: $carrot_text_blue;
-      }
-
-      div.principle-logo {
-        background-image: cdnUrl("/img/ML/about_principle_3.svg");
-      }
-
-      div.principle-oval-bg {
-        background-image: cdnUrl("/img/ML/about_principle_3_oval.svg");
-      }
-    }
-  }
-}
-
-div.about-alignment {
-  background-color: $carrot_dark_blue;
-  padding: 115px 0;
-  position: relative;
-  margin: 177px 0 0;
-  text-align: center;
-
-  @include mobile(){
-    width: 100%;
-    padding: 115px 16px;
-  }
-
-  div.quote {
-    position: absolute;
-    left: 50%;
-    margin-left: -540px;
-    margin-top: 40px;
-    top: 70px;
-    width: 68px;
-    height: 49px;
-    background-image: cdnUrl("/img/ML/about_quotes.svg");
-
-    @include mobile(){
-      position: relative;
-      margin-left: initial;
-      top: 0px;
-      left: 50%;
-      margin-left: -34px;
-    }
-  }
-
-  div.about-alignment-description {
-    max-width: 1154px;
-    padding: 0 117px;
-    margin: 0 auto;
-    font-size: 33px;
-    color: white;
-    text-align: center;
-    @include avenir_BOOK();
-
-    @include mobile(){
-      width: 100%;
-      padding: 0;
-      margin-top: 30px;
-      font-size: 28px;
-      line-height: 48px;
-    }
-  }
-}
-
-div.about-team {
-  padding: 114px 0 190px;
-  background-color: $carrot_settings_background;
-
-  @include mobile(){
-    padding: 50px 16px
-  }
-
-  div.about-team-inner {
-    max-width: 1146px;
-    margin: 0 auto 0;
-    text-align: center;
-
-    @media screen and (max-width: 1121px){
-      width: 100%;
-    }
-
-    h1.team {
-      @include avenir_H();
-      font-size: 40px;
-      letter-spacing: 0.3px;
-      color: $carrot_dark_blue;
-      margin-top: 35px;
-    }
-
-    div.divider-line {
-      margin-bottom: 56px;
-    }
-
-    div.team-card {
-      margin: 26px auto 0;
-      max-width: 561px;
-      min-height: 230px;
-      border-radius: 10px;
-      background-color: #ffffff;
-      box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.03);
-      padding: 40px;
-
-      @media screen and (max-width: 1121px){
-        width: 100%;
-        height: auto;
-        text-align: center;
-      }
-
-      div.team-avatar {
-        width: 64px;
-        height: 64px;
-        img {
-          max-width: 64px;
-          max-height: 64px;
-          border-radius: 32px;
-        }
-      }
-
-      &.new-member {
-        div.team-avatar {
-          background-image: cdnUrl("/img/ML/happy_face_yellow.svg");
-        }
-      }
-
-      &.sean-johnson {
-        @media screen and (min-width: 1122px){
-          height: 333px;
-        }
-      }
-
-      div.team-avatar {
-        background-size: 64px 64px;
+        background-position: center;
         background-repeat: no-repeat;
-        width: 64px;
-        height: 64px;
-        float: left;
+        z-index: 1;
 
-        @media screen and (max-width: 1121px){
-          float: none;
-          position: relative;
-          left: 50%;
-          margin-left: -32px;
+        @include mobile() {
+          display: none;
+        }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow");
+          background-size: 172px 172px;
+          width: 172px;
+          height: 172px;
+          top: -46px;
+          left: -57px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/balloon_big_purple");
+          background-size: 111px 111px;
+          width: 111px;
+          height: 111px;
+          top: -64px;
+          right: 118px;
+        }
+
+        &.big-red {
+          @include image-2x("/img/ML/balloon_big_red");
+          background-size: 226px 208px;
+          width: 226px;
+          height: 208px;
+          top: -82px;
+          right: -55px;
+        }
+
+        &.small-purple-face {
+          @include image-2x("/img/ML/balloon_small_purple_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 118px;
+          left: 5.78%;
+        }
+
+        &.small-red {
+          @include image-2x("/img/ML/balloon_small_red");
+          background-size: 15px 17px;
+          width: 15px;
+          height: 17px;
+          top: 103px;
+          left: 13.71%;
+        }
+
+        &.small-yellow-face {
+          @include image-2x("/img/ML/balloon_small_yellow_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 119px;
+          left: 78.57%;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/balloon_small_yellow");
+          background-size: 15px 15px;
+          width: 15px;
+          height: 15px;
+          top: 179px;
+          left: 86.36%;
+        }
+
+        &.big-purple-1 {
+          @include image-2x("/img/ML/why_balloon_big_purple");
+          background-size: 110px 111px;
+          width: 110px;
+          height: 111px;
+          top: 537px;
+          left: 13.21%;
+        }
+
+        &.small-green {
+          @include image-2x("/img/ML/balloon_small_green");
+          background-size: 35px 33px;
+          width: 35px;
+          height: 33px;
+          top: 668px;
+          left: 8.14%;
+        }
+
+        &.big-blue {
+          @include image-2x("/img/ML/balloon_big_blue");
+          background-size: 155px 154px;
+          width: 155px;
+          height: 154px;
+          top: 1339px;
+          left: 77.07%;
+        }
+
+        &.small-red-2 {
+          @include image-2x("/img/ML/balloon_small_red_2");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 1354px;
+          left: 88.5%;
+        }
+
+      }
+
+      h1.about {
+        @include avenir_H();
+        font-size: 48px;
+        line-height: 60px;
+        color: $carrot_dark_brown_1;
+        margin: 0px auto;
+        padding: 0px 16px;
+      }
+
+      div.about-subline {
+        @include avenir_R();
+        font-size: 24px;
+        color: rgba($carrot_dark_brown, 0.8);
+        max-width: 744px;
+        margin: 16px auto 0px;
+
+        @include mobile(){
+          width: 100%;
+          margin: 16px auto 0;
+          padding: 0 16px;
         }
       }
 
-      div.team-member {
-        float: left;
-        margin-left: 26px;
-        text-align: left;
-        width: 360px;
+      div.paragraphs-container {
+        width: 940px;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0px 4px 6px 0px rgba(black, 0.07);
+        padding: 60px 40px;
+        margin: 70px auto 0px;
+        position: relative;
+        z-index: 2;
 
-        @media screen and (max-width: 1121px){
-          float: none;
-          margin-left: 0px;
+        @include mobile(){
+          width: 100%;
+          margin: 70px 0px 0px;
+          padding: 60px 16px;
+          border-radius: 0px;
+        }
+
+        div.paragraph-title {
+          @include avenir_H();
+          font-size: 36px;
+          color: $carrot_dark_brown_1;
+          line-height: 60px;
+          margin: 0 auto;
+        }
+
+        p {
+          @include avenir_R();
+          font-size: 20px;
+          color: $carrot_dark_brown;
+          margin: 22px auto 0px;
+          text-align: left;
+          width: 800px;
+          line-height: 30px;
+
+          @include mobile() {
+            width: 100%;
+            padding: 0 16px;
+            text-align: center;
+          }
+        }
+
+        div.principles-title {
+          @include avenir_H();
+          font-size: 24px;
+          color: $carrot_dark_brown_1;
+          line-height: 36px;
+          margin: 87px auto 18px;
+        }
+
+        div.principles {
+          width: calc(100% + 80px);
+          margin-left: -40px;
+
+          @include mobile(){
+            width: 100%;
+            margin-left: 0px;
+            padding: 0px 16px;
+          }
+        }
+
+        div.principle {
+          padding: 40px;
+          height: 481px;
+
+          @include mobile(){
+            height: auto;
+            padding: 40px 0px;
+          }
+
+          &.left-principle {
+            float: left;
+            width: 50%;
+            border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
+            border-right: 1px solid rgba($carrot_light_gray_7, 0.5);
+
+            @include mobile(){
+              border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
+              border-right: none;
+              float: unset;
+              width: 100%;
+            }
+
+            div.principle-icon {
+              @include image-2x("/img/ML/about_principle_icon_1");
+              background-size: 103px 102px;
+            }
+          }
+
+          &.right-principle {
+            float: left;
+            width: 50%;
+            border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
+
+            @include mobile(){
+              border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
+              float: unset;
+              width: 100%;
+            }
+
+            div.principle-icon {
+              @include image-2x("/img/ML/about_principle_icon_2");
+              background-size: 114px 83px;
+            }
+          }
+
+          &.center-principle {
+            width: 100%;
+            border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
+
+            @include mobile(){
+              float: unset;
+              width: 100%;
+            }
+
+            div.principle-icon {
+              @include image-2x("/img/ML/about_principle_icon_3");
+              background-size: 119px 96px;
+            }
+
+            div.principle-title {
+              width: 340px;
+
+              @include mobile(){
+                width: 100%;
+              }
+            }
+          }
+
+          div.principle-icon {
+            margin: 0 auto;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 119px;
+            height: 102px;
+          }
+
+          div.principle-title {
+            @include avenir_H();
+            font-size: 24px;
+            color: $carrot_dark_brown;
+            text-align: center;
+            letter-spacing: 0.17px;
+            line-height: 30px;
+            width: 300px;
+            margin: 24px auto 0px;
+
+            @include mobile(){
+              padding: 0px 16px;
+              width: 100%;
+            }
+          }
+
+          div.principle-description {
+            @include avenir_R();
+            font-size: 20px;
+            line-height: 30px;
+            color: $carrot_dark_brown;
+            text-align: left;
+            width: 390px;
+            margin: 24px auto 0px;
+
+            @include mobile(){
+              padding: 0px 16px;
+              width: 100%;
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+
+    section.about-team {
+      padding: 30px 0;
+
+      @include mobile(){
+        padding: 30px 0px 0px;
+      }
+
+      div.about-team-inner {
+        max-width: 1146px;
+        margin: 0 auto 0;
+        text-align: center;
+
+        @include mobile(){
           width: 100%;
         }
 
-        div.team-name {
+        h1.team {
           @include avenir_H();
-          font-size: 24px;
-          color: #383b41;
-
-          @media screen and (max-width: 1121px){
-            text-align: center;
-            margin-top: 22px;
-          }
+          font-size: 38px;
+          line-height: 52px;
+          color: $carrot_dark_brown_1;
+          margin-top: 35px;
         }
 
-        div.team-description, div.team-title {
-          @include avenir_M();
-          font-size: 16px;
-          line-height: 1.75;
-          color: #6a707a;
-          margin-top: 12px;
+        div.about-team-users {
+          width: 940px;
+          margin: 16px auto;
 
-          @media screen and (max-width: 1121px){
-            margin-top: 10px;
-          }
-        }
-
-        div.team-title {
-          margin-top: 0px;
-          @media screen and (max-width: 1121px){
-            text-align: center;
-          }
-        }
-
-        div.team-media-links {
-          height: 20px;
-          margin-top: 19px;
-
-          @media screen and (max-width: 1121px){
-            widtH: auto;
-            text-align: center;
-            margin-left: -40px;
-            left: 50%;
-            position: relative;
+          @include mobile(){
+            width: 100%;
+            margin: 0px auto;
           }
 
-          a {
-            width: 20px;
-            height: 20px;
-            display: block;
+          div.team-card {
+            width: 450px;
+            height: 308px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 4px 6px 0 rgba(black, 0.07);
+            padding: 40px;
+
+            @include mobile(){
+              width: 100%;
+              height: auto;
+              margin-top: 24px;
+              margin-bottom: 0px;
+            }
+
+            &:nth-child(2) {
+              margin-top: 40px;
+
+              @include mobile(){
+                margin-top: 24px;
+              }
+            }
+
+            &.new-member {
+              div.team-avatar {
+                background-image: cdnUrl("/img/ML/happy_face_yellow.svg");
+              }
+            }
+
+            div.team-avatar {
+              background-size: 100px 100px;
+              background-repeat: no-repeat;
+              width: 100px;
+              height: 100px;
+              margin: 0 auto;
+
+              img {
+                max-width: 100px;
+                max-height: 100px;
+                border-radius: 50px;
+              }
+            }
+
+            div.team-member {
+              margin: 16px auto 0px;
+              text-align: center;
+
+              div.team-name {
+                @include avenir_H();
+                font-size: 26px;
+                letter-spacing: 0.18px;
+                color: $carrot_dark_brown;
+              }
+
+              div.team-title {
+                @include avenir_R();
+                font-size: 20px;
+                line-height: 30px;
+                color: rgba($carrot_dark_brown, 0.8);
+              }
+
+              div.team-media-links {
+                height: 24px;
+                text-align: center;
+
+                a {
+                  width: 24px;
+                  height: 24px;
+                  display: block;
+                  margin: 8px auto 0px;
+
+                  &.linkedin {
+                    background-image: cdnUrl("/img/ML/about_linkedin.svg");
+                    background-size: 24px 24px;
+                    background-repeat: no-repeat;
+                  }
+                }
+              }
+            }
+          }
+
+          div.column-left {
             float: left;
-            margin-right: 20px;
-            font-size: 20px;
 
-            &.github {
-              margin-top: -3px;
+            @include mobile(){
+              float: unset;
+            }
+          }
+
+          div.column-right {
+            float: right;
+
+            @include mobile(){
+              float: unset;
+            }
+          }
+
+          div.column-center {
+            margin: 40px auto 0px;
+
+            @include mobile(){
+              margin: 0px;
             }
 
-            &.twitter {
-              background-image: cdnUrl("/img/ML/about_twitter.svg");
-              background-size: 20px 17.5px;
-              background-repeat: no-repeat;
-            }
+            div.team-card {
+              margin: 0 auto;
 
-            &.linkedin {
-              background-image: cdnUrl("/img/ML/about_linkedin.svg");
-              background-size: 20px 20px;
-              background-repeat: no-repeat;
+              @include mobile(){
+                margin: 24px auto 0px;
+              }
             }
           }
         }
       }
     }
 
-    div.column-left {
-      float: left;
-      max-width: 561px;
-
-      @media screen and (max-width: 1121px){
-        float: none;
-        width: 100%;
-        max-width: initial;
-      }
-
-      div.team-card {
-        float: left;
-        margin-right: 24px;
-
-        @media screen and (max-width: 1121px){
-          float: none;
-          margin-right: auto;
-        }
-      }
-    }
-
-    div.column-right {
-      float: right;
-      max-width: 561px;
-
-      @media screen and (max-width: 1121px){
-        float: none;
-        width: 100%;
-        max-width: initial;
-      }
-
-      div.team-card {
-        float: right;
-
-        @media screen and (max-width: 1121px){
-          float: none;
-        }
-      }
-    }
-  }
-}
-
-div.about-footer {
-  width: 100%;
-  margin: 0 auto;
-  padding: 155px 78px;
-  background-image: linear-gradient(252deg, #f7c144, #f2558f);
-
-  @include mobile(){
-    padding: 0px 16px 100px;
-  }
-
-  div.block {
-    width: 50%;
-    text-align: left;
-    padding-left: 50px;
-
-    @include mobile(){
+    section.about-footer {
       width: 100%;
-      padding-left: 0px;
-      text-align: center;
-    }
-
-    div.block-title {
-      @include avenir_H();
-      font-size: 36px;
-      letter-spacing: 0.2px;
-      color: white;
+      margin: 0 auto;
+      padding: 0px 60px;
+      background-color: $carrot_light_yellow_1;
 
       @include mobile(){
-        margin-top: 100px;
+        padding: 32px 32px;
+      }
+
+      div.block {
+        width: 50%;
+        text-align: center;
+        padding: 77px 0px;
+
+        @include mobile(){
+          width: 100%;
+          padding: 40px 0px;
+        }
+
+        &:first-child {
+          border-right: 1px solid rgba($carrot_dark_brown, 0.2);
+
+          @include mobile(){
+            border-right: none;
+            border-bottom: 1px solid rgba($carrot_dark_brown, 0.2);
+          }
+        }
+
+        div.block-title {
+          @include avenir_H();
+          font-size: 26px;
+          letter-spacing: 0.18px;
+          color: $carrot_dark_brown;
+        }
+
+        div.block-description {
+          opacity: 0.8;
+          @include avenir_R();
+          font-size: 20px;
+          color: $carrot_dark_brown;
+          margin: 24px auto 0px;
+          max-width: 417px;
+        }
+
+        a.link {
+          border-radius: 100px;
+          background-color: #FFD24A;
+          @include avenir_H();
+          font-size: 18px;
+          text-align: center;
+          color: $carrot_dark_brown;
+          height: 48px;
+          display: inline-block;
+          margin: 24px auto 0px;
+          padding: 12px 32px;
+        }
+
+        &.join-us {
+          float: left;
+
+          @include mobile(){
+            float: unset;
+          }
+        }
+
+        &.open-source {
+          float: right;
+
+          @include mobile(){
+            float: unset;
+          }
+
+          a.link {
+            @include mobile(){
+              padding: 14px 32px;
+              font-size: 16px;
+            }
+          }
+        }
       }
     }
 
-    div.block-description {
-      opacity: 0.8;
-      @include avenir_M();
-      font-size: 20px;
-      color: #3a3d40;
-      margin-top: 39px;
-      max-width: 417px;
-      text-align: left;
-    }
-
-    a.link {
-      border-radius: 8px;
-      background-color: white;
-      @include avenir_H();
-      font-size: 16px;
-      text-align: center;
-      color: $carrot_orange;
-      margin-top: 39px;
-      padding: 13px 20px;
-      display: inline-block;
-    }
-
-    &.join-us {
-      float: left;
-    }
-
-    &.open-source {
-      float: right
+    section.fourth-section {
+      @include mobile(){
+        padding: 60px 32px;
+      }
     }
   }
-}
-
-div.container p {
-  @include avenir_M();
-  font-size: 18px;
-  color: $oc_gray_5;
-}
-
-div.container p.person {
-  margin-top: 20px;
 }
