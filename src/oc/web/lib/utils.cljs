@@ -308,6 +308,7 @@
                 (when (seq (:topic-name entry-body))
                   (get-topic topics-data :name (:topic-name entry-body))))]
     (-> entry-body
+      (assoc :content-type "entry")
       (assoc :read-only (readonly-entry? (:links entry-body)))
       (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
       (assoc :board-name (or (:board-name entry-body) (:name board-data)))
