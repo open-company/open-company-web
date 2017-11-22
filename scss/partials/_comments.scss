@@ -24,9 +24,8 @@ div.comments {
   }
 
   div.comments-internal {
-    padding-bottom: 123px;
     min-height: 127px;
-    height: 100%;
+    height: calc(100% - 123px);
     width: 100%;
     position: relative;
     bottom: 8px;
@@ -132,11 +131,6 @@ div.comments {
         .emojione {
           @include emoji-size(13);
         }
-      }
-
-      div.comment-footer {
-        color: rgba(78,90,107,0.4);
-        font-size: 11px;
       }
     }
 

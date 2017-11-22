@@ -28,8 +28,8 @@
             (utils/time-since (:created-at c))]]]
       [:p.comment-body.group
         {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
-      [:div.comment-reactions (comment-reactions/comment-reactions c)]
-      [:div.comment-footer.group]]))
+      [:div.comment-reactions-container.group
+        (comment-reactions/comment-reactions c)]]))
 
 (defn add-comment-content [add-comment-div]
   (let [inner-html (.-innerHTML add-comment-div)

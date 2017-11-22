@@ -49,7 +49,7 @@
     (let [reactions-data (:reactions item-data)
           reactions-loading (:reactions-loading item-data)]
       (when (display-reactions? item-data)
-       [:div.reactions
+       [:div.comment-reactions
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
@@ -60,7 +60,7 @@
                                                       (inc (:count reaction-data)))
                                               :reacted (not (:reacted reaction-data))})
                         reaction-data)]]
-          [:button.reaction-btn.btn-reset
+          [:button.comment-reaction-btn.btn-reset
             {:key (str "-entry-" (:uuid item-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
                                       :can-react (not read-only-reaction)
