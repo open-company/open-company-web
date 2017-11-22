@@ -84,6 +84,9 @@ div.orgs-dropdown {
 
       div.org-avatar {
         width: 120px;
+        height: 24px;
+        overflow: hidden;
+        @include org-avatar(24);
 
         div.org-avatar-container {
           width: 120px;
@@ -97,19 +100,20 @@ div.orgs-dropdown {
             @include avenir_M();
             font-size: 14px;
             color: $oc_gray_5;
-            // margin-top: -26px;
             margin-left: 8px;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 90px;
+            max-width: 90px;
             display: inline;
             white-space: pre;
             float: left;
             max-width: 88px;
             width: auto !important;
+            margin-top: 6px;
 
             &.no-logo {
               margin-left: 32px !important;
+              margin-top: 6px !important;
             }
           }
         }

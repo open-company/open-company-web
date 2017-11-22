@@ -232,6 +232,7 @@ div.activity-modal-container {
       div.activity-modal-columns {
         display: flex;
         flex-direction: row;
+        align-items: stretch;
 
         div.activity-left-column {
           flex-grow: 0;
@@ -244,15 +245,15 @@ div.activity-modal-container {
           border-bottom-left-radius: 8px;
 
           div.activity-left-column-content {
-
+              height: 100%;
             div.activity-modal-content {
               padding: 0 50px;
               float: none;
               width: 100%;
+              height: calc(100% - 72px);
               position: relative;
               overflow-y: auto;
-              max-height: calc(100vh - 72px - 96px); // Total window height less the header and the footer
-              min-height: 304px;
+
 
               div.activity-modal-content-title {
                 margin-top: 32px;
@@ -358,7 +359,7 @@ div.activity-modal-container {
                   @include avenir_H();
                   font-size: 12px;
                   color: $carrot_light_gray_3;
-                  background-color: #F5F4F1;
+                  background-color: $carrot_light_gray_9;
                   opacity: 0.7;
 
                   &:hover {
@@ -384,7 +385,7 @@ div.activity-modal-container {
                     @include avenir_H();
                     font-size: 12px;
                     color: $carrot_light_gray_3;
-                    background-color: #F5F4F1;
+                    background-color: $carrot_light_gray_9;
                     opacity: 0.7;
 
                     &:hover {
@@ -456,13 +457,14 @@ div.activity-modal-container {
           flex-shrink: 0;
           flex-basis: 301px;
           width: 301px;
+          max-height: calc(100vh - 72px);
+          min-height: 378px;
           background-color: rgba($carrot_light_gray_2, 0.15);
           position: relative;
           border-left: 1px solid rgba($carrot_light_gray_7, 0.5);
 
           div.activity-right-column-content {
             padding: 24px;
-            position: absolute;
             bottom: 0px;
             width: 100%;
             height: 100%;

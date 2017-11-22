@@ -197,6 +197,11 @@ provided in the table below:
 |  :activity-get/finish | API | Activity (secure or not) loaded from API. |
 |  :activity-modal-edit | UI | Activate editing in modal. |
 |  :activity-move | UI | Move an activity from a board to another. |
+|  :activity-share-hide | UI | Hide the share modal. |
+|  :activity-share-reset | UI | Reset the shared data to start a new share. |
+|  :activity-share-show | UI | Show the share modal. |
+|  :activity-share | UI | Start share request with the passed medium and data. |
+|  :activity-share/finish | API | Share request finished. |
 |  :alert-modal-hide | UI | Hide the alert modal view. |
 |  :alert-modal-show | UI | Show the alert modal view. |
 |  :alert-modal-hide-done | UI | Alert modal view hide finished. |

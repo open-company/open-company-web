@@ -19,7 +19,7 @@ div.activity-share-modal-container {
 
   div.modal-wrapper {
     width: #{520 + 20 + 8}px;
-    margin: 100px auto 50px;
+    margin: 60px auto 50px;
     position: relative;
 
     div.activity-share-modal {
@@ -31,7 +31,7 @@ div.activity-share-modal-container {
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
       padding: 32px 24px;
 
-      div.shared-subheadline {
+      div.activity-share-subheadline {
         @include avenir_BOOK();
         color: $carrot_gray;
         font-size: 16px;
@@ -39,43 +39,83 @@ div.activity-share-modal-container {
         text-align: center;
       }
 
-      div.title {
+      div.activity-share-main-cta {
         @include avenir_H();
-        font-size: 24px;
-        color: $carrot_light-gray_1;
+        font-size: 20px;
+        color: $carrot_dark_gray;
+        position: relative;
+        padding-bottom: 32px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
-        span {
-          @include activity-title();
-          color: $carrot_dark_gray_1;
-          white-space: pre;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 400px;
-          display: block;
-          float: right;
+        span.activity-share-post-title {
+          @include avenir_BOOK();
         }
       }
 
-      div.access {
-        margin-top: 24px;
-        @include avenir_R();
-        color: $carrot_gray;
-        font-size: 15px;
+      div.activity-share-divider-line {
+        width: calc(100% + 48);
+        margin-left: -24px;
+        height: 1px;
+        background-color: rgba($carrot_light_gray, 0.2);
+      }
 
-        span.board-name {
+      div.activity-share-subheadline {
+        @include avenir_R();
+        font-size: 14px;
+        color: $oc_gray_7;
+        text-align: center;
+        position: relative;
+        padding-bottom: 24px;
+      }
+
+      div.activity-share-medium-selector-container {
+        width: 100%;
+        height: 80px;
+        padding-bottom: 32px;
+
+        div.activity-share-medium-selector {
+          width: 33%;
+          height: 48px;
+          border: 1px solid #D8DBDF;
           @include avenir_H();
+          font-size: 15px;
+          text-align: center;
+          padding-top: 15px;
+          background-color: white;
+          color: $carrot_light_gray_3;
+          float: left;
+          cursor: pointer;
+
+          &.medium-selector-disabled {
+            opacity: 0.5;
+          }
+
+          &.selected {
+            background-color: $carrot_light_gray_9;
+            color: $carrot_dark_gray;
+          }
+
+          &:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            border-right: 0px;
+          }
+
+          &:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-left: 0px;
+          }
         }
       }
 
       div.activity-share-share {
 
         div.mediums-box {
-          margin-top: 24px;
-          border: 1px solid rgba($carrot_light_gray_1, 0.3);
-          width: calc(100% + 48px);
-          margin-left: -24px;
-          background-color: rgba($carrot_light_gray_2, 0.3);
-
+          
           div.medium {
             @include avenir_M();
             color: $carrot_dark_gray;
@@ -91,23 +131,11 @@ div.activity-share-modal-container {
               float: right;
             }
 
-            &:last-child {
-              border-top: 1px solid rgba($carrot_light_gray_1, 0.3);
-            }
-
             div.email-medium, div.slack-medium {
 
               div.medium-row {
-                margin: 0px;
                 min-height: 40px;
-
-                &:first-child {
-                  margin-top: 14px;
-                }
-
-                &.subject {
-                  margin-top: 8px;
-                }
+                margin-top: 16px;
 
                 div.fields.error {
                   position: relative;
@@ -131,58 +159,35 @@ div.activity-share-modal-container {
                   }
                 }
 
-                &.note {
-                  span.labels {
-                    line-height: 1.8;
-                    margin-top: 4px;
-                    display: block;
-                    float: left;
-                    padding-top: 8px;
-                    white-space: pre-wrap;
-                    width: 100px;
-                    text-align: left;
-                  }
-
-                  div.fields {
-                    margin-top: 8px;
-                    textarea {
-                      width: 340px;
-                      min-height: 77px;
-                      border-radius: 4px;
-                      background-color: white;
-                      border: 1px solid rgba($carrot_light_gray_1, 0.5);
-                      @include avenir_M();
-                      font-size: 14px;
-                      color: $oc_gray_7;
-                      padding: 0.4rem 0.8rem;
-                      outline: none;
-                    }
-                  }
-                }
-
-                span.labels {
-                  @include avenir_BOOK();
-                  font-size: 16px;
-                  color: $carrot_gray;
+                div.labels {
+                  @include avenir_H();
+                  font-size: 12px;
+                  color: $carrot_dark_gray;
                   padding-top: 8px;
                   display: block;
-                  float: left;
+
+                  span.optional {
+                    @include avenir_M();
+                    font-size: 12px;
+                    color: #94989D;
+                  }
                 }
 
                 div.fields {
-                  float: right;
+                  margin-top: 8px;
 
                   div.email-field {
-                    width: 340px;
+                    width: 100%;
                     min-height: 40px;
                     border-radius: 4px;
                     background-color: white;
-                    border: 1px solid rgba($carrot_light_gray_1, 0.5);
                     @include avenir_M();
                     font-size: 14px;
                     color: $oc_gray_7;
                     padding: 0rem 0.8rem 0.4rem;
                     outline: none;
+                    border: 1px solid $carrot_light_gray_1;
+                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
 
                     &:empty {
                       padding: 0.4rem 0.8rem;
@@ -204,6 +209,7 @@ div.activity-share-modal-container {
 
                     input {
                       border: none;
+                      box-shadow: none;
                       padding: 0px;
                       margin: 0px;
                       outline: none;
@@ -218,17 +224,32 @@ div.activity-share-modal-container {
                     }
                   }
 
-                  input {
-                    width: 340px;
-                    height: 40px;
+                  textarea {
+                    width: 100%;
+                    min-height: 77px;
                     border-radius: 4px;
                     background-color: white;
-                    border: 1px solid rgba($carrot_light_gray_1, 0.5);
                     @include avenir_M();
                     font-size: 14px;
                     color: $oc_gray_7;
                     padding: 0.4rem 0.8rem;
                     outline: none;
+                    border: 1px solid $carrot_light_gray_1;
+                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                  }
+
+                  input {
+                    width: 100%;
+                    height: 40px;
+                    border-radius: 4px;
+                    background-color: white;
+                    @include avenir_M();
+                    font-size: 14px;
+                    color: $oc_gray_7;
+                    padding: 0.4rem 0.8rem;
+                    outline: none;
+                    border: 1px solid $carrot_light_gray_1;
+                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
                   }
                 }
               }
@@ -237,64 +258,92 @@ div.activity-share-modal-container {
         }
 
         div.share-footer{
-          div.buttons {
+          button {
+            height: 48px;
+            padding: .2em 1.8em;
+
+            &.disabled {
+              opacity: 0.6;
+            }
+          }
+
+          div.left-buttons {
+            float: left;
+            height: 48px;
+            margin-top: 24px;
+
+            button {
+              @include avenir_H();
+              font-size: 14px;
+              color: #8B8F95;
+            }
+          }
+
+          div.right-buttons {
             float: right;
             height: 48px;
             margin-top: 24px;
 
             button {
-              margin-left: 16px;
-              height: 48px;
-              padding: .2em 1.8em;
-
-              &.disabled {
-                opacity: 0.6;
-              }
+              @include avenir_H();
+              font-size: 16px;
             }
           }
         }
       }
 
       div.activity-share-modal-shared {
-        text-align: center;
+        margin-top: 32px;
 
-        div.shared-headline {
+        div.share-headline {
           @include avenir_H();
-          font-size: 16px;
+          font-size: 12px;
+          color: $carrot_dark_gray;
+          margin-bottom: 8px;
+        }
+
+        div.shared-subheadline {
+          @include avenir_BOOK();
+          font-size: 12px;
           color: $carrot_dark_gray_1;
           margin-top: 8px;
+          display: block;
+          float: left;
         }
 
         div.shared-url-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.6);
           padding: 7px 4px 7px 8px;
           border-radius: 4px;
-          margin: 16px auto 0;
-          width: 368px;
+          width: 333px;
           height: 40px;
+          float: left;
 
           input {
             border: none;
             outline: none;
             padding: 0.3rem;
             margin: 0;
-            width: 288px;
+            width: 100%;
             @include avenir_R();
             color: $carrot_dark_gray;
             font-size: 14px;
-            float: left;
           }
 
-          button.copy-btn {
-            width: 56px;
-            height: 26px;
-            text-align: center;
-            padding: 0;
-            margin: 0;
-            @include avenir_H();
-            font-size: 12px;
-            float: right;
+          div.tooltip {
+            margin-top: -10px;
           }
+        }
+
+        button.copy-btn {
+          height: 40px;
+          text-align: center;
+          padding: 4px 16px;
+          margin: 0;
+          @include avenir_H();
+          font-size: 12px;
+          float: left;
+          margin-left: 16px;
         }
 
         button.done-btn {

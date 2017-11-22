@@ -65,6 +65,17 @@
 
 (def whats-new-key [:whats-new-data])
 
+(defn current-board-key
+  "Find the board key for db based on the current path."
+  []
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)]
+        ;; if we are coming from all-posts
+        (if (:from-all-posts @router/path)
+          ;; We need to update the entry in all-posts data, not in the board data
+          (all-posts-key org-slug)
+          (board-data-key org-slug board-slug))))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -217,15 +228,18 @@
                               (:topics board-data)
                               (let [edit-board-slug (:board-slug entry-editing)]
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
-   :modal-data          [[:base :org-data :entry-edit-topics]
-                          (fn [base org-data entry-edit-topics]
+   :activity-share        [[:base] (fn [base] (:activity-share base))]
+   :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
+   :modal-data          [[:base :org-data :entry-edit-topics :activity-share]
+                          (fn [base org-data entry-edit-topics activity-share]
                             {:org-data org-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
                              :board-filters (:board-filters base)
                              :modal-editing-data (:modal-editing-data base)
                              :modal-editing (:modal-editing base)
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
-                             :entry-edit-topics entry-edit-topics})]
+                             :entry-edit-topics entry-edit-topics
+                             :activity-share activity-share})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]
@@ -233,8 +247,6 @@
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
    :story-editing-publish [[:base] (fn [base] (:story-editing-published-url base))]
-   :activity-share        [[:base] (fn [base] (:activity-share base))]
-   :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :confirm-invitation    [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)

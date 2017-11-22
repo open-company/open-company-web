@@ -18,7 +18,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
@@ -125,7 +124,6 @@
     (when (and (utils/link-for (:links activity-data) "partial-update")
                (not @(::showing-dropdown state))
                (not @(::move-activity state))
-               (not @(::share-dropdown state))
                (not (.contains (.-classList (.-activeElement js/document)) "add-comment")))
       (real-start-editing state focus))))
 
@@ -181,6 +179,14 @@
         (dis/dispatch! [:alert-modal-show alert-data]))
       (dismiss-fn)))))
 
+(defn modal-height-did-change
+  "Save the height of the activity modal in the local component state
+   so the top margin is moved accordigly on the next render."
+  [s]
+  (when-let [activity-modal (rum/ref-node s "activity-modal")]
+    (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
+      (reset! (::activity-modal-height s) (.-clientHeight activity-modal)))))
+
 (def default-min-modal-height 450)
 
 (rum/defcs activity-modal < rum/reactive
@@ -193,9 +199,9 @@
                             (rum/local nil ::esc-key-listener)
                             (rum/local false ::move-activity)
                             (rum/local default-min-modal-height ::activity-modal-height)
-                            (rum/local false ::share-dropdown)
                             (rum/local nil ::window-click)
                             (rum/local false ::show-bottom-border)
+                            (rum/local nil ::window-resize-listener)
                             ;; Editing locals
                             (rum/local false ::editing)
                             (rum/local "" ::initial-headline)
@@ -211,10 +217,8 @@
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (when (and (not @(::animate s))
                                          (= (:activity-modal-fade-in modal-data) (:uuid (first (:rum/args s)))))
-                                  (reset! (::animate s) true))
-                                (when-let [activity-modal (sel1 [:div.activity-modal])]
-                                  (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
-                                    (reset! (::activity-modal-height s) (.-clientHeight activity-modal)))))
+                                  (reset! (::animate s) true)))
+                              (modal-height-did-change s)
                               s)
                              :will-mount (fn [s]
                               (reset! (::esc-key-listener s)
@@ -245,10 +249,12 @@
                                               (utils/event-inside? e (sel1 [:div.activity-modal :div.more-dropdown])))
                                              (not
                                               (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-move]))))
-                                    (reset! (::showing-dropdown s) false))
-                                  (when
-                                   (not (utils/event-inside? e (sel1 [:div.activity-modal :div.activity-modal-share])))
-                                    (reset! (::share-dropdown s) false)))))
+                                    (reset! (::showing-dropdown s) false)))))
+                              (reset! (::window-resize-listener s)
+                               (events/listen
+                                js/window
+                                EventType/RESIZE
+                                #(modal-height-did-change s)))
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (when (:modal-editing modal-data)
                                   (utils/after 1000
@@ -256,9 +262,10 @@
                               s)
                              :after-render (fn [s]
                               (when @(:first-render-done s)
-                                (let [wh (.-innerHeight js/window)
-                                      activity-modal (rum/ref-node s "activity-modal")
-                                      next-show-bottom-border (>= (.-clientHeight activity-modal) wh)]
+                                (let [activity-modal-content (sel1 [:div.activity-modal-content])
+                                      scroll-height (.-scrollHeight activity-modal-content)
+                                      client-height (.-clientHeight activity-modal-content)
+                                      next-show-bottom-border (> scroll-height client-height)]
                                   (when (not= @(::show-bottom-border s) next-show-bottom-border)
                                     (reset! (::show-bottom-border s) next-show-bottom-border))))
                               s)
@@ -269,6 +276,9 @@
                               (when @(::esc-key-listener s)
                                 (events/unlistenByKey @(::esc-key-listener s))
                                 (reset! (::esc-key-listener s) nil))
+                              (when @(::window-resize-listener s)
+                                (events/unlistenByKey @(::window-resize-listener s))
+                                (reset! (::window-resize-listener s) nil))
                               s)
                              :did-remount (fn [_ s]
                               (let [activity-data (first (:rum/args s))
@@ -305,10 +315,11 @@
                     (close-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
-        [:button.carrot-modal-close.mlb-reset
-          {:on-click #(if editing
-                        (dismiss-editing? s true)
-                        (close-clicked s))}]
+        (when-not (:activity-share modal-data)
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(if editing
+                          (dismiss-editing? s true)
+                          (close-clicked s))}])
         [:div.activity-modal.group
           {:ref "activity-modal"
            :class (str "activity-modal-" (:uuid activity-data))}
@@ -390,7 +401,9 @@
                                        (utils/event-stop e)
                                        (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
                        :dangerouslySetInnerHTML @(::initial-headline s)}]
-                    (rich-body-editor {:on-change (partial body-on-change s)
+                    (rich-body-editor {:on-change #(do
+                                                    (body-on-change s)
+                                                    (modal-height-did-change s))
                                        :initial-body @(::initial-body s)
                                        :show-placeholder false
                                        :show-h2 true
@@ -431,40 +444,15 @@
                       (when (utils/link-for (:links activity-data) "partial-update")
                         [:button.mlb-reset.post-edit
                           {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                                    (not @(::showing-dropdown s))
-                                                                    (not @(::share-dropdown s)))})
+                                                                    (not @(::showing-dropdown s)))})
                            :on-click (fn [e]
                                        (utils/remove-tooltips)
                                        (real-start-editing s :headline))}
                           "Edit"])
                       (when (utils/link-for (:links activity-data) "share")
                         [:div.activity-modal-share
-                          (when @(::share-dropdown s)
-                            [:div.share-dropdown
-                              [:div.triangle]
-                              [:ul.share-dropdown-menu
-                                (when (jwt/team-has-bot? (:team-id (dis/org-data)))
-                                  [:li.share-dropdown-item
-                                    {:on-click (fn [e]
-                                                 (reset! (::share-dropdown s) false)
-                                                 ; open the activity-share-modal component
-                                                 (dis/dispatch! [:activity-share-show :slack activity-data]))}
-                                    "Slack"])
-                                [:li.share-dropdown-item
-                                  {:on-click (fn [e]
-                                               (reset! (::share-dropdown s) false)
-                                               ; open the activity-share-modal component
-                                               (dis/dispatch! [:activity-share-show :email activity-data]))}
-                                  "Email"]
-                                [:li.share-dropdown-item
-                                  {:on-click (fn [e]
-                                               (reset! (::share-dropdown s) false)
-                                               ; open the activity-share-modal component
-                                               (dis/dispatch! [:activity-share-show :link activity-data]))}
-                                  "Link"]]])
                           [:button.mlb-reset.share-button
-                            {:on-click #(do
-                                         (reset! (::share-dropdown s) (not @(::share-dropdown s))))}
+                            {:on-click #(dis/dispatch! [:activity-share-show activity-data])}
                             "Share"]])]])]]
             ;; Right column
             (when show-comments?

@@ -92,27 +92,9 @@ nav.oc-navbar {
         @include avenir_H();
         font-size: 26px;
 
-        div.org-avatar {
+        button.orgs-dropdown div.org-avatar {
           height: 40px;
           @include org-avatar(40);
-        }
-
-        div.orgs-dropdown {
-          ul.dropdown-menu {
-            li div.org-avatar {
-              height: 24px;
-              @include org-avatar(24);
-
-              div.org-avatar-container {
-                span.org-name {
-                  @include avenir_M();
-                  font-size: 14px;
-                  color: $oc_gray_5;
-                  margin-top: 6px;
-                }
-              }
-            }
-          }
         }
       }
     }
