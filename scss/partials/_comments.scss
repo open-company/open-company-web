@@ -34,7 +34,7 @@ div.comments {
     top: 0;
 
     &.add-comment-focus {
-      padding-bottom: 148px;
+      height: calc(100% - 123px);
     }
 
     div.comments-internal-scroll {
@@ -152,7 +152,7 @@ div.comments {
 
       left: 0;
       right: 0;
-      bottom: 12px;
+      bottom: 0px;
       width: 100%;
       margin-top: 16px;
 
