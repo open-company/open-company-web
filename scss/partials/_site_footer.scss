@@ -54,11 +54,12 @@
           color: $carrot_dark_brown;
           @include avenir_M();
           font-size: 13px;
-          text-decoration: underline;
+          text-decoration: none;
           opacity: 0.9;
 
           &:hover {
             opacity: 1;
+            text-decoration: underline;
           }
         }
       }

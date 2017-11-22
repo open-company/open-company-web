@@ -8,8 +8,8 @@
 div.site-mobile-menu {
   position: absolute;
   width: 100vw;
-  height: calc(100vh - 74px);
-  top: 74px;
+  height: calc(100vh - 73px);
+  top: 73px;
   left: 0px;
   background-color: white;
   z-index: 1081;
@@ -39,7 +39,7 @@ div.site-mobile-menu {
   div.site-mobile-menu-footer {
     position: absolute;
     width: 100%;
-    bottom: 30px;
+    bottom: 60px;
     left: 0px;
     padding: 16px;
 
@@ -47,7 +47,7 @@ div.site-mobile-menu {
       max-width: none;
       height: 48px;
       width: 100%;
-      margin: 16px 0px;
+      margin: 16px 0px 0px;
     }
   }
 }

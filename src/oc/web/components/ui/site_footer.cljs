@@ -88,7 +88,7 @@
               {:href oc-urls/sign-up
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
               "Get Started"]
-            "|"
+            "or"
             [:a
               {:href oc-urls/login
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
