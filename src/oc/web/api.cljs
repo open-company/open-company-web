@@ -695,15 +695,15 @@
                                                       :activity-uuid (:uuid activity-data)}]))))))
 
 (defn toggle-reaction
-  [activity-uuid reaction-data]
-  (when (and activity-uuid reaction-data)
+  [item-data reaction-data]
+  (when (and item-data reaction-data)
     (let [reaction-link (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"])]
       (interaction-http (method-for-link reaction-link) (relative-href reaction-link)
         {:headers (headers-for-link reaction-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch!
            [:reaction-toggle/finish
-            activity-uuid
+            item-data
             (:reaction reaction-data)
             (when success (json->cljs body))]))))))
 
