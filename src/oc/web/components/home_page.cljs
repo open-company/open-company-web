@@ -64,11 +64,12 @@
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
           [:div.get-started-button-container
-            [:button.mlb-reset.get-started-button
-              {:on-click #(if (utils/in? (:route @router/path) "login")
-                            (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                            (router/nav! oc-urls/sign-up-with-slack))}
-              "Get started for free"]]
+            (when-not (jwt/jwt)
+              [:button.mlb-reset.get-started-button
+                {:on-click #(if (utils/in? (:route @router/path) "login")
+                              (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                              (router/nav! oc-urls/sign-up-with-slack))}
+                "Get started for free"])]
           (when (and (not @(::confirm s))
                      @(::thanks-box-top s))
             (carrot-box-thanks))
@@ -180,11 +181,8 @@
                 "Expand your network"]
               [:div.description
                 (str
-                 "Share news with recruits, potential investors and "
-                 "customers to keep them engaged and supportive. ")]
-              [:div.description
-                (str
-                 "It’s an easy way to build trust and grow your business.")]]]]
+                 "Share news with recruits, potential investors and customers to keep them "
+                 "engaged and supportive. Build trust and grow your business.")]]]]
 
         [:section.fourth-section.group
           [:div.above-noise-container
@@ -192,19 +190,12 @@
               "Get above the noise"]
             [:div.above-noise-description
               "Give your team a clear view of what’s most important."]
-            [:button.mlb-reset.get-started-button
-              "Get started for free"]]]
-
-        (comment
-          (when-not (jwt/jwt)
-            [:div.try-it
-              {:id "mc_embed_signup"}
-              [:div.try-it-title
-                {:id "thank-you-bottom"}
-                "Request early access"]
-              [:button.get-started-button
-                "Get Started"]]))
-
+            (when-not (jwt/jwt)
+              [:button.mlb-reset.get-started-button
+                {:on-click #(if (utils/in? (:route @router/path) "login")
+                              (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                              (router/nav! oc-urls/sign-up-with-slack))}
+                "Get started for free"])]]
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 
