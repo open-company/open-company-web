@@ -27,7 +27,7 @@
 (rum/defc site-header < rum/static
   []
   ; <!-- Nav Bar -->
-  [:nav.site-navbar.reactaaaaa
+  [:nav.site-navbar
     [:div.site-navbar-container
       [:a.navbar-brand-center
         {:href oc-urls/home
