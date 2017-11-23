@@ -1,7 +1,11 @@
 (ns oc.privacy)
 
 (defn privacy [{contact-mail-to :contact-mail-to contact-email :contact-email}]
-  [:div.container
+  [:div.container.privacy-policy-page
+    [:div.balloon.big-yellow]
+    [:div.balloon.big-red]
+    [:div.balloon.big-purple]
+
     [:div.legal-link "Click here to see OpenCompany " [:a {:href "/terms"} "Terms of Service"] "."]
     [:div.readable-content-container
       [:h1 "Privacy policy"]
