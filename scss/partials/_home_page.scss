@@ -780,8 +780,7 @@ div.main.home-page, div.about {
 
     div.above-noise-container {
       width: 1053px;
-      height: 254px;
-      margin: 0px auto;
+      margin: 0px auto 46px;
 
       @include mobile(){
         width: 100%;
