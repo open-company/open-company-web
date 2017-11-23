@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -38,11 +39,11 @@
           [:a
             {:href oc-urls/home
              :class (when (utils/in? (:route @router/path) "home") "active")
-             :on-click #(do
-                         (utils/event-stop %)
-                         (dis/dispatch! [:login-overlay-show nil])
-                         (dis/dispatch! [:site-menu-toggle])
-                         (router/nav! oc-urls/home))}
+             :on-click (fn [e]
+                        (utils/event-stop e)
+                        (dis/dispatch! [:login-overlay-show nil])
+                        (dis/dispatch! [:site-menu-toggle])
+                        (router/nav! oc-urls/home))}
             "Home"]]
         ; [:div.site-mobile-menu-item
         ;   [:a
@@ -58,11 +59,11 @@
           [:a
             {:href oc-urls/about
              :class (when (utils/in? (:route @router/path) "about") "active")
-             :on-click #(do
-                         (utils/event-stop %)
-                         (dis/dispatch! [:login-overlay-show nil])
-                         (dis/dispatch! [:site-menu-toggle])
-                         (router/nav! oc-urls/about))}
+             :on-click (fn [e]
+                        (.preventDefault e)
+                        (dis/dispatch! [:login-overlay-show nil])
+                        (dis/dispatch! [:site-menu-toggle true])
+                        (router/nav! oc-urls/about))}
             "About"]]
         [:div.site-mobile-menu-item
           [:a
@@ -70,13 +71,23 @@
              :target "_blank"}
             "Blog"]]]
       [:div.site-mobile-menu-footer
-        [:button.mlb-reset.mlb-default
-          {:on-click #(if (utils/in? (:route @router/path) "login")
-                        (dis/dispatch! [:login-overlay-show :login-with-slack])
-                        (router/nav! oc-urls/login))}
-          "Log In"]
+        (when-not (jwt/jwt)
+          [:button.mlb-reset.mlb-default
+            {:on-click (fn [e]
+                        (dis/dispatch! [:site-menu-toggle])
+                        (if (utils/in? (:route @router/path) "login")
+                          (dis/dispatch! [:login-overlay-show :login-with-slack])
+                          (router/nav! oc-urls/login)))}
+            "Log In"])
         [:button.mlb-reset.get-started-button
-          {:on-click #(if (utils/in? (:route @router/path) "login")
-                        (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                        (router/nav! oc-urls/sign-up-with-slack))}
-          "Get started for free"]]]))
+          {:class (when (jwt/jwt) "your-boards")
+           :on-click (fn [e]
+                      (dis/dispatch! [:site-menu-toggle])
+                      (if (jwt/jwt)
+                        (router/redirect! (utils/your-boards-url))
+                        (if (utils/in? (:route @router/path) "login")
+                          (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                          (router/nav! oc-urls/sign-up-with-slack))))}
+          (if (jwt/jwt)
+            "Your Boards"
+            "Get started for free")]]]))
