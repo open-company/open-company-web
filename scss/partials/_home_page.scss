@@ -649,8 +649,7 @@ div#wrap {
         padding: 40px 24px;
 
         @include mobile() {
-          width: calc(100% + 64px);
-          margin-left: -32px;
+          width: 100%;
           height: auto;
         }
 
