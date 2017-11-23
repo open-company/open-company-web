@@ -361,9 +361,12 @@
         auth-url-with-redirect (utils/slack-link-with-state
                                 (:href auth-url)
                                 nil
-                                "open-company-auth" oc-urls/slack-lander-check)]
-    (when (and (not (.startsWith current oc-urls/login))
-               (not (.startsWith current oc-urls/sign-up))
+                                "open-company-auth" oc-urls/slack-lander-check)
+        current-route (:route @router/path)]
+    (when (and (not (utils/in? current-route "login"))
+               (not (utils/in? current-route "sign-up"))
+               (not (utils/in? current-route "about"))
+               (not (utils/in? current-route "home"))
                (not (cook/get-cookie :login-redirect)))
         (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
     (router/redirect! auth-url-with-redirect))
@@ -706,10 +709,12 @@
     db))
 
 (defmethod dispatcher/action :site-menu-toggle
-  [db [_]]
-  (if (responsive/is-mobile-size?)
-    (update-in db [:site-menu-open] not)
-    db))
+  [db [_ force-close]]
+  (let [next-site-menu-open (if (or force-close
+                                    (not (responsive/is-mobile-size?)))
+                              false
+                              (not (:site-menu-open db)))]
+    (assoc db :site-menu-open next-site-menu-open)))
 
 (defn sort-reactions [entry]
   (let [reactions (:reactions entry)
