@@ -25,13 +25,17 @@ div.comments {
 
   div.comments-internal {
     min-height: 127px;
-    height: calc(100% - 123px);
+    height: calc(100% - 58px);
     width: 100%;
     position: relative;
     bottom: 8px;
     left: 0;
     right: 0;
     top: 0;
+
+    &.add-comment-focus {
+      height: calc(100% - 123px);
+    }
 
     div.comments-internal-scroll {
       overflow-x: hidden;
@@ -139,11 +143,16 @@ div.comments {
       border-radius: 4px;
       border: 1px solid rgba($carrot_light_gray_1, 0.5);
       box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
-      padding: 16px;
       position: relative;
+      padding: 12px;
+
+      &.show-buttons {
+        padding: 16px;
+      }
+
       left: 0;
       right: 0;
-      bottom: 12px;
+      bottom: 0px;
       width: 100%;
       margin-top: 16px;
 
@@ -193,7 +202,11 @@ div.comments {
           color: $carrot_light_gray_3;
           font-size: 13px;
           cursor: text;
-          height: 58px;
+
+          &.show-buttons {
+            height: 58px;
+          }
+
           margin-bottom: 4px;
           overflow: auto;
 
