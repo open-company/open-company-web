@@ -57,13 +57,20 @@ $(document).ready(function(){
   // Get the jwt cookie to know if the user is logged in
   var jwt = getCookie(cookieName("jwt"));
   if (jwt) {
-    $("#site-header-login-item").hide();
+    $("#site-header-signup-item").hide();
+    // Remove the get started centered button if the user is signed out
+    $("#get-started-centred-bt").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage
-    $("div.try-it").css({"display": "none"});
-    // Remove the label below it too
-    $("#easy-setup-label").css({"display": "none"});
+    $("section.fourth-section").css({"display": "none"});
+    // Remove login button from the site mobile menu
+    $("button#site-mobile-menu-login").css({"display": "none"});
+    // Change Get started button to Your boards on site mobile menu
+    var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
+    siteMobileMenuGetStarted.text( "Your Boards" );
+    siteMobileMenuGetStarted.addClass("your-boards");
     // Top right corner became Your Boards
-    $("#site-header-signup-item").text( "Your Boards" );
+    var loginButton = $("#site-header-login-item");
+    loginButton.text( "Your Boards" );
     var your_board_url = "/login",
         decoded_jwt;
     if ( typeof jwt_decode === "function" ) {
@@ -90,18 +97,21 @@ $(document).ready(function(){
         }
       }
     }
-    $("#site-header-signup-item").attr("onClick", "window.location = \"" + your_board_url + "\";");
+    loginButton.attr("href", your_board_url);
+    // Set the action of the site mobile menu's Get started button
+    siteMobileMenuGetStarted.attr("onClick", "window.location = \"" + your_board_url + "\"");
     // If in 404 page show error message for logged in users
     $("div.error-page.not-found-page p.not-logged-in").hide();
 
   }else{ // No logged in user
     // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/login?slack\"");
-    // Top right corner button
-    $("#site-header-signup-item").text("Get Started");
-    $("#site-header-signup-item").attr("onClick", "window.location = \"/login?slack\"");
+    // Top right corner signup button
+    $("#site-header-signup-item").attr("href", "/login?slack");
+    // Top right corner login button
+    $("#site-header-login-item").attr("href", "/login");
     // If in 404 page show error message for not logged in users
-    $("div.error-page.not-found-page p.logged-in").hide();
+    $("div.error-page.not-found-page p.logged-in").show();
   }
 
 });
