@@ -349,7 +349,8 @@ div#wrap {
 
           @include mobile(){
             width: 100%;
-            margin: 0px auto;
+            margin: 0px auto 32px;
+            padding: 0px 16px;
           }
 
           div.team-card {
