@@ -53,14 +53,14 @@ nav.site-navbar {
       height: 42px;
 
       a.login {
-        width: 96px;
+        min-width: 96px;
         height: 42px;
         border-radius: 100px;
         background-color: $carrot_orange_light;
         color: #FA6654;
         @include avenir_H();
         font-size: 16px;
-        padding: 10px 8px;
+        padding: 10px 24px;
         text-align: center;
         margin-top: 0px;
 
