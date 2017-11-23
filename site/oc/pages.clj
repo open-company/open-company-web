@@ -75,6 +75,7 @@
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
+            {:id "get-started-centred-bt"}
             "Get started for free"]]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -195,15 +196,6 @@
             "Give your team a clear view of what’s most important."]
           [:button.mlb-reset.get-started-button
             "Get started for free"]]]
-
-      (comment
-        [:div.try-it
-          {:id "mc_embed_signup"}
-          [:div.try-it-title
-            {:id "thank-you-bottom"}
-            "Request early access"]
-          [:button.get-started-button
-            "Get Started"]])
           ]])
 
 (defn features [options]
