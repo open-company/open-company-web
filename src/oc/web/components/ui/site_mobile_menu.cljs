@@ -21,14 +21,11 @@
                                :will-update (fn [s]
                                 (let [site-menu-open @(drv/get-ref s :site-menu-open)
                                       body (sel1 [:body])]
-                                  (js/console.log "site-mobile-menu/will-update site-menu-open" site-menu-open "has-class" (dommy/has-class? body body-class))
                                   (when (responsive/is-mobile-size?)
                                     (if site-menu-open
                                       (when-not (dommy/has-class? body body-class)
-                                        (js/console.log "adding class")
                                         (dommy/add-class! body body-class))
                                       (when (dommy/has-class? body body-class)
-                                        (js/console.log "removing class")
                                         (dommy/remove-class! body body-class)))))
                                 s)}
   [s]
