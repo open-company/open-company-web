@@ -85,10 +85,10 @@
           "Blog"]]]
     [:div.site-mobile-menu-footer
       [:button.mlb-reset.mlb-default
-        {:onClick "javascript:window.location='/login';"}
+        {:id "site-mobile-menu-login"}
         "Log In"]
       [:button.mlb-reset.get-started-button
-        {:onClick "javascript:window.location='/sign-up';"}
+        {:id "site-mobile-menu-getstarted"}
         "Get started for free"]]])
 
 (defn nav
@@ -109,10 +109,12 @@
           "Blog"]]
       [:div.site-navbar-right.big-web-only
         [:a
-          {:href "/login?slack"}
+          {:id "site-header-signup-item"
+           :href "/login?slack"}
           "Get Started"]
         [:a.login
-          {:href "/login"}
+          {:id "site-header-login-item"
+           :href "/login"}
           "Login"]]
       [:div.mobile-ham-menu.mobile-only
         {:onClick "javascript:siteMobileMenuToggle();"}]]])
