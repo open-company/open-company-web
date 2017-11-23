@@ -182,9 +182,10 @@
 (defn modal-height-did-change
   "Save the height of the activity modal in the local component state
    so the top margin is moved accordigly on the next render."
-  [s]
+  [s & [force-reload]]
   (when-let [activity-modal (rum/ref-node s "activity-modal")]
-    (when (not= @(::activity-modal-height s) (.-clientHeight activity-modal))
+    (when (or force-reload
+              (not= @(::activity-modal-height s) (.-clientHeight activity-modal)))
       (reset! (::activity-modal-height s) (.-clientHeight activity-modal)))))
 
 (def default-min-modal-height 450)
@@ -254,7 +255,7 @@
                                (events/listen
                                 js/window
                                 EventType/RESIZE
-                                #(modal-height-did-change s)))
+                                #(modal-height-did-change s true)))
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (when (:modal-editing modal-data)
                                   (utils/after 1000
