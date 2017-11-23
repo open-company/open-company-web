@@ -18,6 +18,14 @@ button.get-started-button {
     max-width: 280px;
     margin: 16px auto;
     padding: 0px 32px;
+
+    &.your-boards {
+      text-align: center;
+
+      &:after {
+        background-image: none;
+      }
+    }
   }
 
   &:after {
@@ -729,47 +737,6 @@ div#wrap {
         }
       }
     }
-
-    // div.try-it {
-    //   width: 100%;
-    //   margin: 0 auto;
-    //   padding: 56px 0 86px;
-    //   background-image: linear-gradient(252deg, #f7c144, #f2558f);
-    //   text-align: center;
-
-    //   button.get-started-button {
-    //     border: none;
-    //     outline: none;
-    //     background-color: #2E405A;
-    //   }
-
-    //   div.try-it-title {
-    //     @include avenir_H();
-    //     font-size: 36px;
-    //     letter-spacing: 0.1px;
-    //     color: white;
-    //   }
-
-    //   div.try-it-subtitle {
-    //     color: #592121;
-    //     @include avenir_H();
-    //     font-size: 16px;
-    //     line-height: 1.75;
-    //   }
-
-    //   div.try-it-combo-field button.try-it-get-started {
-    //     background-color: $carrot_dark_blue;
-    //   }
-
-    //   div.carrot-box-container {
-    //     color: #592121 !important;
-    //     padding: 0;
-
-    //     div.thanks-headline {
-    //       color: white !important;
-    //     }
-    //   }
-    // }
   }
 }
 
