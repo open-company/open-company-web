@@ -14,9 +14,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.try-it-form :refer (get-started-button)]))
 
-(defn navigate-to-your-boards []
-  (router/redirect! (utils/your-boards-url)))
-
 (defn nav! [uri e]
   (.preventDefault e)
   (when (responsive/is-mobile-size?)
@@ -42,19 +39,25 @@
            :target "_blank"}
           "Blog"]]
       [:div.site-navbar-right.big-web-only
-        [:a
-          {:href oc-urls/sign-up-with-slack
-           :on-click (fn [e]
-                       (.preventDefault e)
-                       (when (responsive/is-mobile-size?)
-                         (dis/dispatch! [:site-menu-toggle true]))
-                       (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
-          "Get Started"]
+        (when-not (jwt/jwt)
+          [:a
+            {:href oc-urls/sign-up-with-slack
+             :on-click (fn [e]
+                         (.preventDefault e)
+                         (when (responsive/is-mobile-size?)
+                           (dis/dispatch! [:site-menu-toggle true]))
+                         (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
+            "Get Started"])
         [:a.login
           {:href oc-urls/login
+           :class (when (jwt/jwt) "your-boards")
            :on-click (fn [e]
                        (.preventDefault e)
-                       (dis/dispatch! [:login-overlay-show :login-with-slack]))}
-          "Login"]]
+                       (if (jwt/jwt)
+                        (nav! (utils/your-boards-url) e)
+                        (dis/dispatch! [:login-overlay-show :login-with-slack])))}
+          (if (jwt/jwt)
+            "Your Boards"
+            "Login")]]
       [:div.mobile-ham-menu.mobile-only
         {:on-click #(dis/dispatch! [:site-menu-toggle])}]]])

@@ -161,7 +161,7 @@
       [:div.left-column
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
-        [:div.footer-small-links
+        [:div.footer-small-links.static
           [:a {:href "/sign-up"} "Get Started"]
           "or"
           [:a {:href "/login"} "Log in"]]

@@ -58,6 +58,8 @@ $(document).ready(function(){
   var jwt = getCookie(cookieName("jwt"));
   if (jwt) {
     $("#site-header-signup-item").hide();
+    // Move the red guy up
+    $("div.home-page div.balloon.small-red-face").addClass("no-get-started-button");
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage
@@ -71,6 +73,7 @@ $(document).ready(function(){
     // Top right corner became Your Boards
     var loginButton = $("#site-header-login-item");
     loginButton.text( "Your Boards" );
+    loginButton.addClass("your-boards");
     var your_board_url = "/login",
         decoded_jwt;
     if ( typeof jwt_decode === "function" ) {
@@ -98,6 +101,7 @@ $(document).ready(function(){
       }
     }
     loginButton.attr("href", your_board_url);
+    $("div.footer-small-links.static").html("<a href=\"" + your_board_url + "\">Your Boards</a>")
     // Set the action of the site mobile menu's Get started button
     siteMobileMenuGetStarted.attr("onClick", "window.location = \"" + your_board_url + "\"");
     // If in 404 page show error message for logged in users

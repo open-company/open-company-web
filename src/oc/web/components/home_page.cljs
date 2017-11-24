@@ -49,7 +49,8 @@
           [:div.balloon.small-red]
           [:div.balloon.small-yellow-face]
           [:div.balloon.small-yellow]
-          [:div.balloon.small-red-face]
+          [:div.balloon.small-red-face
+            {:class (when (jwt/jwt) "no-get-started-button")}]
           [:div.balloon.small-purple]
           [:div.balloon.small-blue-face]
           [:div.balloon.small-red-1]
@@ -57,7 +58,7 @@
           [:div.balloon.small-green-face]
 
           [:h1.headline
-            "Get above the noise"]
+            "Rise above the noise"]
           [:div.subheadline
             "Give your team a clear view of what’s most important."]
           ; (when (and (not @(::confirm s))
@@ -153,7 +154,7 @@
               "Did we mention our Slack integration?"]
             [:div.slack-description
               (str
-               "Posts can be automatically shared to the right channels. Discussions about posts happen "
+               "Posts are automatically shared to the right channels. Discussions about posts happen "
                "in Slack and Carrot - everything is kept in sync.")]
             [:button.mlb-reset.slack-btn
               "Learn More"]]]
@@ -187,7 +188,7 @@
         [:section.fourth-section.group
           [:div.above-noise-container
             [:div.above-noise-title
-              "Get above the noise"]
+              "Rise above the noise"]
             [:div.above-noise-description
               "Give your team a clear view of what’s most important."]
             (when-not (jwt/jwt)
