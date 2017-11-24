@@ -162,6 +162,10 @@ div#wrap {
           left: 50%;
           margin-left: -278px;
           z-index: 11;
+
+          &.no-get-started-button {
+            top: 308px;
+          }
         }
 
         &.small-purple {

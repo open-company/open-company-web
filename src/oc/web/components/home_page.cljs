@@ -49,7 +49,8 @@
           [:div.balloon.small-red]
           [:div.balloon.small-yellow-face]
           [:div.balloon.small-yellow]
-          [:div.balloon.small-red-face]
+          [:div.balloon.small-red-face
+            {:class (when (jwt/jwt) "no-get-started-button")}]
           [:div.balloon.small-purple]
           [:div.balloon.small-blue-face]
           [:div.balloon.small-red-1]
