@@ -4,6 +4,8 @@
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
@@ -185,6 +187,9 @@
             [:div.above-noise-description
               "Give your team a clear view of what’s most important."]
             [:button.mlb-reset.get-started-button
+              {:on-click #(if (utils/in? (:route @router/path) "login")
+                              (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                              (router/nav! oc-urls/sign-up-with-slack))}
               "Get started for free"]]]
       ] ;<!-- main -->
     ] ; <!-- wrap -->
