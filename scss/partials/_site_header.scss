@@ -60,9 +60,26 @@ nav.site-navbar {
         color: #FA6654;
         @include avenir_H();
         font-size: 16px;
-        padding: 10px 24px;
+        padding: 11px 24px;
         text-align: center;
         margin-top: 0px;
+
+        &.your-boards {
+          text-align: center;
+          background-color: $carrot_text_blue;
+          color: white;
+          opacity: 0.8;
+
+          &:hover {
+            background-color: $carrot_text_blue;
+            color: white;
+            opacity: 1;
+          }
+
+          &:after {
+            background-image: none;
+          }
+        }
 
         &:hover {
           background-color: #FA6654;
