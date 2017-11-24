@@ -69,7 +69,7 @@
         [:div.balloon.small-green-face]
 
         [:h1.headline
-          "Get above the noise"]
+          "Rise above the noise"]
         [:div.subheadline
           "Give your team a clear view of what’s most important."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
@@ -191,7 +191,7 @@
       [:section.fourth-section.group
         [:div.above-noise-container
           [:div.above-noise-title
-            "Get above the noise"]
+            "Rise above the noise"]
           [:div.above-noise-description
             "Give your team a clear view of what’s most important."]
           [:button.mlb-reset.get-started-button
@@ -466,7 +466,7 @@
       [:section.fourth-section.group
         [:div.above-noise-container
           [:div.above-noise-title
-            "Get above the noise"]
+            "Rise above the noise"]
           [:div.above-noise-description
             "Give your team a clear view of what’s most important."]
           [:button.mlb-reset.get-started-button
