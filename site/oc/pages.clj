@@ -158,7 +158,7 @@
             "Did we mention our Slack integration?"]
           [:div.slack-description
             (str
-             "Posts can be automatically shared to the right channels. Discussions about posts happen "
+             "Posts are automatically shared to the right channels. Discussions about posts happen "
              "in Slack and Carrot - everything is kept in sync.")]
           [:button.mlb-reset.slack-btn
             "Learn More"]]]
