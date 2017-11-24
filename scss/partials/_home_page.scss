@@ -286,30 +286,37 @@ div#wrap {
       }
 
       div.homepage-screenshot-bubble {
-        @include image-2x("/img/ML/screenshot_bubble");
-        background-size: 997px 345px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 997px;
-        height: 345px;
-        margin: -282px auto 0px;
+        background-color: $carrot_text_blue;
+        border-radius: 8px;
+        width: 940px;
+        height: auto;
+        margin: -120px auto 0px;
         @include avenir_H();
         color: white;
         font-size: 24px;
         text-align: center;
-        padding: 170px 50px 0px;
+        padding: 32px;
         z-index: 12;
         position: relative;
+
+        &:after {
+          content: "";
+          position: absolute;
+          top: -9px;
+          left: calc(50% - 12px);
+          width: 18px;
+          height: 18px;
+          -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+          background-color: $carrot_text_blue;
+        }
 
         @include mobile() {
           width: 100%;
           height: auto;
-          background: none;
           max-width: 100%;
-          margin: 24px auto;
+          margin: -30px auto 0px;
           padding: 16px 32px;
-          background-color: $carrot_text_blue;
-          border-radius: 8px;
         }
       }
     }
@@ -425,7 +432,7 @@ div#wrap {
         margin-bottom: 60px;
         max-width: 940px;
         text-align: center;
-        margin: 0 auto;
+        margin: 70px auto 0px;
         padding: 0px;
 
         @include mobile(){
