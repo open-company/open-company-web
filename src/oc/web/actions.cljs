@@ -1112,15 +1112,22 @@
     ;; the comment has yet to be stored locally in app state so ignore and
     ;; wait for server side reaction
     (when comment-idx
-      (let [comment-data (nth comments-data comment-idx)
+      (let [reaction (:reaction reaction-data)
+            comment-data (nth comments-data comment-idx)
             reactions-data (:reactions comment-data)
-            reaction (:reaction reaction-data)
+            reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
+            old-reaction-data (nth reactions-data reaction-idx)
             reaction-data-with-count (assoc reaction-data :count (:count interaction-data))
             is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
             with-reacted (if is-current-user
+                           ;; If the reaction is from the current user we need to update
+                           ;; the reacted, the links are the one coming with the WS message
                            (assoc reaction-data-with-count :reacted add-event?)
-                           reaction-data-with-count)
-            reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
+                           ;; If it's a reaction from another user we need to survive the
+                           ;; reacted and the links from the reactions we already have
+                           (merge reaction-data-with-count {:reacted (:reacted old-reaction-data)
+                                                            :links (:links old-reaction-data)}))
+            with-links (assoc with-reacted :links old-reaction-data)
             new-reactions-data (assoc reactions-data reaction-idx with-reacted)
             new-comment-data (assoc comment-data :reactions new-reactions-data)
             new-comments-data (assoc comments-data comment-idx new-comment-data)]
