@@ -1,65 +1,252 @@
 $illustration_min_width: 1247;
 
 button.get-started-button {
-  max-width: 320px;
+  width: 280px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 100px;
   background-color: $carrot_text_blue;
   color: white;
-  padding: 3px 56px;
   @include avenir_H();
   font-size: 18px;
-  margin: 20px 16px 0;
-  opacity: 0.9;
+  margin: 48px 16px 0;
+  padding: 0px 42px;
+  position: relative;
+  text-align: left;
 
-  &:hover {
-    opacity: 1;
+  @include mobile(){
+    width: 100%;
+    max-width: 280px;
+    margin: 16px auto;
+    padding: 0px 32px;
+
+    &.your-boards {
+      text-align: center;
+
+      &:after {
+        background-image: none;
+      }
+    }
+  }
+
+  &:after {
+    @include image-2x("/img/ML/get_started_arrow");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    content: "";
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 14px;
+    right: 42px;
+
+    @include mobile(){
+      right: 32px
+    }
   }
 }
 
 div#wrap {
+  background-color: $oc_gray_8;
 
   div.main.home-page {
     width: 100%;
+    background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
+    margin-top: 1px;
 
-    @include big_web(){
-      background-image: cdnUrl("/img/ML/home_page_swoosh.svg");
-      background-position: 0px -159px;
-      background-size: 100% auto;
-      background-repeat: no-repeat;
+    @include mobile() {
+      padding: 0 32px;
     }
 
-    div.cta {
-      padding-top: 116px;
-      padding-bottom: 50px;
+    section.cta {
+      padding-top: 142px;
+      padding-bottom: 0px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
 
-      @include mobile(){
-        padding-top: 46px;
+      @include mobile() {
+        width: 100%;
+        padding-top: 80px;
+      }
+
+      div.balloon {
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+
+        @include mobile() {
+          display: none;
+        }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow");
+          background-size: 172px 172px;
+          width: 172px;
+          height: 172px;
+          top: -46px;
+          left: -57px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/balloon_big_purple");
+          background-size: 111px 111px;
+          width: 111px;
+          height: 111px;
+          top: -64px;
+          right: 118px;
+        }
+
+        &.big-red {
+          @include image-2x("/img/ML/balloon_big_red");
+          background-size: 226px 208px;
+          width: 226px;
+          height: 208px;
+          top: -82px;
+          right: -55px;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/balloon_big_green");
+          background-size: 200px 172px;
+          width: 200px;
+          height: 172px;
+          top: 358px;
+          left: 50%;
+          margin-left: -534px;
+        }
+
+        &.small-purple-face {
+          @include image-2x("/img/ML/balloon_small_purple_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 118px;
+          left: 5.78%;
+        }
+
+        &.small-red {
+          @include image-2x("/img/ML/balloon_small_red");
+          background-size: 15px 17px;
+          width: 15px;
+          height: 17px;
+          top: 103px;
+          left: 13.71%;
+        }
+
+        &.small-yellow-face {
+          @include image-2x("/img/ML/balloon_small_yellow_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 119px;
+          left: 78.57%;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/balloon_small_yellow");
+          background-size: 15px 15px;
+          width: 15px;
+          height: 15px;
+          top: 179px;
+          left: 86.36%;
+        }
+
+        &.small-red-face {
+          @include image-2x("/img/ML/balloon_small_red_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 404px;
+          left: 50%;
+          margin-left: -278px;
+          z-index: 11;
+
+          &.no-get-started-button {
+            top: 308px;
+          }
+        }
+
+        &.small-purple {
+          @include image-2x("/img/ML/balloon_small_purple");
+          background-size: 23px 21px;
+          width: 23px;
+          height: 21px;
+          top: 330px;
+          left: 23.64%;
+        }
+
+        &.small-blue-face {
+          @include image-2x("/img/ML/balloon_small_blue_face");
+          background-size: 42px 42px;
+          width: 42px;
+          height: 42px;
+          top: 904px;
+          left: 7.07%;
+        }
+
+        &.small-red-1 {
+          @include image-2x("/img/ML/balloon_small_red_1");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 1203px;
+          left: 9.71%;
+        }
+
+        &.small-yellow-1 {
+          @include image-2x("/img/ML/balloon_small_yellow_1");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 765px;
+          left: 85.86%;
+        }
+
+        &.small-green-face {
+          @include image-2x("/img/ML/balloon_small_green_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 686px;
+          left: 82.14%;
+        }
+
       }
 
       h1.headline {
         font-size: 48px;
-        @include avenir_B();
-        color: $carrot_dark_blue;
+        @include avenir_H();
+        color: $carrot_dark_brown_1;
         padding: 0 16px;
         max-width: 800px;
-        margin: 0 auto 20px;
+        margin: 0 auto;
         line-height: 60px;
+        z-index: 2;
+        position: relative;
 
         @include mobile() {
-          font-size: 32px;
-          line-height: 45px;
+          max-width: 280px;
+          padding: 0px;
         }
       }
 
       div.subheadline {
-        color: #4D4D4D;
-        font-size: 24px;
+        color: $carrot_dark_brown;
+        font-size: 20px;
         padding: 0 16px;
         @include avenir_R();
         max-width: 620px;
-        margin: 20px auto 0px;
+        margin: 4px auto 0px;
+        z-index: 2;
+        position: relative;
+
+        @include mobile(){
+          margin-top: 16px;
+          font-size: 24px;
+          max-width: 330px
+        }
 
         &.second-line {
           margin: 0px auto 40px;
@@ -70,531 +257,529 @@ div#wrap {
         }
       }
 
+      div.get-started-button-container {
+        margin: 0 auto;
+      }
+
       div.small-teams {
         color: $carrot_dark_blue;
         font-size: 14px;
         @include avenir_H();
         margin-top: 16px;
+        z-index: 2;
+        position: relative;
       }
 
-      div.homepage-main-screenshot {
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 756px 511px;
-        @include image-2x("/img/ML/home_main_screenshot");
-        width: 756px;
-        height: 511px;
-        margin: 48px auto 0px;
-        padding: 0 16px;
-        // box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
+      img.homepage-main-screenshot {
+        width: 940px;
+        margin: 106px auto 0px;
+        padding: 0;
         border: 1px solid rgba($oc_gray_5, 0.05);
+        z-index: 10;
+        position: relative;
 
         @include mobile(){
-          display: none;
+          width: 100%;
+          height: auto;
+          margin: 80px auto 0px;
         }
       }
 
-      div.homepage-screenshot {
-        background-repeat: no-repeat;
+      div.homepage-screenshot-bubble {
+        background-color: $carrot_text_blue;
+        border-radius: 8px;
+        width: 940px;
+        height: auto;
+        margin: -120px auto 0px;
+        @include avenir_H();
+        color: white;
+        font-size: 24px;
+        text-align: center;
+        padding: 32px;
+        z-index: 12;
+        position: relative;
+
+        &:after {
+          content: "";
+          position: absolute;
+          top: -9px;
+          left: calc(50% - 12px);
+          width: 18px;
+          height: 18px;
+          -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+          background-color: $carrot_text_blue;
+        }
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+          max-width: 100%;
+          margin: -30px auto 0px;
+          padding: 16px 32px;
+        }
+      }
+    }
+
+    section.second-section {
+      padding: 0px;
+      position: relative;
+
+      div.why-balloon {
+        position: absolute;
         background-position: center;
-        background-size: 756px 511px;
-        @include image-2x("/img/ML/home_page_screenshot");
-        width: 756px;
-        height: 511px;
-        margin: 48px auto 0px;
-        padding: 0 16px;
+        background-repeat: no-repeat;
+        z-index: 1;
 
-        @include mobile(){
+        @include mobile() {
           display: none;
         }
-      }
-    }
 
-    div.illustrations {
-      text-align: center;
-      padding-bottom: 80px;
-
-      div.illustration {
-        margin: 60px auto;
-        padding: 0 16px;
-
-        @include big_web(){
-          width: #{$illustration_min_width}px;
+        &.big-red {
+          @include image-2x("/img/ML/why_balloon_big_red");
+          background-size: 192px 199px;
+          width: 192px;
+          height: 199px;
+          top: 199px;
+          left: -83px;
         }
 
-        div.description {
-          @include mobile(){
-            margin-top: 60px;
-            padding: 0 16px;
-            max-width: 500px;
-            float: unset;
-            margin: 60px auto 0 !important;
-          }
 
-          @include big_web(){
-            max-width: 455px;
-          }
+        // &.big-blue {
+        //   @include image-2x("/img/ML/why_balloon_big_blue");
+        //   background-size: 121px 125px;
+        //   width: 121px;
+        //   height: 125px;
+        //   top: 38px;
+        //   left: 65px;
+        // }
 
-          div.title {
-            color: $carrot_dark_blue;
-            @include avenir_H();
-            font-size: 36px;
-            letter-spacing: 0.1px;
-            text-align: left;
-
-            &.title-right {
-              text-align: right;
-            }
-          }
-
-          div.subtitle {
-            color: $carrot_dark_blue;
-            @include avenir_R();
-            font-size: 20px;
-            line-height: 1.7;
-            text-align: left;
-
-            &.subtitle-right {
-              text-align: right;
-            }
-
-            &.second-line {
-              margin-top: 20px;
-            }
-
-            a {
-              color: #4C67FC;
-              &:hover {
-                text-decoration: underline;
-              }
-            }
-          }
+        &.small-yellow {
+          @include image-2x("/img/ML/why_balloon_small_yellow");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 17px;
+          left: 83%;
         }
 
-        // 1st illustration
-        &.illustration-1 {
-
-          img.illustration-image {
-            float: left;
-            width: 572px;
-            height: 438px;
-            margin-left: 40px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-top: 75px;
-            margin-right: 50px;
-          }
+        &.big-purple {
+          @include image-2x("/img/ML/why_balloon_big_purple");
+          background-size: 110px 111px;
+          width: 110px;
+          height: 111px;
+          top: 48px;
+          left: 85.93%;
         }
 
-        // 2nd illustration
-        &.illustration-2 {
-
-          img.illustration-image {
-            float: right;
-            width: 521px;
-            height: 385px;
-            margin-right: 90px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: left;
-            text-align: right;
-            margin-top: 90px;
-          }
+        &.small-purple {
+          @include image-2x("/img/ML/why_balloon_small_purple");
+          background-size: 33px 30px;
+          width: 33px;
+          height: 30px;
+          top: 482px;
+          left: 11.93%;
         }
 
-        // 3rd illustration
-        &.illustration-3 {
-          img.illustration-image {
-            float: left;
-            width: 450px;
-            height: 349px;
-            margin-left: 90px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-top: 80px;
-            margin-right: 50px;
-          }
+        &.big-yellow {
+          @include image-2x("/img/ML/why_balloon_big_yellow");
+          background-size: 217px 216px;
+          width: 217px;
+          height: 216px;
+          top: 537px;
+          left: 78.57%;
         }
 
-        &.illustration-4 {
-          img.illustration-image {
-            float: right;
-            width: 521px;
-            height: 283px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: left;
-            text-align: left;
-            margin-left: 50px;
-            margin-top: 50px;
-            max-width: 455px;
-          }
+        &.big-green {
+          @include image-2x("/img/ML/why_balloon_big_green");
+          background-size: 132px 132px;
+          width: 132px;
+          height: 132px;
+          top: 989px;
+          left: 12.21%;
         }
 
-        &.illustration-5 {
-          img.illustration-image {
-            float: left;
-            width: 424px;
-            height: 329px;
-            margin-left: 70px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-top: 70px;
-            margin-right: 30px;
-          }
+        &.small-yellow {
+          @include image-2x("/img/ML/why_balloon_small_yellow");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 999px;
+          left: 11.93%;
+          z-index: 2;
         }
 
-        &.illustration-6 {
-          margin-top: 20px;
-          img.illustration-image {
-            float: right;
-            width: 346px;
-            height: 321px;
-            margin-right: 170px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: left;
-            text-align: left;
-            margin-left: 40px;
-            margin-top: 90px;
-          }
+        &.small-red {
+          @include image-2x("/img/ML/why_balloon_small_red");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 1353px;
+          left: 86%;
         }
 
-        &.illustration-7 {
-          img.illustration-image {
-            float: left;
-            width: 333px;
-            height: 274px;
-            margin-left: 70px;
-
-            @include mobile(){
-              max-width: 100%;
-              width: auto;
-              height: auto;
-              margin: 0 auto;
-              float: unset;
-            }
-          }
-
-          div.description {
-            float: right;
-            text-align: left;
-            margin-right: 40px;
-            margin-top: 20px;
-          }
+        &.small-purple-face {
+          @include image-2x("/img/ML/why_balloon_small_purple_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 1384px;
+          left: 82%;
         }
       }
-    }
-
-    div.home-section {
-      padding: 120px 0px;
 
       div.illustrations-title {
         margin-bottom: 60px;
-        max-width: 770px;
+        max-width: 940px;
         text-align: center;
-        margin: 0 auto;
-        padding: 0px 32px;
+        margin: 70px auto 0px;
+        padding: 0px;
 
         @include mobile(){
           text-align: left;
+          margin-top: 40px;
         }
 
         div.why-carrot {
           @include avenir_H();
           font-size: 48px;
-          color: $carrot_dark_blue;
-          margin-bottom: 24px;
+          color: $carrot_dark_brown_1;
+          margin-bottom: 12px;
+          z-index: 2;
+          position: relative;
+
+          @include mobile() {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+          }
         }
 
         div.why-carrot-description {
           @include avenir_R();
-          font-size: 24px;
-          color: #4D4D4D;
+          font-size: 20px;
+          line-height: 30px;
+          color: $carrot_dark_brown;
+          z-index: 2;
+          position: relative;
+          width: 720px;
+          margin: 0 auto;
+
+          @include mobile() {
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+          }
+        }
+      }
+
+      div.illustrations {
+        width: 980px;
+        margin: 54px auto;
+        position: relative;
+        z-index: 10;
+
+        @include mobile() {
+          width: calc(100% + 64px);
+          margin-left: -32px;
+        }
+
+        div.illustration-container {
+          margin: 20px;
+          width: 450px;
+          height: 400px;
+          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+          padding: 40px 50px;
+          background-color: white;
+          float: left;
+          text-align: center;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+            float: unset;
+            margin: 16px 0px 0px;
+            padding: 30px 32px;
+          }
+
+          &.right {
+            float: right;
+
+            @include mobile(){
+              float: unset;
+            }
+          }
+
+          div.illustration {
+            width: 350px;
+            height: 160px;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            @include mobile() {
+              width: auto;
+              margin: 0 auto;
+            }
+
+            &.illustration-1 {
+              @include image-2x("/img/ML/why_illustration_1_246_151");
+              background-size: 246px 151px;
+            }
+
+            &.illustration-2 {
+              @include image-2x("/img/ML/why_illustration_2_235_150");
+              background-size: 235px 150px;
+            }
+
+            &.illustration-3 {
+              @include image-2x("/img/ML/why_illustration_3_225_151");
+              background-size: 225px 151px;
+            }
+
+            &.illustration-4 {
+              @include image-2x("/img/ML/why_illustration_4_165_160");
+              background-size: 165px 160px;
+            }
+          }
+
+          div.description {
+            margin-top: 24px;
+
+            div.title {
+              color: $carrot_dark_brown;
+              @include avenir_H();
+              font-size: 26px;
+            }
+
+            div.subtitle {
+              color: $carrot_dark_brown;
+              @include avenir_R();
+              font-size: 20px;
+              margin: 10px auto;
+            }
+          }
+        }
+      }
+
+      div.slack-section {
+        width: 800px;
+        height: 293px;
+        text-align: center;
+        margin: 40px auto 100px;
+
+        @include mobile(){
+          width: 100%;
+          height: auto;
+          text-align: center;
+        }
+
+        div.slack-logo {
+          @include image-2x("/img/ML/carrot_plus_slack");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 254px 100px;
+          width: 254px;
+          height: 100px;
+          margin: 0 auto;
+        }
+
+        div.slack-title {
+          color: $carrot_dark_brown;
+          @include avenir_H();
+          font-size: 26px;
+          margin-top: 16px;
+        }
+
+        div.slack-description {
+          color: $carrot_dark_brown;
+          @include avenir_R();
+          font-size: 20px;
+          margin-top: 20px;
+          line-height: 30px;
+          opacity: 0.8;
+        }
+
+        button.mlb-reset.slack-btn {
+          width: 160px;
+          height: 48px;
+          border-radius: 100px;
+          background-color: $carrot_orange_light;
+          color: #FA6654;
+          @include avenir_H();
+          font-size: 16px;
+          padding: 10px 8px;
+          text-align: center;
+          margin: 32px auto 0px;
+
+          &:hover {
+            background-color: #FA6654;
+            color: white;
+            text-decoration: none;
+          }
         }
       }
     }
 
-    div.second-section {
-      background-color: $oc_gray_8;
-      padding: 120px 0px 0px;
-    }
+    section.third-section {
+      background-color: $carrot_light_yellow_1;
+      padding: 72px 0px 100px;
 
-    div.third-section {
+      @include mobile(){
+        width: calc(100% + 64px);
+        margin-left: -32px;
+        padding: 32px 32px 50px;
+        text-align: center;
+      }
+
       div.illustrations-title {
-        max-width: 700px;
-        
-        div.centred-screenshot {
-          width: 471px;
-          height: 319px;
-          margin: 64px auto;
-          background-size: 471px 319px;
-          background-repeat: no-repeat;
-          background-position: center;
-          @include image-2x("/img/ML/home_page_screenshot");
+        margin-bottom: 60px;
+        max-width: 940px;
+        text-align: center;
+        margin: 0 auto;
+        padding: 0px;
 
-          @include mobile(){
-            display: none;
-          }
+        @include mobile(){
+          text-align: center;
+        }
+
+        div.why-carrot {
+          @include avenir_H();
+          font-size: 48px;
+          color: $carrot_dark_brown;
+          margin-bottom: 24px;
+          line-height: 60px;
+        }
+
+        div.why-carrot-description {
+          @include avenir_R();
+          font-size: 20px;
+          color: $carrot_dark_brown;
         }
       }
 
       div.third-section-footer {
-        max-width: 1074px;
-        margin: 60px auto;
-
-        div.left-copy {
-          float: left;
-          width: 489px;
-
-          @include mobile(){
-            float: unset;
-            max-width: 100%;
-            padding: 0px 32px;
-          }
-        }
-
-        div.right-copy {
-          float: right;
-          width: 489px;
-
-          @include mobile(){
-            float: unset;
-            max-width: 100%;
-            padding: 32px 32px;
-          }
-        }
-
-        div.title {
-          color: $carrot_dark_blue;
-          @include avenir_H();
-          font-size: 32px;
-          letter-spacing: 0.1px;
-          text-align: left;
-        }
-
-        div.description {
-          color: #3B3D41;
-          @include avenir_R();
-          font-size: 20px;
-          line-height: 1.7;
-          text-align: left;
-        }
-      }
-    }
-
-    div.customers {
-      width: 100%;
-      margin: 50px auto 0;
-      background-color: $carrot_dark_blue;
-      padding: 60px 0;
-      text-align: center;
-
-      div.customers-title {
-        padding: 0 16px;
-        font-size: 36px;
-        @include avenir_H();
-        color: white;
+        width: 940px;
+        height: 336px;
+        background-color: white;
+        margin: 60px auto 0px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
+        padding: 40px 24px;
 
         @include mobile() {
-          font-size: 28px;
+          width: 100%;
+          height: auto;
         }
 
-        img {
-          width: 40px;
-          height: 40px;
-          margin-right: 20px;
-          margin-top: -4px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-      }
-
-      div.customers-cards {
-        margin: 60px auto;
-        width: 1246px;
-
-        div.left-arrow {
-          height: 200px;
-          width: 48px;
-          float: left;
+        div.copy-separator {
+          margin-top: 26px;
+          width: calc(100% + 48px);
+          height: 1px;
+          margin-left: -24px;
+          background-color: rgba($carrot_light_gray_7,0.5);
 
           @include mobile(){
-            display: none;
-          }
-
-          button {
-            margin-top: 50px;
-            background-image: cdnUrl("/img/ML/home_page_left_arrow.png");
-            background-size: 48px 96px;
-            width: 48px;
-            height: 96px;
-            opacity: 0.9;
-
-            &:hover {
-              opacity: 1;
-            }
-
-            &:disabled {
-              opacity: 0.4;
-            }
+            width: 100%;
+            margin-left: 0px;
           }
         }
 
-        div.customers-cards-scroll {
-          width: 1110px;
-          height: 200px;
-          overflow-x: hidden;
-          overflow-y: hidden;
-          margin: 0 20px;
-          float: left;
-          display: inline-block;
+        div.copy {
+          &:first-child {
+            margin-top: 0px;
+          }
+          margin-top: 26px;
 
-          div.customers-card {
-            margin-right: 15px;
-            width: 360px;
-            height: 200px;
-            border-radius: 10px;
-            background-color: white;
-            box-shadow: 0 1px 2px 0 rgba(145, 145, 145, 0.5);
+          div.copy-icon {
             float: left;
+            width: 114px;
+            height: 114px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-top: -6px;
 
-            &:last-child {
-              margin-right: 0px;
-            }
-          }
-        }
-
-        div.right-arrow {
-          height: 200px;
-          width: 48px;
-          float: right;
-
-          @include mobile(){
-            display: none;
-          }
-
-          button {
-            margin-top: 50px;
-            background-image: cdnUrl("/img/ML/home_page_right_arrow.png");
-            background-size: 48px 96px;
-            width: 48px;
-            height: 96px;
-            opacity: 0.9;
-
-            &:hover {
-              opacity: 1;
+            @include mobile (){
+              float: unset;
+              text-align: center;
+              margin: 0px auto;
             }
 
-            &:disabled {
-              opacity: 0.4;
+            &.copy-simplify {
+              @include image-2x("/img/ML/homepage_illustration_simplify");
+              background-size: 108px 108px;
+            }
+
+            &.copy-expand {
+              @include image-2x("/img/ML/homepage_illustration_expand");
+              background-size: 110px 114px;
             }
           }
-        }
-      }
-    }
 
-    div.try-it {
-      width: 100%;
-      margin: 0 auto;
-      padding: 56px 0 86px;
-      background-image: linear-gradient(252deg, #f7c144, #f2558f);
-      text-align: center;
+          div.title {
+            color: $carrot_dark_brown;
+            @include avenir_H();
+            font-size: 26px;
+            text-align: left;
+            margin-left: 138px;
+            letter-spacing: 0.18;
+            line-height: 36px;
 
-      button.get-started-button {
-        border: none;
-        outline: none;
-        background-color: #2E405A;
-      }
+            @include mobile (){
+              margin: 16px 0px;
+              text-align: center;
+            }
+          }
 
-      div.try-it-title {
-        @include avenir_H();
-        font-size: 36px;
-        letter-spacing: 0.1px;
-        color: white;
-      }
+          div.description {
+            color: $carrot_dark_brown;
+            @include avenir_R();
+            font-size: 20px;
+            line-height: 30px;
+            text-align: left;
+            margin-left: 138px;
+            margin-top: 8px;
 
-      div.try-it-subtitle {
-        color: #592121;
-        @include avenir_H();
-        font-size: 16px;
-        line-height: 1.75;
-      }
-
-      div.try-it-combo-field button.try-it-get-started {
-        background-color: $carrot_dark_blue;
-      }
-
-      div.carrot-box-container {
-        color: #592121 !important;
-        padding: 0;
-
-        div.thanks-headline {
-          color: white !important;
+            @include mobile (){
+              margin: 16px 0px 0px;
+              text-align: center;
+            }
+          }
         }
       }
     }
   }
+}
+
+div.main.home-page, div.about {
+  section.fourth-section {
+    text-align: center;
+    padding: 60px 0px;
+
+    div.above-noise-container {
+      width: 1053px;
+      margin: 0px auto 46px;
+
+      @include mobile(){
+        width: 100%;
+        height: auto;
+        text-align: center;
+      }
+
+      div.above-noise-title {
+        color: $carrot_dark_brown_1;
+        @include avenir_H();
+        font-size: 48px;
+        margin-top: 16px;
+      }
+
+      div.above-noise-description {
+        color: $carrot_dark_brown;
+        @include avenir_R();
+        font-size: 20px;
+        margin-top: 16px;
+      }
+    }
+  }
+
 }

@@ -1,5 +1,110 @@
 /* Header */
 
+nav.site-navbar {
+  height: 72px;
+  background-color: white;
+  z-index: 10;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+
+  div.site-navbar-container {
+    height: 72px;
+    padding: 15px 32px;
+    position: relative;
+
+    div.mobile-ham-menu {
+      @include mobile() {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/mobile_ham_menu.svg");
+        background-size: 18px 14px;
+        background-repeat: no-repeat;
+        background-position: center;
+        top: 22px;
+        left: 24px;
+      }
+    }
+
+    a {
+      @include avenir_M();
+      color: $carrot_dark_brown;
+      font-size: 14px;
+      margin: 0px 8px;
+      display: inline-block;
+      height: 30px;
+      margin-top: 12px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    div.site-navbar-left {
+      position: absolute;
+      top: 15px;
+      left: 16px;
+      height: 42px;
+    }
+
+    div.site-navbar-right {
+      position: absolute;
+      top: 15px;
+      right: 16px;
+      height: 42px;
+
+      a.login {
+        min-width: 96px;
+        height: 42px;
+        border-radius: 100px;
+        background-color: $carrot_orange_light;
+        color: #FA6654;
+        @include avenir_H();
+        font-size: 16px;
+        padding: 11px 24px;
+        text-align: center;
+        margin-top: 0px;
+
+        &.your-boards {
+          text-align: center;
+          background-color: $carrot_text_blue;
+          color: white;
+          opacity: 0.8;
+
+          &:hover {
+            background-color: $carrot_text_blue;
+            color: white;
+            opacity: 1;
+          }
+
+          &:after {
+            background-image: none;
+          }
+        }
+
+        &:hover {
+          background-color: #FA6654;
+          color: white;
+          text-decoration: none;
+        }
+      }
+    }
+
+    a.navbar-brand-center {
+      position: relative;
+      left: 50%;
+      top: 7px;
+      margin: 0px 0px 0px -57px;
+      width: 115px;
+      height: 28px;
+      background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
+      background-size: 115px 28px;
+      background-repeat: no-repeat;
+      padding: 0;
+      display: block;
+    }
+  }
+}
+
 @include mobile() {
   .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:active{
     background-color: transparent;

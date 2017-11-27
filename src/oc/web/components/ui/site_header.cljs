@@ -13,77 +13,50 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.try-it-form :refer (get-started-button)]))
 
-(def body-class "mobile-menu-expanded")
+(defn nav! [uri e]
+  (.preventDefault e)
+  (when (responsive/is-mobile-size?)
+    (dis/dispatch! [:site-menu-toggle true]))
+  (dis/dispatch! [:login-overlay-show nil])
+  (router/nav! uri))
 
-(defn toggle-menu
-  "Helper function called every time this component is mounted, remounted or the menu button is clicked"
-  [force-collapse]
-  (let [body (js/$ (.-body js/document))]
-    ;; If it's forcing the collapse or the menu is already open
-    (if (or force-collapse (.hasClass body body-class))
-      (.removeClass body body-class)
-      (.addClass body body-class))))
-
-(defn navigate-to-your-boards []
-  (router/redirect! (utils/your-boards-url)))
-
-(rum/defcs site-header < {:did-mount (fn [s] (toggle-menu true) s)}
-  [s]
+(rum/defc site-header < rum/static
+  []
   ; <!-- Nav Bar -->
-  [:nav.navbar.navbar-default.navbar-static-top
-    [:div.container-fluid
-      [:div.navbar-header
-        [:a.navbar-brand {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}]
-        [:button.navbar-toggle.collapsed
-          {:type "button"
-           :data-toggle "collapse"
-           :data-target "#oc-navbar-collapse"
-           :on-click #(toggle-menu false)}
-          [:span.sr-only "Toggle navigation"]
-          [:span.icon-bar]
-          [:span.icon-bar]
-          [:span.icon-bar]]]
-      [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
-        [:ul.nav.navbar-nav.navbar-right.navbar-top
-          [:li.mobile-only
-            {:class (if (utils/in? (:route @router/path) "home") "active" "")}
-            [:a.navbar-item
-              {:href oc-urls/home :on-click #(do (.preventDefault %) (router/nav! oc-urls/home))}
-              "Home"]]
-          ; [:li
-          ;   {:class (if (utils/in? (:route @router/path) "pricing") "active" "")}
-          ;   [:a.navbar-item
-          ;     {:href oc-urls/pricing
-          ;      :on-click #(do (.preventDefault %) (router/nav! oc-urls/pricing))} "Pricing"]]
-          ; [:li
-          ;   {:class (if (utils/in? (:route @router/path) "features") "active" "")}
-          ;   [:a.navbar-item
-          ;     {:href oc-urls/features
-          ;      :on-click #(do (.preventDefault %) (router/nav! oc-urls/features))}
-          ;     "Features"]]
-          [:li
-            {:class (if (utils/in? (:route @router/path) "about") "active" "")}
-            [:a.navbar-item
-              {:href oc-urls/about
-               :on-click #(do (.preventDefault %) (router/nav! oc-urls/about))}
-              "About"]]
-          [:li
-            [:a.navbar-item {:href oc-urls/blog :target "_blank"} "Blog"]]
-          (when-not (jwt/jwt)
-            [:li
-              [:a.navbar-item {:href oc-urls/login
-                               :on-click
-                                #(do
-                                  (utils/event-stop %)
-                                  (dis/dispatch! [:login-overlay-show :login-with-slack]))} "Login"]])
-          [:li.get-started-item
-            [:div.get-started-button.navbar-item
-              (if (jwt/jwt)
-                [:button.mlb-reset.mlb-get-started
-                  {:on-click #(navigate-to-your-boards)}
-                    "Your Boards"]
-                [:button.mlb-reset.mlb-get-started
-                  {:on-click #(if (utils/in? (:route @router/path) "login")
-                                (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                                (router/nav! oc-urls/sign-up-with-slack))}
-                "Get Started"])]]]]]])
+  [:nav.site-navbar
+    [:div.site-navbar-container
+      [:a.navbar-brand-center
+        {:href oc-urls/home
+         :on-click (partial nav! oc-urls/home)}]
+      [:div.site-navbar-left.big-web-only
+        [:a
+          {:href oc-urls/about
+           :on-click (partial nav! oc-urls/about)}
+          "About"]
+        [:a.big-web-only
+          {:href "http://blog.carrot.io"
+           :target "_blank"}
+          "Blog"]]
+      [:div.site-navbar-right.big-web-only
+        (when-not (jwt/jwt)
+          [:a
+            {:href oc-urls/sign-up-with-slack
+             :on-click (fn [e]
+                         (.preventDefault e)
+                         (when (responsive/is-mobile-size?)
+                           (dis/dispatch! [:site-menu-toggle true]))
+                         (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
+            "Get Started"])
+        [:a.login
+          {:href oc-urls/login
+           :class (when (jwt/jwt) "your-boards")
+           :on-click (fn [e]
+                       (.preventDefault e)
+                       (if (jwt/jwt)
+                        (nav! (utils/your-boards-url) e)
+                        (dis/dispatch! [:login-overlay-show :login-with-slack])))}
+          (if (jwt/jwt)
+            "Your Boards"
+            "Login")]]
+      [:div.mobile-ham-menu.mobile-only
+        {:on-click #(dis/dispatch! [:site-menu-toggle])}]]])

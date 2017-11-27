@@ -3,20 +3,20 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.site-header :refer (site-header)]
+            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.urls :as oc-urls]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs pricing < rum/reactive [s]
   [:div
-    [:div.pricing-wrap {:id "wrap"} ; <!-- used to push footer to the bottom -->
-
-
+    [:div.pricing-wrap
+      {:id "wrap"} ; <!-- used to push footer to the bottom -->
       (site-header)
+      (site-mobile-menu)
       (login-overlays-handler)
 
       [:div.container.main.pricing
-
         [:div.row.equal
           [:div.col-sm-2.col-xs-0]
           [:div.col-sm-4.col-xs-12.left

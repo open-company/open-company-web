@@ -123,6 +123,7 @@
    :whats-new-modal     [[:base] (fn [base] (:whats-new-modal base))]
    :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
+   :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

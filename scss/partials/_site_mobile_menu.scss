@@ -1,0 +1,53 @@
+@include mobile(){
+  body.mobile-menu-expanded {
+    overflow: hidden;
+    height: 100vh;
+  }
+}
+
+div.site-mobile-menu {
+  position: absolute;
+  width: 100vw;
+  height: calc(100vh - 73px);
+  top: 73px;
+  left: 0px;
+  background-color: white;
+  z-index: 1081;
+  padding: 0px 16px;
+
+  div.site-mobile-menu-container {
+    margin: 30px 0px;
+
+    div.site-mobile-menu-item {
+      width: 100%;
+      text-align: center;
+      padding: 8px 0px;
+
+      a {
+        @include avenir_M();
+        font-size: 24px;
+        color: #8D8162;
+
+        &.active {
+          color: $carrot_orange;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  div.site-mobile-menu-footer {
+    position: absolute;
+    width: 100%;
+    bottom: 60px;
+    left: 0px;
+    padding: 16px;
+
+    button, button.get-started-button {
+      max-width: none;
+      height: 48px;
+      width: 100%;
+      margin: 16px 0px 0px;
+    }
+  }
+}
