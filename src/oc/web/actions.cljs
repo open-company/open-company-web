@@ -1062,7 +1062,7 @@
       (if (and entry-data (seq (:reactions entry-data)))
         ; If the entry is present in the local state and it has reactions
         (let [reaction-data (:interaction interaction-data)
-              old-reactions-data (:reactions entry-data)
+              old-reactions-data (or (:reactions entry-data) [])
               reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
               old-reaction-data (if reaction-idx
                                   (get old-reactions-data reaction-idx)
@@ -1074,8 +1074,8 @@
                             with-reaction-data)
               with-links (assoc with-reacted :links (:links reaction-data))
               new-reactions-data (if reaction-idx
-                                   (assoc-in old-reactions-data [reaction-idx] with-links)
-                                   (assoc-in old-reactions-data [(count old-reactions-data)] with-links))
+                                   (assoc old-reactions-data reaction-idx with-links)
+                                   (assoc old-reactions-data (count old-reactions-data) with-links))
               ; Update the entry with the new reaction
               updated-entry-data (assoc entry-data :reactions new-reactions-data)]
           ;; Refresh the topic data if the action coming in is from the current user
@@ -1627,7 +1627,7 @@
           activity-from-db (get-in db activity-key)
           reaction-idx (utils/index-of (:reactions activity-from-db) #(= (:reaction %) reaction))
           new-reaction-data (assoc reaction-data :reaction reaction)
-          old-reactions (:reactions activity-from-db)
+          old-reactions (or (:reactions activity-from-db) [])
           updated-reactions (if reaction-idx
                               (assoc old-reactions reaction-idx new-reaction-data)
                               (assoc old-reactions (count (:reactions activity-from-db)) new-reaction-data))]
