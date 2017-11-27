@@ -32,6 +32,7 @@ div.reactions {
         top: 3px;
         position: relative;
         display: inline-block;
+        -webkit-filter: grayscale(100%);
         filter: grayscale(100%);
       }
 
@@ -43,16 +44,12 @@ div.reactions {
         vertical-align: bottom;
       }
 
-      &:hover .no-reactions {
-        -webkit-filter: grayscale(0%);
-        filter: grayscale(0%);
-      }
-
       &.can-react {
         cursor: pointer;
 
         &:hover {
           span.reaction {
+            -webkit-filter: grayscale(0%);
             filter: grayscale(0%);
           }
         }
@@ -62,6 +59,7 @@ div.reactions {
         background-color: $carrot_light_yellow;
 
         span.reaction {
+          -webkit-filter: grayscale(0%);
           filter: grayscale(0%);
         }
 
