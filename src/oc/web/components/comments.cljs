@@ -3,7 +3,11 @@
                    [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :refer (first-render-mixin)]
@@ -14,10 +18,48 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(rum/defc comment-row < rum/static
-  [c]
+(defn- comment-uuid
+  [comment-data]
+  (last (clojure.string/split (:href (first (:links comment-data))) "/")))
+
+(defn delete-clicked [e comment-data]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-comment"
+                    :message (str "Delete this comment?")
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(let [org-slug (router/current-org-slug)
+                                            board-slug (router/current-board-slug)
+                                            board-url (utils/get-board-url org-slug board-slug)
+                                            activity-uuid (router/current-activity-id)]
+                                       (router/nav! (oc-urls/entry org-slug board-slug activity-uuid))
+                                       (dis/dispatch! [:comment-delete activity-uuid comment-data])
+                                       (dis/dispatch! [:alert-modal-hide]))
+                    }]
+    (dis/dispatch! [:alert-modal-show alert-data])))
+
+(rum/defcs comment-row < rum/static
+                         rum/reactive
+                         (rum/local false ::more-dropdown)
+                         (rum/local nil ::window-click)
+                         {:did-mount (fn [s]
+                           (let [comment-data (first (:rum/args s))
+                                 comment-ref (str "comment-" (comment-uuid comment-data))
+                                 comment-node (rum/ref-node s comment-ref)
+                                 comment-more-button (sel1 [comment-node :div.more-button])]
+                             (reset! (::window-click s)
+                               (events/listen comment-node EventType/CLICK
+                                 (fn [e]
+                                   (when (not (utils/event-inside? e comment-more-button))
+                                     (reset! (::more-dropdown s) false))))))
+                             s)
+                          :will-unmount (fn [s]
+                                          (events/unlistenByKey @(::window-click s))
+                                          s)}
+  [s c]
   (let [author (:author c)]
-    [:div.comment
+    [:div.comment {:ref (str "comment-" (comment-uuid c))}
       [:div.comment-header.group
         [:div.comment-avatar
           {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
@@ -25,7 +67,33 @@
           [:div.comment-author
             (:name author)]
           [:div.comment-timestamp
-            (utils/time-since (:created-at c))]]]
+            (utils/time-since (:created-at c))]]
+          (when (seq (:links c))
+            [:div.more-button
+              [:button.mlb-reset.more-ellipsis
+                {:type "button"
+                 :on-click (fn [e]
+                             (utils/remove-tooltips)
+                             (reset! (::more-dropdown s) (not @(::more-dropdown s))))
+                 :title "More"
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"}]
+             (when @(::more-dropdown s)
+               [:div.comment-more-dropdown-menu
+                [:div.triangle]
+                  [:ul.comment-card-more-menu
+                   (when (utils/link-for (:links c) "delete")
+                     [:li
+                      {:on-click #(do
+                                    (reset! (::more-dropdown s) false)
+                                    (delete-clicked % c))}
+                      "Delete"])
+                ]
+              ]
+             )
+          ])
+       ]
       [:p.comment-body.group
         {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
       [:div.comment-reactions-container.group
@@ -121,6 +189,7 @@
       (reset! (::comments-requested s) true)
       (utils/after 10 #(dis/dispatch! [:comments-get activity-data])))))
 
+;; Rum comments component
 (rum/defcs comments < (drv/drv :activity-comments-data)
                       (drv/drv :comment-add-finish)
                       (drv/drv :add-comment-focus)

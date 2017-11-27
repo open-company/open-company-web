@@ -894,9 +894,36 @@
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
-  [db [_ {:keys [activity-uuid]}]]
-  (api/get-comments activity-uuid)
+  [db [_ {:keys [activity-data]}]]
+  (api/get-comments activity-data)
   (assoc db :comment-add-finish true))
+
+(defmethod dispatcher/action :comment-delete
+  [db [_ activity-uuid comment-data]]
+  (api/delete-comment comment-data)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        item-uuid (:uuid comment-data)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+    (assoc-in db comments-key new-comments-data)))
+
+(defmethod dispatcher/action :comment-delete/finish
+  [db [_]]
+  db)
+
+(defmethod dispatcher/action :ws-interaction/comment-delete
+  [db [_ comment-data]]
+  (let [; Get the current router data
+        org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        item-uuid (:uuid (:interaction comment-data))
+        activity-uuid (router/current-activity-id)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+    (assoc-in db comments-key new-comments-data)))
 
 (defn- handle-reaction-to-entry
   "Update the data in db to reflect the reaction toggle on an entry."
