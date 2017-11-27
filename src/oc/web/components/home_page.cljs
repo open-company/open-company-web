@@ -17,8 +17,7 @@
   {:src (utils/cdn (str url ".png"))
    :src-set (str (utils/cdn (str url "@2x.png")) " 2x")})
 
-(rum/defcs home-page < rum/static
-                       (rum/local false ::thanks-box-top)
+(rum/defcs home-page < (rum/local false ::thanks-box-top)
                        (rum/local false ::thanks-box-bottom)
                        (rum/local false ::confirm)
                        {:did-mount (fn [s]
