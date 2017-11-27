@@ -12,7 +12,8 @@
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defcs about < rum/reactive [s]
+(rum/defcs about
+  [s]
   [:div
     [:div.about-wrap
       {:id "wrap"} ; <!-- used to push footer to the bottom -->

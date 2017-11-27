@@ -3,7 +3,6 @@
    and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
