@@ -695,9 +695,10 @@
                                                       :activity-uuid (:uuid activity-data)}]))))))
 
 (defn toggle-reaction
-  [item-data reaction-data]
+  [item-data reaction-data reacting?]
   (when (and item-data reaction-data)
-    (let [reaction-link (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"])]
+    (let [link-method (if reacting? "PUT" "DELETE")
+          reaction-link (utils/link-for (:links reaction-data) "react" link-method)]
       (interaction-http (method-for-link reaction-link) (relative-href reaction-link)
         {:headers (headers-for-link reaction-link)}
         (fn [{:keys [status success body]}]

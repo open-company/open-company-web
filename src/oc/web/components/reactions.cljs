@@ -76,12 +76,13 @@
             (for [idx (range (count reactions-data))
                   :let [reaction-data (get reactions-data idx)
                         is-loading (utils/in? reactions-loading (:reaction reaction-data))
-                        read-only-reaction (not (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"]))
+                        reacted (:reacted reaction-data)
+                        read-only-reaction (not (utils/link-for (:links reaction-data) "react" (if reacted "DELETE" "PUT")))
                         r (if is-loading
-                            (merge reaction-data {:count (if (:reacted reaction-data)
+                            (merge reaction-data {:count (if reacted
                                                           (dec (:count reaction-data))
                                                           (inc (:count reaction-data)))
-                                                  :reacted (not (:reacted reaction-data))})
+                                                  :reacted (not reacted)})
                             reaction-data)]]
               [:button.reaction-btn.btn-reset
                 {:key (str "reaction-" (:uuid entry-data) "-" idx)
@@ -95,7 +96,7 @@
                                           (not (js/isEdge))
                                           (not (js/isIE)))
                                  (animate-reaction e s))
-                               (dis/dispatch! [:reaction-toggle (:uuid entry-data) r])))}
+                               (dis/dispatch! [:reaction-toggle (:uuid entry-data) r (not reacted)])))}
                 [:span.reaction (:reaction r)]
                 [:div.count
                   (when (pos? (:count r))
