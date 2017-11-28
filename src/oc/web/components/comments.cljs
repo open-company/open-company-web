@@ -42,7 +42,7 @@
                          {:did-mount (fn [s]
                            (let [comment-data (first (:rum/args s))
                                  comment-node (rum/ref-node s "comment")
-                                 comment-more-button (sel1 [comment-node :div.more-button])]
+                                 comment-more-button (rum/ref-node s "more-button")]
                              (reset! (::window-click s)
                                (events/listen comment-node EventType/CLICK
                                  (fn [e]
@@ -64,7 +64,7 @@
           [:div.comment-timestamp
             (utils/time-since (:created-at c))]]
           (when (seq (:links c))
-            [:div.more-button
+            [:div.more-button {:ref "more-button"}
               [:button.mlb-reset.more-ellipsis
                 {:type "button"
                  :on-click (fn [e]
