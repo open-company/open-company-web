@@ -45,8 +45,7 @@
                          (rum/local nil ::window-click)
                          {:did-mount (fn [s]
                            (let [comment-data (first (:rum/args s))
-                                 comment-ref (str "comment-" (comment-uuid comment-data))
-                                 comment-node (rum/ref-node s comment-ref)
+                                 comment-node (rum/ref-node s "comment")
                                  comment-more-button (sel1 [comment-node :div.more-button])]
                              (reset! (::window-click s)
                                (events/listen comment-node EventType/CLICK
@@ -59,7 +58,7 @@
                                           s)}
   [s c]
   (let [author (:author c)]
-    [:div.comment {:ref (str "comment-" (comment-uuid c))}
+    [:div.comment {:ref "comment"}
       [:div.comment-header.group
         [:div.comment-avatar
           {:style {:background-image (str "url(" (:avatar-url author) ")")}}]

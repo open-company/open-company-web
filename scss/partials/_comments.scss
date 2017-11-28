@@ -38,7 +38,7 @@ div.comments {
     }
 
     div.comments-internal-scroll {
-      overflow-x: hidden;
+      overflow-x: visible;
       overflow-y: auto;
       height: 100%;
       padding: 10px 10px 0px;
@@ -89,7 +89,6 @@ div.comments {
 
         div.comment-author-timestamp {
           display: block;
-          float: left;
           width: calc(100% - 23px);
 
           div.comment-author {
@@ -142,9 +141,8 @@ div.comments {
           div.comment-more-dropdown-menu {
             position: absolute;
             top: 36px;
-            right: -10px;
-            left: calc(100% - 100px + 10px);
-            min-width: 100px;
+            right: -4px;
+            left: calc(100% - 100px + 31px);
             height: auto;
             border: none;
             outline: none;
@@ -156,7 +154,7 @@ div.comments {
             div.triangle {
                position: absolute;
                top: -7px;
-               left: calc(100% - 30px);
+               left: calc(100% - 23px);
                background-color: white;
                border-top: 1px solid rgba(177,184,192,0.50);
                border-left: 1px solid rgba(177,184,192,0.50);
@@ -172,7 +170,6 @@ div.comments {
               border-radius: 5px;
               margin: 0px;
               padding: 10px 13px 6px 8px;
-              min-height: 50px;
               list-style-type: none;
               width: 100%;
 
