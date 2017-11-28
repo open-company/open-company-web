@@ -37,24 +37,9 @@
 
 (rum/defcs comment-row < rum/static
                          rum/reactive
-                         (rum/local false ::more-dropdown)
-                         (rum/local nil ::window-click)
-                         {:did-mount (fn [s]
-                           (let [comment-data (first (:rum/args s))
-                                 comment-node (rum/ref-node s "comment")
-                                 comment-more-button (rum/ref-node s "more-button")]
-                             (reset! (::window-click s)
-                               (events/listen comment-node EventType/CLICK
-                                 (fn [e]
-                                   (when (not (utils/event-inside? e comment-more-button))
-                                     (reset! (::more-dropdown s) false))))))
-                             s)
-                          :will-unmount (fn [s]
-                                          (events/unlistenByKey @(::window-click s))
-                                          s)}
   [s c]
   (let [author (:author c)]
-    [:div.comment {:ref "comment"}
+    [:div.comment
       [:div.comment-header.group
         [:div.comment-avatar
           {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
@@ -64,31 +49,16 @@
           [:div.comment-timestamp
             (utils/time-since (:created-at c))]]
           (when (seq (:links c))
-            [:div.more-button {:ref "more-button"}
-              [:button.mlb-reset.more-ellipsis
+            [:div.delete-button
+              [:button
                 {:type "button"
                  :on-click (fn [e]
                              (utils/remove-tooltips)
-                             (reset! (::more-dropdown s) (not @(::more-dropdown s))))
-                 :title "More"
+                             (delete-clicked e c))
+                 :title "Delete"
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :data-container "body"}]
-             (when @(::more-dropdown s)
-               [:div.comment-more-dropdown-menu
-                [:div.triangle]
-                  [:ul.comment-card-more-menu
-                   (when (utils/link-for (:links c) "delete")
-                     [:li
-                      {:on-click #(do
-                                    (reset! (::more-dropdown s) false)
-                                    (delete-clicked % c))}
-                      "Delete"])
-                ]
-              ]
-             )
-          ])
-       ]
+                 :data-container "body"}]])]
       [:p.comment-body.group
         {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
       [:div.comment-reactions-container.group
