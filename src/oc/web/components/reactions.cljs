@@ -31,6 +31,18 @@
          (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
         (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
+(defn can-pick-reaction
+  "Given an emoji and the list of the current reactions
+   check if the user can react.
+   A user can react if:
+   - the reaction is NOT already in the reactions list
+   - the reaction is already in the reactions list and its not reacted"
+  [emoji reactions-data]
+  (let [reaction-map (first (filter #(= (:reaction %) emoji) reactions-data))]
+    (or (not reaction-map)
+        (and (map? reaction-map)
+             (not (:reacted reaction-map))))))
+
 (def default-reaction-number 5)
 
 (rum/defcs reactions < (rum/local false ::show-picker)
@@ -100,5 +112,6 @@
             (react-utils/build (.-Picker js/EmojiMart)
               {:native true
                :onClick (fn [emoji event]
-                          (dis/dispatch! [:react-from-picker entry-data (.-native emoji)])
-                          (reset! (::show-picker s) false))}))]])))
+                          (when (can-pick-reaction (.-native emoji) reactions-data)
+                            (dis/dispatch! [:react-from-picker entry-data (.-native emoji)])
+                            (reset! (::show-picker s) false)))}))]])))
