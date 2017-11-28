@@ -34,6 +34,7 @@ div.reactions {
         display: inline-block;
         -webkit-filter: grayscale(100%);
         filter: grayscale(100%);
+        min-width: 22px;
       }
 
       div.count {
