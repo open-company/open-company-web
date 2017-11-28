@@ -969,9 +969,9 @@
       (assoc-in db comments-key comments-data))))
 
 (defmethod dispatcher/action :reaction-toggle
-  [db [_ item-data reaction-data]]
+  [db [_ item-data reaction-data reacting?]]
   (let [item-uuid (:uuid item-data)]
-    (api/toggle-reaction item-data reaction-data)
+    (api/toggle-reaction item-data reaction-data reacting?)
     (if (= (:content-type item-data) "entry")
       (handle-reaction-to-entry db item-uuid reaction-data)
       (handle-reaction-to-comment db item-uuid reaction-data))))
@@ -1107,9 +1107,8 @@
                                   {:reacted false :reaction (:reaction reaction-data)})
               with-reaction-data (assoc old-reaction-data :count (:count interaction-data))
               is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
-              with-reacted (if is-current-user
-                            (assoc with-reaction-data :reacted add-event?)
-                            with-reaction-data)
+              reacted (if is-current-user add-event? (:reacted old-reaction-data))
+              with-reacted (assoc with-reaction-data :reacted reacted)
               with-links (assoc with-reacted :links (:links reaction-data))
               new-reactions-data (if reaction-idx
                                    (assoc old-reactions-data reaction-idx with-links)
