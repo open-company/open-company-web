@@ -18,10 +18,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn- comment-uuid
-  [comment-data]
-  (last (clojure.string/split (:href (first (:links comment-data))) "/")))
-
 (defn delete-clicked [e comment-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-comment"
