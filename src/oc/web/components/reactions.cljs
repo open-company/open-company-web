@@ -114,5 +114,5 @@
               {:native true
                :onClick (fn [emoji event]
                           (when (can-pick-reaction (.-native emoji) reactions-data)
-                            (dis/dispatch! [:react-from-picker entry-data (.-native emoji)])
-                            (reset! (::show-picker s) false)))}))]])))
+                            (dis/dispatch! [:react-from-picker entry-data (.-native emoji)]))
+                          (reset! (::show-picker s) false))}))]])))
