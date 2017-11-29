@@ -21,7 +21,7 @@ div.onboard-wrapper-container {
       div.onboard-wrapper-logo {
         width: 82px;
         height: 20px;
-        background-image: cdnUrl("/img/carrot_logo_with_copy.svg");
+        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
         background-size: 82px 20px;
         background-repeat: no-repeat;
       }
@@ -34,7 +34,7 @@ div.onboard-wrapper-container {
         margin-top: 0px;
         width: 294px;
         height: 301px;
-        background-image: cdnUrl("/img/ML/carrot_box.svg");
+        @include image-2x("/img/ML/carrot_box");
         background-size: 294px 301px;
         background-repeat: no-repeat;
       }
@@ -220,9 +220,13 @@ div.onboard-lander {
 
     div.title {
       margin-top: 64px;
-      @include avenir_M();
+      @include avenir_H();
       font-size: 32px;
-      color: $carrot_dark_gray;
+      color: $carrot_dark_brown_1;
+
+      &.main-lander {
+        margin-top: 117px;
+      }
 
       &.about-yourself {
         @include avenir_H();
@@ -250,6 +254,36 @@ div.onboard-lander {
     width: 340px;
     margin: 0 auto 32px;
     text-align: left;
+
+    button.signup-with-slack {
+      width: 340px;
+      height: 48px;
+      margin-top: 52px;
+      background-color: rgba($carrot_text_blue, 0.1);
+      border-radius: 100px;
+      padding: 14px 78px;
+      @include avenir_H();
+      font-size: 18px;
+      color: $carrot_text_blue;
+      text-align: left;
+
+      div.slack-blue-icon {
+        width: 70px;
+        height: 21px;
+        @include image-2x("/img/ML/slack_blue_icon");
+        background-repeat: no-repeat;
+        background-size: 70px 21px;
+        float: right;
+      }
+    }
+
+    div.or-with-email {
+      @include avenir_H();
+      font-size: 16px;
+      color: rgba($oc_gray_7, 0.7);
+      text-align: center;
+      margin-top: 36px;
+    }
 
     div.logo-upload-container {
       margin-top: 32px;
@@ -325,7 +359,7 @@ div.onboard-lander {
     div.field-label {
       @include avenir_H();
       font-size: 15px;
-      color: $carrot_gray;
+      color: #8C9096;
       margin-top: 32px;
 
       span.error {
@@ -335,10 +369,11 @@ div.onboard-lander {
     }
 
     div.field-description {
-      @include avenir_BOOK();
+      @include avenir_R();
       font-size: 14px;
       margin-top: 16px;
-      color: $carrot_light_gray;
+      color: rgba($oc_gray_7, 0.5);
+      text-align: center;
 
       a {
         text-decoration: underline;
@@ -347,9 +382,9 @@ div.onboard-lander {
     }
 
     div.footer-link {
-      margin-top: 60px;
+      margin-top: 20px;
       @include avenir_R();
-      font-size: 16px;
+      font-size: 14px;
       color: $oc_gray_7;
       text-align: center;
 
@@ -364,16 +399,20 @@ div.onboard-lander {
 
     input.field {
       width: 100%;
-      min-height: 40px;
+      height: 40px;
       border-radius: 4px;
       background-color: white;
       border: 1px solid rgba($carrot_light_gray_1, 0.5);
       outline: none;
       padding: 10px 16px;
       position: relative;
-      @include avenir_R();
+      @include avenir_BOOK();
       font-size: 16px;
-      color: $carrot_dark_gray;
+      color: $oc_gray_7;
+      line-height: 24px;
+      letter-spacing: 0.2px;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+      margin-top: 4px;
 
       @include placeholder() {
         @include avenir_R();
@@ -399,7 +438,7 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 16px;
+      margin-top: 35px;
       outline: none;
       border: none;
       width: 100%;
@@ -408,7 +447,7 @@ div.onboard-lander {
       color: white;
       @include avenir_H();
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 100px;
 
       &.disabled {
         opacity: 0.8;
