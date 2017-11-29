@@ -900,7 +900,7 @@
 
 (defmethod dispatcher/action :comment-delete
   [db [_ activity-uuid comment-data]]
-  (api/delete-comment comment-data)
+  (api/delete-comment activity-uuid comment-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         item-uuid (:uuid comment-data)
@@ -910,8 +910,16 @@
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-delete/finish
-  [db [_]]
-  db)
+  [db [_ {:keys [success activity-uuid]}]]
+  (if success
+    db
+    (let [org-slug (router/current-org-slug)
+          board-slug (router/current-board-slug)
+          board-key (dispatcher/board-data-key org-slug board-slug)
+          board-data (get-in db board-key)
+          activity-data (get-in board-data [:fixed-items activity-uuid])]
+      (api/get-comments activity-data)
+      db)))
 
 (defmethod dispatcher/action :ws-interaction/comment-delete
   [db [_ comment-data]]

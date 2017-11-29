@@ -25,11 +25,7 @@
                     :link-button-title "No"
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
-                    :solid-button-cb #(let [org-slug (router/current-org-slug)
-                                            board-slug (router/current-board-slug)
-                                            board-url (utils/get-board-url org-slug board-slug)
-                                            activity-uuid (router/current-activity-id)]
-                                       (router/nav! (oc-urls/entry org-slug board-slug activity-uuid))
+                    :solid-button-cb #(let [activity-uuid (router/current-activity-id)]
                                        (dis/dispatch! [:comment-delete activity-uuid comment-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
@@ -48,7 +44,7 @@
             (:name author)]
           [:div.comment-timestamp
             (utils/time-since (:created-at c))]]
-          (when (seq (:links c))
+          (when (boolean (utils/link-for (:links c) "delete"))
             [:div.delete-button
               [:button
                 {:type "button"
