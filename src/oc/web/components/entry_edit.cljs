@@ -124,6 +124,7 @@
                         (drv/drv :editable-boards)
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
+                        (drv/drv :nux-post)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -141,13 +142,14 @@
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
-                          (let [entry-editing @(drv/get-ref s :entry-editing)
+                          (let [nux-post @(drv/get-ref s :nux-post)
+                                entry-editing @(drv/get-ref s :entry-editing)
                                 board-filters @(drv/get-ref s :board-filters)
-                                initial-body (if (contains? entry-editing :links)
+                                initial-body (if (or (contains? entry-editing :links) nux-post)
                                               (:body entry-editing)
                                               utils/default-body)
                                 initial-headline (utils/emojify
-                                                  (if (contains? entry-editing :links)
+                                                  (if (or (contains? entry-editing :links) nux-post)
                                                    (:headline entry-editing)
                                                    ""))]
                             (reset! (::initial-body s) initial-body)
@@ -160,9 +162,10 @@
                                    (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
                           s)
                          :did-mount (fn [s]
-                          (utils/after 300 #(setup-headline s))
-                          (when-let [headline-el (rum/ref-node s "headline")]
-                            (utils/to-end-of-content-editable headline-el))
+                          (when-not @(drv/get-ref s :nux-post)
+                            (utils/after 300 #(setup-headline s))
+                            (when-let [headline-el (rum/ref-node s "headline")]
+                              (utils/to-end-of-content-editable headline-el)))
                           s)
                          :before-render (fn [s] (calc-edit-entry-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
@@ -199,7 +202,8 @@
                             (reset! (::headline-input-listener s) nil))
                           s)}
   [s]
-  (let [org-data          (drv/react s :org-data)
+  (let [nux-post          (drv/react s :nux-post)
+        org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
         alert-modal       (drv/react s :alert-modal)
@@ -228,7 +232,8 @@
         ;; Show the close button only when there are no modals shown
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))
-                   (not alert-modal))
+                   (not alert-modal)
+                   (not nux-post))
           [:button.carrot-modal-close.mlb-reset
             {:on-click #(cancel-clicked s)}])
         [:div.entry-edit-modal.group
@@ -243,7 +248,7 @@
               [:div.boards-dropdown-caret
                 {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
                 (:board-name entry-editing)
-                (when @(::show-boards-dropdown s)
+                (when (and (not nux-post) @(::show-boards-dropdown s))
                   (dropdown-list
                    {:items (map
                             #(clojure.set/rename-keys % {:name :label :slug :value})
@@ -254,12 +259,13 @@
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                  (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-            (topics-dropdown board-topics entry-editing :entry-editing)]
+            (when-not nux-post
+              (topics-dropdown board-topics entry-editing :entry-editing))]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
-            {:content-editable true
+            {:content-editable (not nux-post)
              :ref "headline"
              :placeholder "Untitled post"
              :on-paste    #(headline-on-paste s %)
@@ -274,6 +280,7 @@
                              :initial-body @(::initial-body s)
                              :show-placeholder (not (contains? entry-editing :links))
                              :show-h2 true
+                             :nux-post nux-post
                              :dispatch-input-key :entry-editing
                              :upload-progress-cb (fn [is-uploading?]
                                                    (reset! (::uploading-media s) is-uploading?))
@@ -285,7 +292,8 @@
         [:div.entry-edit-modal-divider
           {:class (when-not @(::show-divider-line s) "not-visible")}]
         [:div.entry-edit-modal-footer.group
-          (when-not (js/isIE)
+          (when (and (not nux-post)
+                     (not (js/isIE)))
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :container-selector "div.entry-edit-modal"}))
           [:button.mlb-reset.mlb-default.form-action-bt
@@ -298,13 +306,14 @@
             (when @(::publishing s)
               (small-loading))
             "Post"]
-          [:button.mlb-reset.mlb-link-black.form-action-bt
-            {:disabled (or @(::saving s)
-                           (not (:has-changes entry-editing)))
-             :on-click #(do
-                          (clean-body)
-                          (reset! (::saving s) true)
-                          (dis/dispatch! [:entry-save]))}
-            (when @(::saving s)
-              (small-loading))
-            "Save draft"]]]]]))
+          (when-not nux-post
+            [:button.mlb-reset.mlb-link-black.form-action-bt
+              {:disabled (or @(::saving s)
+                             (not (:has-changes entry-editing)))
+               :on-click #(do
+                            (clean-body)
+                            (reset! (::saving s) true)
+                            (dis/dispatch! [:entry-save]))}
+              (when @(::saving s)
+                (small-loading))
+              "Save draft"])]]]]))
