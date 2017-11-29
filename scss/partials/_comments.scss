@@ -38,7 +38,7 @@ div.comments {
     }
 
     div.comments-internal-scroll {
-      overflow-x: hidden;
+      overflow-x: visible;
       overflow-y: auto;
       height: 100%;
       padding: 10px 10px 0px;
@@ -73,6 +73,10 @@ div.comments {
     div.comment {
       margin: 10px 0;
 
+      &:hover div.comment-header div.delete-button button.mdi.mdi-delete {
+        opacity: 0.8;
+      }
+
       div.comment-header {
         div.comment-avatar {
           width: #{$comment_avatar_size}px;
@@ -85,7 +89,6 @@ div.comments {
 
         div.comment-author-timestamp {
           display: block;
-          float: left;
           width: calc(100% - 23px);
 
           div.comment-author {
@@ -112,6 +115,23 @@ div.comments {
             white-space: nowrap;
             // display: block;
             float: left;
+          }
+        }
+        div.delete-button {
+          float: right;
+          position: relative;
+          margin-right: -6px;
+
+          button.mdi.mdi-delete {
+            padding: 7px 2px 1px;
+            background-position: center;
+            background-color: rgba($carrot_light_gray_2, 0.15);
+            opacity: 0;
+            border: none;
+
+            &:hover {
+              opacity: 1;
+            }
           }
         }
       }
