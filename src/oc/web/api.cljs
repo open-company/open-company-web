@@ -695,14 +695,27 @@
                                                       :activity-data activity-data}]))))))
 
 (defn delete-comment
-  [comment-data]
-  (when (and comment-data)
+  [activity-uuid comment-data]
+  (when comment-data
     (let [comment-link (utils/link-for (:links comment-data) "delete")]
       (interaction-http (method-for-link comment-link) (relative-href comment-link)
         {:headers (headers-for-link comment-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch!
            [:comment-delete/finish
+            {:success success :activity-uuid activity-uuid}]))))))
+
+(defn save-comment
+  [comment-data new-data]
+  (when (and comment-data new-data)
+    (let [comment-link (utils/link-for (:links comment-data) "partial-update")
+          json-data (cljs->json {:body new-data})]
+      (interaction-http (method-for-link comment-link) (relative-href comment-link)
+        {:headers (headers-for-link comment-link)
+         :json-params json-data}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch!
+           [:comment-save/finish
             {:sucess success}]))))))
 
 (defn toggle-reaction

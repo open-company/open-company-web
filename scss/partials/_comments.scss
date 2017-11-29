@@ -73,7 +73,7 @@ div.comments {
     div.comment {
       margin: 10px 0;
 
-      &:hover div.comment-header div.more-button button.more-ellipsis {
+      &:hover div.comment-header div.delete-button button {
         opacity: 0.8;
       }
 
@@ -117,74 +117,26 @@ div.comments {
             float: left;
           }
         }
-        div.more-button {
+        div.delete-button {
           float: right;
           position: relative;
           margin-right: -6px;
 
-          button.more-ellipsis {
-            width: 24px;
-            height: 24px;
-            padding: 2px 10px;
+          button {
+            width: 18px;
+            height: 18px;
             display: block;
-            background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+            background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
             background-position: center;
-            background-size: 4px 20px;
+            background-size: 18px 18px;
             background-repeat: no-repeat;
+            background-color: rgba($carrot_light_gray_2, 0.15);
             opacity: 0;
+            border: none;
 
             &:hover {
               opacity: 1;
-            }
-          }
-
-          div.comment-more-dropdown-menu {
-            position: absolute;
-            top: 36px;
-            right: -4px;
-            left: calc(100% - 100px + 31px);
-            height: auto;
-            border: none;
-            outline: none;
-            box-shadow: none;
-            background-color: transparent;
-            overflow: visible;
-            z-index: 300;
-
-            div.triangle {
-               position: absolute;
-               top: -7px;
-               left: calc(100% - 23px);
-               background-color: white;
-               border-top: 1px solid rgba(177,184,192,0.50);
-               border-left: 1px solid rgba(177,184,192,0.50);
-               transform: rotate(45deg);
-               width: 15px;
-               height: 15px;
-            }
-
-            ul.comment-card-more-menu {
-              background-color: white;
-              border: 1px solid rgba(177,184,192,0.50);
-              box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-              border-radius: 5px;
-              margin: 0px;
-              padding: 10px 13px 6px 8px;
-              list-style-type: none;
-              width: 100%;
-
-              li {
-                padding: 3px 8px;
-                @include avenir_M();
-                font-size: 14px;
-                color: $carrot_light_gray_3;
-                cursor: pointer;
-                background-color: transparent;
-
-                &:hover {
-                  background-color: rgba($carrot_light_gray_4, 0.2);
-                }
-              }
+              background-image: cdnUrl("/img/ML/trash.svg");
             }
           }
         }

@@ -900,7 +900,7 @@
 
 (defmethod dispatcher/action :comment-delete
   [db [_ activity-uuid comment-data]]
-  (api/delete-comment comment-data)
+  (api/delete-comment activity-uuid comment-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
         item-uuid (:uuid comment-data)
@@ -910,8 +910,16 @@
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-delete/finish
-  [db [_]]
-  db)
+  [db [_ {:keys [success activity-uuid]}]]
+  (if success
+    db
+    (let [org-slug (router/current-org-slug)
+          board-slug (router/current-board-slug)
+          board-key (dispatcher/board-data-key org-slug board-slug)
+          board-data (get-in db board-key)
+          activity-data (get-in board-data [:fixed-items activity-uuid])]
+      (api/get-comments activity-data)
+      db)))
 
 (defmethod dispatcher/action :ws-interaction/comment-delete
   [db [_ comment-data]]
@@ -924,6 +932,41 @@
         comments-data (get-in db comments-key)
         new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
     (assoc-in db comments-key new-comments-data)))
+
+(defmethod dispatcher/action :comment-save
+  [db [_ comment-data new-body]]
+  (api/save-comment comment-data new-body)
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (router/current-activity-id)
+        item-uuid (:uuid comment-data)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
+    (if comment-idx
+      (let [comment-data (nth comments-data comment-idx)
+            with-new-comment (assoc comment-data :body new-body)
+            new-comments-data (assoc comments-data comment-idx with-new-comment)]
+        (assoc-in db comments-key new-comments-data))
+      db)))
+
+(defmethod dispatcher/action :ws-interaction/comment-update
+  [db [_ interaction-data]]
+  (if (= (jwt/get-key :user-id) (:user-id (:author (:interaction interaction-data))))
+    db
+    (let [; Get the current router data
+          org-slug   (router/current-org-slug)
+          board-slug (router/current-board-slug)
+          comment-data (:interaction interaction-data)
+          item-uuid (:uuid comment-data)
+          activity-uuid (router/current-activity-id)
+          comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+          comments-data (get-in db comments-key)
+          comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
+      (if comment-idx
+        (let [new-comments-data (assoc comments-data comment-idx comment-data)]
+          (assoc-in db comments-key new-comments-data))
+        db))))
 
 (defn- handle-reaction-to-entry
   "Update the data in db to reflect the reaction toggle on an entry."
