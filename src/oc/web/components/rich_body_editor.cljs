@@ -294,11 +294,13 @@
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
                                {:did-mount (fn [s]
-                                 (utils/after 300 #(do
-                                  (setup-editor s)
-                                  (let [classes (:classes (first (:rum/args s)))]
-                                    (when (string/includes? classes "emoji-autocomplete")
-                                      (js/emojiAutocomplete)))))
+                                 (let [props (first (:rum/args s))]
+                                   (when-not (:nux-post props)
+                                     (utils/after 300 #(do
+                                      (setup-editor s)
+                                      (let [classes (:classes (first (:rum/args s)))]
+                                        (when (string/includes? classes "emoji-autocomplete")
+                                          (js/emojiAutocomplete)))))))
                                  s)
                                 :will-update (fn [s]
                                  (let [data @(drv/get-ref s :media-input)
@@ -329,11 +331,11 @@
                                  (when @(::editor s)
                                    (.destroy @(::editor s)))
                                  s)}
-  [s {:keys [initial-body on-change classes show-placeholder upload-progress-cb]}]
+  [s {:keys [initial-body nux-post on-change classes show-placeholder upload-progress-cb]}]
   [:div.rich-body-editor-container
     [:div.rich-body-editor
       {:ref "body"
-       :content-editable true
+       :content-editable (not nux-post)
        :class (str classes
                (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
                                  :uploading @(::upload-lock s)}))
