@@ -34,12 +34,16 @@
                             s)}
   [s]
   (let [signup-with-email (drv/react s :signup-with-email)]
-    [:div.onboard-lander
+    [:div.onboard-lander.lander
       [:div.main-cta
         [:div.title.main-lander
           "Sign Up"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
+          {:on-click #(do
+                       (.preventDefault %)
+                       (when (:auth-settings @dis/app-state)
+                         (dis/dispatch! [:login-with-slack])))}
           "Sign Up with "
           [:div.slack-blue-icon]]
         [:div.or-with-email
@@ -111,9 +115,6 @@
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
                                     (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                    (cook/set-cookie!
-                                     (router/should-show-dashboard-tooltips
-                                      (jwt/get-key :user-id)) true (* 60 60 24 7))
                                     (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                     s)
                                    :will-update (fn [s]
@@ -132,21 +133,19 @@
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)]
-    [:div.onboard-lander.second-step
+    [:div.onboard-lander.lander-profile
       [:div.steps.three-steps
         [:div.step-1
           "Sign Up"]
         [:div.step-progress-bar]
-        [:div.step-2
+        [:div.step-2.active
           "Your Profile"]
         [:div.step-progress-bar]
         [:div.step-3
           "Your Team"]]
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us a bit about yourself..."]
-        [:div.subtitle
-          "This information will be visible to your team"]
+          "Tell us a bit about yourself…"]
         (when (:error edit-user-profile)
           [:div.subtitle.error
             "An error occurred while saving your data, please try again"])]
@@ -169,7 +168,7 @@
                           nil))}
             (user-avatar-image fixed-user-data)
             [:div.add-picture-link
-              "Change photo"]
+              "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
@@ -236,7 +235,7 @@
   (let [teams-data (drv/react s :teams-data)
         _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)]
-    [:div.onboard-lander.third-step
+    [:div.onboard-lander.lander-team
       [:div.steps.three-steps
         [:div.step-1
           "Sign Up"]
@@ -244,13 +243,11 @@
         [:div.step-2
           "Your Profile"]
         [:div.step-progress-bar]
-        [:div.step-3
+        [:div.step-3.active
           "Your Team"]]
       [:div.main-cta
-        [:div.title
-          "About your team"]
-        [:div.subtitle
-          "How your company will appear on Carrot"]]
+        [:div.title.company-setup
+          "Company setup"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -284,8 +281,8 @@
             (org-avatar org-editing false :never)
             [:div.add-picture-link
               (if (empty? (:logo-url org-editing))
-                "Upload logo"
-                "Delete logo")]
+                "+ Upload your company logo"
+                "+ Change your company logo")]
             [:div.add-picture-link-subtitle
               "A transparent background PNG works best"]]
           [:div.field-label
@@ -296,7 +293,13 @@
              :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
           [:button.continue
             {:disabled (empty? (:name org-editing))
-             :on-click #(dis/dispatch! [:org-create])}
+             :on-click #(do
+                         ;; Make sure the onboard nux is shown once the dashboard is shown
+                         (cook/set-cookie!
+                          (router/should-show-dashboard-tooltips
+                           (jwt/get-key :user-id)) true (* 60 60 24 7))
+                         ;; Create org and show setup screen
+                         (dis/dispatch! [:org-create]))}
             "Create my team"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
@@ -308,7 +311,7 @@
         collect-pswd (:collect-pswd confirm-invitation)
         collect-pswd-error (:collect-pswd-error confirm-invitation)
         invitation-confirmed (:invitation-confirmed confirm-invitation)]
-    [:div.onboard-lander
+    [:div.onboard-lander.invitee-lander
       [:div.steps.two-steps
         [:div.step-1
           "Get Started"]
@@ -380,16 +383,16 @@
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)]
-    [:div.onboard-lander.second-step
+    [:div.onboard-lander.invitee-lander-profile
       [:div.steps.two-steps
         [:div.step-1
           "Get Started"]
         [:div.step-progress-bar]
-        [:div.step-2
+        [:div.step-2.active
           "Your Profile"]]
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us a bit about yourself..."]
+          "Tell us a bit about yourself…"]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -414,7 +417,7 @@
                           nil))}
             (user-avatar-image fixed-user-data)
             [:div.add-picture-link
-              "Change photo"]
+              "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
