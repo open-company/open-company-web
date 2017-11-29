@@ -95,8 +95,8 @@
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
                               {:will-mount (fn [s]
-                                (let [show-onboard-overlay @(drv/get-ref s :show-onboard-overlay)]
-                                  (reset! (::show-boards-tooltip s) show-onboard-overlay))
+                                ; (let [show-onboard-overlay @(drv/get-ref s :show-onboard-overlay)]
+                                ;   (reset! (::show-boards-tooltip s) show-onboard-overlay))
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
