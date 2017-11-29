@@ -126,7 +126,7 @@ div.comments {
             width: 18px;
             height: 18px;
             display: block;
-            background-image: cdnUrl("/img/ML/trash.svg");
+            background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
             background-position: center;
             background-size: 18px 18px;
             background-repeat: no-repeat;
@@ -136,6 +136,7 @@ div.comments {
 
             &:hover {
               opacity: 1;
+              background-image: cdnUrl("/img/ML/trash.svg");
             }
           }
         }
