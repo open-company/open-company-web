@@ -71,7 +71,7 @@
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
             (:show-onboard-overlay data)
-            (onboard-overlay)
+            (onboard-overlay :1)
             ;; Org settings
             (:org-settings data)
             (org-settings)
