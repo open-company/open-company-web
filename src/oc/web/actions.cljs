@@ -49,7 +49,7 @@
           (cond
             (and (:slack-lander-check-team-redirect db)
                  (zero? (count orgs)))
-            (router/nav! oc-urls/slack-lander-team)
+            (router/nav! oc-urls/sign-up-team)
             (and (:email-lander-check-team-redirect db)
                  (zero? (count orgs)))
             (router/nav! oc-urls/sign-up-team)
@@ -790,7 +790,9 @@
   (let [org-data (:org-editing db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data))))
-  (dissoc db :latest-entry-point :latest-auth-settings))
+  (-> db
+   (dissoc :latest-entry-point :latest-auth-settings)
+   (assoc :show-setup true)))
 
 (defmethod dispatcher/action :private-board-add
   [db [_]]
@@ -1679,3 +1681,33 @@
       (assoc-in db (vec (conj activity-key :reactions)) updated-reactions))
     ;; Wait for the entry refresh if it didn't
     db))
+
+(defmethod dispatcher/action :org-redirect
+  [db [_ org-slug]]
+  (when (:redirect-to-org db)
+    (router/redirect! (oc-urls/org org-slug)))
+  (assoc db :org-redirect org-slug))
+
+(defmethod dispatcher/action :org-created-redirect
+  [db [_]]
+  (when (:org-redirect db)
+    (router/redirect! (oc-urls/org (:org-redirect db))))
+  (assoc db :redirect-to-org true))
+
+(defmethod dispatcher/action :first-forced-post-start
+  [db [_]]
+  (let [current-board (dispatcher/board-data)
+        headline "Using Carrot to stay aligned with the big picture! 🚀"
+        body (str
+              "<p>We know it’s a struggle to keep everyone on the same page. Important "
+              "information often gets missed or lost, so everyone has a different idea of what’s "
+              "important. Let’s fix that!<p>"
+              "<p>Carrot makes key announcements, updates and plans visible and easy to find, so "
+              "everyone can stay on the same page.")]
+    (js/console.log "current-board" current-board)
+    (merge db {:entry-editing {:headline headline
+                               :body body
+                               :board-name (:name current-board)
+                               :board-slug (:slug current-board)}
+               :nux-post true
+               :show-onboard-overlay false})))

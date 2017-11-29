@@ -21,7 +21,7 @@ div.onboard-wrapper-container {
       div.onboard-wrapper-logo {
         width: 82px;
         height: 20px;
-        background-image: cdnUrl("/img/carrot_logo_with_copy.svg");
+        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
         background-size: 82px 20px;
         background-repeat: no-repeat;
       }
@@ -34,7 +34,7 @@ div.onboard-wrapper-container {
         margin-top: 0px;
         width: 294px;
         height: 301px;
-        background-image: cdnUrl("/img/ML/carrot_box.svg");
+        @include image-2x("/img/ML/carrot_box");
         background-size: 294px 301px;
         background-repeat: no-repeat;
       }
@@ -107,33 +107,7 @@ div.onboard-email-container {
 
 div.onboard-lander {
   text-align: center;
-  margin-top: 62px;
-
-  &.second-step {
-    div.steps {
-      div.step-2 {
-        background-image: cdnUrl("/img/ML/about_principle_2_oval_red.svg");
-        color: $oc_gray_7;
-      }
-
-      div.step-progress-bar:nth-child(2) {
-        background-color: $carrot_orange;
-      }
-    }
-  }
-
-  &.third-step {
-    div.steps {
-      div.step-3 {
-        background-image: cdnUrl("/img/ML/about_principle_3_oval_red.svg");
-        color: $oc_gray_7;
-      }
-
-      div.step-progress-bar:nth-child(4) {
-        background-color: $carrot_orange;
-      }
-    }
-  }
+  margin-top: 34px;
 
   div.steps {
     height: 58px;
@@ -148,55 +122,65 @@ div.onboard-lander {
       width: 464px;
     }
 
-    div.step-1 {
+    div.step-1, div.step-2, div.step-3 {
       width: 92px;
       height: 53px;
-      background-image: cdnUrl("/img/ML/about_principle_1.svg");
-      background-size: 24px;
-      background-repeat: no-repeat;
-      background-position: 50% 0%;
-      @include avenir_R();
-      font-size: 14px;
-      color: $oc_gray_7;
+      color: rgba($oc_gray_7, 0.5);
+      @include avenir_H();
+      font-size: 12px;
       position: absolute;
-      top: 0px;
-      left: 0px;
       padding-top: 36px;
       text-align: center;
+
+      &:before {
+        width: 28px;
+        height: 28px;
+        @include image-2x("/img/ML/onboard_step_balloon");
+        background-size: 28px;
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 50%;
+        margin-left: -14px;
+        padding-top: 7px;
+        @include avenir_H();
+        font-size: 12px;
+        color: white;
+      }
+
+      &.active {
+        color: $oc_gray_7;
+        &:before {
+          @include image-2x("/img/ML/onboard_step_balloon_blue");
+        }
+      }
+    }
+
+    div.step-1 {
+      left: 0px;
+      top: 0px;
+
+      &:before {
+        content: "1";
+      }
     }
 
     div.step-2 {
-      width: 92px;
-      height: 53px;
-      background-image: cdnUrl("/img/ML/about_principle_2_oval_gray.svg");
-      background-size: 34px;
-      background-repeat: no-repeat;
-      background-position: 50% -4px;
-      @include avenir_R();
-      font-size: 14px;
-      color: rgba($oc_gray_7, 0.5);
-      position: absolute;
-      top: 0px;
       left: 186px;
-      padding-top: 36px;
-      text-align: center;
+      top: 0px;
+
+      &:before {
+        content: "2";
+      }
     }
 
     div.step-3 {
-      width: 92px;
-      height: 53px;
-      background-image: cdnUrl("/img/ML/about_principle_3_oval_gray.svg");
-      background-size: 34px;
-      background-repeat: no-repeat;
-      background-position: 50% -4px;
-      @include avenir_R();
-      font-size: 14px;
-      color: rgba($oc_gray_7, 0.5);
-      position: absolute;
       left: 374px;
       top: 0px;
-      padding-top: 36px;
-      text-align: center;
+
+      &:before {
+        content: "3";
+      }
     }
 
     div.step-progress-bar {
@@ -205,6 +189,10 @@ div.onboard-lander {
       background-color: $carrot_light_gray_2;
       position: absolute;
       top: 12px;
+
+      &.active {
+        background-color: $carrot_light_gray_2;
+      }
     }
 
     div.step-progress-bar:nth-child(2) {
@@ -220,12 +208,22 @@ div.onboard-lander {
 
     div.title {
       margin-top: 64px;
-      @include avenir_M();
+      @include avenir_H();
       font-size: 32px;
-      color: $carrot_dark_gray;
+      color: $carrot_dark_brown_1;
+      letter-spacing: auto;
+      line-height: 44px;
+
+      &.main-lander {
+        margin-top: 117px;
+      }
 
       &.about-yourself {
-        @include avenir_H();
+        margin-top: 25px;
+      }
+
+      &.company-setup {
+        margin-top: 25px;
       }
     }
 
@@ -251,10 +249,40 @@ div.onboard-lander {
     margin: 0 auto 32px;
     text-align: left;
 
+    button.signup-with-slack {
+      width: 340px;
+      height: 48px;
+      margin-top: 52px;
+      background-color: rgba($carrot_text_blue, 0.1);
+      border-radius: 100px;
+      padding: 14px 78px;
+      @include avenir_H();
+      font-size: 18px;
+      color: $carrot_text_blue;
+      text-align: left;
+
+      div.slack-blue-icon {
+        width: 70px;
+        height: 21px;
+        @include image-2x("/img/ML/slack_blue_icon");
+        background-repeat: no-repeat;
+        background-size: 70px 21px;
+        float: right;
+      }
+    }
+
+    div.or-with-email {
+      @include avenir_H();
+      font-size: 16px;
+      color: rgba($oc_gray_7, 0.7);
+      text-align: center;
+      margin-top: 36px;
+    }
+
     div.logo-upload-container {
-      margin-top: 32px;
-      width: 400px;
-      height: 82px;
+      margin-top: 112px;
+      width: 340px;
+      height: 80px;
       cursor: pointer;
 
       &:hover {
@@ -265,35 +293,41 @@ div.onboard-lander {
 
       &.org-logo {
         div.org-avatar.missing-logo {
-          border: 1px solid $carrot_light_gray;
-          border-radius: 4px;
-          opacity: 0.2;
           position: relative;
-          width: 82px;
-          height: 82px;
+          width: 80px;
+          height: 80px;
+          background-color: rgba($carrot_text_blue, 0.3);
+          border-radius: 40px;
 
           &:after {
             content: "";
-            background-image: cdnUrl("/img/ML/carrot_grey.svg");
-            background-position: 50%;
-            background-size: 30px 62px;
+            display: block;
+            width: 16px;
+            height: 16px;
+            @include image-2x("/img/ML/onboard_plus_icon");
             background-repeat: no-repeat;
-            width: 82px;
-            height: 82px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
+            background-size: 16px;
+            margin-top: 32px;
+            margin-left: 32px;
           }
         }
 
         div.org-avatar {
-          @include org-avatar(82);
+          @include org-avatar(80);
 
           div.org-avatar-container {
             img.org-avatar-img {
               max-width: 340px;
             }
           }
+        }
+
+        div.add-picture-link {
+          margin-top: 10px;
+        }
+
+        div.add-picture-link-subtitle {
+          margin-top: 10px;
         }
       }
 
@@ -305,27 +339,29 @@ div.onboard-lander {
 
       div.add-picture-link {
         @include avenir_H();
-        font-size: 16px;
+        font-size: 14px;
         color: $carrot_text_blue;
         float: left;
-        margin-left: 16px;
+        margin-left: 24px;
         margin-top: 16px;
+        width: 220px;
       }
 
       div.add-picture-link-subtitle {
-        @include avenir_BOOK();
+        @include avenir_R();
         font-size: 14px;
         color: rgba($oc_gray_7, 0.5);
         float: left;
-        margin-left: 16px;
+        margin-left: 24px;
         margin-top: 12px;
+        width: 220px;
       }
     }
 
     div.field-label {
       @include avenir_H();
       font-size: 15px;
-      color: $carrot_gray;
+      color: #8C9096;
       margin-top: 32px;
 
       span.error {
@@ -335,10 +371,11 @@ div.onboard-lander {
     }
 
     div.field-description {
-      @include avenir_BOOK();
+      @include avenir_R();
       font-size: 14px;
       margin-top: 16px;
-      color: $carrot_light_gray;
+      color: rgba($oc_gray_7, 0.5);
+      text-align: center;
 
       a {
         text-decoration: underline;
@@ -347,9 +384,9 @@ div.onboard-lander {
     }
 
     div.footer-link {
-      margin-top: 60px;
+      margin-top: 20px;
       @include avenir_R();
-      font-size: 16px;
+      font-size: 14px;
       color: $oc_gray_7;
       text-align: center;
 
@@ -364,16 +401,20 @@ div.onboard-lander {
 
     input.field {
       width: 100%;
-      min-height: 40px;
+      height: 40px;
       border-radius: 4px;
       background-color: white;
       border: 1px solid rgba($carrot_light_gray_1, 0.5);
       outline: none;
       padding: 10px 16px;
       position: relative;
-      @include avenir_R();
+      @include avenir_BOOK();
       font-size: 16px;
-      color: $carrot_dark_gray;
+      color: $oc_gray_7;
+      line-height: 24px;
+      letter-spacing: 0.2px;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+      margin-top: 4px;
 
       @include placeholder() {
         @include avenir_R();
@@ -399,20 +440,141 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 16px;
+      margin-top: 35px;
       outline: none;
       border: none;
       width: 100%;
-      height: 42px;
+      height: 48px;
       background-color: #4D67FC;
       color: white;
       @include avenir_H();
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 100px;
 
       &.disabled {
         opacity: 0.8;
       }
     }
   }
+
+  &.lander-team {
+    div.onboard-form {
+      button.continue {
+        margin-top: 149px;
+      }
+    }
+  }
+}
+
+div.setup-screen {
+  background-color: $carrot_text_blue;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  @include avenir_H();
+  font-size: 25px;
+  color: white;
+
+  div.setup-cta {
+    position: relative;
+    top: 50%;
+    padding-top: 85px;
+  }
+
+  div.oc-loading.rloading {
+    background-color: transparent;
+  }
+  
+  div.balloon {
+    position: absolute;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+
+    // Top left corner
+    &.big-yellow {
+      @include image-2x("/img/ML/balloon_big_yellow");
+      background-size: 172px 172px;
+      width: 172px;
+      height: 172px;
+      left: -57px;
+      top: -37px;
+    }
+
+    &.small-face-purple {
+      @include image-2x("/img/ML/balloon_small_purple_face");
+      background-size: 48px 48px;
+      width: 48px;
+      height: 48px;
+      left: 9.68%;
+      top: 11.87%;
+    }
+
+    &.small-red {
+      @include image-2x("/img/ML/balloon_small_red_1");
+      background-size: 17px 15px;
+      width: 17px;
+      height: 15px;
+      left: 13.43%;
+      top: 8.00%;
+    }
+
+    // Top right corner
+    &.big-red {
+      @include image-2x("/img/ML/setup_screen_balloon_big_red");
+      background-size: 241px 223px;
+      width: 241px;
+      height: 223px;
+      left: 65.31%;
+      top: 4.00%;
+    }
+
+    &.small-face-yellow {
+      @include image-2x("/img/ML/balloon_small_yellow_face");
+      background-size: 48px 48px;
+      width: 48px;
+      height: 48px;
+      left: 77.96%;
+      top: 27.37%;
+    }
+
+    &.small-yellow {
+      @include image-2x("/img/ML/balloon_small_yellow");
+      background-size: 15px 15px;
+      width: 15px;
+      height: 15px;
+      left: 86.01%;
+      top: 25.50%;
+    }
+
+    // Bottom left corner
+
+    &.big-green {
+      @include image-2x("/img/ML/setup_screen_balloon_big_green");
+      background-size: 111px 95px;
+      width: 111px;
+      height: 95px;
+      left: 21.72%;
+      top: 67.12%;
+    }
+
+    &.small-purple {
+      @include image-2x("/img/ML/balloon_small_purple");
+      background-size: 23px 21px;
+      width: 23px;
+      height: 21px;
+      left: 27.65%;
+      top: 63.5%;
+    }
+
+    // Bottom right corner
+    &.big-purple {
+      @include image-2x("/img/ML/setup_screen_balloon_big_purple");
+      background-size: 203px 205px;
+      width: 203px;
+      height: 205px;
+      right: 0px;
+      bottom: 0px;
+    }
+  } 
 }

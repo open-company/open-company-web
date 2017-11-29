@@ -190,7 +190,7 @@
             [:button.mlb-reset.get-started-button
               {:on-click #(if (utils/in? (:route @router/path) "login")
                               (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                              (router/nav! oc-urls/sign-up-with-slack))}
+                              (router/nav! oc-urls/sign-up))}
               "Get started for free"]]]
       ] ;<!-- main -->
     ] ; <!-- wrap -->

@@ -461,7 +461,7 @@
             (dispatcher/dispatch! [:jwt body]))
           (router/redirect! oc-urls/logout))))))
 
-(defn patch-team [team-id new-team-data redirect-url]
+(defn patch-team [team-id new-team-data redirect-to-slug]
   (when-let* [team-data (dispatcher/team-data team-id)
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-http (method-for-link team-patch) (relative-href team-patch)
@@ -469,8 +469,8 @@
        :json-params (cljs->json new-team-data)}
       (fn [{:keys [success body status]}]
         (when (and success
-                   (not (s/blank? redirect-url)))
-          (router/redirect! redirect-url))))))
+                   (not (s/blank? redirect-to-slug)))
+          (dispatcher/dispatch! [:org-redirect redirect-to-slug]))))))
 
 (defn create-org [org-name logo-url logo-width logo-height]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
@@ -488,17 +488,16 @@
         (fn [{:keys [success status body]}]
           (when-let [org-data (when success (json->cljs body))]
             (dispatcher/dispatch! [:org org-data])
-            (let [team-data (dispatcher/team-data team-id)
-                  org-url (oc-urls/org (:slug org-data))]
+            (let [team-data (dispatcher/team-data team-id)]
               (if (and (s/blank? (:name team-data))
                        (utils/link-for (:links team-data) "partial-update"))
                 ; if the current team has no name and
                 ; the user has write permission on it
                 ; use the org name
                 ; for it and patch it back
-                (patch-team (:team-id org-data) {:name org-name} org-url)
-                ; if not refirect the user to the slug
-                (router/redirect! org-url)))))))))
+                (patch-team (:team-id org-data) {:name org-name} (:slug org-data))
+                ; if not refirect the user to the slug)
+                (dispatcher/dispatch! [:org-redirect (:slug org-data)])))))))))
 
 (defn create-board [board-name board-access]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]

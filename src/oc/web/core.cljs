@@ -33,6 +33,7 @@
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
+            [oc.web.components.ui.team-setup :refer (team-setup)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
 
 (enable-console-print!)
@@ -239,7 +240,7 @@
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
   (if (= (:new (:query-params params)) "true")
-    (utils/after 100 #(router/nav! urls/slack-lander))
+    (utils/after 100 #(router/nav! urls/sign-up-profile))
     (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])))
 
 ;; Routes - Do not define routes when js/document#app
@@ -261,43 +262,27 @@
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
-      (simple-handler #(onboard-wrapper :email-lander) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
-      (simple-handler #(onboard-wrapper :email-lander) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
-      (simple-handler #(onboard-wrapper :email-lander-profile) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
-      (simple-handler #(onboard-wrapper :email-lander-profile) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
-      (simple-handler #(onboard-wrapper :email-lander-team) "sign-up" target params))
+      (simple-handler #(team-setup) "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
-      (simple-handler #(onboard-wrapper :email-lander-team) "sign-up" target params))
-
-    (defroute slack-lander-route urls/slack-lander {:as params}
-      (timbre/info "Routing slack-lander-route" urls/slack-lander)
-      (simple-handler #(onboard-wrapper :slack-lander) "sign-up" target params))
-
-    (defroute slack-lander-slash-route (str urls/slack-lander "/") {:as params}
-      (timbre/info "Routing slack-lander-slash-route" (str urls/slack-lander "/"))
-      (simple-handler #(onboard-wrapper :slack-lander) "sign-up" target params))
-
-    (defroute slack-lander-team-route urls/slack-lander-team {:as params}
-      (timbre/info "Routing slack-lander-team-route" urls/slack-lander-team)
-      (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
-
-    (defroute slack-lander-team-slash-route (str urls/slack-lander-team "/") {:as params}
-      (timbre/info "Routing slack-lander-team-slash-route" (str urls/slack-lander-team "/"))
-      (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
+      (simple-handler #(team-setup) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
@@ -493,10 +478,6 @@
                                  ;; Signup slack
                                  slack-lander-check-route
                                  slack-lander-check-slash-route
-                                 slack-lander-team-route
-                                 slack-lander-team-slash-route
-                                 slack-lander-route
-                                 slack-lander-slash-route
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route

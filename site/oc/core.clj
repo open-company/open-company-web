@@ -110,7 +110,7 @@
       [:div.site-navbar-right.big-web-only
         [:a
           {:id "site-header-signup-item"
-           :href "/login?slack"}
+           :href "/sign-up"}
           "Get Started"]
         [:a.login
           {:id "site-header-login-item"

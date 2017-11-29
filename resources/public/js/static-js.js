@@ -109,9 +109,9 @@ $(document).ready(function(){
 
   }else{ // No logged in user
     // link all get started button to signup with Slack
-    $(".get-started-button").attr("onClick", "window.location = \"/login?slack\"");
+    $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
-    $("#site-header-signup-item").attr("href", "/login?slack");
+    $("#site-header-signup-item").attr("href", "/sign-up");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
     // If in 404 page show error message for not logged in users
