@@ -31,8 +31,6 @@
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
 
-(def slack-lander "/slack-lander")
-(def slack-lander-team "/slack-lander/team")
 (def slack-lander-check "/slack-lander/check")
 
 (def logout "/logout")

@@ -49,7 +49,7 @@
           (cond
             (and (:slack-lander-check-team-redirect db)
                  (zero? (count orgs)))
-            (router/nav! oc-urls/slack-lander-team)
+            (router/nav! oc-urls/sign-up-team)
             (and (:email-lander-check-team-redirect db)
                  (zero? (count orgs)))
             (router/nav! oc-urls/sign-up-team)
