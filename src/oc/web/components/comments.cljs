@@ -3,7 +3,6 @@
                    [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -31,11 +30,25 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+
+(defn add-comment-content [add-comment-div]
+  (let [inner-html (.-innerHTML add-comment-div)
+        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
+        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
+        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
+        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
+        final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
+    final-text))
+
+
 (rum/defcs comment-row < rum/static
                          rum/reactive
   [s c]
-  (let [author (:author c)]
+  (let [author (:author c)
+        editable (boolean (utils/link-for (:links c) "partial-update"))]
     [:div.comment
+      {:on-click #(when editable
+                    (.focus (rum/ref-node s "comment-body")))}
       [:div.comment-header.group
         [:div.comment-avatar
           {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
@@ -56,18 +69,15 @@
                  :data-placement "top"
                  :data-container "body"}]])]
       [:p.comment-body.group
-        {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
+        {:on-blur #(let [new-comment (rum/ref-node s "comment-body")
+                         comment-text (add-comment-content new-comment)]
+                     (dis/dispatch! [:comment-save c comment-text]))
+         :ref "comment-body"
+         :class (utils/class-set {:editable editable})
+         :content-editable editable
+         :dangerouslySetInnerHTML (utils/emojify (:body c))}]
       [:div.comment-reactions-container.group
         (comment-reactions/comment-reactions c)]]))
-
-(defn add-comment-content [add-comment-div]
-  (let [inner-html (.-innerHTML add-comment-div)
-        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
-        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
-        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
-        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
-        final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
-    final-text))
 
 (defn enable-add-comment? [s]
   (let [add-comment-div (rum/ref-node s "add-comment")
