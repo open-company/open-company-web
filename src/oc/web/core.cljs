@@ -33,6 +33,7 @@
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
+            [oc.web.components.ui.team-setup :refer (team-setup)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
 
 (enable-console-print!)
@@ -277,11 +278,11 @@
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
-      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+      (simple-handler #(team-setup) "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
-      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+      (simple-handler #(team-setup) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
