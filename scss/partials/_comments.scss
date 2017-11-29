@@ -73,7 +73,7 @@ div.comments {
     div.comment {
       margin: 10px 0;
 
-      &:hover div.comment-header div.delete-button button {
+      &:hover div.comment-header div.delete-button button.mdi.mdi-delete {
         opacity: 0.8;
       }
 
@@ -122,14 +122,9 @@ div.comments {
           position: relative;
           margin-right: -6px;
 
-          button {
-            width: 18px;
-            height: 18px;
-            display: block;
-            background-image: cdnUrl("/img/ML/trash.svg");
+          button.mdi.mdi-delete {
+            padding: 7px 2px 1px;
             background-position: center;
-            background-size: 18px 18px;
-            background-repeat: no-repeat;
             background-color: rgba($carrot_light_gray_2, 0.15);
             opacity: 0;
             border: none;

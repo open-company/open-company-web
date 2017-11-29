@@ -46,7 +46,7 @@
             (utils/time-since (:created-at c))]]
           (when (boolean (utils/link-for (:links c) "delete"))
             [:div.delete-button
-              [:button
+              [:button.mdi.mdi-delete
                 {:type "button"
                  :on-click (fn [e]
                              (utils/remove-tooltips)
