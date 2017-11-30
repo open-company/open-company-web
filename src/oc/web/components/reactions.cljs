@@ -97,7 +97,9 @@
                                           (not (js/isIE)))
                                  (animate-reaction e s))
                                (dis/dispatch! [:reaction-toggle (:uuid entry-data) r (not reacted)])))}
-                [:span.reaction (:reaction r)]
+                [:span.reaction
+                  {:class (when (pos? (:count r)) "has-count")}
+                  (:reaction r)]
                 [:div.count
                   (when (pos? (:count r))
                     (:count r))]]))

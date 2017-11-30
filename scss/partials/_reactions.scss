@@ -35,6 +35,11 @@ div.reactions {
         -webkit-filter: grayscale(100%);
         filter: grayscale(100%);
         min-width: 22px;
+
+        &.has-count {
+          -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+        }
       }
 
       div.count {
