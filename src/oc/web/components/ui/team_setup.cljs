@@ -12,10 +12,14 @@
                         rum/reactive
                         (drv/drv :show-setup)
                         (drv/drv :org-redirect)
-                        {:did-mount (fn [s]
-                          (utils/after
-                           (* 1000 default-setup-wait-seconds)
-                           #(dis/dispatch! [:org-created-redirect]))
+                        (rum/local false ::show-setup)
+                        {:did-update (fn [s]
+                          (when (and (not @(::show-setup s))
+                                     @(drv/get-ref s :show-setup))
+                            (reset! (::show-setup s) true)
+                            (utils/after
+                             (* 1000 default-setup-wait-seconds)
+                             #(dis/dispatch! [:org-created-redirect])))
                           s)}
   [s]
   [:div
