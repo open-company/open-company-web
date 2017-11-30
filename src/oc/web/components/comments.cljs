@@ -3,7 +3,6 @@
                    [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -18,47 +17,20 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn delete-clicked [e comment-data]
+(defn delete-clicked [e comment-data s]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-comment"
                     :message (str "Delete this comment?")
                     :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :link-button-cb #(do
+                                       (dis/dispatch! [:alert-modal-hide])
+                                       (reset! (::editing? s) false))
                     :solid-button-title "Yes"
                     :solid-button-cb #(let [activity-uuid (router/current-activity-id)]
                                        (dis/dispatch! [:comment-delete activity-uuid comment-data])
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
-
-(rum/defcs comment-row < rum/static
-                         rum/reactive
-  [s c]
-  (let [author (:author c)]
-    [:div.comment
-      [:div.comment-header.group
-        [:div.comment-avatar
-          {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
-        [:div.comment-author-timestamp
-          [:div.comment-author
-            (:name author)]
-          [:div.comment-timestamp
-            (utils/time-since (:created-at c))]]
-          (when (boolean (utils/link-for (:links c) "delete"))
-            [:div.delete-button
-              [:button.mdi.mdi-delete
-                {:type "button"
-                 :on-click (fn [e]
-                             (utils/remove-tooltips)
-                             (delete-clicked e c))
-                 :title "Delete"
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"}]])]
-      [:p.comment-body.group
-        {:dangerouslySetInnerHTML (utils/emojify (:body c))}]
-      [:div.comment-reactions-container.group
-        (comment-reactions/comment-reactions c)]]))
 
 (defn add-comment-content [add-comment-div]
   (let [inner-html (.-innerHTML add-comment-div)
@@ -68,6 +40,79 @@
         cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
         final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
     final-text))
+
+(defn edit-finished
+  [e s c]
+  (let [new-comment (rum/ref-node s "comment-body")
+        comment-text (add-comment-content new-comment)]
+    (when (not (= comment-text (:body c)))
+      (reset! (::editing? s) false)
+      (dis/dispatch! [:comment-save c comment-text]))))
+
+
+(rum/defcs comment-row < rum/static
+                         rum/reactive
+                         (rum/local false ::editing?)
+                         (rum/local nil ::window-click)
+                         {:did-mount (fn [s]
+                                      (reset! (::window-click s)
+                                        (events/listen
+                                        js/window
+                                        EventType/CLICK
+                                        (fn [e]
+                                          (when (and
+                                                 (not (utils/event-inside? e (rum/ref-node s "comment-body")))
+                                                 (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete"))))
+                                            (reset! (::editing? s) false)))))
+                                      s)
+                          :will-unmount (fn [s]
+                                          (events/unlistenByKey
+                                           @(::window-click s)))
+                          }
+[s c]
+  (let [author (:author c)
+        editable (boolean (and
+                           (utils/link-for (:links c) "partial-update")
+                           (utils/link-for (:links c) "delete")))]
+    [:div.comment
+      [:div.comment-header.group
+        [:div.comment-avatar
+          {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
+        [:div.comment-author-timestamp
+          [:div.comment-author
+            (:name author)]
+          [:div.comment-timestamp
+            (utils/time-since (:created-at c))]]
+          (when editable
+            [:div.edit-delete-button {:ref "comment-edit-delete"}
+              [:button.mlb-reset
+                {:class (utils/class-set {:mdi @(::editing? s)
+                                          :mdi-delete @(::editing? s)})
+                 :type "button"
+                 :on-click (fn [e]
+                             (utils/remove-tooltips)
+                             (if @(::editing? s)
+                               (delete-clicked e c s)
+                               (.focus (rum/ref-node s "comment-body")))
+                             (when (not @(::editing? s))
+                               (reset! (::editing? s) true)))
+                 :title (if @(::editing? s) "Delete" "Edit")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"}]])]
+      [:p.comment-body.group
+       {:on-key-down (fn [e]
+                       (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
+                         (.blur (rum/ref-node s "comment-body"))
+                         (.preventDefault e)))
+         :on-blur #(edit-finished % s c)
+         :on-focus #(reset! (::editing? s) true)
+         :ref "comment-body"
+         :class (utils/class-set {:editable editable})
+         :content-editable editable
+         :dangerouslySetInnerHTML (utils/emojify (:body c))}]
+      [:div.comment-reactions-container.group
+        (comment-reactions/comment-reactions c)]]))
 
 (defn enable-add-comment? [s]
   (let [add-comment-div (rum/ref-node s "add-comment")
