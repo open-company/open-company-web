@@ -1350,14 +1350,14 @@
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
         (update-in [:entry-editing] dissoc :publishing)
         ;; Progress the NUX
-        (assoc :nux-post (when (= (:nux-post db) :2) :3))))))
+        (assoc :nux (when (= (:nux db) :2) :3))))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
   (-> db
     (update-in [:entry-editing] dissoc :publishing)
     (update-in [:entry-editing] assoc :error true)
-    (assoc :nux-post (when (= (:nux-post db) :2) :4))))
+    (assoc :nux (when (= (:nux db) :2) :4))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1597,7 +1597,7 @@
 (defmethod dispatcher/action :nux-end
   [db [_]]
   (cook/remove-cookie! (router/should-show-nux (jwt/user-id)))
-  (dissoc db :nux-post))
+  (dissoc db :nux))
 
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
@@ -1744,4 +1744,4 @@
                                :body body
                                :board-name (:name current-board)
                                :board-slug (:slug current-board)}
-               :nux-post :2})))
+               :nux :2})))

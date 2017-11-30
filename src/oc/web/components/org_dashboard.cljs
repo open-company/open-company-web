@@ -70,8 +70,8 @@
                                            :no-scroll (router/current-activity-id)})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
-            (some #{(:nux-post data)} [:1 :7])
-            (onboard-overlay (:nux-post data))
+            (some #{(:nux data)} [:1 :7])
+            (onboard-overlay (:nux data))
             ;; Org settings
             (:org-settings data)
             (org-settings)

@@ -85,7 +85,7 @@
    :org-slug            [[:route] (fn [route] (:org route))]
    :show-setup          [[:base] (fn [base] (:show-setup base))]
    :org-redirect        [[:base] (fn [base] (:org-redirect base))]
-   :nux-post            [[:base] (fn [base] (:nux-post base))]
+   :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :topic-slug          [[:route] (fn [route] (:topic route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
