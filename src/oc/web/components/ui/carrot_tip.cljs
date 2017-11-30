@@ -42,46 +42,84 @@
                         " Z ")]
     (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)))
 
+(defn carrot-tip-inner
+  [{:keys [x y width height ;; container data
+           arrow-top arrow-left ;; arrow data
+           step-label ;; label on top right corner
+           title message message-2;; content data
+           button-title on-next-click button-position ;; button data
+           circle-type ;; used to check if it has circle or not
+           container-bg-class ;; class to add the balloons bg
+           ] :as data}]
+  [:div.carrot-tip
+    {:style (when circle-type
+              {:left (str x "px")
+               :top (str y "px")
+               :width (str width "px")
+               :height (when height
+                         (str height "px"))})}
+    [:div.arrow
+      {:style {:top (str arrow-top "px")
+               :left (str arrow-left "px")}}]
+    (when container-bg-class
+      [:div.balloons-background
+        {:class container-bg-class}])
+    [:div.carrot-tip-inner
+      (when step-label
+        [:div.carrot-tip-step
+          step-label])
+      [:div.carrot-tip-title
+        title]
+      [:div.carrot-tip-description
+        message]
+      (when message-2
+        [:div.carrot-tip-description.second-line
+          message-2])
+      (when (fn? on-next-click)
+        [:button.mlb-reset.mlb-default.next-button
+          {:class button-position
+           :on-click (fn [e]
+                       (utils/event-stop e)
+                       (when (fn? on-next-click)
+                         (on-next-click)))}
+          button-title])]])
+
 (rum/defc carrot-tip < rum/static
-  [{:keys [x y big-circle button-title title message footer on-next-click]}]
-  [:div.carrot-tip-container
-    [:div.carrot-tip-background
-      [:svg
-        {:width "100%"
-         :height "100%"
-         :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-innerHeight js/window))
-         :version "1.1"
-         :xmlns "http://www.w3.org/2000/svg"
-         :xmlnsXlink "http://www.w3.org/1999/xlink"}
-        [:g
-          {:stroke "none"
-           :stroke-width "1"
-           :fill "none"
-           :fill-rule "evenodd"
-           :fill-opacity "0.9"
-           :opacity "0.3"}
-          [:g
-            {:fill "#34414F"}
+  [{:keys [x y width height ;; container data
+           arrow-top arrow-left ;; arrow data
+           circle-type ;; type of background circle
+           step ;; Overall nux step
+           ] :as data}]
+  (if circle-type
+    [:div.carrot-tip-container.needs-background
+      {:class (str "step-" (name step))}
+      (when circle-type
+        [:div.carrot-tip-background
+          [:svg
+            {:width "100%"
+             :height "100%"
+             :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-innerHeight js/window))
+             :version "1.1"
+             :xmlns "http://www.w3.org/2000/svg"
+             :xmlnsXlink "http://www.w3.org/1999/xlink"}
             [:g
-              [:path
-                {:d (if big-circle
-                     (big-oval (.-innerWidth js/window) (.-innerHeight js/window) (- x 170) (+ y 60))
-                     (small-oval (.-innerWidth js/window) (.-innerHeight js/window) (- x 170) (+ y 60)))}]]]]]]
-    [:div.carrot-tip
-      {:style {:left (str (+ x (if big-circle 50 -50)) "px")
-               :top (str (+ y (if big-circle 50 0)) "px")}}
-      [:div.triangle]
-      [:div.carrot-tip-inner
-        [:div.carrot-tip-title
-          title]
-        [:div.carrot-tip-description
-          message]
-        [:div.carrot-tip-footer.group
-          [:div.carrot-tip-num
-            footer]
-          [:button.mlb-reset.mlb-default.next-button
-            {:on-click (fn [e]
-                         (utils/event-stop e)
-                         (when (fn? on-next-click)
-                           (on-next-click)))}
-            button-title]]]]])
+              {:stroke "none"
+               :stroke-width "1"
+               :fill "none"
+               :fill-rule "evenodd"
+               :fill-opacity "0.9"
+               :opacity "0.3"}
+              [:g
+                {:fill "#34414F"}
+                [:g
+                  [:path
+                    {:d (if (= circle-type :big-circle)
+                         (big-oval (.-innerWidth js/window) (.-innerHeight js/window) (- x 170) (+ y 60))
+                         (small-oval (.-innerWidth js/window) (.-innerHeight js/window) (- x 170) (+ y 60)))}]]]]]])
+      (carrot-tip-inner data)]
+    [:div.carrot-tip-container
+      {:style {:left (str x "px")
+               :top (str y "px")
+               :width (str width "px")
+               :height (str height "px")}}
+      (carrot-tip-inner data)]))

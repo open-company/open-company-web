@@ -1348,7 +1348,9 @@
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [:entry-editing] dissoc :publishing)))))
+        (update-in [:entry-editing] dissoc :publishing)
+        ;; Progress the NUX
+        (assoc :nux-post (when (= (:nux-post db) :2) :3))))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
@@ -1591,13 +1593,9 @@
       (api/get-auth-settings)))
   db)
 
-(defmethod dispatcher/action :onboard-overlay-show
+(defmethod dispatcher/action :nux-end
   [db [_]]
-  (assoc db :show-onboard-overlay true))
-
-(defmethod dispatcher/action :onboard-overlay-hide
-  [db [_]]
-  (dissoc db :show-onboard-overlay))
+  (dissoc db :nux-post))
 
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
@@ -1744,5 +1742,4 @@
                                :body body
                                :board-name (:name current-board)
                                :board-slug (:slug current-board)}
-               :nux-post true
-               :show-onboard-overlay false})))
+               :nux-post :2})))
