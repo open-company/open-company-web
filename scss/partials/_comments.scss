@@ -73,7 +73,7 @@ div.comments {
     div.comment {
       margin: 10px 0;
 
-      &:hover div.comment-header div.delete-button button.mdi.mdi-delete {
+      &:hover div.comment-header div.edit-delete-button button.mlb-reset {
         opacity: 0.8;
       }
 
@@ -117,21 +117,27 @@ div.comments {
             float: left;
           }
         }
-        div.delete-button {
+        div.edit-delete-button {
           float: right;
           position: relative;
           margin-right: -6px;
 
-          button.mdi.mdi-delete {
-            padding: 7px 2px 1px;
+          button.mlb-reset {
+            width: 18px;
+            height: 18px;
+            display: block;
+            background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
             background-position: center;
+            background-repeat: no-repeat;
             background-color: rgba($carrot_light_gray_2, 0.15);
             opacity: 0;
             border: none;
 
-            &:hover {
+            &.mdi.mdi-delete {
+              padding: 7px 0px 7px 0px;
+              text-align: left;
+              background-image: none;
               opacity: 1;
-              background-image: cdnUrl("/img/ML/trash.svg");
             }
           }
         }
