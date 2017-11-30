@@ -146,9 +146,9 @@ $h2_top_margin: 20;
   }
 
   b, strong{
-    @include avenir_H();
+    @include avenir_BOOK();
     color: $carrot_dark_gray;
-    font-weight: normal;
+    font-weight: 700;
   }
 
   h2:first-child {

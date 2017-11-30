@@ -393,7 +393,7 @@
                     [:div.activity-modal-content-headline.emoji-autocomplete.emojiable
                       {:content-editable true
                        :ref "edit-headline"
-                       :placeholder "Untitled post"
+                       :placeholder "Add a title"
                        :on-paste    #(headline-on-paste s %)
                        :on-key-down #(headline-on-change s)
                        :on-click    #(headline-on-change s)
@@ -411,7 +411,7 @@
                                        :dispatch-input-key :modal-editing-data
                                        :upload-progress-cb (fn [is-uploading?]
                                                              (reset! (::uploading-media s) is-uploading?))
-                                       :media-config ["photo" "video" "chart" "attachment" "divider-line"]
+                                       :media-config ["photo" "video" "chart" "attachment"]
                                        :classes "emoji-autocomplete emojiable"})]
                   [:div.activity-modal-content
                     {:key "activity-modal-content"}
@@ -434,7 +434,8 @@
                         "Cancel"]
                       [:button.mlb-reset.mlb-default.save-edit
                         {:on-click #(save-editing? s)
-                         :disabled (not (:has-changes (:modal-editing-data modal-data)))}
+                         :disabled (or (not (:has-changes (:modal-editing-data modal-data)))
+                                       (not (seq (:headline (:modal-editing-data modal-data)))))}
                         (when (:loading (:modal-editing-data modal-data))
                           (small-loading))
                         "Save"]]]

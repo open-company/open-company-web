@@ -114,8 +114,8 @@
 
 (defn- is-publishable? [entry-editing]
   (and (seq (:board-slug entry-editing))
-       (or (seq (:headline entry-editing))
-           (seq (:body entry-editing)))))
+       (:has-changes entry-editing)
+       (seq (:headline entry-editing))))
 
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
@@ -270,7 +270,7 @@
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable (not nux)
              :ref "headline"
-             :placeholder "Untitled post"
+             :placeholder "Add a title"
              :on-paste    #(headline-on-paste s %)
              :on-key-down #(headline-on-change s)
              :on-click    #(headline-on-change s)
@@ -287,7 +287,7 @@
                              :dispatch-input-key :entry-editing
                              :upload-progress-cb (fn [is-uploading?]
                                                    (reset! (::uploading-media s) is-uploading?))
-                             :media-config ["photo" "video" "chart" "attachment" "divider-line"]
+                             :media-config ["photo" "video" "chart" "attachment"]
                              :classes "emoji-autocomplete emojiable"})
           [:div.entry-edit-controls-right]]
           ; Bottom controls
