@@ -38,7 +38,7 @@
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
-                        (rum/local false ::slack-enabled)
+                        (rum/local true ::slack-enabled)
                         (rum/local nil ::input-event)
                         (rum/local nil ::dom-add-event)
                         (rum/local nil ::dom-remove-event)
@@ -51,7 +51,8 @@
                         {:will-mount (fn [s]
                           (dis/dispatch! [:teams-get])
                           (let [board-data @(drv/get-ref s :board-editing)]
-                            (reset! (::slack-enabled s) (:slack-mirror board-data))
+                            (when (some? (:slack-mirror board-data))
+                              (reset! (::slack-enabled s) (:slack-mirror board-data)))
                             (reset! (::initial-board-name s) (:name board-data)))
                           (when (and (not @(drv/get-ref s :team-channels))
                                      (not @(::team-channels-requested s)))
@@ -107,8 +108,7 @@
         board-editing (drv/react s :board-editing)
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
-        show-slack-channels? (and (seq (:slug board-editing))
-                                  (pos? (apply + (map #(-> % :channels count) slack-teams))))]
+        show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
