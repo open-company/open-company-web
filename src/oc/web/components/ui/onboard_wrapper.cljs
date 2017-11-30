@@ -296,7 +296,7 @@
              :on-click #(do
                          ;; Make sure the onboard nux is shown once the dashboard is shown
                          (cook/set-cookie!
-                          (router/should-show-dashboard-tooltips
+                          (router/should-show-nux
                            (jwt/get-key :user-id)) true (* 60 60 24 7))
                          ;; Create org and show setup screen
                          (dis/dispatch! [:org-create]))}
