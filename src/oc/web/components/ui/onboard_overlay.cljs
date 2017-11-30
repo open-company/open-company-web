@@ -38,7 +38,7 @@
           [:button.mlb-reset.continue-btn
             {:on-click #(dis/dispatch! [:first-forced-post-start])}
             "Create your first post"]]
-        :last
+        :7
         [:div.onboard-overlay-step.step-last
           [:div.onboard-overlay-step-title
             "You’re on your way!"]
