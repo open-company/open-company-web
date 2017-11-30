@@ -101,9 +101,10 @@
                  :data-placement "top"
                  :data-container "body"}]])]
       [:p.comment-body.group
-        {:on-key-down #(when (= "Enter" (.-key %))
+       {:on-key-down (fn [e]
+                       (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
                          (.blur (rum/ref-node s "comment-body"))
-                         (.preventDefault %))
+                         (.preventDefault e)))
          :on-blur #(edit-finished % s c)
          :on-focus #(reset! (::editing? s) true)
          :ref "comment-body"
