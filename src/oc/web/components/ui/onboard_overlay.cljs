@@ -9,7 +9,7 @@
             [oc.web.mixins.ui :as mixins]))
 
 (defn dismiss-modal []
-  (dis/dispatch! [:onboard-overlay-hide]))
+  (dis/dispatch! [:nux-end]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
@@ -48,5 +48,5 @@
              "We hope you enjoy Carrot as much as we do. Feel free "
              "to reach out if you have any questions!")]
           [:button.mlb-reset.continue-btn
-            {:on-click #()}
+            {:on-click #(close-clicked s)}
             "Start using Carrot"]])]])

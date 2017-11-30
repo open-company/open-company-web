@@ -191,7 +191,7 @@
                          (keyword (:org-settings query-params))
                          (when (contains? query-params :access)
                            :main))
-          next-app-state {:show-onboard-overlay show-onboard-overlay
+          next-app-state {:nux-post :3
                           :loading loading
                           :org-settings org-settings}]
       (utils/after 1 #(swap! dis/app-state merge next-app-state)))
