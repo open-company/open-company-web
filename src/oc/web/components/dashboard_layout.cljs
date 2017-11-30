@@ -57,7 +57,7 @@
                               (drv/drv :board-data)
                               (drv/drv :all-posts)
                               (drv/drv :board-filters)
-                              (drv/drv :nux-post)
+                              (drv/drv :nux)
                               (drv/drv :editable-boards)
                               ;; Locals
                               (rum/local nil ::force-update)
@@ -94,7 +94,7 @@
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         board-filters (drv/react s :board-filters)
-        nux-post (drv/react s :nux-post)
+        nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
         dashboard-layout-container-key (if current-activity-id
@@ -118,10 +118,10 @@
         topics (:topics board-data)]
       ;; Topic list
       [:div.dashboard-layout.group
-        (when (= nux-post :3)
+        (when (= nux :3)
           (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
                       first-card-offset (.offset first-card)]
-            (carrot-tip {:step nux-post
+            (carrot-tip {:step nux
                          :x (+ (aget first-card-offset "left") (.width first-card) 24)
                          :y (aget first-card-offset "top")
                          :width 432
@@ -137,12 +137,12 @@
                          :button-title "Next"
                          :button-position "left"
                          :circle-type :huge-circle
-                         :on-next-click #(dis/dispatch! [:input [:nux-post] :4])})))
-        (when (= nux-post :4)
+                         :on-next-click #(dis/dispatch! [:input [:nux] :4])})))
+        (when (= nux :4)
           (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
                       offset (.offset new-post-bt)]
             (let [create-link (utils/link-for (:links org-data) "create")]
-              (carrot-tip {:step nux-post
+              (carrot-tip {:step nux
                            :x (- (aget offset "left") 284)
                            :y (+ (aget offset "top") 60)
                            :circle-offset {:top -170
@@ -158,11 +158,11 @@
                            :button-position "left"
                            :circle-type :asd-circle
                            :on-next-click (fn []
-                                            (dis/dispatch! [:input [:nux-post] :5]))}))))
-        (when (= nux-post :5)
+                                            (dis/dispatch! [:input [:nux] :5]))}))))
+        (when (= nux :5)
           (when-let* [plus-button (js/$ "button#add-board-button")
                       plus-offset (.offset plus-button)]
-            (carrot-tip {:step nux-post
+            (carrot-tip {:step nux
                          :x (+ (aget plus-offset "left") 40)
                          :y (- (aget plus-offset "top") 22)
                          :width 432
@@ -179,11 +179,11 @@
                          :button-title "Next"
                          :button-position "left"
                          :on-next-click (fn []
-                                          (dis/dispatch! [:input [:nux-post] :6]))})))
-        (when (= nux-post :6)
+                                          (dis/dispatch! [:input [:nux] :6]))})))
+        (when (= nux :6)
           (when-let* [invite-button (js/$ "button.invite-people-btn")
                       invite-offset (.offset invite-button)]
-            (carrot-tip {:step nux-post
+            (carrot-tip {:step nux
                          :x (+ (aget invite-offset "left") 16)
                          :y (- (aget invite-offset "top") 310)
                          :width 432
@@ -199,7 +199,7 @@
                          :button-title "Ok, got it"
                          :button-position "left"
                          :on-next-click (fn []
-                                          (dis/dispatch! [:input [:nux-post] :7]))})))
+                                          (dis/dispatch! [:input [:nux] :7]))})))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
           (when-not is-mobile-size?
