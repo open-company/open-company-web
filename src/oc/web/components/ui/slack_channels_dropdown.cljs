@@ -75,7 +75,7 @@
       [:i.fa
         {:class (utils/class-set {:fa-angle-down (not @(::show-channels-dropdown s))
                                   :fa-angle-up @(::show-channels-dropdown s)})
-         :on-click #(do
+         :on-click #(when (not disabled)
                       (reset! (::typing s) false)
                       (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
                       (utils/event-stop %))}]
