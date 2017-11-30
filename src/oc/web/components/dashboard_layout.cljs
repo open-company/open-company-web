@@ -125,7 +125,8 @@
                          :x (+ (aget first-card-offset "left") (.width first-card) 24)
                          :y (aget first-card-offset "top")
                          :width 432
-                         :container-bg-class "new-post-bt-bg"
+                         :circle-offset {:top -170
+                                         :left -750}
                          :title "Success! 👏"
                          :message "Your first post is on the General board!"
                          :message-2 (str
@@ -135,16 +136,18 @@
                          :step-label "1 of 4"
                          :button-title "Next"
                          :button-position "left"
-                         :circle-type :big-circle
+                         :circle-type :huge-circle
                          :on-next-click #(dis/dispatch! [:input [:nux-post] :4])})))
         (when (= nux-post :4)
-          (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
-                      offset (.offset nav-boards)
-                      boards-left (aget offset "left")]
+          (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
+                      offset (.offset new-post-bt)]
             (let [create-link (utils/link-for (:links org-data) "create")]
               (carrot-tip {:step nux-post
-                           :x (+ boards-left 145 30)
-                           :y (- (aget offset "top") 110)
+                           :x (- (aget offset "left") 284)
+                           :y (+ (aget offset "top") 60)
+                           :circle-offset {:top -170
+                                           :left -760}
+                           :width 432
                            :title "Add new posts"
                            :message (str
                                      "It’s quick and easy to add announcements, "
@@ -152,24 +155,51 @@
                                      "the New Post button to get started!")
                            :step-label "2 of 4"
                            :button-title "Next"
-                           :circle-type :big-circle
+                           :button-position "left"
+                           :circle-type :asd-circle
                            :on-next-click (fn []
-                                            (.addClass (js/$ "button#add-board-button") "active")
                                             (dis/dispatch! [:input [:nux-post] :5]))}))))
         (when (= nux-post :5)
           (when-let* [plus-button (js/$ "button#add-board-button")
-                      offset (.offset plus-button)
-                      plus-button-left (aget offset "left")]
+                      plus-offset (.offset plus-button)]
             (carrot-tip {:step nux-post
-                         :x (+ plus-button-left 90 30)
-                         :y (- (aget offset "top") 110)
-                         :title "Creating boards"
-                         :message ""
-                         :button-title "Got It!"
-                         :circle-type :small-circle
+                         :x (+ (aget plus-offset "left") 40)
+                         :y (- (aget plus-offset "top") 22)
+                         :width 432
+                         :circle-offset {:top -70
+                                         :left -220}
+                         :title "Organize posts with boards"
+                         :message (str
+                                   "You can add boards to keep related "
+                                   "information together. Try high-level boards "
+                                   "like All-hands, Strategy, and Who We Are; "
+                                   "or group-level boards like Sales, Marketing "
+                                   "and Design.")
+                         :step-label "3 of 4"
+                         :button-title "Next"
+                         :button-position "left"
                          :on-next-click (fn []
-                                          (.removeClass (js/$ "button#add-board-button") "active")
                                           (dis/dispatch! [:input [:nux-post] :6]))})))
+        (when (= nux-post :6)
+          (when-let* [invite-button (js/$ "button.invite-people-btn")
+                      invite-offset (.offset invite-button)]
+            (carrot-tip {:step nux-post
+                         :x (+ (aget invite-offset "left") 16)
+                         :y (- (aget invite-offset "top") 310)
+                         :width 432
+                         :circle-offset {:top -350
+                                         :left -80}
+                         :title "Invite your teammates"
+                         :message (str
+                                   "Don’t do all the work yourself! Invite others "
+                                   "to contribute or view information so "
+                                   "everyone can have a clear view of what’s "
+                                   "important.")
+                         :step-label "4 of 4"
+                         :button-title "Ok, got it"
+                         :button-position "left"
+                         :on-next-click (fn []
+                                          (dis/dispatch! [:input [:nux-post] :7]))})))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
           (when-not is-mobile-size?

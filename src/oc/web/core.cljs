@@ -175,7 +175,7 @@
                                     (jwt/jwt)
                                     (=
                                      (cook/get-cookie
-                                      (router/should-show-dashboard-tooltips
+                                      (router/should-show-nux
                                        (jwt/get-key :user-id)))
                                      "true"))
           loading (or (and ;; if is board page

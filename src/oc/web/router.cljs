@@ -129,10 +129,10 @@
   [org-slug board-slug]
   (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
 
-(defn should-show-dashboard-tooltips
+(defn should-show-nux
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
-  (str "should-show-dashboard-tooltips-" user-id))
+  (str "show-nux-" user-id))
 
 (defn print-router-path []
   (js/console.log @path))
