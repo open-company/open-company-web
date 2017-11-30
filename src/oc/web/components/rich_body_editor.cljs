@@ -248,14 +248,13 @@
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
         buttons (if show-subtitle
-                  ["custombold" "italic" "h2" "unorderedlist" "anchor"]
-                  ["custombold" "italic" "unorderedlist" "anchor"])
+                  ["bold" "italic" "h2" "unorderedlist" "anchor"]
+                  ["bold" "italic" "unorderedlist" "anchor"])
         options {:toolbar #js {:buttons (clj->js buttons)}
                  :buttonLabels "fontawesome"
                  :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
                  :extensions #js {"autolist" (js/AutoList.)
-                                  "media-picker" media-picker-ext
-                                  "custombold" (new js/CustomBold)}
+                                  "media-picker" media-picker-ext}
                  :autoLink true
                  :anchor #js {:customClassOption nil
                               :customClassOptionText "Button"
