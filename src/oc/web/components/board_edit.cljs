@@ -166,7 +166,7 @@
             [:div.board-edit-slack-channels-container
               [:div.board-edit-slack-channels-label.group
                 [:div.title
-                  "Connect comments to Slack"
+                  "Connect this board to Slack"
                   [:span.more-info]]
                 (carrot-checkbox {:selected @(::slack-enabled s)
                                   :did-change-cb #(do
