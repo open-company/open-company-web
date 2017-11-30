@@ -156,6 +156,10 @@ div.entry-edit-modal-container {
             b, strong {
               @include avenir_BOOK();
               font-weight: 700;
+
+              &.bold {
+                @include avenir_H();
+              }
             }
 
             @include activity-attachment(true);
