@@ -1,4 +1,5 @@
 (ns oc.web.components.entry-edit
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
@@ -299,13 +300,15 @@
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :container-selector "div.entry-edit-modal"}))
           (when nux-post
-            (carrot-tip {:x 446
-                         :y 408
-                         :title "Here’s a sample post for you."
-                         :message "Click the green button to see how it works. Don’t worry, you can delete this later if you’d like."
-                         :width 494
-                         :container-bg-class "entry-edit-bg"}))
-          [:button.mlb-reset.mlb-default.form-action-bt
+            (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
+                        post-button-offset (.offset post-button)]
+              (carrot-tip {:step :2
+                           :x (- (aget post-button-offset "left") 522)
+                           :y (- (aget post-button-offset "top") 20)
+                           :title "Here’s a sample post for you."
+                           :message "Click the green button to see how it works. Don’t worry, you can delete this later if you’d like."
+                           :width 494})))
+          [:button.mlb-reset.mlb-default.form-action-bt.post-btn
             {:on-click #(do
                           (clean-body)
                           (reset! (::publishing s) true)
