@@ -600,8 +600,6 @@
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorMediaPicker
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
-          ;; MediumEditorCustomBold
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorCustomBold/CustomBold.js"}]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]]})
 
