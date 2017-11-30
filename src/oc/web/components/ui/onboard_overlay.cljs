@@ -40,13 +40,13 @@
             "Create your first post"]]
         :last
         [:div.onboard-overlay-step.step-last
-          [:div.empty-line]
           [:div.onboard-overlay-step-title
-            "Keep everyone on the same page"]
-          [:div.step-illustration-container
-            [:div.step-illustration-left
-              "CEO Update"]
-            [:div.step-illustration-right
-              "Sales Update"]]
+            "You’re on your way!"]
+          [:div.step-illustration-container]
           [:div.onboard-overlay-step-description
-            "It’s simple to post announcements, updates and stories that bring everyone together."]])]])
+            (str
+             "We hope you enjoy Carrot as much as we do. Feel free "
+             "to reach out if you have any questions!")]
+          [:button.mlb-reset.continue-btn
+            {:on-click #()}
+            "Start using Carrot"]])]])
