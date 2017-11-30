@@ -268,7 +268,29 @@
                              :cleanTags #js ["meta" "video" "audio"]
                              :unwrapTags #js ["div" "span" "label" "font" "h1" "h3" "h4" "h5" "h6" "strong"]}
                  :placeholder #js {:text "Start writing..."
-                                   :hideOnClick true}}
+                                   :hideOnClick true}
+                 :keyboardCommands #js {:commands #js [
+                                    #js {
+                                      :command "bold"
+                                      :key "B"
+                                      :meta true
+                                      :shift false
+                                      :alt false
+                                    }
+                                    #js {
+                                      :command "italic"
+                                      :key "I"
+                                      :meta true
+                                      :shift false
+                                      :alt false
+                                    }
+                                    #js {
+                                      :command false
+                                      :key "U"
+                                      :meta true
+                                      :shift false
+                                      :alt false
+                                    }]}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
     (reset! (::media-picker-ext s) media-picker-ext)
     (.subscribe body-editor
