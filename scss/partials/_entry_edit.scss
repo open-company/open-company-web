@@ -26,7 +26,7 @@ div.entry-edit-modal-container {
     position: relative;
 
     div.entry-edit-modal {
-      width: 672px;
+      width: 700px;
       margin: 0px 0px 0px 28px;
       position: relative;
       background-color: white;
@@ -35,10 +35,10 @@ div.entry-edit-modal-container {
       padding: 0px;
 
       div.entry-edit-modal-header{
-        height: 64px;
+        height: 72px;
         width: 100%;
         background-color: $carrot_light_gray_2;
-        padding: 20px 36px 0px;
+        padding: 20px 24px 20px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
 
@@ -68,7 +68,7 @@ div.entry-edit-modal-container {
             cursor: pointer;
             position: relative;
 
-            &:after {
+            &.no-nux:after {
               float: right;
               content: "";
               background-image: cdnUrl("/img/ML/board_settings.svg");
@@ -109,10 +109,10 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-body {
         margin: 0px;
-        padding: 24px 24px 24px 58px;
+        padding: 24px 50px 24px 72px;
         overflow-y: auto;
         overflow-x: visible;
-        max-height: calc(100vh - 64px - 72px);
+        max-height: calc(100vh - 72px - 88px - 1px);
         width: calc(100% + 22px);
         margin-left: -22px;
 
@@ -181,7 +181,8 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-footer {
         height: 40px;
-        margin: 16px 36px;
+        margin: 16px 36px 32px;
+        position: relative;
 
         div.emoji-picker {
           float: left;

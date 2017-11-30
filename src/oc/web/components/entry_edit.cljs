@@ -12,6 +12,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -246,7 +247,8 @@
                   "Draft for "
                   "Posting in ")]
               [:div.boards-dropdown-caret
-                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
+                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
+                 :class (when (not nux-post) "no-nux")}
                 (:board-name entry-editing)
                 (when (and (not nux-post) @(::show-boards-dropdown s))
                   (dropdown-list
@@ -296,6 +298,13 @@
                      (not (js/isIE)))
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :container-selector "div.entry-edit-modal"}))
+          (when nux-post
+            (carrot-tip {:x 446
+                         :y 408
+                         :title "Here’s a sample post for you."
+                         :message "Click the green button to see how it works. Don’t worry, you can delete this later if you’d like."
+                         :width 494
+                         :container-bg-class "entry-edit-bg"}))
           [:button.mlb-reset.mlb-default.form-action-bt
             {:on-click #(do
                           (clean-body)
