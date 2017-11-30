@@ -50,32 +50,6 @@
         (.css entry-floating #js {:opacity opacity
                                  :display (if (pos? opacity) "block" "none")})))))
 
-(defn get-first-tooltip-message [org-data]
-  (let [create-link (utils/link-for (:links org-data) "create")
-        boards (:boards org-data)]
-    (if create-link
-      (if (> (count boards) 1)
-        (str
-         "Boards are where you’ll find the announcements, updates "
-         "and stories that help connect you with your team. "
-         "You can create new posts or react and comment on what you read")
-        (str
-         "We’ve created a super helpful welcome board for you - it’s "
-         "full of ideas on how to get the most out of Carrot!"))
-      (str
-       "Boards are where you’ll find the announcements, updates and stories "
-       "that help connect you with your team. You can react and comment on what you read."))))
-
-(defn get-second-tooltip-message [org-data]
-  (let [boards (:boards org-data)]
-    (if (> (count boards) 1)
-      (str
-       "When you need to, you can click here to create new boards "
-       "for different areas like Sales, Marketing and Product.")
-      (str
-       "When you’re ready, click here and get rolling with your first boards. "
-       "You can create boards for different areas like Sales, Marketing and Product."))))
-
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
@@ -83,11 +57,9 @@
                               (drv/drv :board-data)
                               (drv/drv :all-posts)
                               (drv/drv :board-filters)
-                              (drv/drv :show-onboard-overlay)
+                              (drv/drv :nux-post)
                               (drv/drv :editable-boards)
                               ;; Locals
-                              (rum/local nil ::show-boards-tooltip)
-                              (rum/local false ::show-plus-tooltip)
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
                               (rum/local nil ::resize-listener)
@@ -95,8 +67,6 @@
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
                               {:will-mount (fn [s]
-                                ; (let [show-onboard-overlay @(drv/get-ref s :show-onboard-overlay)]
-                                ;   (reset! (::show-boards-tooltip s) show-onboard-overlay))
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
@@ -108,8 +78,6 @@
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
-                                ; (when @(::show-boards-tooltip s)
-                                ;   (utils/after 1000 #(reset! (::force-update s) true)))
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -126,7 +94,7 @@
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         board-filters (drv/react s :board-filters)
-        show-onboard-overlay (drv/react s :show-onboard-overlay)
+        nux-post (drv/react s :nux-post)
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
         dashboard-layout-container-key (if current-activity-id
@@ -150,44 +118,58 @@
         topics (:topics board-data)]
       ;; Topic list
       [:div.dashboard-layout.group
-        (when (and @(::show-boards-tooltip s)
-                   (not show-onboard-overlay))
+        (when (= nux-post :3)
+          (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
+                      first-card-offset (.offset first-card)]
+            (carrot-tip {:step nux-post
+                         :x (+ (aget first-card-offset "left") (.width first-card) 24)
+                         :y (aget first-card-offset "top")
+                         :width 432
+                         :container-bg-class "new-post-bt-bg"
+                         :title "Success! 👏"
+                         :message "Your first post is on the General board!"
+                         :message-2 (str
+                                     "If you like, you can turn on automatic "
+                                     "sharing to Slack or email to keep everyone "
+                                     "up to date!")
+                         :step-label "1 of 4"
+                         :button-title "Next"
+                         :button-position "left"
+                         :circle-type :big-circle
+                         :on-next-click #(dis/dispatch! [:input [:nux-post] :4])})))
+        (when (= nux-post :4)
           (when-let* [nav-boards (js/$ "h3#navigation-sidebar-boards")
                       offset (.offset nav-boards)
                       boards-left (aget offset "left")]
             (let [create-link (utils/link-for (:links org-data) "create")]
-              (carrot-tip {:x (+ boards-left 145 30)
+              (carrot-tip {:step nux-post
+                           :x (+ boards-left 145 30)
                            :y (- (aget offset "top") 110)
-                           :title "Welcome to Carrot"
-                           :message (get-first-tooltip-message org-data)
-                           :footer (if create-link "1 of 2" "")
-                           :button-title (if create-link "Next" "Got It!")
-                           :big-circle true
+                           :title "Add new posts"
+                           :message (str
+                                     "It’s quick and easy to add announcements, "
+                                     "updates, and plans for your team. Just click "
+                                     "the New Post button to get started!")
+                           :step-label "2 of 4"
+                           :button-title "Next"
+                           :circle-type :big-circle
                            :on-next-click (fn []
-                                            (reset! (::show-plus-tooltip s) (not (not create-link)))
-                                            (reset! (::show-boards-tooltip s) false)
-                                            (if create-link
-                                              (.addClass (js/$ "button#add-board-button") "active")
-                                              (cook/remove-cookie!
-                                               (router/should-show-dashboard-tooltips
-                                                (jwt/get-key :user-id)))))}))))
-        (when @(::show-plus-tooltip s)
+                                            (.addClass (js/$ "button#add-board-button") "active")
+                                            (dis/dispatch! [:input [:nux-post] :5]))}))))
+        (when (= nux-post :5)
           (when-let* [plus-button (js/$ "button#add-board-button")
                       offset (.offset plus-button)
                       plus-button-left (aget offset "left")]
-            (carrot-tip {:x (+ plus-button-left 90 30)
+            (carrot-tip {:step nux-post
+                         :x (+ plus-button-left 90 30)
                          :y (- (aget offset "top") 110)
                          :title "Creating boards"
-                         :message (get-second-tooltip-message org-data)
-                         :footer ""
+                         :message ""
                          :button-title "Got It!"
-                         :big-circle false
+                         :circle-type :small-circle
                          :on-next-click (fn []
                                           (.removeClass (js/$ "button#add-board-button") "active")
-                                          (reset! (::show-plus-tooltip s) false)
-                                          (cook/remove-cookie!
-                                           (router/should-show-dashboard-tooltips
-                                            (jwt/get-key :user-id))))})))
+                                          (dis/dispatch! [:input [:nux-post] :6]))})))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
           (when-not is-mobile-size?
