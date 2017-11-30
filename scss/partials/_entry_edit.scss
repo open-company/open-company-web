@@ -153,14 +153,6 @@ div.entry-edit-modal-container {
             cursor: text;
             min-height: 85px;
             @include activity-body();
-            b, strong {
-              @include avenir_BOOK();
-              font-weight: 700;
-
-              &.bold {
-                @include avenir_H();
-              }
-            }
 
             @include activity-attachment(true);
 

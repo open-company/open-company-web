@@ -347,21 +347,9 @@ div.activity-card {
         display: none;
       }
 
-      b {
-        font-weight: 400;
-        @include avenir_M();
-      }
-
-      a.read-more {
+      b, strong {
+        font-weight: normal;
         @include avenir_R();
-        font-size: 16px;
-        color: $carrot_text_blue;
-        cursor: pointer;
-        display: inline-block !important;
-
-        &:hover {
-          text-decoration: underline;
-        }
       }
 
       // // Uncomment this to programmatically add the read full update at the end of the last body tag
