@@ -1282,7 +1282,8 @@
   [db [_]]
   (-> db
     (update-in [:entry-editing] dissoc :publishing)
-    (update-in [:entry-editing] assoc :error true)))
+    (update-in [:entry-editing] assoc :error true)
+    (assoc :nux-post (when (= (:nux-post db) :2) :4))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
