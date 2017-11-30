@@ -74,7 +74,6 @@
         editable (boolean (and
                            (utils/link-for (:links c) "partial-update")
                            (utils/link-for (:links c) "delete")))]
->>>>>>> dec617f70f7fcceb2d9734a88176b23310547cc9
     [:div.comment
       {:on-click #(when editable
                     (.focus (rum/ref-node s "comment-body")))}
