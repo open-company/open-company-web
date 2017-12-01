@@ -129,10 +129,16 @@
   [org-slug board-slug]
   (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
 
-(defn should-show-nux
+(defn show-nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
   (str "show-nux-" user-id))
+
+;; Values for NUX cookie
+
+(def nux-cookie-values
+  {:new-user "new-user"
+   :first-evenr-user "first-evenr-user"})
 
 (defn print-router-path []
   (js/console.log @path))

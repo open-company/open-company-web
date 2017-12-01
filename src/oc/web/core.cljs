@@ -171,13 +171,12 @@
          "/"
          ls/jwt-cookie-domain
          ls/jwt-cookie-secure)))
-    (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
-                                    (jwt/jwt)
-                                    (=
-                                     (cook/get-cookie
-                                      (router/should-show-nux
-                                       (jwt/get-key :user-id)))
-                                     "true"))
+    (let [nux-cookie (cook/get-cookie
+                      (router/show-nux-cookie
+                       (jwt/get-key :user-id)))
+          show-nux (and (not (:show-login-overlay @dis/app-state))
+                        (jwt/jwt)
+                        (some #(= % nux-cookie) (vals router/nux-cookie-values)))
           loading (or (and ;; if is board page
                            (not (contains? query-params :ap))
                            ;; if the board data are not present
@@ -191,7 +190,7 @@
                          (keyword (:org-settings query-params))
                          (when (contains? query-params :access)
                            :main))
-          next-app-state {:nux (when show-onboard-overlay :1)
+          next-app-state {:nux (when show-nux :1)
                           :loading loading
                           :org-settings org-settings}]
       (utils/after 1 #(swap! dis/app-state merge next-app-state)))
