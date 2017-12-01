@@ -69,6 +69,10 @@ div.onboard-overlay-container {
         text-align: left;
         padding: 8px 28px;
 
+        &.center-button {
+          text-align: center;
+        }
+
         &:after {
           @include image-2x("/img/ML/get_started_arrow");
           background-size: 20px 20px;
