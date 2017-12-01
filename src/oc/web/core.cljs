@@ -238,9 +238,16 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (if (= (:new (:query-params params)) "true")
-    (utils/after 100 #(router/nav! urls/sign-up-profile))
-    (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])))
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (cook/set-cookie!
+       (router/show-nux-cookie
+        (jwt/get-key :user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7)))
+    (if new-user
+      (utils/after 100 #(router/nav! urls/sign-up-profile))
+      (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}]))))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -269,27 +276,39 @@
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler team-setup "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler team-setup "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
 
     (defroute slack-lander-check-slash-route (str urls/slack-lander-check "/") {:as params}
       (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
 
