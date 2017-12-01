@@ -444,7 +444,7 @@
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
       (cook/set-cookie!
-       (router/show-nux-cookie (jwt/get-key :user-id))
+       (router/show-nux-cookie (jwt/user-id))
        (:new-user router/nux-cookie-values)
        (* 60 60 24 7))
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
@@ -464,7 +464,7 @@
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
       (cook/set-cookie!
-       (router/show-nux-cookie (jwt/get-key :user-id))
+       (router/show-nux-cookie (jwt/user-id))
        (:new-user router/nux-cookie-values)
        (* 60 60 24 7))
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
@@ -706,7 +706,12 @@
         (do
           (cook/remove-cookie! :show-login-overlay)
           (router/nav! oc-urls/login))
-        (router/nav! oc-urls/confirm-invitation-profile))
+        (do
+          (cook/set-cookie!
+           (router/show-nux-cookie (jwt/user-id))
+           (:new-user router/nux-cookie-values)
+           (* 60 60 24 7))
+          (router/nav! oc-urls/confirm-invitation-profile)))
       (dissoc db :show-login-overlay))
     (assoc db :collect-password-error status)))
 
@@ -1696,7 +1701,7 @@
     (router/redirect! (oc-urls/org org-slug)))
   ;; Show NUX for first ever user when the dashboard is loaded
   (cook/set-cookie!
-   (router/show-nux-cookie (jwt/get-key :user-id))
+   (router/show-nux-cookie (jwt/user-id))
    (:first-ever-user router/nux-cookie-values)
    (* 60 60 24 7))
   (assoc db :org-redirect org-slug))
