@@ -135,7 +135,7 @@
         orgs (drv/react s :orgs)]
     [:div.onboard-lander.lander-profile
       [:div.steps
-        (when (pos? (count orgs))
+        (when (zero? (count orgs))
           [:div.steps-internal.three-steps
             [:div.step-1
               "Sign Up"]
@@ -255,7 +255,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.org-logo
+          [:div.logo-upload-container.org-logo.group
             {:on-click (fn [_]
                         (if (empty? (:logo-url org-editing))
                           (iu/upload! {:accept "image/*"}
@@ -297,10 +297,6 @@
           [:button.continue
             {:disabled (empty? (:name org-editing))
              :on-click #(do
-                         ;; Make sure the onboard nux is shown once the dashboard is shown
-                         (cook/set-cookie!
-                          (router/should-show-nux
-                           (jwt/get-key :user-id)) true (* 60 60 24 7))
                          ;; Create org and show setup screen
                          (dis/dispatch! [:org-create]))}
             "Create my team"]]]]))
