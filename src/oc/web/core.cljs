@@ -300,15 +300,11 @@
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
 
     (defroute slack-lander-check-slash-route (str urls/slack-lander-check "/") {:as params}
       (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
 
