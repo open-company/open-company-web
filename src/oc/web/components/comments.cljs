@@ -45,7 +45,7 @@
   [e s c]
   (let [new-comment (rum/ref-node s "comment-body")
         comment-text (add-comment-content new-comment)]
-    (when (not (= comment-text (:body c)))
+    (when-not (= comment-text (:body c))
       (reset! (::editing? s) false)
       (dis/dispatch! [:comment-save c comment-text]))))
 
@@ -103,8 +103,10 @@
                  :data-placement "top"
                  :data-container "body"}]])]
       [:p.comment-body.group
-        {:on-key-up #(when (= "Enter" (.-key %))
-                       (.blur (rum/ref-node s "comment-body")))
+       {:on-key-down (fn [e]
+                       (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
+                         (.blur (rum/ref-node s "comment-body"))
+                         (.preventDefault e)))
          :on-blur #(edit-finished % s c)
          :on-focus #(reset! (::editing? s) true)
          :ref "comment-body"
