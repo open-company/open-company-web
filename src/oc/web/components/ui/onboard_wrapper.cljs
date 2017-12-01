@@ -18,7 +18,7 @@
 (defn- delay-focus-field-with-ref
   "Given a Rum state and a ref, async focus the filed if it exists."
   [s r]
-  (utils/after 1000
+  (utils/after 2500
    #(when-let [field (rum/ref-node s r)]
      (.focus field))))
 
@@ -535,7 +535,12 @@
           {:on-click #(router/nav!
                         (let [org (utils/get-default-org orgs)]
                           (if org
-                            (oc-urls/org (:slug org))
+                            (do
+                             (cook/set-cookie!
+                              (router/show-nux-cookie (jwt/user-id))
+                              (:new-user router/nux-cookie-values)
+                              (* 60 60 24 7))
+                             (oc-urls/org (:slug org)))
                             oc-urls/login)))}
           "Get Started"]]
       :else
