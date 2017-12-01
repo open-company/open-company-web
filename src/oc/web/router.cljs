@@ -138,7 +138,7 @@
 
 (def nux-cookie-values
   {:new-user "new-user"
-   :first-evenr-user "first-evenr-user"})
+   :first-ever-user "first-ever-user"})
 
 (defn print-router-path []
   (js/console.log @path))
