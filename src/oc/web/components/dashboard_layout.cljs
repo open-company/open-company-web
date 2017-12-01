@@ -127,8 +127,8 @@
                          :width 432
                          :circle-offset {:top -170
                                          :left -750}
-                         :title "Success! 👏"
-                         :message "Your first post is on the General board!"
+                         :title "Success!"
+                         :message (str "Your first post is on the " (:name board-data) " board!")
                          :message-2 (str
                                      "If you like, you can turn on automatic "
                                      "sharing to Slack or email to keep everyone "
