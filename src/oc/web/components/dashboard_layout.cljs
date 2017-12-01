@@ -179,7 +179,8 @@
                          :button-title "Next"
                          :button-position "left"
                          :on-next-click (fn []
-                                          (dis/dispatch! [:input [:nux] :6]))})))
+                                          (let [is-admin? (jwt/is-admin? (:team-id org-data))]
+                                            (dis/dispatch! [:input [:nux] (if is-admin? :6 :7)])))})))
         (when (= nux :6)
           (when-let* [invite-button (js/$ "button.invite-people-btn")
                       invite-offset (.offset invite-button)]
