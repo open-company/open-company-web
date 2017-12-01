@@ -29,7 +29,6 @@
                                   {:email ""
                                    :pswd ""
                                    :first-name ""
-
                                    :last-name ""}])))
                             s)}
   [s]

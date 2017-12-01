@@ -278,11 +278,11 @@
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
-      (simple-handler #(team-setup) "sign-up" target params))
+      (simple-handler team-setup "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
-      (simple-handler #(team-setup) "sign-up" target params))
+      (simple-handler team-setup "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
