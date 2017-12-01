@@ -36,7 +36,7 @@
     [:div.onboard-lander.lander
       [:div.main-cta
         [:div.title.main-lander
-          "Sign Up"]]
+          "Welcome!"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-click #(do
@@ -46,7 +46,9 @@
           "Sign Up with "
           [:div.slack-blue-icon]]
         [:div.or-with-email
-          "Or, sign up with email"]
+          [:div.or-with-email-line]
+          [:div.or-with-email-copy
+            "Or, sign up with email"]]
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
@@ -116,6 +118,11 @@
                                     (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                     (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                     s)
+                                   :did-mount (fn [s]
+                                    (utils/after 1000
+                                     #(when-let [first-name-field (rum/ref-node s "first-name")]
+                                       (.focus first-name-field)))
+                                    s)
                                    :will-update (fn [s]
                                     (when (and @(::saving s)
                                                (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
@@ -177,6 +184,7 @@
             "First name"]
           [:input.field
             {:type "text"
+             :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
@@ -199,7 +207,12 @@
                                (drv/drv :teams-data)
                                (drv/drv :org-editing)
                                (rum/local false ::saving)
-                               {:will-update (fn [s]
+                               {:did-mount (fn [s]
+                                 (utils/after 1000
+                                  #(when-let [org-name-field (rum/ref-node s "org-name")]
+                                    (.focus org-name-field)))
+                                 s)
+                                :will-update (fn [s]
                                  (let [org-editing @(drv/get-ref s :org-editing)
                                        teams-data @(drv/get-ref s :teams-data)
                                        teams-load @(drv/get-ref s :teams-load)]
@@ -250,7 +263,7 @@
             "Your Team"]]]
       [:div.main-cta
         [:div.title.company-setup
-          "Company setup"]]
+          "Your team"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -292,6 +305,7 @@
             "Team name"]
           [:input.field
             {:type "text"
+             :ref "org-name"
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
           [:button.continue
@@ -299,11 +313,16 @@
              :on-click #(do
                          ;; Create org and show setup screen
                          (dis/dispatch! [:org-create]))}
-            "Create my team"]]]]))
+            "Create my team!"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
                             (rum/local false ::password-error)
+                            {:did-mount (fn [s]
+                              (utils/after 1000
+                               #(when-let [password-field (rum/ref-node s "password")]
+                                 (.focus password-field)))
+                              s)}
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)
         jwt (:jwt confirm-invitation)
@@ -337,6 +356,7 @@
             {:type "password"
              :class (when collect-pswd-error "error")
              :value (or (:pswd collect-pswd) "")
+             :ref "password"
              :on-change #(do
                            (reset! (::password-error s) false)
                            (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
@@ -367,6 +387,11 @@
                                     {:will-mount (fn [s]
                                       (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                        (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                      s)
+                                     :did-mount (fn [s]
+                                      (utils/after 1000
+                                       #(when-let [first-name-field (rum/ref-node s "first-name")]
+                                         (.focus first-name-field)))
                                       s)
                                      :will-update (fn [s]
                                       (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
@@ -425,6 +450,7 @@
             "First name"]
           [:input.field
             {:type "text"
+             :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label

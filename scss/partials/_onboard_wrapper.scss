@@ -274,12 +274,34 @@ div.onboard-lander {
       }
     }
 
-    div.or-with-email {
-      @include avenir_H();
-      font-size: 16px;
-      color: rgba($oc_gray_7, 0.7);
-      text-align: center;
+    div.or-with-email{
+      width: 100%;
+      height: 19px;
       margin-top: 36px;
+      position: relative;
+
+      div.or-with-email-line {
+        position: absolute;
+        height: 1px;
+        background-color: $carrot_dark_bg_gray;
+        width: 340px;
+        top: 9px;
+        left: 0px;
+        display: block;
+      }
+
+      div.or-with-email-copy {
+        position: absolute;
+        top: 0px;
+        left: 71px;
+        text-align: center;
+        @include avenir_H();
+        font-size: 16px;
+        color: rgba($oc_gray_7, 0.7);
+        margin: 0 auto;
+        width: 196px;
+        background-color: white;
+      }
     }
 
     div.logo-upload-container {
