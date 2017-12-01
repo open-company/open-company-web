@@ -52,7 +52,7 @@
           {:on-click #(do
                        (.preventDefault %)
                        (when (:auth-settings @dis/app-state)
-                         (dis/dispatch! [:login-with-slack])))}
+                         (oc.web.actions.user/login-with-slack)))}
           [:div.signup-with-slack-content
             "Sign Up with "
             [:div.slack-blue-icon]]]

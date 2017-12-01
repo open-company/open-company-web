@@ -8,6 +8,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]))
 
@@ -38,7 +39,7 @@
              :class (when (utils/in? (:route @router/path) "home") "active")
              :on-click (fn [e]
                         (utils/event-stop e)
-                        (dis/dispatch! [:login-overlay-show nil])
+                        (user/show-login nil)
                         (dis/dispatch! [:site-menu-toggle])
                         (router/nav! oc-urls/home))}
             "Home"]]
@@ -58,7 +59,7 @@
              :class (when (utils/in? (:route @router/path) "about") "active")
              :on-click (fn [e]
                         (.preventDefault e)
-                        (dis/dispatch! [:login-overlay-show nil])
+                        (user/show-login nil)
                         (dis/dispatch! [:site-menu-toggle true])
                         (router/nav! oc-urls/about))}
             "About"]]
@@ -73,7 +74,7 @@
             {:on-click (fn [e]
                         (dis/dispatch! [:site-menu-toggle])
                         (if (utils/in? (:route @router/path) "login")
-                          (dis/dispatch! [:login-overlay-show :login-with-slack])
+                          (user/show-login :login-with-slack)
                           (router/nav! oc-urls/login)))}
             "Log In"])
         [:button.mlb-reset.get-started-button
@@ -83,7 +84,7 @@
                       (if (jwt/jwt)
                         (router/redirect! (utils/your-boards-url))
                         (if (utils/in? (:route @router/path) "login")
-                          (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                          (user/show-login :signup-with-slack)
                           (router/nav! oc-urls/sign-up))))}
           (if (jwt/jwt)
             "Your Boards"
