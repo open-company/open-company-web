@@ -45,7 +45,7 @@
   [e s c]
   (let [new-comment (rum/ref-node s "comment-body")
         comment-text (add-comment-content new-comment)]
-    (when (not (= comment-text (:body c)))
+    (when-not (= comment-text (:body c))
       (reset! (::editing? s) false)
       (dis/dispatch! [:comment-save c comment-text]))))
 
