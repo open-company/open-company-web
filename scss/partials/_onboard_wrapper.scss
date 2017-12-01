@@ -111,96 +111,99 @@ div.onboard-lander {
 
   div.steps {
     height: 58px;
-    position: relative;
-    margin: 0 auto;
 
-    &.two-steps {
-      width: 278px;
-    }
+    div.steps-internal {
+      position: relative;
+      margin: 0 auto;
 
-    &.three-steps {
-      width: 464px;
-    }
+      &.two-steps {
+        width: 278px;
+      }
 
-    div.step-1, div.step-2, div.step-3 {
-      width: 92px;
-      height: 53px;
-      color: rgba($oc_gray_7, 0.5);
-      @include avenir_H();
-      font-size: 12px;
-      position: absolute;
-      padding-top: 36px;
-      text-align: center;
+      &.three-steps {
+        width: 464px;
+      }
 
-      &:before {
-        width: 28px;
-        height: 28px;
-        @include image-2x("/img/ML/onboard_step_balloon");
-        background-size: 28px;
-        background-repeat: no-repeat;
-        position: absolute;
-        top: 0px;
-        left: 50%;
-        margin-left: -14px;
-        padding-top: 7px;
+      div.step-1, div.step-2, div.step-3 {
+        width: 92px;
+        height: 53px;
+        color: rgba($oc_gray_7, 0.5);
         @include avenir_H();
         font-size: 12px;
-        color: white;
-      }
+        position: absolute;
+        padding-top: 36px;
+        text-align: center;
 
-      &.active {
-        color: $oc_gray_7;
         &:before {
-          @include image-2x("/img/ML/onboard_step_balloon_blue");
+          width: 28px;
+          height: 28px;
+          @include image-2x("/img/ML/onboard_step_balloon");
+          background-size: 28px;
+          background-repeat: no-repeat;
+          position: absolute;
+          top: 0px;
+          left: 50%;
+          margin-left: -14px;
+          padding-top: 7px;
+          @include avenir_H();
+          font-size: 12px;
+          color: white;
+        }
+
+        &.active {
+          color: $oc_gray_7;
+          &:before {
+            @include image-2x("/img/ML/onboard_step_balloon_blue");
+          }
         }
       }
-    }
 
-    div.step-1 {
-      left: 0px;
-      top: 0px;
+      div.step-1 {
+        left: 0px;
+        top: 0px;
 
-      &:before {
-        content: "1";
+        &:before {
+          content: "1";
+        }
       }
-    }
 
-    div.step-2 {
-      left: 186px;
-      top: 0px;
+      div.step-2 {
+        left: 186px;
+        top: 0px;
 
-      &:before {
-        content: "2";
+        &:before {
+          content: "2";
+        }
       }
-    }
 
-    div.step-3 {
-      left: 374px;
-      top: 0px;
+      div.step-3 {
+        left: 374px;
+        top: 0px;
 
-      &:before {
-        content: "3";
+        &:before {
+          content: "3";
+        }
       }
-    }
 
-    div.step-progress-bar {
-      height: 2px;
-      width: 156px;
-      background-color: $carrot_light_gray_2;
-      position: absolute;
-      top: 12px;
-
-      &.active {
+      div.step-progress-bar {
+        height: 2px;
+        width: 156px;
         background-color: $carrot_light_gray_2;
+        position: absolute;
+        top: 12px;
+
+        &.active {
+          background-color: $carrot_light_gray_2;
+        }
       }
-    }
 
-    div.step-progress-bar:nth-child(2) {
-      left: 61px;
-    }
+      div.step-progress-bar:nth-child(2) {
+        left: 61px;
+      }
 
-    div.step-progress-bar:nth-child(4) {
-      left: 248px;
+      div.step-progress-bar:nth-child(4) {
+        left: 248px;
+      }
     }
   }
 
@@ -282,7 +285,7 @@ div.onboard-lander {
     div.logo-upload-container {
       margin-top: 112px;
       width: 340px;
-      height: 80px;
+      min-height: 80px;
       cursor: pointer;
 
       &:hover {
@@ -292,6 +295,8 @@ div.onboard-lander {
       }
 
       &.org-logo {
+        width: 340px;
+
         div.org-avatar.missing-logo {
           position: relative;
           width: 80px;
@@ -314,6 +319,7 @@ div.onboard-lander {
 
         div.org-avatar {
           @include org-avatar(80);
+          margin-right: 10px;
 
           div.org-avatar-container {
             img.org-avatar-img {
@@ -323,10 +329,12 @@ div.onboard-lander {
         }
 
         div.add-picture-link {
+          margin-left: 0px;
           margin-top: 10px;
         }
 
         div.add-picture-link-subtitle {
+          margin-left: 0px;
           margin-top: 10px;
         }
       }

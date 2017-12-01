@@ -131,17 +131,20 @@
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
+                          user-data)
+        orgs (drv/react s :orgs)]
     [:div.onboard-lander.lander-profile
-      [:div.steps.three-steps
-        [:div.step-1
-          "Sign Up"]
-        [:div.step-progress-bar]
-        [:div.step-2.active
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3
-          "Your Team"]]
+      [:div.steps
+        (when (pos? (count orgs))
+          [:div.steps-internal.three-steps
+            [:div.step-1
+              "Sign Up"]
+            [:div.step-progress-bar]
+            [:div.step-2.active
+              "Your Profile"]
+            [:div.step-progress-bar]
+            [:div.step-3
+              "Your Team"]])]
       [:div.main-cta
         [:div.title.about-yourself
           "Tell us a bit about yourself…"]
@@ -235,15 +238,16 @@
         _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)]
     [:div.onboard-lander.lander-team
-      [:div.steps.three-steps
-        [:div.step-1
-          "Sign Up"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3.active
-          "Your Team"]]
+      [:div.steps
+        [:div.steps-internal.three-steps
+          [:div.step-1
+            "Sign Up"]
+          [:div.step-progress-bar]
+          [:div.step-2
+            "Your Profile"]
+          [:div.step-progress-bar]
+          [:div.step-3.active
+            "Your Team"]]]
       [:div.main-cta
         [:div.title.company-setup
           "Company setup"]]
@@ -311,12 +315,13 @@
         collect-pswd-error (:collect-pswd-error confirm-invitation)
         invitation-confirmed (:invitation-confirmed confirm-invitation)]
     [:div.onboard-lander.invitee-lander
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]]
+      [:div.steps
+        [:div.steps-internal.two-steps
+          [:div.step-1
+            "Get Started"]
+          [:div.step-progress-bar]
+          [:div.step-2
+            "Your Profile"]]]
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
@@ -383,12 +388,13 @@
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)]
     [:div.onboard-lander.invitee-lander-profile
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2.active
-          "Your Profile"]]
+      [:div.steps
+        [:div.steps-internal.two-steps
+          [:div.step-1
+            "Get Started"]
+          [:div.step-progress-bar]
+          [:div.step-2.active
+            "Your Profile"]]]
       [:div.main-cta
         [:div.title.about-yourself
           "Tell us a bit about yourself…"]
