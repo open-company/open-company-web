@@ -1707,6 +1707,7 @@
     (js/console.log "current-board" current-board)
     (merge db {:entry-editing {:headline headline
                                :body body
+                               :has-changes true
                                :board-name (:name current-board)
                                :board-slug (:slug current-board)}
                :nux :2})))
