@@ -16,7 +16,7 @@ before_script:
   - echo $BOOT_JVM_OPTIONS
 script:
   - boot test!
-  - boot check-sources
+  - boot check-sources!
 cache:
   directories:
   - "$HOME/.m2"

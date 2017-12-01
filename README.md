@@ -233,6 +233,10 @@ provided in the table below:
 |  :channels-enumerate/success | API | Slack channels loaded, it saves them in the proper place of the app-state. |
 |  :comment-add | UI | Add a comment to an entry. |
 |  :comment-add/finish | API | Request to add a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
+|  :comment-save | UI | Edit and save a comment to an entry. |
+|  :comment-save/finish | API | Request to save a comment finished, can be it failed. |
+|  :comment-delete | UI | Delete a comment to an entry. |
+|  :comment-delete/finish | API | Request to delete a comment finished, can be it failed. In all cases reloads the comments with :comments-get. |
 |  :comments-get | UI | Starts the request to load the comments given an entry UUID. |
 |  :comments-get/finish | API | Request to load the comments for an entry finished, could be it failed though. |
 |  :container/change | WS | Notice from change service with change info for a board |
@@ -314,6 +318,8 @@ provided in the table below:
 |  :whats-new-modal-hide | UI | Hide the What's New modal. |
 |  :whats-new-modal-show | UI | Show the What's New modal. |
 |  :ws-interaction/comment-add | WS | Websocket message for an added comment. |
+|  :ws-interaction/comment-delete | WS | Websocket message for a deleted comment. |
+|  :ws-interaction/comment-update | WS | Websocket message for an updated comment. |
 |  :ws-interaction/reaction-add | WS | Websocket message for an added reaction. |
 |  :ws-interaction/reaction-delete | WS | Websocket message for a removed reaction. |
 

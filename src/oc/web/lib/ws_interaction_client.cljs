@@ -49,8 +49,18 @@
 
 (defmethod event-handler :interaction-comment/add
   [_ body]
-  (timbre/debug "Comment event" body)
+  (timbre/debug "Comment add event" body)
   (dis/dispatch! [:ws-interaction/comment-add body]))
+
+(defmethod event-handler :interaction-comment/update
+  [_ body]
+  (timbre/debug "Comment update event" body)
+  (dis/dispatch! [:ws-interaction/comment-update body]))
+
+(defmethod event-handler :interaction-comment/delete
+  [_ body]
+  (timbre/debug "Comment delete event" body)
+  (dis/dispatch! [:ws-interaction/comment-delete body]))
 
 (defmethod event-handler :interaction-reaction/add
   [_ body]
