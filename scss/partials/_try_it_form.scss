@@ -1,5 +1,5 @@
 div.try-it-combo-field {
-  margin-top: 12px;
+  margin: 48px auto;
   padding: 0 16px;
 
   div.mc-field-group {
@@ -7,13 +7,13 @@ div.try-it-combo-field {
 
     input {
       margin: 0;
-      border-top-left-radius: 8px;
-      border-bottom-left-radius: 8px;
+      border-top-left-radius: 100px;
+      border-bottom-left-radius: 100px;
       width: 322px;
-      height: 61px;
+      height: 48px;
       @include avenir_M();
       font-size: 16px;
-      color: $carrot_dark_blue;
+      color: $carrot_dark_brown;
       padding: 11px 20px 10px;
       outline: none;
       border: 1px solid transparent;
@@ -33,11 +33,13 @@ div.try-it-combo-field {
   }
 
   button.try-it-get-started {
-    height: 61px;
+    height: 48px;
     margin: 0;
     background-color: $carrot_text_blue;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-top-right-radius: 100px;
+    border-bottom-right-radius: 100px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
     color: white;
     @include avenir_H();
     font-size: 16px;

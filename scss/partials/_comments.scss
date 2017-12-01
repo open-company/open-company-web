@@ -38,7 +38,7 @@ div.comments {
     }
 
     div.comments-internal-scroll {
-      overflow-x: hidden;
+      overflow-x: visible;
       overflow-y: auto;
       height: 100%;
       padding: 10px 10px 0px;
@@ -73,6 +73,10 @@ div.comments {
     div.comment {
       margin: 10px 0;
 
+      &:hover div.comment-header div.edit-delete-button button.mlb-reset {
+        opacity: 0.8;
+      }
+
       div.comment-header {
         div.comment-avatar {
           width: #{$comment_avatar_size}px;
@@ -85,7 +89,6 @@ div.comments {
 
         div.comment-author-timestamp {
           display: block;
-          float: left;
           width: calc(100% - 23px);
 
           div.comment-author {
@@ -112,6 +115,30 @@ div.comments {
             white-space: nowrap;
             // display: block;
             float: left;
+          }
+        }
+        div.edit-delete-button {
+          float: right;
+          position: relative;
+          margin-right: -6px;
+
+          button.mlb-reset {
+            width: 18px;
+            height: 18px;
+            display: block;
+            background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba($carrot_light_gray_2, 0.15);
+            opacity: 0;
+            border: none;
+
+            &.mdi.mdi-delete {
+              padding: 7px 0px 7px 0px;
+              text-align: left;
+              background-image: none;
+              opacity: 1;
+            }
           }
         }
       }

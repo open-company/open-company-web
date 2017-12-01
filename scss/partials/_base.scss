@@ -93,13 +93,6 @@ div.fullscreen-page {
   overflow-y: hidden;
 }
 
-@include mobile(){
-  body.mobile-menu-expanded {
-    overflow-y: hidden;
-    height: 100vh;
-  }
-}
-
 h1, h2, h3, h4, h5, h6, .oc-header {
   @include avenir_M();
 }

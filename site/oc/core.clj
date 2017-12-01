@@ -58,74 +58,74 @@
    ;; jQuery textcomplete needed by Emoji One autocomplete
    [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
 
+(defn mobile-menu
+  "Mobile menu used to show the collapsable menu in the marketing site."
+  [active-page]
+  [:div.site-mobile-menu.mobile-only.hidden
+    [:div.site-mobile-menu-container
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/"
+           :class (when (= active-page "index") "active")}
+          "Home"]]
+      ; [:div.site-mobile-menu-item
+      ;   [:a
+      ;     {:href "/pricing"
+      ;      :class (when (= active-page "pricing") "active")}
+      ;     "Pricing"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/about"
+           :class (when (= active-page "about") "active")}
+          "About"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "http://blog.carrot.io"
+           :target "_blank"}
+          "Blog"]]]
+    [:div.site-mobile-menu-footer
+      [:button.mlb-reset.mlb-default
+        {:id "site-mobile-menu-login"}
+        "Log In"]
+      [:button.mlb-reset.get-started-button
+        {:id "site-mobile-menu-getstarted"}
+        "Get started for free"]]])
+
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.navbar.navbar-default.navbar-static-top
-    [:div.container-fluid
-      [:div.navbar-header
-        [:a.navbar-brand {:href "/"}]
-        [:button.navbar-toggle.collapsed
-          {:type "button"
-           :data-toggle "collapse"
-           :data-target "#oc-navbar-collapse"
-           :onClick "$(document.body).toggleClass('mobile-menu-expanded');"}
-            [:span.sr-only "Toggle navigation"]
-            [:span.icon-bar]
-            [:span.icon-bar]
-            [:span.icon-bar]]]
-      [:div.collapse.navbar-collapse {:id "oc-navbar-collapse"}
-        [:ul.nav.navbar-nav.navbar-right.navbar-top
-          [:li.mobile-only
-            {:class (if (= active-page "index") "active" "")}
-            [:a.navbar-item {:href "/"} "Home"]]
-          ; [:li
-          ;   {:class (if (= active-page "pricing") "active" "")}
-          ;   [:a.navbar-item {:href "/pricing"} "Pricing"]]
-          ; [:li
-          ;   {:class (if (= active-page "features") "active" "")}
-          ;   [:a.navbar-item {:href "/features"} "Features"]]
-          [:li
-            {:class (if (= active-page "about") "active" "")}
-            [:a.navbar-item {:href "/about"} "About"]]
-          [:li
-            [:a.navbar-item {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
-          [:li
-            {:id "site-header-login-item"}
-            [:a.navbar-item {:href "/login"} "Login"]]
-          [:li.get-started-item
-            [:div.get-started-button.navbar-item
-              [:button.mlb-reset.mlb-get-started
-                {:id "site-header-signup-item"}
-                "Get Started"]
-              ; [:div.mobile-already-account
-              ;   [:a {:href "/login"} "Already have an account? " [:span.login "Sign in"]]]
-                ]]]]]])
+  [:nav.site-navbar
+    [:div.site-navbar-container
+      [:a.navbar-brand-center
+        {:href "/"}]
+      [:div.site-navbar-left.big-web-only
+        [:a
+          {:href "/about"}
+          "About"]
+        [:a
+          {:href "http://blog.carrot.io"}
+          "Blog"]]
+      [:div.site-navbar-right.big-web-only
+        [:a
+          {:id "site-header-signup-item"
+           :href "/login?slack"}
+          "Get Started"]
+        [:a.login
+          {:id "site-header-login-item"
+           :href "/login"}
+          "Login"]]
+      [:div.mobile-ham-menu.mobile-only
+        {:onClick "javascript:siteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
    and every change here should be reflected there."
   []
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
-  [:nav.navbar.navbar-default.navbar-bottom
+  [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
-      [:div.left-column
-        [:img.logo
-          {:src (pages/cdn "/img/ML/carrot_wordmark_white.svg")}]
-        [:div.footer-small-links
-          [:a {:href "/sign-up"} "Get Started"]
-          "|"
-          [:a {:href "/login"} "Log in"]]
-        [:div.small-logos
-          [:a.twitter
-            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
-            [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
-          [:a.medium
-            {:target "_blank" :href "https://blog.carrot.io" :title "Carrot on Medium"}
-            [:img {:src (pages/cdn "/img/ML/home_page_medium.svg")}]]]
-        [:div.copyright "© Copyright 2017. All rights reserved"]]
       [:div.right-column
 
         [:div.column.column-company
@@ -157,7 +157,22 @@
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
           [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]]])
+          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]
+      [:div.left-column
+        [:img.logo
+          {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
+        [:div.footer-small-links.static
+          [:a {:href "/sign-up"} "Get Started"]
+          "or"
+          [:a {:href "/login"} "Log in"]]
+        [:div.small-logos
+          [:a.twitter
+            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
+            [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
+          [:a.medium
+            {:target "_blank" :href "https://blog.carrot.io" :title "Carrot on Medium"}
+            [:img {:src (pages/cdn "/img/ML/home_page_medium.svg")}]]]
+        [:div.copyright "© Copyright 2017. All rights reserved"]]]])
 
 
 (defn read-edn [entry]
@@ -173,10 +188,9 @@
                (head)
                [:body
                 [:div
-                 {:class "gradient"}
-                 [:div
-                  {:class "outer header"}
-                  (nav (name page))]]
+                 {:class "outer header"}
+                 (nav (name page))
+                 (mobile-menu (name page))]
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)
