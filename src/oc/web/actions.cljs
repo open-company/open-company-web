@@ -1703,11 +1703,11 @@
               "information often gets missed or lost, so everyone has a different idea of what’s "
               "important. Let’s fix that!<p>"
               "<p>Carrot makes key announcements, updates and plans visible and easy to find, so "
-              "everyone can stay on the same page.")]
-    (js/console.log "current-board" current-board)
-    (merge db {:entry-editing {:headline headline
-                               :body body
-                               :has-changes true
-                               :board-name (:name current-board)
-                               :board-slug (:slug current-board)}
+              "everyone can stay on the same page.")
+        entry-editing {:headline headline
+                       :body body
+                       :has-changes true
+                       :board-name (:name current-board)
+                       :board-slug (:slug current-board)}]
+    (merge db {:entry-editing entry-editing
                :nux :2})))
