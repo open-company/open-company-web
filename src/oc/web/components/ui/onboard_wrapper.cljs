@@ -15,6 +15,13 @@
             [goog.dom :as gdom]
             [goog.object :as gobj]))
 
+(defn- delay-focus-field-with-ref
+  "Given a Rum state and a ref, async focus the filed if it exists."
+  [s r]
+  (utils/after 1000
+   #(when-let [field (rum/ref-node s r)]
+     (.focus field))))
+
 (rum/defcs lander < rum/static
                           rum/reactive
                           (drv/drv :signup-with-email)
@@ -119,9 +126,7 @@
                                     (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                     s)
                                    :did-mount (fn [s]
-                                    (utils/after 1000
-                                     #(when-let [first-name-field (rum/ref-node s "first-name")]
-                                       (.focus first-name-field)))
+                                    (delay-focus-field-with-ref s "first-name")
                                     s)
                                    :will-update (fn [s]
                                     (when (and @(::saving s)
@@ -208,9 +213,7 @@
                                (drv/drv :org-editing)
                                (rum/local false ::saving)
                                {:did-mount (fn [s]
-                                 (utils/after 1000
-                                  #(when-let [org-name-field (rum/ref-node s "org-name")]
-                                    (.focus org-name-field)))
+                                 (delay-focus-field-with-ref s "org-name")
                                  s)
                                 :will-update (fn [s]
                                  (let [org-editing @(drv/get-ref s :org-editing)
@@ -319,9 +322,7 @@
                             (drv/drv :confirm-invitation)
                             (rum/local false ::password-error)
                             {:did-mount (fn [s]
-                              (utils/after 1000
-                               #(when-let [password-field (rum/ref-node s "password")]
-                                 (.focus password-field)))
+                              (delay-focus-field-with-ref s "password")
                               s)}
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)
@@ -389,9 +390,7 @@
                                        (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                       s)
                                      :did-mount (fn [s]
-                                      (utils/after 1000
-                                       #(when-let [first-name-field (rum/ref-node s "first-name")]
-                                         (.focus first-name-field)))
+                                      (delay-focus-field-with-ref s "first-name")
                                       s)
                                      :will-update (fn [s]
                                       (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
