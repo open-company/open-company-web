@@ -443,6 +443,10 @@
   (cond
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
+      (cook/set-cookie!
+       (router/show-nux-cookie (jwt/user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7))
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
       db)
     (= status 200) ;; Valid login, not signup, redirect to home
@@ -459,6 +463,10 @@
     :else ;; Valid signup let's collect user data
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (cook/set-cookie!
+       (router/show-nux-cookie (jwt/user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7))
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point)
       (dissoc db :signup-with-email-error))))
@@ -698,7 +706,12 @@
         (do
           (cook/remove-cookie! :show-login-overlay)
           (router/nav! oc-urls/login))
-        (router/nav! oc-urls/confirm-invitation-profile))
+        (do
+          (cook/set-cookie!
+           (router/show-nux-cookie (jwt/user-id))
+           (:new-user router/nux-cookie-values)
+           (* 60 60 24 7))
+          (router/nav! oc-urls/confirm-invitation-profile)))
       (dissoc db :show-login-overlay))
     (assoc db :collect-password-error status)))
 
@@ -1596,7 +1609,7 @@
 
 (defmethod dispatcher/action :nux-end
   [db [_]]
-  (cook/remove-cookie! (router/should-show-nux (jwt/user-id)))
+  (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
   (dissoc db :nux))
 
 (defmethod dispatcher/action :activity-share-show
@@ -1721,6 +1734,11 @@
   [db [_ org-slug]]
   (when (:redirect-to-org db)
     (router/redirect! (oc-urls/org org-slug)))
+  ;; Show NUX for first ever user when the dashboard is loaded
+  (cook/set-cookie!
+   (router/show-nux-cookie (jwt/user-id))
+   (:first-ever-user router/nux-cookie-values)
+   (* 60 60 24 7))
   (assoc db :org-redirect org-slug))
 
 (defmethod dispatcher/action :org-created-redirect

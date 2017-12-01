@@ -15,6 +15,13 @@
             [goog.dom :as gdom]
             [goog.object :as gobj]))
 
+(defn- delay-focus-field-with-ref
+  "Given a Rum state and a ref, async focus the filed if it exists."
+  [s r]
+  (utils/after 2500
+   #(when-let [field (rum/ref-node s r)]
+     (.focus field))))
+
 (rum/defcs lander < rum/static
                           rum/reactive
                           (drv/drv :signup-with-email)
@@ -36,7 +43,7 @@
     [:div.onboard-lander.lander
       [:div.main-cta
         [:div.title.main-lander
-          "Sign Up"]]
+          "Welcome!"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-click #(do
@@ -46,7 +53,9 @@
           "Sign Up with "
           [:div.slack-blue-icon]]
         [:div.or-with-email
-          "Or, sign up with email"]
+          [:div.or-with-email-line]
+          [:div.or-with-email-copy
+            "Or, sign up with email"]]
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
@@ -116,6 +125,9 @@
                                     (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                     (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                     s)
+                                   :did-mount (fn [s]
+                                    (delay-focus-field-with-ref s "first-name")
+                                    s)
                                    :will-update (fn [s]
                                     (when (and @(::saving s)
                                                (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
@@ -131,17 +143,20 @@
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
+                          user-data)
+        orgs (drv/react s :orgs)]
     [:div.onboard-lander.lander-profile
-      [:div.steps.three-steps
-        [:div.step-1
-          "Sign Up"]
-        [:div.step-progress-bar]
-        [:div.step-2.active
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3
-          "Your Team"]]
+      [:div.steps
+        (when (zero? (count orgs))
+          [:div.steps-internal.three-steps
+            [:div.step-1
+              "Sign Up"]
+            [:div.step-progress-bar]
+            [:div.step-2.active
+              "Your Profile"]
+            [:div.step-progress-bar]
+            [:div.step-3
+              "Your Team"]])]
       [:div.main-cta
         [:div.title.about-yourself
           "Tell us a bit about yourself…"]
@@ -174,6 +189,7 @@
             "First name"]
           [:input.field
             {:type "text"
+             :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
@@ -196,7 +212,10 @@
                                (drv/drv :teams-data)
                                (drv/drv :org-editing)
                                (rum/local false ::saving)
-                               {:will-update (fn [s]
+                               {:did-mount (fn [s]
+                                 (delay-focus-field-with-ref s "org-name")
+                                 s)
+                                :will-update (fn [s]
                                  (let [org-editing @(drv/get-ref s :org-editing)
                                        teams-data @(drv/get-ref s :teams-data)
                                        teams-load @(drv/get-ref s :teams-load)]
@@ -235,23 +254,24 @@
         _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)]
     [:div.onboard-lander.lander-team
-      [:div.steps.three-steps
-        [:div.step-1
-          "Sign Up"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3.active
-          "Your Team"]]
+      [:div.steps
+        [:div.steps-internal.three-steps
+          [:div.step-1
+            "Sign Up"]
+          [:div.step-progress-bar]
+          [:div.step-2
+            "Your Profile"]
+          [:div.step-progress-bar]
+          [:div.step-3.active
+            "Your Team"]]]
       [:div.main-cta
         [:div.title.company-setup
-          "Company setup"]]
+          "Your team"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.org-logo
+          [:div.logo-upload-container.org-logo.group
             {:on-click (fn [_]
                         (if (empty? (:logo-url org-editing))
                           (iu/upload! {:accept "image/*"}
@@ -288,22 +308,22 @@
             "Team name"]
           [:input.field
             {:type "text"
+             :ref "org-name"
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
           [:button.continue
             {:disabled (empty? (:name org-editing))
              :on-click #(do
-                         ;; Make sure the onboard nux is shown once the dashboard is shown
-                         (cook/set-cookie!
-                          (router/should-show-nux
-                           (jwt/get-key :user-id)) true (* 60 60 24 7))
                          ;; Create org and show setup screen
                          (dis/dispatch! [:org-create]))}
-            "Create my team"]]]]))
+            "Create my team!"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
                             (rum/local false ::password-error)
+                            {:did-mount (fn [s]
+                              (delay-focus-field-with-ref s "password")
+                              s)}
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)
         jwt (:jwt confirm-invitation)
@@ -311,12 +331,13 @@
         collect-pswd-error (:collect-pswd-error confirm-invitation)
         invitation-confirmed (:invitation-confirmed confirm-invitation)]
     [:div.onboard-lander.invitee-lander
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]]
+      [:div.steps
+        [:div.steps-internal.two-steps
+          [:div.step-1
+            "Get Started"]
+          [:div.step-progress-bar]
+          [:div.step-2
+            "Your Profile"]]]
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
@@ -336,6 +357,7 @@
             {:type "password"
              :class (when collect-pswd-error "error")
              :value (or (:pswd collect-pswd) "")
+             :ref "password"
              :on-change #(do
                            (reset! (::password-error s) false)
                            (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
@@ -367,6 +389,9 @@
                                       (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                        (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                       s)
+                                     :did-mount (fn [s]
+                                      (delay-focus-field-with-ref s "first-name")
+                                      s)
                                      :will-update (fn [s]
                                       (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
                                             orgs @(drv/get-ref s :orgs)]
@@ -383,12 +408,13 @@
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)]
     [:div.onboard-lander.invitee-lander-profile
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2.active
-          "Your Profile"]]
+      [:div.steps
+        [:div.steps-internal.two-steps
+          [:div.step-1
+            "Get Started"]
+          [:div.step-progress-bar]
+          [:div.step-2.active
+            "Your Profile"]]]
       [:div.main-cta
         [:div.title.about-yourself
           "Tell us a bit about yourself…"]
@@ -423,6 +449,7 @@
             "First name"]
           [:input.field
             {:type "text"
+             :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
@@ -508,7 +535,12 @@
           {:on-click #(router/nav!
                         (let [org (utils/get-default-org orgs)]
                           (if org
-                            (oc-urls/org (:slug org))
+                            (do
+                             (cook/set-cookie!
+                              (router/show-nux-cookie (jwt/user-id))
+                              (:new-user router/nux-cookie-values)
+                              (* 60 60 24 7))
+                             (oc-urls/org (:slug org)))
                             oc-urls/login)))}
           "Get Started"]]
       :else

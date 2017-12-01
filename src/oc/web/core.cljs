@@ -171,13 +171,12 @@
          "/"
          ls/jwt-cookie-domain
          ls/jwt-cookie-secure)))
-    (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
-                                    (jwt/jwt)
-                                    (=
-                                     (cook/get-cookie
-                                      (router/should-show-nux
-                                       (jwt/get-key :user-id)))
-                                     "true"))
+    (let [nux-cookie (cook/get-cookie
+                      (router/show-nux-cookie
+                       (jwt/get-key :user-id)))
+          show-nux (and (not (:show-login-overlay @dis/app-state))
+                        (jwt/jwt)
+                        (some #(= % nux-cookie) (vals router/nux-cookie-values)))
           loading (or (and ;; if is board page
                            (not (contains? query-params :ap))
                            ;; if the board data are not present
@@ -191,7 +190,7 @@
                          (keyword (:org-settings query-params))
                          (when (contains? query-params :access)
                            :main))
-          next-app-state {:nux (when show-onboard-overlay :1)
+          next-app-state {:nux (when show-nux :1)
                           :loading loading
                           :org-settings org-settings}]
       (utils/after 1 #(swap! dis/app-state merge next-app-state)))
@@ -239,9 +238,16 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (if (= (:new (:query-params params)) "true")
-    (utils/after 100 #(router/nav! urls/sign-up-profile))
-    (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])))
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (cook/set-cookie!
+       (router/show-nux-cookie
+        (jwt/get-key :user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7)))
+    (if new-user
+      (utils/after 100 #(router/nav! urls/sign-up-profile))
+      (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}]))))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -270,18 +276,26 @@
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler team-setup "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
       (simple-handler team-setup "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
