@@ -100,7 +100,8 @@
         dashboard-layout-container-key (if current-activity-id
                                         (str "dashboard-layout-activity-" current-activity-id)
                                         (str "dashboard-layout-" (if is-all-posts "all-posts" (:slug board-data))))
-        empty-board? (zero? (count (:fixed-items board-data)))
+        empty-board? (and (not nux)
+                          (zero? (count (:fixed-items board-data))))
         org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
