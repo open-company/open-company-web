@@ -93,7 +93,7 @@
               {:src (utils/cdn "/img/ML/new_homepage_screenshot.png")
                :srcSet (str (utils/cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]]
           [:div.homepage-screenshot-bubble
-            "Carrot provides the big picture that keeps everyone on the same page."]]
+            "It’s never been this easy to keep everyone on the same page"]]
 
         [:section.second-section.group
           [:div.why-balloon.big-red]
