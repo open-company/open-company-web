@@ -284,6 +284,20 @@ div#wrap {
         }
       }
 
+      video.homepage-main-animation {
+        width: 940px;
+        margin: 106px auto 0px;
+        padding: 0;
+        z-index: 10;
+        position: relative;
+
+        @include mobile(){
+          width: 100%;
+          height: auto;
+          margin: 80px auto 0px;
+        }
+      }
+
       div.homepage-screenshot-bubble {
         background-color: $carrot_text_blue;
         border-radius: 8px;
