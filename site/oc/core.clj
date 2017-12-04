@@ -117,7 +117,7 @@
            :href "/login"}
           "Login"]]
       [:div.mobile-ham-menu.mobile-only
-        {:onClick "javascript:siteMobileMenuToggle();"}]]])
+        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
