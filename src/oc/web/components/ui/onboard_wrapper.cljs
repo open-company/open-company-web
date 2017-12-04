@@ -333,7 +333,7 @@
     [:div.onboard-lander.invitee-lander
       [:div.steps
         [:div.steps-internal.two-steps
-          [:div.step-1
+          [:div.step-1.active
             "Get Started"]
           [:div.step-progress-bar]
           [:div.step-2
