@@ -1696,8 +1696,6 @@
 
 (defmethod dispatcher/action :org-redirect
   [db [_ org-slug]]
-  (when (:redirect-to-org db)
-    (router/redirect! (oc-urls/org org-slug)))
   ;; Show NUX for first ever user when the dashboard is loaded
   (cook/set-cookie!
    (router/show-nux-cookie (jwt/user-id))
@@ -1705,13 +1703,8 @@
    (* 60 60 24 7))
   ;; Static cookie for blue loading screen
   (cook/set-cookie! :nux true (* 60 60 24 7))
+  (utils/after 100 #(router/redirect! (oc-urls/org org-slug)))
   (assoc db :org-redirect org-slug))
-
-(defmethod dispatcher/action :org-created-redirect
-  [db [_]]
-  (when (:org-redirect db)
-    (router/redirect! (oc-urls/org (:org-redirect db))))
-  (assoc db :redirect-to-org true))
 
 (defmethod dispatcher/action :first-forced-post-start
   [db [_]]
