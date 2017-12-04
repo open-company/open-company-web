@@ -3,14 +3,13 @@
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
             [rum.core :as rum]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
 (rum/defc rloading < rum/static
   [data]
   [:div.oc-loading.rloading
     {:class (utils/class-set {:active (:loading data)
-                              :setup-screen (= (:nux data) (:first-ever-user router/nux-cookie-values))})}
+                              :setup-screen (:nux data)})}
     ;; Top left corner
     [:div.balloon.big.big-yellow]
     [:div.balloon.small.small-red]
