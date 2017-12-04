@@ -222,13 +222,13 @@ div.comments {
           color: $carrot_light_gray_3;
           font-size: 13px;
           cursor: text;
+          margin-bottom: 4px;
+          overflow-y: auto;
+          overflow-x: hidden;
 
           &.show-buttons {
             height: 58px;
           }
-
-          margin-bottom: 4px;
-          overflow: auto;
 
           .emojione {
             @include emoji-size(13);
