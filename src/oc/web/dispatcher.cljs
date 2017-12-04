@@ -83,7 +83,6 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (:orgs base))]
    :org-slug            [[:route] (fn [route] (:org route))]
-   :show-setup          [[:base] (fn [base] (:show-setup base))]
    :org-redirect        [[:base] (fn [base] (:org-redirect base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
