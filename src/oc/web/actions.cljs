@@ -1604,7 +1604,6 @@
 (defmethod dispatcher/action :nux-end
   [db [_]]
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
-  (cook/remove-cookie! :nux)
   (dissoc db :nux))
 
 (defmethod dispatcher/action :activity-share-show
