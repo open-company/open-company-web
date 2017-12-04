@@ -167,7 +167,10 @@
               [:div.board-edit-slack-channels-label.group
                 [:div.title
                   "Connect comments to Slack"
-                  [:span.more-info]]
+                  [:span.more-info
+                   {:data-toggle "tooltip"
+                    :data-placement "top"
+                    :title "Post comments and updates to your selected Slack channel."}]]
                 (carrot-checkbox {:selected @(::slack-enabled s)
                                   :did-change-cb #(do
                                                     (reset! (::slack-enabled s) %)
