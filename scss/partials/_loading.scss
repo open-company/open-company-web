@@ -12,6 +12,125 @@ div.oc-loading {
     display: inline;
   }
 
+  div.balloon {
+    display: none;
+  }
+
+  div.setup-cta {
+    display: none;
+  }
+
+  &.setup-screen {
+    background-color: $carrot_text_blue;
+    width: 100vw;
+    height: 100vh;
+    text-align: center;
+    @include avenir_H();
+    font-size: 25px;
+    color: white;
+
+    div.setup-cta {
+      position: relative;
+      top: 50%;
+      padding-top: 85px;
+      display: block;
+    }
+
+    div.balloon {
+      position: absolute;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 1;
+      display: block;
+
+      // Top left corner
+      &.big-yellow {
+        @include image-2x("/img/ML/balloon_big_yellow");
+        background-size: 172px 172px;
+        width: 172px;
+        height: 172px;
+        left: -57px;
+        top: -37px;
+      }
+
+      &.small-face-purple {
+        @include image-2x("/img/ML/balloon_small_purple_face");
+        background-size: 48px 48px;
+        width: 48px;
+        height: 48px;
+        left: 9.68%;
+        top: 11.87%;
+      }
+
+      &.small-red {
+        @include image-2x("/img/ML/balloon_small_red_1");
+        background-size: 17px 15px;
+        width: 17px;
+        height: 15px;
+        left: 13.43%;
+        top: 8.00%;
+      }
+
+      // Top right corner
+      &.big-red {
+        @include image-2x("/img/ML/setup_screen_balloon_big_red");
+        background-size: 241px 223px;
+        width: 241px;
+        height: 223px;
+        left: 65.31%;
+        top: 4.00%;
+      }
+
+      &.small-face-yellow {
+        @include image-2x("/img/ML/balloon_small_yellow_face");
+        background-size: 48px 48px;
+        width: 48px;
+        height: 48px;
+        left: 77.96%;
+        top: 27.37%;
+      }
+
+      &.small-yellow {
+        @include image-2x("/img/ML/balloon_small_yellow");
+        background-size: 15px 15px;
+        width: 15px;
+        height: 15px;
+        left: 86.01%;
+        top: 25.50%;
+      }
+
+      // Bottom left corner
+
+      &.big-green {
+        @include image-2x("/img/ML/setup_screen_balloon_big_green");
+        background-size: 111px 95px;
+        width: 111px;
+        height: 95px;
+        left: 21.72%;
+        top: 67.12%;
+      }
+
+      &.small-purple {
+        @include image-2x("/img/ML/balloon_small_purple");
+        background-size: 23px 21px;
+        width: 23px;
+        height: 21px;
+        left: 27.65%;
+        top: 63.5%;
+      }
+
+      // Bottom right corner
+      &.big-purple {
+        @include image-2x("/img/ML/setup_screen_balloon_big_purple");
+        background-size: 203px 205px;
+        width: 203px;
+        height: 205px;
+        right: 0px;
+        bottom: 0px;
+      }
+    }
+  }
+
   div.oc-loading-inner {
     position: relative;
     width: 52px;

@@ -279,7 +279,6 @@ provided in the table below:
 |  :nux-end | UI | Finish the NUX. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
-|  :org-created-redirect | UI | Called when the new org has been created. |
 |  :org-edit | UI | Setup the data to start the organization settings editing. |
 |  :org-edit-save | UI | Save the organization data edited from settings. |
 |  :org-redirect | UI | Redirect to the newly created org after the setup screen have been shown. |

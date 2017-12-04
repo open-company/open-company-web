@@ -84,9 +84,19 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:img.homepage-main-screenshot
-          {:src (cdn "/img/ML/new_homepage_screenshot.png")
-           :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
+        ; [:img.homepage-main-screenshot
+        ;   {:src (cdn "/img/ML/new_homepage_screenshot.png")
+        ;    :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
+        [:video.homepage-main-animation
+          {:controls false
+           :autoplay true
+           :loop true}
+           [:source
+            {:src (cdn "/img/ML/animation.webm")
+             :type "video/webm"}]
+           [:source
+            {:src (cdn "/img/ML/animation.mp4")
+             :type "video/mp4"}]]
         [:div.homepage-screenshot-bubble
           "Carrot provides the big picture that keeps everyone on the same page."]]
 
@@ -552,11 +562,30 @@
    :body [:body.small-footer
           [:div#app
             [:div.oc-loading.active
+              ;; Top left corner
+              [:div.balloon.big.big-yellow]
+              [:div.balloon.small.small-red]
+              [:div.balloon.small.face.small-face-purple]
+              ;; Top right corner
+              [:div.balloon.big.big-red]
+              [:div.balloon.small.small-yellow]
+              [:div.balloon.small.face.small-face-yellow]
+              ;; Bottom left corner
+              [:div.balloon.big.big-green]
+              [:div.balloon.small.small-purple]
+              ;; Bottom right corner
+              [:div.balloon.big.big-purple]
+
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+                [:div.oc-loading-body]]
+              [:div.setup-cta
+                [:div "Hang tight. We’re just getting"]
+                [:div "everything setup for you!"]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
+          ;; Static js files
+          [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
           ;; JWT decode library
           [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
@@ -642,9 +671,32 @@
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
    :body [:body.small-footer
-          [:div#app [:div.oc-loading.active [:div.oc-loading-inner [:div.oc-loading-heart] [:div.oc-loading-body]]]]
+          [:div#app
+            [:div.oc-loading.active
+              ;; Top left corner
+              [:div.balloon.big.big-yellow]
+              [:div.balloon.small.small-red]
+              [:div.balloon.small.face.small-face-purple]
+              ;; Top right corner
+              [:div.balloon.big.big-red]
+              [:div.balloon.small.small-yellow]
+              [:div.balloon.small.face.small-face-yellow]
+              ;; Bottom left corner
+              [:div.balloon.big.big-green]
+              [:div.balloon.small.small-purple]
+              ;; Bottom right corner
+              [:div.balloon.big.big-purple]
+
+              [:div.oc-loading-inner
+                [:div.oc-loading-heart]
+                [:div.oc-loading-body]]
+              [:div.setup-cta
+                [:div "Hang tight. We’re just getting"]
+                [:div "everything setup for you!"]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
+          ;; Static js files
+          [:script {:src (cdn "/js/static-js.js")}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
             {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
@@ -664,6 +716,4 @@
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assents
-          [:script {:src (cdn "/oc_assets.js")}]
-          ;; Static js files
-          [:script {:src (cdn "/js/static-js.js")}]]})
+          [:script {:src (cdn "/oc_assets.js")}]]})

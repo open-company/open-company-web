@@ -208,47 +208,47 @@
             "Continue"]]]]))
 
 (rum/defcs lander-team < rum/reactive
-                               (drv/drv :teams-load)
-                               (drv/drv :teams-data)
-                               (drv/drv :org-editing)
-                               (rum/local false ::saving)
-                               {:did-mount (fn [s]
-                                 (delay-focus-field-with-ref s "org-name")
-                                 s)
-                                :will-update (fn [s]
-                                 (let [org-editing @(drv/get-ref s :org-editing)
-                                       teams-data @(drv/get-ref s :teams-data)
-                                       teams-load @(drv/get-ref s :teams-load)]
-                                   ;; Load the list of teams if it's not already
-                                   (when (and (empty? teams-data)
-                                              (:auth-settings teams-load)
-                                              (not (:teams-data-requested teams-load)))
-                                     (dis/dispatch! [:teams-get]))
-                                   ;; If the team is loaded setup the form
-                                   (when (and (nil? (:name org-editing))
-                                              (nil? (:logo-url org-editing))
-                                              (seq teams-data))
-                                     (let [first-team (select-keys
-                                                       (first teams-data)
-                                                       [:name :logo-url :logo-width :logo-height])]
-                                       (dis/dispatch!
-                                        [:input
-                                         [:org-editing]
-                                         first-team])
-                                       (when-not (:logo-height first-team)
-                                         (let [img (gdom/createDom "img")]
-                                           (set! (.-onload img)
-                                            #(do
-                                              (dis/dispatch!
-                                               [:input
-                                                [:org-editing]
-                                                (merge @(drv/get-ref s :org-editing)
-                                                 {:logo-width (.-width img)
-                                                  :logo-height (.-height img)})])
-                                              (gdom/removeNode img)))
-                                           (gdom/append (.-body js/document) img)
-                                           (set! (.-src img) (:logo-url first-team)))))))
-                                 s)}
+                         (drv/drv :teams-load)
+                         (drv/drv :teams-data)
+                         (drv/drv :org-editing)
+                         (rum/local false ::saving)
+                         {:did-mount (fn [s]
+                           (delay-focus-field-with-ref s "org-name")
+                           s)
+                          :will-update (fn [s]
+                           (let [org-editing @(drv/get-ref s :org-editing)
+                                 teams-data @(drv/get-ref s :teams-data)
+                                 teams-load @(drv/get-ref s :teams-load)]
+                             ;; Load the list of teams if it's not already
+                             (when (and (empty? teams-data)
+                                        (:auth-settings teams-load)
+                                        (not (:teams-data-requested teams-load)))
+                               (dis/dispatch! [:teams-get]))
+                             ;; If the team is loaded setup the form
+                             (when (and (nil? (:name org-editing))
+                                        (nil? (:logo-url org-editing))
+                                        (seq teams-data))
+                               (let [first-team (select-keys
+                                                 (first teams-data)
+                                                 [:name :logo-url :logo-width :logo-height])]
+                                 (dis/dispatch!
+                                  [:input
+                                   [:org-editing]
+                                   first-team])
+                                 (when-not (:logo-height first-team)
+                                   (let [img (gdom/createDom "img")]
+                                     (set! (.-onload img)
+                                      #(do
+                                        (dis/dispatch!
+                                         [:input
+                                          [:org-editing]
+                                          (merge @(drv/get-ref s :org-editing)
+                                           {:logo-width (.-width img)
+                                            :logo-height (.-height img)})])
+                                        (gdom/removeNode img)))
+                                     (gdom/append (.-body js/document) img)
+                                     (set! (.-src img) (:logo-url first-team)))))))
+                           s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
         _ (drv/react s :teams-load)
