@@ -84,19 +84,19 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        ; [:img.homepage-main-screenshot
-        ;   {:src (cdn "/img/ML/new_homepage_screenshot.png")
-        ;    :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
         [:video.homepage-main-animation
           {:controls false
            :autoplay true
            :loop true}
-           [:source
+          [:source
             {:src (cdn "/img/ML/animation.webm")
              :type "video/webm"}]
-           [:source
+          [:source
             {:src (cdn "/img/ML/animation.mp4")
-             :type "video/mp4"}]]
+             :type "video/mp4"}]
+          [:img.homepage-main-screenshot
+            {:src (cdn "/img/ML/new_homepage_screenshot.png")
+             :srcSet (str (cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]]
         [:div.homepage-screenshot-bubble
           "Carrot provides the big picture that keeps everyone on the same page."]]
 
