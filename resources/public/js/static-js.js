@@ -184,7 +184,6 @@ var nux_cookie = OCStaticGetCookie(OCStaticCookieName("nux"));
 console.log("nux-cookie name:", OCStaticCookieName("nux"), "value", nux_cookie);
 if (nux_cookie) {
   var oc_loading = document.querySelectorAll("div.oc-loading");
-  console.log("setup loading", oc_loading);
   if (oc_loading) {
     oc_loading.forEach(function(item){
       item.classList.add("setup-screen");
@@ -192,7 +191,6 @@ if (nux_cookie) {
   }
 }else {
   var oc_loading = document.querySelectorAll("div.oc-loading");
-  console.log("regular loading", oc_loading);
   if (oc_loading) {
     oc_loading.forEach(function(item){
       item.classList.remove("setup-screen");
