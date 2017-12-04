@@ -889,7 +889,11 @@
         {:headers (headers-for-link react-link)
          :body emoji}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:react-from-picker/finish {:status status :activity-data activity-data :reaction-data (if success (json->cljs body) {})}]))))))
+          (dispatcher/dispatch!
+           [:react-from-picker/finish
+            {:status status
+             :activity-data activity-data
+             :reaction-data (if success (json->cljs body) {})}]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
