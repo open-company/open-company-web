@@ -9,7 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
@@ -66,7 +66,7 @@
                    (not (:nux-end data))))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
-          (rloading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))}))
+          (loading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)

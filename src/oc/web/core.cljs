@@ -21,7 +21,7 @@
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
-            [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
@@ -60,7 +60,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(om/component (rloading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
+    (drv-root #(om/component (loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
 
 (defn rewrite-url []
   (let [l (.-location js/window)
