@@ -181,7 +181,6 @@ function OCStaticSiteMobileMenuToggle(){
 
 // Check nux cookie to see if we need to show the blue setup screen or the regular loading screen
 var nux_cookie = OCStaticGetCookie(OCStaticCookieName("nux"));
-console.log("nux-cookie name:", OCStaticCookieName("nux"), "value", nux_cookie);
 if (nux_cookie) {
   var oc_loading = document.querySelectorAll("div.oc-loading");
   if (oc_loading) {
