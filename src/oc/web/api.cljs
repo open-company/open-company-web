@@ -461,16 +461,15 @@
             (dispatcher/dispatch! [:jwt body]))
           (router/redirect! oc-urls/logout))))))
 
-(defn patch-team [team-id new-team-data redirect-to-slug]
+(defn patch-team [team-id new-team-data org-data]
   (when-let* [team-data (dispatcher/team-data team-id)
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-http (method-for-link team-patch) (relative-href team-patch)
       {:headers (headers-for-link team-patch)
        :json-params (cljs->json new-team-data)}
       (fn [{:keys [success body status]}]
-        (when (and success
-                   (not (s/blank? redirect-to-slug)))
-          (dispatcher/dispatch! [:org-redirect redirect-to-slug]))))))
+        (when success
+          (dispatcher/dispatch! [:org-redirect org-data]))))))
 
 (defn create-org [org-name logo-url logo-width logo-height]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
@@ -495,9 +494,9 @@
                 ; the user has write permission on it
                 ; use the org name
                 ; for it and patch it back
-                (patch-team (:team-id org-data) {:name org-name} (:slug org-data))
+                (patch-team (:team-id org-data) {:name org-name} org-data)
                 ; if not refirect the user to the slug)
-                (dispatcher/dispatch! [:org-redirect (:slug org-data)])))))))))
+                (dispatcher/dispatch! [:org-redirect org-data])))))))))
 
 (defn create-board [board-name board-access]
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")]
