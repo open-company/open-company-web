@@ -60,10 +60,13 @@
                             (not board-data))
                        ;; Or the all-posts data
                        (and (= (router/current-board-slug) "all-posts")
-                            (not all-posts-data)))))
+                            (not all-posts-data))))
+              ;; First ever user nux, not enough time
+              (and (:nux-loading data)
+                   (not (:nux-end data))))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
-          (rloading {:loading true :nux (= (cook/get-cookie (router/show-nux-cookie (jwt/user-id))) (:first-ever-user router/nux-cookie-values))}))
+          (rloading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
