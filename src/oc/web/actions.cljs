@@ -803,9 +803,7 @@
   (let [org-data (:org-editing db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data))))
-  (-> db
-   (dissoc :latest-entry-point :latest-auth-settings)
-   (assoc :show-setup true)))
+  (dissoc db :latest-entry-point :latest-auth-settings))
 
 (defmethod dispatcher/action :private-board-add
   [db [_]]
@@ -1606,6 +1604,7 @@
 (defmethod dispatcher/action :nux-end
   [db [_]]
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
+  (cook/remove-cookie! :nux)
   (dissoc db :nux))
 
 (defmethod dispatcher/action :activity-share-show
@@ -1704,6 +1703,8 @@
    (router/show-nux-cookie (jwt/user-id))
    (:first-ever-user router/nux-cookie-values)
    (* 60 60 24 7))
+  ;; Static cookie for blue loading screen
+  (cook/set-cookie! :nux true (* 60 60 24 7))
   (assoc db :org-redirect org-slug))
 
 (defmethod dispatcher/action :org-created-redirect
