@@ -270,20 +270,6 @@ div#wrap {
         position: relative;
       }
 
-      img.homepage-main-screenshot {
-        width: 972px;
-        margin: 106px auto 0px;
-        padding: 0;
-        z-index: 10;
-        position: relative;
-
-        @include mobile(){
-          width: 100%;
-          height: auto;
-          margin: 80px auto 0px;
-        }
-      }
-
       video.homepage-main-animation {
         width: 940px;
         margin: 106px auto 0px;
@@ -295,6 +281,18 @@ div#wrap {
           width: 100%;
           height: auto;
           margin: 80px auto 0px;
+        }
+
+        img.homepage-main-screenshot {
+          width: 972px;
+          margin-left: -16px;
+          padding: 0;
+
+          @include mobile(){
+            width: 100%;
+            height: auto;
+            margin: 0px;
+          }
         }
       }
 

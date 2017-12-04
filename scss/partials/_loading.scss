@@ -162,61 +162,61 @@ div.oc-loading {
   }
 
   &.active div.oc-loading-inner {
-    -webkit-animation: -webkit-loading-frames 3.2s linear 1.8s;
+    -webkit-animation: -webkit-loading-frames 3.2s linear 1.0s;
     -webkit-animation-iteration-count: infinite;
-    animation: loading-frames 3.2s linear 1.8s;
+    animation: loading-frames 3.2s linear 1.0s;
     animation-iteration-count: infinite;
   }
 }
 
 @-webkit-keyframes -webkit-loading-frames {
-  70% {
+  10% {
     -webkit-transform:scale(1);
   }
-  75%{
+  15%{
     -webkit-transform:scale(1.2);
   }
-  80%{
+  20%{
     -webkit-transform:scale(1.2) rotate(30deg);
   }
-  85%{
+  25%{
     -webkit-transform:scale(1.2) rotate(0deg);
 
   }
-  90%{
+  30%{
     -webkit-transform:scale(1.2) rotate(30deg);
 
   }
-  95%{
+  35%{
     -webkit-transform:scale(1.2) rotate(0deg);
   }
-  100%{
+  40%{
     -webkit-transform:scale(1) rotate(0deg);
   }
 }
 
 @keyframes loading-frames {
-  70% {
+  10% {
     transform:scale(1);
   }
-  75%{
+  15%{
     transform:scale(1.2);
   }
-  80%{
+  20%{
     transform:scale(1.2) rotate(30deg);
   }
-  85%{
+  25%{
     transform:scale(1.2) rotate(0deg);
 
   }
-  90%{
+  30%{
     transform:scale(1.2) rotate(30deg);
 
   }
-  95%{
+  35%{
     transform:scale(1.2) rotate(0deg);
   }
-  100%{
+  40%{
     transform:scale(1) rotate(0deg);
   }
 }
