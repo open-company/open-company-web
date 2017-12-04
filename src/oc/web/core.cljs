@@ -21,7 +21,7 @@
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
-            [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.ui.loading :refer (rloading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
@@ -33,7 +33,6 @@
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
-            [oc.web.components.ui.team-setup :refer (team-setup)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
 
 (enable-console-print!)
@@ -61,7 +60,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root loading target)))
+    (drv-root #(om/component (rloading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
 
 (defn rewrite-url []
   (let [l (.-location js/window)
@@ -290,13 +289,13 @@
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
       (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
-      (simple-handler team-setup "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
       (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
-      (simple-handler team-setup "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
