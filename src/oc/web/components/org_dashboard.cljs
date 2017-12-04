@@ -7,7 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.ui.loading :refer (rloading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
@@ -61,7 +61,7 @@
                             (not all-posts-data)))))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
-          (om/build loading {:loading true}))
+          (rloading {:loading true :nux (:nux data)}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
