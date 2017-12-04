@@ -138,6 +138,8 @@
     ;; render component
     (drv-root #(om/component (component)) target)))
 
+(def default-nux-setup-time 3000)
+
 ;; Component specific to a board
 (defn board-handler [route target component params & [board-sort-or-filter]]
   (let [org (:org (:params params))
@@ -191,8 +193,14 @@
                            :main))
           next-app-state {:nux (when show-nux :1)
                           :loading loading
-                          :org-settings org-settings}]
-      (utils/after 1 #(swap! dis/app-state merge next-app-state)))
+                          :org-settings org-settings
+                          :nux-loading (cook/get-cookie :nux)
+                          :nux-end nil}]
+      (utils/after 1 #(swap! dis/app-state merge next-app-state))
+      (utils/after default-nux-setup-time
+       #(do
+         (cook/remove-cookie! :nux)
+         (swap! dis/app-state assoc :nux-end true))))
     (post-routing)
     ;; render component
     (drv-root component target)))
