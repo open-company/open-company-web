@@ -1,6 +1,5 @@
 (ns oc.web.components.ui.slack-channels-dropdown
   (:require [rum.core :as rum]
-            [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
             [goog.events :as events]
@@ -38,11 +37,7 @@
                                                       (not
                                                        (utils/event-inside?
                                                         %
-                                                        (sel1 [:div.board-edit-slack-channels-dropdown])))
-                                                      (not
-                                                       (utils/event-inside?
-                                                        %
-                                                        (sel1 [:input.board-edit-slack-channel]))))
+                                                        (rum/dom-node s))))
                                              (reset! (::show-channels-dropdown s) false))))
                                        s)
                                       :did-remount (fn [o s]
