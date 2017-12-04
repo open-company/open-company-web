@@ -77,7 +77,10 @@
                   :let [reaction-data (get reactions-data idx)
                         is-loading (utils/in? reactions-loading (:reaction reaction-data))
                         reacted (:reacted reaction-data)
-                        read-only-reaction (not (utils/link-for (:links reaction-data) "react" (if reacted "DELETE" "PUT")))
+                        read-only-reaction (not (utils/link-for
+                                                 (:links reaction-data)
+                                                 "react"
+                                                 (if reacted "DELETE" "PUT")))
                         r (if is-loading
                             (merge reaction-data {:count (if reacted
                                                           (dec (:count reaction-data))
