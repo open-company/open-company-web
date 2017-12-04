@@ -5,9 +5,9 @@
             [rum.core :as rum]
             [oc.web.lib.utils :as utils]))
 
-(rum/defc rloading < rum/static
+(rum/defc loading < rum/static
   [data]
-  [:div.oc-loading.rloading
+  [:div.oc-loading
     {:class (utils/class-set {:active (:loading data)
                               :setup-screen (:nux data)})}
     ;; Top left corner

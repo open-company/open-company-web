@@ -4,7 +4,7 @@
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.ui.loading :refer (rloading)]))
+            [oc.web.components.ui.loading :refer (loading)]))
 
 (rum/defcs mobile-boards-list < rum/reactive
                                        (drv/drv :org-data)
@@ -16,7 +16,7 @@
     [:div.mobile-boards-list-container
       (if loading
         [:div.org-dashboard.main-scroll
-          (rloading {:loading true})]
+          (loading {:loading true})]
         [:div.mobile-boards-list
           (navbar)
           [:div.mobile-boards-list-inner

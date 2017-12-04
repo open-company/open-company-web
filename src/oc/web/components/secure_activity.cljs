@@ -6,7 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
@@ -58,4 +58,4 @@
             [:div.carrot-logo]
             [:div.you-did-it "Made with Carrot"]]]]
       [:div.secure-activity-container
-        (rloading {:loading true})])))
+        (loading {:loading true})])))
