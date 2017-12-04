@@ -1408,7 +1408,7 @@
   (let [board-data (:board-editing db)]
     (if (and (string/blank? (:slug board-data))
              (not (string/blank? (:name board-data))))
-      (api/create-board (:name board-data) (:access board-data))
+      (api/create-board board-data)
       (api/patch-board board-data)))
   db)
 
