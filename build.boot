@@ -246,7 +246,7 @@
               :source-map true
               :compiler-options {:externs ["public/js/externs.js"]})))
 
-(deftask check-sources
+(deftask check-sources!
   "Check source files with yagni, eastwood, kibit and bikeshed."
   []
   (set-env! :source-paths #{"src" "test"})
