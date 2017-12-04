@@ -5,18 +5,27 @@
             [rum.core :as rum]
             [oc.web.lib.utils :as utils]))
 
-(defcomponent loading [data owner]
-  (render [_]
-    (dom/div {:class (utils/class-set {:oc-loading true
-                                       :active (:loading data)})}
-      (dom/div {:class "oc-loading-inner"}
-        (dom/div {:class "oc-loading-heart"})
-        (dom/div {:class "oc-loading-body"})))))
-
 (rum/defc rloading < rum/static
   [data]
   [:div.oc-loading.rloading
-    {:class (if (:loading data) "active" "")}
+    {:class (utils/class-set {:active (:loading data)
+                              :setup-screen (:nux data)})}
+    ;; Top left corner
+    [:div.balloon.big.big-yellow]
+    [:div.balloon.small.small-red]
+    [:div.balloon.small.face.small-face-purple]
+    ;; Top right corner
+    [:div.balloon.big.big-red]
+    [:div.balloon.small.small-yellow]
+    [:div.balloon.small.face.small-face-yellow]
+    ;; Bottom left corner
+    [:div.balloon.big.big-green]
+    [:div.balloon.small.small-purple]
+    ;; Bottom right corner
+    [:div.balloon.big.big-purple]
     [:div.oc-loading-inner
       [:div.oc-loading-heart]
-      [:div.oc-loading-body]]])
+      [:div.oc-loading-body]]
+    [:div.setup-cta
+      [:div "Hang tight. We’re just getting"]
+      [:div "everything setup for you!"]]])
