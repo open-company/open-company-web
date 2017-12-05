@@ -184,7 +184,10 @@ var nux_cookie = OCStaticGetCookie(OCStaticCookieName("nux"));
 var oc_loading = document.querySelectorAll("div.oc-loading");
 if (oc_loading) {
   oc_loading.forEach(function(item) {
-    var fn = nux_cookie ? 'add' : 'remove';
-    item.classList[fn].call('setup-screen');
+    if (nux_cookie) {
+      item.classList.add('setup-screen');
+    }else{
+      item.classList.remove('setup-screen');
+    }
   });
 }
