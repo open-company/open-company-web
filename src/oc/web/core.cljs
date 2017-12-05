@@ -60,7 +60,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root loading target)))
+    (drv-root #(om/component (loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
 
 (defn rewrite-url []
   (let [l (.-location js/window)
@@ -138,6 +138,8 @@
     ;; render component
     (drv-root #(om/component (component)) target)))
 
+(def default-nux-setup-time 3000)
+
 ;; Component specific to a board
 (defn board-handler [route target component params & [board-sort-or-filter]]
   (let [org (:org (:params params))
@@ -170,13 +172,12 @@
          "/"
          ls/jwt-cookie-domain
          ls/jwt-cookie-secure)))
-    (let [show-onboard-overlay (and (not (:show-login-overlay @dis/app-state))
-                                    (jwt/jwt)
-                                    (=
-                                     (cook/get-cookie
-                                      (router/should-show-dashboard-tooltips
-                                       (jwt/get-key :user-id)))
-                                     "true"))
+    (let [nux-cookie (cook/get-cookie
+                      (router/show-nux-cookie
+                       (jwt/get-key :user-id)))
+          show-nux (and (not (:show-login-overlay @dis/app-state))
+                        (jwt/jwt)
+                        (some #(= % nux-cookie) (vals router/nux-cookie-values)))
           loading (or (and ;; if is board page
                            (not (contains? query-params :ap))
                            ;; if the board data are not present
@@ -190,10 +191,16 @@
                          (keyword (:org-settings query-params))
                          (when (contains? query-params :access)
                            :main))
-          next-app-state {:show-onboard-overlay show-onboard-overlay
+          next-app-state {:nux (when show-nux :1)
                           :loading loading
-                          :org-settings org-settings}]
-      (utils/after 1 #(swap! dis/app-state merge next-app-state)))
+                          :org-settings org-settings
+                          :nux-loading (cook/get-cookie :nux)
+                          :nux-end nil}]
+      (utils/after 1 #(swap! dis/app-state merge next-app-state))
+      (utils/after default-nux-setup-time
+       #(do
+         (cook/remove-cookie! :nux)
+         (swap! dis/app-state assoc :nux-end true))))
     (post-routing)
     ;; render component
     (drv-root component target)))
@@ -238,9 +245,16 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (if (= (:new (:query-params params)) "true")
-    (utils/after 100 #(router/nav! urls/slack-lander))
-    (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}])))
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (cook/set-cookie!
+       (router/show-nux-cookie
+        (jwt/get-key :user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7)))
+    (if new-user
+      (utils/after 100 #(router/nav! urls/sign-up-profile))
+      (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}]))))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -261,43 +275,35 @@
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
-      (simple-handler #(onboard-wrapper :email-lander) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
-      (simple-handler #(onboard-wrapper :email-lander) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
-      (simple-handler #(onboard-wrapper :email-lander-profile) "sign-up" target params))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
-      (simple-handler #(onboard-wrapper :email-lander-profile) "sign-up" target params))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
-      (simple-handler #(onboard-wrapper :email-lander-team) "sign-up" target params))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
-      (simple-handler #(onboard-wrapper :email-lander-team) "sign-up" target params))
-
-    (defroute slack-lander-route urls/slack-lander {:as params}
-      (timbre/info "Routing slack-lander-route" urls/slack-lander)
-      (simple-handler #(onboard-wrapper :slack-lander) "sign-up" target params))
-
-    (defroute slack-lander-slash-route (str urls/slack-lander "/") {:as params}
-      (timbre/info "Routing slack-lander-slash-route" (str urls/slack-lander "/"))
-      (simple-handler #(onboard-wrapper :slack-lander) "sign-up" target params))
-
-    (defroute slack-lander-team-route urls/slack-lander-team {:as params}
-      (timbre/info "Routing slack-lander-team-route" urls/slack-lander-team)
-      (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
-
-    (defroute slack-lander-team-slash-route (str urls/slack-lander-team "/") {:as params}
-      (timbre/info "Routing slack-lander-team-slash-route" (str urls/slack-lander-team "/"))
-      (simple-handler #(onboard-wrapper :slack-lander-team) "sign-up" target params))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
@@ -493,10 +499,6 @@
                                  ;; Signup slack
                                  slack-lander-check-route
                                  slack-lander-check-slash-route
-                                 slack-lander-team-route
-                                 slack-lander-team-slash-route
-                                 slack-lander-route
-                                 slack-lander-slash-route
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route

@@ -49,7 +49,7 @@
           (cond
             (and (:slack-lander-check-team-redirect db)
                  (zero? (count orgs)))
-            (router/nav! oc-urls/slack-lander-team)
+            (router/nav! oc-urls/sign-up-team)
             (and (:email-lander-check-team-redirect db)
                  (zero? (count orgs)))
             (router/nav! oc-urls/sign-up-team)
@@ -443,6 +443,10 @@
   (cond
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
+      (cook/set-cookie!
+       (router/show-nux-cookie (jwt/user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7))
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
       db)
     (= status 200) ;; Valid login, not signup, redirect to home
@@ -459,6 +463,10 @@
     :else ;; Valid signup let's collect user data
     (do
       (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (cook/set-cookie!
+       (router/show-nux-cookie (jwt/user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7))
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point)
       (dissoc db :signup-with-email-error))))
@@ -698,7 +706,12 @@
         (do
           (cook/remove-cookie! :show-login-overlay)
           (router/nav! oc-urls/login))
-        (router/nav! oc-urls/confirm-invitation-profile))
+        (do
+          (cook/set-cookie!
+           (router/show-nux-cookie (jwt/user-id))
+           (:new-user router/nux-cookie-values)
+           (* 60 60 24 7))
+          (router/nav! oc-urls/confirm-invitation-profile)))
       (dissoc db :show-login-overlay))
     (assoc db :collect-password-error status)))
 
@@ -1346,13 +1359,16 @@
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [:entry-editing] dissoc :publishing)))))
+        (update-in [:entry-editing] dissoc :publishing)
+        ;; Progress the NUX
+        (assoc :nux (when (= (:nux db) :2) :3))))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
   (-> db
     (update-in [:entry-editing] dissoc :publishing)
-    (update-in [:entry-editing] assoc :error true)))
+    (update-in [:entry-editing] assoc :error true)
+    (assoc :nux (when (= (:nux db) :2) :4))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1412,7 +1428,7 @@
   (let [board-data (:board-editing db)]
     (if (and (string/blank? (:slug board-data))
              (not (string/blank? (:name board-data))))
-      (api/create-board (:name board-data) (:access board-data))
+      (api/create-board board-data)
       (api/patch-board board-data)))
   db)
 
@@ -1589,13 +1605,10 @@
       (api/get-auth-settings)))
   db)
 
-(defmethod dispatcher/action :onboard-overlay-show
+(defmethod dispatcher/action :nux-end
   [db [_]]
-  (assoc db :show-onboard-overlay true))
-
-(defmethod dispatcher/action :onboard-overlay-hide
-  [db [_]]
-  (dissoc db :show-onboard-overlay))
+  (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
+  (dissoc db :nux))
 
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
@@ -1714,3 +1727,36 @@
       (assoc-in db (vec (conj activity-key :reactions)) updated-reactions))
     ;; Wait for the entry refresh if it didn't
     db))
+
+(defmethod dispatcher/action :org-redirect
+  [db [_ org-data]]
+  ;; Show NUX for first ever user when the dashboard is loaded
+  (cook/set-cookie!
+   (router/show-nux-cookie (jwt/user-id))
+   (:first-ever-user router/nux-cookie-values)
+   (* 60 60 24 7))
+  ;; Static cookie for blue loading screen
+  (cook/set-cookie! :nux true (* 60 60 24 7))
+  (when org-data
+    (let [org-slug (:slug org-data)
+          first-board (first (:boards org-data))]
+      (utils/after 100 #(router/redirect! (oc-urls/board org-slug (:slug first-board))))))
+  db)
+
+(defmethod dispatcher/action :first-forced-post-start
+  [db [_]]
+  (let [current-board (dispatcher/board-data)
+        headline "Using Carrot to stay aligned with the big picture! 🚀"
+        body (str
+              "<p>We know it’s a struggle to keep everyone on the same page. Important "
+              "information often gets missed or lost, so everyone has a different idea of what’s "
+              "important. Let’s fix that!<p>"
+              "<p>Carrot makes key announcements, updates and plans visible and easy to find, so "
+              "everyone can stay on the same page.")
+        entry-editing {:headline headline
+                       :body body
+                       :has-changes true
+                       :board-name (:name current-board)
+                       :board-slug (:slug current-board)}]
+    (merge db {:entry-editing entry-editing
+               :nux :2})))

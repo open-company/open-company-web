@@ -2,9 +2,11 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.core :as om-core :refer-macros (defcomponent)]
             [om-tools.dom :as dom :include-macros true]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -58,10 +60,13 @@
                             (not board-data))
                        ;; Or the all-posts data
                        (and (= (router/current-board-slug) "all-posts")
-                            (not all-posts-data)))))
+                            (not all-posts-data))))
+              ;; First ever user nux, not enough time
+              (and (:nux-loading data)
+                   (not (:nux-end data))))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :main-scroll true})}
-          (om/build loading {:loading true}))
+          (loading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
@@ -70,8 +75,8 @@
                                            :no-scroll (router/current-activity-id)})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
-            (:show-onboard-overlay data)
-            (onboard-overlay)
+            (some #{(:nux data)} [:1 :7])
+            (onboard-overlay (:nux data))
             ;; Org settings
             (:org-settings data)
             (org-settings)

@@ -1,4 +1,5 @@
-function mailchimpApiSubmit(e, form, success, fail){
+
+function OCStaticMailchimpApiSubmit(e, form, success, fail){
   e.preventDefault();
   $.ajax({
     type: "POST",
@@ -18,7 +19,7 @@ function mailchimpApiSubmit(e, form, success, fail){
   });
 }
 
-function getCookie(name) {
+function OCStaticGetCookie(name) {
     var dc = document.cookie;
     var prefix = name + "=";
     var begin = dc.indexOf("; " + prefix);
@@ -39,7 +40,7 @@ function getCookie(name) {
     return decodeURI(dc.substring(begin + prefix.length, end));
 }
 
-function cookieName(name){
+function OCStaticCookieName(name){
   var h = window.location.hostname.split(".")[0];
   var prefix = "";
   switch(h) {
@@ -53,9 +54,10 @@ function cookieName(name){
   return prefix + name;
 }
 
-$(document).ready(function(){
+
+document.addEventListener("DOMContentLoaded", function(_) {
   // Get the jwt cookie to know if the user is logged in
-  var jwt = getCookie(cookieName("jwt"));
+  var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
   if (jwt) {
     $("#site-header-signup-item").hide();
     // Move the red guy up
@@ -84,11 +86,11 @@ $(document).ready(function(){
       if (jwt_decode &&  decoded_jwt) {
         user_id = decoded_jwt["user-id"];
         if ( user_id ) {
-          org_slug = getCookie(cookieName("last-org-" + user_id))
+          org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id))
           if ( org_slug ) {
-            board_slug = getCookie(cookieName("last-board-" + user_id + "-" + org_slug))
+            board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug))
             if ( board_slug ){
-              if ( getCookie(cookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
+              if ( OCStaticGetCookie(OCStaticCookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
                 your_board_url = "/" + org_slug + "/" + board_slug + "/by-topic";
               } else {
                 your_board_url = "/" + org_slug + "/" + board_slug;
@@ -109,9 +111,9 @@ $(document).ready(function(){
 
   }else{ // No logged in user
     // link all get started button to signup with Slack
-    $(".get-started-button").attr("onClick", "window.location = \"/login?slack\"");
+    $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
-    $("#site-header-signup-item").attr("href", "/login?slack");
+    $("#site-header-signup-item").attr("href", "/sign-up");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
     // If in 404 page show error message for not logged in users
@@ -120,7 +122,7 @@ $(document).ready(function(){
 
 });
 
-function getParameterByName(name, url) {
+function OCStaticGetParameterByName(name, url) {
   if (!url)
     url = window.location.href;
   name = name.replace(/[\[\]]/g, "\\$&");
@@ -165,7 +167,7 @@ function isIE(){
   }
 }
 
-function siteMobileMenuToggle(){
+function OCStaticSiteMobileMenuToggle(){
   var menuClass = "mobile-menu-expanded";
   var body = document.body;
   if (body.classList.contains(menuClass)) {
@@ -175,4 +177,17 @@ function siteMobileMenuToggle(){
     body.querySelector("div.site-mobile-menu").classList.remove("hidden");
     body.classList.add(menuClass);
   }
+}
+
+// Check nux cookie to see if we need to show the blue setup screen or the regular loading screen
+var nux_cookie = OCStaticGetCookie(OCStaticCookieName("nux"));
+var oc_loading = document.querySelectorAll("div.oc-loading");
+if (oc_loading) {
+  oc_loading.forEach(function(item) {
+    if (nux_cookie) {
+      item.classList.add('setup-screen');
+    }else{
+      item.classList.remove('setup-screen');
+    }
+  });
 }

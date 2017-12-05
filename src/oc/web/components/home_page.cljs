@@ -68,7 +68,7 @@
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
                               (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                              (router/nav! oc-urls/sign-up-with-slack))}
+                              (router/nav! oc-urls/sign-up))}
                 "Get started for free"])]
           (when (and (not @(::confirm s))
                      @(::thanks-box-top s))
@@ -79,11 +79,21 @@
                 [:div.thanks-headline "You are Confirmed!"]
                 [:div.thanks-subheadline "Thank you for subscribing."]]])
 
-          [:img.homepage-main-screenshot
-            {:src (utils/cdn "/img/ML/new_homepage_screenshot.png")
-             :srcSet (str (utils/cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]
+          [:video.homepage-main-animation
+            {:controls false
+             :autoplay true
+             :loop true}
+            [:source
+              {:src (utils/cdn "/img/ML/animation.webm")
+               :type "video/webm"}]
+            [:source
+              {:src (utils/cdn "/img/ML/animation.mp4")
+               :type "video/mp4"}]
+            [:img.homepage-main-screenshot
+              {:src (utils/cdn "/img/ML/new_homepage_screenshot.png")
+               :srcSet (str (utils/cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]]
           [:div.homepage-screenshot-bubble
-            "Carrot provides the big picture that keeps everyone on the same page."]]
+            "It’s never been this easy to keep everyone on the same page"]]
 
         [:section.second-section.group
           [:div.why-balloon.big-red]
@@ -194,7 +204,7 @@
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
                               (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                              (router/nav! oc-urls/sign-up-with-slack))}
+                              (router/nav! oc-urls/sign-up))}
                 "Get started for free"])]]
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->

@@ -69,7 +69,9 @@
                                              (.text (.html (js/$ "<div />") (:headline activity-data))))]
                                (reset! (::email-subject s) subject)
                                (reset! (::email-data s) {:subject subject
-                                                         :note ""}))
+                                                         :note ""})
+                               (when (has-bot? org-data)
+                                 (reset! (::medium s) :slack)))
                              s)
                              :did-mount (fn [s]
                               (let [slack-button (rum/ref-node s "slack-button")
@@ -131,20 +133,6 @@
           [:div.activity-share-subheadline
             "People outside your Carrot team will not see comments."]
           [:div.activity-share-medium-selector-container
-            [:div.activity-share-medium-selector
-              {:class (when (= @(::medium s) :url) "selected")
-               :on-click (fn [_]
-                          (when-not @(::sharing s)
-                            (reset! (::medium s) :url)
-                            (utils/after
-                             500
-                             #(highlight-url s))))}
-              "URL"]
-            [:div.activity-share-medium-selector
-              {:class (when (= @(::medium s) :email) "selected")
-               :on-click #(when-not @(::sharing s)
-                           (reset! (::medium s) :email))}
-              "Email"]
             (let [slack-disabled (not (has-bot? org-data))
                   show-slack-tooltip? (show-slack-tooltip? org-data)]
               [:div.activity-share-medium-selector
@@ -165,7 +153,22 @@
                                       2000
                                       #(.tooltip $this "hide"))))
                                  (reset! (::medium s) :slack))))}
-                "Slack"])]
+                "Slack"])
+            [:div.activity-share-medium-selector
+              {:class (when (= @(::medium s) :url) "selected")
+               :on-click (fn [_]
+                          (when-not @(::sharing s)
+                            (reset! (::medium s) :url)
+                            (utils/after
+                             500
+                             #(highlight-url s))))}
+              "URL"]
+            [:div.activity-share-medium-selector
+              {:class (when (= @(::medium s) :email) "selected")
+               :on-click #(when-not @(::sharing s)
+                           (reset! (::medium s) :email))}
+              "Email"]
+            ]
           [:div.activity-share-divider-line]
           (when (= @(::medium s) :email)
             [:div.activity-share-share
