@@ -141,10 +141,15 @@
                           (.preventDefault %)
                           (dis/dispatch! [:login-with-email]))}
             "Sign In"]]]
-      ;;
+      ;; Link to signup
       [:div.footer-link
         "Don't have an account yet?"
-        [:a {:href oc-urls/login} "Signup here"]]]])
+        [:a
+          {:href oc-urls/sign-up
+           :on-click (fn [e]
+                       (utils/event-stop e)
+                       (router/nav! oc-urls/sign-up))}
+          "Signup here"]]]])
 
 (rum/defcs password-reset < rum/reactive
                             dont-scroll

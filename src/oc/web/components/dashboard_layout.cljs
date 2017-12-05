@@ -50,6 +50,91 @@
         (.css entry-floating #js {:opacity opacity
                                  :display (if (pos? opacity) "block" "none")})))))
 
+(defn nux-steps
+  [org-data board-data nux]
+  (case nux
+    :3
+    (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
+                first-card-offset (.offset first-card)]
+      (carrot-tip {:step nux
+                   :x (+ (aget first-card-offset "left") (.width first-card) 24)
+                   :y (aget first-card-offset "top")
+                   :width 432
+                   :circle-offset {:top -170
+                                   :left -750}
+                   :title "Success!"
+                   :message (str "Your first post is on the " (:name board-data) " board!")
+                   :message-2 (str
+                               "If you like, you can turn on automatic "
+                               "sharing to Slack or email to keep everyone "
+                               "up to date!")
+                   :step-label "1 of 4"
+                   :button-title "Next"
+                   :button-position "left"
+                   :on-next-click #(dis/dispatch! [:input [:nux] :4])}))
+    :4
+    (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
+                offset (.offset new-post-bt)]
+      (let [create-link (utils/link-for (:links org-data) "create")]
+        (carrot-tip {:step nux
+                     :x (- (aget offset "left") 284)
+                     :y (+ (aget offset "top") 60)
+                     :circle-offset {:top -170
+                                     :left -760}
+                     :width 432
+                     :title "Add new posts"
+                     :message (str
+                               "It’s quick and easy to add announcements, "
+                               "updates, and plans for your team. Just click "
+                               "the New Post button to get started!")
+                     :step-label "2 of 4"
+                     :button-title "Next"
+                     :button-position "left"
+                     :on-next-click (fn []
+                                      (dis/dispatch! [:input [:nux] :5]))})))
+    :5
+    (when-let* [plus-button (js/$ "button#add-board-button")
+                plus-offset (.offset plus-button)]
+      (carrot-tip {:step nux
+                   :x (+ (aget plus-offset "left") 40)
+                   :y (- (aget plus-offset "top") 22)
+                   :width 432
+                   :circle-offset {:top -70
+                                   :left -220}
+                   :title "Organize posts with boards"
+                   :message (str
+                             "You can add boards to keep related "
+                             "information together. Try high-level boards "
+                             "like All-hands, Strategy, and Who We Are; "
+                             "or group-level boards like Sales, Marketing "
+                             "and Design.")
+                   :step-label "3 of 4"
+                   :button-title "Next"
+                   :button-position "left"
+                   :on-next-click (fn []
+                                    (let [is-admin? (jwt/is-admin? (:team-id org-data))]
+                                      (dis/dispatch! [:input [:nux] (if is-admin? :6 :7)])))}))
+    :6
+    (when-let* [invite-button (js/$ "button.invite-people-btn")
+                invite-offset (.offset invite-button)]
+      (carrot-tip {:step nux
+                   :x (+ (aget invite-offset "left") 16)
+                   :y (- (aget invite-offset "top") 310)
+                   :width 432
+                   :circle-offset {:top -350
+                                   :left -80}
+                   :title "Invite your teammates"
+                   :message (str
+                             "Don’t do all the work yourself! Invite others "
+                             "to contribute or view information so "
+                             "everyone can have a clear view of what’s "
+                             "important.")
+                   :step-label "4 of 4"
+                   :button-title "Ok, got it"
+                   :button-position "left"
+                   :on-next-click (fn []
+                                    (dis/dispatch! [:input [:nux] :7]))}))))
+
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
@@ -119,89 +204,8 @@
         topics (:topics board-data)]
       ;; Topic list
       [:div.dashboard-layout.group
-        (when (= nux :3)
-          (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
-                      first-card-offset (.offset first-card)]
-            (carrot-tip {:step nux
-                         :x (+ (aget first-card-offset "left") (.width first-card) 24)
-                         :y (aget first-card-offset "top")
-                         :width 432
-                         :circle-offset {:top -170
-                                         :left -750}
-                         :title "Success!"
-                         :message (str "Your first post is on the " (:name board-data) " board!")
-                         :message-2 (str
-                                     "If you like, you can turn on automatic "
-                                     "sharing to Slack or email to keep everyone "
-                                     "up to date!")
-                         :step-label "1 of 4"
-                         :button-title "Next"
-                         :button-position "left"
-                         :circle-type :huge-circle
-                         :on-next-click #(dis/dispatch! [:input [:nux] :4])})))
-        (when (= nux :4)
-          (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
-                      offset (.offset new-post-bt)]
-            (let [create-link (utils/link-for (:links org-data) "create")]
-              (carrot-tip {:step nux
-                           :x (- (aget offset "left") 284)
-                           :y (+ (aget offset "top") 60)
-                           :circle-offset {:top -170
-                                           :left -760}
-                           :width 432
-                           :title "Add new posts"
-                           :message (str
-                                     "It’s quick and easy to add announcements, "
-                                     "updates, and plans for your team. Just click "
-                                     "the New Post button to get started!")
-                           :step-label "2 of 4"
-                           :button-title "Next"
-                           :button-position "left"
-                           :circle-type :asd-circle
-                           :on-next-click (fn []
-                                            (dis/dispatch! [:input [:nux] :5]))}))))
-        (when (= nux :5)
-          (when-let* [plus-button (js/$ "button#add-board-button")
-                      plus-offset (.offset plus-button)]
-            (carrot-tip {:step nux
-                         :x (+ (aget plus-offset "left") 40)
-                         :y (- (aget plus-offset "top") 22)
-                         :width 432
-                         :circle-offset {:top -70
-                                         :left -220}
-                         :title "Organize posts with boards"
-                         :message (str
-                                   "You can add boards to keep related "
-                                   "information together. Try high-level boards "
-                                   "like All-hands, Strategy, and Who We Are; "
-                                   "or group-level boards like Sales, Marketing "
-                                   "and Design.")
-                         :step-label "3 of 4"
-                         :button-title "Next"
-                         :button-position "left"
-                         :on-next-click (fn []
-                                          (let [is-admin? (jwt/is-admin? (:team-id org-data))]
-                                            (dis/dispatch! [:input [:nux] (if is-admin? :6 :7)])))})))
-        (when (= nux :6)
-          (when-let* [invite-button (js/$ "button.invite-people-btn")
-                      invite-offset (.offset invite-button)]
-            (carrot-tip {:step nux
-                         :x (+ (aget invite-offset "left") 16)
-                         :y (- (aget invite-offset "top") 310)
-                         :width 432
-                         :circle-offset {:top -350
-                                         :left -80}
-                         :title "Invite your teammates"
-                         :message (str
-                                   "Don’t do all the work yourself! Invite others "
-                                   "to contribute or view information so "
-                                   "everyone can have a clear view of what’s "
-                                   "important.")
-                         :step-label "4 of 4"
-                         :button-title "Ok, got it"
-                         :button-position "left"
-                         :on-next-click (fn []
-                                          (dis/dispatch! [:input [:nux] :7]))})))
+        (when (some #{nux} [:3 :4 :5 :6])
+          (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
           (when-not is-mobile-size?
