@@ -144,7 +144,7 @@
       ;;
       [:div.footer-link
         "Don't have an account yet?"
-        [:a {:href oc-urls/login} "Signup here"]]]])
+        [:a {:href oc-urls/sign-up} "Signup here"]]]])
 
 (rum/defcs password-reset < rum/reactive
                             dont-scroll
