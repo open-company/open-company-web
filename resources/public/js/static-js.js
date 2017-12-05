@@ -181,18 +181,13 @@ function OCStaticSiteMobileMenuToggle(){
 
 // Check nux cookie to see if we need to show the blue setup screen or the regular loading screen
 var nux_cookie = OCStaticGetCookie(OCStaticCookieName("nux"));
-if (nux_cookie) {
-  var oc_loading = document.querySelectorAll("div.oc-loading");
-  if (oc_loading) {
-    oc_loading.forEach(function(item){
-      item.classList.add("setup-screen");
-    });
-  }
-}else {
-  var oc_loading = document.querySelectorAll("div.oc-loading");
-  if (oc_loading) {
-    oc_loading.forEach(function(item){
-      item.classList.remove("setup-screen");
-    });
-  }
+var oc_loading = document.querySelectorAll("div.oc-loading");
+if (oc_loading) {
+  oc_loading.forEach(function(item) {
+    if (nux_cookie) {
+      item.classList.add('setup-screen');
+    }else{
+      item.classList.remove('setup-screen');
+    }
+  });
 }
