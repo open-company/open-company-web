@@ -7,7 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
@@ -102,4 +102,4 @@
             :invite
             (org-settings-invite-panel org-data #(close-clicked s))
             (org-settings-main-panel org-data #(close-clicked s)))]]
-      (rloading {:loading true}))))
+      (loading {:loading true}))))

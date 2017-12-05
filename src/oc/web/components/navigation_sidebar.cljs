@@ -197,7 +197,7 @@
           [:button.mlb-reset.invite-people-btn
             {:on-click #(dis/dispatch! [:org-settings-show :invite])}
             [:div.invite-people-icon]
-            [:span "Invite People"]])
+            [:span "Add teammates"]])
         [:button.mlb-reset.about-carrot-btn
           {:on-click #(dis/dispatch! [:whats-new-modal-show])}
           [:div.about-carrot-icon]

@@ -8,7 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.logging :as logging]
             [oc.web.components.activity-card :refer (activity-card)]
-            [oc.web.components.ui.loading :refer (rloading)]
+            [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -285,7 +285,7 @@
                     @(::scroll-to-entry s)
                     (= @(::last-direction s) :up))
             [:div.activities-overlay
-              (rloading {:loading true})
+              (loading {:loading true})
               (when (or @(::top-loading s)
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])

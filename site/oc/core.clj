@@ -110,14 +110,14 @@
       [:div.site-navbar-right.big-web-only
         [:a
           {:id "site-header-signup-item"
-           :href "/login?slack"}
+           :href "/sign-up"}
           "Get Started"]
         [:a.login
           {:id "site-header-login-item"
            :href "/login"}
           "Login"]]
       [:div.mobile-ham-menu.mobile-only
-        {:onClick "javascript:siteMobileMenuToggle();"}]]])
+        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
