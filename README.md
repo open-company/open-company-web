@@ -242,6 +242,7 @@ provided in the table below:
 |  :container/change | WS | Notice from change service with change info for a board |
 |  :container/status | WS | Response from change service watch request with timestamp info for boards |
 |  :default | - | Default action, never used, it's only a fallback |
+|  :first-forced-post-start | UI | Dismiss the first onboarded nux screen and open the new forced post modal. |
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
@@ -275,10 +276,12 @@ provided in the table below:
 |  :mobile-menu-toggle | UI | Toggle the menu on mobile device. |
 |  :name-pswd-collect | UI | Start the request to save the user name and password. |
 |  :name-pswd-collect/finish | API | Collect name and password request finished. |
+|  :nux-end | UI | Finish the NUX. |
 |  :org | API | Read and save the org data in the app-state. Redirect the UI to the last seen or the last created board or to the board creation if none is present.  |
 |  :org-create | UI | Start the request to create a new org. |
 |  :org-edit | UI | Setup the data to start the organization settings editing. |
 |  :org-edit-save | UI | Save the organization data edited from settings. |
+|  :org-redirect | UI | Redirect to the newly created org after the setup screen have been shown. |
 |  :password-reset | UI | Start the request to reset the user password. |
 |  :password-reset/finish | API | Password reset request finished. |
 |  :private-board-action | UI | Given a private board, a user of this board and an action perform the action: change role or remove the user. |

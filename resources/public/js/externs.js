@@ -98,7 +98,7 @@ var moment = {};
 moment.tz = {};
 moment.tz.guess = function(){};
 
-var mailchimpApiSubmit = function(){};
+var OCStaticMailchimpApiSubmit = function(){};
 
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};

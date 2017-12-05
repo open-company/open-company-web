@@ -84,7 +84,7 @@
                         (router/redirect! (utils/your-boards-url))
                         (if (utils/in? (:route @router/path) "login")
                           (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                          (router/nav! oc-urls/sign-up-with-slack))))}
+                          (router/nav! oc-urls/sign-up))))}
           (if (jwt/jwt)
             "Your Boards"
             "Get started for free")]]]))

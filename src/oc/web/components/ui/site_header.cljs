@@ -40,7 +40,7 @@
       [:div.site-navbar-right.big-web-only
         (when-not (jwt/jwt)
           [:a
-            {:href oc-urls/sign-up-with-slack
+            {:href oc-urls/sign-up
              :on-click (fn [e]
                          (.preventDefault e)
                          (when (responsive/is-mobile-size?)
