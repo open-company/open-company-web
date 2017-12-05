@@ -39,10 +39,10 @@ div.login-overlay-container {
     top: 0px;
     margin-left: -250px;
     margin-top: 5%;
-    background-color: #FCFCFC;
+    background-color: white;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    padding: 0px 0px 0px;
+    border-radius: 5px;
+    padding: 40px 80px;
     max-height: calc(100vh - 80px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -67,54 +67,83 @@ div.login-overlay-container {
     }
 
     div.login-overlay-cta {
-      padding: 1.5rem 2rem;
-      border-bottom: solid 1px rgba(78, 90, 107, 0.1);
+      text-align: center;
 
       div.sign-in-cta {
         @include avenir_H();
-        font-size: 24px;
-        line-height: 1.2;
-        color: $oc_gray_7;
-        letter-spacing: 1;
+        font-size: 32px;
+        color: $carrot_dark_brown_1;
         text-transform: none;
       }
     }
 
-    hr.divider {
-      height: 1px;
+    button.signup-with-slack {
+      width: 340px;
+      height: 48px;
+      margin-top: 52px;
+      background-color: rgba($carrot_text_blue, 0.1);
+      border-radius: 100px;
+      padding: 14px 78px;
+      @include avenir_H();
+      font-size: 18px;
+      color: $carrot_text_blue;
+      text-align: left;
+
+      div.slack-blue-icon {
+        width: 70px;
+        height: 21px;
+        @include image-2x("/img/ML/slack_blue_icon");
+        background-repeat: no-repeat;
+        background-size: 70px 21px;
+        float: right;
+      }
     }
 
-    &.login-with-slack {
-      div.login-with-email {
-        margin-top: 13px;
-        margin-bottom: 77px;
+    div.or-with-email {
+      width: 100%;
+      height: 19px;
+      margin-top: 36px;
+      position: relative;
 
-        a {
-          font-size: 14px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $carrot_text_blue;
-          @include avenir_H();
-        }
+      div.or-with-email-line {
+        position: absolute;
+        height: 1px;
+        background-color: $carrot_dark_bg_gray;
+        width: 340px;
+        top: 9px;
+        left: 0px;
+        display: block;
+      }
+
+      div.or-with-email-copy {
+        position: absolute;
+        top: 0px;
+        left: 71px;
+        text-align: center;
+        @include avenir_H();
+        font-size: 16px;
+        color: rgba($oc_gray_7, 0.7);
+        margin: 0 auto;
+        width: 196px;
+        background-color: white;
       }
     }
 
     &.login-with-email, &.signup-with-email, &.password-reset, &.collect-name-pswd, &.collect-pswd {
 
       div.sign-in-label-container {
-        margin-top: 20px;
+        margin-top: 36px;
 
         label.sign-in-label {
           margin: 0px;
           padding: 0px;
           @include avenir_H();
-          font-size: 14px;
-          color: $oc_gray_7;
+          font-size: 15px;
+          color: #8C9096;
         }
       }
 
       div.sign-in-field-container {
-        margin-top: 7px;
 
         input {
           width: 100%;
@@ -125,9 +154,13 @@ div.login-overlay-container {
           outline: none;
           padding: 10px 16px;
           position: relative;
-          @include avenir_R();
+          @include avenir_BOOK();
           font-size: 16px;
-          color: $carrot_dark_gray;
+          color: $oc_gray_7;
+          line-height: 24px;
+          letter-spacing: 0.2px;
+          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+          margin-top: 4px;
 
           @include placeholder() {
             @include avenir_R();
@@ -135,32 +168,70 @@ div.login-overlay-container {
             color: $carrot_light_gray;
           }
 
-          &:invalid {
-            border: 1px solid rgba($carrot_orange, 0.4);
+          &.error, &:invalid {
+            border: 1px solid rgba($carrot_orange, 0.5);
           }
 
           &.half{
             width: 49%;
           }
+        }
 
-          &:active, &:focus {
-            outline: none;
+        div.forgot-password {
+          margin-top: 4px;
+          float: right;
+
+          a {
+            @include avenir_R();
+            font-size: 12px;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            color: $oc_gray_7;
+            @include avenir_H();
+            text-decoration: underline;
+            &:hover {
+              text-decoration: underline;
+            }
           }
         }
       }
 
-      div.forgot-password {
-        margin-top: 4px;
+      button {
+        width: 100%;
+        text-align: center;
+        margin-top: 32px;
+      }
+
+      button.continue {
+        margin-top: 35px;
+        outline: none;
+        border: none;
+        width: 100%;
+        height: 48px;
+        background-color: #4D67FC;
+        color: white;
+        @include avenir_H();
+        font-size: 16px;
+        border-radius: 100px;
+
+        &.disabled {
+          opacity: 0.8;
+        }
+      }
+
+      div.footer-link {
+        margin-top: 20px;
+        @include avenir_R();
+        font-size: 14px;
+        color: $oc_gray_7;
+        text-align: center;
+
         a {
-          font-size: 14px;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $carrot_text_blue;
+          display: block;
           @include avenir_H();
+          font-size: 16px;
+          color: $oc_gray_7;
           text-decoration: underline;
-          &:hover {
-            text-decoration: underline;
-          }
         }
       }
     }
