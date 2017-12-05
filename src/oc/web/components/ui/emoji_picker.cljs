@@ -76,14 +76,30 @@
                               focusout (events/listen
                                         js/document
                                         EventType/FOCUSOUT
-                                        (partial check-focus s))]
+                                        (partial check-focus s))
+                              ff-click (when js/isFireFox
+                                         (events/listen
+                                          js/window
+                                          EventType/CLICK
+                                          (partial check-focus s)))
+                              ff-keypress (when js/isFireFox
+                                            (events/listen
+                                             js/window
+                                             EventType/KEYPRESS
+                                             (partial check-focus s)))]
                           (merge s {::click-listener click-listener
                                     ::focusin-listener focusin
-                                    ::focusout-listener focusout}))))
+                                    ::focusout-listener focusout
+                                    ::ff-window-click ff-click
+                                    ::ff-keypress ff-keypress}))))
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
-                         (dissoc s ::click-listener ::focusin-listener ::focusout-listener))}
+                         (when (::ff-window-click s)
+                           (events/unlistenByKey (::ff-window-click s)))
+                         (when (::ff-keypress s)
+                           (events/unlistenByKey (::ff-keypress s)))
+                         (dissoc s ::click-listener ::focusin-listener ::focusout-listener ::ff-window-click ::ff-keypress))}
   [s {:keys [add-emoji-cb position width height container-selector]
       :as arg
       :or {position "top"
