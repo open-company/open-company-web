@@ -238,9 +238,11 @@ div.comments {
             border-radius: 6px;
             margin: 0px;
 
-            &.editable {
+            &.is-owner {
               background-color: $carrot_light_yellow;
+            }
 
+            &.editable {
               &[contentEditable=true] {
                 outline: $oc_gray_5 auto 3px;
               }
