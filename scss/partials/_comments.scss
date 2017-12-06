@@ -216,6 +216,10 @@ div.comments {
               background-color: transparent;
               font-size: 50px;
               padding: 0px;
+
+              &.is-owner {
+                background-color: transparent;
+              }
             }
           }
 
