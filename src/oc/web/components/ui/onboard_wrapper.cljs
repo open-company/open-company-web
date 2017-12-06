@@ -15,7 +15,14 @@
             [goog.dom :as gdom]
             [goog.object :as gobj]))
 
-(rum/defcs email-lander < rum/static
+(defn- delay-focus-field-with-ref
+  "Given a Rum state and a ref, async focus the filed if it exists."
+  [s r]
+  (utils/after 2500
+   #(when-let [field (rum/ref-node s r)]
+     (.focus field))))
+
+(rum/defcs lander < rum/static
                           rum/reactive
                           (drv/drv :signup-with-email)
                           (rum/local false ::email-error)
@@ -29,25 +36,26 @@
                                   {:email ""
                                    :pswd ""
                                    :first-name ""
-
                                    :last-name ""}])))
                             s)}
   [s]
   (let [signup-with-email (drv/react s :signup-with-email)]
-    [:div.onboard-lander
-      [:div.steps.three-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3
-          "Your Team"]]
+    [:div.onboard-lander.lander
       [:div.main-cta
-        [:div.title
-          "Get Started"]]
+        [:div.title.main-lander
+          "Welcome!"]]
       [:div.onboard-form
+        [:button.mlb-reset.signup-with-slack
+          {:on-click #(do
+                       (.preventDefault %)
+                       (when (:auth-settings @dis/app-state)
+                         (dis/dispatch! [:login-with-slack])))}
+          "Sign Up with "
+          [:div.slack-blue-icon]]
+        [:div.or-with-email
+          [:div.or-with-email-line]
+          [:div.or-with-email-copy
+            "Or, sign up with email"]]
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
@@ -108,17 +116,17 @@
           "Already have an account?"
           [:a {:href oc-urls/login} "Login here"]]]]))
 
-(rum/defcs email-lander-profile < rum/reactive
+(rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
                                     (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                    (cook/set-cookie!
-                                     (router/should-show-dashboard-tooltips
-                                      (jwt/get-key :user-id)) true (* 60 60 24 7))
                                     (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                    s)
+                                   :did-mount (fn [s]
+                                    (delay-focus-field-with-ref s "first-name")
                                     s)
                                    :will-update (fn [s]
                                     (when (and @(::saving s)
@@ -135,22 +143,23 @@
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
-    [:div.onboard-lander.second-step
-      [:div.steps.three-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3
-          "Your Team"]]
+                          user-data)
+        orgs (drv/react s :orgs)]
+    [:div.onboard-lander.lander-profile
+      [:div.steps
+        (when (zero? (count orgs))
+          [:div.steps-internal.three-steps
+            [:div.step-1
+              "Sign Up"]
+            [:div.step-progress-bar]
+            [:div.step-2.active
+              "Your Profile"]
+            [:div.step-progress-bar]
+            [:div.step-3
+              "Your Team"]])]
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us a bit about yourself..."]
-        [:div.subtitle
-          "This information will be visible to your team"]
+          "Tell us a bit about yourself…"]
         (when (:error edit-user-profile)
           [:div.subtitle.error
             "An error occurred while saving your data, please try again"])]
@@ -173,13 +182,14 @@
                           nil))}
             (user-avatar-image fixed-user-data)
             [:div.add-picture-link
-              "Change photo"]
+              "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
           [:input.field
             {:type "text"
+             :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
@@ -197,233 +207,71 @@
                           (dis/dispatch! [:user-profile-save]))}
             "Continue"]]]]))
 
-(rum/defcs email-lander-team < rum/reactive
-                               (drv/drv :teams-data)
-                               (drv/drv :org-editing)
-                               (rum/local false ::saving)
-                               {:after-render (fn [s]
-                                               (let [org-editing @(drv/get-ref s :org-editing)
-                                                     teams-data @(drv/get-ref s :teams-data)]
-                                                 (when (and (empty? (:name org-editing))
-                                                            (empty? (:logo-url org-editing))
-                                                            (seq teams-data))
-                                                   (dis/dispatch!
-                                                    [:input
-                                                     [:org-editing]
-                                                     (select-keys
-                                                      (first teams-data)
-                                                      [:name :logo-url :logo-width :logo-height])])))
-                                               s)}
-  [s]
-  (let [teams-data (drv/react s :teams-data)
-        org-editing (drv/react s :org-editing)]
-    [:div.onboard-lander.second-step.third-step
-      [:div.steps.three-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]
-        [:div.step-progress-bar]
-        [:div.step-3
-          "Your Team"]]
-      [:div.main-cta
-        [:div.title
-          "About your team"]
-        [:div.subtitle
-          "How your company will appear on Carrot"]]
-      [:div.onboard-form
-        [:form
-          {:on-submit (fn [e]
-                        (.preventDefault e))}
-          [:div.logo-upload-container.org-logo
-            {:on-click (fn [_]
-                        (if (empty? (:logo-url org-editing))
-                          (iu/upload! {:accept "image/*"}
-                            (fn [res]
-                              (let [url (gobj/get res "url")
-                                    img (gdom/createDom "img")]
-                                (set! (.-onload img) (fn []
-                                                        (dis/dispatch!
-                                                         [:input
-                                                          [:org-editing]
-                                                          (merge
-                                                           org-editing
-                                                           {:logo-url url
-                                                            :logo-width (.-width img)
-                                                            :logo-height (.-height img)})])
-                                                        (gdom/removeNode img)))
-                                (set! (.-className img) "hidden")
-                                (gdom/append (.-body js/document) img)
-                                (set! (.-src img) url)))
-                            nil
-                            (fn [_])
-                            nil)
-                          (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
-                                                                                    :logo-width 0
-                                                                                    :logo-height 0})])))}
-            (org-avatar org-editing false :never)
-            [:div.add-picture-link
-              (if (empty? (:logo-url org-editing))
-                "Upload logo"
-                "Delete logo")]
-            [:div.add-picture-link-subtitle
-              "A transparent background PNG works best"]]
-          [:div.field-label
-            "Team name"]
-          [:input.field
-            {:type "text"
-             :value (:name org-editing)
-             :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
-          [:button.continue
-            {:disabled (empty? (:name org-editing))
-             :on-click #(dis/dispatch! [:org-create])}
-            "Create my team"]]]]))
-
-(rum/defcs slack-lander < rum/reactive
-                          (drv/drv :edit-user-profile)
-                          (drv/drv :orgs)
-                          (rum/local false ::saving)
-                          (rum/local nil ::temp-user-avatar)
-                          {:will-mount (fn [s]
-                                         (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                         (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
-                                         s)
-                           :will-update (fn [s]
-                                         (when (and @(::saving s)
-                                                    (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
-                                                    (not (:error @(drv/get-ref s :edit-user-profile))))
-                                            (let [orgs @(drv/get-ref s :orgs)]
-                                              (if (pos? (count orgs))
-                                                (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
-                                                (utils/after 100 #(router/nav! oc-urls/slack-lander-team)))))
-                                         s)}
-  [s]
-  (let [edit-user-profile (drv/react s :edit-user-profile)
-        user-data (:user-data edit-user-profile)
-        temp-user-avatar @(::temp-user-avatar s)
-        fixed-user-data (if (empty? (:avatar-url user-data))
-                          (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
-    [:div.onboard-lander
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Team"]]
-      [:div.main-cta
-        [:div.title.about-yourself
-          "Tell us a bit about yourself..."]
-        [:div.subtitle
-          "This information will be visible to your team"]]
-      [:div.onboard-form
-        [:form
-          {:on-submit (fn [e]
-                        (.preventDefault e))}
-          [:div.logo-upload-container
-            {:on-click (fn []
-                        (when (not= (:avatar-url user-data) temp-user-avatar)
-                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
-                          (fn [res]
-                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                          nil
-                          (fn [_])
-                          nil))}
-            (user-avatar-image fixed-user-data)
-            [:div.add-picture-link
-              "Change photo"]
-            [:div.add-picture-link-subtitle
-              "A 160x160 PNG or JPG works best"]]
-          [:div.field-label
-            "First name"]
-          [:input.field
-            {:type "text"
-             :value (:first-name user-data)
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-          [:div.field-label
-            "Last name"]
-          [:input.field
-            {:type "text"
-             :value (:last-name user-data)
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-          [:button.continue
-            {:disabled (or (and (empty? (:first-name user-data))
-                                (empty? (:last-name user-data)))
-                           (empty? (:avatar-url user-data)))
-             :on-click #(do
-                          (cook/set-cookie!
-                           (router/should-show-dashboard-tooltips (:user-id user-data))
-                           true
-                           (* 60 60 24 7))
-                          (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save true]))}
-            "Sign Up"]]]]))
-
-(rum/defcs slack-lander-team < rum/reactive
-                               (drv/drv :teams-load)
-                               (drv/drv :teams-data)
-                               (drv/drv :org-editing)
-                               (rum/local false ::saving)
-                               {:will-update (fn [s]
-                                 (let [org-editing @(drv/get-ref s :org-editing)
-                                       teams-data @(drv/get-ref s :teams-data)
-                                       teams-load @(drv/get-ref s :teams-load)]
-                                   ;; Load the list of teams if it's not already
-                                   (when (and (empty? teams-data)
-                                              (:auth-settings teams-load)
-                                              (not (:teams-data-requested teams-load)))
-                                     (dis/dispatch! [:teams-get]))
-                                   ;; If the team is loaded setup the form
-                                   (when (and (nil? (:name org-editing))
-                                              (nil? (:logo-url org-editing))
-                                              (seq teams-data))
-                                     (let [first-team (select-keys
-                                                       (first teams-data)
-                                                       [:name :logo-url :logo-width :logo-height])]
-                                       (dis/dispatch!
-                                        [:input
-                                         [:org-editing]
-                                         first-team])
-                                       (when-not (:logo-height first-team)
-                                         (let [img (gdom/createDom "img")]
-                                           (set! (.-onload img)
-                                            #(do
-                                              (dis/dispatch!
-                                               [:input
-                                                [:org-editing]
-                                                (merge @(drv/get-ref s :org-editing)
-                                                 {:logo-width (.-width img)
-                                                  :logo-height (.-height img)})])
-                                              (gdom/removeNode img)))
-                                           (gdom/append (.-body js/document) img)
-                                           (set! (.-src img) (:logo-url first-team)))))))
-                                 s)}
+(rum/defcs lander-team < rum/reactive
+                         (drv/drv :teams-load)
+                         (drv/drv :teams-data)
+                         (drv/drv :org-editing)
+                         (rum/local false ::saving)
+                         {:did-mount (fn [s]
+                           (delay-focus-field-with-ref s "org-name")
+                           s)
+                          :will-update (fn [s]
+                           (let [org-editing @(drv/get-ref s :org-editing)
+                                 teams-data @(drv/get-ref s :teams-data)
+                                 teams-load @(drv/get-ref s :teams-load)]
+                             ;; Load the list of teams if it's not already
+                             (when (and (empty? teams-data)
+                                        (:auth-settings teams-load)
+                                        (not (:teams-data-requested teams-load)))
+                               (dis/dispatch! [:teams-get]))
+                             ;; If the team is loaded setup the form
+                             (when (and (nil? (:name org-editing))
+                                        (nil? (:logo-url org-editing))
+                                        (seq teams-data))
+                               (let [first-team (select-keys
+                                                 (first teams-data)
+                                                 [:name :logo-url :logo-width :logo-height])]
+                                 (dis/dispatch!
+                                  [:input
+                                   [:org-editing]
+                                   first-team])
+                                 (when-not (:logo-height first-team)
+                                   (let [img (gdom/createDom "img")]
+                                     (set! (.-onload img)
+                                      #(do
+                                        (dis/dispatch!
+                                         [:input
+                                          [:org-editing]
+                                          (merge @(drv/get-ref s :org-editing)
+                                           {:logo-width (.-width img)
+                                            :logo-height (.-height img)})])
+                                        (gdom/removeNode img)))
+                                     (gdom/append (.-body js/document) img)
+                                     (set! (.-src img) (:logo-url first-team)))))))
+                           s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
         _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)]
-    [:div.onboard-lander.second-step
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Team"]]
+    [:div.onboard-lander.lander-team
+      [:div.steps
+        [:div.steps-internal.three-steps
+          [:div.step-1
+            "Sign Up"]
+          [:div.step-progress-bar]
+          [:div.step-2
+            "Your Profile"]
+          [:div.step-progress-bar]
+          [:div.step-3.active
+            "Your Team"]]]
       [:div.main-cta
-        [:div.title
-          "About your team"]
-        [:div.subtitle
-          "How your company will appear on Carrot"]]
+        [:div.title.company-setup
+          "Your team"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.org-logo
+          [:div.logo-upload-container.org-logo.group
             {:on-click (fn [_]
                         (if (empty? (:logo-url org-editing))
                           (iu/upload! {:accept "image/*"}
@@ -452,37 +300,44 @@
             (org-avatar org-editing false :never)
             [:div.add-picture-link
               (if (empty? (:logo-url org-editing))
-                "Upload logo"
-                "Delete logo")]
+                "+ Upload your company logo"
+                "+ Change your company logo")]
             [:div.add-picture-link-subtitle
               "A transparent background PNG works best"]]
           [:div.field-label
             "Team name"]
           [:input.field
             {:type "text"
+             :ref "org-name"
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
           [:button.continue
             {:disabled (empty? (:name org-editing))
-             :on-click #(dis/dispatch! [:org-create])}
-            "Create my team"]]]]))
+             :on-click #(do
+                         ;; Create org and show setup screen
+                         (dis/dispatch! [:org-create]))}
+            "Create my team!"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
                             (rum/local false ::password-error)
+                            {:did-mount (fn [s]
+                              (delay-focus-field-with-ref s "password")
+                              s)}
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)
         jwt (:jwt confirm-invitation)
         collect-pswd (:collect-pswd confirm-invitation)
         collect-pswd-error (:collect-pswd-error confirm-invitation)
         invitation-confirmed (:invitation-confirmed confirm-invitation)]
-    [:div.onboard-lander
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]]
+    [:div.onboard-lander.invitee-lander
+      [:div.steps
+        [:div.steps-internal.two-steps
+          [:div.step-1.active
+            "Get Started"]
+          [:div.step-progress-bar]
+          [:div.step-2
+            "Your Profile"]]]
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
@@ -502,6 +357,7 @@
             {:type "password"
              :class (when collect-pswd-error "error")
              :value (or (:pswd collect-pswd) "")
+             :ref "password"
              :on-change #(do
                            (reset! (::password-error s) false)
                            (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
@@ -533,6 +389,9 @@
                                       (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
                                        (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                       s)
+                                     :did-mount (fn [s]
+                                      (delay-focus-field-with-ref s "first-name")
+                                      s)
                                      :will-update (fn [s]
                                       (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
                                             orgs @(drv/get-ref s :orgs)]
@@ -548,16 +407,17 @@
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)]
-    [:div.onboard-lander.second-step
-      [:div.steps.two-steps
-        [:div.step-1
-          "Get Started"]
-        [:div.step-progress-bar]
-        [:div.step-2
-          "Your Profile"]]
+    [:div.onboard-lander.invitee-lander-profile
+      [:div.steps
+        [:div.steps-internal.two-steps
+          [:div.step-1
+            "Get Started"]
+          [:div.step-progress-bar]
+          [:div.step-2.active
+            "Your Profile"]]]
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us a bit about yourself..."]
+          "Tell us a bit about yourself…"]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -582,13 +442,14 @@
                           nil))}
             (user-avatar-image fixed-user-data)
             [:div.add-picture-link
-              "Change photo"]
+              "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
           [:input.field
             {:type "text"
+             :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
@@ -674,7 +535,12 @@
           {:on-click #(router/nav!
                         (let [org (utils/get-default-org orgs)]
                           (if org
-                            (oc-urls/org (:slug org))
+                            (do
+                             (cook/set-cookie!
+                              (router/show-nux-cookie (jwt/user-id))
+                              (:new-user router/nux-cookie-values)
+                              (* 60 60 24 7))
+                             (oc-urls/org (:slug org)))
                             oc-urls/login)))}
           "Get Started"]]
       :else
@@ -717,11 +583,9 @@
 
 (defn get-component [c]
   (case c
-    :email-lander (email-lander)
-    :email-lander-profile (email-lander-profile)
-    :email-lander-team (email-lander-team)
-    :slack-lander (slack-lander)
-    :slack-lander-team (slack-lander-team)
+    :lander (lander)
+    :lander-profile (lander-profile)
+    :lander-team (lander-team)
     :invitee-lander (invitee-lander)
     :invitee-lander-profile (invitee-lander-profile)
     :email-wall (email-wall)

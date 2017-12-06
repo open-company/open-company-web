@@ -51,7 +51,7 @@ div#wrap {
 
   div.main.home-page {
     width: 100%;
-    background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
+    background: linear-gradient(to top, #FBFAF7 70%, #FBE3DD 84%, #FFEFBD 88%, #FFFBED 105%);
     margin-top: 1px;
 
     @include mobile() {
@@ -67,7 +67,7 @@ div#wrap {
 
       @include mobile() {
         width: 100%;
-        padding-top: 80px;
+        overflow: visible;
       }
 
       div.balloon {
@@ -158,13 +158,13 @@ div#wrap {
           background-size: 48px 48px;
           width: 48px;
           height: 48px;
-          top: 404px;
+          top: 414px;
           left: 50%;
           margin-left: -278px;
           z-index: 11;
 
           &.no-get-started-button {
-            top: 308px;
+            top: 318px;
           }
         }
 
@@ -270,11 +270,10 @@ div#wrap {
         position: relative;
       }
 
-      img.homepage-main-screenshot {
+      video.homepage-main-animation {
         width: 940px;
         margin: 106px auto 0px;
         padding: 0;
-        border: 1px solid rgba($oc_gray_5, 0.05);
         z-index: 10;
         position: relative;
 
@@ -282,6 +281,18 @@ div#wrap {
           width: 100%;
           height: auto;
           margin: 80px auto 0px;
+        }
+
+        img.homepage-main-screenshot {
+          width: 972px;
+          margin-left: -16px;
+          padding: 0;
+
+          @include mobile(){
+            width: 100%;
+            height: auto;
+            margin: 0px;
+          }
         }
       }
 
@@ -312,10 +323,9 @@ div#wrap {
         }
 
         @include mobile() {
-          width: 100%;
+          width: calc(100% + 64px);
           height: auto;
-          max-width: 100%;
-          margin: -30px auto 0px;
+          margin: -30px 0px 0px -32px;
           padding: 16px 32px;
         }
       }
@@ -324,6 +334,13 @@ div#wrap {
     section.second-section {
       padding: 0px;
       position: relative;
+      background-color: $oc_gray_8;
+
+      @include mobile(){
+        width: calc(100% + 64px);
+        margin-left: -32px;
+        padding: 40px 32px 0px;
+      }
 
       div.why-balloon {
         position: absolute;
@@ -449,9 +466,8 @@ div#wrap {
           position: relative;
 
           @include mobile() {
-            width: 100%;
-            max-width: 100%;
-            margin: 0 auto;
+            width: calc(100% + 64px);
+            margin-left: -32px;
             text-align: center;
           }
         }

@@ -9,7 +9,7 @@
 
 (defn submit-try-it-form [e try-it-form-id form-submit-success-cb]
   (.preventDefault e)
-  (js/mailchimpApiSubmit
+  (js/OCStaticMailchimpApiSubmit
    e
    (js/$ (str "#" try-it-form-id))
    #(when (fn? form-submit-success-cb) (form-submit-success-cb)) nil))

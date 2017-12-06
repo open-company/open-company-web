@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.onboard-overlay
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -9,89 +10,60 @@
             [oc.web.mixins.ui :as mixins]))
 
 (defn dismiss-modal []
-  (dis/dispatch! [:onboard-overlay-hide]))
+  (dis/dispatch! [:nux-end]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
-(rum/defcs onboard-overlay < ;; Locals
-                             (rum/local 1 ::step)
+(rum/defcs onboard-overlay < rum/reactive
+                             ;; Locals
                              (rum/local false ::dismiss)
+                             (drv/drv :board-data)
                              ;; Mixins
                              mixins/no-scroll-mixin
-  [s]
+  [s step]
   [:div.onboard-overlay-container
     {:class (utils/class-set {:will-appear @(::dismiss s)
                               :appear (not @(::dismiss s))})}
     [:div.onboard-overlay
-      (case @(::step s)
-        1
-        [:div.onboard-overlay-step.step-1
-          [:div.step-illustration-container
-            ""]
+      (case step
+        :1
+        (let [nux-cookie (cook/get-cookie (router/show-nux-cookie (jwt/user-id)))
+              first-ever-user? (= nux-cookie (:first-ever-user router/nux-cookie-values))
+              board-data (drv/react s :board-data)
+              read-only-user (not (utils/link-for (:links board-data) "create"))]
+          [:div.onboard-overlay-step.step-1
+            [:div.onboard-overlay-step-title
+              "Getting started with posts"]
+            [:div.step-illustration-container]
+            [:div.onboard-overlay-step-description
+              (if first-ever-user?
+                (str
+                 "Updates and interactions are based around posts. Your "
+                 "posts keep information tidy, accessible, and open for "
+                 "feedback.")
+                (str
+                 "Updates and interactions are based around posts. "
+                 "Posts keep information tidy, accessible, and open for "
+                 "feedback."))]
+            [:button.mlb-reset.continue-btn
+              {:class (when-not first-ever-user? "center-button")
+               :on-click #(if first-ever-user?
+                           (dis/dispatch! [:first-forced-post-start])
+                           (dis/dispatch! [:input [:nux] (if read-only-user :7 :4)]))}
+              (if first-ever-user?
+                "Create your first post"
+                "OK, got it")]])
+        :7
+        [:div.onboard-overlay-step.step-last
           [:div.onboard-overlay-step-title
-            "Welcome to Carrot"]
-          ; [:div.onboard-overlay-step-description
-          ;   "The big picture keeps everyone aligned."]
-            ]
-        2
-        [:div.onboard-overlay-step.step-2
-          [:div.empty-line]
-          [:div.onboard-overlay-step-title
-            "Keep everyone on the same page"]
-          [:div.step-illustration-container
-            [:div.step-illustration-left
-              "CEO Update"]
-            [:div.step-illustration-right
-              "Sales Update"]]
+            "You’re on your way!"]
+          [:div.step-illustration-container]
           [:div.onboard-overlay-step-description
-            "It’s simple to post announcements, updates and stories that bring everyone together."]]
-        3
-        [:div.onboard-overlay-step.step-3
-          [:div.empty-line]
-          [:div.onboard-overlay-step-title
-            "Encourage feedback"]
-          [:div.step-illustration-container
-            "2H Strategy"]
-          [:div.onboard-overlay-step-description
-            "Comments and reactions keep everyone engaged and in sync - great for distributed teams."]]
-        4
-        [:div.onboard-overlay-step.step-4
-          [:div.empty-line]
-          [:div.onboard-overlay-step-title
-            "Keep stakeholders in the loop, too"]
-          [:div.step-illustration-container
-            "News"]
-          [:div.onboard-overlay-step-description
-            "It’s easy to share your news with investors, advisors, recruits and customers."]])
-      [:div.onboard-overlay-footer
-        [:div.onboard-overlay-footer-left
-          [:button.mlb-reset.skip-button
-            {:on-click #(do (utils/event-stop %) (close-clicked s))}
-            "Skip"]]
-        [:div.onboard-overlay-footer-steps
-          [:div.dot-step
-            {:class (when (= @(::step s) 1) "active")
-             :on-click #(reset! (::step s) 1)}]
-          [:div.dot-step
-            {:class (when (= @(::step s) 2) "active")
-             :on-click #(reset! (::step s) 2)}]
-          [:div.dot-step
-            {:class (when (= @(::step s) 3) "active")
-             :on-click #(reset! (::step s) 3)}]
-          [:div.dot-step
-            {:class (when (= @(::step s) 4) "active")
-             :on-click #(reset! (::step s) 4)}]]
-        [:div.onboard-overlay-footer-right
-          [:button.mlb-reset.mlb-default.next-button
-            {:on-click #(if (< @(::step s) 4)
-                          (reset! (::step s) (inc @(::step s)))
-                          (close-clicked s))}
-            (if (= @(::step s) 4)
-              "Let's go! "
-              "Next ")
-            [:img
-              {:src (utils/cdn "/img/ML/next_arrow.png")
-               :width 20
-               :height 20}]]]]]])
+            (str
+             "We hope you enjoy Carrot as much as we do. Feel free "
+             "to reach out if you have any questions!")]
+          [:button.mlb-reset.continue-btn
+            {:on-click #(close-clicked s)}
+            "Start using Carrot"]])]])
