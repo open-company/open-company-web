@@ -107,7 +107,7 @@ div.comments {
 
   div.comments-internal {
     min-height: 127px;
-    height: calc(100% - 98px);
+    height: calc(100% - 106px);
     width: 100%;
     margin-right: 16px;
     position: relative;
@@ -117,7 +117,7 @@ div.comments {
     top: 0;
 
     &.add-comment-focus {
-      height: calc(100% - 178px);
+      height: calc(100% - 188px);
     }
 
     div.comments-internal-scroll {
@@ -156,7 +156,7 @@ div.comments {
 
     div.comment {
       margin: 0px;
-      padding: 4px 8px 4px 0px;
+      padding: 4px 14px 4px 0px;
       position: relative;
 
       &:hover div.comment-content div.comment-footer-container div.edit-delete-button button.more-button {
@@ -308,7 +308,7 @@ div.comments {
     }
 
     div.add-comment-box-container {
-      padding: 16px 12px 12px #{$comment_avatar_size + 16}px;
+      padding: 20px 24px 18px #{$comment_avatar_size + 8}px;
       position: relative;
 
       div.add-comment-label {
@@ -341,12 +341,12 @@ div.comments {
         right: 0;
         bottom: 0px;
         width: 100%;
-        padding: 12px;
+        padding: 10px 12px;
 
         div.emoji-picker {
           position: absolute;
           right: 16px;
-          top: 8px;
+          top: 7px;
 
           button.emoji-button {
             width: 32px;
@@ -387,9 +387,9 @@ div.comments {
             @include avenir_M();
             background-color: transparent;
             color: $carrot_light_gray_3;
-            font-size: 13px;
+            font-size: 14px;
             cursor: text;
-            margin-bottom: 4px;
+            margin: 2px 0px;
             overflow-y: auto;
             overflow-x: hidden;
 
@@ -403,7 +403,7 @@ div.comments {
 
             &:empty:before {
               @include avenir_M();
-              font-size: 13px;
+              font-size: 14px;
               content: attr(placeholder);
               color: rgba($carrot_light_gray_3, 0.4);
               cursor: text;

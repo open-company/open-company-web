@@ -218,15 +218,16 @@
          (emoji-picker {:width 32
                         :height 32
                         :add-emoji-cb (fn [active-element emoji already-added?]
-                                        (enable-add-comment? s)
                                         (let [add-comment (rum/ref-node s "add-comment")]
                                           (.focus add-comment)
-                                          (when-not already-added?
-                                            (utils/after 100
-                                             #(js/pasteHtmlAtCaret
-                                               (.-native emoji)
-                                               (.getSelection js/window)
-                                               false)))))
+                                          (utils/after 100
+                                           #(do
+                                              (when-not already-added?
+                                                (js/pasteHtmlAtCaret
+                                                 (.-native emoji)
+                                                 (.getSelection js/window)
+                                                 false))
+                                              (enable-add-comment? s)))))
                         :force-enabled true
                         :container-selector "div.add-comment-box"}))]]))
 
