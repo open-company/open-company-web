@@ -248,14 +248,13 @@
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
         buttons (if show-subtitle
-                  ["custombold" "italic" "h2" "unorderedlist" "anchor"]
-                  ["custombold" "italic" "unorderedlist" "anchor"])
+                  ["bold" "italic" "h2" "unorderedlist" "anchor"]
+                  ["bold" "italic" "unorderedlist" "anchor"])
         options {:toolbar #js {:buttons (clj->js buttons)}
                  :buttonLabels "fontawesome"
                  :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
                  :extensions #js {"autolist" (js/AutoList.)
-                                  "media-picker" media-picker-ext
-                                  "custombold" (new js/CustomBold)}
+                                  "media-picker" media-picker-ext}
                  :autoLink true
                  :anchor #js {:customClassOption nil
                               :customClassOptionText "Button"
@@ -269,7 +268,29 @@
                              :cleanTags #js ["meta" "video" "audio"]
                              :unwrapTags #js ["div" "span" "label" "font" "h1" "h3" "h4" "h5" "h6" "strong"]}
                  :placeholder #js {:text "Start writing..."
-                                   :hideOnClick true}}
+                                   :hideOnClick true}
+                 :keyboardCommands #js {:commands #js [
+                                    #js {
+                                      :command "bold"
+                                      :key "B"
+                                      :meta true
+                                      :shift false
+                                      :alt false
+                                    }
+                                    #js {
+                                      :command "italic"
+                                      :key "I"
+                                      :meta true
+                                      :shift false
+                                      :alt false
+                                    }
+                                    #js {
+                                      :command false
+                                      :key "U"
+                                      :meta true
+                                      :shift false
+                                      :alt false
+                                    }]}}
         body-editor  (new js/MediumEditor body-el (clj->js options))]
     (reset! (::media-picker-ext s) media-picker-ext)
     (.subscribe body-editor

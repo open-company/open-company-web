@@ -250,7 +250,7 @@ div.activity-modal-container {
               padding: 0 50px;
               float: none;
               width: 100%;
-              height: calc(100% - 72px);
+              height: calc(100% - 82px);
               position: relative;
               overflow-y: auto;
 
@@ -331,8 +331,8 @@ div.activity-modal-container {
             }
 
             div.activity-modal-footer {
-              padding: 24px 20px 22px 32px;
-              height: 96px;
+              padding: 24px 20px 20px 32px;
+              height: 82px;
 
               &.scrolling-content {
                 border-top: 1px solid rgba($carrot_light_gray_1, 0.3);

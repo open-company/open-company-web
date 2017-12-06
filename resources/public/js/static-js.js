@@ -146,6 +146,15 @@ function isSafari(){
   }
 }
 
+function isFireFox(){
+  var ua = navigator.userAgent.toLowerCase();
+  if (ua.match(/Firefox/) && !ua.match(/Seamonkey/)) {
+      return true;
+  } else {
+      return false;
+  }
+}
+
 function isEdge(){
   if (navigator.appName == 'Microsoft Internet Explorer' ||
       !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
