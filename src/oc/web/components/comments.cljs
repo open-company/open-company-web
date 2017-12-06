@@ -106,7 +106,7 @@
         should-show-comment-reaction? (and (not is-emoji-comment?)
                                            (or (not can-edit?)
                                                (and can-edit?
-                                                    (pos? (:count (first (:reactions c)))))))]
+                                                    (pos? (:count (last (:reactions c)))))))]
     [:div.comment.group
       [:div.comment-avatar-container
         [:div.comment-avatar
