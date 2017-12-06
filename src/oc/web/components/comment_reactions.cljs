@@ -19,12 +19,13 @@
           reactions-loading (:reactions-loading item-data)
           reaction-data (last reactions-data)
           is-loading (utils/in? reactions-loading (:reaction reaction-data))
+          reacted (:reacted reaction-data)
           read-only-reaction (read-only? item-data)
           r (if is-loading
-              (merge reaction-data {:count (if (:reacted reaction-data)
+              (merge reaction-data {:count (if reacted
                                             (dec (:count reaction-data))
                                             (inc (:count reaction-data)))
-                                    :reacted (not (:reacted reaction-data))})
+                                    :reacted (not reacted)})
               reaction-data)]
       [:div.comment-reactions
         [:button.comment-reaction-btn.btn-reset
