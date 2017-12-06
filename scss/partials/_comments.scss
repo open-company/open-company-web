@@ -21,9 +21,6 @@ div.comments {
 
   div.top-gradient {
     position: absolute;
-    // top: 0px;
-    // left: 32px;
-    // right: 10px;
     height: 40px;
     z-index: 10;
     pointer-events: none;
@@ -67,9 +64,6 @@ div.comments {
 
   div.bottom-gradient {
     position: absolute;
-    // bottom: 0px;
-    // left: 32px;
-    // right: 10px;
     height: 40px;
     z-index: 10;
     pointer-events: none;
@@ -130,7 +124,7 @@ div.comments {
       overflow-x: visible;
       overflow-y: auto;
       height: 100%;
-      padding: 0px 10px 0px 0px;
+      padding: 16px 10px 0px 0px;
     }
 
     &.empty {
@@ -185,14 +179,14 @@ div.comments {
       }
 
       div.comment-content {
-        width: calc(100% - #{$comment_avatar_size}px - 16px);
+        width: calc(100% - #{$comment_avatar_size}px - 8px);
         float: right;
 
         div.comment-author-timestamp {
           display: block;
 
           div.comment-author {
-            max-width: calc(60% - 16px);
+            max-width: calc(60% - 8px);
             overflow: hidden;
             text-overflow: ellipsis;
             font-size: 12px;
@@ -215,8 +209,23 @@ div.comments {
           }
         }
 
+        &.single-emoji {
+          div.comment-body-container {
+            height: 50px;
+            p.comment-body {
+              background-color: transparent;
+              font-size: 50px;
+              padding: 0px;
+            }
+          }
+
+          div.comment-footer-container {
+            margin-top: 0px;
+          }
+        }
+
         div.comment-body-container {
-          margin-top: 8px;
+          margin-top: 4px;
 
           p.comment-body {
             @include avenir_M();
@@ -228,12 +237,6 @@ div.comments {
             background-color: $carrot_light_gray_9;
             border-radius: 6px;
             margin: 0px;
-
-            &.single-emoji {
-              background-color: transparent;
-              font-size: 50px;
-              padding: 0px;
-            }
 
             &.editable {
               background-color: $carrot_light_yellow;
@@ -247,10 +250,6 @@ div.comments {
               @include emoji-size(13);
             }
           }
-        }
-
-        &:hover {
-
         }
 
         div.comment-footer-container {
@@ -338,17 +337,41 @@ div.comments {
         width: 100%;
         padding: 12px;
 
-        &.show-buttons {
-          padding: 16px;
+        div.emoji-picker {
+          position: absolute;
+          right: 16px;
+          top: 8px;
+
+          button.emoji-button {
+            width: 32px;
+            height: 32px;
+            background-color: $carrot_green_3;
+            background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg");
+            background-size: 14px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 16px;
+
+            &:hover {
+              background-color: $carrot_green_2;
+              background-image: cdnUrl("/img/ML/emoji_picker_bt_white.svg");
+            }
+
+            &.disabled:hover {
+              background-color: $carrot_green_3;
+              background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg");
+            }
+
+            @include preload_image(cdnUrl("/img/ML/emoji_picker_bt_white.svg"), "before");
+          }
+
+          div.picker-container {
+            right: -92px !important;
+          }
         }
 
         div.add-comment-internal{
           position: relative;
-
-          div.emoji-picker {
-            right: unset;
-            left: 10px;
-          }
 
           div.add-comment {
             resize: none;
@@ -401,64 +424,13 @@ div.comments {
           }
         }
 
-        div.successfully-posted {
-          width: 168px;
-          height: 55px;
-          background-color: $carrot_dark_gray;
-          border-radius: 4px;
-          position: absolute;
-          padding: 12px 24px;
-          text-align: center;
-          @include avenir_H();
-          color: white;
-          font-size: 12px;
-          top: -62px;
-          left: calc(50% - 84px);
-          @include no-user-select();
+        &.show-buttons {
+          padding: 16px;
 
-          &:before {
-            display: block;
-            content: "";
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            transform: rotate(45deg);
-            background-color: $carrot_dark_gray;
-            left: calc(50% - 4px);
-            bottom: -4px;
-          }
-        }
-
-        div.emoji-picker {
-          position: absolute;
-          right: 80px;
-          bottom: 16px;
-
-          button.emoji-button {
-            width: 32px;
-            height: 32px;
-            background-color: $carrot_green_3;
-            background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg");
-            background-size: 14px 14px;
-            background-position: center;
-            background-repeat: no-repeat;
-            border-radius: 16px;
-
-            &:hover {
-              background-color: $carrot_green_2;
-              background-image: cdnUrl("/img/ML/emoji_picker_bt_white.svg");
-            }
-
-            &.disabled:hover {
-              background-color: $carrot_green_3;
-              background-image: cdnUrl("/img/ML/emoji_picker_bt_green.svg");
-            }
-
-            @include preload_image(cdnUrl("/img/ML/emoji_picker_bt_white.svg"), "before");
-          }
-
-          div.picker-container {
-            right: -92px !important;
+          div.emoji-picker {
+            right: 80px;
+            bottom: 16px;
+            top: unset;
           }
         }
       }

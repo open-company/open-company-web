@@ -3,6 +3,7 @@ $picker_width: 338;
 
 div.emoji-picker {
   z-index: 1234;
+  position: relative;
 
   button.emoji-button{
     padding: 1px 0 0 0;
