@@ -3,6 +3,7 @@
                    [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as s]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -13,24 +14,26 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.comment-reactions :as comment-reactions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn delete-clicked [e comment-data s]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-comment"
-                    :message (str "Delete this comment?")
-                    :link-button-title "No"
-                    :link-button-cb #(do
-                                       (dis/dispatch! [:alert-modal-hide])
-                                       (reset! (::editing? s) false))
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(let [activity-uuid (router/current-activity-id)]
-                                       (dis/dispatch! [:comment-delete activity-uuid comment-data])
-                                       (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
+(defn delete-clicked [s]
+  (let [comment-data (first (:rum/args s))]
+    (let [alert-data {:icon "/img/ML/trash.svg"
+                      :action "delete-comment"
+                      :message (str "Delete this comment?")
+                      :link-button-title "No"
+                      :link-button-cb #(do
+                                         (dis/dispatch! [:alert-modal-hide])
+                                         (reset! (::editing? s) false))
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(let [activity-uuid (router/current-activity-id)]
+                                         (dis/dispatch! [:comment-delete activity-uuid comment-data])
+                                         (dis/dispatch! [:alert-modal-hide]))
+                      }]
+      (dis/dispatch! [:alert-modal-show alert-data]))))
 
 (defn add-comment-content [add-comment-div]
   (let [inner-html (.-innerHTML add-comment-div)
@@ -49,72 +52,100 @@
       (reset! (::editing? s) false)
       (dis/dispatch! [:comment-save c comment-text]))))
 
+(defn is-emoji
+  [body]
+  ; (let [ranges #js ["\\ud83c[\\udf00-\\udfff]"  ;; U+1F300 to U+1F3FF
+  ;                   "\\ud83d[\\udc00-\\ude4f]"  ;; U+1F400 to U+1F64F
+  ;                   "\\ud83d[\\ude80-\\udeff]"]] ;; U+1F680 to U+1F6FF
+  ;   (.match body (.join ranges "|")))
+  (let [r (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")]
+    (and ;; emojis can have up to 11 codepoints
+         (<= (count body) 11)
+         ;;
+         (.match body r)
+         (not (.match body (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g"))))))
+
+(defn edit-clicked
+  [s]
+  (reset! (::editing? s) true)
+  (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s "comment-body"))))
 
 (rum/defcs comment-row < rum/static
                          rum/reactive
                          (rum/local false ::editing?)
                          (rum/local nil ::window-click)
+                         (rum/local false ::show-more-dropdown)
                          {:did-mount (fn [s]
-                                      (reset! (::window-click s)
-                                        (events/listen
-                                        js/window
-                                        EventType/CLICK
-                                        (fn [e]
-                                          (when (and
-                                                 (not (utils/event-inside? e (rum/ref-node s "comment-body")))
-                                                 (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete"))))
-                                            (reset! (::editing? s) false)))))
-                                      s)
+                            (reset! (::window-click s)
+                             (events/listen
+                              js/window
+                              EventType/CLICK
+                              (fn [e]
+                                (when (and @(::editing? s)
+                                       (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete")))
+                                       (not (utils/event-inside? e (rum/ref-node s "comment-body"))))
+                                  (reset! (::editing? s) false))
+                                (when (and @(::show-more-dropdown s)
+                                           (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete"))))
+                                  (reset! (::show-more-dropdown s) false)))))
+                            s)
                           :will-unmount (fn [s]
-                                          (events/unlistenByKey
-                                           @(::window-click s)))
+                            (events/unlistenByKey
+                             @(::window-click s)))
                           }
-[s c]
+  [s c]
   (let [author (:author c)
-        editable (boolean (and
-                           (utils/link-for (:links c) "partial-update")
-                           (utils/link-for (:links c) "delete")))]
-    [:div.comment
-      {:on-click #(when editable
-                    (.focus (rum/ref-node s "comment-body")))}
-      [:div.comment-header.group
+        is-emoji-comment? (is-emoji (:body c))
+        can-delete? (utils/link-for (:links c) "delete")
+        can-edit? (and (not is-emoji-comment?)
+                       (utils/link-for (:links c) "partial-update"))
+        editable (or can-delete? can-edit?)]
+    [:div.comment.group
+      [:div.vertical-line]
+      [:div.comment-avatar-container
         [:div.comment-avatar
-          {:style {:background-image (str "url(" (:avatar-url author) ")")}}]
-        [:div.comment-author-timestamp
+          {:style {:background-image (str "url(" (:avatar-url author) ")")}}]]
+      [:div.comment-content
+        [:div.comment-author-timestamp.group
           [:div.comment-author
             (:name author)]
           [:div.comment-timestamp
             (utils/time-since (:created-at c))]]
+        [:div.comment-body-container
+          [:p.comment-body.group
+           {:on-key-down (fn [e]
+                           (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
+                             (.blur (rum/ref-node s "comment-body"))
+                             (.preventDefault e)))
+             :on-blur #(edit-finished % s c)
+             :ref "comment-body"
+             :class (utils/class-set {:editable can-edit?
+                                      :single-emoji is-emoji-comment?}) ;;(:body c))})
+             :content-editable @(::editing? s)
+             :dangerouslySetInnerHTML (utils/emojify (:body c))}]];; (:body c))}]]
+        [:div.comment-footer-container.group
+          (when-not is-emoji-comment?
+            (comment-reactions/comment-reactions c))
           (when editable
-            [:div.edit-delete-button {:ref "comment-edit-delete"}
-              [:button.mlb-reset
-                {:class (utils/class-set {:mdi @(::editing? s)
-                                          :mdi-delete @(::editing? s)})
-                 :type "button"
-                 :on-click (fn [e]
-                             (utils/remove-tooltips)
-                             (if @(::editing? s)
-                               (delete-clicked e c s)
-                               (.focus (rum/ref-node s "comment-body")))
-                             (when (not @(::editing? s))
-                               (reset! (::editing? s) true)))
-                 :title (if @(::editing? s) "Delete" "Edit")
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"}]])]
-      [:p.comment-body.group
-       {:on-key-down (fn [e]
-                       (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
-                         (.blur (rum/ref-node s "comment-body"))
-                         (.preventDefault e)))
-         :on-blur #(edit-finished % s c)
-         :on-focus #(reset! (::editing? s) true)
-         :ref "comment-body"
-         :class (utils/class-set {:editable editable})
-         :content-editable editable
-         :dangerouslySetInnerHTML (utils/emojify (:body c))}]
-      [:div.comment-reactions-container.group
-        (comment-reactions/comment-reactions c)]]))
+            [:div.edit-delete-button
+              {:ref "comment-edit-delete"}
+              [:button.mlb-reset.more-button
+                {:on-click #(reset! (::show-more-dropdown s) true)
+                 :title "More"
+                 :class (utils/class-set {:more-dd-expanded @(::show-more-dropdown s)})}]
+              (when @(::show-more-dropdown s)
+                (let [edit-item [{:value "delete" :label "Delete"}]
+                      items (if can-edit?
+                              (concat [{:value "edit" :label "Edit"}] edit-item)
+                              edit-item)]
+                  (dropdown-list {:items items
+                                  :on-change (fn [item]
+                                              (reset! (::show-more-dropdown s) false)
+                                              (cond
+                                                (= (:value item) "edit")
+                                                (edit-clicked s)
+                                                (= (:value item) "delete")
+                                                (delete-clicked s)))})))])]]]))
 
 (defn enable-add-comment? [s]
   (let [add-comment-div (rum/ref-node s "add-comment")
@@ -146,42 +177,44 @@
                                           s)}
   [s activity-data]
   (let [current-user-data (drv/react s :current-user-data)]
-    [:div.add-comment-box
-      {:class (utils/class-set {:show-buttons @(::show-buttons s)})}
-     (when @(::show-successful s)
-       [:div.successfully-posted
-         "Comment was posted successfully!"])
-     [:div.add-comment-internal
-       [:div.add-comment.emoji-autocomplete.emojiable
-         {:ref "add-comment"
-          :content-editable true
-          :on-key-up #(enable-add-comment? s)
-          :on-focus #(do
-                       (enable-add-comment? s)
-                       (dis/dispatch! [:input [:add-comment-focus] true])
-                       (reset! (::show-buttons s) true))
-          :on-blur #(enable-add-comment? s)
-          :on-paste #(do
-                       (js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
-                       (enable-add-comment? s))
-          :placeholder "Share your thoughts..."
-          :class (utils/class-set {:show-buttons @(::show-buttons s)})}]
-      (when @(::show-buttons s)
-        [:div.add-comment-footer.group
-          [:div.reply-button-container
-            [:button.mlb-reset.mlb-default.reply-btn
-              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
-                            (reset! (::show-buttons s) false)
-                            (dis/dispatch! [:input [:add-comment-focus] false])
-                            (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                            (set! (.-innerHTML add-comment-div) ""))
-               :disabled @(::add-button-disabled s)}
-              "Add"]]])]
-     (when (and (not (js/isIE)) @(::show-buttons s))
-       (emoji-picker {:width 32
-                      :height 32
-                      :add-emoji-cb #(enable-add-comment? s)
-                      :container-selector "div.add-comment-box"}))]))
+    [:div.add-comment-box-container
+      [:div.add-comment-label "Add comment"]
+      [:div.add-comment-box
+        {:class (utils/class-set {:show-buttons @(::show-buttons s)})}
+       (when @(::show-successful s)
+         [:div.successfully-posted
+           "Comment was posted successfully!"])
+       [:div.add-comment-internal
+         [:div.add-comment.emoji-autocomplete.emojiable
+           {:ref "add-comment"
+            :content-editable true
+            :on-key-up #(enable-add-comment? s)
+            :on-focus #(do
+                         (enable-add-comment? s)
+                         (dis/dispatch! [:input [:add-comment-focus] true])
+                         (reset! (::show-buttons s) true))
+            :on-blur #(enable-add-comment? s)
+            :on-paste #(do
+                         (js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
+                         (enable-add-comment? s))
+            :placeholder "Share your thoughts..."
+            :class (utils/class-set {:show-buttons @(::show-buttons s)})}]
+        (when @(::show-buttons s)
+          [:div.add-comment-footer.group
+            [:div.reply-button-container
+              [:button.mlb-reset.mlb-default.reply-btn
+                {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")]
+                              (reset! (::show-buttons s) false)
+                              (dis/dispatch! [:input [:add-comment-focus] false])
+                              (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
+                              (set! (.-innerHTML add-comment-div) ""))
+                 :disabled @(::add-button-disabled s)}
+                "Add"]]])]
+       (when (and (not (js/isIE)) @(::show-buttons s))
+         (emoji-picker {:width 32
+                        :height 32
+                        :add-emoji-cb #(enable-add-comment? s)
+                        :container-selector "div.add-comment-box"}))]]))
 
 (defn scroll-to-bottom [s]
   (when-let* [dom-node (utils/rum-dom-node s)
@@ -203,42 +236,43 @@
                       (drv/drv :add-comment-focus)
                       rum/reactive
                       rum/static
-                      (rum/local false ::needs-gradient)
+                      ; (rum/local false ::needs-gradient)
                       (rum/local false ::comments-requested)
                       (rum/local true  ::scroll-bottom-after-render)
                       {:will-mount (fn [s]
-                                    (load-comments-if-needed s)
-                                    s)
+                        (load-comments-if-needed s)
+                        s)
                        :did-remount (fn [o s]
-                                      (load-comments-if-needed s)
-                                      (when @(drv/get-ref s :comment-add-finish)
-                                        (reset! (::scroll-bottom-after-render s) true))
-                                      s)
+                        (load-comments-if-needed s)
+                        (when @(drv/get-ref s :comment-add-finish)
+                          (reset! (::scroll-bottom-after-render s) true))
+                        s)
                        :after-render (fn [s]
-                                       (let [comments-internal-scroll (js/$ ".comments-internal-scroll")
-                                             next-needs-gradient (>
-                                                                  (.prop comments-internal-scroll "scrollHeight")
-                                                                  (.height comments-internal-scroll))]
-                                         ;; Show the gradient at the top only if there are at least 5 comments
-                                         ;; or the container has some scroll
-                                         (when (not= @(::needs-gradient s) next-needs-gradient)
-                                           (reset! (::needs-gradient s) next-needs-gradient))
-                                         ;; recall scroll to bottom if needed
-                                         (scroll-to-bottom s))
-                                       s)}
+                        ;; recall scroll to bottom if needed
+                        (scroll-to-bottom s)
+                        ; (let [comments-internal-scroll (js/$ ".comments-internal-scroll")
+                        ;       next-needs-gradient (>
+                        ;                            (.prop comments-internal-scroll "scrollHeight")
+                        ;                            (.height comments-internal-scroll))]
+                        ;   ;; Show the gradient at the top only if there are at least 5 comments
+                        ;   ;; or the container has some scroll
+                        ;   (when (not= @(::needs-gradient s) next-needs-gradient)
+                        ;     (reset! (::needs-gradient s) next-needs-gradient)))
+                        s)}
   [s activity-data]
   (let [comments-data (drv/react s :activity-comments-data)
         add-comment-focus (drv/react s :add-comment-focus)
         sorted-comments (:sorted-comments comments-data)
-        needs-gradient @(::needs-gradient s)]
+        ; needs-gradient @(::needs-gradient s)
+        ]
     (if (and (zero? (count sorted-comments))
              (or (:loading comments-data)
                  (not (contains? comments-data :sorted-comments))))
       [:div.comments
         (small-loading)]
       [:div.comments
-        (when needs-gradient
-          [:div.top-gradient])
+        ; (when needs-gradient
+        ;   [:div.top-gradient])
         [:div.comments-internal
          {:class (utils/class-set {:add-comment-focus add-comment-focus
                                    :empty (zero? (count sorted-comments))})}
