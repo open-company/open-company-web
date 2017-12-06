@@ -13,10 +13,8 @@ div.comment-reactions {
 
     div.reaction {
       display: inline-block;
-      &.no-reactions {
-        -webkit-filter: grayscale(100%);
-        filter: grayscale(100%);
-      }
+      -webkit-filter: grayscale(100%);
+      filter: grayscale(100%);
     }
 
     div.count {
@@ -26,15 +24,27 @@ div.comment-reactions {
 
     &.can-react {
       cursor: pointer;
+
+      &.reacted:hover {
+        div.reaction {
+          -webkit-filter: grayscale(100%);
+          filter: grayscale(100%);
+        }
+      }
+
       &:hover {
-        -webkit-filter: grayscale(0%);
-        filter: grayscale(0%);
+        div.reaction {
+          -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+        }
       }
     }
 
     &.reacted {
-      -webkit-filter: grayscale(0%);
-      filter: grayscale(0%);
+      div.reaction {
+        -webkit-filter: grayscale(0%);
+        filter: grayscale(0%);
+      }
 
       div.count {
         color: $carrot_yellow;

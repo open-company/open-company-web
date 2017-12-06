@@ -31,9 +31,7 @@
           [:button.comment-reaction-btn.btn-reset
             {:key (str "-entry-" (:uuid item-data) "-" idx)
              :class (utils/class-set {:reacted (:reacted r)
-                                      :can-react (not read-only-reaction)
-                                      :has-reactions (pos? (:count r))
-                                      :comment true})
+                                      :can-react (not read-only-reaction)})
              :on-click (fn [e]
                          (when (and (not is-loading) (not read-only-reaction))
                            (when (and (not (:reacted r))
