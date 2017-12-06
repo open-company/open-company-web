@@ -289,6 +289,8 @@ provided in the table below:
 |  :pswd-collect | UI | Start the request to save the new user password on password request. |
 |  :pswd-collect/finish | API | Collect password request finished. |
 |  :reaction-toggle | UI | Toggle a reaction, temporarily change it in the local state then starts the request to save it server side. |
+|  :react-from-picker | UI | Add a reaction selected from the picker. |
+|  :react-from-picker/finish | API | Reaction add request finished. |
 |  :secure-activity-get | UI | Load an activity using the secure uuid. |
 |  :signup-with-email | UI | Show the signup with email overlay. |
 |  :signup-with-email/failed | API | Signup with email failed. Add the proper error message to the app-state. |
