@@ -41,7 +41,7 @@ div.comments {
       overflow-x: visible;
       overflow-y: auto;
       height: 100%;
-      padding: 10px 10px 0px 0px;
+      padding: 0px 10px 0px 0px;
     }
 
     &.empty {
@@ -72,7 +72,7 @@ div.comments {
 
     div.comment {
       margin: 0px;
-      padding-bottom: 16px;
+      padding: 4px 0px;
       position: relative;
 
       div.vertical-line {
@@ -84,8 +84,8 @@ div.comments {
         left: 16px;
       }
 
-      &:hover div.comment-header div.edit-delete-button button.mlb-reset {
-        opacity: 0.8;
+      &:hover div.comment-content div.comment-footer-container div.edit-delete-button button.more-button {
+        opacity: 1;
       }
 
       div.comment-avatar-container {
@@ -114,8 +114,8 @@ div.comments {
             max-width: calc(60% - 16px);
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 14px;
-            color: $oc_gray_5;
+            font-size: 12px;
+            color: $carrot_dark_gray_2;
             @include avenir_H();
             white-space: nowrap;
             float: left;
@@ -125,11 +125,12 @@ div.comments {
             max-width: calc(40% - 5px);
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 4px;
-            font-size: 11px;
-            color: rgba(78,90,107,0.6);
+            margin-top: 2px;
             white-space: nowrap;
             float: right;
+            @include avenir_M();
+            color: rgba($carrot_light_gray_3, 0.5);
+            font-size: 10px;
           }
         }
 
@@ -147,34 +148,74 @@ div.comments {
             border-radius: 6px;
             margin: 0px;
 
+            &.single-emoji {
+              background-color: transparent;
+              font-size: 50px;
+              padding: 0px;
+            }
+
+            &.editable {
+              background-color: $carrot_light_yellow;
+
+              &[contentEditable=true] {
+                outline: $oc_gray_5 auto 3px;
+              }
+            }
+
             .emojione {
               @include emoji-size(13);
             }
           }
         }
-      }
 
-      div.comment-reactions-container {
-        height: 16px;
+        &:hover {
 
-        div.edit-delete-button {
-          button.mlb-reset {
-            width: 18px;
-            height: 18px;
-            display: block;
-            background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: rgba($carrot_light_gray_2, 0.15);
-            opacity: 0;
-            border: none;
+        }
 
-            &.mdi.mdi-delete {
-              padding: 7px 0px 7px 0px;
-              text-align: left;
-              background-image: none;
-              opacity: 1;
+        div.comment-footer-container {
+          height: 20px;
+          width: 100%;
+          margin-top: 4px;
+
+          div.edit-delete-button {
+            float: right;
+            margin-right: 8px;
+            position: relative;
+
+            button.more-button {
+              width: 18px;
+              height: 18px;
+              @include image-2x("/img/ML/horizontal_ellipsis");
+              background-size: 18px 4px;
+              background-position: center;
+              background-repeat: no-repeat;
+              opacity: 0;
+              border: none;
+
+              &.more-dd-expanded {
+                opacity: 1;
+              }
             }
+
+            div.dropdown-list-container {
+              width: 92px;
+              left: unset;
+              right: calc(100% - 31px);
+              top: unset;
+              bottom: 24px;
+
+              div.triangle {
+                top: unset;
+                bottom: -2px;
+                left: unset;
+                right: 12px;
+                transform: rotate(225deg);
+              }
+            }
+          }
+
+          div.comment-reactions {
+            float: right;
           }
         }
       }
