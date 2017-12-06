@@ -99,6 +99,7 @@
   [s c]
   (let [author (:author c)
         is-emoji-comment? (is-emoji (:body c))
+        is-owner? (= (-> c :author :user-id) (jwt/user-id))
         can-delete? (utils/link-for (:links c) "delete")
         can-edit? (and (not is-emoji-comment?)
                        (utils/link-for (:links c) "partial-update"))
@@ -131,7 +132,8 @@
                                 (reset! (::editing? s) false))))
              :on-blur #(edit-finished % s c)
              :ref "comment-body"
-             :class (utils/class-set {:editable can-edit?})
+             :class (utils/class-set {:editable can-edit?
+                                      :is-owner is-owner?})
              :content-editable @(::editing? s)
              :dangerouslySetInnerHTML (utils/emojify (:body c))}]]
         (when (or should-show-comment-reaction?
