@@ -268,14 +268,17 @@
     (if (and (zero? (count sorted-comments))
              (or (:loading comments-data)
                  (not (contains? comments-data :sorted-comments))))
+      [:div.comments.loading
+        [:div.vertical-line]
+        (small-loading {:class "small-loading"})]
       [:div.comments
-        (small-loading)]
-      [:div.comments
-        ; (when needs-gradient
-        ;   [:div.top-gradient])
+        [:div.top-gradient.top-left]
+        [:div.line-top-gradient]
+        [:div.top-gradient.top-right]
         [:div.comments-internal
-         {:class (utils/class-set {:add-comment-focus add-comment-focus
-                                   :empty (zero? (count sorted-comments))})}
+          {:class (utils/class-set {:add-comment-focus add-comment-focus
+                                    :empty (zero? (count sorted-comments))})}
+          [:div.vertical-line]
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
              {:on-scroll (fn [e]
@@ -288,7 +291,10 @@
                                (reset! (::scroll-bottom-after-render s) false))
                              (.data comments-internal-scroll "lastScrollTop" (.scrollTop comments-internal-scroll))))}
               (for [c sorted-comments]
-                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))]
+                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
+              [:div.bottom-gradient.bottom-left]
+              [:div.line-bottom-gradient]
+              [:div.bottom-gradient.bottom-right]]
             [:div.comments-internal-empty
               [:div.no-comments-placeholder]
               [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
