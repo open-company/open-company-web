@@ -192,12 +192,21 @@
          [:div.add-comment.emoji-autocomplete.emojiable
            {:ref "add-comment"
             :content-editable true
+            :on-key-down #(let [add-comment-node (rum/ref-node s "add-comment")]
+                            (when (and (= "Escape" (.-key %))
+                                     (= (.-activeElement js/document) add-comment-node))
+                              (.stopPropagation %)
+                              (.blur add-comment-node)))
             :on-key-up #(enable-add-comment? s)
             :on-focus #(do
                          (enable-add-comment? s)
                          (dis/dispatch! [:input [:add-comment-focus] true])
                          (reset! (::show-buttons s) true))
-            :on-blur #(enable-add-comment? s)
+            :on-blur #(do
+                        (enable-add-comment? s)
+                        (when (empty? (.-innerHTML (rum/ref-node s "add-comment")))
+                          (reset! (::show-buttons s) false)
+                          (dis/dispatch! [:input [:add-comment-focus] false])))
             :on-paste #(do
                          (js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
                          (enable-add-comment? s))
@@ -218,15 +227,16 @@
          (emoji-picker {:width 32
                         :height 32
                         :add-emoji-cb (fn [active-element emoji already-added?]
-                                        (enable-add-comment? s)
                                         (let [add-comment (rum/ref-node s "add-comment")]
                                           (.focus add-comment)
-                                          (when-not already-added?
-                                            (utils/after 100
-                                             #(js/pasteHtmlAtCaret
-                                               (.-native emoji)
-                                               (.getSelection js/window)
-                                               false)))))
+                                          (utils/after 100
+                                           #(do
+                                              (when-not already-added?
+                                                (js/pasteHtmlAtCaret
+                                                 (.-native emoji)
+                                                 (.getSelection js/window)
+                                                 false))
+                                              (enable-add-comment? s)))))
                         :force-enabled true
                         :container-selector "div.add-comment-box"}))]]))
 
