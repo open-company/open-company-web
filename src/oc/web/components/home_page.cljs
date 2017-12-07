@@ -59,7 +59,9 @@
           [:h1.headline
             "Rise above the noise"]
           [:div.subheadline
-            "Give your team a clear view of what’s most important."]
+            "Give your team a clear view of what’s most important"]
+          [:div.subheadline.second-line
+            "to keep everyone on the same page"]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -93,7 +95,7 @@
             [:div.fallback
               "Your browser doesn’t support this video format."]]
           [:div.homepage-screenshot-bubble
-            "It’s never been this easy to keep everyone on the same page"]]
+            "It’s never been easier to keep everyone on the same page"]]
 
         [:section.second-section.group
           [:div.why-balloon.big-red]
@@ -150,7 +152,7 @@
               [:div.illustration.illustration-4]
               [:div.description
                 [:div.title
-                  "All together"]
+                  "The big picture"]
                 [:div.subtitle
                   (str
                    "Daily or weekly digest reinforces "
@@ -171,9 +173,7 @@
         [:section.third-section.group
           [:div.illustrations-title
             [:div.why-carrot
-              "Share your big picture with stakeholders"]
-            [:div.why-carrot-description
-              "Create and organize stakeholder updates in less time"]]
+              "Keep your stakeholders informed"]]
           [:div.third-section-footer.group
             [:div.copy
               [:div.copy-icon.copy-simplify]

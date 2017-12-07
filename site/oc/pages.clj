@@ -71,7 +71,9 @@
         [:h1.headline
           "Rise above the noise"]
         [:div.subheadline
-          "Give your team a clear view of what’s most important."]
+          "Give your team a clear view of what’s most important"]
+        [:div.subheadline.second-line
+          "to keep everyone on the same page"]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -99,7 +101,7 @@
           [:div.fallback
             "Your browser doesn´t support this video format."]]
         [:div.homepage-screenshot-bubble
-          "It’s never been this easy to keep everyone on the same page"]]
+          "It’s never been easier to keep everyone on the same page"]]
 
       [:section.second-section.group
         [:div.why-balloon.big-red]
@@ -156,7 +158,7 @@
             [:div.illustration.illustration-4]
             [:div.description
               [:div.title
-                "All together"]
+                "The big picture"]
               [:div.subtitle
                 (str
                  "Daily or weekly digest reinforces "
@@ -177,9 +179,7 @@
       [:section.third-section.group
         [:div.illustrations-title
           [:div.why-carrot
-            "Share your big picture with stakeholders"]
-          [:div.why-carrot-description
-            "Create and organize stakeholder updates in less time"]]
+            "Keep your stakeholders informed"]]
         [:div.third-section-footer.group
           [:div.copy
             [:div.copy-icon.copy-simplify]
@@ -337,14 +337,11 @@
 
         [:div.paragraphs-container.group
           [:div.paragraph-title
-            "Team chat gets pretty noisy,"]
-
-          [:div.paragraph-title
             "making it easy to miss the important stuff."]
           [:p
             (str
              "Messaging apps are designed for real-time work. They’re great in the moment, "
-             "but chat gets noisy and conversations disappear, making it difficult to know what you missed.")]
+             "but chat gets noisy and conversations disappear, making it easy to miss the important stuff.")]
           [:p
             (str
               "Carrot provides an easy to read view of the latest announcements, updates, and stories "
