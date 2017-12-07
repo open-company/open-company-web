@@ -81,7 +81,8 @@
 
           [:video.homepage-main-animation
             {:controls false
-             :autoplay true
+             :auto-play true
+             :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
              :loop true}
             [:source
               {:src (utils/cdn "/img/ML/animation.webm")
@@ -89,9 +90,8 @@
             [:source
               {:src (utils/cdn "/img/ML/animation.mp4")
                :type "video/mp4"}]
-            [:img.homepage-main-screenshot
-              {:src (utils/cdn "/img/ML/new_homepage_screenshot.png")
-               :srcSet (str (utils/cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]]
+            [:div.fallback
+              "Your browser doesn’t support this video format."]]
           [:div.homepage-screenshot-bubble
             "It’s never been this easy to keep everyone on the same page"]]
 
