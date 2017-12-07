@@ -103,7 +103,8 @@ document.addEventListener("DOMContentLoaded", function(_) {
       }
     }
     loginButton.attr("href", your_board_url);
-    $("div.footer-small-links.static").html("<a href=\"" + your_board_url + "\">Your Boards</a>")
+    // Hide get started and login buttons in the footer
+    $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button
     siteMobileMenuGetStarted.attr("onClick", "window.location = \"" + your_board_url + "\"");
     // If in 404 page show error message for logged in users

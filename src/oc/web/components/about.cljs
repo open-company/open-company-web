@@ -44,14 +44,11 @@
 
           [:div.paragraphs-container.group
             [:div.paragraph-title
-              "Team chat gets pretty noisy,"]
-
-            [:div.paragraph-title
               "making it easy to miss the important stuff."]
             [:p
               (str
                "Messaging apps are designed for real-time work. They’re great in the moment, but chat "
-               "gets noisy and conversations disappear, making it difficult to know what you missed.")]
+               "gets noisy and conversations disappear, making it easy to miss the important stuff.")]
             [:p
               (str
                 "Carrot provides an easy to read view of the latest announcements, updates, and stories "
