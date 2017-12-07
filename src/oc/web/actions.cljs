@@ -444,7 +444,7 @@
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (do
       (cook/set-cookie!
-       (router/show-nux-cookie (jwt/user-id))
+       (router/show-nux-cookie (:user-id jwt))
        (:new-user router/nux-cookie-values)
        (* 60 60 24 7))
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
