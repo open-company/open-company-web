@@ -101,7 +101,12 @@
                            (events/unlistenByKey (::ff-window-click s)))
                          (when (::ff-keypress s)
                            (events/unlistenByKey (::ff-keypress s)))
-                         (dissoc s ::click-listener ::focusin-listener ::focusout-listener ::ff-window-click ::ff-keypress))}
+                         (dissoc s
+                          ::click-listener
+                          ::focusin-listener
+                          ::focusout-listener
+                          ::ff-window-click
+                          ::ff-keypress))}
   [s {:keys [add-emoji-cb position width height container-selector]
       :as arg
       :or {position "top"
