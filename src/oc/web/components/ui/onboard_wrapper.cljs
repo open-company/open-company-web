@@ -535,7 +535,10 @@
           {:on-click #(router/nav!
                         (let [org (utils/get-default-org orgs)]
                           (if org
-                            (oc-urls/org (:slug org))
+                            (if (and (empty? (jwt/get-key :first-name))
+                                     (empty? (jwt/get-key :last-name)))
+                              oc-urls/confirm-invitation-profile
+                              (oc-urls/org (:slug org)))
                             oc-urls/login)))}
           "Get Started"]]
       :else
