@@ -535,12 +535,7 @@
           {:on-click #(router/nav!
                         (let [org (utils/get-default-org orgs)]
                           (if org
-                            (do
-                             (cook/set-cookie!
-                              (router/show-nux-cookie (jwt/user-id))
-                              (:new-user router/nux-cookie-values)
-                              (* 60 60 24 7))
-                             (oc-urls/org (:slug org)))
+                            (oc-urls/org (:slug org))
                             oc-urls/login)))}
           "Get Started"]]
       :else
