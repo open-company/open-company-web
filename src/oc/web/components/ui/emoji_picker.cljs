@@ -60,11 +60,13 @@
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
+  (rum/local false ::preloaded)
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
                  s)
    :did-mount (fn [s] (when-not (utils/is-test-env?)
+                        (utils/after 1500 #(reset! (::preloaded s) true))
                         (let [click-listener (events/listen
                                               js/window
                                               EventType/CLICK
@@ -99,7 +101,12 @@
                            (events/unlistenByKey (::ff-window-click s)))
                          (when (::ff-keypress s)
                            (events/unlistenByKey (::ff-keypress s)))
-                         (dissoc s ::click-listener ::focusin-listener ::focusout-listener ::ff-window-click ::ff-keypress))}
+                         (dissoc s
+                          ::click-listener
+                          ::focusin-listener
+                          ::focusout-listener
+                          ::ff-window-click
+                          ::ff-keypress))}
   [s {:keys [add-emoji-cb position width height container-selector]
       :as arg
       :or {position "top"
@@ -127,6 +134,7 @@
                                (reset! visible vis)))}]
       [:div.picker-container
         {:class (utils/class-set {position true
+                                  :preloading (not @(::preloaded s))
                                   :visible @visible})}
         (when-not (utils/is-test-env?)
           (react-utils/build (.-Picker js/EmojiMart)
