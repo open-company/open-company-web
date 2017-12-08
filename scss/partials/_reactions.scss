@@ -2,74 +2,98 @@ div.reactions {
   height: 25px;
   float: left;
 
-  button.reaction-btn {
-    margin-right: 5px;
-    float: left;
-    outline: none;
-    opacity: 0.6;
-    position: relative;
-    height: 32px;
-    cursor: default;
-    border-radius: 100px;
-    background-color: $carrot_light_gray_2;
-    padding: 0px 16px;
-    // padding: .35em .9em;
-    color: $carrot_light_gray_3;
-    @include avenir_H();
-    font-size: 12px;
+  div.reactions-list {
 
-    &.comment {
-      height: 24px;
-    }
-
-    span.reaction {
-      font-size: 20px;
-      top: 3px;
+    button.reaction-btn {
+      float: left;
+      outline: none;
       position: relative;
+      height: 32px;
+      margin-left: 1px;
+      cursor: default;
+      background-color: $carrot_light_gray_2;
+      padding: 0px 14px;
+      color: $carrot_light_gray_3;
+      @include avenir_H();
+      font-size: 14px;
 
-      &.comment {
-        top: 0px;
-        padding-right: 3px;
-        font-size: 12px;
+      &:first-child {
+        border-top-left-radius: 100px;
+        border-bottom-left-radius: 100px;
       }
 
-      &.no-reactions {
+      &:last-child {
+        border-top-right-radius: 100px;
+        border-bottom-right-radius: 100px;
+      }
+
+      span.reaction {
+        font-size: 15px;
+        top: 3px;
+        position: relative;
+        display: inline-block;
         -webkit-filter: grayscale(100%);
         filter: grayscale(100%);
-      }
-    }
+        min-width: 22px;
 
-    &.has-reactions {
-      opacity: 1;
-    }
-
-    div.count {
-      margin-left: 5px;
-      // margin-top: -3px;
-      display: inline-block;
-    }
-
-    &.can-react {
-      cursor: pointer;
-      &:hover {
-        opacity: 1;
-      }
-      &:hover .no-reactions {
-        -webkit-filter: grayscale(0%);
-        filter: grayscale(0%);
-      }
-    }
-
-    &.reacted {
-      background-color: $carrot_light_yellow;
-
-      &:hover {
-        opacity: 0.8;
+        &.has-count {
+          -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+        }
       }
 
       div.count {
-        color: $carrot_yellow;
+        margin-left: 5px;
+        padding-top: 1px;
+        display: inline-block;
+        color: $carrot_light_gray_3;
+        vertical-align: bottom;
       }
+
+      &.can-react {
+        cursor: pointer;
+
+        &:hover {
+          span.reaction {
+            -webkit-filter: grayscale(0%);
+            filter: grayscale(0%);
+          }
+        }
+      }
+
+      &.reacted {
+        background-color: $carrot_light_yellow;
+
+        span.reaction {
+          -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+        }
+
+        div.count {
+          color: #FDAB1D;
+        }
+      }
+
+      &.reaction-picker {
+        div.count {
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+  div.reactions-picker-container {
+    position: relative;
+    display: none;
+    z-index: 1234;
+
+    &.visible {
+      display: block;
+    }
+
+    div.emoji-mart {
+      position: absolute;
+      bottom: -31px;
     }
   }
 }

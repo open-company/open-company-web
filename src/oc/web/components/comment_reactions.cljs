@@ -53,12 +53,13 @@
         (for [idx (range (count reactions-data))
               :let [reaction-data (get reactions-data idx)
                     is-loading (utils/in? reactions-loading (:reaction reaction-data))
+                    reacted (:reacted reaction-data)
                     read-only-reaction (read-only? item-data)
                     r (if is-loading
-                        (merge reaction-data {:count (if (:reacted reaction-data)
+                        (merge reaction-data {:count (if reacted
                                                       (dec (:count reaction-data))
                                                       (inc (:count reaction-data)))
-                                              :reacted (not (:reacted reaction-data))})
+                                              :reacted (not reacted)})
                         reaction-data)]]
           [:button.comment-reaction-btn.btn-reset
             {:key (str "-entry-" (:uuid item-data) "-" idx)
@@ -73,7 +74,7 @@
                                       (not (js/isEdge))
                                       (not (js/isIE)))
                              (reactions/animate-reaction e s))
-                           (dis/dispatch! [:reaction-toggle item-data r])))}
+                           (dis/dispatch! [:reaction-toggle item-data r (not reacted)])))}
             [:span.reaction
               {:class (reaction-class-helper item-data r)}
               (:reaction r)]
