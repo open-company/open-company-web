@@ -66,12 +66,8 @@ div.onboard-overlay-container {
         @include avenir_H();
         font-size: 16px;
         position: relative;
-        text-align: left;
+        text-align: center;
         padding: 8px 28px;
-
-        &.center-button {
-          text-align: center;
-        }
 
         &:after {
           @include image-2x("/img/ML/get_started_arrow");

@@ -205,7 +205,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))}
-            "Continue"]]]]))
+            "That’s me"]]]]))
 
 (rum/defcs lander-team < rum/reactive
                          (drv/drv :teams-load)
@@ -266,7 +266,7 @@
             "Your Team"]]]
       [:div.main-cta
         [:div.title.company-setup
-          "Your team"]]
+          "Your team…"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -316,7 +316,7 @@
              :on-click #(do
                          ;; Create org and show setup screen
                          (dis/dispatch! [:org-create]))}
-            "Create my team!"]]]]))
+            "All set!"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
@@ -465,7 +465,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))}
-            "Continue"]]]]))
+            "That’s me"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]

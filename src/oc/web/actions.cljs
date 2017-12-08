@@ -1746,13 +1746,13 @@
 (defmethod dispatcher/action :first-forced-post-start
   [db [_]]
   (let [current-board (dispatcher/board-data)
-        headline "Using Carrot to stay aligned with the big picture! 🚀"
+        headline "We’re getting aligned with Carrot! 🚀"
         body (str
-              "<p>We know it’s a struggle to keep everyone on the same page. Important "
-              "information often gets missed or lost, so everyone has a different idea of what’s "
-              "important. Let’s fix that!<p>"
-              "<p>Carrot makes key announcements, updates and plans visible and easy to find, so "
-              "everyone can stay on the same page.")
+              "<p>It’s tough to keep everyone on the same page. Important information is "
+              "missed or lost, so everyone has a different idea of what’s important. Let’s fix "
+              "that!</p>"
+              "<p>Carrot makes key announcements, updates and plans visible and interactive, so we "
+              "can all stay on the same page.</p>")
         entry-editing {:headline headline
                        :body body
                        :has-changes true
