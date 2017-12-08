@@ -38,7 +38,7 @@
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
-                        (rum/local true ::slack-enabled)
+                        (rum/local false ::slack-enabled)
                         (rum/local nil ::input-event)
                         (rum/local nil ::dom-add-event)
                         (rum/local nil ::dom-remove-event)
@@ -108,7 +108,8 @@
         board-editing (drv/react s :board-editing)
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
-        show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))]
+        show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
+        channel-name (when-not new-board? (:channel-name (:slack-mirror (drv/react s :board-data))))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -180,11 +181,7 @@
                                                         [:board-editing :slack-mirror]
                                                         nil])))})]
               (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
-                                        :initial-value (or
-                                                        (str
-                                                         "#"
-                                                         (:channel-name (:slack-mirror (drv/react s :board-data))))
-                                                        "")
+                                        :initial-value (when channel-name (str "#" channel-name))
                                         :on-change (fn [team channel]
                                                      (dis/dispatch!
                                                       [:input
