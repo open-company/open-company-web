@@ -43,8 +43,6 @@
              "Carrot provides the big picture that keeps them together.")]
 
           [:div.paragraphs-container.group
-            [:div.paragraph-title
-              "making it easy to miss the important stuff."]
             [:p
               (str
                "Messaging apps are designed for real-time work. They’re great in the moment, but chat "
