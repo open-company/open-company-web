@@ -722,9 +722,10 @@
             {:sucess success}]))))))
 
 (defn toggle-reaction
-  [item-data reaction-data]
+  [item-data reaction-data reacting?]
   (when (and item-data reaction-data)
-    (let [reaction-link (utils/link-for (:links reaction-data) "react" ["PUT" "DELETE"])]
+    (let [link-method (if reacting? "PUT" "DELETE")
+          reaction-link (utils/link-for (:links reaction-data) "react" link-method)]
       (interaction-http (method-for-link reaction-link) (relative-href reaction-link)
         {:headers (headers-for-link reaction-link)}
         (fn [{:keys [status success body]}]
@@ -878,6 +879,21 @@
         {:headers (headers-for-link activity-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) {})]))))))
+
+(defn react-from-picker
+  "Given the link to react with an arbitrary emoji and the emoji, post it to the interaction service"
+  [activity-data emoji]
+  (when activity-data
+    (when-let [react-link (utils/link-for (:links activity-data) "react")]
+      (interaction-http (method-for-link react-link) (relative-href react-link)
+        {:headers (headers-for-link react-link)
+         :body emoji}
+        (fn [{:keys [status success body]}]
+          (dispatcher/dispatch!
+           [:react-from-picker/finish
+            {:status status
+             :activity-data activity-data
+             :reaction-data (if success (json->cljs body) {})}]))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)

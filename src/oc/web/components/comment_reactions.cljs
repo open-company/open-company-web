@@ -39,7 +39,7 @@
                                     (not (js/isEdge))
                                     (not (js/isIE)))
                            (reactions/animate-reaction e s))
-                         (dis/dispatch! [:reaction-toggle item-data r])))}
+                         (dis/dispatch! [:reaction-toggle item-data r (not reacted)])))}
           [:div.reaction
             {:class (utils/class-set {:no-reactions (not (pos? (:count r)))})}
             (:reaction r)]
