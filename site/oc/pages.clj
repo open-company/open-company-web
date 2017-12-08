@@ -576,10 +576,7 @@
 
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]
-              [:div.setup-cta
-                [:div "Hang tight. We’re just getting"]
-                [:div "everything setup for you!"]]]]
+                [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files
