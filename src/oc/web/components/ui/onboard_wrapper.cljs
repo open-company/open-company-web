@@ -532,16 +532,18 @@
       [:div.onboard-email-container
         "Thanks for verifying"
         [:button.mlb-reset.continue
-          {:on-click #(router/nav!
-                        (let [org (utils/get-default-org orgs)]
-                          (if org
+          {:on-click #(let [org (utils/get-default-org orgs)]
+                        (if org
+                          (if (and (empty? (jwt/get-key :first-name))
+                                   (empty? (jwt/get-key :last-name)))
                             (do
-                             (cook/set-cookie!
-                              (router/show-nux-cookie (jwt/user-id))
-                              (:new-user router/nux-cookie-values)
-                              (* 60 60 24 7))
-                             (oc-urls/org (:slug org)))
-                            oc-urls/login)))}
+                              (cook/set-cookie!
+                               (router/show-nux-cookie (jwt/user-id))
+                               (:new-user router/nux-cookie-values)
+                               (* 60 60 24 7))
+                              (router/nav! oc-urls/confirm-invitation-profile))
+                            (router/nav! (oc-urls/org (:slug org))))
+                          (router/nav! oc-urls/login)))}
           "Get Started"]]
       :else
       [:div.onboard-email-container.small.dot-animation
