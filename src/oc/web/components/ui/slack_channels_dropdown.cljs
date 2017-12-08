@@ -55,7 +55,7 @@
     [:div.slack-channels-dropdown
       {:class (if disabled "disabled" "")}
       [:input.board-edit-slack-channel
-        {:value @(::slack-channel s)
+        {:value (if disabled "Not connected." (or @(::slack-channel s) "Select a channel..."))
          :on-focus (fn []
                     (utils/after
                      100
@@ -65,8 +65,7 @@
                        (when (fn? on-intermediate-change)
                          (on-intermediate-change (.. % -target -value)))
                        (reset! (::slack-channel s) (.. % -target -value)))
-         :disabled disabled
-         :placeholder "Select Channel..."}]
+         :disabled disabled}]
       [:i.fa
         {:class (utils/class-set {:fa-angle-down (not @(::show-channels-dropdown s))
                                   :fa-angle-up @(::show-channels-dropdown s)})
