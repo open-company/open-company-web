@@ -166,7 +166,7 @@
             [:div.board-edit-slack-channels-container
               [:div.board-edit-slack-channels-label.group
                 [:div.title
-                  "Automatically send new posts and comments to Slack."]
+                  "Send new posts and comments to Slack."]
                 (carrot-checkbox {:selected @(::slack-enabled s)
                                   :did-change-cb #(do
                                                     (reset! (::slack-enabled s) %)
