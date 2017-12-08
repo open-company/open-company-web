@@ -771,7 +771,7 @@ div.main.home-page, div.about {
 
     div.above-noise-container {
       width: 1053px;
-      margin: 0px auto 46px;
+      margin: 0px auto;
 
       @include mobile(){
         width: 100%;
@@ -787,10 +787,15 @@ div.main.home-page, div.about {
       }
 
       div.above-noise-description {
-        color: $carrot_dark_brown;
-        @include avenir_R();
-        font-size: 20px;
+        color: $carrot_dark_brown_1;
+        @include avenir_H();
+        font-size: 40px;
+        color: #373f4f;
         margin-top: 16px;
+      }
+
+      button.get-started-button {
+        margin-top: 60px;
       }
     }
   }

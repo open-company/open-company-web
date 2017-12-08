@@ -155,9 +155,9 @@
                   "The big picture"]
                 [:div.subtitle
                   (str
-                   "Daily or weekly digest reinforces "
-                   "big picture content so everyone has "
-                   "the same information.")]]]]
+                   "Daily or weekly digest for email "
+                   "and Slack ensures everyone has the "
+                   "same view of what’s important.")]]]]
 
           [:div.slack-section
             [:div.slack-logo]
@@ -173,7 +173,9 @@
         [:section.third-section.group
           [:div.illustrations-title
             [:div.why-carrot
-              "Keep your stakeholders informed"]]
+              "Keep your stakeholders informed"]
+            [:div.why-carrot-description
+              "It’s just as easy to share the latest news with your extended team."]]
           [:div.third-section-footer.group
             [:div.copy
               [:div.copy-icon.copy-simplify]
@@ -196,10 +198,10 @@
 
         [:section.fourth-section.group
           [:div.above-noise-container
-            [:div.above-noise-title
-              "Rise above the noise"]
             [:div.above-noise-description
-              "Give your team a clear view of what’s most important."]
+              (str
+               "Give your team a clear view of what’s important "
+               "to keep everyone on the same page.")]
             (when-not (jwt/jwt)
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
