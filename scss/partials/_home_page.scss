@@ -251,10 +251,6 @@ div#wrap {
 
         &.second-line {
           margin: 0px auto 40px;
-
-          @include mobile(){
-            margin-top: 20px;
-          }
         }
       }
 
@@ -583,7 +579,7 @@ div#wrap {
         width: 800px;
         height: 293px;
         text-align: center;
-        margin: 40px auto 100px;
+        margin: 60px auto 100px;
 
         @include mobile(){
           width: 100%;
