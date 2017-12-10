@@ -10,7 +10,7 @@
     [tolitius/boot-check "0.1.4" :scope "test"]
 
     ;; Clojure/ClojureScript
-    [org.clojure/clojure "1.9.0-alpha17"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.9.0"] ; Lisp on the JVM http://clojure.org/documentation
     ;; NB: do not update to 1.9.493+ since it's broken w/ advanced compilation
     [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
