@@ -59,7 +59,9 @@
           [:h1.headline
             "Rise above the noise"]
           [:div.subheadline
-            "Give your team a clear view of what’s most important."]
+            "Give your team a clear view of what’s most important"]
+          [:div.subheadline.second-line
+            "to keep everyone on the same page"]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -81,7 +83,8 @@
 
           [:video.homepage-main-animation
             {:controls false
-             :autoplay true
+             :auto-play true
+             :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
              :loop true}
             [:source
               {:src (utils/cdn "/img/ML/animation.webm")
@@ -89,11 +92,10 @@
             [:source
               {:src (utils/cdn "/img/ML/animation.mp4")
                :type "video/mp4"}]
-            [:img.homepage-main-screenshot
-              {:src (utils/cdn "/img/ML/new_homepage_screenshot.png")
-               :srcSet (str (utils/cdn "/img/ML/new_homepage_screenshot@2x.png") " 2x")}]]
+            [:div.fallback
+              "Your browser doesn’t support this video format."]]
           [:div.homepage-screenshot-bubble
-            "It’s never been this easy to keep everyone on the same page"]]
+            "It’s never been easier to keep everyone on the same page"]]
 
         [:section.second-section.group
           [:div.why-balloon.big-red]
@@ -150,12 +152,12 @@
               [:div.illustration.illustration-4]
               [:div.description
                 [:div.title
-                  "All together"]
+                  "The big picture"]
                 [:div.subtitle
                   (str
-                   "Daily or weekly digest reinforces "
-                   "big picture content so everyone has "
-                   "the same information.")]]]]
+                   "Daily or weekly digest for email "
+                   "and Slack ensures everyone has the "
+                   "same view of what’s important.")]]]]
 
           [:div.slack-section
             [:div.slack-logo]
@@ -171,9 +173,9 @@
         [:section.third-section.group
           [:div.illustrations-title
             [:div.why-carrot
-              "Share your big picture with stakeholders"]
+              "Keep your stakeholders informed"]
             [:div.why-carrot-description
-              "Create and organize stakeholder updates in less time"]]
+              "It’s just as easy to share the latest news with your extended team."]]
           [:div.third-section-footer.group
             [:div.copy
               [:div.copy-icon.copy-simplify]
@@ -196,10 +198,10 @@
 
         [:section.fourth-section.group
           [:div.above-noise-container
-            [:div.above-noise-title
-              "Rise above the noise"]
             [:div.above-noise-description
-              "Give your team a clear view of what’s most important."]
+              (str
+               "Give your team a clear view of what’s important "
+               "to keep everyone on the same page.")]
             (when-not (jwt/jwt)
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")

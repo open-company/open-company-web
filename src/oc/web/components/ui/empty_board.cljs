@@ -9,12 +9,10 @@
   [s]
   (let [board-data (drv/react s :board-data)]
     [:div.empty-board.group
-      (if (:read-only board-data)
-        [:div.empty-board-headline
-          (str "There aren't updates in " (:name board-data) " yet. ")]
-        [:div.empty-board-headline
-          (str "You don’t have any updates in " (:name board-data) " yet. ")
+      [:div.empty-board-headline
+        (str "There aren’t any posts in " (:name board-data) " yet. ")
+        (when-not (:read-only board-data)
           [:button.mlb-reset
             {:on-click #(dis/dispatch! [:entry-edit {:board-slug (:slug board-data) :board-name (:name board-data)}])}
-            "Add one?"]])
+            "Add one?"])]
       [:div.empty-board-image]]))

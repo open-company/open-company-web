@@ -64,12 +64,8 @@
                                    :left -750}
                    :title "Success!"
                    :message (str "Your first post is on the " (:name board-data) " board!")
-                   :message-2 (str
-                               "If you like, you can turn on automatic "
-                               "sharing to Slack or email to keep everyone "
-                               "up to date!")
                    :step-label "1 of 4"
-                   :button-title "Next"
+                   :button-title "Cool"
                    :button-position "left"
                    :on-next-click #(dis/dispatch! [:input [:nux] :4])}))
     :4
@@ -82,13 +78,13 @@
                      :circle-offset {:top -170
                                      :left -760}
                      :width 432
-                     :title "Add new posts"
+                     :title "It’s simple to post something"
                      :message (str
-                               "It’s quick and easy to add announcements, "
-                               "updates, and plans for your team. Just click "
-                               "the New Post button to get started!")
+                               "Add new announcements, updates, and plans "
+                               "for your team in no time. Just click the New "
+                               "Post button!")
                      :step-label "2 of 4"
-                     :button-title "Next"
+                     :button-title "Got it"
                      :button-position "left"
                      :on-next-click (fn []
                                       (dis/dispatch! [:input [:nux] :5]))})))
@@ -101,15 +97,14 @@
                    :width 432
                    :circle-offset {:top -70
                                    :left -220}
-                   :title "Organize posts with boards"
+                   :title "Boards keep posts organized"
                    :message (str
-                             "You can add boards to keep related "
-                             "information together. Try high-level boards "
-                             "like All-hands, Strategy, and Who We Are; "
-                             "or group-level boards like Sales, Marketing "
-                             "and Design.")
+                             "You can add high-level boards like "
+                             "All-hands, Strategy, and Who We Are; or "
+                             "group-level boards like Sales, Marketing and "
+                             "Design.")
                    :step-label "3 of 4"
-                   :button-title "Next"
+                   :button-title "Makes sense"
                    :button-position "left"
                    :on-next-click (fn []
                                     (let [is-admin? (jwt/is-admin? (:team-id org-data))]
@@ -119,18 +114,16 @@
                 invite-offset (.offset invite-button)]
       (carrot-tip {:step nux
                    :x (+ (aget invite-offset "left") 16)
-                   :y (- (aget invite-offset "top") 310)
+                   :y (- (aget invite-offset "top") 255)
                    :width 432
                    :circle-offset {:top -350
                                    :left -80}
                    :title "Invite your teammates"
                    :message (str
-                             "Don’t do all the work yourself! Invite others "
-                             "to contribute or view information so "
-                             "everyone can have a clear view of what’s "
-                             "important.")
+                             "The best way to keep your team aligned? Invite "
+                             "them to join you on Carrot!")
                    :step-label "4 of 4"
-                   :button-title "Ok, got it"
+                   :button-title "Will do"
                    :button-position "left"
                    :on-next-click (fn []
                                     (dis/dispatch! [:input [:nux] :7]))}))))
