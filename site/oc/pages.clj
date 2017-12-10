@@ -623,7 +623,9 @@
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorMediaPicker
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]]})
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
+          ;; Static js files
+          [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]]})
 
 (def prod-app-shell
   {:head [:head
