@@ -43,15 +43,10 @@
              "Carrot provides the big picture that keeps them together.")]
 
           [:div.paragraphs-container.group
-            [:div.paragraph-title
-              "Team chat gets pretty noisy,"]
-
-            [:div.paragraph-title
-              "making it easy to miss the important stuff."]
             [:p
               (str
                "Messaging apps are designed for real-time work. They’re great in the moment, but chat "
-               "gets noisy and conversations disappear, making it difficult to know what you missed.")]
+               "gets noisy and conversations disappear, making it easy to miss the important stuff.")]
             [:p
               (str
                 "Carrot provides an easy to read view of the latest announcements, updates, and stories "
@@ -122,7 +117,7 @@
                     [:img {:src "http://www.gravatar.com/avatar/99399ee082e57d67045cb005f9c2e4ef?s=100"}]]
                   [:div.team-member
                     [:div.team-name "Stuart Levinson"]
-                    [:div.team-title "CEO"]
+                    [:div.team-title "Founder and CEO"]
                     [:div.team-media-links
                       [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]]]]
                 [:div.team-card.iacopo-carraro
@@ -140,7 +135,7 @@
                     [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=100"}]]
                   [:div.team-member
                     [:div.team-name "Sean Johnson"]
-                    [:div.team-title "CTO"]
+                    [:div.team-title "Founder and CTO"]
                     [:div.team-media-links
                       [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]]]]
                 [:div.team-card.nathan-zorn
