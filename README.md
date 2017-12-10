@@ -2,7 +2,6 @@
 
 [![MPL License](http://img.shields.io/badge/license-MPL-blue.svg?style=flat)](https://www.mozilla.org/MPL/2.0/)
 [![Build Status](https://travis-ci.org/open-company/open-company-web.svg?branch=master)](https://travis-ci.org/open-company/open-company-web)
-[![Dependencies Status](https://versions.deps.co/open-company/open-company-web/status.svg)](https://versions.deps.co/open-company/open-company-web)
 
 ## Background
 
