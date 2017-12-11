@@ -11,8 +11,8 @@
 
     ;; Clojure/ClojureScript
     ;; NB: Can't go past Clojure Alpha 19 due to issue w/ Doo 0.1.8
-    [org.clojure/clojure "1.9.0"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.9.946"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojure "1.9.0-alpha19"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Om and Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes acecss
