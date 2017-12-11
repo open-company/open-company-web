@@ -3,7 +3,6 @@
                    [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [cuerdas.core :as s]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
