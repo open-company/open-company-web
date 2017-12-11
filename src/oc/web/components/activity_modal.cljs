@@ -26,28 +26,48 @@
 
 ;; Unsaved edits handling
 
-(defn save-edits? [s]
-  (js/console.log "save-edits" @(::save-on-exit s))
+(defn- get-cache-key
+  "Local edits cache key."
+  [activity-data]
+  (str (:uuid activity-data) "-activity-modal"))
+
+(defn save-on-exit?
+  "Save the current edits if needed."
+  [s]
   (when @(::save-on-exit s)
     (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))
-          cache-key (str (:uuid edited-data) "-activity-modal")
           body-el (sel1 [:div.rich-body-editor])
           cleaned-body (when body-el
                         (utils/clean-body-html (.-innerHTML body-el)))
           entry-map (assoc edited-data :body (or cleaned-body ""))]
-      (js/console.log "saving" cache-key "-" entry-map)
-      (uc/set-item cache-key entry-map))))
+      (uc/set-item (get-cache-key edited-data) entry-map
+       #(when-not %
+         (reset! (::save-on-exit s) false)
+         (set! (.-onbeforeunload js/window) nil))))))
+
+(defn confirm-save-on-exit?
+  "Function set to onBeforeUnload when needed."
+  [e s]
+  (when @(::save-on-exit s)
+    (save-on-exit? s))
+  @(::save-on-exit s))
+
+(defn toggle-save-on-exit
+  "Enable and disable save current edit."
+  [s turn-on?]
+  (reset! (::save-on-exit s) turn-on?)
+  (set! (.-onbeforeunload js/window) (if turn-on? #(confirm-save-on-exit? % s) nil)))
 
 (defn load-cached-edits
+  "Load the locally saved edits."
   [s]
-  (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))
-        cache-key (str (:uuid edited-data) "-activity-modal")]
-    (uc/get-item cache-key
+  (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))]
+    (uc/get-item (get-cache-key edited-data)
      (fn [item err]
-       (when (and (not err)
+       (when (and (map? item)
+                  (not err)
                   (:updated-at edited-data)
                   (= (:updated-at edited-data) (:updated-at item)))
-         (js/console.log "load-cached-edits" (:haedline item))
          (dis/dispatch! [:input [:modal-editing-data] (merge item (select-keys edited-data [:links]))])
          (reset! (::initial-body s) (:body item))
          (reset! (::initial-headline s) (utils/emojify (:headline item))))))))
@@ -99,13 +119,11 @@
 ;; Editing
 
 (defn body-on-change [state]
-  (js/console.log "body-on-change")
-  (reset! (::save-on-exit state) true)
+  (toggle-save-on-exit state true)
   (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))
 
 (defn- headline-on-change [state]
-  (js/console.log "headline-on-change")
-  (reset! (::save-on-exit state) true)
+  (toggle-save-on-exit state true)
   (when-let [headline (sel1 [:div.activity-modal-content-headline])]
     (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:modal-editing-data :headline] emojied-headline])
@@ -166,10 +184,9 @@
       (real-start-editing state focus))))
 
 (defn- stop-editing [state]
-  (save-edits? state)
+  (save-on-exit? state)
   (reset! (::editing state) false)
-  (js/console.log "stop-editing ::save-on-exit")
-  (reset! (::save-on-exit state) false)
+  (toggle-save-on-exit state false)
   (dis/dispatch! [:activity-modal-edit false])
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
@@ -202,7 +219,7 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
-                                          (save-edits? state)
+                                          (save-on-exit? state)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (dismiss-fn))
                       }]
@@ -215,7 +232,7 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
-                                            (save-edits? state)
+                                            (save-on-exit? state)
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
                         }]
@@ -280,11 +297,10 @@
                                     activity-data (first (:rum/args s))
                                     initial-body (:body activity-data)
                                     initial-headline (utils/emojify (:headline activity-data))]
-                                (js/console.log "will-mount" initial-headline)
                                 (reset! (::editing s) (:modal-editing modal-data))
                                 (reset! (::initial-body s) initial-body)
                                 (reset! (::initial-headline s) initial-headline)
-                                (set! (.-onBeforeUnload js/window) #(save-edits? s)))
+                                (set! (.-onBeforeUnload js/window) #(save-on-exit? s)))
                               s)
                              :did-mount (fn [s]
                               (reset! (::window-click s)
@@ -336,11 +352,10 @@
                                         initial-headline (utils/emojify (:headline entry-edit))]
                                     (when-not (:loading entry-edit)
                                       (when-not (:error entry-edit)
-                                        (js/console.log "did-remount" initial-headline)
                                         (reset! (::initial-headline s) initial-headline)
                                         (reset! (::initial-body s) initial-body)
-                                        (js/console.log "did-remount ::save-on-exit")
-                                        (reset! (::save-on-exit s) false)
+                                        (toggle-save-on-exit s false)
+                                        (uc/remove-item (get-cache-key entry-edit))
                                         (stop-editing s))
                                       (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                       (reset! (::entry-saving s) false)))))
@@ -426,7 +441,7 @@
                  (distinct (:entry-edit-topics modal-data))
                  (:modal-editing-data modal-data)
                  :modal-editing-data
-                 #(reset! (::save-on-exit s) true))
+                 #(toggle-save-on-exit s true))
                 (when (:topic-slug activity-data)
                   (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                     [:div.activity-tag.on-gray

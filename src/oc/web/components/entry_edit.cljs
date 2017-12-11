@@ -46,17 +46,47 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
-(defn save-on-exit? [s]
+;; Local cache for outstanding edits
+
+(defn get-cache-key
+  "Local edits cache key."
+  [entry-editing]
+  (str
+   (if (:uuid entry-editing)
+    (:uuid entry-editing)
+    (str (router/current-org-slug) "-" (router/current-board-slug)))
+   "-entry-edit"))
+
+(defn save-on-exit?
+  "Locally save the current outstanding edits if needed."
+  [s]
   (when @(::save-on-exit s)
     (let [entry-editing @(drv/get-ref s :entry-editing)
-          cache-key (if (:uuid entry-editing)
-                      (str (:uuid entry-editing) "-entry-edit")
-                      "entry-edit")
+          cache-key (get-cache-key entry-editing)
           body-el (sel1 [:div.rich-body-editor])
           cleaned-body (when body-el
                         (utils/clean-body-html (.-innerHTML body-el)))
           entry-map (assoc entry-editing :body (or cleaned-body ""))]
-      (uc/set-item cache-key entry-map))))
+      (uc/set-item cache-key entry-map
+       (fn [err]
+          (when-not err
+            (reset! (::save-on-exit s) s)
+            (set! (.-onbeforeunload js/window) nil)))))))
+
+(defn confirm-save-on-exit?
+  "Function set to onBeforeUnload when needed."
+  [e s]
+  (when @(::save-on-exit s)
+    (save-on-exit? s))
+  @(::save-on-exit s))
+
+(defn toggle-save-on-exit
+  "Enable and disable save current edit."
+  [s turn-on?]
+  (reset! (::save-on-exit s) turn-on?)
+  (set! (.-onbeforeunload js/window) (if turn-on? #(confirm-save-on-exit? % s) nil)))
+
+;; Close dismiss handling
 
 (defn cancel-clicked [s]
   (if @(::uploading-media s)
@@ -87,17 +117,21 @@
         (dis/dispatch! [:alert-modal-show alert-data]))
       (real-close s))))
 
+;; Data change handling
+
 (defn body-on-change [state]
-  (reset! (::save-on-exit state) true)
+  (toggle-save-on-exit state true)
   (dis/dispatch! [:input [:entry-editing :has-changes] true])
   (calc-edit-entry-modal-height state))
 
 (defn- headline-on-change [state]
-  (reset! (::save-on-exit state) true)
+  (toggle-save-on-exit state true)
   (when-let [headline (sel1 [:div.entry-edit-headline])]
     (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+
+;; Headline setup and paste handler
 
 (defn- setup-headline [state]
   (when-let [headline-el  (rum/ref-node state "headline")]
@@ -178,19 +212,16 @@
                                  (when topic
                                    (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
                                    (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)]))))
-                            (set! (.-onBeforeUnload js/window) #(save-on-exit? s))
-                            (let [cache-key (if (:uuid entry-editing)
-                                              (str (:uuid entry-editing) "-entry-edit")
-                                              "entry-edit")]
-                              (uc/get-item cache-key
-                               (fn [item err]
-                                 (when (and (not err)
-                                            (or (and (:updated-at entry-editing)
-                                                     (= (:updated-at entry-editing) (:updated-at item)))
-                                                (not (:updated-at entry-editing))))
-                                   (dis/dispatch! [:input [:entry-editing] (merge item (select-keys entry-editing [:links]))])
-                                   (reset! (::initial-body s) (:body item))
-                                   (reset! (::initial-headline s) (utils/emojify (:headline item))))))))
+                            (uc/get-item (get-cache-key entry-editing)
+                             (fn [item err]
+                               (when (and (map? item)
+                                          (not err)
+                                          (or (and (:updated-at entry-editing)
+                                                   (= (:updated-at entry-editing) (:updated-at item)))
+                                              (not (:updated-at entry-editing))))
+                                 (dis/dispatch! [:input [:entry-editing] (merge item (select-keys entry-editing [:links]))])
+                                 (reset! (::initial-body s) (:body item))
+                                 (reset! (::initial-headline s) (utils/emojify (:headline item)))))))
                           s)
                          :did-mount (fn [s]
                           (when-not @(drv/get-ref s :nux)
@@ -207,7 +238,9 @@
                               ;: Save request finished
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
-                                (reset! (::save-on-exit s) false)
+                                (toggle-save-on-exit s false)
+                                (dis/dispatch! [:input [:entry-editing :has-changes] false])
+                                (uc/remove-item (get-cache-key entry-editing))
                                 (when-not (:error entry-editing)
                                   ;; If it's not published already redirect to drafts board
                                   (when (not= (:status entry-editing) "published")
@@ -216,7 +249,9 @@
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
-                                (reset! (::save-on-exit s) false)
+                                (toggle-save-on-exit s false)
+                                (uc/remove-item (get-cache-key entry-editing))
+                                (dis/dispatch! [:input [:entry-editing :has-changes] false])
                                 ;; Redirect to the publishing board if the slug is available
                                 (when (seq (:board-slug entry-editing))
                                   (utils/after
@@ -233,6 +268,7 @@
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
+                          (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
   (let [nux               (drv/react s :nux)
@@ -290,12 +326,12 @@
                     :value (:board-slug entry-editing)
                     :on-blur #(reset! (::show-boards-dropdown s) false)
                     :on-change (fn [item]
-                                 (reset! (::save-on-exit state) true)
+                                 (toggle-save-on-exit s true)
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                  (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
             (when-not nux
-              (topics-dropdown board-topics entry-editing :entry-editing #(reset! (::save-on-exit state) true)))]
+              (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
