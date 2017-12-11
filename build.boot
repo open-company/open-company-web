@@ -11,8 +11,8 @@
 
     ;; Clojure/ClojureScript
     ;; NB: Can't go past Clojure Alpha 19 due to issue w/ Doo 0.1.8
-    [org.clojure/clojure "1.9.0-alpha19"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojure "1.9.0"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.9.946"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Om and Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes acecss
@@ -34,7 +34,6 @@
     [funcool/cuerdas "2.0.4"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
-    [clojure-humanize "0.2.2"] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
 
     ;; CLJSJS packages http://cljsjs.github.io/
@@ -51,8 +50,6 @@
     [cljsjs/filestack "0.9.9-0"] ; Filestack image manipulatino and storing https://github.com/filestack/filestack-js
     [cljsjs/emoji-mart "2.2.1-0"] ; EmojiMart picker for native emoji picking https://github.com/missive/emoji-mart
 
-    [binaryage/devtools "0.9.8"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
-
     ;; Library for OC projects https://github.com/open-company/open-company-lib
     [open-company/lib "0.14.8" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component]] 
     ;; In addition to common functions, brings in the following common dependencies used by this project:
@@ -63,6 +60,9 @@
     ;; hickory - HTML as data https://github.com/davidsantiago/hickory
     ;; cljs-time - clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
     ;; com.taoensso/sente - WebSocket client https://github.com/ptaoussanis/sente
+
+    ;; Needs to add after oc-lib to avoid deps override
+    [clojure-humanize "0.2.2" :excludes [com.andrewmcveigh/cljs-time]] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
 
     ;; ------- Deps for project repl ------------------
     ;; The following dependencies are from: https://github.com/adzerk-oss/boot-cljs-repl
@@ -138,12 +138,18 @@
   "Run tests."
   []
   (set-env! :source-paths #(conj % "test")
-            :dependencies #(into % '[[doo "0.1.8" :scope "test"]
+            :dependencies #(into % '[[binaryage/devtools "0.9.8"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
+                                     [doo "0.1.8" :scope "test"]
                                      [cljs-react-test "0.1.4-SNAPSHOT" :scope "test" :exclusions [cljsjs/react-with-addons]]]))
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true
-             :namespaces #{"test.oc.web.*"}
+             :namespaces ['test.oc.web.lib.utils
+                          'test.oc.web.components.user-profile
+                          'test.oc.web.components.ui.loading
+                          'test.oc.web.components.ui.login-button
+                          'test.oc.web.components.ui.org-avatar
+                          'test.oc.web.components.ui.user-avatar]
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.js"
@@ -187,6 +193,7 @@
 (deftask dev
   "OC Development build"
   []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
@@ -199,6 +206,7 @@
         (cljs :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true
+                                 :parallel-build true
                                  :preloads '[devtools.preload]})))
 
 (deftask dev-advanced 
@@ -213,10 +221,10 @@
         (cljs :optimizations :advanced
               :source-map true
               :compiler-options {
+                :parallel-build true
                 :pretty-print true
                 :pseudo-names true
                 :externs ["public/js/externs.js"]
-                :preloads '[devtools.preload]
                 :external-config {
                   :devtools/config {
                     :print-config-overrides true
@@ -230,8 +238,8 @@
         (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]
-                                 :preloads '[devtools.preload]
+              :compiler-options {:parallel-build true
+                                 :externs ["public/js/externs.js"]
                                  :external-config {
                                   :devtools/config {
                                     :print-config-overrides true
@@ -245,7 +253,8 @@
         (build-prod-site)
         (cljs :optimizations :advanced
               :source-map true
-              :compiler-options {:externs ["public/js/externs.js"]})))
+              :compiler-options {:parallel-build true
+                                 :externs ["public/js/externs.js"]})))
 
 (deftask check-sources!
   "Check source files with yagni, eastwood, kibit and bikeshed."
