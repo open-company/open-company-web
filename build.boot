@@ -11,9 +11,12 @@
 
     ;; Clojure/ClojureScript
     ;; NB: Need to change Clojure version in boot.properties in sync with this
-    ;; NB: Can't go past Clojure Alpha 19 due to prod-build issue and issue w/ Doo 0.1.8
+    ;; NB: Can't go past Clojure Alpha 19 to Alpha 20 due to ##NaN issues w/ doo library
+    ;;     discussed here: https://groups.google.com/forum/#!msg/clojure/IB2CaORBMnM/NjN24lQLDQAJ
+    ;;     These are apparently fixed with ClojureScript 1.9.946+
     [org.clojure/clojure "1.9.0-alpha19"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    ;; NB: Can't go past ClojureScript 1.9.908 right now due to issues w/ React
+    [org.clojure/clojurescript "1.9.908"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Om and Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes acecss
@@ -68,7 +71,7 @@
     ;; ------- Deps for project repl ------------------
     ;; The following dependencies are from: https://github.com/adzerk-oss/boot-cljs-repl
     [adzerk/boot-cljs-repl   "0.3.3"] ;; latest release
-    [com.cemerick/piggieback "0.2.1"  :scope "test"]
+    [com.cemerick/piggieback "0.2.2"  :scope "test"]
     [weasel                  "0.7.0"  :scope "test"]
     [org.clojure/tools.nrepl "0.2.13" :scope "test"]
     ;; ------------------------------------------------
@@ -81,7 +84,7 @@
     [compojure "1.6.0" :scope "test"]
     [pandeiro/boot-http "0.8.3" :scope "test"]
     [deraen/boot-sass "0.3.1" :scope "test"]
-    [org.slf4j/slf4j-nop "1.8.0-alpha2" :scope "test"]])
+    [org.slf4j/slf4j-nop "1.8.0-beta0" :scope "test"]])
 
 (set-env!
   :source-paths   #{"src" "scss" "site"}
