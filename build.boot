@@ -11,7 +11,7 @@
 
     ;; Clojure/ClojureScript
     ;; NB: Can't go past Clojure Alpha 19 due to issue w/ Doo 0.1.8
-    [org.clojure/clojure "1.9.0-alpha19"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.9.0-alpha17"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Om and Rum React Frameworks
