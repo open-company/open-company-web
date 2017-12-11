@@ -10,8 +10,9 @@
     [tolitius/boot-check "0.1.6" :scope "test"]
 
     ;; Clojure/ClojureScript
-    ;; NB: Can't go past Clojure Alpha 19 due to issue w/ Doo 0.1.8
-    [org.clojure/clojure "1.9.0-alpha17"] ; Lisp on the JVM http://clojure.org/documentation
+    ;; NB: Need to change Clojure version in boot.properties in sync with this
+    ;; NB: Can't go past Clojure Alpha 19 due to prod-build issue and issue w/ Doo 0.1.8
+    [org.clojure/clojure "1.9.0-alpha19"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "1.9.562"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Om and Rum React Frameworks
@@ -54,7 +55,7 @@
     [binaryage/devtools "0.9.8"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.8" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component]] 
+    [open-company/lib "0.14.8" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]] 
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
