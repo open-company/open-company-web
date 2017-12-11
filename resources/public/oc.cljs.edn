@@ -1,5 +1,5 @@
 {:require [oc.web.core]
  :init-fns [oc.web.core/init]
  :compiler-options {:asset-path "/oc.out"
-                    :output-to "oc.js"
-                    :source-map "oc.js.map"}}
+                    :output-to "public/oc.js"
+                    :source-map "public/oc.js.map"}}

@@ -4,6 +4,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as react-utils]
             [goog.events :as events]
+            [goog.object :as gobj]
             [goog.events.EventType :as EventType]
             [cljsjs.react]
             [cljsjs.react.dom]
@@ -36,7 +37,7 @@
 (defn replace-with-emoji [caret-pos emoji]
   (when @caret-pos
     (.restoreSelection js/rangy @caret-pos)
-    (js/pasteHtmlAtCaret (.-native emoji) (.getSelection js/rangy js/window) false)))
+    (js/pasteHtmlAtCaret (gobj/get emoji "native") (.getSelection js/rangy js/window) false)))
 
 (defn check-focus [s _]
   (let [container-selector (or (:container-selector (first (:rum/args s))) "document.body")
