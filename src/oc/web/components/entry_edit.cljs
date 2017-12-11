@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.lib.user-cache :as uc]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
@@ -45,6 +46,18 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
+(defn save-on-exit? [s]
+  (when @(::save-on-exit s)
+    (let [entry-editing @(drv/get-ref s :entry-editing)
+          cache-key (if (:uuid entry-editing)
+                      (str (:uuid entry-editing) "-entry-edit")
+                      "entry-edit")
+          body-el (sel1 [:div.rich-body-editor])
+          cleaned-body (when body-el
+                        (utils/clean-body-html (.-innerHTML body-el)))
+          entry-map (assoc entry-editing :body (or cleaned-body ""))]
+      (uc/set-item cache-key entry-map))))
+
 (defn cancel-clicked [s]
   (if @(::uploading-media s)
     (let [alert-data {:icon "/img/ML/trash.svg"
@@ -54,6 +67,7 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
+                                          (save-on-exit? s)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
                       }]
@@ -66,6 +80,7 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
+                                            (save-on-exit? s)
                                             (dis/dispatch! [:alert-modal-hide])
                                             (real-close s))
                         }]
@@ -73,10 +88,12 @@
       (real-close s))))
 
 (defn body-on-change [state]
+  (reset! (::save-on-exit state) true)
   (dis/dispatch! [:input [:entry-editing :has-changes] true])
   (calc-edit-entry-modal-height state))
 
 (defn- headline-on-change [state]
+  (reset! (::save-on-exit state) true)
   (when-let [headline (sel1 [:div.entry-edit-headline])]
     (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
@@ -104,13 +121,11 @@
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
-  (when-let [body (sel1 [:div.rich-body-editor])]
-    (body-on-change s)))
+  (body-on-change s))
 
 (defn- clean-body []
   (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (let [raw-html (.-innerHTML body-el)]
-      (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
+    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))])))
 
 (defn- is-publishable? [entry-editing]
   (and (seq (:board-slug entry-editing))
@@ -139,6 +154,7 @@
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
                         (rum/local false ::show-boards-dropdown)
+                        (rum/local false ::save-on-exit)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -148,12 +164,12 @@
                                 entry-editing @(drv/get-ref s :entry-editing)
                                 board-filters @(drv/get-ref s :board-filters)
                                 initial-body (if (or (contains? entry-editing :links) nux)
-                                              (:body entry-editing)
-                                              utils/default-body)
+                                               (:body entry-editing)
+                                               utils/default-body)
                                 initial-headline (utils/emojify
-                                                  (if (or (contains? entry-editing :links) nux)
-                                                   (:headline entry-editing)
-                                                   ""))]
+                                                   (if (or (contains? entry-editing :links) nux)
+                                                     (:headline entry-editing)
+                                                     ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (when (and (string? board-filters)
@@ -161,7 +177,20 @@
                                (let [topic (first (filter #(= (:slug %) board-filters) (:topics-list entry-editing)))]
                                  (when topic
                                    (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
-                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
+                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)]))))
+                            (set! (.-onBeforeUnload js/window) #(save-on-exit? s))
+                            (let [cache-key (if (:uuid entry-editing)
+                                              (str (:uuid entry-editing) "-entry-edit")
+                                              "entry-edit")]
+                              (uc/get-item cache-key
+                               (fn [item err]
+                                 (when (and (not err)
+                                            (or (and (:updated-at entry-editing)
+                                                     (= (:updated-at entry-editing) (:updated-at item)))
+                                                (not (:updated-at entry-editing))))
+                                   (dis/dispatch! [:input [:entry-editing] (merge item (select-keys entry-editing [:links]))])
+                                   (reset! (::initial-body s) (:body item))
+                                   (reset! (::initial-headline s) (utils/emojify (:headline item))))))))
                           s)
                          :did-mount (fn [s]
                           (when-not @(drv/get-ref s :nux)
@@ -178,6 +207,7 @@
                               ;: Save request finished
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
+                                (reset! (::save-on-exit s) false)
                                 (when-not (:error entry-editing)
                                   ;; If it's not published already redirect to drafts board
                                   (when (not= (:status entry-editing) "published")
@@ -186,6 +216,7 @@
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
+                                (reset! (::save-on-exit s) false)
                                 ;; Redirect to the publishing board if the slug is available
                                 (when (seq (:board-slug entry-editing))
                                   (utils/after
@@ -259,11 +290,12 @@
                     :value (:board-slug entry-editing)
                     :on-blur #(reset! (::show-boards-dropdown s) false)
                     :on-change (fn [item]
+                                 (reset! (::save-on-exit state) true)
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                  (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
             (when-not nux
-              (topics-dropdown board-topics entry-editing :entry-editing))]
+              (topics-dropdown board-topics entry-editing :entry-editing #(reset! (::save-on-exit state) true)))]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element

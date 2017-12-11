@@ -13,6 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.lib.user-cache :as uc]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -22,6 +23,36 @@
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
+
+;; Unsaved edits handling
+
+(defn save-edits? [s]
+  (js/console.log "save-edits" @(::save-on-exit s))
+  (when @(::save-on-exit s)
+    (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))
+          cache-key (str (:uuid edited-data) "-activity-modal")
+          body-el (sel1 [:div.rich-body-editor])
+          cleaned-body (when body-el
+                        (utils/clean-body-html (.-innerHTML body-el)))
+          entry-map (assoc edited-data :body (or cleaned-body ""))]
+      (js/console.log "saving" cache-key "-" entry-map)
+      (uc/set-item cache-key entry-map))))
+
+(defn load-cached-edits
+  [s]
+  (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))
+        cache-key (str (:uuid edited-data) "-activity-modal")]
+    (uc/get-item cache-key
+     (fn [item err]
+       (when (and (not err)
+                  (:updated-at edited-data)
+                  (= (:updated-at edited-data) (:updated-at item)))
+         (js/console.log "load-cached-edits" (:haedline item))
+         (dis/dispatch! [:input [:modal-editing-data] (merge item (select-keys edited-data [:links]))])
+         (reset! (::initial-body s) (:body item))
+         (reset! (::initial-headline s) (utils/emojify (:headline item))))))))
+
+;; Modal dismiss handling
 
 (defn dismiss-modal [s board-filters]
   (let [org (router/current-org-slug)
@@ -47,6 +78,8 @@
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s board-filters)))
 
+;; Delete handling
+
 (defn delete-clicked [e activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
@@ -66,9 +99,13 @@
 ;; Editing
 
 (defn body-on-change [state]
+  (js/console.log "body-on-change")
+  (reset! (::save-on-exit state) true)
   (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))
 
 (defn- headline-on-change [state]
+  (js/console.log "headline-on-change")
+  (reset! (::save-on-exit state) true)
   (when-let [headline (sel1 [:div.activity-modal-content-headline])]
     (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:modal-editing-data :headline] emojied-headline])
@@ -101,6 +138,7 @@
     (body-on-change state)))
 
 (defn- real-start-editing [state & [focus]]
+  (load-cached-edits state)
   (reset! (::editing state) true)
   (let [activity-data (first (:rum/args state))]
     (dis/dispatch! [:input [:modal-editing-data] activity-data]))
@@ -128,7 +166,10 @@
       (real-start-editing state focus))))
 
 (defn- stop-editing [state]
+  (save-edits? state)
   (reset! (::editing state) false)
+  (js/console.log "stop-editing ::save-on-exit")
+  (reset! (::save-on-exit state) false)
   (dis/dispatch! [:activity-modal-edit false])
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
@@ -141,8 +182,8 @@
 
 (defn- save-editing? [state]
   (let [modal-data @(drv/get-ref state :modal-data)
-        edit-data (:modal-editing-data modal-data)]
-    (when (:has-changes edit-data)
+        edited-data (:modal-editing-data modal-data)]
+    (when (:has-changes edited-data)
       (reset! (::entry-saving state) true)
       (clean-body)
       (dis/dispatch! [:entry-modal-save (router/current-board-slug)]))))
@@ -161,6 +202,7 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
+                                          (save-edits? state)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (dismiss-fn))
                       }]
@@ -173,6 +215,7 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
+                                            (save-edits? state)
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
                         }]
@@ -210,6 +253,7 @@
                             (rum/local nil ::headline-input-listener)
                             (rum/local false ::entry-saving)
                             (rum/local nil ::uploading-media)
+                            (rum/local false ::save-on-exit)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -236,9 +280,11 @@
                                     activity-data (first (:rum/args s))
                                     initial-body (:body activity-data)
                                     initial-headline (utils/emojify (:headline activity-data))]
+                                (js/console.log "will-mount" initial-headline)
                                 (reset! (::editing s) (:modal-editing modal-data))
                                 (reset! (::initial-body s) initial-body)
-                                (reset! (::initial-headline s) initial-headline))
+                                (reset! (::initial-headline s) initial-headline)
+                                (set! (.-onBeforeUnload js/window) #(save-edits? s)))
                               s)
                              :did-mount (fn [s]
                               (reset! (::window-click s)
@@ -282,17 +328,19 @@
                                 (reset! (::window-resize-listener s) nil))
                               s)
                              :did-remount (fn [_ s]
-                              (let [activity-data (first (:rum/args s))
-                                    initial-body (:body activity-data)
-                                    initial-headline (utils/emojify (:headline activity-data))]
-                                (reset! (::initial-headline s) initial-headline)
-                                (reset! (::initial-body s) initial-body))
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (when (and (:modal-editing modal-data)
                                            @(::entry-saving s))
-                                  (let [entry-edit (:modal-editing-data modal-data)]
+                                  (let [entry-edit (:modal-editing-data modal-data)
+                                        initial-body (:body entry-edit)
+                                        initial-headline (utils/emojify (:headline entry-edit))]
                                     (when-not (:loading entry-edit)
                                       (when-not (:error entry-edit)
+                                        (js/console.log "did-remount" initial-headline)
+                                        (reset! (::initial-headline s) initial-headline)
+                                        (reset! (::initial-body s) initial-body)
+                                        (js/console.log "did-remount ::save-on-exit")
+                                        (reset! (::save-on-exit s) false)
                                         (stop-editing s))
                                       (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                       (reset! (::entry-saving s) false)))))
@@ -377,7 +425,8 @@
                 (topics-dropdown
                  (distinct (:entry-edit-topics modal-data))
                  (:modal-editing-data modal-data)
-                 :modal-editing-data)
+                 :modal-editing-data
+                 #(reset! (::save-on-exit s) true))
                 (when (:topic-slug activity-data)
                   (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
                     [:div.activity-tag.on-gray
