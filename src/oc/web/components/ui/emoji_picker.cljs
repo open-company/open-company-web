@@ -108,7 +108,7 @@
                           ::focusout-listener
                           ::ff-window-click
                           ::ff-keypress))}
-  [s {:keys [add-emoji-cb position width height container-selector]
+  [s {:keys [add-emoji-cb position width height container-selector force-enabled]
       :as arg
       :or {position "top"
            width 25
@@ -117,7 +117,7 @@
         caret-pos (::caret-pos s)
         last-active-element (::last-active-element s)
         disabled (::disabled s)]
-    [:div.emoji-picker.relative
+    [:div.emoji-picker
       {:ref "emoji-picker"
        :style {:width (str width "px")
                :height (str height "px")}}
@@ -127,10 +127,11 @@
          :data-placement "top"
          :data-container "body"
          :data-toggle "tooltip"
-         :disabled @(::disabled s)
-         :on-mouse-down #(when-not @(::disabled s)
+         :disabled (and (not force-enabled) @(::disabled s))
+         :on-mouse-down #(when (or force-enabled (not @(::disabled s)))
                            (save-caret-position s)
-                             (let [vis (and @caret-pos
+                             (let [vis (and (or force-enabled
+                                                @caret-pos)
                                             (not @visible))]
                                (reset! visible vis)))}]
       [:div.picker-container
@@ -141,9 +142,11 @@
           (react-utils/build (.-Picker js/EmojiMart)
            {:native true
             :onClick (fn [emoji event]
-                       (replace-with-emoji caret-pos emoji)
-                       (remove-markers s)
-                       (reset! visible false)
-                       (.focus @last-active-element)
-                       (when (fn? add-emoji-cb)
-                          (add-emoji-cb @last-active-element emoji)))}))]]))
+                      (let [add-emoji? (boolean @(::caret-pos s))]
+                         (when add-emoji?
+                           (replace-with-emoji caret-pos emoji)
+                           (remove-markers s)
+                           (.focus @last-active-element))
+                         (reset! visible false)
+                         (when (fn? add-emoji-cb)
+                           (add-emoji-cb @last-active-element emoji add-emoji?))))}))]]))
