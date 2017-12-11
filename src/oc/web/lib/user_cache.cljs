@@ -9,7 +9,7 @@
 
 (defn set-item
   "Add an item to the localforage for later use."
-  [data-key data-value & [error-cb]]
+  [data-key data-value & [completed-cb]]
   (let [fixed-key (get-key data-key)]
     (timbre/info "set-item for" fixed-key)
     (.setItem js/localforage
@@ -17,8 +17,15 @@
      (clj->js (stringify-keys data-value))
      (fn [err]
        (timbre/info "set-item error" err)
-       (when (fn? error-cb)
-         (error-cb err))))))
+       (when (fn? completed-cb)
+         (completed-cb err))))))
+
+(defn remove-item
+  "Remove an item from the localforage."
+  [data-key]
+  (let [fixed-key (get-key data-key)]
+    (timbre/info "remove-item for" fixed-key)
+    (.removeItem js/localforage fixed-key)))
 
 (defn get-item
   "Get an item from the localforage and return it."
