@@ -213,6 +213,7 @@
 (deftask dev-advanced 
   "Advanced build to be used in development to find compilation/externs errors."
   []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
@@ -226,6 +227,7 @@
                 :pretty-print true
                 :pseudo-names true
                 :externs ["public/js/externs.js"]
+                :preloads '[devtools.preload]
                 :external-config {
                   :devtools/config {
                     :print-config-overrides true
@@ -234,6 +236,7 @@
 (deftask staging-build
   "OC Staging build."
   []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
@@ -241,6 +244,7 @@
               :source-map true
               :compiler-options {:parallel-build true
                                  :externs ["public/js/externs.js"]
+                                 :preloads '[devtools.preload]
                                  :external-config {
                                   :devtools/config {
                                     :print-config-overrides true
