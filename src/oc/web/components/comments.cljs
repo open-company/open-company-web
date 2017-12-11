@@ -1,6 +1,5 @@
 (ns oc.web.components.comments
-  (:require-macros [if-let.core :refer (when-let*)]
-                   [dommy.core :refer (sel1)])
+  (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
@@ -240,8 +239,7 @@
                         :container-selector "div.add-comment-box"}))]]))
 
 (defn scroll-to-bottom [s & [force-scroll]]
-  (when-let* [dom-node (rum/dom-node s)
-              comments-internal-scroll (sel1 dom-node :div.comments-internal-scroll)]
+  (when-let [comments-internal-scroll (rum/ref-node s "comments-internal-scroll")]
     ;; Make sure the dom-node exists and that it's part of the dom, ie has a parent element.
     (when (and comments-internal-scroll
                (or force-scroll
@@ -255,6 +253,13 @@
       (reset! (::comments-requested s) true)
       (utils/after 10 #(dis/dispatch! [:comments-get activity-data])))))
 
+(defn show-loading?
+  [s]
+  (let [comments-data @(drv/get-ref s :activity-comments-data)]
+    (and (zero? (count (:sorted-comments comments-data)))
+         (or (:loading comments-data)
+             (not (contains? comments-data :sorted-comments))))))
+
 ;; Rum comments component
 (rum/defcs comments < (drv/drv :activity-comments-data)
                       (drv/drv :comment-add-finish)
@@ -264,8 +269,12 @@
                       (rum/local false ::comments-requested)
                       (rum/local true  ::scroll-bottom-after-render)
                       (rum/local false ::scrolled-on-add-focus)
+                      (rum/local false ::initially-scrolled)
                       {:will-mount (fn [s]
                         (load-comments-if-needed s)
+                        s)
+                       :did-mount (fn [s]
+                        (utils/after 1000 #(scroll-to-bottom s true))
                         s)
                        :did-remount (fn [o s]
                         (load-comments-if-needed s)
@@ -279,16 +288,17 @@
                           (reset! scrolled-on-add-focus add-comment-focus))
                         s)
                        :after-render (fn [s]
-                        ;; recall scroll to bottom if needed
-                        (scroll-to-bottom s)
+                        (let [show-loading (show-loading? s)]
+                          (when (and (not @(::initially-scrolled s))
+                                     (not show-loading))
+                            (reset! (::initially-scrolled s) true)
+                            (utils/after 230 #(scroll-to-bottom s true))))
                         s)}
   [s activity-data]
-  (let [comments-data (drv/react s :activity-comments-data)
+  (let [sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
         add-comment-focus (drv/react s :add-comment-focus)
-        sorted-comments (:sorted-comments comments-data)]
-    (if (and (zero? (count sorted-comments))
-             (or (:loading comments-data)
-                 (not (contains? comments-data :sorted-comments))))
+        show-loading (show-loading? s)]
+    (if show-loading
       [:div.comments.loading
         [:div.vertical-line]
         (small-loading {:class "small-loading"})]
@@ -302,7 +312,8 @@
           [:div.vertical-line]
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
-             {:on-scroll (fn [e]
+             {:ref "comments-internal-scroll"
+              :on-scroll (fn [e]
                            (let [comments-internal-scroll (js/$ ".comments-internal-scroll")]
                              ;; when a user scrolls up,
                              ;; turn off the scroll to bottom after render
