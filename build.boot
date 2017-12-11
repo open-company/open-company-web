@@ -50,6 +50,7 @@
     [cljsjs/moment-timezone "0.5.11-0"] ; Timezone support for moment.js https://github.com/moment/moment-timezone/
     [cljsjs/filestack "0.9.9-0"] ; Filestack image manipulatino and storing https://github.com/filestack/filestack-js
     [cljsjs/emoji-mart "2.2.1-0"] ; EmojiMart picker for native emoji picking https://github.com/missive/emoji-mart
+    [cljsjs/localforage "1.5.3-0"] ; Offline storage, improved. Wraps IndexedDB, WebSQL, or localStorage using a simple but powerful API. https://github.com/localForage/localForage
 
     [binaryage/devtools "0.9.4"] ; Chrome DevTools enhancements https://github.com/binaryage/cljs-devtools
 
