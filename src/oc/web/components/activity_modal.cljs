@@ -13,7 +13,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.lib.user-cache :as uc]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -26,51 +25,19 @@
 
 ;; Unsaved edits handling
 
-(defn- get-cache-key
-  "Local edits cache key."
-  [activity-data]
-  (str (:uuid activity-data) "-activity-modal"))
-
 (defn save-on-exit?
-  "Save the current edits if needed."
+  "Locally save the current outstanding edits if needed."
   [s]
-  (when @(::save-on-exit s)
-    (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))
-          body-el (sel1 [:div.rich-body-editor])
+  (when (:entry-save-on-exit @(drv/get-ref s :modal-data))
+    (let [body-el (sel1 [:div.rich-body-editor])
           cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))
-          entry-map (assoc edited-data :body (or cleaned-body ""))]
-      (uc/set-item (get-cache-key edited-data) entry-map
-       #(when-not %
-         (reset! (::save-on-exit s) false)
-         (set! (.-onbeforeunload js/window) nil))))))
-
-(defn confirm-save-on-exit?
-  "Function set to onBeforeUnload when needed."
-  [e s]
-  (when @(::save-on-exit s)
-    (save-on-exit? s))
-  @(::save-on-exit s))
+                        (utils/clean-body-html (.-innerHTML body-el)))]
+      (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body]))))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (reset! (::save-on-exit s) turn-on?)
-  (set! (.-onbeforeunload js/window) (if turn-on? #(confirm-save-on-exit? % s) nil)))
-
-(defn load-cached-edits
-  "Load the locally saved edits."
-  [s]
-  (let [edited-data (:modal-editing-data @(drv/get-ref s :modal-data))]
-    (uc/get-item (get-cache-key edited-data)
-     (fn [item err]
-       (when (and (map? item)
-                  (not err)
-                  (:updated-at edited-data)
-                  (= (:updated-at edited-data) (:updated-at item)))
-         (dis/dispatch! [:input [:modal-editing-data] (merge item (select-keys edited-data [:links]))])
-         (reset! (::initial-body s) (:body item))
-         (reset! (::initial-headline s) (utils/emojify (:headline item))))))))
+  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
 
 ;; Modal dismiss handling
 
@@ -156,11 +123,7 @@
     (body-on-change state)))
 
 (defn- real-start-editing [state & [focus]]
-  (load-cached-edits state)
-  (reset! (::editing state) true)
-  (let [activity-data (first (:rum/args state))]
-    (dis/dispatch! [:input [:modal-editing-data] activity-data]))
-  (dis/dispatch! [:activity-modal-edit true])
+  (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
   (utils/after 100 #(setup-headline state))
   (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
   (when focus
@@ -185,9 +148,10 @@
 
 (defn- stop-editing [state]
   (save-on-exit? state)
-  (reset! (::editing state) false)
+  ; (reset! (::editing state) false)
   (toggle-save-on-exit state false)
-  (dis/dispatch! [:activity-modal-edit false])
+  (reset! (::edited-data-loaded state) false)
+  (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) false])
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
     (reset! (::headline-input-listener state) nil)))
@@ -250,6 +214,17 @@
 
 (def default-min-modal-height 450)
 
+(defn setup-editing-data [s]
+  (let [modal-data @(drv/get-ref s :modal-data)]
+    (when (and (not @(::edited-data-loaded s))
+               (:modal-editing modal-data))
+      (let [activity-data (:modal-editing-data modal-data)
+            initial-body (:body activity-data)
+            initial-headline (utils/emojify (:headline activity-data))]
+        (reset! (::initial-body s) initial-body)
+        (reset! (::initial-headline s) initial-headline)
+        (reset! (::edited-data-loaded s) true)))))
+
 (rum/defcs activity-modal < rum/reactive
                             ;; Derivatives
                             (drv/drv :modal-data)
@@ -264,13 +239,13 @@
                             (rum/local false ::show-bottom-border)
                             (rum/local nil ::window-resize-listener)
                             ;; Editing locals
-                            (rum/local false ::editing)
                             (rum/local "" ::initial-headline)
                             (rum/local "" ::initial-body)
                             (rum/local nil ::headline-input-listener)
                             (rum/local false ::entry-saving)
                             (rum/local nil ::uploading-media)
                             (rum/local false ::save-on-exit)
+                            (rum/local false ::edited-data-loaded)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -293,14 +268,7 @@
                                               (not @(::uploading-media s)))
                                        (dismiss-editing? s true)
                                        (close-clicked s))))))
-                              (let [modal-data @(drv/get-ref s :modal-data)
-                                    activity-data (first (:rum/args s))
-                                    initial-body (:body activity-data)
-                                    initial-headline (utils/emojify (:headline activity-data))]
-                                (reset! (::editing s) (:modal-editing modal-data))
-                                (reset! (::initial-body s) initial-body)
-                                (reset! (::initial-headline s) initial-headline)
-                                (set! (.-onBeforeUnload js/window) #(save-on-exit? s)))
+                              (setup-editing-data s)
                               s)
                              :did-mount (fn [s]
                               (reset! (::window-click s)
@@ -322,6 +290,7 @@
                                 (when (:modal-editing modal-data)
                                   (utils/after 1000
                                     #(real-start-editing s :headline))))
+                              (setup-editing-data s)
                               s)
                              :after-render (fn [s]
                               (when @(:first-render-done s)
@@ -342,9 +311,17 @@
                               (when @(::window-resize-listener s)
                                 (events/unlistenByKey @(::window-resize-listener s))
                                 (reset! (::window-resize-listener s) nil))
+                              (set! (.-onbeforeunload js/window) nil)
                               s)
                              :did-remount (fn [_ s]
                               (let [modal-data @(drv/get-ref s :modal-data)]
+                                (let [save-on-exit (:entry-save-on-exit modal-data)]
+                                  (set! (.-onbeforeunload js/window) (if save-on-exit
+                                                                #(do
+                                                                  (save-on-exit? s)
+                                                                  "Do you want to save before leaving?")
+                                                                nil)))
+                                (setup-editing-data s)
                                 (when (and (:modal-editing modal-data)
                                            @(::entry-saving s))
                                   (let [entry-edit (:modal-editing-data modal-data)
@@ -354,8 +331,6 @@
                                       (when-not (:error entry-edit)
                                         (reset! (::initial-headline s) initial-headline)
                                         (reset! (::initial-body s) initial-body)
-                                        (toggle-save-on-exit s false)
-                                        (uc/remove-item (get-cache-key entry-edit))
                                         (stop-editing s))
                                       (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                       (reset! (::entry-saving s) false)))))
@@ -365,7 +340,7 @@
         fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
         wh (.-innerHeight js/window)
         modal-data (drv/react s :modal-data)
-        editing @(::editing s)]
+        editing (:modal-editing modal-data)]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)

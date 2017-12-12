@@ -241,7 +241,8 @@
                              :modal-editing (:modal-editing base)
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
                              :entry-edit-topics entry-edit-topics
-                             :activity-share activity-share})]
+                             :activity-share activity-share
+                             :entry-save-on-exit (:entry-save-on-exit base)})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]

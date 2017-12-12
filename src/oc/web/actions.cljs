@@ -1234,19 +1234,6 @@
   [db [_ status]]
   (assoc db :trend-bar-status status))
 
-(defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ board-slug activity-uuid activity-type editing]]
-  (utils/after 10
-   #(let [from-all-posts (= (router/current-board-slug) "all-posts")
-          activity-url (oc-urls/entry board-slug activity-uuid)]
-      (router/nav! (str activity-url (when from-all-posts "?ap")))))
-  (-> db
-    (assoc :activity-modal-fade-in activity-uuid)
-    (assoc :modal-editing editing)
-    (assoc :dismiss-modal-on-editing-stop editing)
-    ;; Make sure the seen-at is not reset when navigating to modal view
-    (assoc :no-reset-seen-at true)))
-
 (defn get-entry-cache-key
   [entry-uuid]
   (str (or
@@ -1254,8 +1241,45 @@
         (str (router/current-org-slug) "-" (router/current-board-slug)))
    "-entry-edit"))
 
+(defn activity-load-cached-item
+  [activity-data]
+  (let [cache-key (get-entry-cache-key (:uuid activity-data))]
+    (uc/get-item cache-key
+     (fn [item err]
+       (if (and (not err)
+                (map? item)
+                (= (:updated-at activity-data) (:updated-at item)))
+         (let [entry-to-save (merge item (select-keys activity-data [:links]))]
+           (dispatcher/dispatch! [:input [:modal-editing-data] entry-to-save]))
+         (do
+           ;; If we got an item remove it since it won't be used
+           ;; since we have an updated version of it already
+           (when item
+             (uc/remove-item cache-key))
+           (dispatcher/dispatch! [:input [:modal-editing-data] activity-data])))
+       (dispatcher/dispatch! [:input [:modal-editing] true])
+       (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
+
+(defmethod dispatcher/action :activity-modal-fade-in
+  [db [_ board-slug activity-uuid activity-type editing]]
+  (utils/after 10
+   #(let [from-all-posts (= (router/current-board-slug) "all-posts")
+          activity-url (oc-urls/entry board-slug activity-uuid)]
+      (router/nav! (str activity-url (when from-all-posts "?ap")))))
+  (when editing
+    (let [board-data (dispatcher/board-data)
+          activity-data (get (:fixed-items board-data) activity-uuid)]
+      (utils/after 100 #(activity-load-cached-item activity-data))))
+  (-> db
+    (assoc :activity-modal-fade-in activity-uuid)
+    (assoc :dismiss-modal-on-editing-stop editing)
+    ;; Make sure the seen-at is not reset when navigating to modal view
+    (assoc :no-reset-seen-at true)))
+
 (defmethod dispatcher/action :entry-edit
   [db [_ initial-entry-data]]
+  ;; Delay the entry-edit open to the cached item load
+  ;; if we have a cached item starts with it, if not start with the initial passed data
   (let [cache-key (get-entry-cache-key (:uuid initial-entry-data))]
     (uc/get-item cache-key
      (fn [item err]
@@ -1265,8 +1289,13 @@
                          (= (:updated-at initial-entry-data) (:updated-at item)))
                     (not (:updated-at initial-entry-data))))
          (let [entry-to-save (merge item (select-keys initial-entry-data [:links]))]
-          (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
-         (assoc db :entry-editing initial-entry-data)))))
+           (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
+         (do
+           ;; If we got an item remove it since it won't be used
+           ;; since we have an updated version of it already
+           (when item
+             (uc/remove-item cache-key))
+           (dispatcher/dispatch! [:input [:entry-editing] initial-entry-data]))))))
   db)
 
 (defmethod dispatcher/action :entry-edit/dismiss
@@ -1708,8 +1737,13 @@
     (assoc-in db [:modal-editing-data :loading] true)))
 
 (defmethod dispatcher/action :activity-modal-edit
-  [db [_ activate]]
-  (assoc db :modal-editing activate))
+  [db [_ activity-data activate]]
+  (assoc db :modal-editing activate)
+  (if activate
+    (do
+      (activity-load-cached-item activity-data)
+      db)
+    (dissoc db :modal-editing)))
 
 (defmethod dispatcher/action :whats-new/finish
   [db [_ whats-new-data]]
@@ -1787,8 +1821,8 @@
   (assoc db :entry-save-on-exit enabled?))
 
 (defmethod dispatcher/action :entry-save-on-exit
-  [db [_ entry-body]]
-  (let [entry-editing (:entry-editing db)
+  [db [_ edit-key entry-body]]
+  (let [entry-editing (get db edit-key)
         entry-map (assoc entry-editing :body entry-body)
         cache-key (get-entry-cache-key (:uuid entry-editing))]
     (uc/set-item cache-key entry-map
