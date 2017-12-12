@@ -28,6 +28,7 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.features :refer (features)]
+            [oc.web.components.slack :refer (slack)]
             [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
@@ -322,6 +323,10 @@
     (defroute features-route urls/features {:as params}
       (timbre/info "Routing features-route" urls/features)
       (simple-handler features "features" target params))
+
+    (defroute features-route urls/slack {:as params}
+      (timbre/info "Routing slack-route" urls/slack)
+      (simple-handler slack "slack" target params))
 
     (defroute pricing-route urls/pricing {:as params}
       (timbre/info "Routing pricing-route" urls/pricing)
