@@ -54,7 +54,7 @@
     (let [body-el (sel1 [:div.rich-body-editor])
           cleaned-body (when body-el
                         (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit cleaned-body]))))
+      (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body]))))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
@@ -171,11 +171,11 @@
                           (let [nux @(drv/get-ref s :nux)
                                 entry-editing @(drv/get-ref s :entry-editing)
                                 board-filters @(drv/get-ref s :board-filters)
-                                initial-body (if (or (contains? entry-editing :links) nux)
+                                initial-body (if (seq (:body entry-editing))
                                                (:body entry-editing)
                                                utils/default-body)
                                 initial-headline (utils/emojify
-                                                   (if (or (contains? entry-editing :links) nux)
+                                                   (if (seq (:headline entry-editing))
                                                      (:headline entry-editing)
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
@@ -197,7 +197,11 @@
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :did-remount (fn [_ s]
                           (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
-                            (set! (.-onBeforeUnload js/window) (if save-on-exit #(str "Do you want to save before leaving?") nil)))
+                            (set! (.-onbeforeunload js/window) (if save-on-exit
+                                                                #(do
+                                                                  (save-on-exit? s)
+                                                                  "Do you want to save before leaving?")
+                                                                nil)))
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
