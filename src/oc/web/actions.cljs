@@ -1238,7 +1238,7 @@
   [entry-uuid]
   (str (or
         entry-uuid
-        (str (router/current-org-slug) "-" (router/current-board-slug)))
+        (router/current-org-slug))
    "-entry-edit"))
 
 (defn activity-load-cached-item
