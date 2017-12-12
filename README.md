@@ -255,8 +255,10 @@ provided in the table below:
 |  :entry-publish/failed | API | Publish entry reuqest finish but failed. |
 |  :entry-publish/finish | API | Publish entry reuqest finish, refresh the board data. |
 |  :entry-save | UI | Save the edited entry. |
+|  :entry-save-on-exit | UI | Save the current edits to the local cache to avoid losing them. |
 |  :entry-save/failed | API | Save entry reuqest finish but failed. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
+|  :entry-toggle-save-on-exit | UI | Toggle save on exit to avoid losing edits on page unload or edit exit. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
 |  :invitation-confirmed | API | Confirm invitation request succeeded. |
