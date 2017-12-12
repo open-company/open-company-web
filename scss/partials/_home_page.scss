@@ -519,6 +519,7 @@ div#wrap {
           background-color: white;
           float: left;
           text-align: center;
+          border-radius: 8px;
 
           @include mobile() {
             width: 100%;
@@ -526,6 +527,7 @@ div#wrap {
             float: unset;
             margin: 16px 0px 0px;
             padding: 30px 32px;
+            border-radius: 0px;
           }
 
           &.right {
