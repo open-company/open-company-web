@@ -25,4 +25,6 @@
     [:div.balloon.big.big-purple]
     [:div.oc-loading-inner
       [:div.oc-loading-heart]
-      [:div.oc-loading-body]]])
+      [:div.oc-loading-body]
+      [:div.setup-cta
+        "Here we go!"]]])

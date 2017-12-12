@@ -16,6 +16,10 @@ div.oc-loading {
     display: none;
   }
 
+  div.setup-cta {
+    display: none;
+  }
+
   &.setup-screen {
     background-color: $carrot_text_blue;
     width: 100vw;
@@ -24,6 +28,13 @@ div.oc-loading {
     @include avenir_H();
     font-size: 25px;
     color: white;
+
+    div.setup-cta {
+      position: relative;
+      top: 50%;
+      padding-top: 85px;
+      display: block;
+    }
 
     div.balloon {
       position: absolute;
