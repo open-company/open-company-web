@@ -10,6 +10,7 @@
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
             [goog.events :as events]
+            [goog.object :as gobj]
             [goog.events.EventType :as EventType]))
 
 (defn animate-reaction [e s]
@@ -118,6 +119,6 @@
             (react-utils/build (.-Picker js/EmojiMart)
               {:native true
                :onClick (fn [emoji event]
-                          (when (can-pick-reaction (.-native emoji) reactions-data)
-                            (dis/dispatch! [:react-from-picker entry-data (.-native emoji)]))
+                          (when (can-pick-reaction (gobj/get emoji "native") reactions-data)
+                            (dis/dispatch! [:react-from-picker entry-data (gobj/get emoji "native")]))
                           (reset! (::show-picker s) false))}))]])))

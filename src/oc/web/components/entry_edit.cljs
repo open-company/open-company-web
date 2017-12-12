@@ -337,10 +337,8 @@
               (carrot-tip {:step :2
                            :x (- (aget post-button-offset "left") 522)
                            :y (- (aget post-button-offset "top") 20)
-                           :title "Here’s a sample post for you."
-                           :message (str
-                                     "Click the green button to see how it works. Don’t "
-                                     "worry, you can delete this later if you’d like.")
+                           :title "Here’s a sample post"
+                           :message "Click the green Post button to see how it works."
                            :width 494})))
           [:button.mlb-reset.mlb-default.form-action-bt.post-btn
             {:on-click #(do

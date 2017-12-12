@@ -1,70 +1,51 @@
 div.comment-reactions {
-  height: 25px;
-  float: left;
+  height: 20px;
 
   button.comment-reaction-btn {
-    margin-right: 5px;
-    float: left;
     outline: none;
-    opacity: 0.6;
     position: relative;
-    height: 32px;
+    height: 20px;
     cursor: default;
-    border-radius: 100px;
-    background-color: $carrot_light_gray_2;
-    padding: 0px 16px;
-    // padding: .35em .9em;
-    color: $carrot_light_gray_3;
+    color: #C3C5C8;
     @include avenir_H();
-    font-size: 12px;
+    font-size: 15px;
+    padding: 0px;
 
-    &.comment {
-      height: 24px;
-    }
-
-    span.reaction {
-      font-size: 20px;
-      top: 3px;
-      position: relative;
-
-      &.comment {
-        top: 0px;
-        padding-right: 3px;
-        font-size: 12px;
-      }
-
-      &.no-reactions {
-        -webkit-filter: grayscale(100%);
-        filter: grayscale(100%);
-      }
-    }
-
-    &.has-reactions {
-      opacity: 1;
+    div.reaction {
+      display: inline-block;
+      -webkit-filter: grayscale(100%);
+      filter: grayscale(100%);
+      width: 20px;
+      padding: 2px;
     }
 
     div.count {
-      margin-left: 5px;
-      // margin-top: -3px;
+      margin-left: 4px;
       display: inline-block;
     }
 
     &.can-react {
       cursor: pointer;
-      &:hover {
-        opacity: 1;
+
+      &.reacted:hover {
+        div.reaction {
+          -webkit-filter: grayscale(100%);
+          filter: grayscale(100%);
+        }
       }
-      &:hover .no-reactions {
-        -webkit-filter: grayscale(0%);
-        filter: grayscale(0%);
+
+      &:hover {
+        div.reaction {
+          -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+        }
       }
     }
 
     &.reacted {
-      background-color: $carrot_light_yellow;
-
-      &:hover {
-        opacity: 0.8;
+      div.reaction {
+        -webkit-filter: grayscale(0%);
+        filter: grayscale(0%);
       }
 
       div.count {

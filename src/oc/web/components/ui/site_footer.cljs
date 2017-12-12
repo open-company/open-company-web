@@ -82,12 +82,7 @@
       [:div.left-column
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
-        (if (jwt/jwt)
-          [:div.footer-small-links
-            [:a
-              {:href oc-urls/sign-up
-               :on-click #(do (utils/event-stop %) (navigate-to-your-boards (utils/your-boards-url)))}
-              "Your Boards"]]
+        (when-not (jwt/jwt)
           [:div.footer-small-links
             [:a
               {:href oc-urls/sign-up

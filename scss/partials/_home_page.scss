@@ -68,6 +68,7 @@ div#wrap {
       @include mobile() {
         width: 100%;
         overflow: visible;
+        padding-top: 76px;
       }
 
       div.balloon {
@@ -250,10 +251,6 @@ div#wrap {
 
         &.second-line {
           margin: 0px auto 40px;
-
-          @include mobile(){
-            margin-top: 20px;
-          }
         }
       }
 
@@ -272,7 +269,7 @@ div#wrap {
 
       video.homepage-main-animation {
         width: 940px;
-        margin: 106px auto 0px;
+        margin: 46px auto 0px;
         padding: 0;
         z-index: 10;
         position: relative;
@@ -284,7 +281,7 @@ div#wrap {
         }
 
         img.homepage-main-screenshot {
-          width: 972px;
+          width: 940px;
           margin-left: -16px;
           padding: 0;
 
@@ -325,7 +322,7 @@ div#wrap {
         @include mobile() {
           width: calc(100% + 64px);
           height: auto;
-          margin: -30px 0px 0px -32px;
+          margin: -8px 0px 0px -32px;
           padding: 16px 32px;
         }
       }
@@ -582,7 +579,7 @@ div#wrap {
         width: 800px;
         height: 293px;
         text-align: center;
-        margin: 40px auto 100px;
+        margin: 60px auto 100px;
 
         @include mobile(){
           width: 100%;
@@ -774,7 +771,7 @@ div.main.home-page, div.about {
 
     div.above-noise-container {
       width: 1053px;
-      margin: 0px auto 46px;
+      margin: 0px auto;
 
       @include mobile(){
         width: 100%;
@@ -790,10 +787,15 @@ div.main.home-page, div.about {
       }
 
       div.above-noise-description {
-        color: $carrot_dark_brown;
-        @include avenir_R();
-        font-size: 20px;
+        color: $carrot_dark_brown_1;
+        @include avenir_H();
+        font-size: 40px;
+        color: #373f4f;
         margin-top: 16px;
+      }
+
+      button.get-started-button {
+        margin-top: 60px;
       }
     }
   }
