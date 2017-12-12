@@ -47,7 +47,7 @@
                                   (events/unlistenByKey @(::window-click s))
                                   (reset! (::window-click s) nil))
                                 s)}
-  [s topics entry-editing edit-key]
+  [s topics entry-editing edit-key on-change-cb]
   [:div.entry-card-dd-container
     [:button.mlb-reset.entry-card-dd-button
       {:class (utils/class-set {:has-topic (not (empty? (:topic-name entry-editing)))
@@ -72,7 +72,9 @@
                              (dis/dispatch!
                               [:input
                                [edit-key]
-                               (merge entry-editing {:topic-name (:name t) :has-changes true})]))
+                               (merge entry-editing {:topic-name (:name t) :has-changes true})])
+                             (when (fn? on-change-cb)
+                               (on-change-cb t)))
                  :class (when selected "select")}
                 [:button.mlb-reset
                   (:name t)]
@@ -84,7 +86,9 @@
                                  (dis/dispatch!
                                   [:input
                                    [edit-key]
-                                   (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})]))}
+                                   (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})])
+                                 (when (fn? on-change-cb)
+                                   (on-change-cb nil)))}
                     "Remove"])])
             [:li.divider]
             [:li.entry-edit-new-topic.group

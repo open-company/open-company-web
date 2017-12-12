@@ -45,6 +45,24 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
+;; Local cache for outstanding edits
+
+(defn save-on-exit?
+  "Locally save the current outstanding edits if needed."
+  [s]
+  (when @(drv/get-ref s :entry-save-on-exit)
+    (let [body-el (sel1 [:div.rich-body-editor])
+          cleaned-body (when body-el
+                        (utils/clean-body-html (.-innerHTML body-el)))]
+      (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body]))))
+
+(defn toggle-save-on-exit
+  "Enable and disable save current edit."
+  [s turn-on?]
+  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
+
+;; Close dismiss handling
+
 (defn cancel-clicked [s]
   (if @(::uploading-media s)
     (let [alert-data {:icon "/img/ML/trash.svg"
@@ -54,6 +72,7 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
+                                          (save-on-exit? s)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
                       }]
@@ -66,21 +85,28 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
+                                            (save-on-exit? s)
                                             (dis/dispatch! [:alert-modal-hide])
                                             (real-close s))
                         }]
         (dis/dispatch! [:alert-modal-show alert-data]))
       (real-close s))))
 
+;; Data change handling
+
 (defn body-on-change [state]
+  (toggle-save-on-exit state true)
   (dis/dispatch! [:input [:entry-editing :has-changes] true])
   (calc-edit-entry-modal-height state))
 
 (defn- headline-on-change [state]
+  (toggle-save-on-exit state true)
   (when-let [headline (sel1 [:div.entry-edit-headline])]
     (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
       (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
       (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+
+;; Headline setup and paste handler
 
 (defn- setup-headline [state]
   (when-let [headline-el  (rum/ref-node state "headline")]
@@ -104,17 +130,14 @@
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
-  (when-let [body (sel1 [:div.rich-body-editor])]
-    (body-on-change s)))
+  (body-on-change s))
 
 (defn- clean-body []
   (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (let [raw-html (.-innerHTML body-el)]
-      (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html raw-html)]))))
+    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))])))
 
 (defn- is-publishable? [entry-editing]
   (and (seq (:board-slug entry-editing))
-       (:has-changes entry-editing)
        (seq (:headline entry-editing))))
 
 (rum/defcs entry-edit < rum/reactive
@@ -127,6 +150,7 @@
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         (drv/drv :nux)
+                        (drv/drv :entry-save-on-exit)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -147,13 +171,13 @@
                           (let [nux @(drv/get-ref s :nux)
                                 entry-editing @(drv/get-ref s :entry-editing)
                                 board-filters @(drv/get-ref s :board-filters)
-                                initial-body (if (or (contains? entry-editing :links) nux)
-                                              (:body entry-editing)
-                                              utils/default-body)
+                                initial-body (if (seq (:body entry-editing))
+                                               (:body entry-editing)
+                                               utils/default-body)
                                 initial-headline (utils/emojify
-                                                  (if (or (contains? entry-editing :links) nux)
-                                                   (:headline entry-editing)
-                                                   ""))]
+                                                   (if (seq (:headline entry-editing))
+                                                     (:headline entry-editing)
+                                                     ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (when (and (string? board-filters)
@@ -172,6 +196,12 @@
                          :before-render (fn [s] (calc-edit-entry-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :did-remount (fn [_ s]
+                          (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
+                            (set! (.-onbeforeunload js/window) (if save-on-exit
+                                                                #(do
+                                                                  (save-on-exit? s)
+                                                                  "Do you want to save before leaving?")
+                                                                nil)))
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
@@ -202,6 +232,7 @@
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
+                          (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
   (let [nux               (drv/react s :nux)
@@ -259,11 +290,12 @@
                     :value (:board-slug entry-editing)
                     :on-blur #(reset! (::show-boards-dropdown s) false)
                     :on-change (fn [item]
+                                 (toggle-save-on-exit s true)
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                  (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
             (when-not nux
-              (topics-dropdown board-topics entry-editing :entry-editing))]
+              (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element

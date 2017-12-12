@@ -98,6 +98,7 @@
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
+   :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -240,7 +241,8 @@
                              :modal-editing (:modal-editing base)
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
                              :entry-edit-topics entry-edit-topics
-                             :activity-share activity-share})]
+                             :activity-share activity-share
+                             :entry-save-on-exit (:entry-save-on-exit base)})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]
