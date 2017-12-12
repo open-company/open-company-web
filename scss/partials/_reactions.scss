@@ -11,7 +11,7 @@ div.reactions {
       height: 32px;
       margin-left: 1px;
       cursor: default;
-      background-color: $carrot_light_gray_2;
+      background-color: $carrot_light_gray_9;
       padding: 0px 14px;
       color: $carrot_light_gray_3;
       @include avenir_H();
@@ -53,7 +53,13 @@ div.reactions {
       &.can-react {
         cursor: pointer;
 
+        &.reacted:hover {
+          background-color: rgba(#FED157, 0.4);
+        }
+
         &:hover {
+          background-color: #EBE9E3;
+
           span.reaction {
             -webkit-filter: grayscale(0%);
             filter: grayscale(0%);
@@ -62,7 +68,7 @@ div.reactions {
       }
 
       &.reacted {
-        background-color: $carrot_light_yellow;
+        background-color: #FFF6DD;
 
         span.reaction {
           -webkit-filter: grayscale(0%);

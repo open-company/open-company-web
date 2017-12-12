@@ -49,6 +49,10 @@ div.oc-loading {
         height: 48px;
         left: 9.68%;
         top: 11.87%;
+
+        @include mobile(){
+          left: 124px;
+        }
       }
 
       &.small-red {
@@ -58,6 +62,10 @@ div.oc-loading {
         height: 15px;
         left: 13.43%;
         top: 8.00%;
+
+        @include mobile(){
+          left: 172px;
+        }
       }
 
       // Top right corner
@@ -68,6 +76,10 @@ div.oc-loading {
         height: 223px;
         left: 65.31%;
         top: 4.00%;
+
+        @include mobile(){
+          display: none;
+        }
       }
 
       &.small-face-yellow {
@@ -77,6 +89,10 @@ div.oc-loading {
         height: 48px;
         left: 77.96%;
         top: 27.37%;
+
+        @include mobile(){
+          display: none;
+        }
       }
 
       &.small-yellow {
@@ -86,6 +102,10 @@ div.oc-loading {
         height: 15px;
         left: 86.01%;
         top: 25.50%;
+
+        @include mobile(){
+          display: none;
+        }
       }
 
       // Bottom left corner
@@ -97,6 +117,13 @@ div.oc-loading {
         height: 95px;
         left: 21.72%;
         top: 67.12%;
+
+        @include mobile(){
+          top: unset;
+          bottom: -35px;
+          left: unset;
+          right: 40px;
+        }
       }
 
       &.small-purple {
@@ -106,6 +133,13 @@ div.oc-loading {
         height: 21px;
         left: 27.65%;
         top: 63.5%;
+
+        @include mobile(){
+          top: unset;
+          bottom: 69px;
+          left: unset;
+          right: 40px;
+        }
       }
 
       // Bottom right corner
@@ -116,6 +150,10 @@ div.oc-loading {
         height: 205px;
         right: 0px;
         bottom: 0px;
+
+        @include mobile(){
+          display: none;
+        }
       }
     }
   }
