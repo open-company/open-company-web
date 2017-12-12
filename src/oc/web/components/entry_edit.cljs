@@ -10,7 +10,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.lib.user-cache :as uc]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
@@ -48,43 +47,19 @@
 
 ;; Local cache for outstanding edits
 
-(defn get-cache-key
-  "Local edits cache key."
-  [entry-editing]
-  (str
-   (if (:uuid entry-editing)
-    (:uuid entry-editing)
-    (str (router/current-org-slug) "-" (router/current-board-slug)))
-   "-entry-edit"))
-
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
-  (when @(::save-on-exit s)
-    (let [entry-editing @(drv/get-ref s :entry-editing)
-          cache-key (get-cache-key entry-editing)
-          body-el (sel1 [:div.rich-body-editor])
+  (when @(drv/get-ref s :entry-save-on-exit)
+    (let [body-el (sel1 [:div.rich-body-editor])
           cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))
-          entry-map (assoc entry-editing :body (or cleaned-body ""))]
-      (uc/set-item cache-key entry-map
-       (fn [err]
-          (when-not err
-            (reset! (::save-on-exit s) s)
-            (set! (.-onbeforeunload js/window) nil)))))))
-
-(defn confirm-save-on-exit?
-  "Function set to onBeforeUnload when needed."
-  [e s]
-  (when @(::save-on-exit s)
-    (save-on-exit? s))
-  @(::save-on-exit s))
+                        (utils/clean-body-html (.-innerHTML body-el)))]
+      (dis/dispatch! [:entry-save-on-exit cleaned-body]))))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (reset! (::save-on-exit s) turn-on?)
-  (set! (.-onbeforeunload js/window) (if turn-on? #(confirm-save-on-exit? % s) nil)))
+  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
 
 ;; Close dismiss handling
 
@@ -163,7 +138,6 @@
 
 (defn- is-publishable? [entry-editing]
   (and (seq (:board-slug entry-editing))
-       (:has-changes entry-editing)
        (seq (:headline entry-editing))))
 
 (rum/defcs entry-edit < rum/reactive
@@ -176,6 +150,7 @@
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         (drv/drv :nux)
+                        (drv/drv :entry-save-on-exit)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -188,7 +163,6 @@
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
                         (rum/local false ::show-boards-dropdown)
-                        (rum/local false ::save-on-exit)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -211,17 +185,7 @@
                                (let [topic (first (filter #(= (:slug %) board-filters) (:topics-list entry-editing)))]
                                  (when topic
                                    (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
-                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)]))))
-                            (uc/get-item (get-cache-key entry-editing)
-                             (fn [item err]
-                               (when (and (map? item)
-                                          (not err)
-                                          (or (and (:updated-at entry-editing)
-                                                   (= (:updated-at entry-editing) (:updated-at item)))
-                                              (not (:updated-at entry-editing))))
-                                 (dis/dispatch! [:input [:entry-editing] (merge item (select-keys entry-editing [:links]))])
-                                 (reset! (::initial-body s) (:body item))
-                                 (reset! (::initial-headline s) (utils/emojify (:headline item)))))))
+                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
                           s)
                          :did-mount (fn [s]
                           (when-not @(drv/get-ref s :nux)
@@ -232,15 +196,14 @@
                          :before-render (fn [s] (calc-edit-entry-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :did-remount (fn [_ s]
+                          (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
+                            (set! (.-onBeforeUnload js/window) (if save-on-exit #(str "Do you want to save before leaving?") nil)))
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
                               ;: Save request finished
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
-                                (toggle-save-on-exit s false)
-                                (dis/dispatch! [:input [:entry-editing :has-changes] false])
-                                (uc/remove-item (get-cache-key entry-editing))
                                 (when-not (:error entry-editing)
                                   ;; If it's not published already redirect to drafts board
                                   (when (not= (:status entry-editing) "published")
@@ -249,9 +212,6 @@
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
-                                (toggle-save-on-exit s false)
-                                (uc/remove-item (get-cache-key entry-editing))
-                                (dis/dispatch! [:input [:entry-editing :has-changes] false])
                                 ;; Redirect to the publishing board if the slug is available
                                 (when (seq (:board-slug entry-editing))
                                   (utils/after

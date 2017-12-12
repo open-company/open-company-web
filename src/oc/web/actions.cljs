@@ -11,6 +11,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.user-cache :as uc]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.lib.ws-change-client :as ws-cc]
@@ -1246,9 +1247,27 @@
     ;; Make sure the seen-at is not reset when navigating to modal view
     (assoc :no-reset-seen-at true)))
 
+(defn get-entry-cache-key
+  [entry-uuid]
+  (str (or
+        entry-uuid
+        (str (router/current-org-slug) "-" (router/current-board-slug)))
+   "-entry-edit"))
+
 (defmethod dispatcher/action :entry-edit
   [db [_ initial-entry-data]]
-  (assoc db :entry-editing initial-entry-data))
+  (let [cache-key (get-entry-cache-key (:uuid initial-entry-data))]
+    (uc/get-item cache-key
+     (fn [item err]
+       (if (and (not err)
+                (map? item)
+                (or (and (:updated-at initial-entry-data)
+                         (= (:updated-at initial-entry-data) (:updated-at item)))
+                    (not (:updated-at initial-entry-data))))
+         (let [entry-to-save (merge item (select-keys initial-entry-data [:links]))]
+          (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
+         (assoc db :entry-editing initial-entry-data)))))
+  db)
 
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
@@ -1313,6 +1332,8 @@
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
     (api/get-org (dispatcher/org-data))
+    ; Remove saved cached item
+    (uc/remove-item (get-entry-cache-key (-> db edit-key :uuid)))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
@@ -1321,8 +1342,9 @@
           next-db (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)
           with-edited-key (if edit-key
                             (update-in next-db [edit-key] dissoc :loading)
-                            next-db)]
-      with-edited-key)))
+                            next-db)
+          without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)]
+      without-entry-save-on-exit)))
 
 (defmethod dispatcher/action :entry-save/failed
   [db [_ edit-key]]
@@ -1348,6 +1370,8 @@
   [db [_ {:keys [activity-data]}]]
   (let [board-slug (:board-slug activity-data)]
     (api/get-org (dispatcher/org-data))
+    ;; Remove entry cached edits
+    (uc/remove-item (get-entry-cache-key (-> db :entry-editing :uuid)))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
@@ -1356,6 +1380,7 @@
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
         (update-in [:entry-editing] dissoc :publishing)
+        (dissoc :entry-toggle-save-on-exit)
         ;; Progress the NUX
         (assoc :nux (when (= (:nux db) :2) :3))))))
 
@@ -1756,3 +1781,18 @@
                        :board-slug (:slug current-board)}]
     (merge db {:entry-editing entry-editing
                :nux :2})))
+
+(defmethod dispatcher/action :entry-toggle-save-on-exit
+  [db [_ enabled?]]
+  (assoc db :entry-save-on-exit enabled?))
+
+(defmethod dispatcher/action :entry-save-on-exit
+  [db [_ entry-body]]
+  (let [entry-editing (:entry-editing db)
+        entry-map (assoc entry-editing :body entry-body)
+        cache-key (get-entry-cache-key (:uuid entry-editing))]
+    (uc/set-item cache-key entry-map
+     (fn [err]
+        (when-not err
+          (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
+    db))
