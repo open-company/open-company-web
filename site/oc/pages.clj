@@ -174,6 +174,7 @@
              "Posts are automatically shared to the right channels. Discussions about posts happen "
              "in Slack and Carrot - everything is kept in sync.")]
           [:button.mlb-reset.slack-btn
+            {:onClick "window.location='/slack';"}
             "Learn More"]]]
 
       [:section.third-section.group
