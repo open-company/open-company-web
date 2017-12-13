@@ -230,8 +230,7 @@
                    :on-change #(let [query (.. % -target -value)]
                                 (reset! (::show-search-results s) (seq query))
                                 (reset! (::search-users s) query))}]
-                (when (and @(::show-search-results s)
-                           (seq @(::search-users s)))
+                (when @(::show-search-results s)
                   [:div.board-edit-private-users-results
                     (let [roster (drv/react s :team-roster)
                           query (string/lower @(::search-users s))]
