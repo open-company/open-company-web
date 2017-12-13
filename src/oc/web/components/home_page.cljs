@@ -58,10 +58,14 @@
 
           [:h1.headline
             "Rise above the noise"]
-          [:div.subheadline
+          [:div.subheadline.big-web-only
             "Give your team a clear view of what’s most important"]
-          [:div.subheadline.second-line
+          [:div.subheadline.second-line.big-web-only
             "to keep everyone on the same page"]
+          [:div.subheadline.mobile-only
+            (str
+             "Give your team a clea view of what’s most important "
+             "to keep everyone on the same page")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
