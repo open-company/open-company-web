@@ -24,7 +24,7 @@ div.board-edit-container {
     position: relative;
 
     div.board-edit {
-      margin: 0px 0px 0px 28px;
+      margin: 0px 0px 32px 28px;
       position: relative;
       width: 552px;
       background-color: white;
@@ -276,8 +276,6 @@ div.board-edit-container {
             left: 0px;
             width: 100%;
             max-height: 130px;
-            overflow-x: visible;
-            overflow-y: auto;
             background-color: white;
             border-radius: 6px;
             border: 1px solid rgba($carrot_light_gray_1, 0.5);
@@ -290,7 +288,6 @@ div.board-edit-container {
               color: $carrot_dark_gray;
               padding: 4px 16px;
               width: 100%;
-              cursor: pointer;
 
               &:hover {
                 background-color: rgba($carrot_light_gray, 0.3);
@@ -314,15 +311,106 @@ div.board-edit-container {
               div.user-type {
                 float: right;
                 max-width: calc(50% - 32px - 6px);
+                margin-top: 6px;
+                position: relative;
+                padding-right: 12px;
+                cursor: pointer;
+
+                &:after {
+                  content: "";
+                  position: absolute;
+                  top: 6px;
+                  right: 0px;
+                  background-image: cdnUrl("/img/ML/board_settings.svg");
+                  background-size: 8px 8px;
+                  background-repeat: no-repeat;
+                  width: 8px;
+                  height: 8px;
+                }
+
+                &.self {
+                  cursor: default;
+
+                  &:after {
+                    display: none;
+                  }
+                }
+
+                div.dropdown-list-container {
+                  top: 24px;
+                  left: -29px;
+                }
+              }
+            }
+          }
+        }
+
+        div.board-edit-private-users {
+          margin: 16px 0px;
+
+          div.board-edit-private-users-list {
+            width: 100%;
+            padding: 0px 16px 0px 0px;
+            @include avenir_R();
+            font-size: 16px;
+            color: $carrot_dark_gray;
+
+            div.board-edit-private-user {
+              height: 64px;
+              width: 100%;
+              padding: 16px 0px;
+              box-shadow: inset 0px -1px 0px $carrot_light_gray_2;
+
+              @include user-profile(32);
+
+              div.user-avatar-img-container {
+                float: left;
+              }
+
+              div.name {
+                float: left;
+                max-width: 50%;
+                margin-left: 16px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 margin-top: 6px;
               }
+
+              div.user-type {
+                float: right;
+                max-width: calc(50% - 32px - 6px);
+                margin-top: 6px;
+                position: relative;
+                padding-right: 12px;
+                cursor: pointer;
+
+                &:after {
+                  content: "";
+                  position: absolute;
+                  top: 6px;
+                  right: 0px;
+                  background-image: cdnUrl("/img/ML/board_settings.svg");
+                  background-size: 8px 8px;
+                  background-repeat: no-repeat;
+                  width: 8px;
+                  height: 8px;
+                }
+
+                &.self {
+                  cursor: default;
+
+                  &:after {
+                    display: none;
+                  }
+                }
+
+                div.dropdown-list-container {
+                  top: 24px;
+                  left: -11px;
+                }
+              }
             }
           }
-
-
-
         }
       }
 

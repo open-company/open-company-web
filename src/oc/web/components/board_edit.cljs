@@ -3,10 +3,12 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]
@@ -45,8 +47,8 @@
   that match the given string."
   [board-data roster query]
   (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))
-        not-in-users (filter #(some #{(:user-id %)} already-in-ids))
-        filtered-users (filter #(filter-user-by-query % query) (:users roster))]
+        not-in-users (remove #(some #{(:user-id %)} already-in-ids) (:users roster))
+        filtered-users (filter #(filter-user-by-query % query) not-in-users)]
     (sort #(compare (str (:first-name %1) (:last-name %1)) (str (:first-name %2) (:last-name %2))) filtered-users)))
 
 (rum/defcs board-edit < rum/reactive
@@ -68,15 +70,16 @@
                         (rum/local nil ::char-data-mod-event)
                         (rum/local nil ::initial-board-name)
                         (rum/local nil ::window-click-event)
-                        (rum/local "" ::search-users)
+                        (rum/local "" ::query)
                         (rum/local false ::show-search-results)
+                        (rum/local nil ::show-user-dropdown)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
                           (dis/dispatch! [:teams-get])
-                          (let [board-data @(drv/get-ref s :board-editing)]
+                          (let [board-data @(drv/get-ref s :board-data)]
                             (when (some? (:slack-mirror board-data))
                               (reset! (::slack-enabled s) (:slack-mirror board-data)))
                             (reset! (::initial-board-name s) (:name board-data)))
@@ -139,10 +142,11 @@
   [s]
   (let [current-user-data (drv/react s :current-user-data)
         board-editing (drv/react s :board-editing)
+        board-data (drv/react s :board-data)
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
-        channel-name (when-not new-board? (:channel-name (:slack-mirror (drv/react s :board-data))))]
+        channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -218,33 +222,72 @@
                                                        {:channel-id (:id channel)
                                                         :channel-name (:name channel)
                                                         :slack-org-id (:slack-org-id team)}]))})])
-          (when (= (:access board-editing) "private")
-            [:div.board-edit-private-users-container
-              [:div.board-edit-private-users-search
-                {:ref "private-users-search"}
-                [:input
-                  {:value @(::search-users s)
-                   :type "text"
-                   :placeholder "Look for people to add"
-                   :on-focus #(reset! (::show-search-results s) true)
-                   :on-change #(let [query (.. % -target -value)]
-                                (reset! (::show-search-results s) (seq query))
-                                (reset! (::search-users s) query))}]
-                (when @(::show-search-results s)
-                  [:div.board-edit-private-users-results
-                    (let [roster (drv/react s :team-roster)
-                          query (string/lower @(::search-users s))]
-                      (for [user (filter-users board-editing roster query)]
+          (when (= (:access board-data) "private")
+            (let [roster (drv/react s :team-roster)
+                  query  (::query s)]
+              [:div.board-edit-private-users-container
+                [:div.board-edit-private-users-search
+                  {:ref "private-users-search"}
+                  [:input
+                    {:value @query
+                     :type "text"
+                     :placeholder "Look for people to add"
+                     :on-focus #(reset! (::show-search-results s) true)
+                     :on-change #(let [query (.. % -target -value)]
+                                  (reset! (::show-search-results s) (seq query))
+                                  (reset! query query))}]
+                  (when @(::show-search-results s)
+                    [:div.board-edit-private-users-results
+                      (for [user (filter-users board-data roster @query)]
                         [:div.board-edit-private-users-result
                           (user-avatar-image user)
                           [:div.name
-                            (str (:first-name user) " " (:last-name user))]
+                            (utils/name-or-email user)]
                           [:div.user-type
-                            "user type"]]))])]])
+                            {:on-click #(reset! (::show-user-dropdown s) (:user-id user))}
+                            "Role"
+                            (when (= @(::show-user-dropdown s) (:user-id user))
+                              (dropdown-list {:items [{:value :author :label "Author"}
+                                                      {:value :viewer :label "Viewer"}]
+                                              :on-change (fn [item]
+                                                            (reset! (::show-search-results s) false)
+                                                            (dis/dispatch! [:private-board-user-add user (:value item)])
+                                                            (utils/after 10 #(reset! (::show-user-dropdown s) nil)))
+                                              :on-blur #(reset! (::show-user-dropdown s) nil)}))]])])]
+                [:div.board-edit-private-users
+                  [:div.board-edit-private-users-list.group
+                    (for [u (concat
+                              (map #(assoc % :type :author) (:authors board-data))
+                              (map #(assoc % :type :viewer) (:viewers board-data)))
+                          :let [user-type (:type u)
+                                user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
+                                self (= (:user-id u) (jwt/user-id))]]
+                      [:div.board-edit-private-user.group
+                        (user-avatar-image user)
+                        [:div.name
+                          (utils/name-or-email user)]
+                        [:div.user-type
+                          {:on-click #(when-not self
+                                        (reset! (::show-user-dropdown s) (:user-id user)))
+                           :class (when self "self")}
+                          (if (= user-type :author)
+                            "Author"
+                            "Viewer")
+                          (when (= @(::show-user-dropdown s) (:user-id user))
+                            (dropdown-list {:items [{:value :author :label "Author"}
+                                                    {:value :viewer :label "Viewer"}
+                                                    {:value :remove :label "Leave board"}]
+                                            :value user-type
+                                            :on-change (fn [item]
+                                                        (reset! (::show-user-dropdown s) nil)
+                                                        (if (= (:value item) :remove)
+                                                          (dis/dispatch! [:private-board-user-remove u])
+                                                          (dis/dispatch! [:private-board-user-add user (:value item)])))
+                                            :on-blur #(reset! (::show-user-dropdown s) nil)}))]])]]]))
           [:div.board-edit-footer
             [:div.board-edit-footer-left
-              (when (and (seq (:slug board-editing))
-                         (utils/link-for (:links board-editing) "delete"))
+              (when (and (seq (:slug board-data))
+                         (utils/link-for (:links board-data) "delete"))
                 [:button.mlb-reset.mlb-link-black.delete-board
                   {:on-click (fn []
                               (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
@@ -256,7 +299,7 @@
                                                                  :solid-button-cb (fn []
                                                                                     (dis/dispatch!
                                                                                      [:board-delete
-                                                                                     (:slug board-editing)])
+                                                                                     (:slug board-data)])
                                                                                     (dis/dispatch!
                                                                                      [:alert-modal-hide])
                                                                                     (close-clicked s))}]))}
