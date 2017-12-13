@@ -70,10 +70,14 @@
 
         [:h1.headline
           "Rise above the noise"]
-        [:div.subheadline
+        [:div.subheadline.big-web-only
           "Give your team a clear view of what’s most important"]
-        [:div.subheadline.second-line
+        [:div.subheadline.second-line.big-web-only
           "to keep everyone on the same page"]
+        [:div.subheadline.mobile-only
+          (str
+           "Give your team a clea view of what’s most important "
+           "to keep everyone on the same page")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -577,7 +581,9 @@
 
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+                [:div.oc-loading-body]]
+              [:div.setup-cta
+                "Here we go!"]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files
@@ -683,7 +689,9 @@
 
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+                [:div.oc-loading-body]]
+              [:div.setup-cta
+                "Here we go!"]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files
