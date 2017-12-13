@@ -27,6 +27,28 @@
                             (utils/emoji-images-to-unicode (gobj/get (utils/emojify board-html) "__html")))]
     (dis/dispatch! [:input [:board-editing :name] cleaned-board-name])))
 
+;; Private board users search helpers
+
+(defn filter-user-by-query
+  "Given a user and a query string, return true if first-name, last-name or email contains it."
+  [user query]
+  (let [lower-query (string/lower query)
+        first-name (:first-name user)
+        last-name (:last-name user)
+        lower-name (string/lower (str first-name " " last-name))
+        lower-email (string/lower (:email user))]
+    (or (>= (.search lower-name lower-query) 0)
+        (>= (.search lower-email lower-query) 0))))
+
+(defn filter-users
+  "Given a board, the team roster and a query string, search for users
+  that match the given string."
+  [board-data roster query]
+  (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))
+        not-in-users (filter #(some #{(:user-id %)} already-in-ids))
+        filtered-users (filter #(filter-user-by-query % query) (:users roster))]
+    (sort #(compare (str (:first-name %1) (:last-name %1)) (str (:first-name %2) (:last-name %2))) filtered-users)))
+
 (rum/defcs board-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :board-editing)
@@ -35,6 +57,7 @@
                         (drv/drv :board-data)
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
+                        (drv/drv :team-roster)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
@@ -44,6 +67,9 @@
                         (rum/local nil ::dom-remove-event)
                         (rum/local nil ::char-data-mod-event)
                         (rum/local nil ::initial-board-name)
+                        (rum/local nil ::window-click-event)
+                        (rum/local "" ::search-users)
+                        (rum/local false ::show-search-results)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -78,6 +104,10 @@
                             (reset! (::char-data-mod-event s)
                              (events/listen board-name-node EventType/DOMCHARACTERDATAMODIFIED
                               #(board-name-on-change s board-name-node))))
+                          (reset! (::window-click-event s)
+                            (events/listen js/window EventType/CLICK
+                             #(when-not (utils/event-inside? % (rum/ref-node s "private-users-search"))
+                                (reset! (::show-search-results s) false))))
                           s)
                          :did-remount (fn [o s]
                           ;; Dismiss animated since the board-editing was removed
@@ -102,6 +132,9 @@
                           (when @(::char-data-mod-event s)
                             (events/unlistenByKey @(::char-data-mod-event s))
                             (reset! (::char-data-mod-event s) nil))
+                          (when @(::window-click-event s)
+                            (events/unlistenByKey @(::window-click-event s))
+                            (reset! (::window-click-event s) nil))
                           s)}
   [s]
   (let [current-user-data (drv/react s :current-user-data)
@@ -185,6 +218,30 @@
                                                        {:channel-id (:id channel)
                                                         :channel-name (:name channel)
                                                         :slack-org-id (:slack-org-id team)}]))})])
+          (when (= (:access board-editing) "private")
+            [:div.board-edit-private-users-container
+              [:div.board-edit-private-users-search
+                {:ref "private-users-search"}
+                [:input
+                  {:value @(::search-users s)
+                   :type "text"
+                   :placeholder "Look for people to add"
+                   :on-focus #(reset! (::show-search-results s) true)
+                   :on-change #(let [query (.. % -target -value)]
+                                (reset! (::show-search-results s) (seq query))
+                                (reset! (::search-users s) query))}]
+                (when (and @(::show-search-results s)
+                           (seq @(::search-users s)))
+                  [:div.board-edit-private-users-results
+                    (let [roster (drv/react s :team-roster)
+                          query (string/lower @(::search-users s))]
+                      (for [user (filter-users board-editing roster query)]
+                        [:div.board-edit-private-users-result
+                          (user-avatar-image user)
+                          [:div.name
+                            (str (:first-name user) " " (:last-name user))]
+                          [:div.user-type
+                            "user type"]]))])]])
           [:div.board-edit-footer
             [:div.board-edit-footer-left
               (when (and (seq (:slug board-editing))
