@@ -224,6 +224,22 @@
                      :data-container "body"
                      :title (str (:name board-data) " settings")
                      :on-click #(dis/dispatch! [:board-edit board-data])}])]
+              (when (= (:access board-data) "private")
+                [:div.private-board
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title (if (= (router/current-board-slug) "drafts")
+                           "Only visible to you"
+                           "Only visible to invited team members")}
+                  "Private"])
+              (when (= (:access board-data) "public")
+                [:div.public-board
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Visible to the world, including search engines"}
+                  "Public"])
               ;; Add entry button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))

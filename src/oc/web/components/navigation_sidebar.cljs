@@ -118,7 +118,8 @@
             {:class (when is-all-posts "item-selected")
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
-            [:div.all-posts-icon]
+            [:div.all-posts-icon
+              {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
                 "All Posts"]])
         ;; Boards list
@@ -140,20 +141,20 @@
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)
-                  :let [board-url (utils/get-board-url org-slug (:slug board))]]
+                  :let [board-url (utils/get-board-url org-slug (:slug board))
+                        is-current-board (= (router/current-board-slug) (:slug board))]]
               [:a.left-navigation-sidebar-item.hover-item
-                {:class (when (and (not is-all-posts) (= (router/current-board-slug) (:slug board))) "item-selected")
+                {:class (when (and (not is-all-posts) is-current-board) "item-selected")
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(anchor-nav! % board-url)}
-                (when (or (= (:access board) "public")
-                          (= (:access board) "private"))
-                  [:img
-                    {:src (if (= (:access board) "public")
-                           (utils/cdn "/img/ML/board_public.svg")
-                           (utils/cdn "/img/ML/board_private.svg"))
-                     :class (if (= (:access board) "public") "public" "private")}])
+                (when (= (:access board) "public")
+                  [:div.public
+                    {:class (when is-current-board "selected")}])
+                (when (= (:access board) "private")
+                  [:div.private
+                    {:class (when is-current-board "selected")}])
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")
@@ -173,13 +174,8 @@
                    :key (str "board-list-" (name (:slug drafts-board)))
                    :href board-url
                    :on-click #(anchor-nav! % board-url)}
-                  (when (or (= (:access drafts-board) "public")
-                            (= (:access drafts-board) "private"))
-                    [:img
-                      {:src (if (= (:access drafts-board) "public")
-                             (utils/cdn "/img/ML/board_public.svg")
-                             (utils/cdn "/img/ML/board_private.svg"))
-                       :class (if (= (:access drafts-board) "public") "public" "private")}])
+                  [:div.private
+                    {:class (when (= (router/current-board-slug) (:slug drafts-board)) "selected")}]
                   [:div.board-name.group
                     {:class (utils/class-set {:public-board (= (:access drafts-board) "public")
                                               :private-board (= (:access drafts-board) "private")
