@@ -638,18 +638,6 @@
         (fn [{:keys [status success body]}]
           (get-board (dispatcher/board-data)))))))
 
-(defn private-board-user-action
-  [user-data action-link & [params]]
-  (when (and user-data action-link)
-    (let [headers {:headers (headers-for-link action-link)}
-          with-params (if params
-                        (assoc headers :json-params (cljs->json params))
-                        headers)]
-      (storage-http (method-for-link action-link) (relative-href action-link)
-        with-params
-        (fn [{:keys [status success body]}]
-          (get-board (dispatcher/board-data)))))))
-
 (defn password-reset
   [email]
   (when email
@@ -894,6 +882,38 @@
             {:status status
              :activity-data activity-data
              :reaction-data (if success (json->cljs body) {})}]))))))
+
+(defn add-user-to-private-board
+  [board-data user user-type]
+  (when (and user
+             board-data
+             (= (:access board-data) "private"))
+    (let [add-link (utils/link-for
+                    (:links board-data)
+                    "add"
+                    "POST"
+                    {:content-type
+                      (if (= user-type :viewer)
+                        "application/vnd.open-company.board.viewer.v1"
+                        "application/vnd.open-company.board.author.v1")})]
+      (when add-link
+        (storage-http (method-for-link add-link) (relative-href add-link)
+         {:headers (headers-for-link add-link)
+          :body (:user-id user)}
+         (fn [{:keys [status success body]}]
+           (js/console.log "api/add-user-to-private-board" success status body)
+           (dispatcher/dispatch! [:private-board-user-add/finish success])))))))
+
+(defn remove-user-from-private-board
+  [user]
+  (when user
+    (let [remove-link (utils/link-for (:links user) "remove")]
+      (when remove-link
+        (storage-http (method-for-link remove-link) (relative-href remove-link)
+         {:headers (headers-for-link remove-link)}
+         (fn [{:keys [status success body]}]
+           (js/console.log "api/remove-user-from-private-board" success status body)
+           (dispatcher/dispatch! [:private-board-user-remove/finish success])))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)

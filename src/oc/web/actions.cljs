@@ -802,45 +802,6 @@
       (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data))))
   (dissoc db :latest-entry-point :latest-auth-settings))
 
-(defmethod dispatcher/action :private-board-add
-  [db [_]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        user-type (:selected-user-type (:private-board-invite db))
-        user-id (:selected-user-id (:private-board-invite db))
-        board-data (dispatcher/board-data db)
-        viewers (:viewers board-data)
-        authors (:authors board-data)
-        new-viewers (if (= user-type :viewer)
-                      (conj viewers {:user-id user-id :loading true})
-                      (filterv #(not= (:user-id %) user-id) viewers))
-        new-authors (if (= user-type :author)
-                      (conj authors {:user-id user-id :loading true})
-                      (filterv #(not= (:user-id %) user-id) authors))
-        new-board-data (merge board-data {:viewers new-viewers
-                                          :authors new-authors})]
-    (api/add-private-board board-data user-id user-type)
-    (assoc-in db board-key new-board-data)))
-
-(defmethod dispatcher/action :private-board-action
-  [db [_ user-id user-type link]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        board-data (dispatcher/board-data db)
-        viewers (:viewers board-data)
-        authors (:authors board-data)
-        user (if (= user-type :viewer)
-                (first (filter #(= (:user-id %) user-id) viewers))
-                (first (filter #(= (:user-id %) user-id) authors)))
-        new-viewers (if (= user-type :viewer)
-                      (conj (filterv #(= (:user-id %) user-id) viewers) (assoc user :loading true))
-                      viewers)
-        new-authors (if (= user-type :authors)
-                      (conj (filterv #(= (:user-id %) user-id) authors) (assoc user :loading true))
-                      authors)
-        new-board-data (merge board-data {:viewers new-viewers
-                                          :authors new-authors})]
-    (api/private-board-user-action user link)
-    (assoc-in db board-key new-board-data)))
-
 (defmethod dispatcher/action :password-reset
   [db [_]]
   (api/password-reset (:email (:password-reset db)))
@@ -1830,3 +1791,30 @@
         (when-not err
           (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
     db))
+
+(defmethod dispatcher/action :private-board-user-add
+  [db [_ user user-type]]
+  (let [board-data (dispatcher/board-data db)]
+    (api/add-user-to-private-board board-data user user-type)
+    db))
+
+(defmethod dispatcher/action :private-board-user-add/finish
+  [db [_ success]]
+  (when success
+    (let [board-data (dispatcher/board-data db)
+          board-link (utils/link-for (:links board-data) "self")]
+      (api/get-board board-link)))
+  db)
+
+(defmethod dispatcher/action :private-board-user-remove
+  [db [_ user]]
+  (api/remove-user-from-private-board user)
+  db)
+
+(defmethod dispatcher/action :private-board-user-remove/finish
+  [db [_ success]]
+  (when success
+    (let [board-data (dispatcher/board-data db)
+          board-link (utils/link-for (:links board-data) "self")]
+      (api/get-board board-link)))
+  db)
