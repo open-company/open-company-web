@@ -201,18 +201,16 @@
                  "Share news with recruits, potential investors and customers to keep them "
                  "engaged and supportive. Build trust and grow your business.")]]]]
 
-        [:section.fourth-section.group
-          [:div.above-noise-container
-            [:div.above-noise-description
-              (str
-               "Give your team a clear view of what’s important "
-               "to keep everyone on the same page.")]
-            (when-not (jwt/jwt)
+        (when-not (jwt/jwt)
+          [:section.fourth-section.group
+            [:div.above-noise-container
+              [:div.above-noise-description
+                "With Carrot, everyone’s on the same page."]
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
                               (dis/dispatch! [:login-overlay-show :signup-with-slack])
                               (router/nav! oc-urls/sign-up))}
-                "Get started for free"])]]
+                "Get started for free"]]])
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 

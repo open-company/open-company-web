@@ -209,9 +209,7 @@
       [:section.fourth-section.group
         [:div.above-noise-container
           [:div.above-noise-description
-            (str
-             "Give your team a clear view of what’s important "
-             "to keep everyone on the same page.")]
+            "With Carrot, everyone’s on the same page."]
           [:button.mlb-reset.get-started-button
             "Get started for free"]]]
       ]])
@@ -519,7 +517,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Grow together"]
+          [:title "Carrot - Stay aligned"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -643,7 +641,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Grow together"]
+          [:title "Carrot - Stay aligned"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
