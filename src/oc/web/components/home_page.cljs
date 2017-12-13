@@ -64,7 +64,7 @@
             "to keep everyone on the same page"]
           [:div.subheadline.mobile-only
             (str
-             "Give your team a clea view of what’s most important "
+             "Give your team a clear view of what’s most important "
              "to keep everyone on the same page")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))

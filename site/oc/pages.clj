@@ -76,7 +76,7 @@
           "to keep everyone on the same page"]
         [:div.subheadline.mobile-only
           (str
-           "Give your team a clea view of what’s most important "
+           "Give your team a clear view of what’s most important "
            "to keep everyone on the same page")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
