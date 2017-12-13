@@ -15,6 +15,10 @@
   (when-not (jwt/jwt)
     [:div
       [:button.signin-with-slack
+        {:on-click #(do
+                     (.preventDefault %)
+                     (when (:auth-settings @dis/app-state)
+                       (dis/dispatch! [:login-with-slack])))}
         "Sign in with"
         [:div.slack-white-icon]]
       [:div.signin-with-slack-description
