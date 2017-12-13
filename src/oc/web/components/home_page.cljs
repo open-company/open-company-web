@@ -180,7 +180,7 @@
             [:div.why-carrot
               "Keep your stakeholders informed"]
             [:div.why-carrot-description
-              "It’s just as easy to share the latest news with your extended team."]]
+              "Share the latest news with your extended team."]]
           [:div.third-section-footer.group
             [:div.copy
               [:div.copy-icon.copy-simplify]

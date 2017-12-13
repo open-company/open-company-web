@@ -186,7 +186,7 @@
           [:div.why-carrot
             "Keep your stakeholders informed"]
           [:div.why-carrot-description
-            "It’s just as easy to share the latest news with your extended team."]]
+            "Share the latest news with your extended team."]]
         [:div.third-section-footer.group
           [:div.copy
             [:div.copy-icon.copy-simplify]
@@ -313,7 +313,6 @@
         [:li [:b "Concierge support to desgin custom stakeholder content *"]]]
        [:div.pricing-footer
         [:p "Impress your investors and advisors with beautful, concise and meaningful updates."]]]]
-     ;; "<!--         <div class=\"col-md-4 sm-12\">\n          <h2>Team</h2>\n          <p>Internal distribution with Slack.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Stakeholders</h2>\n          <p>Periodic stakeholder updates distributed automatically.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Concierge</h2>\n          <p>Beautiful stakeholder updates, hand-crafted by content creation professionals.</p>\n        </div>\n -->"
      ]])
 
 (defn about
@@ -417,7 +416,7 @@
                   [:img {:src "http://www.gravatar.com/avatar/99399ee082e57d67045cb005f9c2e4ef?s=100"}]]
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
-                  [:div.team-title "CEO"]
+                  [:div.team-title "Founder and CEO"]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]]]]
               [:div.team-card.iacopo-carraro
@@ -435,7 +434,7 @@
                   [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=100"}]]
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
-                  [:div.team-title "CTO"]
+                  [:div.team-title "Founder and CTO"]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]]]]
               [:div.team-card.nathan-zorn
