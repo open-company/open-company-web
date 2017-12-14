@@ -422,6 +422,14 @@ div.board-edit-container {
                 padding-right: 12px;
                 cursor: pointer;
 
+                &.remove-link {
+                  text-decoration: underline;
+
+                  &:after {
+                    display: none;
+                  }
+                }
+
                 &:after {
                   content: "";
                   position: absolute;
