@@ -53,8 +53,9 @@
 (defn get-addable-users
   "Filter users that are not arleady viewer or author users."
   [board-data roster]
-  (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))]
-    (remove #(some #{(:user-id %)} already-in-ids) (:users roster))))
+  (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))
+        without-self (remove #(= (:user-id %) (jwt/user-id)) (:users roster))]
+    (remove #(some #{(:user-id %)} already-in-ids) without-self)))
 
 (rum/defcs board-edit < rum/reactive
                         ;; Derivatives
