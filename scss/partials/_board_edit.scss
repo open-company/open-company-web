@@ -20,7 +20,6 @@ div.board-edit-container {
   div.modal-wrapper {
     width: #{552 + 20 + 8}px;
     margin: 40px auto;
-    height: 387px;
     position: relative;
 
     div.board-edit {
@@ -31,10 +30,6 @@ div.board-edit-container {
       border-radius: 8px;
       box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
       padding: 24px 16px;
-
-      &.show-slack-channels {
-        height: 500px;
-      }
 
       span.more-info {
         width: 16px;
