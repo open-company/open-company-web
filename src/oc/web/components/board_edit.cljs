@@ -173,9 +173,32 @@
                 [:span.board-name
                   {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
           [:div.board-edit-divider]
+          (when show-slack-channels?
+            [:div.board-edit-slack-channels-container
+              [:div.board-edit-slack-channels-label.group
+                [:div.title
+                  "Send new posts and comments to Slack"]
+                (carrot-checkbox {:selected @(::slack-enabled s)
+                                  :did-change-cb #(do
+                                                    (reset! (::slack-enabled s) %)
+                                                    (when-not %
+                                                      (dis/dispatch!
+                                                       [:input
+                                                        [:board-editing :slack-mirror]
+                                                        nil])))})]
+              (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
+                                        :initial-value (when channel-name (str "#" channel-name))
+                                        :on-change (fn [team channel]
+                                                     (dis/dispatch!
+                                                      [:input
+                                                       [:board-editing :slack-mirror]
+                                                       {:channel-id (:id channel)
+                                                        :channel-name (:name channel)
+                                                        :slack-org-id (:slack-org-id team)}]))})])
+          [:div.board-edit-divider]
           [:div.board-edit-body
             [:div.board-edit-name-label-container.group
-              [:div.board-edit-label.board-edit-name-label "BOARD NAME"]
+              [:div.board-edit-label.board-edit-name-label "Board name"]
               (when (:board-name-error board-editing)
                 [:div.board-name-error (:board-name-error board-editing)])]
             [:div.board-edit-name-field.emoji-autocomplete
@@ -186,7 +209,7 @@
                :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
                :placeholder "All-hands, Announcements, CEO, Marketing, Sales, Who We Are"
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
-            [:div.board-edit-label.board-edit-access-label "BOARD PERMISSIONS"]
+            [:div.board-edit-label.board-edit-access-label "Board permissions"]
             [:div.board-edit-access-field.group
               [:div.board-edit-access-bt.board-edit-access-team-bt
                 {:class (when (= (:access board-editing) "team") "selected")
@@ -209,29 +232,6 @@
                  :data-placement "top"
                  :title "This board is open for the public to see. Contributors can edit."}
                 [:span.board-edit-access-title "Public"]]]]
-          [:div.board-edit-divider]
-          (when show-slack-channels?
-            [:div.board-edit-slack-channels-container
-              [:div.board-edit-slack-channels-label.group
-                [:div.title
-                  "SEND NEW POSTS AND COMMENTS TO SLACK"]
-                (carrot-checkbox {:selected @(::slack-enabled s)
-                                  :did-change-cb #(do
-                                                    (reset! (::slack-enabled s) %)
-                                                    (when-not %
-                                                      (dis/dispatch!
-                                                       [:input
-                                                        [:board-editing :slack-mirror]
-                                                        nil])))})]
-              (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
-                                        :initial-value (when channel-name (str "#" channel-name))
-                                        :on-change (fn [team channel]
-                                                     (dis/dispatch!
-                                                      [:input
-                                                       [:board-editing :slack-mirror]
-                                                       {:channel-id (:id channel)
-                                                        :channel-name (:name channel)
-                                                        :slack-org-id (:slack-org-id team)}]))})])
           (when (= (:access board-editing) "private")
             (let [query  (::query s)
                   addable-users (get-addable-users board-data roster)
