@@ -267,13 +267,13 @@ div.board-edit-container {
 
           div.board-edit-add-user-dropdown-container{
             position: absolute;
-            right: 100px;
+            right: 120px;
             z-index: 3;
 
             div.dropdown-list-container {
               top: 0px;
               left: 0px;
-              width: 100px;
+              width: 120px;
 
               div.triangle {
                 top: unset;
@@ -390,7 +390,7 @@ div.board-edit-container {
             @include avenir_R();
             font-size: 16px;
             color: $carrot_dark_gray;
-            height: 192px;
+            max-height: 192px;
             overflow-y: auto;
 
             div.board-edit-private-user {
