@@ -59,9 +59,9 @@ div.board-edit-container {
         @include user-profile(32);
 
         div.title {
-          @include avenir_M();
-          font-size: 16px;
-          color: $carrot_light_gray_1;
+          @include avenir_H();
+          font-size: 12px;
+          color: $oc_gray_7;
           float: left;
           margin-top: 5px;
 
