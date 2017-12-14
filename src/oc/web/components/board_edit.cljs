@@ -79,8 +79,6 @@
                         (rum/local nil ::window-click-event)
                         (rum/local "" ::query)
                         (rum/local false ::show-search-results)
-                        (rum/local nil ::show-add-user-dropdown)
-                        (rum/local nil ::show-add-user-top)
                         (rum/local nil ::show-edit-user-dropdown)
                         (rum/local nil ::show-edit-user-top)
                         ;; Mixins
@@ -121,8 +119,7 @@
                             (events/listen js/window EventType/CLICK
                              #(do
                                (when-not (utils/event-inside? % (rum/ref-node s "private-users-search"))
-                                 (reset! (::show-search-results s) false)
-                                 (reset! (::show-add-user-dropdown s) nil))
+                                 (reset! (::show-search-results s) false))
                                (when-not (utils/event-inside? % (rum/ref-node s "edit-users-scroll"))
                                  (reset! (::show-edit-user-dropdown s) nil)))))
                           s)
@@ -162,7 +159,8 @@
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
         roster (drv/react s :team-roster)
-        org-data (drv/react s :org-data)]
+        org-data (drv/react s :org-data)
+        team-data (drv/react s :team-data)]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -179,10 +177,24 @@
                 [:span.board-name
                   {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
           [:div.board-edit-divider]
+          [:div.board-edit-body
+            [:div.board-edit-name-label-container.group
+              [:div.board-edit-label.board-edit-name-label "Board name"]
+              (when (:board-name-error board-editing)
+                [:div.board-name-error (:board-name-error board-editing)])]
+            [:div.board-edit-name-field.emoji-autocomplete
+              {:class (when (:board-name-error board-editing) "board-name-error")
+               :content-editable true
+               :ref "board-name"
+               :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
+               :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
+               :placeholder "All-hands, Announcements, CEO, Marketing, Sales, Who We Are"
+               :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]]
+          [:div.board-edit-divider]
           (when show-slack-channels?
             [:div.board-edit-slack-channels-container
               [:div.board-edit-slack-channels-label.group
-                [:div.title
+                [:div.board-edit-label
                   "Send new posts and comments to Slack"]
                 (carrot-checkbox {:selected @(::slack-enabled s)
                                   :did-change-cb #(do
@@ -203,18 +215,6 @@
                                                         :slack-org-id (:slack-org-id team)}]))})])
           [:div.board-edit-divider]
           [:div.board-edit-body
-            [:div.board-edit-name-label-container.group
-              [:div.board-edit-label.board-edit-name-label "Board name"]
-              (when (:board-name-error board-editing)
-                [:div.board-name-error (:board-name-error board-editing)])]
-            [:div.board-edit-name-field.emoji-autocomplete
-              {:class (when (:board-name-error board-editing) "board-name-error")
-               :content-editable true
-               :ref "board-name"
-               :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
-               :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
-               :placeholder "All-hands, Announcements, CEO, Marketing, Sales, Who We Are"
-               :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]
             [:div.board-edit-label.board-edit-access-label "Board permissions"]
             [:div.board-edit-access-field.group
               [:div.board-edit-access-bt.board-edit-access-team-bt
@@ -238,6 +238,7 @@
                  :data-placement "top"
                  :title "This board is open for the public to see. Contributors can edit."}
                 [:span.board-edit-access-title "Public"]]]]
+          [:div.board-edit-divider]
           (when (= (:access board-editing) "private")
             (let [query  (::query s)
                   addable-users (get-addable-users board-data roster)
@@ -255,41 +256,30 @@
                     [:input
                       {:value @query
                        :type "text"
-                       :placeholder "Look for people to add"
+                       :placeholder "Add a team member to this board"
                        :on-focus #(reset! (::show-search-results s) true)
-                       :on-change #(let [query (.. % -target -value)]
-                                    (reset! (::show-search-results s) (seq query))
-                                    (reset! query query))}]
-                    [:div.board-edit-add-user-dropdown-container
-                      {:style {:top (str (+ @(::show-add-user-top s) 40 -100) "px")
-                               :display (if (seq @(::show-add-user-dropdown s)) "block" "none")}}
-                      (dropdown-list {:items [{:value :author :label "Full Access"}
-                                              {:value :viewer :label "Viewer"}]
-                                      :on-change (fn [item]
-                                                   (let [user (some #(when (= (:user-id %) @(::show-add-user-dropdown s)) %) filtered-users)]
-                                                     (reset! (::show-search-results s) false)
-                                                     (dis/dispatch! [:private-board-user-add user (:value item)])
-                                                     (utils/after 10 #(reset! (::show-add-user-dropdown s) nil))))})]
+                       :on-change #(let [q (.. % -target -value)]
+                                    (reset! (::show-search-results s) (seq q))
+                                    (reset! query q))}]
                     (when @(::show-search-results s)
                       [:div.board-edit-private-users-results
-                        {:on-scroll #(when @(::show-add-user-dropdown s)
-                                       (reset! (::show-add-user-dropdown s) nil))
-                         :ref "add-users-scroll"}
-                        (for [user filtered-users]
+                        (for [u filtered-users
+                              :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users team-data))
+                                    user (merge u team-user)
+                                    user-type (utils/get-user-type user org-data board-data)]]
                           [:div.board-edit-private-users-result
-                            {:on-click #(let [user-row-node (rum/ref-node s (str "add-user-" (:user-id user)))
-                                              top (- (.-offsetTop user-row-node) (.-scrollTop (.-parentElement user-row-node)))
-                                              next-user-id (if (= @(::show-add-user-dropdown s) (:user-id user))
-                                                             nil
-                                                             (:user-id user))]
-                                         (reset! (::show-add-user-top s) top)
-                                         (reset! (::show-add-user-dropdown s) next-user-id))
+                            {:on-click #(do
+                                          (reset! query "")
+                                          (reset! (::show-search-results s) false)
+                                          (dis/dispatch! [:private-board-user-add user user-type]))
                              :ref (str "add-user-" (:user-id user))}
                             (user-avatar-image user)
                             [:div.name
                               (utils/name-or-email user)]
                             [:div.user-type
-                              "Add as"]])])])
+                              (if (= user-type :viewer)
+                               "Viewer"
+                               "Full Access")]])])])
                 [:div.board-edit-private-users
                   (let [user-id @(::show-edit-user-dropdown s)
                         user-type (if (utils/in? (map :user-id (:viewers board-data)) user-id)
@@ -304,7 +294,7 @@
                       (dropdown-list {:items [{:value :viewer :label "Viewer"}
                                               {:value :author :label "Full Access"}
                                               {:value nil :label :divider-line}
-                                              {:value :remove :label "Remove User"}]
+                                              {:value :remove :label "Remove User" :color "#FA6452"}]
                                       :value user-type
                                       :on-change (fn [item]
                                                   (reset! (::show-edit-user-dropdown s) nil)
@@ -366,6 +356,8 @@
                             (if (= user-type :author)
                               "Full Access"
                               "Viewer")])])]]]))
+          (when (= (:access board-editing) "private")
+            [:div.board-edit-divider])
           [:div.board-edit-footer
             [:div.board-edit-footer-left
               (when (and (seq (:slug board-data))
