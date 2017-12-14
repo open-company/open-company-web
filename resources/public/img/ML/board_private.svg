@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="10px" height="14px" viewBox="0 0 10 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 46 (44423) - http://www.bohemiancoding.com/sketch -->
-    <title>icon</title>
+<svg width="8px" height="10px" viewBox="0 0 8 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.1 (47250) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_lock</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Components-/-Navigation-/-Design" transform="translate(-4.000000, -432.000000)">
-            <g id="Group-4" transform="translate(1.000000, -3.000000)">
-                <g id="Components-/-Navigation-/-Design" transform="translate(0.000000, 3.000000)">
-                    <g id="ic_lock" transform="translate(0.000000, 431.000000)">
-                        <g id="icon" transform="translate(3.000000, 1.000000)">
-                            <g>
-                                <path d="M0,5.49710104 C0,4.67027497 0.671655983,4 1.49710104,4 L8.50289896,4 C9.32972503,4 10,4.67165598 10,5.49710104 L10,12.502899 C10,13.329725 9.32834402,14 8.50289896,14 L1.49710104,14 C0.670274966,14 0,13.328344 0,12.502899 L0,5.49710104 Z M5,10 C5.55228475,10 6,9.55228475 6,9 C6,8.44771525 5.55228475,8 5,8 C4.44771525,8 4,8.44771525 4,9 C4,9.55228475 4.44771525,10 5,10 Z" id="Rectangle-19" fill="#C7C9CC"></path>
-                                <rect id="Rectangle-18" stroke="#C7C9CD" stroke-width="1.5" x="2.75" y="0.75" width="4.5" height="5.5" rx="2"></rect>
-                            </g>
-                        </g>
-                    </g>
-                </g>
+    <g id="Board-privacy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-525.000000, -120.000000)" opacity="0.5">
+        <g id="Group-5" transform="translate(525.000000, 116.000000)">
+            <g id="ic_lock" transform="translate(0.000000, 4.000000)">
+                <rect id="Rectangle-19" fill="#34414F" x="0" y="3.33333333" width="8" height="6.66666667" rx="1.5"></rect>
+                <rect id="Rectangle-18" stroke="#34414F" stroke-width="1.5" x="1.89285714" y="0.75" width="4.21428571" height="5.34444444" rx="2"></rect>
             </g>
         </g>
     </g>

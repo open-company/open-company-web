@@ -34,16 +34,64 @@ div.dashboard-layout {
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
           background-repeat: no-repeat;
-          background-position: 0px 9px;
+          background-position: 6px 7px;
+          background-color: #F0EFEA;
+          border-radius: 10px;
           width: 20px;
           height: 20px;
-          margin-top: 6px;
-          margin-left: 6px;
+          margin-top: 11px;
+          margin-left: 7px;
           opacity: 0.8;
 
           &:hover {
             opacity: 1;
           }
+        }
+      }
+
+      div.private-board {
+        @include avenir_M();
+        font-size: 14px;
+        color: rgba(#34414F, 0.5);
+        position: relative;
+        padding-left: 16px;
+        float: left;
+        margin-top: 12px;
+        margin-left: 16px;
+
+        &:before {
+          content: "";
+          background-image: cdnUrl("/img/ML/board_private.svg");
+          background-size: 8px 10px;
+          background-repeat: no-repeat;
+          width: 8px;
+          height: 10px;
+          position: absolute;
+          top: 3px;
+          left: 0px;
+        }
+      }
+
+      div.public-board {
+        @include avenir_M();
+        font-size: 14px;
+        color: rgba(#34414F, 0.5);
+        position: relative;
+        padding-left: 16px;
+        float: left;
+        margin-top: 12px;
+        margin-left: 16px;
+
+        &:before {
+          content: "";
+          background-image: cdnUrl("/img/ML/board_public.svg");
+          background-size: 10px 10px;
+          background-repeat: no-repeat;
+          width: 10px;
+          height: 10px;
+          position: absolute;
+          top: 4px;
+          left: 0px;
         }
       }
 

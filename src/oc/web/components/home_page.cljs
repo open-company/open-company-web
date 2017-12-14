@@ -40,6 +40,7 @@
       [:div.main.home-page
         ; Hope page header
         [:section.cta.group
+          {:class (when (jwt/jwt) "no-get-started-button")}
           [:div.balloon.big-yellow]
           [:div.balloon.big-red]
           [:div.balloon.big-purple]
@@ -48,8 +49,7 @@
           [:div.balloon.small-red]
           [:div.balloon.small-yellow-face]
           [:div.balloon.small-yellow]
-          [:div.balloon.small-red-face
-            {:class (when (jwt/jwt) "no-get-started-button")}]
+          [:div.balloon.small-red-face]
           [:div.balloon.small-purple]
           [:div.balloon.small-blue-face]
           [:div.balloon.small-red-1]
@@ -58,10 +58,14 @@
 
           [:h1.headline
             "Rise above the noise"]
-          [:div.subheadline
+          [:div.subheadline.big-web-only
             "Give your team a clear view of what’s most important"]
-          [:div.subheadline.second-line
+          [:div.subheadline.second-line.big-web-only
             "to keep everyone on the same page"]
+          [:div.subheadline.mobile-only
+            (str
+             "Give your team a clear view of what’s most important "
+             "to keep everyone on the same page")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -168,6 +172,7 @@
                "Posts are automatically shared to the right channels. Discussions about posts happen "
                "in Slack and Carrot - everything is kept in sync.")]
             [:button.mlb-reset.slack-btn
+              {:on-click #(router/nav! oc-urls/slack)}
               "Learn More"]]]
 
         [:section.third-section.group
@@ -175,7 +180,7 @@
             [:div.why-carrot
               "Keep your stakeholders informed"]
             [:div.why-carrot-description
-              "It’s just as easy to share the latest news with your extended team."]]
+              "Share the latest news with your extended team."]]
           [:div.third-section-footer.group
             [:div.copy
               [:div.copy-icon.copy-simplify]
@@ -196,18 +201,16 @@
                  "Share news with recruits, potential investors and customers to keep them "
                  "engaged and supportive. Build trust and grow your business.")]]]]
 
-        [:section.fourth-section.group
-          [:div.above-noise-container
-            [:div.above-noise-description
-              (str
-               "Give your team a clear view of what’s important "
-               "to keep everyone on the same page.")]
-            (when-not (jwt/jwt)
+        (when-not (jwt/jwt)
+          [:section.fourth-section.group
+            [:div.above-noise-container
+              [:div.above-noise-description
+                "With Carrot, everyone’s on the same page."]
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
                               (dis/dispatch! [:login-overlay-show :signup-with-slack])
                               (router/nav! oc-urls/sign-up))}
-                "Get started for free"])]]
+                "Get started for free"]]])
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 

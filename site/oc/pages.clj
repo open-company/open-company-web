@@ -70,10 +70,14 @@
 
         [:h1.headline
           "Rise above the noise"]
-        [:div.subheadline
+        [:div.subheadline.big-web-only
           "Give your team a clear view of what’s most important"]
-        [:div.subheadline.second-line
+        [:div.subheadline.second-line.big-web-only
           "to keep everyone on the same page"]
+        [:div.subheadline.mobile-only
+          (str
+           "Give your team a clear view of what’s most important "
+           "to keep everyone on the same page")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -174,6 +178,7 @@
              "Posts are automatically shared to the right channels. Discussions about posts happen "
              "in Slack and Carrot - everything is kept in sync.")]
           [:button.mlb-reset.slack-btn
+            {:onClick "window.location='/slack';"}
             "Learn More"]]]
 
       [:section.third-section.group
@@ -181,7 +186,7 @@
           [:div.why-carrot
             "Keep your stakeholders informed"]
           [:div.why-carrot-description
-            "It’s just as easy to share the latest news with your extended team."]]
+            "Share the latest news with your extended team."]]
         [:div.third-section-footer.group
           [:div.copy
             [:div.copy-icon.copy-simplify]
@@ -204,9 +209,7 @@
       [:section.fourth-section.group
         [:div.above-noise-container
           [:div.above-noise-description
-            (str
-             "Give your team a clear view of what’s important "
-             "to keep everyone on the same page.")]
+            "With Carrot, everyone’s on the same page."]
           [:button.mlb-reset.get-started-button
             "Get started for free"]]]
       ]])
@@ -308,7 +311,6 @@
         [:li [:b "Concierge support to desgin custom stakeholder content *"]]]
        [:div.pricing-footer
         [:p "Impress your investors and advisors with beautful, concise and meaningful updates."]]]]
-     ;; "<!--         <div class=\"col-md-4 sm-12\">\n          <h2>Team</h2>\n          <p>Internal distribution with Slack.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Stakeholders</h2>\n          <p>Periodic stakeholder updates distributed automatically.</p>\n        </div>\n        <div class=\"col-md-4 sm-12\">\n          <h2>Concierge</h2>\n          <p>Beautiful stakeholder updates, hand-crafted by content creation professionals.</p>\n        </div>\n -->"
      ]])
 
 (defn about
@@ -412,7 +414,7 @@
                   [:img {:src "http://www.gravatar.com/avatar/99399ee082e57d67045cb005f9c2e4ef?s=100"}]]
                 [:div.team-member
                   [:div.team-name "Stuart Levinson"]
-                  [:div.team-title "CEO"]
+                  [:div.team-title "Founder and CEO"]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]]]]
               [:div.team-card.iacopo-carraro
@@ -430,7 +432,7 @@
                   [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=100"}]]
                 [:div.team-member
                   [:div.team-name "Sean Johnson"]
-                  [:div.team-title "CTO"]
+                  [:div.team-title "Founder and CTO"]
                   [:div.team-media-links
                     [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]]]]
               [:div.team-card.nathan-zorn
@@ -515,7 +517,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Grow together"]
+          [:title "Carrot - Stay aligned"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -576,7 +578,9 @@
 
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+                [:div.oc-loading-body]]
+              [:div.setup-cta
+                "Here we go!"]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files
@@ -637,7 +641,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Grow together"]
+          [:title "Carrot - Stay aligned"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -682,7 +686,9 @@
 
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+                [:div.oc-loading-body]]
+              [:div.setup-cta
+                "Here we go!"]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files

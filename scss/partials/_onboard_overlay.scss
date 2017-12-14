@@ -30,11 +30,26 @@ div.onboard-overlay-container {
     box-shadow: 0 4px 34px 0 rgba(#7B7B7B, 0.5);
     text-align: center;
 
+    @include mobile(){
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      margin-left: 0px;
+      margin-top: 0px;
+      border-radius: 0px;
+    }
+
     div.onboard-overlay-step {
       height: 540px;
       background-size: 600px 540px;
       background-repeat: no-repeat;
       padding: 50px 32px;
+
+      @include mobile(){
+        width: 100%;
+        height: 100%;
+      }
 
       div.onboard-overlay-step-title {
         @include avenir_H();
@@ -55,6 +70,10 @@ div.onboard-overlay-container {
         line-height: 26px;
         width: 450px;
         margin: 0 auto;
+
+        @include mobile(){
+          width: 100%;
+        }
       }
 
       button.continue-btn {
@@ -68,6 +87,10 @@ div.onboard-overlay-container {
         position: relative;
         text-align: center;
         padding: 8px 28px;
+
+        @include mobile(){
+          width: 100%;
+        }
 
         &:after {
           @include image-2x("/img/ML/get_started_arrow");
@@ -86,6 +109,10 @@ div.onboard-overlay-container {
       &.step-1 {
         background-image: cdnUrl("/img/ML/onboard_overlay_step_1.png");
 
+        @include mobile() {
+          background-image: none;
+        }
+
         div.step-illustration-container {
           margin-top: 38px;
           width: 402px;
@@ -93,6 +120,11 @@ div.onboard-overlay-container {
           background-size: 402px 164px;
           background-repeat: no-repeat;
           @include image-2x("/img/ML/onboard_overlay_il_1");
+
+          @include mobile(){
+            width: 100%;
+            background-size: 100%;
+          }
         }
 
         div.onboard-overlay-step-description {
@@ -107,6 +139,10 @@ div.onboard-overlay-container {
       &.step-last {
         background-image: cdnUrl("/img/ML/onboard_overlay_step_last.png");
 
+        @include mobile() {
+          background-image: none;
+        }
+
         div.onboard-overlay-step-title {
           margin-top: 0px;
         }
@@ -118,6 +154,11 @@ div.onboard-overlay-container {
           background-size: 260px 231px;
           background-repeat: no-repeat;
           @include image-2x("/img/ML/onboard_overlay_il_last");
+
+          @include mobile(){
+            width: 100%;
+            background-size: 100%;
+          }
         }
 
         div.onboard-overlay-step-description {

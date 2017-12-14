@@ -54,6 +54,10 @@
     }
   }
 
+  div.public, div.private, div.all-posts-icon {
+    opacity: 1;
+  }
+
   div.all-posts-label {
     color: $carrot_dark_gray;
     @include avenir_H();
@@ -120,12 +124,18 @@ div.left-navigation-sidebar {
 
     div.all-posts-icon {
       background-image: cdnUrl("/img/ML/activity_hamburger.svg");
-      background-size: 12px 11px;
-      width: 12px;
-      height: 11px;
+      background-size: 15px 14px;
+      width: 15px;
+      height: 14px;
       float: left;
-      margin-left: 0px;
+      margin-left: -4px;
       margin-top: 8px;
+      opacity: 0.5;
+
+      &.selected {
+        opacity: 1;
+        background-image: cdnUrl("/img/ML/activity_hamburger_blue.svg");
+      }
     }
   }
 
@@ -217,20 +227,36 @@ div.left-navigation-sidebar {
         }
       }
 
-      img.public {
+      div.public {
         float: left;
-        margin-left: 6px;
-        margin-top: 5px;
-        width: 16px;
-        height: 16px;
+        margin-left: 7px;
+        margin-top: 8px;
+        width: 10px;
+        height: 10px;
+        background-image: cdnUrl("/img/ML/board_public.svg");
+        background-size: 10px 10px;
+        opacity: 0.5;
+
+        &.selected {
+          opacity: 1;
+          background-image: cdnUrl("/img/ML/board_public_blue.svg");
+        }
       }
 
-      img.private{
+      div.private{
         float: left;
-        margin-left: 9px;
-        margin-top: 5px;
-        width: 10px;
-        height: 14px;
+        margin-left: 8px;
+        margin-top: 7px;
+        width: 8px;
+        height: 10px;
+        background-image: cdnUrl("/img/ML/board_private.svg");
+        background-size: 8px 10px;
+        opacity: 0.5;
+
+        &.selected {
+          opacity: 1;
+          background-image: cdnUrl("/img/ML/board_private_blue.svg");
+        }
       }
 
       div.board-name {

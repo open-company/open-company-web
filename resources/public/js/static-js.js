@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
   if (jwt) {
     $("#site-header-signup-item").hide();
     // Move the red guy up
-    $("div.home-page div.balloon.small-red-face").addClass("no-get-started-button");
+    $("div.home-page section.cta").addClass("no-get-started-button");
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage

@@ -71,6 +71,22 @@ div#wrap {
         padding-top: 76px;
       }
 
+      &.no-get-started-button {
+        div.balloon {
+          &.small-red-face {
+            top: 330px;
+          }
+
+          &.big-green {
+            top: 321px;
+          }
+
+          &.small-purple {
+            top: 294px;
+          }
+        }
+      }
+
       div.balloon {
         position: absolute;
         background-position: center;
@@ -113,7 +129,7 @@ div#wrap {
           background-size: 200px 172px;
           width: 200px;
           height: 172px;
-          top: 358px;
+          top: 402px;
           left: 50%;
           margin-left: -534px;
         }
@@ -159,14 +175,10 @@ div#wrap {
           background-size: 48px 48px;
           width: 48px;
           height: 48px;
-          top: 414px;
+          top: 426px;
           left: 50%;
           margin-left: -278px;
           z-index: 11;
-
-          &.no-get-started-button {
-            top: 318px;
-          }
         }
 
         &.small-purple {
@@ -174,7 +186,7 @@ div#wrap {
           background-size: 23px 21px;
           width: 23px;
           height: 21px;
-          top: 330px;
+          top: 374px;
           left: 23.64%;
         }
 
@@ -234,8 +246,8 @@ div#wrap {
       }
 
       div.subheadline {
-        color: $carrot_dark_brown;
-        font-size: 20px;
+        color: rgba(#70674B, 0.8);
+        font-size: 24px;
         padding: 0 16px;
         @include avenir_R();
         max-width: 620px;
@@ -248,14 +260,14 @@ div#wrap {
           font-size: 24px;
           max-width: 330px
         }
-
-        &.second-line {
-          margin: 0px auto 40px;
-        }
       }
 
       div.get-started-button-container {
         margin: 0 auto;
+
+        button.get-started-button {
+          margin-top: 33px;
+        }
       }
 
       div.small-teams {
@@ -269,7 +281,7 @@ div#wrap {
 
       video.homepage-main-animation {
         width: 940px;
-        margin: 46px auto 0px;
+        margin: 90px auto 0px;
         padding: 0;
         z-index: 10;
         position: relative;
@@ -507,6 +519,7 @@ div#wrap {
           background-color: white;
           float: left;
           text-align: center;
+          border-radius: 8px;
 
           @include mobile() {
             width: 100%;
@@ -514,6 +527,7 @@ div#wrap {
             float: unset;
             margin: 16px 0px 0px;
             padding: 30px 32px;
+            border-radius: 0px;
           }
 
           &.right {
@@ -659,7 +673,7 @@ div#wrap {
         div.why-carrot {
           @include avenir_H();
           font-size: 48px;
-          color: $carrot_dark_brown;
+          color: $carrot_dark_brown_1;
           margin-bottom: 24px;
           line-height: 60px;
         }
