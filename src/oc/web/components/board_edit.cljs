@@ -354,6 +354,7 @@
                                                                                [:private-board-user-remove u])
                                                                               (dis/dispatch!
                                                                                [:alert-modal-hide])
+                                                                              (close-clicked s)
                                                                               ;; Redirect to the first available board
                                                                               (let [all-boards (:boards org-data)
                                                                                     not-this-boards (remove #(= (:slug %) (router/current-board-slug)) all-boards)]

@@ -1808,13 +1808,15 @@
 
 (defmethod dispatcher/action :private-board-user-remove
   [db [_ user]]
-  (api/remove-user-from-private-board user)
+  (api/remove-user-from-private-board user (= (:user-id user) (jwt/user-id)))
   db)
 
 (defmethod dispatcher/action :private-board-user-remove/finish
-  [db [_ success]]
+  [db [_ success self-user?]]
   (when success
-    (let [board-data (dispatcher/board-data db)
-          board-link (utils/link-for (:links board-data) "self")]
-      (api/get-board board-link)))
+    (if self-user?
+      (api/get-org (dispatcher/org-data))
+      (let [board-data (dispatcher/board-data db)
+            board-link (utils/link-for (:links board-data) "self")]
+        (api/get-board board-link))))
   db)

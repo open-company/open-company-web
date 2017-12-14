@@ -903,14 +903,14 @@
            (dispatcher/dispatch! [:private-board-user-add/finish success])))))))
 
 (defn remove-user-from-private-board
-  [user]
+  [user self-user?]
   (when user
     (let [remove-link (utils/link-for (:links user) "remove")]
       (when remove-link
         (storage-http (method-for-link remove-link) (relative-href remove-link)
          {:headers (headers-for-link remove-link)}
          (fn [{:keys [status success body]}]
-           (dispatcher/dispatch! [:private-board-user-remove/finish success])))))))
+           (dispatcher/dispatch! [:private-board-user-remove/finish success self-user?])))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)
