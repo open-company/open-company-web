@@ -52,7 +52,12 @@
 (rum/defcs login-with-email < rum/reactive
                               dont-scroll
                               no-scroll-mixin
-                              {:did-mount (fn [s] (.focus (sel1 [:input.email])) s)}
+                              {:will-mount (fn [s]
+                                (dis/dispatch! [:input [:login-with-email] {:email "" :pswd ""}])
+                                s)
+                               :did-mount (fn [s]
+                                (.focus (sel1 [:input.email]))
+                                s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -109,7 +114,7 @@
           [:div.sign-in-field-container
             [:input.sign-in-field.email
               {:value (:email (:login-with-email (rum/react dis/app-state)))
-               :on-change #(dis/dispatch! [:input [:login-with-email :email] (.-value (sel1 [:input.email]))])
+               :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
                :type "email"
                :id "sign-in-email"
                :auto-focus true
@@ -121,7 +126,7 @@
           [:div.sign-in-field-container
             [:input.sign-in-field.pswd
               {:value (:pswd (:login-with-email (rum/react dis/app-state)))
-               :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.-value (sel1 [:input.pswd]))])
+               :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
                :type "password"
                :id "sign-in-pswd"
                :tabIndex 2
@@ -154,7 +159,12 @@
 (rum/defcs password-reset < rum/reactive
                             dont-scroll
                             no-scroll-mixin
-                            {:did-mount (fn [s] (.focus (sel1 [:div.sign-in-field-container.email])) s)}
+                            {:will-mount (fn [s]
+                              (dis/dispatch! [:input [:password-reset] {:email ""}])
+                              s)
+                             :did-mount (fn [s]
+                              (.focus (sel1 [:div.sign-in-field-container.email]))
+                              s)}
   [state]
   [:div.login-overlay-container.group
     {:on-click (partial close-overlay)}
@@ -204,7 +214,10 @@
 (rum/defcs collect-name-password < rum/reactive
                                    dont-scroll
                                    no-scroll-mixin
-                                   {:did-mount (fn [s]
+                                   {:will-mount (fn [s]
+                                    (dis/dispatch! [:input [:collect-name-pswd] {:firstname "" :lastname "" :pswd ""}])
+                                    s)
+                                   :did-mount (fn [s]
                                      ; initialise the keys to string to avoid jumps in UI focus
                                      (utils/after 500
                                       #(dis/dispatch!
@@ -242,7 +255,7 @@
             [:input.sign-in-field.firstname.half.left
               {:value (:firstname (:collect-name-pswd (rum/react dis/app-state)))
                :id "collect-name-pswd-firstname"
-               :on-change #(dis/dispatch! [:input [:collect-name-pswd :firstname] (.-value (sel1 [:input.firstname]))])
+               :on-change #(dis/dispatch! [:input [:collect-name-pswd :firstname] (.. % -target -value)])
                :placeholder "First name"
                :type "text"
                :tabIndex 1
@@ -250,7 +263,7 @@
             [:input.sign-in-field.lastname.half.right
               {:value (:lastname (:collect-name-pswd (rum/react dis/app-state)))
                :id "collect-name-pswd-lastname"
-               :on-change #(dis/dispatch! [:input [:collect-name-pswd :lastname] (.-value (sel1 [:input.lastname]))])
+               :on-change #(dis/dispatch! [:input [:collect-name-pswd :lastname] (.. % -target -value)])
                :placeholder "Last name"
                :type "text"
                :tabIndex 2
@@ -261,7 +274,7 @@
             [:input.sign-in-field.pswd
               {:value (:pswd (:collect-name-pswd (rum/react dis/app-state)))
                :id "collect-name-pswd-pswd"
-               :on-change #(dis/dispatch! [:input [:collect-name-pswd :pswd] (.-value (sel1 [:input.pswd]))])
+               :on-change #(dis/dispatch! [:input [:collect-name-pswd :pswd] (.. % -target -value)])
                :pattern ".{8,}"
                :placeholder "Minimum 8 characters"
                :type "password"
@@ -279,7 +292,10 @@
 (rum/defcs collect-password < rum/reactive
                               dont-scroll
                               no-scroll-mixin
-                              {:did-mount (fn [s]
+                              {:will-mount (fn [s]
+                                (dis/dispatch! [:input [:collect-pswd] {:pswd ""}])
+                                s)
+                               :did-mount (fn [s]
                                 ; initialise the keys to string to avoid jumps in UI focus
                                 (utils/after 500
                                  #(dis/dispatch!
@@ -312,7 +328,7 @@
             [:input.sign-in-field.pswd
               {:value (:pswd (:collect-pswd (rum/react dis/app-state)))
                :id "collect-pswd-pswd"
-               :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.-value (sel1 [:input.pswd]))])
+               :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)])
                :pattern ".{8,}"
                :placeholder "Minimum 8 characters"
                :type "password"

@@ -7,6 +7,10 @@ div.onboard-wrapper-container {
     height: 100vh;
     display: flex;
 
+    @include mobile(){
+      display: block;
+    }
+
     div.onboard-wrapper-left {
       background-color: $carrot_dark_bg_gray;
       padding: 21px;
@@ -17,6 +21,10 @@ div.onboard-wrapper-container {
       bottom: 0px;
       left: 0px;
       width: 50%;
+
+      @include mobile(){
+        display: none;
+      }
 
       div.onboard-wrapper-logo {
         width: 82px;
@@ -48,6 +56,12 @@ div.onboard-wrapper-container {
       bottom: 0px;
       right: 0px;
       width: 50%;
+
+      @include mobile(){
+        flex: unset;
+        width: 100%;
+        position: relative;
+      }
     }
   }
 }
@@ -107,105 +121,6 @@ div.onboard-email-container {
 
 div.onboard-lander {
   text-align: center;
-  margin-top: 34px;
-
-  div.steps {
-    height: 58px;
-
-    div.steps-internal {
-      position: relative;
-      margin: 0 auto;
-
-      &.two-steps {
-        width: 278px;
-      }
-
-      &.three-steps {
-        width: 464px;
-      }
-
-      div.step-1, div.step-2, div.step-3 {
-        width: 92px;
-        height: 53px;
-        color: rgba($oc_gray_7, 0.5);
-        @include avenir_H();
-        font-size: 12px;
-        position: absolute;
-        padding-top: 36px;
-        text-align: center;
-
-        &:before {
-          width: 28px;
-          height: 28px;
-          @include image-2x("/img/ML/onboard_step_balloon");
-          background-size: 28px;
-          background-repeat: no-repeat;
-          position: absolute;
-          top: 0px;
-          left: 50%;
-          margin-left: -14px;
-          padding-top: 7px;
-          @include avenir_H();
-          font-size: 12px;
-          color: white;
-        }
-
-        &.active {
-          color: $oc_gray_7;
-          &:before {
-            @include image-2x("/img/ML/onboard_step_balloon_blue");
-          }
-        }
-      }
-
-      div.step-1 {
-        left: 0px;
-        top: 0px;
-
-        &:before {
-          content: "1";
-        }
-      }
-
-      div.step-2 {
-        left: 186px;
-        top: 0px;
-
-        &:before {
-          content: "2";
-        }
-      }
-
-      div.step-3 {
-        left: 374px;
-        top: 0px;
-
-        &:before {
-          content: "3";
-        }
-      }
-
-      div.step-progress-bar {
-        height: 2px;
-        width: 156px;
-        background-color: $carrot_light_gray_2;
-        position: absolute;
-        top: 12px;
-
-        &.active {
-          background-color: $carrot_light_gray_2;
-        }
-      }
-
-      div.step-progress-bar:nth-child(2) {
-        left: 61px;
-      }
-
-      div.step-progress-bar:nth-child(4) {
-        left: 248px;
-      }
-    }
-  }
 
   div.main-cta {
 
@@ -216,18 +131,7 @@ div.onboard-lander {
       color: $carrot_dark_brown_1;
       letter-spacing: auto;
       line-height: 44px;
-
-      &.main-lander {
-        margin-top: 117px;
-      }
-
-      &.about-yourself {
-        margin-top: 25px;
-      }
-
-      &.company-setup {
-        margin-top: 25px;
-      }
+      margin-top: 80px;
     }
 
     div.subtitle {

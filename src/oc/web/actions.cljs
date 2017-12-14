@@ -75,6 +75,7 @@
                  (not (utils/in? (:route @router/path) "email-verification"))
                  (not (utils/in? (:route @router/path) "about"))
                  (not (utils/in? (:route @router/path) "features"))
+                 (not (utils/in? (:route @router/path) "slack"))
                  (not (utils/in? (:route @router/path) "email-wall"))
                  (not (utils/in? (:route @router/path) "sign-up"))
                  (not (utils/in? (:route @router/path) "confirm-invitation")))

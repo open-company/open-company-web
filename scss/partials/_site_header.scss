@@ -26,9 +26,9 @@ nav.site-navbar {
     }
 
     a {
-      @include avenir_M();
-      color: $carrot_dark_brown;
-      font-size: 14px;
+      @include avenir_H();
+      color: rgba(#70674B, 0.8);
+      font-size: 16px;
       margin: 0px 8px;
       display: inline-block;
       height: 30px;

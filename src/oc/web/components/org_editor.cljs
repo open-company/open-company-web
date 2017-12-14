@@ -53,7 +53,6 @@
      :name-did-change false})
 
   (did-mount [_]
-    (utils/update-page-title "Carrot - Setup Your Organization")
     (when-not (:org-editing data)
       (setup-org-name owner data)))
 
