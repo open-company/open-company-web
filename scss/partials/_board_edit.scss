@@ -329,7 +329,7 @@ div.board-edit-container {
                   height: 8px;
                 }
 
-                &.self {
+                &.no-dropdown {
                   cursor: default;
 
                   &:after {
@@ -397,7 +397,7 @@ div.board-edit-container {
                   height: 8px;
                 }
 
-                &.self {
+                &.no-dropdown {
                   cursor: default;
 
                   &:after {

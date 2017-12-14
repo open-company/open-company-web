@@ -230,9 +230,11 @@
                                                         :channel-name (:name channel)
                                                         :slack-org-id (:slack-org-id team)}]))})])
           (when (= (:access board-editing) "private")
-            (let [query  (::query s)]
+            (let [query  (::query s)
+                  can-change (some #{(jwt/user-id)} (map :user-id (:authors board-data)))]
               [:div.board-edit-private-users-container
-                (when (pos? (count addable-users))
+                (when (and can-change
+                           (pos? (count addable-users)))
                   [:div.board-edit-private-users-search
                     {:ref "private-users-search"}
                     [:input
@@ -277,9 +279,10 @@
                         [:div.name
                           (utils/name-or-email user)]
                         [:div.user-type
-                          {:on-click #(when-not self
+                          {:on-click #(when (and can-change
+                                                 (not self))
                                         (reset! (::show-user-dropdown s) (:user-id user)))
-                           :class (when self "self")}
+                           :class (when (or (not can-change) self) "no-dropdown")}
                           (if (= user-type :author)
                             "Author"
                             "Viewer")
