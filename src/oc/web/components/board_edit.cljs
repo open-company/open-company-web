@@ -187,7 +187,8 @@
                :content-editable true
                :ref "board-name"
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
-               :on-key-down #(dis/dispatch! [:input [:board-editing :board-name-error] nil])
+               :on-key-up #(when (:board-name-error board-editing)
+                             (dis/dispatch! [:input [:board-editing :board-name-error] nil]))
                :placeholder "All-hands, Announcements, CEO, Marketing, Sales, Who We Are"
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]]
           [:div.board-edit-divider]
