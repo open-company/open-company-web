@@ -57,12 +57,21 @@ div.board-edit-container {
           @include avenir_M();
           font-size: 16px;
           color: $carrot_light_gray;
-          float: left;
-          margin-top: 5px;
+
+          span {
+            float: left;
+            margin-top: 5px;
+          }
 
           span.board-name {
             color: $carrot_dark_gray;
             @include avenir_H();
+            display: block;
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-left: 8px;
 
             .emojione {
               @include emoji-size(14);
@@ -113,7 +122,7 @@ div.board-edit-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.5);
           width: 100%;
           margin-top: 6px;
-          height: 40px;
+          min-height: 40px;
           @include avenir_M();
           font-size: 14px;
           color: $oc_gray_7;

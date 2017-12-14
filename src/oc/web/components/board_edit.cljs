@@ -172,8 +172,10 @@
           [:div.board-edit-header.group
             (user-avatar-image current-user-data)
             (if new-board?
-              [:div.title "Creating a new Board"]
-              [:div.title "Editing "
+              [:div.title
+                [:span "Creating a new Board"]]
+              [:div.title.group
+                [:span "Editing "]
                 [:span.board-name
                   {:dangerouslySetInnerHTML (utils/emojify (:name board-editing))}]])]
           [:div.board-edit-divider]
@@ -189,6 +191,10 @@
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "board-name") %)
                :on-key-up #(when (:board-name-error board-editing)
                              (dis/dispatch! [:input [:board-editing :board-name-error] nil]))
+               :on-key-press (fn [e]
+                               (when (or (>= (count (.. e -target -innerText)) 50)
+                                        (= (.-key e) "Enter"))
+                                (utils/event-stop e)))
                :placeholder "All-hands, Announcements, CEO, Marketing, Sales, Who We Are"
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]]
           [:div.board-edit-divider]
