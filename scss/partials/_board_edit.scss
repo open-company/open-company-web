@@ -270,6 +270,27 @@ div.board-edit-container {
             }
           }
 
+          div.board-edit-add-user-dropdown-container{
+            position: absolute;
+            right: 100px;
+            z-index: 3;
+
+            div.dropdown-list-container {
+              top: 0px;
+              left: 0px;
+              width: 100px;
+
+              div.triangle {
+                top: unset;
+                bottom: -1px;
+                border-top: 0px solid rgba(177,184,192,0.50);
+                border-left: 0px solid rgba(177,184,192,0.50);
+                border-bottom: 1px solid rgba(177,184,192,0.50);
+                border-right: 1px solid rgba(177,184,192,0.50);
+              }
+            }
+          }
+
           div.board-edit-private-users-results {
             position: absolute;
             top: 38px;
@@ -280,6 +301,7 @@ div.board-edit-container {
             border-radius: 6px;
             border: 1px solid rgba($carrot_light_gray_1, 0.5);
             z-index: 2;
+            overflow-y: auto;
 
             div.board-edit-private-users-result {
               height: 40px;
@@ -335,11 +357,6 @@ div.board-edit-container {
                   &:after {
                     display: none;
                   }
-                }
-
-                div.dropdown-list-container {
-                  top: 24px;
-                  left: -29px;
                 }
               }
             }

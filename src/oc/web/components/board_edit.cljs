@@ -77,14 +77,16 @@
                         (rum/local nil ::window-click-event)
                         (rum/local "" ::query)
                         (rum/local false ::show-search-results)
-                        (rum/local nil ::show-user-dropdown)
+                        (rum/local nil ::show-add-user-dropdown)
+                        (rum/local nil ::show-add-user-top)
+                        (rum/local nil ::show-edit-user-dropdown)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
                           (dis/dispatch! [:teams-get])
-                          (let [board-data @(drv/get-ref s :board-data)]
+                          (let [board-data @(drv/get-ref s :board-editing)]
                             (when (some? (:slack-mirror board-data))
                               (reset! (::slack-enabled s) (:slack-mirror board-data)))
                             (reset! (::initial-board-name s) (:name board-data)))
@@ -115,7 +117,8 @@
                           (reset! (::window-click-event s)
                             (events/listen js/window EventType/CLICK
                              #(when-not (utils/event-inside? % (rum/ref-node s "private-users-search"))
-                                (reset! (::show-search-results s) false))))
+                                (reset! (::show-search-results s) false)
+                                (reset! (::show-add-user-dropdown s) nil))))
                           s)
                          :did-remount (fn [o s]
                           ;; Dismiss animated since the board-editing was removed
@@ -147,13 +150,12 @@
   [s]
   (let [current-user-data (drv/react s :current-user-data)
         board-editing (drv/react s :board-editing)
-        board-data (drv/react s :board-data)
+        board-data (if (seq (:slug board-editing)) (drv/react s :board-data) board-editing)
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
-        roster (drv/react s :team-roster)
-        addable-users (get-addable-users board-data roster)]
+        roster (drv/react s :team-roster)]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -231,7 +233,13 @@
                                                         :slack-org-id (:slack-org-id team)}]))})])
           (when (= (:access board-editing) "private")
             (let [query  (::query s)
-                  can-change (some #{(jwt/user-id)} (map :user-id (:authors board-data)))]
+                  addable-users (get-addable-users board-data roster)
+                  filtered-users (filter-users addable-users @query)
+                  ;; user can edit the private board users if
+                  ;; he's creating a new board
+                  ;; or if he's in the authors list of the existing board
+                  can-change (or (not (seq (:slug board-editing)))
+                                 (some #{(jwt/user-id)} (map :user-id (:authors board-data))))]
               [:div.board-edit-private-users-container
                 (when (and can-change
                            (pos? (count addable-users)))
@@ -245,27 +253,36 @@
                        :on-change #(let [query (.. % -target -value)]
                                     (reset! (::show-search-results s) (seq query))
                                     (reset! query query))}]
+                    [:div.board-edit-add-user-dropdown-container
+                      {:style {:top (str (+ @(::show-add-user-top s) 40 -100) "px")
+                               :display (if (seq @(::show-add-user-dropdown s)) "block" "none")}}
+                      (dropdown-list {:items [{:value :author :label "Author"}
+                                              {:value :viewer :label "Viewer"}]
+                                      :on-change (fn [item]
+                                                   (let [user (some #(when (= (:user-id %) @(::show-add-user-dropdown s)) %) filtered-users)]
+                                                     (reset! (::show-search-results s) false)
+                                                     (dis/dispatch! [:private-board-user-add user (:value item)])
+                                                     (utils/after 10 #(reset! (::show-add-user-dropdown s) nil))))})]
                     (when @(::show-search-results s)
                       [:div.board-edit-private-users-results
-                        (for [user (filter-users addable-users @query)]
+                        {:on-scroll #(when @(::show-add-user-dropdown s)
+                                       (reset! (::show-add-user-dropdown s) nil))
+                         :ref "add-users-scroll"}
+                        (for [user filtered-users]
                           [:div.board-edit-private-users-result
-                            {:on-click #(reset! (::show-user-dropdown s)
-                                         (if (= @(::show-user-dropdown s) (:user-id user))
-                                          nil
-                                          (:user-id user)))}
+                            {:on-click #(let [user-row-node (rum/ref-node s (str "add-user-" (:user-id user)))
+                                              top (- (.-offsetTop user-row-node) (.-scrollTop (.-parentElement user-row-node)))
+                                              next-user-id (if (= @(::show-add-user-dropdown s) (:user-id user))
+                                                             nil
+                                                             (:user-id user))]
+                                         (reset! (::show-add-user-top s) top)
+                                         (reset! (::show-add-user-dropdown s) next-user-id))
+                             :ref (str "add-user-" (:user-id user))}
                             (user-avatar-image user)
                             [:div.name
                               (utils/name-or-email user)]
                             [:div.user-type
-                              "Add as"
-                              (when (= @(::show-user-dropdown s) (:user-id user))
-                                (dropdown-list {:items [{:value :author :label "Author"}
-                                                        {:value :viewer :label "Viewer"}]
-                                                :on-change (fn [item]
-                                                              (reset! (::show-search-results s) false)
-                                                              (dis/dispatch! [:private-board-user-add user (:value item)])
-                                                              (utils/after 10 #(reset! (::show-user-dropdown s) nil)))
-                                                :on-blur #(reset! (::show-user-dropdown s) nil)}))]])])])
+                              "Add as"]])])])
                 [:div.board-edit-private-users
                   [:div.board-edit-private-users-list.group
                     (for [u (concat
@@ -281,22 +298,22 @@
                         [:div.user-type
                           {:on-click #(when (and can-change
                                                  (not self))
-                                        (reset! (::show-user-dropdown s) (:user-id user)))
+                                        (reset! (::show-edit-user-dropdown s) (:user-id user)))
                            :class (when (or (not can-change) self) "no-dropdown")}
                           (if (= user-type :author)
                             "Author"
                             "Viewer")
-                          (when (= @(::show-user-dropdown s) (:user-id user))
+                          (when (= @(::show-edit-user-dropdown s) (:user-id user))
                             (dropdown-list {:items [{:value :author :label "Author"}
                                                     {:value :viewer :label "Viewer"}
                                                     {:value :remove :label "Leave board"}]
                                             :value user-type
                                             :on-change (fn [item]
-                                                        (reset! (::show-user-dropdown s) nil)
+                                                        (reset! (::show-edit-user-dropdown s) nil)
                                                         (if (= (:value item) :remove)
                                                           (dis/dispatch! [:private-board-user-remove u])
                                                           (dis/dispatch! [:private-board-user-add user (:value item)])))
-                                            :on-blur #(reset! (::show-user-dropdown s) nil)}))]])]]]))
+                                            :on-blur #(reset! (::show-edit-user-dropdown s) nil)}))]])]]]))
           [:div.board-edit-footer
             [:div.board-edit-footer-left
               (when (and (seq (:slug board-data))

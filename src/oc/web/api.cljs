@@ -900,7 +900,6 @@
          {:headers (headers-for-link add-link)
           :body (:user-id user)}
          (fn [{:keys [status success body]}]
-           (js/console.log "api/add-user-to-private-board" success status body)
            (dispatcher/dispatch! [:private-board-user-add/finish success])))))))
 
 (defn remove-user-from-private-board
@@ -911,7 +910,6 @@
         (storage-http (method-for-link remove-link) (relative-href remove-link)
          {:headers (headers-for-link remove-link)}
          (fn [{:keys [status success body]}]
-           (js/console.log "api/remove-user-from-private-board" success status body)
            (dispatcher/dispatch! [:private-board-user-remove/finish success])))))))
 
 (defn force-jwt-refresh []
