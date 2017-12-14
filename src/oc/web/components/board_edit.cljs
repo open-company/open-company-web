@@ -43,19 +43,21 @@
     (or (>= (.search lower-name lower-query) 0)
         (>= (.search lower-email lower-query) 0))))
 
+(defn compare-users [user-1 user-2]
+  (compare (string/lower (utils/name-or-email user-1))
+           (string/lower (utils/name-or-email user-2))))
+
 (defn filter-users
   "Given a list of users and a query string, return those that match the given query."
   [users-list query]
   (let [filtered-users (filter #(filter-user-by-query % query) users-list)]
-    (sort #(compare (str (:first-name %1) (:last-name %1))
-                    (str (:first-name %2) (:last-name %2)))
-     filtered-users)))
+    (sort compare-users filtered-users)))
 
 (defn get-addable-users
   "Filter users that are not arleady viewer or author users."
-  [board-data roster]
+  [board-data users]
   (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))
-        without-self (remove #(= (:user-id %) (jwt/user-id)) (:users roster))]
+        without-self (remove #(= (:user-id %) (jwt/user-id)) users)]
     (remove #(some #{(:user-id %)} already-in-ids) without-self)))
 
 (rum/defcs board-edit < rum/reactive
@@ -66,7 +68,6 @@
                         (drv/drv :board-data)
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
-                        (drv/drv :team-roster)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
@@ -158,7 +159,6 @@
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
-        roster (drv/react s :team-roster)
         org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)]
     [:div.board-edit-container
@@ -248,7 +248,7 @@
           [:div.board-edit-divider]
           (when (= (:access board-editing) "private")
             (let [query  (::query s)
-                  addable-users (get-addable-users board-data roster)
+                  addable-users (get-addable-users board-data (:users team-data))
                   filtered-users (filter-users addable-users @query)
                   ;; user can edit the private board users if
                   ;; he's creating a new board
@@ -292,7 +292,7 @@
                         user-type (if (utils/in? (map :user-id (:viewers board-data)) user-id)
                                     :viewer
                                     :author)
-                        team-user (some #(when (= (:user-id %) user-id) %) (:users roster))
+                        team-user (some #(when (= (:user-id %) user-id) %) (:users team-data))
                         users-list (if (= user-type :viewer) (:viewers board-data) (:authors board-data))
                         user-links (some #(when (= (:user-id %) user-id) %) users-list)]
                     [:div.board-edit-private-users-dropdown-container
@@ -304,65 +304,71 @@
                                               {:value :remove :label "Remove User" :color "#FA6452"}]
                                       :value user-type
                                       :on-change (fn [item]
-                                                  (reset! (::show-edit-user-dropdown s) nil)
-                                                  (if (= (:value item) :remove)
-                                                    (dis/dispatch! [:private-board-user-remove user-links])
-                                                    (dis/dispatch! [:private-board-user-add team-user (:value item)])))
-                                      ; :on-blur #(reset! (::show-edit-user-dropdown s) nil)
-                                      })])
+                                       (reset! (::show-edit-user-dropdown s) nil)
+                                       (if (= (:value item) :remove)
+                                         (dis/dispatch! [:private-board-user-remove user-links])
+                                         (dis/dispatch! [:private-board-user-add team-user (:value item)])))})])
                   [:div.board-edit-private-users-list.group
                     {:on-scroll #(do
                                   (reset! (::show-edit-user-dropdown s) nil)
                                   (reset! (::show-edit-user-top s) nil))
                      :ref "edit-users-scroll"}
-                    (for [u (concat
-                              (map #(assoc % :type :author) (:authors board-data))
-                              (map #(assoc % :type :viewer) (:viewers board-data)))
-                          :let [user-type (:type u)
-                                user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
-                                self (= (:user-id u) (jwt/user-id))]]
-                      [:div.board-edit-private-user.group
-                        {:ref (str "edit-user-" (:user-id u))
-                         :on-click #(when (and can-change
-                                               (not self))
-                                      (let [user-node (rum/ref-node s (str "edit-user-" (:user-id u)))
-                                            top (- (.-offsetTop user-node) (.-scrollTop (.-parentElement user-node)))
-                                            next-user-id (if (= @(::show-edit-user-dropdown s) (:user-id u))
-                                                           nil
-                                                           (:user-id u))]
-                                        (reset! (::show-edit-user-top s) top)
-                                        (reset! (::show-edit-user-dropdown s) next-user-id)))}
-                        (user-avatar-image user)
-                        [:div.name
-                          (utils/name-or-email user)]
-                        (if self
-                          (when (> (count (:authors board-data)) 1)
-                            [:div.user-type.remove-link
-                              {:on-click (fn []
-                                          (dis/dispatch! [:alert-modal-show
-                                                          {:icon "/img/ML/error_icon.png"
-                                                           :action "remove-self-user-from-private-board"
-                                                           :message "Are you sure you want to leave this board?"
-                                                           :link-button-title "No"
-                                                           :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                                           :solid-button-title "Yes"
-                                                           :solid-button-cb (fn []
-                                                                              (dis/dispatch!
-                                                                               [:private-board-user-remove u])
-                                                                              (dis/dispatch!
-                                                                               [:alert-modal-hide])
-                                                                              (close-clicked s)
-                                                                              ;; Redirect to the first available board
-                                                                              (let [all-boards (:boards org-data)
-                                                                                    not-this-boards (remove #(= (:slug %) (router/current-board-slug)) all-boards)]
-                                                                                (utils/after 200
-                                                                                 #(router/nav! (oc-urls/board (:slug (first not-this-boards)))))))}]))}
-                              "Leave Board"])
-                          [:div.user-type
-                            {:class (when (not can-change) "no-dropdown")}
-                            (if (= user-type :author)
-                              "Full Access"
-                              "Viewer")])])]]]))
+                    (let [author-ids (set (map :user-id (:authors board-data)))
+                          viewer-ids (set (map :user-id (:viewers board-data)))
+                          authors (filter (comp author-ids :user-id) (:users team-data))
+                          viewers (filter (comp viewer-ids :user-id) (:users team-data))
+                          complete-authors (map
+                                            #(merge % {:type :author :display-name (utils/name-or-email %)})
+                                            authors)
+                          complete-viewers (map
+                                            #(merge % {:type :viewer :display-name (utils/name-or-email %)})
+                                            viewers)
+                          all-users (concat complete-authors complete-viewers)
+                          sorted-users (sort compare-users all-users)]
+                      (for [user sorted-users
+                            :let [user-type (:type user)
+                                  self (= (:user-id user) (jwt/user-id))]]
+                        [:div.board-edit-private-user.group
+                          {:ref (str "edit-user-" (:user-id user))
+                           :on-click #(when (and can-change
+                                                 (not self))
+                                        (let [user-node (rum/ref-node s (str "edit-user-" (:user-id user)))
+                                              top (- (.-offsetTop user-node) (.-scrollTop (.-parentElement user-node)))
+                                              next-user-id (if (= @(::show-edit-user-dropdown s) (:user-id user))
+                                                             nil
+                                                             (:user-id user))]
+                                          (reset! (::show-edit-user-top s) top)
+                                          (reset! (::show-edit-user-dropdown s) next-user-id)))}
+                          (user-avatar-image user)
+                          [:div.name
+                            (utils/name-or-email user)]
+                          (if self
+                            (when (> (count (:authors board-data)) 1)
+                              [:div.user-type.remove-link
+                                {:on-click (fn []
+                                  (dis/dispatch! [:alert-modal-show
+                                   {:icon "/img/ML/error_icon.png"
+                                    :action "remove-self-user-from-private-board"
+                                    :message "Are you sure you want to leave this board?"
+                                    :link-button-title "No"
+                                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                    :solid-button-title "Yes"
+                                    :solid-button-cb (fn []
+                                     (dis/dispatch! [:private-board-user-remove user])
+                                     (dis/dispatch! [:alert-modal-hide])
+                                     (close-clicked s)
+                                     ;; Redirect to the first available board
+                                     (let [all-boards (:boards org-data)
+                                           not-this-boards (remove #(= (:slug %)
+                                                            (router/current-board-slug)) all-boards)]
+                                       (utils/after 200
+                                        #(router/nav! (oc-urls/board (:slug (first not-this-boards)))))))}]))}
+                                "Leave Board"])
+                            [:div.user-type
+                              {:class (when (not can-change) "no-dropdown")}
+                              (if (= user-type :author)
+                                "Full Access"
+                                "Viewer")])]))]]]))
           (when (= (:access board-editing) "private")
             [:div.board-edit-divider])
           [:div.board-edit-footer
