@@ -288,6 +288,7 @@ div.board-edit-container {
               color: $carrot_dark_gray;
               padding: 4px 16px;
               width: 100%;
+              cursor: pointer;
 
               &:hover {
                 background-color: rgba($carrot_light_gray, 0.3);

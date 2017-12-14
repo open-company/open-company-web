@@ -43,13 +43,18 @@
         (>= (.search lower-email lower-query) 0))))
 
 (defn filter-users
-  "Given a board, the team roster and a query string, search for users
-  that match the given string."
-  [board-data roster query]
-  (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))
-        not-in-users (remove #(some #{(:user-id %)} already-in-ids) (:users roster))
-        filtered-users (filter #(filter-user-by-query % query) not-in-users)]
-    (sort #(compare (str (:first-name %1) (:last-name %1)) (str (:first-name %2) (:last-name %2))) filtered-users)))
+  "Given a list of users and a query string, return those that match the given query."
+  [users-list query]
+  (let [filtered-users (filter #(filter-user-by-query % query) users-list)]
+    (sort #(compare (str (:first-name %1) (:last-name %1))
+                    (str (:first-name %2) (:last-name %2)))
+     filtered-users)))
+
+(defn get-addable-users
+  "Filter users that are not arleady viewer or author users."
+  [board-data roster]
+  (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))]
+    (remove #(some #{(:user-id %)} already-in-ids) (:users roster))))
 
 (rum/defcs board-edit < rum/reactive
                         ;; Derivatives
@@ -146,7 +151,9 @@
         new-board? (not (contains? board-editing :links))
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
-        channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))]
+        channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
+        roster (drv/react s :team-roster)
+        addable-users (get-addable-users board-data roster)]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -222,38 +229,41 @@
                                                        {:channel-id (:id channel)
                                                         :channel-name (:name channel)
                                                         :slack-org-id (:slack-org-id team)}]))})])
-          (when (= (:access board-data) "private")
-            (let [roster (drv/react s :team-roster)
-                  query  (::query s)]
+          (when (= (:access board-editing) "private")
+            (let [query  (::query s)]
               [:div.board-edit-private-users-container
-                [:div.board-edit-private-users-search
-                  {:ref "private-users-search"}
-                  [:input
-                    {:value @query
-                     :type "text"
-                     :placeholder "Look for people to add"
-                     :on-focus #(reset! (::show-search-results s) true)
-                     :on-change #(let [query (.. % -target -value)]
-                                  (reset! (::show-search-results s) (seq query))
-                                  (reset! query query))}]
-                  (when @(::show-search-results s)
-                    [:div.board-edit-private-users-results
-                      (for [user (filter-users board-data roster @query)]
-                        [:div.board-edit-private-users-result
-                          (user-avatar-image user)
-                          [:div.name
-                            (utils/name-or-email user)]
-                          [:div.user-type
-                            {:on-click #(reset! (::show-user-dropdown s) (:user-id user))}
-                            "Role"
-                            (when (= @(::show-user-dropdown s) (:user-id user))
-                              (dropdown-list {:items [{:value :author :label "Author"}
-                                                      {:value :viewer :label "Viewer"}]
-                                              :on-change (fn [item]
-                                                            (reset! (::show-search-results s) false)
-                                                            (dis/dispatch! [:private-board-user-add user (:value item)])
-                                                            (utils/after 10 #(reset! (::show-user-dropdown s) nil)))
-                                              :on-blur #(reset! (::show-user-dropdown s) nil)}))]])])]
+                (when (pos? (count addable-users))
+                  [:div.board-edit-private-users-search
+                    {:ref "private-users-search"}
+                    [:input
+                      {:value @query
+                       :type "text"
+                       :placeholder "Look for people to add"
+                       :on-focus #(reset! (::show-search-results s) true)
+                       :on-change #(let [query (.. % -target -value)]
+                                    (reset! (::show-search-results s) (seq query))
+                                    (reset! query query))}]
+                    (when @(::show-search-results s)
+                      [:div.board-edit-private-users-results
+                        (for [user (filter-users addable-users @query)]
+                          [:div.board-edit-private-users-result
+                            {:on-click #(reset! (::show-user-dropdown s)
+                                         (if (= @(::show-user-dropdown s) (:user-id user))
+                                          nil
+                                          (:user-id user)))}
+                            (user-avatar-image user)
+                            [:div.name
+                              (utils/name-or-email user)]
+                            [:div.user-type
+                              "Add as"
+                              (when (= @(::show-user-dropdown s) (:user-id user))
+                                (dropdown-list {:items [{:value :author :label "Author"}
+                                                        {:value :viewer :label "Viewer"}]
+                                                :on-change (fn [item]
+                                                              (reset! (::show-search-results s) false)
+                                                              (dis/dispatch! [:private-board-user-add user (:value item)])
+                                                              (utils/after 10 #(reset! (::show-user-dropdown s) nil)))
+                                                :on-blur #(reset! (::show-user-dropdown s) nil)}))]])])])
                 [:div.board-edit-private-users
                   [:div.board-edit-private-users-list.group
                     (for [u (concat

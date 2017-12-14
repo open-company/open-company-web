@@ -886,8 +886,7 @@
 (defn add-user-to-private-board
   [board-data user user-type]
   (when (and user
-             board-data
-             (= (:access board-data) "private"))
+             board-data)
     (let [add-link (utils/link-for
                     (:links board-data)
                     "add"
