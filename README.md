@@ -30,7 +30,7 @@ To get started, head to: [Carrot](https://carrot.io/)
 
 The OpenCompany Web Application provides a Web UI for creating and consuming open company content and data.
 
-![OpenCompany Screenshot](https://open-company-assets.s3.amazonaws.com/animation.webm)
+![OpenCompany Screenshot](https://open-company-assets.s3.amazonaws.com/new_homepage_screenshot.png)
 
 ### Browser Support
 
