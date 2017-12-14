@@ -81,6 +81,7 @@
                         (rum/local nil ::show-add-user-dropdown)
                         (rum/local nil ::show-add-user-top)
                         (rum/local nil ::show-edit-user-dropdown)
+                        (rum/local nil ::show-edit-user-top)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -117,9 +118,12 @@
                               #(board-name-on-change s board-name-node))))
                           (reset! (::window-click-event s)
                             (events/listen js/window EventType/CLICK
-                             #(when-not (utils/event-inside? % (rum/ref-node s "private-users-search"))
-                                (reset! (::show-search-results s) false)
-                                (reset! (::show-add-user-dropdown s) nil))))
+                             #(do
+                               (when-not (utils/event-inside? % (rum/ref-node s "private-users-search"))
+                                 (reset! (::show-search-results s) false)
+                                 (reset! (::show-add-user-dropdown s) nil))
+                               (when-not (utils/event-inside? % (rum/ref-node s "edit-users-scroll"))
+                                 (reset! (::show-edit-user-dropdown s) nil)))))
                           s)
                          :did-remount (fn [o s]
                           ;; Dismiss animated since the board-editing was removed
@@ -285,7 +289,32 @@
                             [:div.user-type
                               "Add as"]])])])
                 [:div.board-edit-private-users
+                  (let [user-id @(::show-edit-user-dropdown s)
+                        user-type (if (utils/in? (:viewers board-data) user-id)
+                                    :viewer
+                                    :author)
+                        team-user (some #(when (= (:user-id %) user-id) %) (:users roster))
+                        users-list (if (= user-type :viewer) (:viewers board-data) (:authors board-data))
+                        user-links (some #(when (= (:user-id %) user-id) %) users-list)]
+                    [:div.board-edit-private-users-dropdown-container
+                      {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
+                               :display (if (seq @(::show-edit-user-dropdown s)) "block" "none")}}
+                      (dropdown-list {:items [{:value :author :label "Author"}
+                                              {:value :viewer :label "Viewer"}
+                                              {:value :remove :label "Leave board"}]
+                                      :value user-type
+                                      :on-change (fn [item]
+                                                  (reset! (::show-edit-user-dropdown s) nil)
+                                                  (if (= (:value item) :remove)
+                                                    (dis/dispatch! [:private-board-user-remove user-links])
+                                                    (dis/dispatch! [:private-board-user-add team-user (:value item)])))
+                                      ; :on-blur #(reset! (::show-edit-user-dropdown s) nil)
+                                      })])
                   [:div.board-edit-private-users-list.group
+                    {:on-scroll #(do
+                                  (reset! (::show-edit-user-dropdown s) nil)
+                                  (reset! (::show-edit-user-top s) nil))
+                     :ref "edit-users-scroll"}
                     (for [u (concat
                               (map #(assoc % :type :author) (:authors board-data))
                               (map #(assoc % :type :viewer) (:viewers board-data)))
@@ -293,28 +322,24 @@
                                 user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
                                 self (= (:user-id u) (jwt/user-id))]]
                       [:div.board-edit-private-user.group
+                        {:ref (str "edit-user-" (:user-id u))
+                         :on-click #(when (and can-change
+                                               (not self))
+                                      (let [user-node (rum/ref-node s (str "edit-user-" (:user-id u)))
+                                            top (- (.-offsetTop user-node) (.-scrollTop (.-parentElement user-node)))
+                                            next-user-id (if (= @(::show-edit-user-dropdown s) (:user-id u))
+                                                           nil
+                                                           (:user-id u))]
+                                        (reset! (::show-edit-user-top s) top)
+                                        (reset! (::show-edit-user-dropdown s) next-user-id)))}
                         (user-avatar-image user)
                         [:div.name
                           (utils/name-or-email user)]
                         [:div.user-type
-                          {:on-click #(when (and can-change
-                                                 (not self))
-                                        (reset! (::show-edit-user-dropdown s) (:user-id user)))
-                           :class (when (or (not can-change) self) "no-dropdown")}
+                          {:class (when (or (not can-change) self) "no-dropdown")}
                           (if (= user-type :author)
                             "Author"
-                            "Viewer")
-                          (when (= @(::show-edit-user-dropdown s) (:user-id user))
-                            (dropdown-list {:items [{:value :author :label "Author"}
-                                                    {:value :viewer :label "Viewer"}
-                                                    {:value :remove :label "Leave board"}]
-                                            :value user-type
-                                            :on-change (fn [item]
-                                                        (reset! (::show-edit-user-dropdown s) nil)
-                                                        (if (= (:value item) :remove)
-                                                          (dis/dispatch! [:private-board-user-remove u])
-                                                          (dis/dispatch! [:private-board-user-add user (:value item)])))
-                                            :on-blur #(reset! (::show-edit-user-dropdown s) nil)}))]])]]]))
+                            "Viewer")]])]]]))
           [:div.board-edit-footer
             [:div.board-edit-footer-left
               (when (and (seq (:slug board-data))

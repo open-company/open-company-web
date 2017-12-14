@@ -360,6 +360,29 @@ div.board-edit-container {
 
         div.board-edit-private-users {
           margin: 16px 0px;
+          position: relative;
+
+          div.board-edit-private-users-dropdown-container {
+            position: absolute;
+            right: 140px;
+            z-index: 3;
+
+            div.dropdown-list-container {
+              top: 0px;
+              left: 0px;
+
+              div.triangle {
+                top: unset;
+                bottom: -1px;
+                left: unset;
+                right: 20px;
+                border-top: 0px solid rgba(177,184,192,0.50);
+                border-left: 0px solid rgba(177,184,192,0.50);
+                border-bottom: 1px solid rgba(177,184,192,0.50);
+                border-right: 1px solid rgba(177,184,192,0.50);
+              }
+            }
+          }
 
           div.board-edit-private-users-list {
             width: 100%;
@@ -367,6 +390,8 @@ div.board-edit-container {
             @include avenir_R();
             font-size: 16px;
             color: $carrot_dark_gray;
+            height: 192px;
+            overflow-y: auto;
 
             div.board-edit-private-user {
               height: 64px;
@@ -403,6 +428,7 @@ div.board-edit-container {
                   top: 6px;
                   right: 0px;
                   background-image: cdnUrl("/img/ML/board_settings.svg");
+                  transform: rotate(180deg);
                   background-size: 8px 8px;
                   background-repeat: no-repeat;
                   width: 8px;
@@ -419,7 +445,12 @@ div.board-edit-container {
 
                 div.dropdown-list-container {
                   top: 24px;
-                  left: -11px;
+                  left: -68px;
+
+                  div.triangle {
+                    left: unset;
+                    right: 30px;
+                  }
                 }
               }
             }
