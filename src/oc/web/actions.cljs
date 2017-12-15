@@ -280,6 +280,9 @@
       ; auth settings loaded
       (do
         (api/get-current-user body)
+        ;; Start teams retrieve if we have a link
+        (when (utils/link-for (:links body) "collection")
+          (utils/after 5000 #(dispatcher/dispatch! [:teams-get])))
         (cond
           ; if showing the create organization UI load the list of teams
           ; if a link for it is present
@@ -504,7 +507,11 @@
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
   (if team-data
-    (assoc-in db (dispatcher/team-data-key (:team-id team-data)) team-data)
+    (do
+      (when (= (:team-id (dispatcher/org-data db)) (:team-id team-data))
+        (utils/after 100 #(dispatcher/dispatch! [:channels-enumerate (:team-id team-data)])))
+      ;; if team is the current org team, load the slack chennels
+      (assoc-in db (dispatcher/team-data-key (:team-id team-data)) team-data))
     db))
 
 (defmethod dispatcher/action :team-roster-loaded

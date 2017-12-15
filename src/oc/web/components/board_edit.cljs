@@ -88,16 +88,17 @@
                         mixins/first-render-mixin
 
                         {:will-mount (fn [s]
-                          (dis/dispatch! [:teams-get])
+                          ;; Load team-data if not already loaded
+                          (if-let [team-data @(drv/get-ref s :team-data)]
+                            (when (and (not @(drv/get-ref s :team-channels))
+                                       (not @(::team-channels-requested s)))
+                              (reset! (::team-channels-requested s) true)
+                              (dis/dispatch! [:channels-enumerate (:team-id team-data)]))
+                            (dis/dispatch! [:teams-get]))
                           (let [board-data @(drv/get-ref s :board-editing)]
                             (when (some? (:slack-mirror board-data))
                               (reset! (::slack-enabled s) (:slack-mirror board-data)))
                             (reset! (::initial-board-name s) (:name board-data)))
-                          (when (and (not @(drv/get-ref s :team-channels))
-                                     (not @(::team-channels-requested s)))
-                            (when-let [team-data @(drv/get-ref s :team-data)]
-                              (reset! (::team-channels-requested s) true)
-                              (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                           s)
                          :did-mount (fn [s]
                           (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))

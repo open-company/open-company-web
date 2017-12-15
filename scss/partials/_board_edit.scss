@@ -81,15 +81,15 @@ div.board-edit-container {
       }
 
       div.board-edit-divider {
-        width: calc(100% + 48px);
-        margin-left: -24px;
+        width: calc(100% + 32px);
+        margin-left: -16px;
         height: 1px;
         background-color: $carrot_light_gray_1;
         opacity: 0.3;
       }
 
       div.board-edit-body {
-        margin-bottom: 16px;
+        margin-bottom: 24px;
 
         div.board-edit-label {
           @include avenir_H();
@@ -147,7 +147,7 @@ div.board-edit-container {
         }
 
         div.board-edit-access-label {
-          margin-top: 26px;
+          margin-top: 24px;
         }
 
         div.board-edit-access-field {
@@ -244,6 +244,8 @@ div.board-edit-container {
       }
 
       div.board-edit-private-users-container {
+        margin-top: 24px;
+
         div.board-edit-private-users-search {
           width: 100%;
           height: 40px;
@@ -341,7 +343,7 @@ div.board-edit-container {
         }
 
         div.board-edit-private-users {
-          margin: 16px 0px;
+          margin: 16px 0px 0px;
           position: relative;
 
           div.board-edit-private-users-dropdown-container {
