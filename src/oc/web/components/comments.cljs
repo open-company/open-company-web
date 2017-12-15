@@ -47,9 +47,9 @@
   [e s c]
   (let [new-comment (rum/ref-node s "comment-body")
         comment-text (add-comment-content new-comment)]
-    (when-not (= comment-text (:body c))
-      (reset! (::editing? s) false)
-      (dis/dispatch! [:comment-save c comment-text]))))
+    (reset! (::editing? s) false)
+    (set! (.-innerHTML new-comment) comment-text)
+    (dis/dispatch! [:comment-save c comment-text])))
 
 (defn is-emoji
   [body]
@@ -121,7 +121,8 @@
         [:div.comment-body-container
           [:p.comment-body.group
            {:on-key-down (fn [e]
-                           (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
+                           (when (and (= "Enter" (.-key e))
+                                      (not (.-shiftKey e)))
                              (.blur (rum/ref-node s "comment-body"))
                              (.preventDefault e))
                            (when (= "Escape" (.-key e))
