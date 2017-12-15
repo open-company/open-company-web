@@ -68,6 +68,7 @@
                         (drv/drv :board-data)
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
+                        (drv/drv :team-roster)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
@@ -160,7 +161,8 @@
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
         org-data (drv/react s :org-data)
-        team-data (drv/react s :team-data)]
+        _ (drv/react s :team-data)
+        roster (drv/react s :team-roster)]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -248,7 +250,8 @@
           [:div.board-edit-divider]
           (when (= (:access board-editing) "private")
             (let [query  (::query s)
-                  addable-users (get-addable-users board-data (:users team-data))
+                  available-users (filter :user-id (:users roster))
+                  addable-users (get-addable-users board-data available-users)
                   filtered-users (filter-users addable-users @query)
                   ;; user can edit the private board users if
                   ;; he's creating a new board
@@ -271,7 +274,7 @@
                     (when @(::show-search-results s)
                       [:div.board-edit-private-users-results
                         (for [u filtered-users
-                              :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users team-data))
+                              :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
                                     user (merge u team-user)
                                     user-type (utils/get-user-type user org-data board-data)]]
                           [:div.board-edit-private-users-result
@@ -292,7 +295,7 @@
                         user-type (if (utils/in? (map :user-id (:viewers board-data)) user-id)
                                     :viewer
                                     :author)
-                        team-user (some #(when (= (:user-id %) user-id) %) (:users team-data))
+                        team-user (some #(when (= (:user-id %) user-id) %) (:users roster))
                         users-list (if (= user-type :viewer) (:viewers board-data) (:authors board-data))
                         user-links (some #(when (= (:user-id %) user-id) %) users-list)]
                     [:div.board-edit-private-users-dropdown-container
@@ -315,8 +318,8 @@
                      :ref "edit-users-scroll"}
                     (let [author-ids (set (map :user-id (:authors board-data)))
                           viewer-ids (set (map :user-id (:viewers board-data)))
-                          authors (filter (comp author-ids :user-id) (:users team-data))
-                          viewers (filter (comp viewer-ids :user-id) (:users team-data))
+                          authors (filter (comp author-ids :user-id) (:users roster))
+                          viewers (filter (comp viewer-ids :user-id) (:users roster))
                           complete-authors (map
                                             #(merge % {:type :author :display-name (utils/name-or-email %)})
                                             authors)
