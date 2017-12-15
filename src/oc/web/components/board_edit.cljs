@@ -285,11 +285,7 @@
                              :ref (str "add-user-" (:user-id user))}
                             (user-avatar-image user)
                             [:div.name
-                              (utils/name-or-email user)]
-                            [:div.user-type
-                              (if (= user-type :viewer)
-                               "Viewer"
-                               "Full Access")]])])])
+                              (utils/name-or-email user)]])])])
                 [:div.board-edit-private-users
                   (let [user-id @(::show-edit-user-dropdown s)
                         user-type (if (utils/in? (map :user-id (:viewers board-data)) user-id)

@@ -93,7 +93,7 @@ div.board-edit-container {
 
         div.board-edit-label {
           @include avenir_H();
-          font-size: 12px;
+          font-size: 14px;
           color: $oc_gray_7;
         }
 
@@ -226,7 +226,7 @@ div.board-edit-container {
         div.board-edit-slack-channels-label {
           div.board-edit-label {
             @include avenir_H();
-            font-size: 12px;
+            font-size: 14px;
             color: $oc_gray_7;
             margin-top: 7px;
             float: left;
@@ -330,19 +330,11 @@ div.board-edit-container {
 
               div.name {
                 float: left;
-                max-width: 50%;
+                max-width: 80%;
                 margin-left: 16px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 margin-top: 6px;
-              }
-
-              div.user-type {
-                float: right;
-                max-width: calc(50% - 32px - 6px);
-                margin-top: 6px;
-                position: relative;
-                padding-right: 12px;
               }
             }
           }
