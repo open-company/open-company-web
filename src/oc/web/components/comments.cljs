@@ -2,6 +2,7 @@
   (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as string]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -40,7 +41,7 @@
         cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
         cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
         final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
-    final-text))
+    (.trim final-text)))
 
 (defn edit-finished
   [e s c]
