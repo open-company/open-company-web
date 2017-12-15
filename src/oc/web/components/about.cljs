@@ -117,7 +117,7 @@
                     [:img {:src "http://www.gravatar.com/avatar/99399ee082e57d67045cb005f9c2e4ef?s=100"}]]
                   [:div.team-member
                     [:div.team-name "Stuart Levinson"]
-                    [:div.team-title "CEO and Founder"]
+                    [:div.team-title "CEO and founder"]
                     [:div.team-media-links
                       [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]]]]
                 [:div.team-card.iacopo-carraro
@@ -135,7 +135,7 @@
                     [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=100"}]]
                   [:div.team-member
                     [:div.team-name "Sean Johnson"]
-                    [:div.team-title "CTO and Founder"]
+                    [:div.team-title "CTO and founder"]
                     [:div.team-media-links
                       [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]]]]
                 [:div.team-card.nathan-zorn
