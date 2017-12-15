@@ -14,7 +14,7 @@
 (defn get-started-button []
   (when-not (jwt/jwt)
     [:div
-      [:button.signin-with-slack
+      [:button.signin-with-slack.mlb-reset
         {:on-click #(do
                      (.preventDefault %)
                      (when (:auth-settings @dis/app-state)
