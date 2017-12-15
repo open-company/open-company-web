@@ -367,6 +367,7 @@
         current-route (:route @router/path)]
     (when (and (not (utils/in? current-route "login"))
                (not (utils/in? current-route "sign-up"))
+               (not (utils/in? current-route "slack"))
                (not (utils/in? current-route "about"))
                (not (utils/in? current-route "home"))
                (not (cook/get-cookie :login-redirect)))
