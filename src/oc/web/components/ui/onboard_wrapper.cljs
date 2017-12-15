@@ -204,7 +204,10 @@
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
-                         {:did-mount (fn [s]
+                         {:will-mount (fn [s]
+                           (dis/dispatch! [:input [:org-editing :name] ""])
+                           s)
+                          :did-mount (fn [s]
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
