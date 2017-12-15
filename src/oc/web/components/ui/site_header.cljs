@@ -45,7 +45,7 @@
                          (.preventDefault e)
                          (when (responsive/is-mobile-size?)
                            (dis/dispatch! [:site-menu-toggle true]))
-                         (dis/dispatch! [:login-overlay-show :signup-with-slack]))}
+                         (router/nav! oc-urls/sign-up))}
             "Get Started"])
         [:a.login
           {:href oc-urls/login
