@@ -387,7 +387,7 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:user-data (json->cljs body)])))))
 
-(def user-profile-keys [:first-name :last-name :email :password :avatar-url])
+(def user-profile-keys [:first-name :last-name :email :password :avatar-url :timezone :digest-frequency :digest-medium])
 
 (defn patch-user-profile [old-user-data new-user-data]
   (when (and (:links old-user-data)

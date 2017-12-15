@@ -133,13 +133,21 @@ div.user-profile {
 
         div.user-profile-field-label {
           @include avenir_H();
-          font-size: 15px;
-          color: $carrot_gray;
+          font-size: 14px;
+          color: $oc_gray_7;
           margin-top: 32px;
 
           span.error {
             margin-left: 16px;
             color: $carrot_orange;
+          }
+
+          i.mdi.mdi-information-outline {
+            margin-left: 8px;
+            
+            &:before {
+              font-size: 14px;
+            }
           }
         }
 
@@ -168,16 +176,6 @@ div.user-profile {
               @include avenir_R();
               font-size: 16px;
               color: $carrot_light_gray;
-            }
-          }
-
-          &.digest-frequency-field {
-            float: left;
-            width: 208px;
-            margin-right: 10px;
-
-            &:last-child {
-              margin-right: 0px;
             }
           }
         }
