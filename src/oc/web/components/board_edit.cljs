@@ -163,7 +163,9 @@
         channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
         org-data (drv/react s :org-data)
         _ (drv/react s :team-data)
-        roster (drv/react s :team-roster)]
+        roster (drv/react s :team-roster)
+        should-show-private-board-editing? (and (seq (:slug board-editing))
+                                                (= (:access board-editing) "private"))]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -249,7 +251,7 @@
                  :title "This board is open for the public to see. Contributors can edit."}
                 [:span.board-edit-access-title "Public"]]]]
           [:div.board-edit-divider]
-          (when (= (:access board-editing) "private")
+          (when should-show-private-board-editing?
             (let [query  (::query s)
                   available-users (filter :user-id (:users roster))
                   addable-users (get-addable-users board-data available-users)
@@ -369,7 +371,7 @@
                               (if (= user-type :author)
                                 "Full Access"
                                 "Viewer")])]))]]]))
-          (when (= (:access board-editing) "private")
+          (when should-show-private-board-editing?
             [:div.board-edit-divider])
           [:div.board-edit-footer
             [:div.board-edit-footer-left
