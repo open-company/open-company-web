@@ -220,12 +220,31 @@
                    :data-toggle "tooltip"
                    :data-placement "top"}]]  
               [:div.user-profile-field.digest-frequency-field.digest-frequency
-                [:select
-                  {:value (:digest-frequency current-user-data)
-                   :on-change #(change! s :digest-frequency (.. % -target -value))}
-                  [:option {:value "daily"} "Daily"]
-                  [:option {:value "weekly"} "Weekly"]
-                  [:option {:value "never"} "Never"]]]]]
+                [:div.dropdown
+                  [:button.btn-reset.user-type-btn.dropdown-toggle
+                    {:id "user-digest-frequency-dropdown"
+                     :data-toggle "dropdown"
+                     :aria-haspopup true
+                     :aria-expanded false}
+                    (case (:digest-frequency current-user-data)
+                      "daily"
+                      "Daily"
+                      "weekly"
+                      "Weekly"
+                      "Never")]
+                  [:ul.dropdown-menu.user-type-dropdown-menu
+                    {:aria-labelledby "user-digest-frequency-dropdown"}
+                    [:li
+                      {:on-click #(change! s :digest-frequency "daily")}
+                      "Daily"]
+                    [:li
+                      {:on-click #(change! s :digest-frequency "weekly")}
+                      "Weekly"]
+                    [:li
+                      {:on-click #(change! s :digest-frequency "never")}
+                      "Never"]]]]]]
+
+
           ; Right column
           [:div.user-profile-column-right
             ; Last name
@@ -254,7 +273,7 @@
             [:div.user-profile-field-box
               [:div.user-profile-field-label
                 "Time Zone"]
-              [:div.user-profile-field
+              [:div.user-profile-field.timezone
                 [:select
                   {:value (:timezone current-user-data)
                    :on-change #(change! s :timezone (.. % -target -value))}
@@ -279,13 +298,24 @@
               [:div.user-profile-field-label
                 "Digest Type"]
               [:div.user-profile-field.digest-medium
-                [:select
-                  {:value (:digest-medium current-user-data)
-                   :disabled (= (:digest-frequency current-user-data) "never")
-                   :on-change #(change! s :digest-medium (.. % -target -value))}
-                  [:option {:value "email"} "Email"]
-                  [:option {:value "slack"} "Slack"]]]]
-                  ]]]
+                [:div.dropdown
+                  [:button.btn-reset.user-type-btn.dropdown-toggle
+                    {:id "user-digest-medium-dropdown"
+                     :data-toggle "dropdown"
+                     :aria-haspopup true
+                     :aria-expanded false}
+                    (case (:digest-medium current-user-data)
+                      "slack"
+                      "Slack"
+                      "Email")]
+                  [:ul.dropdown-menu.user-type-dropdown-menu
+                    {:aria-labelledby "user-digest-medium-dropdown"}
+                    [:li
+                      {:on-click #(change! s :digest-medium "email")}
+                      "Email"]
+                    [:li
+                      {:on-click #(change! s :digest-medium "slack")}
+                      "Slack"]]]]]]]]
             ;; Eventually we want them to be able specify day and time of digest, but not yet
             ; [:div.user-profile-field.digest-frequency-field.digest-day
             ;   [:select
