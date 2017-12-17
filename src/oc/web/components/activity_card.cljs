@@ -129,7 +129,7 @@
         [:div.activity-card-head-right
           (when (or (utils/link-for (:links activity-data) "partial-update")
                     (utils/link-for (:links activity-data) "delete"))
-            (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))]
+            (let [all-boards (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards (drv/react s :org-data)))]
               [:div.more-button
                 [:button.mlb-reset.more-ellipsis
                   {:type "button"

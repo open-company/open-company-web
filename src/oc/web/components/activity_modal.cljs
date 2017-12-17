@@ -376,7 +376,7 @@
             [:div.activity-modal-header-right
               (when (or (utils/link-for (:links activity-data) "partial-update")
                         (utils/link-for (:links activity-data) "delete"))
-                (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (:org-data modal-data)))]
+                (let [all-boards (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards (:org-data modal-data)))]
                   [:div.more-dropdown
                     [:button.mlb-reset.activity-modal-more.dropdown-toggle
                       {:type "button"

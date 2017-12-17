@@ -122,8 +122,8 @@
         (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
           (api/get-board board-link))
         ; The board wasn't found, showing a 404 page
-        (if (= (router/current-board-slug) "drafts")
-          (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
+        (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+          (utils/after 100 #(dispatcher/dispatch! [:board utils/default-drafts-board]))
           (router/nav! (oc-urls/org (router/current-org-slug)))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
@@ -1345,7 +1345,7 @@
   [db [_]]
   (let [entry-data (:entry-editing db)]
     (if (:links entry-data)
-      (let [redirect-board-slug (if (= (:status entry-data) "published") (router/current-board-slug) "drafts")]
+      (let [redirect-board-slug (if (= (:status entry-data) "published") (router/current-board-slug) utils/default-drafts-board-slug)]
         (api/update-entry entry-data redirect-board-slug :entry-editing))
       (let [org-slug (router/current-org-slug)
             entry-board-key (dispatcher/board-data-key org-slug (:board-slug entry-data))
@@ -1356,8 +1356,8 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [activity-data edit-key]}]]
-  (let [board-slug (if (= (:status activity-data) "draft")
-                     "drafts"
+  (let [board-slug (if (= (:status activity-data) utils/default-draft-status)
+                     utils/default-drafts-board-slug
                      (:board-slug activity-data))
         is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
@@ -1368,10 +1368,10 @@
     (uc/remove-item (get-entry-cache-key (-> db edit-key :uuid)))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
-          board-data (get-in db board-key)
+          board-data (or (get-in db board-key) utils/default-drafts-board)
           fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
-          next-db (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)
+          next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
           with-edited-key (if edit-key
                             (update-in next-db [edit-key] dissoc :loading)
                             next-db)
@@ -1439,11 +1439,11 @@
   [db [_]]
   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
   ;; Reload the org to update the number of drafts in the navigation
-  (when (= (router/current-board-slug) "drafts")
+  (when (= (router/current-board-slug) utils/default-drafts-board-slug)
     (api/get-org (dispatcher/org-data))
     (let [org-slug (router/current-org-slug)
           org-data (dispatcher/org-data)
-          boards-no-draft (sort-by :name (filterv #(not= (:slug %) "drafts") (:boards org-data)))
+          boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
           board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
           board-data (get-in db board-key)]
       (when (zero? (count (:fixed-items board-data)))
