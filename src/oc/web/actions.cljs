@@ -1289,7 +1289,7 @@
                 (or (and (:updated-at initial-entry-data)
                          (= (:updated-at initial-entry-data) (:updated-at item)))
                     (not (:updated-at initial-entry-data))))
-         (let [entry-to-save (merge item (select-keys initial-entry-data [:links]))]
+         (let [entry-to-save (merge item (select-keys initial-entry-data [:links :board-slug :board-name]))]
            (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
          (do
            ;; If we got an item remove it since it won't be used
@@ -1356,7 +1356,9 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [activity-data edit-key]}]]
-  (let [board-slug (:board-slug activity-data)
+  (let [board-slug (if (= (:status activity-data) "draft")
+                     "drafts"
+                     (:board-slug activity-data))
         is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
