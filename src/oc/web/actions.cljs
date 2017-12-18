@@ -1376,7 +1376,7 @@
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
     (api/get-org (dispatcher/org-data))
     ; Remove saved cached item
-    (remove-cached-item edit-key)
+    (remove-cached-item (-> db edit-key :uuid))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (or (get-in db board-key) utils/default-drafts-board)
