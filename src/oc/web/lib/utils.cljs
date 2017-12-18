@@ -1220,6 +1220,6 @@
    :slug default-drafts-board-slug
    :name default-drafts-board-name
    :entries []
-   :fixed-items []
+   :fixed-items {}
    :access "private"
    :read-only true})
