@@ -49,14 +49,17 @@
 
 ;; Local cache for outstanding edits
 
+(defn autosave []
+  (let [body-el (sel1 [:div.rich-body-editor])
+        cleaned-body (when body-el
+                      (utils/clean-body-html (.-innerHTML body-el)))]
+    (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body])))
+
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when @(drv/get-ref s :entry-save-on-exit)
-    (let [body-el (sel1 [:div.rich-body-editor])
-          cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body]))))
+    (autosave)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
@@ -74,7 +77,6 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
-                                          (save-on-exit? s)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
                       }]
@@ -87,7 +89,7 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
-                                            (save-on-exit? s)
+                                            (dis/dispatch! [:entry-clear-local-cache :entry-editing])
                                             (dis/dispatch! [:alert-modal-hide])
                                             (real-close s))
                         }]
@@ -166,6 +168,7 @@
                         (rum/local false ::publishing)
                         (rum/local false ::show-boards-dropdown)
                         (rum/local false ::window-resize-listener)
+                        (rum/local nil ::autosave-timer)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -200,6 +203,9 @@
                             js/window
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
+                          (reset! (::autosave-timer s)
+                           (utils/every 5000
+                            #(autosave)))
                           s)
                          :before-render (fn [s] (calc-entry-edit-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
@@ -244,6 +250,9 @@
                           (when @(::window-resize-listener s)
                             (events/unlistenByKey @(::window-resize-listener s))
                             (reset! (::window-resize-listener s) nil))
+                          (when @(::autosave-timer s)
+                            (js/clearInterval @(::autosave-timer s))
+                            (reset! (::autosave-timer s) nil))
                           (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
