@@ -1242,6 +1242,15 @@
         (router/current-org-slug))
    "-entry-edit"))
 
+(defn remove-cached-item
+  [item-uuid]
+  (uc/remove-item (get-entry-cache-key item-uuid)))
+
+(defmethod dispatcher/action :entry-clear-local-cache
+  [db [_ edit-key]]
+  (remove-cached-item (-> db edit-key :uuid))
+  (dissoc db :entry-save-on-exit))
+
 (defn activity-load-cached-item
   [activity-data]
   (let [cache-key (get-entry-cache-key (:uuid activity-data))]
@@ -1256,7 +1265,7 @@
            ;; If we got an item remove it since it won't be used
            ;; since we have an updated version of it already
            (when item
-             (uc/remove-item cache-key))
+             (remove-cached-item (:uuid activity-data)))
            (dispatcher/dispatch! [:input [:modal-editing-data] activity-data])))
        (dispatcher/dispatch! [:input [:modal-editing] true])
        (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
@@ -1295,7 +1304,7 @@
            ;; If we got an item remove it since it won't be used
            ;; since we have an updated version of it already
            (when item
-             (uc/remove-item cache-key))
+             (remove-cached-item (:uuid initial-entry-data)))
            (dispatcher/dispatch! [:input [:entry-editing] initial-entry-data]))))))
   db)
 
@@ -1345,7 +1354,9 @@
   [db [_]]
   (let [entry-data (:entry-editing db)]
     (if (:links entry-data)
-      (let [redirect-board-slug (if (= (:status entry-data) "published") (router/current-board-slug) utils/default-drafts-board-slug)]
+      (let [redirect-board-slug (if (= (:status entry-data) "published")
+                                 (router/current-board-slug)
+                                 utils/default-drafts-board-slug)]
         (api/update-entry entry-data redirect-board-slug :entry-editing))
       (let [org-slug (router/current-org-slug)
             entry-board-key (dispatcher/board-data-key org-slug (:board-slug entry-data))
@@ -1365,7 +1376,7 @@
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
     (api/get-org (dispatcher/org-data))
     ; Remove saved cached item
-    (uc/remove-item (get-entry-cache-key (-> db edit-key :uuid)))
+    (remove-cached-item edit-key)
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (or (get-in db board-key) utils/default-drafts-board)
@@ -1403,7 +1414,7 @@
   (let [board-slug (:board-slug activity-data)]
     (api/get-org (dispatcher/org-data))
     ;; Remove entry cached edits
-    (uc/remove-item (get-entry-cache-key (-> db :entry-editing :uuid)))
+    (remove-cached-item (-> db :entry-editing :uuid))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
