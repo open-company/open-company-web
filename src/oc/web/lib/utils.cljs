@@ -641,6 +641,9 @@
 (defn after [ms fn]
   (js/setTimeout fn ms))
 
+(defn every [ms fn]
+  (js/setInterval fn ms))
+
 (defn unicode-emojis [txt]
   (js/emojione.shortnameToUnicode txt))
 
