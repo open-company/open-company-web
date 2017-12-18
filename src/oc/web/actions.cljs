@@ -122,8 +122,8 @@
         (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
           (api/get-board board-link))
         ; The board wasn't found, showing a 404 page
-        (if (= (router/current-board-slug) "drafts")
-          (utils/after 100 #(dispatcher/dispatch! [:board {:slug "drafts" :name "Drafts" :stories []}]))
+        (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+          (utils/after 100 #(dispatcher/dispatch! [:board utils/default-drafts-board]))
           (router/nav! (oc-urls/org (router/current-org-slug)))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "create-org"))
@@ -1242,6 +1242,15 @@
         (router/current-org-slug))
    "-entry-edit"))
 
+(defn remove-cached-item
+  [item-uuid]
+  (uc/remove-item (get-entry-cache-key item-uuid)))
+
+(defmethod dispatcher/action :entry-clear-local-cache
+  [db [_ edit-key]]
+  (remove-cached-item (-> db edit-key :uuid))
+  (dissoc db :entry-save-on-exit))
+
 (defn activity-load-cached-item
   [activity-data]
   (let [cache-key (get-entry-cache-key (:uuid activity-data))]
@@ -1256,7 +1265,7 @@
            ;; If we got an item remove it since it won't be used
            ;; since we have an updated version of it already
            (when item
-             (uc/remove-item cache-key))
+             (remove-cached-item (:uuid activity-data)))
            (dispatcher/dispatch! [:input [:modal-editing-data] activity-data])))
        (dispatcher/dispatch! [:input [:modal-editing] true])
        (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
@@ -1289,13 +1298,13 @@
                 (or (and (:updated-at initial-entry-data)
                          (= (:updated-at initial-entry-data) (:updated-at item)))
                     (not (:updated-at initial-entry-data))))
-         (let [entry-to-save (merge item (select-keys initial-entry-data [:links]))]
+         (let [entry-to-save (merge item (select-keys initial-entry-data [:links :board-slug :board-name]))]
            (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
          (do
            ;; If we got an item remove it since it won't be used
            ;; since we have an updated version of it already
            (when item
-             (uc/remove-item cache-key))
+             (remove-cached-item (:uuid initial-entry-data)))
            (dispatcher/dispatch! [:input [:entry-editing] initial-entry-data]))))))
   db)
 
@@ -1345,7 +1354,9 @@
   [db [_]]
   (let [entry-data (:entry-editing db)]
     (if (:links entry-data)
-      (let [redirect-board-slug (if (= (:status entry-data) "published") (router/current-board-slug) "drafts")]
+      (let [redirect-board-slug (if (= (:status entry-data) "published")
+                                 (router/current-board-slug)
+                                 utils/default-drafts-board-slug)]
         (api/update-entry entry-data redirect-board-slug :entry-editing))
       (let [org-slug (router/current-org-slug)
             entry-board-key (dispatcher/board-data-key org-slug (:board-slug entry-data))
@@ -1356,20 +1367,22 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [activity-data edit-key]}]]
-  (let [board-slug (:board-slug activity-data)
+  (let [board-slug (if (= (:status activity-data) utils/default-draft-status)
+                     utils/default-drafts-board-slug
+                     (:board-slug activity-data))
         is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
     (api/get-org (dispatcher/org-data))
     ; Remove saved cached item
-    (uc/remove-item (get-entry-cache-key (-> db edit-key :uuid)))
+    (remove-cached-item (-> db edit-key :uuid))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
-          board-data (get-in db board-key)
+          board-data (or (get-in db board-key) utils/default-drafts-board)
           fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
-          next-db (assoc-in db (vec (conj board-key :fixed-items)) next-fixed-items)
+          next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
           with-edited-key (if edit-key
                             (update-in next-db [edit-key] dissoc :loading)
                             next-db)
@@ -1401,7 +1414,7 @@
   (let [board-slug (:board-slug activity-data)]
     (api/get-org (dispatcher/org-data))
     ;; Remove entry cached edits
-    (uc/remove-item (get-entry-cache-key (-> db :entry-editing :uuid)))
+    (remove-cached-item (-> db :entry-editing :uuid))
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
@@ -1437,11 +1450,11 @@
   [db [_]]
   (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
   ;; Reload the org to update the number of drafts in the navigation
-  (when (= (router/current-board-slug) "drafts")
+  (when (= (router/current-board-slug) utils/default-drafts-board-slug)
     (api/get-org (dispatcher/org-data))
     (let [org-slug (router/current-org-slug)
           org-data (dispatcher/org-data)
-          boards-no-draft (sort-by :name (filterv #(not= (:slug %) "drafts") (:boards org-data)))
+          boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
           board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
           board-data (get-in db board-key)]
       (when (zero? (count (:fixed-items board-data)))

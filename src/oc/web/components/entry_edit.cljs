@@ -32,10 +32,12 @@
         (when (not= next-show-divider-line @(::show-divider-line s))
           (reset! (::show-divider-line s) next-show-divider-line))))))
 
-(defn calc-edit-entry-modal-height [s]
+(defn calc-entry-edit-modal-height
+  [s & [force-calc]]
   (when @(:first-render-done s)
     (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
-      (when (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))
+      (when (or force-calc
+                (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal)))
         (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
 
 (defn dismiss-modal []
@@ -47,14 +49,17 @@
 
 ;; Local cache for outstanding edits
 
+(defn autosave []
+  (let [body-el (sel1 [:div.rich-body-editor])
+        cleaned-body (when body-el
+                      (utils/clean-body-html (.-innerHTML body-el)))]
+    (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body])))
+
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when @(drv/get-ref s :entry-save-on-exit)
-    (let [body-el (sel1 [:div.rich-body-editor])
-          cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body]))))
+    (autosave)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
@@ -72,7 +77,6 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
-                                          (save-on-exit? s)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
                       }]
@@ -85,7 +89,7 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
-                                            (save-on-exit? s)
+                                            (dis/dispatch! [:entry-clear-local-cache :entry-editing])
                                             (dis/dispatch! [:alert-modal-hide])
                                             (real-close s))
                         }]
@@ -97,7 +101,7 @@
 (defn body-on-change [state]
   (toggle-save-on-exit state true)
   (dis/dispatch! [:input [:entry-editing :has-changes] true])
-  (calc-edit-entry-modal-height state))
+  (calc-entry-edit-modal-height state))
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
@@ -163,6 +167,8 @@
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
                         (rum/local false ::show-boards-dropdown)
+                        (rum/local false ::window-resize-listener)
+                        (rum/local nil ::autosave-timer)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -192,16 +198,25 @@
                             (utils/after 300 #(setup-headline s))
                             (when-let [headline-el (rum/ref-node s "headline")]
                               (utils/to-end-of-content-editable headline-el)))
+                          (reset! (::window-resize-listener s)
+                           (events/listen
+                            js/window
+                            EventType/RESIZE
+                            #(calc-entry-edit-modal-height s true)))
+                          (reset! (::autosave-timer s)
+                           (utils/every 5000
+                            #(autosave)))
                           s)
-                         :before-render (fn [s] (calc-edit-entry-modal-height s) s)
+                         :before-render (fn [s] (calc-entry-edit-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :did-remount (fn [_ s]
                           (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
-                            (set! (.-onbeforeunload js/window) (if save-on-exit
-                                                                #(do
-                                                                  (save-on-exit? s)
-                                                                  "Do you want to save before leaving?")
-                                                                nil)))
+                            (set! (.-onbeforeunload js/window)
+                             (if save-on-exit
+                              #(do
+                                (save-on-exit? s)
+                                "Do you want to save before leaving?")
+                              nil)))
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
@@ -232,6 +247,12 @@
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
+                          (when @(::window-resize-listener s)
+                            (events/unlistenByKey @(::window-resize-listener s))
+                            (reset! (::window-resize-listener s) nil))
+                          (when @(::autosave-timer s)
+                            (js/clearInterval @(::autosave-timer s))
+                            (reset! (::autosave-timer s) nil))
                           (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]

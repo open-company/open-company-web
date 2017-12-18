@@ -347,6 +347,12 @@ div.activity-card {
         display: none;
       }
 
+      h2 {
+        @include avenir_R();
+        font-size: 16px;
+        font-weight: normal;
+      }
+
       b, strong {
         font-weight: normal;
         @include avenir_R();

@@ -244,6 +244,7 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entry-clear-local-cache | UI | Remove the locally saved edits for the current editing item. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-modal-save | UI | Save editing from modal. |

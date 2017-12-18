@@ -81,6 +81,12 @@ div.drafts-layout {
               @include avenir_M();
             }
 
+            h2 {
+              @include avenir_R();
+              font-size: 16px;
+              font-weight: normal;
+            }
+
             a.read-more {
               @include avenir_R();
               font-size: 16px;
