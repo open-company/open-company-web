@@ -214,7 +214,7 @@
 
 (defn patch-board [data]
   (when data
-    (let [board-data (select-keys data [:name :slug :access :slack-mirror])
+    (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers])
           json-data (cljs->json board-data)
           board-patch-link (utils/link-for (:links data) "partial-update")]
       (storage-http (method-for-link board-patch-link) (relative-href board-patch-link)
@@ -502,12 +502,16 @@
   (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")
         board-name (:name board-data)
         board-access (:access board-data)
-        slack-mirror (:slack-mirror board-data)]
+        slack-mirror (:slack-mirror board-data)
+        viewers (:viewers board-data)
+        authors (:authors board-data)]
     (when (and board-name create-link)
       (storage-http (method-for-link create-link) (relative-href create-link)
         {:headers (headers-for-link create-link)
          :json-params (cljs->json {:name board-name
                                    :access board-access
+                                   :authors authors
+                                   :viewers viewers
                                    :slack-mirror slack-mirror})}
         (fn [{:keys [success status body]}]
           (let [board-data (when success (json->cljs body))]
@@ -882,35 +886,6 @@
             {:status status
              :activity-data activity-data
              :reaction-data (if success (json->cljs body) {})}]))))))
-
-(defn add-user-to-private-board
-  [board-data user user-type]
-  (when (and user
-             board-data)
-    (let [add-link (utils/link-for
-                    (:links board-data)
-                    "add"
-                    "POST"
-                    {:content-type
-                      (if (= user-type :viewer)
-                        "application/vnd.open-company.board.viewer.v1"
-                        "application/vnd.open-company.board.author.v1")})]
-      (when add-link
-        (storage-http (method-for-link add-link) (relative-href add-link)
-         {:headers (headers-for-link add-link)
-          :body (:user-id user)}
-         (fn [{:keys [status success body]}]
-           (dispatcher/dispatch! [:private-board-user-add/finish success])))))))
-
-(defn remove-user-from-private-board
-  [user self-user?]
-  (when user
-    (let [remove-link (utils/link-for (:links user) "remove")]
-      (when remove-link
-        (storage-http (method-for-link remove-link) (relative-href remove-link)
-         {:headers (headers-for-link remove-link)}
-         (fn [{:keys [status success body]}]
-           (dispatcher/dispatch! [:private-board-user-remove/finish success self-user?])))))))
 
 (defn force-jwt-refresh []
   (when (j/jwt)

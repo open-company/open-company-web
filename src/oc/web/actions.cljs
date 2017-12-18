@@ -1437,9 +1437,13 @@
 
 (defmethod dispatcher/action :board-edit
   [db [_ initial-board-data]]
-  (let [fixed-board-data (or
-                           initial-board-data
-                           {:name "" :slug "" :access "team"})]
+  (let [authors (or (map :user-id (:authors initial-board-data)) [])
+        viewers (or (map :user-id (:viewers initial-board-data)) [])
+        board-data (or
+                    initial-board-data
+                    {:name "" :slug "" :access "team"})
+        fixed-board-data (merge board-data {:viewers viewers
+                                            :authors authors})]
     (assoc db :board-editing fixed-board-data)))
 
 (defmethod dispatcher/action :board-edit-save
@@ -1802,29 +1806,22 @@
 
 (defmethod dispatcher/action :private-board-user-add
   [db [_ user user-type]]
-  (let [board-data (dispatcher/board-data db)]
-    (api/add-user-to-private-board board-data user user-type)
-    db))
-
-(defmethod dispatcher/action :private-board-user-add/finish
-  [db [_ success]]
-  (when success
-    (let [board-data (dispatcher/board-data db)
-          board-link (utils/link-for (:links board-data) "self")]
-      (api/get-board board-link)))
-  db)
+  (let [board-data (:board-editing db)
+        current-authors (filterv #(not= % (:user-id user)) (:authors board-data))
+        current-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))
+        next-authors (if (= user-type :author)
+                       (vec (conj current-authors (:user-id user)))
+                       current-authors)
+        next-viewers (if (= user-type :viewer)
+                       (vec (conj current-viewers (:user-id user)))
+                       current-viewers)]
+    (assoc db :board-editing (merge board-data {:authors next-authors
+                                                :viewers next-viewers}))))
 
 (defmethod dispatcher/action :private-board-user-remove
   [db [_ user]]
-  (api/remove-user-from-private-board user (= (:user-id user) (jwt/user-id)))
-  db)
-
-(defmethod dispatcher/action :private-board-user-remove/finish
-  [db [_ success self-user?]]
-  (when success
-    (if self-user?
-      (api/get-org (dispatcher/org-data))
-      (let [board-data (dispatcher/board-data db)
-            board-link (utils/link-for (:links board-data) "self")]
-        (api/get-board board-link))))
-  db)
+  (let [board-data (:board-editing db)
+        next-authors (filterv #(not= % (:user-id user)) (:authors board-data))
+        next-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))]
+    (assoc db :board-editing (merge board-data {:authors next-authors
+                                                :viewers next-viewers}))))

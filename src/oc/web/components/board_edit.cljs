@@ -55,8 +55,8 @@
 
 (defn get-addable-users
   "Filter users that are not arleady viewer or author users."
-  [board-data users]
-  (let [already-in-ids (map :user-id (concat (:viewers board-data) (:authors board-data)))
+  [board-editing users]
+  (let [already-in-ids (concat (:viewers board-editing) (:authors board-editing))
         without-self (remove #(= (:user-id %) (jwt/user-id)) users)]
     (remove #(some #{(:user-id %)} already-in-ids) without-self)))
 
@@ -164,8 +164,8 @@
         org-data (drv/react s :org-data)
         _ (drv/react s :team-data)
         roster (drv/react s :team-roster)
-        should-show-private-board-editing? (and (seq (:slug board-editing))
-                                                (= (:access board-editing) "private"))]
+        should-show-private-board-editing? (= (:access board-editing) "private")
+        current-user-id (jwt/user-id)]
     [:div.board-edit-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -238,7 +238,14 @@
                 [:span.board-edit-access-title "Team"]]
               [:div.board-edit-access-bt.board-edit-access-private-bt
                 {:class (when (= (:access board-editing) "private") "selected")
-                 :on-click #(dis/dispatch! [:input [:board-editing :access] "private"])
+                 :on-click (fn [_]
+                            (let [current-authors (:authors board-editing)
+                                  next-authors (if (first (filter #(= % current-user-id) current-authors))
+                                                 current-authors
+                                                 (vec (concat [current-user-id] current-authors)))
+                                  next-board-editing (merge board-editing {:authors next-authors
+                                                                           :access "private"})]
+                              (dis/dispatch! [:input [:board-editing] next-board-editing])))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :title "Only team members you invite can see or edit this board."}
@@ -254,13 +261,13 @@
           (when should-show-private-board-editing?
             (let [query  (::query s)
                   available-users (filter :user-id (:users roster))
-                  addable-users (get-addable-users board-data available-users)
+                  addable-users (get-addable-users board-editing available-users)
                   filtered-users (filter-users addable-users @query)
                   ;; user can edit the private board users if
                   ;; he's creating a new board
                   ;; or if he's in the authors list of the existing board
                   can-change (or (not (seq (:slug board-editing)))
-                                 (some #{(jwt/user-id)} (map :user-id (:authors board-data))))]
+                                 (some #{current-user-id} (map :user-id (:authors board-data))))]
               [:div.board-edit-private-users-container
                 (when (and can-change
                            (pos? (count addable-users)))
@@ -291,12 +298,10 @@
                               (utils/name-or-email user)]])])])
                 [:div.board-edit-private-users
                   (let [user-id @(::show-edit-user-dropdown s)
-                        user-type (if (utils/in? (map :user-id (:viewers board-data)) user-id)
+                        user-type (if (utils/in? (:viewers board-editing) user-id)
                                     :viewer
                                     :author)
-                        team-user (some #(when (= (:user-id %) user-id) %) (:users roster))
-                        users-list (if (= user-type :viewer) (:viewers board-data) (:authors board-data))
-                        user-links (some #(when (= (:user-id %) user-id) %) users-list)]
+                        team-user (some #(when (= (:user-id %) user-id) %) (:users roster))]
                     [:div.board-edit-private-users-dropdown-container
                       {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
                                :display (if (seq @(::show-edit-user-dropdown s)) "block" "none")}}
@@ -308,15 +313,15 @@
                                       :on-change (fn [item]
                                        (reset! (::show-edit-user-dropdown s) nil)
                                        (if (= (:value item) :remove)
-                                         (dis/dispatch! [:private-board-user-remove user-links])
+                                         (dis/dispatch! [:private-board-user-remove team-user])
                                          (dis/dispatch! [:private-board-user-add team-user (:value item)])))})])
                   [:div.board-edit-private-users-list.group
                     {:on-scroll #(do
                                   (reset! (::show-edit-user-dropdown s) nil)
                                   (reset! (::show-edit-user-top s) nil))
                      :ref "edit-users-scroll"}
-                    (let [author-ids (set (map :user-id (:authors board-data)))
-                          viewer-ids (set (map :user-id (:viewers board-data)))
+                    (let [author-ids (set (:authors board-editing))
+                          viewer-ids (set (:viewers board-editing))
                           authors (filter (comp author-ids :user-id) (:users roster))
                           viewers (filter (comp viewer-ids :user-id) (:users roster))
                           complete-authors (map
@@ -329,7 +334,7 @@
                           sorted-users (sort compare-users all-users)]
                       (for [user sorted-users
                             :let [user-type (:type user)
-                                  self (= (:user-id user) (jwt/user-id))]]
+                                  self (= (:user-id user) current-user-id)]]
                         [:div.board-edit-private-user.group
                           {:ref (str "edit-user-" (:user-id user))
                            :on-click #(when (and can-change
@@ -345,7 +350,8 @@
                           [:div.name
                             (utils/name-or-email user)]
                           (if self
-                            (when (> (count (:authors board-data)) 1)
+                            (if (and (seq (:slug board-editing))
+                                     (> (count (:authors board-data)) 1))
                               [:div.user-type.remove-link
                                 {:on-click (fn []
                                   (dis/dispatch! [:alert-modal-show
@@ -365,7 +371,9 @@
                                                             (router/current-board-slug)) all-boards)]
                                        (utils/after 200
                                         #(router/nav! (oc-urls/board (:slug (first not-this-boards)))))))}]))}
-                                "Leave Board"])
+                                "Leave Board"]
+                              [:div.user-type.no-dropdown
+                                "Full Access"])
                             [:div.user-type
                               {:class (when (not can-change) "no-dropdown")}
                               (if (= user-type :author)
