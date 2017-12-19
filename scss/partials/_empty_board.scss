@@ -1,5 +1,4 @@
 div.empty-board {
-  margin-top: 68px;
   margin: 4px 130px;
   float: left;
   text-align: center;
@@ -9,6 +8,7 @@ div.empty-board {
     float: unset;
     margin: 0px auto;
     width: 100%;
+    padding: 0px 24px;
   }
 
   div.empty-board-headline {
