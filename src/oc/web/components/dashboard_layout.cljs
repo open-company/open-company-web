@@ -183,7 +183,7 @@
         org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:marginLeft (if (responsive/is-mobile-size?)
+        board-container-style {:marginLeft (if is-mobile-size?
                                              "0px"
                                              (str (max
                                                    sidebar-width
@@ -203,8 +203,7 @@
           (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
-          (when-not is-mobile-size?
-            (navigation-sidebar))
+          (navigation-sidebar)
           [:div.board-container.group
             {:style board-container-style}
             ;; Board name row: board name, settings button and say something button
