@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.1 (47250) - http://www.bohemiancoding.com/sketch -->
+    <title>Globe icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Main-Menu-(m)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-42.000000, -376.000000)">
+        <g id="Group-3" transform="translate(24.000000, 140.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <g id="Globe-icon" transform="translate(18.000000, 236.000000)">
+                <path d="M6,0 C2.688,0 0,2.688 0,6 C0,9.312 2.688,12 6,12 C9.312,12 12,9.312 12,6 C12,2.688 9.312,0 6,0 Z M5.4,10.758 C3.03,10.464 1.2,8.448 1.2,6 C1.2,5.628 1.248,5.274 1.326,4.926 L4.2,7.8 L4.2,8.4 C4.2,9.06 4.74,9.6 5.4,9.6 L5.4,10.758 Z M9.54,9.234 C9.384,8.748 8.94,8.4 8.4,8.4 L7.8,8.4 L7.8,6.6 C7.8,6.27 7.53,6 7.2,6 L3.6,6 L3.6,4.8 L4.8,4.8 C5.13,4.8 5.4,4.53 5.4,4.2 L5.4,3 L6.6,3 C7.26,3 7.8,2.46 7.8,1.8 L7.8,1.554 C9.558,2.268 10.8,3.99 10.8,6 C10.8,7.248 10.32,8.382 9.54,9.234 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>
