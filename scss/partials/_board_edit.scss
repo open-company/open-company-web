@@ -409,6 +409,7 @@ div.board-edit-container {
                 &.remove-link {
                   text-decoration: underline;
                   color: $carrot_orange;
+                  padding-right: 0px;
 
                   &:after {
                     display: none;
@@ -429,6 +430,7 @@ div.board-edit-container {
 
                 &.no-dropdown {
                   cursor: default;
+                  padding-right: 0px;
 
                   &:after {
                     display: none;
