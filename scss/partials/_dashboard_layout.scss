@@ -30,21 +30,20 @@ div.dashboard-layout {
         margin-left: 15px;
 
         @include mobile() {
-          max-width: 65%;
-          overflow: hidden;
-          text-overflow: ellipsis;
           display: inline-block;
-          white-space: nowrap;
-          padding-right: 32px;
+          text-align: center;
+          float: unset;
         }
 
         span.board-name-span {
           @include avenir_M();
           font-size: 32px;
           color: $carrot_gray;
+          float: left;
 
           @include mobile() {
             color: $carrot_dark_gray;
+            float: unset;
           }
 
           .emojione {
@@ -53,7 +52,7 @@ div.dashboard-layout {
         }
 
         button.board-settings-bt {
-          float: right;
+          float: left;
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
           background-repeat: no-repeat;
@@ -69,57 +68,84 @@ div.dashboard-layout {
           @include mobile(){
             margin-right: -30px;
             margin-left: unset;
+            float: unset;
           }
 
           &:hover {
             opacity: 1;
           }
         }
-      }
 
-      div.private-board {
-        @include avenir_M();
-        font-size: 14px;
-        color: rgba(#34414F, 0.5);
-        position: relative;
-        padding-left: 16px;
-        float: left;
-        margin-top: 12px;
-        margin-left: 16px;
+        div.private-board {
+          @include avenir_M();
+          font-size: 14px;
+          color: rgba(#34414F, 0.5);
+          position: relative;
+          padding-left: 16px;
+          float: left;
+          margin-top: 12px;
+          margin-left: 16px;
 
-        &:before {
-          content: "";
-          background-image: cdnUrl("/img/ML/board_private.svg");
-          background-size: 8px 10px;
-          background-repeat: no-repeat;
-          width: 8px;
-          height: 10px;
-          position: absolute;
-          top: 3px;
-          left: 0px;
+          @include mobile() {
+            float: unset;
+            display: inline;
+            margin-left: 40px;
+            top: -5px;
+          }
+
+          &:before {
+            content: "";
+            background-image: cdnUrl("/img/ML/board_private.svg");
+            background-size: 8px 10px;
+            background-repeat: no-repeat;
+            width: 8px;
+            height: 10px;
+            position: absolute;
+            top: 3px;
+            left: 0px;
+
+            @include mobile(){
+              left: unset;
+              top: 0px;
+              margin-left: -12px;
+            }
+          }
         }
-      }
 
-      div.public-board {
-        @include avenir_M();
-        font-size: 14px;
-        color: rgba(#34414F, 0.5);
-        position: relative;
-        padding-left: 16px;
-        float: left;
-        margin-top: 12px;
-        margin-left: 16px;
+        div.public-board {
+          @include avenir_M();
+          font-size: 14px;
+          color: rgba(#34414F, 0.5);
+          position: relative;
+          padding-left: 16px;
+          float: left;
+          margin-top: 12px;
+          margin-left: 16px;
 
-        &:before {
-          content: "";
-          background-image: cdnUrl("/img/ML/board_public.svg");
-          background-size: 10px 10px;
-          background-repeat: no-repeat;
-          width: 10px;
-          height: 10px;
-          position: absolute;
-          top: 4px;
-          left: 0px;
+          @include mobile() {
+            float: unset;
+            display: inline;
+            margin-left: 40px;
+            top: -5px;
+          }
+
+          &:before {
+            content: "";
+            background-image: cdnUrl("/img/ML/board_public.svg");
+            background-size: 10px 10px;
+            background-repeat: no-repeat;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            top: 4px;
+            left: 0px;
+
+            @include mobile(){
+              left: unset;
+              top: 0px;
+              margin-left: -12px;
+            }
+          }
         }
       }
 
