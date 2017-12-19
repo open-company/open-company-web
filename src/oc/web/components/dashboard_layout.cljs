@@ -183,16 +183,16 @@
         org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:marginLeft (if responsive/is-mobile-size?
-                                            "0px"
-                                            (str
-                                             (max
-                                              sidebar-width
-                                              (+
-                                               (/
-                                                (- @(::ww s) responsive/board-container-width sidebar-width)
-                                                2)
-                                               sidebar-width)) "px"))}
+        board-container-style {:margin-left (if (responsive/is-mobile-size?)
+                                             "0px"
+                                             (str (max
+                                                   sidebar-width
+                                                   (+
+                                                    (/
+                                                     (- @(::ww s) responsive/board-container-width sidebar-width)
+                                                     2)
+                                                   sidebar-width))
+                                             "px"))}
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
@@ -299,8 +299,7 @@
                (all-posts all-posts-data)
                (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
               ;; Empty board
-              (and (not is-mobile-size?)
-                   (not current-activity-id)
+              (and (not current-activity-id)
                    empty-board?)
               (empty-board)
               ;; Layout boards activities

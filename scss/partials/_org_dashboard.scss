@@ -30,6 +30,10 @@ div.org-dashboard {
         min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}
       }
 
+      @include mobile() {
+        margin: 0px 24px;
+      }
+
       div.empty-dashboard {
         min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 30px);
         padding: 80px 20px;
