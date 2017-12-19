@@ -559,7 +559,7 @@
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]]
-   :body [:body.small-footer
+   :body [:body
           [:div#app
             [:div.oc-loading.active
               ;; Top left corner
@@ -667,7 +667,7 @@
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
-   :body [:body.small-footer
+   :body [:body
           [:div#app
             [:div.oc-loading.active
               ;; Top left corner

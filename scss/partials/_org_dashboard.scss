@@ -82,10 +82,10 @@ div.org-dashboard {
   }
 }
 
-body.small-footer {
+body {
   div.org-dashboard {
     div.page {
-      min-height: calc(100vh - #{$footer_small_height}px);
+      min-height: 100vh;
     }
   }
 }
@@ -110,6 +110,6 @@ div.org-dashboard div.topic-list{
     padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
   @include mobile(){
-    min-height: calc(100vh - #{$footer_small_height}px);
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
   }
 }
