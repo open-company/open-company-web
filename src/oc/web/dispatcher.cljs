@@ -99,6 +99,7 @@
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
+   :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings

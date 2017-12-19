@@ -84,9 +84,21 @@ div.left-navigation-sidebar {
   height: calc(100vh - 118px);
   @include no-user-select();
 
+  @include mobile() {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    left: 0px;
+    display: none;
+
+    &.show-boards-menu {
+      display: block;
+    }
+  }
+
   div.left-navigation-sidebar-content {
     padding-bottom: 32px;
-
   }
 
   a.all-posts {

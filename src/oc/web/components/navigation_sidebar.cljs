@@ -51,6 +51,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :change-data)
+                                (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::resize-listener)
@@ -84,6 +85,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         change-data (drv/react s :change-data)
+        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filterv #(not= (:slug %) utils/default-drafts-board-slug) all-boards)
@@ -110,6 +112,7 @@
                           (when show-invite-people
                            footer-button-height)))]
     [:div.left-navigation-sidebar.group
+      {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts
