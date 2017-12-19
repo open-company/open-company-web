@@ -7,7 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.menu :refer (menu)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
@@ -25,7 +25,13 @@
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
                                   s)}
   [s disabled-user-menu]
-  (let [{:keys [show-login-overlay mobile-menu-open org-data board-data] :as navbar-data} (drv/react s :navbar-data)]
+  (let [{:keys [current-user-data
+                org-data
+                board-data
+                show-login-overlay
+                mobile-navigation-sidebar
+                mobile-menu-open]
+         :as navbar-data} (drv/react s :navbar-data)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -40,6 +46,11 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
+          (when (and (responsive/is-mobile-size?)
+                     mobile-navigation-sidebar))
+          [:div.nav.navbar-nav.navbar-left
+            [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+              {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}]]
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
           [:ul.nav.navbar-nav.navbar-right
@@ -47,7 +58,7 @@
               (if (responsive/is-mobile-size?)
                 [:button.btn-reset.mobile-menu.group
                   {:on-click #(dis/dispatch! [:mobile-menu-toggle])}
-                  [:div.vertical-ellipses]]
+                  (user-avatar-image current-user-data)]
                 (if (jwt/jwt)
                   [:div.group
                     [:div.dropdown.right

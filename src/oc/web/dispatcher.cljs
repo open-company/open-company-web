@@ -246,7 +246,10 @@
                              :entry-save-on-exit (:entry-save-on-exit base)})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
-                            (let [navbar-data (select-keys base [:mobile-menu-open :show-login-overlay])]
+                            (let [navbar-data (select-keys base [:mobile-menu-open
+                                                                 :show-login-overlay
+                                                                 :mobile-navigation-sidebar
+                                                                 :current-user-data])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]

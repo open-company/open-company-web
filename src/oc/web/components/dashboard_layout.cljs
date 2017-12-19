@@ -183,7 +183,7 @@
         org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:margin-left (if (responsive/is-mobile-size?)
+        board-container-style {:marginLeft (if (responsive/is-mobile-size?)
                                              "0px"
                                              (str (max
                                                    sidebar-width
