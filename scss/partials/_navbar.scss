@@ -92,9 +92,24 @@ nav.oc-navbar {
         @include avenir_H();
         font-size: 26px;
 
+        @include mobile() {
+          width: 256px;
+          height: 32px;
+          margin-left: -128px;
+          top: 0px;
+        }
+
         button.orgs-dropdown div.org-avatar {
           height: 40px;
-          @include org-avatar(40);
+
+          @include big_web() {
+            @include org-avatar(40);
+          }
+
+          @include mobile() {
+            height: 32px;
+            @include org-avatar(32);
+          }
         }
       }
     }
@@ -102,6 +117,10 @@ nav.oc-navbar {
     ul.navbar-right {
       float: right;
       margin-right: 30px;
+
+      @include mobile() {
+        margin-right: 0px;
+      }
 
       div.alerts {
         float: right;

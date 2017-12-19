@@ -13,6 +13,12 @@ div.org-avatar {
     }
   }
 
-  @include org-avatar();
+  @include big_web(){
+    @include org-avatar(42);
+  }
+
+  @include mobile(){
+    @include org-avatar(32);
+  }
   
 }
