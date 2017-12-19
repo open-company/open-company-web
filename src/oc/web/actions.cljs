@@ -138,14 +138,12 @@
       (cond
         ;; Redirect to the first board if only one is present
         (>= (count boards) 1)
-        (if (responsive/is-tablet-or-mobile?)
-          (utils/after 10 #(router/nav! (oc-urls/boards)))
-          (let [board-to (utils/get-default-board org-data)]
-            (utils/after 10
-              #(router/nav!
-                 (if board-to
-                   (utils/get-board-url (:slug org-data) (:slug board-to))
-                   (oc-urls/all-posts (:slug org-data))))))))))
+        (let [board-to (utils/get-default-board org-data)]
+          (utils/after 10
+            #(router/nav!
+               (if board-to
+                 (utils/get-board-url (:slug org-data) (:slug board-to))
+                 (oc-urls/all-posts (:slug org-data)))))))))
 
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
