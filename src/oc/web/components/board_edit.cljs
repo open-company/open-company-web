@@ -69,6 +69,7 @@
                         (drv/drv :team-data)
                         (drv/drv :team-channels)
                         (drv/drv :team-roster)
+                        (drv/drv :alert-modal)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local false ::team-channels-requested)
@@ -162,7 +163,7 @@
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when-not new-board? (:channel-name (:slack-mirror board-data)))
         org-data (drv/react s :org-data)
-        _ (drv/react s :team-data)
+        team-data (drv/react s :team-data)
         roster (drv/react s :team-roster)
         should-show-private-board-editing? (= (:access board-editing) "private")
         current-user-id (jwt/user-id)]
@@ -170,8 +171,9 @@
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.modal-wrapper
-        [:button.carrot-modal-close.mlb-reset
-          {:on-click #(close-clicked s)}]
+        (when (nil? (drv/react s :alert-modal))
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(close-clicked s)}])
         [:div.board-edit
           {:class (when show-slack-channels? "show-slack-channels")}
           [:div.board-edit-header.group
@@ -301,7 +303,7 @@
                         user-type (if (utils/in? (:viewers board-editing) user-id)
                                     :viewer
                                     :author)
-                        team-user (some #(when (= (:user-id %) user-id) %) (:users roster))]
+                        team-user (some #(when (= (:user-id %) user-id) %) (:users team-data))]
                     [:div.board-edit-private-users-dropdown-container
                       {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
                                :display (if (seq @(::show-edit-user-dropdown s)) "block" "none")}}
@@ -322,8 +324,8 @@
                      :ref "edit-users-scroll"}
                     (let [author-ids (set (:authors board-editing))
                           viewer-ids (set (:viewers board-editing))
-                          authors (filter (comp author-ids :user-id) (:users roster))
-                          viewers (filter (comp viewer-ids :user-id) (:users roster))
+                          authors (filter (comp author-ids :user-id) (:users team-data))
+                          viewers (filter (comp viewer-ids :user-id) (:users team-data))
                           complete-authors (map
                                             #(merge % {:type :author :display-name (utils/name-or-email %)})
                                             authors)
@@ -362,15 +364,8 @@
                                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                     :solid-button-title "Yes"
                                     :solid-button-cb (fn []
-                                     (dis/dispatch! [:private-board-user-remove user])
-                                     (dis/dispatch! [:alert-modal-hide])
-                                     (close-clicked s)
-                                     ;; Redirect to the first available board
-                                     (let [all-boards (:boards org-data)
-                                           not-this-boards (remove #(= (:slug %)
-                                                            (router/current-board-slug)) all-boards)]
-                                       (utils/after 200
-                                        #(router/nav! (oc-urls/board (:slug (first not-this-boards)))))))}]))}
+                                     (dis/dispatch! [:private-board-kick-out-self user])
+                                     (dis/dispatch! [:alert-modal-hide]))}]))}
                                 "Leave Board"]
                               [:div.user-type.no-dropdown
                                 "Full Access"])

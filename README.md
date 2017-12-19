@@ -284,6 +284,8 @@ provided in the table below:
 |  :org-redirect | UI | Redirect to the newly created org after the setup screen have been shown. |
 |  :password-reset | UI | Start the request to reset the user password. |
 |  :password-reset/finish | API | Password reset request finished. |
+|  :private-board-kick-out-self | UI | Kick out self user from the current private board. |
+|  :private-board-kick-out-self/finish | API | Kick out action finished, redirect to the first available board or to org page. |
 |  :private-board-user-add | UI | Add a user to a private board with a specific role. |
 |  :private-board-user-add/finish | API | REST request to add a user to a private board finished. |
 |  :private-board-user-remove | UI | Remove a user from a private board with a specific role. |

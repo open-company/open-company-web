@@ -1825,3 +1825,28 @@
         next-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))]
     (assoc db :board-editing (merge board-data {:authors next-authors
                                                 :viewers next-viewers}))))
+
+(defmethod dispatcher/action :private-board-kick-out-self
+  [db [_ user]]
+  ;; If the user is self (same user-id) kick out from the current private board
+  (when (= (:user-id user) (jwt/user-id))
+    (api/remove-user-from-private-board user))
+  db)
+
+(defmethod dispatcher/action :private-board-kick-out-self/finish
+  [db [_ success]]
+  (if success
+    ;; Redirect to the first available board
+    (let [org-data (dispatcher/org-data db)
+          all-boards (:boards org-data)
+          current-board-slug (router/current-board-slug)
+          except-this-boards (remove #(#{current-board-slug "drafts"} (:slug %)) all-boards)
+          redirect-url (if-let [next-board (first except-this-boards)]
+                         (oc-urls/board (:slug next-board))
+                         (oc-urls/org (router/current-org-slug)))]
+     (api/get-org org-data)
+     (utils/after 0 #(router/nav! redirect-url))
+     ;; Force board editing dismiss
+     (dissoc db :board-editing))
+    ;; An error occurred while kicking the user out, no-op to let the user retry
+    db))
