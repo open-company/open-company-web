@@ -9,20 +9,43 @@ div.dashboard-layout {
     width: auto;
     width: 100%;
 
+    @include mobile(){
+      padding: 16px 0px;
+    }
+
     div.board-container {
       margin-right: 36px;
       width: #{$board_container_width}px;
       background-color: $oc_gray_8;
       left: 50%;
 
+      @include mobile() {
+        width: 100%;
+        margin: 0px;
+        left: unset;
+      }
+
       div.board-name {
         float: left;
         margin-left: 15px;
+
+        @include mobile() {
+          max-width: 65%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          white-space: nowrap;
+          padding-right: 32px;
+        }
 
         span.board-name-span {
           @include avenir_M();
           font-size: 32px;
           color: $carrot_gray;
+
+          @include mobile() {
+            color: $carrot_dark_gray;
+          }
 
           .emojione {
             @include emoji-size(32);
@@ -42,6 +65,11 @@ div.dashboard-layout {
           margin-top: 11px;
           margin-left: 7px;
           opacity: 0.8;
+
+          @include mobile(){
+            margin-right: -30px;
+            margin-left: unset;
+          }
 
           &:hover {
             opacity: 1;
