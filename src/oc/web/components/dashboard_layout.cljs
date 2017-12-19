@@ -208,7 +208,7 @@
           [:div.board-container.group
             {:style board-container-style}
             ;; Board name row: board name, settings button and say something button
-            [:div.group
+            [:div.board-name-container.group
               ;; Board name and settings button
               [:div.board-name
                 (when (router/current-board-slug)

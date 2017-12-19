@@ -7,6 +7,11 @@ div.activity-card {
   margin: 12px;
   position: relative;
 
+  @include mobile() {
+    width: 100%;
+    margin: 12px 0px;
+  }
+
   &:hover, &.dropdown-active {
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
 

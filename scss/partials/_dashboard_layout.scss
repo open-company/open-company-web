@@ -25,191 +25,195 @@ div.dashboard-layout {
         left: unset;
       }
 
-      div.board-name {
-        float: left;
-        margin-left: 15px;
+      div.board-name-container {
+        padding: 0px 24px;
 
-        @include mobile() {
-          display: inline-block;
-          text-align: center;
-          float: unset;
-        }
-
-        span.board-name-span {
-          @include avenir_M();
-          font-size: 32px;
-          color: $carrot_gray;
+        div.board-name {
           float: left;
+          margin-left: 15px;
 
           @include mobile() {
-            color: $carrot_dark_gray;
+            display: inline-block;
+            text-align: center;
             float: unset;
           }
 
-          .emojione {
-            @include emoji-size(32);
-          }
-        }
+          span.board-name-span {
+            @include avenir_M();
+            font-size: 32px;
+            color: $carrot_gray;
+            float: left;
 
-        button.board-settings-bt {
-          float: left;
-          background-image: cdnUrl("/img/ML/board_settings.svg");
-          background-size: 8px 8px;
-          background-repeat: no-repeat;
-          background-position: 6px 7px;
-          background-color: #F0EFEA;
-          border-radius: 10px;
-          width: 20px;
-          height: 20px;
-          margin-top: 11px;
-          margin-left: 7px;
-          opacity: 0.8;
+            @include mobile() {
+              color: $carrot_dark_gray;
+              float: unset;
+            }
 
-          @include mobile(){
-            margin-right: -30px;
-            margin-left: unset;
-            float: unset;
+            .emojione {
+              @include emoji-size(32);
+            }
           }
 
-          &:hover {
-            opacity: 1;
-          }
-        }
-
-        div.private-board {
-          @include avenir_M();
-          font-size: 14px;
-          color: rgba(#34414F, 0.5);
-          position: relative;
-          padding-left: 16px;
-          float: left;
-          margin-top: 12px;
-          margin-left: 16px;
-
-          @include mobile() {
-            float: unset;
-            display: inline;
-            margin-left: 40px;
-            top: -5px;
-          }
-
-          &:before {
-            content: "";
-            background-image: cdnUrl("/img/ML/board_private.svg");
-            background-size: 8px 10px;
+          button.board-settings-bt {
+            float: left;
+            background-image: cdnUrl("/img/ML/board_settings.svg");
+            background-size: 8px 8px;
             background-repeat: no-repeat;
-            width: 8px;
-            height: 10px;
-            position: absolute;
-            top: 3px;
-            left: 0px;
+            background-position: 6px 7px;
+            background-color: #F0EFEA;
+            border-radius: 10px;
+            width: 20px;
+            height: 20px;
+            margin-top: 11px;
+            margin-left: 7px;
+            opacity: 0.8;
 
             @include mobile(){
-              left: unset;
-              top: 0px;
-              margin-left: -12px;
+              margin-right: -30px;
+              margin-left: unset;
+              float: unset;
+            }
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+
+          div.private-board {
+            @include avenir_M();
+            font-size: 14px;
+            color: rgba(#34414F, 0.5);
+            position: relative;
+            padding-left: 16px;
+            float: left;
+            margin-top: 12px;
+            margin-left: 16px;
+
+            @include mobile() {
+              float: unset;
+              display: inline;
+              margin-left: 40px;
+              top: -5px;
+            }
+
+            &:before {
+              content: "";
+              background-image: cdnUrl("/img/ML/board_private.svg");
+              background-size: 8px 10px;
+              background-repeat: no-repeat;
+              width: 8px;
+              height: 10px;
+              position: absolute;
+              top: 3px;
+              left: 0px;
+
+              @include mobile(){
+                left: unset;
+                top: 0px;
+                margin-left: -12px;
+              }
+            }
+          }
+
+          div.public-board {
+            @include avenir_M();
+            font-size: 14px;
+            color: rgba(#34414F, 0.5);
+            position: relative;
+            padding-left: 16px;
+            float: left;
+            margin-top: 12px;
+            margin-left: 16px;
+
+            @include mobile() {
+              float: unset;
+              display: inline;
+              margin-left: 40px;
+              top: -5px;
+            }
+
+            &:before {
+              content: "";
+              background-image: cdnUrl("/img/ML/board_public.svg");
+              background-size: 10px 10px;
+              background-repeat: no-repeat;
+              width: 10px;
+              height: 10px;
+              position: absolute;
+              top: 4px;
+              left: 0px;
+
+              @include mobile(){
+                left: unset;
+                top: 0px;
+                margin-left: -12px;
+              }
             }
           }
         }
 
-        div.public-board {
-          @include avenir_M();
-          font-size: 14px;
-          color: rgba(#34414F, 0.5);
+        div.new-post-top-dropdown-container {
           position: relative;
-          padding-left: 16px;
-          float: left;
-          margin-top: 12px;
-          margin-left: 16px;
+          float: right;
 
-          @include mobile() {
-            float: unset;
-            display: inline;
-            margin-left: 40px;
-            top: -5px;
-          }
-
-          &:before {
-            content: "";
-            background-image: cdnUrl("/img/ML/board_public.svg");
-            background-size: 10px 10px;
-            background-repeat: no-repeat;
-            width: 10px;
-            height: 10px;
-            position: absolute;
-            top: 4px;
-            left: 0px;
-
-            @include mobile(){
-              left: unset;
-              top: 0px;
-              margin-left: -12px;
-            }
-          }
-        }
-      }
-
-      div.new-post-top-dropdown-container {
-        position: relative;
-        float: right;
-
-        button.add-to-board-top-button {
-          width: 143px;
-          height: 42px;
-          background-color: $carrot_orange_light;
-          color: $carrot_orange;
-          border-radius: 100px;
-          padding: 10px 22px;
-          margin-right: 16px;
-          margin-top: -3px;
-          border: 2px solid transparent;
-          opacity: 1;
-          transition: 0ms;
-          cursor: pointer;
-
-          &:hover, &:active, &:focus, &.active {
-            background-color: $carrot_orange;
-            color: white;
+          button.add-to-board-top-button {
+            width: 143px;
+            height: 42px;
+            background-color: $carrot_orange_light;
+            color: $carrot_orange;
+            border-radius: 100px;
+            padding: 10px 22px;
+            margin-right: 16px;
+            margin-top: -3px;
+            border: 2px solid transparent;
             opacity: 1;
+            transition: 0ms;
+            cursor: pointer;
+
+            &:hover, &:active, &:focus, &.active {
+              background-color: $carrot_orange;
+              color: white;
+              opacity: 1;
+
+              div.add-to-board-pencil {
+                background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+              }
+
+              label.add-to-board-label {
+                color: white;
+              }
+            }
+
+            &:active, &:focus {
+              background-color: #ED4F3B;
+              opacity: 1;
+            }
 
             div.add-to-board-pencil {
-              background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+              background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
+              background-size: 14px 14px;
+              width: 14px;
+              height: 14px;
+              margin: 3px 6px 0px 0px;
+              padding: 0;
+              float: left;
+              cursor: pointer;
             }
 
             label.add-to-board-label {
-              color: white;
+              @include avenir_H();
+              font-size: 16px;
+              color: $carrot_orange;
+              float: left;
+              cursor: pointer;
             }
           }
 
-          &:active, &:focus {
-            background-color: #ED4F3B;
-            opacity: 1;
+          div.dropdown-list-container {
+            top: 46px;
+            width: 200px;
+            left: -26px;
           }
-
-          div.add-to-board-pencil {
-            background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
-            background-size: 14px 14px;
-            width: 14px;
-            height: 14px;
-            margin: 3px 6px 0px 0px;
-            padding: 0;
-            float: left;
-            cursor: pointer;
-          }
-
-          label.add-to-board-label {
-            @include avenir_H();
-            font-size: 16px;
-            color: $carrot_orange;
-            float: left;
-            cursor: pointer;
-          }
-        }
-
-        div.dropdown-list-container {
-          top: 46px;
-          width: 200px;
-          left: -26px;
         }
       }
     }

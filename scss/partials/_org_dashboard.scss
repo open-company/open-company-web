@@ -31,7 +31,7 @@ div.org-dashboard {
       }
 
       @include mobile() {
-        margin: 0px 24px;
+        margin: 0px;
       }
 
       div.empty-dashboard {
@@ -39,35 +39,14 @@ div.org-dashboard {
         padding: 80px 20px;
         margin-top: -20px;
 
+        @include mobile() {
+          margin: -20px 24px 0px;
+        }
+
         h3.empty-dashboard-title {
           @include avenir_H();
           font-size: 16px;
           line-height: 1.5;
-        }
-      }
-
-      div.sharing-board-container {
-        background-color: transparent;
-
-        &:first-child {
-          padding-top: 80px;
-        }
-
-        div.topic-list {
-          padding-top: 0px;
-
-          div.topics-column-container {
-            padding: 20px;
-          }
-        }
-
-        h3.board-title {
-          background-color: transparent;
-          color: $oc_gray_5;
-          font-size: 18px;
-          @include avenir_H();
-          line-height: 1.5;
-          margin-left: 200px;
         }
       }
     }
