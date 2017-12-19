@@ -887,6 +887,16 @@
              :activity-data activity-data
              :reaction-data (if success (json->cljs body) {})}]))))))
 
+(defn remove-user-from-private-board
+  [user]
+  (when user
+    (let [remove-link (utils/link-for (:links user) "remove")]
+      (when remove-link
+        (storage-http (method-for-link remove-link) (relative-href remove-link)
+         {:headers (headers-for-link remove-link)}
+         (fn [{:keys [status success body]}]
+           (dispatcher/dispatch! [:private-board-kick-out-self/finish success])))))))
+
 (defn force-jwt-refresh []
   (when (j/jwt)
     (go
