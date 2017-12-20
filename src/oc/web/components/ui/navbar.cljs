@@ -72,7 +72,7 @@
                         [:img
                           {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}]])]
                   (login-button)))]]]]
-      ; (when (responsive/is-mobile-size?)
-      ;   ;; Render the menu here only on mobile so it can expand the navbar
-      ;   (menu {:mobile-menu-open mobile-menu-open}))
+      (when (responsive/is-mobile-size?)
+        ;; Render the menu here only on mobile so it can expand the navbar
+        (menu))
       ]))

@@ -41,6 +41,7 @@ nav.oc-navbar {
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
+    height: 100vh;
 
     &:not(.mobile-menu-open) {
       height: #{$mobile_navbar_height}px;

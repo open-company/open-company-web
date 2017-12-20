@@ -15,6 +15,10 @@ div.menu {
     top: -15px;
     right: 10px;
     position: absolute;
+
+    @include mobile(){
+      right: 30px;
+    }
   }
 
   div.menu-header {
@@ -46,6 +50,7 @@ div.menu {
     top: 0px;
     left: 0px;
     width: 100%;
+    height: calc(100vh - 64px);
     opacity: 0;
     border: none;
     border-top: 1px solid rgba(78,90,107,0.1);
@@ -54,6 +59,7 @@ div.menu {
     transition: 230ms;
     display: block;
     text-align: right;
+    background-color: white;
 
     &.mobile-menu-open {
       opacity: 1;
@@ -71,10 +77,6 @@ div.menu {
     &:last-child {
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
-    }
-
-    @include mobile(){
-      padding: 4px;
     }
 
     @include big_web(){
