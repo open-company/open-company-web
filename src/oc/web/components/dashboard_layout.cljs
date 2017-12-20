@@ -221,7 +221,7 @@
                            (not is-all-posts)
                            (not (:read-only board-data)))
                   [:button.mlb-reset.board-settings-bt
-                    {:data-toggle "tooltip"
+                    {:data-toggle (when-not is-mobile-size? "tooltip")
                      :data-placement "top"
                      :data-container "body"
                      :title (str (:name board-data) " settings")
