@@ -327,7 +327,7 @@
                     {:class (when @(::show-floating-boards-dropdown s) "active")
                      :data-placement "left"
                      :data-container "body"
-                     :data-toggle "tooltip"
+                     :data-toggle (when-not is-mobile-size? "tooltip")
                      :title "Start a new post"
                      :on-click (fn [_]
                                 (utils/remove-tooltips)
