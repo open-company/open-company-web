@@ -28,6 +28,10 @@ div.dashboard-layout {
       div.board-name-container {
         padding: 0px 24px;
 
+        @include mobile() {
+          text-align: center;
+        }
+
         div.board-name {
           float: left;
           margin-left: 15px;
@@ -36,6 +40,7 @@ div.dashboard-layout {
             display: inline-block;
             text-align: center;
             float: unset;
+            margin-left: 0px;
           }
 
           span.board-name-span {
