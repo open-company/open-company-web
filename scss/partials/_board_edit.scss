@@ -19,22 +19,17 @@ div.board-edit-container {
 
   div.modal-wrapper {
     width: #{552 + 20 + 8}px;
-    margin: 100px auto;
-    height: 387px;
+    margin: 40px auto;
     position: relative;
 
     div.board-edit {
-      margin: 0px 0px 0px 28px;
+      margin: 0px 0px 32px 28px;
       position: relative;
       width: 552px;
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
       padding: 24px 16px;
-
-      &.show-slack-channels {
-        height: 500px;
-      }
 
       span.more-info {
         width: 16px;
@@ -61,13 +56,22 @@ div.board-edit-container {
         div.title {
           @include avenir_M();
           font-size: 16px;
-          color: $carrot_light_gray_1;
-          float: left;
-          margin-top: 5px;
+          color: $carrot_light_gray;
+
+          span {
+            float: left;
+            margin-top: 5px;
+          }
 
           span.board-name {
-            color: $oc_gray_7;
+            color: $carrot_dark_gray;
             @include avenir_H();
+            display: block;
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-left: 8px;
 
             .emojione {
               @include emoji-size(14);
@@ -77,19 +81,19 @@ div.board-edit-container {
       }
 
       div.board-edit-divider {
-        width: calc(100% + 48px);
-        margin-left: -24px;
+        width: calc(100% + 32px);
+        margin-left: -16px;
         height: 1px;
         background-color: $carrot_light_gray_1;
         opacity: 0.3;
       }
 
       div.board-edit-body {
-        margin-bottom: 16px;
+        margin-bottom: 24px;
 
         div.board-edit-label {
           @include avenir_H();
-          font-size: 12px;
+          font-size: 14px;
           color: $oc_gray_7;
         }
 
@@ -118,7 +122,7 @@ div.board-edit-container {
           border: 1px solid rgba($carrot_light_gray_1, 0.5);
           width: 100%;
           margin-top: 6px;
-          height: 40px;
+          min-height: 40px;
           @include avenir_M();
           font-size: 14px;
           color: $oc_gray_7;
@@ -134,6 +138,7 @@ div.board-edit-container {
             font-size: 14px;
             color: $carrot_light_gray_1;
             content: attr(placeholder);
+            cursor: text;
           }
 
           &.board-name-error {
@@ -142,7 +147,7 @@ div.board-edit-container {
         }
 
         div.board-edit-access-label {
-          margin-top: 26px;
+          margin-top: 24px;
         }
 
         div.board-edit-access-field {
@@ -219,10 +224,11 @@ div.board-edit-container {
         padding: 16px;
 
         div.board-edit-slack-channels-label {
-          div.title {
-            font-size: 16px;
-            color: $carrot_dark_gray;
-            @include avenir_M();
+          div.board-edit-label {
+            @include avenir_H();
+            font-size: 14px;
+            color: $oc_gray_7;
+            margin-top: 7px;
             float: left;
             width: 70%;
           }
@@ -237,9 +243,220 @@ div.board-edit-container {
         }
       }
 
+      div.board-edit-private-users-container {
+        margin-top: 24px;
+
+        div.board-edit-private-users-search {
+          width: 100%;
+          height: 40px;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          border-radius: 4px;
+          position: relative;
+          padding: 10px 43px;
+
+          &:before {
+            position: absolute;
+            content: "";
+            top: 10px;
+            left: 6px;
+            width: 21px;
+            height: 20px;
+            @include image-2x("/img/ML/search_lens");
+            background-size: 21px 20px;
+          }
+
+          input {
+            width: 100%;
+            border: none;
+            outline: none;
+            @include avenir_R();
+            font-size: 16px;
+            color: $carrot_dark_gray;
+
+            @include placeholder(){
+              color: rgba($carrot_light_gray, 0.9);
+            }
+          }
+
+          div.board-edit-add-user-dropdown-container{
+            position: absolute;
+            right: 120px;
+            z-index: 3;
+
+            div.dropdown-list-container {
+              top: 0px;
+              left: 0px;
+              width: 120px;
+
+              div.triangle {
+                top: unset;
+                bottom: -2px;
+                border-top: 0px solid rgba(177,184,192,0.50);
+                border-left: 0px solid rgba(177,184,192,0.50);
+                border-bottom: 1px solid rgba(177,184,192,0.50);
+                border-right: 1px solid rgba(177,184,192,0.50);
+              }
+            }
+          }
+
+          div.board-edit-private-users-results {
+            position: absolute;
+            top: 38px;
+            left: 0px;
+            width: 100%;
+            max-height: 130px;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid rgba($carrot_light_gray_1, 0.5);
+            z-index: 2;
+            overflow-y: auto;
+
+            div.board-edit-private-users-result {
+              height: 40px;
+              @include avenir_R();
+              font-size: 16px;
+              color: $carrot_dark_gray;
+              padding: 4px 16px;
+              width: 100%;
+              cursor: pointer;
+
+              &:hover {
+                background-color: rgba($carrot_light_gray, 0.3);
+              }
+
+              @include user-profile(32);
+
+              div.user-avatar-img-container {
+                float: left;
+              }
+
+              div.name {
+                float: left;
+                max-width: 80%;
+                margin-left: 16px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 6px;
+              }
+            }
+          }
+        }
+
+        div.board-edit-private-users {
+          margin: 16px 0px 0px;
+          position: relative;
+
+          div.board-edit-private-users-dropdown-container {
+            position: absolute;
+            right: 140px;
+            z-index: 3;
+
+            div.dropdown-list-container {
+              top: 0px;
+              left: 0px;
+
+              div.triangle {
+                top: unset;
+                bottom: -2px;
+                left: unset;
+                right: 20px;
+                border-top: 0px solid rgba(177,184,192,0.50);
+                border-left: 0px solid rgba(177,184,192,0.50);
+                border-bottom: 1px solid rgba(177,184,192,0.50);
+                border-right: 1px solid rgba(177,184,192,0.50);
+              }
+            }
+          }
+
+          div.board-edit-private-users-list {
+            width: 100%;
+            padding: 0px 16px 0px 0px;
+            @include avenir_R();
+            font-size: 16px;
+            color: $carrot_dark_gray;
+            max-height: 224px;
+            overflow-y: auto;
+
+            div.board-edit-private-user {
+              height: 64px;
+              width: 100%;
+              padding: 16px 0px;
+              box-shadow: inset 0px -1px 0px $carrot_light_gray_2;
+
+              @include user-profile(32);
+
+              div.user-avatar-img-container {
+                float: left;
+              }
+
+              div.name {
+                float: left;
+                max-width: 50%;
+                margin-left: 16px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 6px;
+              }
+
+              div.user-type {
+                float: right;
+                max-width: calc(50% - 32px - 6px);
+                margin-top: 6px;
+                position: relative;
+                padding-right: 12px;
+                cursor: pointer;
+
+                &.remove-link {
+                  text-decoration: underline;
+                  color: $carrot_orange;
+                  padding-right: 0px;
+
+                  &:after {
+                    display: none;
+                  }
+                }
+
+                &:after {
+                  content: "";
+                  position: absolute;
+                  top: 6px;
+                  right: 0px;
+                  background-image: cdnUrl("/img/ML/board_settings.svg");
+                  background-size: 8px 8px;
+                  background-repeat: no-repeat;
+                  width: 8px;
+                  height: 8px;
+                }
+
+                &.no-dropdown {
+                  cursor: default;
+                  padding-right: 0px;
+
+                  &:after {
+                    display: none;
+                  }
+                }
+
+                div.dropdown-list-container {
+                  top: 24px;
+                  left: -68px;
+
+                  div.triangle {
+                    left: unset;
+                    right: 30px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
       div.board-edit-footer {
         height: 40px;
         margin-top: 15px;
+        position: relative;
+        z-index: 1;
 
         div.board-edit-footer-left {
           float: left;
