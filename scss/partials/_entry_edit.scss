@@ -25,6 +25,14 @@ div.entry-edit-modal-container {
     margin: 0px auto 50px;
     position: relative;
 
+    @include mobile() {
+      min-height: 100vh;
+      max-height: 100vh;
+      height: 100vh !important;
+      margin-top: 0px !important;
+      width: 100%;
+    }
+
     div.entry-edit-modal {
       width: 700px;
       margin: 0px 0px 0px 28px;
@@ -33,6 +41,13 @@ div.entry-edit-modal-container {
       border-radius: 8px;
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
       padding: 0px;
+
+      @include mobile() {
+        width: 100%;
+        margin: 0px;
+        border-radius: 0px;
+        height: 100%;
+      }
 
       div.entry-edit-modal-header{
         height: 72px;
@@ -55,9 +70,14 @@ div.entry-edit-modal-container {
           color: $oc_gray_7;
           float: left;
           margin-top: 5px;
+          max-width: 50%;
 
           span {
             float: left;
+
+            @include mobile() {
+              display: none;
+            }
           }
 
           div.boards-dropdown-caret {
@@ -93,6 +113,20 @@ div.entry-edit-modal-container {
             }
           }
         }
+
+        @include mobile() {
+          div.entry-card-dd-container {
+            div.entry-edit-topics-dd {
+              left: unset;
+              right: 0px;
+
+              div.triangle {
+                left: unset;
+                right: 20px;
+              }
+            }
+          }
+        }
       }
 
       div.entry-edit-modal-divider {
@@ -115,6 +149,10 @@ div.entry-edit-modal-container {
         max-height: calc(100vh - 72px - 88px - 1px);
         width: calc(100% + 22px);
         margin-left: -22px;
+
+        @include mobile() {
+          height: calc(100vh - 72px - 88px - 1px);
+        }
 
         div.entry-edit-headline {
           border: none;
