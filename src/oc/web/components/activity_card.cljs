@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -174,7 +174,7 @@
           (activity-attachments activity-data true)
           ; Topic tag button
           (when (:topic-slug activity-data)
-            (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
+            (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
                  :on-click #(router/nav!
