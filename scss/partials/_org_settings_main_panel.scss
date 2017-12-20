@@ -91,6 +91,10 @@ div.org-settings-main {
       margin-right: 26px;
       height: 40px;
 
+      @include mobile() {
+        width: 70% !important;
+      }
+
       input {
         @include placeholder(){
           @include avenir_R();
