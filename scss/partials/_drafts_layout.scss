@@ -1,14 +1,32 @@
 div.drafts-layout {
   margin-left: 16px;
 
+  @include mobile() {
+    margin-left: 0px;
+  }
+
   div.draft-cards-container {
     width: 888px;
+
+    @include mobile() {
+      width: 100%;
+    }
+
     div.draft-card-column {
       width: 432px;
       float: left;
 
+      @include mobile() {
+        width: 100%;
+        float: unset
+      }
+
       &:first-child {
         margin-right: 24px;
+
+        @include mobile() {
+          margin-right: 0px;
+        }
       }
 
       div.draft-card {
@@ -23,6 +41,14 @@ div.drafts-layout {
         margin-top: 24px;
         cursor: pointer;
 
+        @include mobile() {
+          width: 100%;
+          min-height: initial;
+          max-height: initial;
+          border: none;
+          box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+        }
+
         &:hover {
           box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.15);
           div.draft-card-footer-last-edit {
@@ -35,6 +61,61 @@ div.drafts-layout {
         div.draft-card-tag {
           @include activity-tag();
           padding: 16px 16px 0;
+        }
+
+        div.draft-card-head {
+          display: none;
+
+          @include mobile() {
+            width: 100%;
+            padding: 16px 24px;
+            height: 72px;
+            background-color: $carrot_light_gray_2;
+            display: block;
+
+            div.draft-card-head-author {
+              float: left;
+              width: 55%;
+              padding-right: 20px;
+              overflow: hidden;
+
+              @include activity-author(40);
+            }
+
+            div.draft-card-head-right {
+              float: right;
+              position: relative;
+              width: 45%;
+              margin-top: 8px;
+
+              div.new-tag {
+                @include avenir_B();
+                color: $carrot_green_1;
+                font-size: 12px;
+                line-height: 14px;
+                padding: 6px 7px 4px 7px;
+                float: right;
+                text-transform: uppercase;
+                border: 1px solid $carrot_green_2;
+                border-radius: 3px;
+              }
+
+              div.activity-tag {
+                margin-top: 0;
+                float: right;
+                max-width: 100%;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-right: 8px;
+
+                &.double-tag {
+                  max-width: 50%;
+                }
+              }
+
+              @include activity-tag();
+            }
+          }
         }
 
         div.draft-card-content {
@@ -103,6 +184,32 @@ div.drafts-layout {
           @include activity-media-preview();
         }
 
+        div.draft-card-mobile-footer {
+          display: none;
+
+          @include mobile() {
+            display: block;
+            width: 100%;
+            padding: 16px 24px 24px;
+
+            button.continue-editing-bt {
+              padding: 8px 32px;
+              @include avenir_H();
+              font-size: 12px;
+              color: $carrot_green_1;
+              background-color: rgba(#E0F8EC, 0.7);
+              border-radius: 100px;
+            }
+
+            button.delete-draft-bt {
+              margin-left: 16px;
+              padding: 8px 12px;
+              background-color: transparent;
+              color: $carrot_green_1;
+            }
+          }
+        }
+
         div.draft-card-footer-last-edit {
           padding: 16px;
           margin: 24px;
@@ -111,6 +218,10 @@ div.drafts-layout {
           background-color: #D4F7E5;
           border-radius: 4px;
           cursor: pointer;
+
+          @include mobile() {
+            display: none;
+          }
 
           span.edit {
             float: left;
@@ -146,37 +257,14 @@ div.drafts-layout {
           }
         }
 
-        div.draft-card-footer {
-          background-color: $carrot_light_gray_2;
-          padding: 8px 16px;
-          margin-top: 4px;
-          position: absolute;
-          left: 0px;
-          bottom: 0px;
-          width: 432px;
-          height: 48px;
-
-          div.draft-card-footer-left {
-            margin-top: 8px;
-            font-size: 14px;
-            color: rgba($oc_gray_7, 0.5);
-            @include avenir_R();
-            float: left;
-          }
-
-          div.draft-card-footer-right {
-            margin-top: 8px;
-            font-size: 14px;
-            color: rgba($oc_gray_7, 0.5);
-            @include avenir_R();
-            float: right;
-          }
-        }
-
         &.empty-draft {
           background-color: transparent;
           box-shadow: none;
           border: none;
+
+          @include mobile() {
+            display: none;
+          }
         }
       }
     }

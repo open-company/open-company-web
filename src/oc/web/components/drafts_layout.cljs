@@ -1,11 +1,26 @@
 (ns oc.web.components.drafts-layout
   (:require [rum.core :as rum]
+            [cuerdas.core :as string]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.activity :as am]
             [oc.web.lib.activity-utils :as au]
-            [oc.web.mixins.activity :as am]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+
+(defn delete-clicked [draft e]
+  (utils/event-stop e)
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-entry"
+                    :message "Delete this draft?"
+                    :link-button-title "No"
+                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                       (dis/dispatch! [:activity-delete draft])
+                                       (dis/dispatch! [:alert-modal-hide]))}]
+   (dis/dispatch! [:alert-modal-show alert-data])))
 
 (rum/defcs draft-card < am/truncate-body-mixin
                         am/body-thumbnail-mixin
@@ -25,6 +40,25 @@
                   (dis/dispatch! [:entry-edit draft]))}
     (when draft
       [:div.draft-card-inner
+        [:div.draft-card-head
+          [:div.draft-card-head-author
+            (user-avatar-image (:author draft))
+            [:div.name (:name (:author draft))]
+            [:div.time-since
+              (let [t (:created-at draft)]
+                [:time
+                  {:date-time t
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                   :title (utils/activity-date-tooltip draft)}
+                  (utils/time-since t)])]]
+          [:div.draft-card-head-right
+            ; Topic tag button
+            (when (:topic-slug draft)
+              (let [topic-name (or (:topic-name draft) (string/upper (:topic-slug draft)))]
+                [:div.activity-tag.on-gray
+                  topic-name]))]]
         [:div.draft-card-content.group
           [:div.draft-card-title
             {:dangerouslySetInnerHTML
@@ -51,27 +85,15 @@
               {:title "Delete draft"
                :data-toggle "tooltip"
                :data-placement "top"
-               :on-click (fn [e]
-                           (utils/event-stop e)
-                           (let [alert-data {:icon "/img/ML/trash.svg"
-                                             :action "delete-entry"
-                                             :message "Delete this draft?"
-                                             :link-button-title "No"
-                                             :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                             :solid-button-title "Yes"
-                                             :solid-button-cb #(do
-                                                                (dis/dispatch! [:activity-delete draft])
-                                                                (dis/dispatch! [:alert-modal-hide]))}]
-                            (dis/dispatch! [:alert-modal-show alert-data])))}
+               :on-click (partial delete-clicked draft)}
               [:i.mdi..mdi-delete]])
           [:span.last-edit (str "Last edited " (utils/time-since (:updated-at draft)))]]
-        ; [:div.draft-card-footer.group
-        ;   [:div.draft-card-footer-left
-        ;     (let [author (:author draft)
-        ;           last-edit (if (map? author) author (last author))]
-        ;       (utils/draft-date (:updated-at last-edit)))]
-        ;   [:div.draft-card-footer-right ""]]
-          ])])
+        [:div.draft-card-mobile-footer
+          [:button.mlb-reset.continue-editing-bt
+            "Continue editing"]
+          [:button.mlb-reset.delete-draft-bt
+            {:on-click (partial delete-clicked draft)}
+            "Delete draft"]]])])
 
 (defn get-sorted-drafts [drafts-data]
   (vec (reverse (sort-by :created-at (vals (:fixed-items drafts-data))))))
