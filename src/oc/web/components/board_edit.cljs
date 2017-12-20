@@ -356,16 +356,18 @@
                                      (> (count (:authors board-data)) 1))
                               [:div.user-type.remove-link
                                 {:on-click (fn []
-                                  (dis/dispatch! [:alert-modal-show
-                                   {:icon "/img/ML/error_icon.png"
-                                    :action "remove-self-user-from-private-board"
-                                    :message "Are you sure you want to leave this board?"
-                                    :link-button-title "No"
-                                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                    :solid-button-title "Yes"
-                                    :solid-button-cb (fn []
-                                     (dis/dispatch! [:private-board-kick-out-self user])
-                                     (dis/dispatch! [:alert-modal-hide]))}]))}
+                                  (let [authors (:authors board-data)
+                                        self-data (first (filter #(= (:user-id %) current-user-id) authors))]
+                                    (dis/dispatch! [:alert-modal-show
+                                     {:icon "/img/ML/error_icon.png"
+                                      :action "remove-self-user-from-private-board"
+                                      :message "Are you sure you want to leave this board?"
+                                      :link-button-title "No"
+                                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                      :solid-button-title "Yes"
+                                      :solid-button-cb (fn []
+                                       (dis/dispatch! [:private-board-kick-out-self self-data])
+                                       (dis/dispatch! [:alert-modal-hide]))}])))}
                                 "Leave Board"]
                               [:div.user-type.no-dropdown
                                 "Full Access"])
