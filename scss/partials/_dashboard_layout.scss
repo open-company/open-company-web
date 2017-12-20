@@ -161,6 +161,10 @@ div.dashboard-layout {
           position: relative;
           float: right;
 
+          @include mobile() {
+            display: none;
+          }
+
           button.add-to-board-top-button {
             width: 143px;
             height: 42px;

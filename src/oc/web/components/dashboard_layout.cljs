@@ -44,7 +44,8 @@
   (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
     (when (pos? (.-length entry-floating))
       (let [scroll-top (document-scroll-top)
-            opacity (if @(::show-floating-boards-dropdown s)
+            opacity (if (or @(::show-floating-boards-dropdown s)
+                            (responsive/is-tablet-or-mobile?))
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
@@ -244,7 +245,6 @@
               ;; Add entry button
               (when (and (not is-all-posts)
                          (not (:read-only org-data))
-                         (not (responsive/is-tablet-or-mobile?))
                          (or (utils/link-for (:links board-data) "create")
                              is-drafts-board))
                 [:div.new-post-top-dropdown-container.group
@@ -313,10 +313,10 @@
             ;; Add entry floating button
             (when (and (not is-all-posts)
                        (not (:read-only org-data))
-                       (not (responsive/is-tablet-or-mobile?))
                        (or (utils/link-for (:links board-data) "create")
                            is-drafts-board))
-              (let [opacity (if @(::show-floating-boards-dropdown s)
+              (let [opacity (if (or @(::show-floating-boards-dropdown s)
+                                    (responsive/is-tablet-or-mobile?))
                               1
                               (calc-opacity (document-scroll-top)))]
                 [:div.new-post-floating-dropdown-container.group
