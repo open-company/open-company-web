@@ -127,27 +127,29 @@
     (body-on-change state)))
 
 (defn- real-start-editing [state & [focus]]
-  (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
-  (utils/after 100 #(setup-headline state))
-  (reset! (::autosave-timer state)
-   (utils/every 5000
-    #(autosave)))
-  (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
-  (when focus
-    (utils/after 1000
-      #(cond
-         (= focus :body)
-         (let [body-el (sel1 [:div.rich-body-editor])
-               scrolling-el (sel1 [:div.activity-modal-content])]
-           (utils/to-end-of-content-editable body-el)
-           (utils/scroll-to-bottom scrolling-el))
-         (= focus :headline)
-         (when-let [headline-el (rum/ref-node state "edit-headline")]
-           (utils/to-end-of-content-editable headline-el))))))
+  (when-not (responsive/is-tablet-or-mobile?)
+    (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
+    (utils/after 100 #(setup-headline state))
+    (reset! (::autosave-timer state)
+     (utils/every 5000
+      #(autosave)))
+    (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
+    (when focus
+      (utils/after 1000
+        #(cond
+           (= focus :body)
+           (let [body-el (sel1 [:div.rich-body-editor])
+                 scrolling-el (sel1 [:div.activity-modal-content])]
+             (utils/to-end-of-content-editable body-el)
+             (utils/scroll-to-bottom scrolling-el))
+           (= focus :headline)
+           (when-let [headline-el (rum/ref-node state "edit-headline")]
+             (utils/to-end-of-content-editable headline-el)))))))
 
 (defn- start-editing? [state & [focus]]
   (let [activity-data (first (:rum/args state))]
-    (when (and (utils/link-for (:links activity-data) "partial-update")
+    (when (and (not (responsive/is-tablet-or-mobile?))
+               (utils/link-for (:links activity-data) "partial-update")
                (not @(::showing-dropdown state))
                (not @(::move-activity state))
                (not (.contains (.-classList (.-activeElement js/document)) "add-comment")))
@@ -155,7 +157,6 @@
 
 (defn- stop-editing [state]
   (save-on-exit? state)
-  ; (reset! (::editing state) false)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
   (js/clearInterval @(::autosave-timer state))
@@ -483,7 +484,11 @@
                     [:div.activity-modal-content-body
                       {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                        :on-click #(start-editing? s :body)
-                       :class (when (empty? (:headline activity-data)) "no-headline")}]])
+                       :class (when (empty? (:headline activity-data)) "no-headline")}]
+                    (when is-mobile?
+                      (reactions activity-data))
+                    (when is-mobile?
+                      (comments activity-data))])
                 (when-not is-mobile?
                   (if editing
                     [:div.activity-modal-footer.group
