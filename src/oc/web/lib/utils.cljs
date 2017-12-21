@@ -1158,7 +1158,7 @@
 (defn get-default-board [org-data]
   (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
     (if (and (= last-board-slug "all-posts")
-             (link-for (:links org-data) "all-posts"))
+             (link-for (:links org-data) "activity"))
       {:slug "all-posts"}
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]

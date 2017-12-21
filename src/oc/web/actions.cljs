@@ -114,7 +114,12 @@
       ;; If it's all posts page, loads all posts for the current org
       (and (router/current-board-slug)
            (= (router/current-board-slug) "all-posts"))
-      (api/get-all-posts org-data)
+      (if (utils/link-for (:links org-data) "activity")
+        (api/get-all-posts org-data)
+        (do
+          ;; Remove the last board cookie to avoid falling in the all-posts 404 again
+          (cook/remove-cookie! (router/last-board-cookie (:slug org-data)))
+          (router/redirect-404!)))
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -1518,7 +1523,9 @@
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
-  (api/get-all-posts (dispatcher/org-data db))
+  (if (utils/link-for (:links (dispatcher/org-data db)) "activity")
+    (api/get-all-posts (dispatcher/org-data db))
+    (router/redirect-404!))
   db)
 
 (defmethod dispatcher/action :all-posts-calendar
@@ -1537,6 +1544,8 @@
                                 ;; Force the component to trigger a did-remount
                                 ;; or it won't see the finish of the loading
                                 (assoc :rand (rand 1000)))]
+      (when (and (not year) (not month))
+        (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
       (assoc-in db all-posts-key with-calendar-data))
     db))
 
