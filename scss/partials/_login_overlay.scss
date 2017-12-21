@@ -58,6 +58,7 @@ div.login-overlay-container {
       top: 0px;
       overflow: auto;
       box-shadow: none;
+      padding: 40px 16px;
     }
 
     a.red {
@@ -88,6 +89,11 @@ div.login-overlay-container {
       font-size: 18px;
       color: $carrot_text_blue;
       text-align: left;
+
+      @include mobile() {
+        width: 100%;
+        padding: 14px calc(100% - 274px);
+      }
 
       div.slack-blue-icon {
         width: 70px;

@@ -168,6 +168,11 @@ div.onboard-lander {
       color: $carrot_text_blue;
       text-align: left;
 
+      @include mobile() {
+        width: 100%;
+        padding: 14px calc(100% - 260px);
+      }
+
       div.slack-blue-icon {
         width: 70px;
         height: 21px;
