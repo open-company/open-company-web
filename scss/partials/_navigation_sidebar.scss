@@ -59,13 +59,13 @@
   }
 }
 
-@mixin item-selected-hover(){
+@mixin item-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
 
   @include mobile() {
-    border-radisu: 100px;
+    border-radius: 100px;
   }
 
   .internal {
@@ -193,8 +193,10 @@ div.left-navigation-sidebar {
         cursor: pointer;
       }
 
-      &:not(.item-selected):hover {
-        @include item-selected-hover();
+      @include big_web() {
+        &:not(.item-selected):hover {
+          @include item-hover();
+        }
       }
 
       &.item-selected {
@@ -335,8 +337,10 @@ div.left-navigation-sidebar {
           cursor: pointer;
         }
 
-        &:not(.item-selected):hover {
-          @include item-selected-hover();
+        @include big_web() {
+          &:not(.item-selected):hover {
+            @include item-hover();
+          }
         }
 
         &.item-selected {
