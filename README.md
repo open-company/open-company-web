@@ -244,6 +244,7 @@ provided in the table below:
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
 |  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entry-clear-local-cache | UI | Remove the locally saved edits for the current editing item. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
 |  :entry-modal-save | UI | Save editing from modal. |
@@ -284,8 +285,12 @@ provided in the table below:
 |  :org-redirect | UI | Redirect to the newly created org after the setup screen have been shown. |
 |  :password-reset | UI | Start the request to reset the user password. |
 |  :password-reset/finish | API | Password reset request finished. |
-|  :private-board-action | UI | Given a private board, a user of this board and an action perform the action: change role or remove the user. |
-|  :private-board-add | UI | Add a user to a private board with a specific role. |
+|  :private-board-kick-out-self | UI | Kick out self user from the current private board. |
+|  :private-board-kick-out-self/finish | API | Kick out action finished, redirect to the first available board or to org page. |
+|  :private-board-user-add | UI | Add a user to a private board with a specific role. |
+|  :private-board-user-add/finish | API | REST request to add a user to a private board finished. |
+|  :private-board-user-remove | UI | Remove a user from a private board with a specific role. |
+|  :private-board-user-remove/finish | API | REST request to remove a user from a private board finished. |
 |  :pswd-collect | UI | Start the request to save the new user password on password request. |
 |  :pswd-collect/finish | API | Collect password request finished. |
 |  :reaction-toggle | UI | Toggle a reaction, temporarily change it in the local state then starts the request to save it server side. |

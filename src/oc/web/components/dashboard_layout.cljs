@@ -192,7 +192,7 @@
                                                2)
                                               sidebar-width)) "px")}
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
-        is-drafts-board (= (:slug board-data) "drafts")
+        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         topics (:topics board-data)]
       ;; Topic list
@@ -229,7 +229,7 @@
                   {:data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"
-                   :title (if (= (router/current-board-slug) "drafts")
+                   :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
                            "Only visible to you"
                            "Only visible to invited team members")}
                   "Private"])

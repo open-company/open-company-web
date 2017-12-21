@@ -28,16 +28,14 @@
                          (drv/drv :alert-modal)
                          ;; Locals
                          (rum/local false ::dismiss)
-                         (rum/local false ::dismissing)
                          ;; Mixins
                          mixins/no-scroll-mixin
                          mixins/first-render-mixin
 
                          {:after-render (fn [s]
                                           (let [alert-modal @(drv/get-ref s :alert-modal)]
-                                            (when (and (:dismiss alert-modal)
-                                                       (not @(::dismissing s)))
-                                              (reset! (::dismissing s) true)
+                                            (when (and (not @(::dismiss s))
+                                                       (:dismiss alert-modal))
                                               (close-clicked s)))
                                           s)}
   "Customizable alert modal. It gets the following property from the :alert-modal derivative:

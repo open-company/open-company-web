@@ -223,7 +223,7 @@
                               (set! (.-innerHTML add-comment-div) ""))
                  :disabled @(::add-button-disabled s)}
                 "Add"]]])]
-       (when (not (js/isIE))
+       (when-not (js/isIE)
          (emoji-picker {:width 32
                         :height 32
                         :add-emoji-cb (fn [active-element emoji already-added?]

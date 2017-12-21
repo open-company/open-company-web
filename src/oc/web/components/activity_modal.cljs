@@ -25,14 +25,17 @@
 
 ;; Unsaved edits handling
 
+(defn autosave []
+  (let [body-el (sel1 [:div.rich-body-editor])
+        cleaned-body (when body-el
+                      (utils/clean-body-html (.-innerHTML body-el)))]
+    (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body])))
+
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when (:entry-save-on-exit @(drv/get-ref s :modal-data))
-    (let [body-el (sel1 [:div.rich-body-editor])
-          cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body]))))
+    (autosave)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
@@ -125,6 +128,9 @@
 (defn- real-start-editing [state & [focus]]
   (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
   (utils/after 100 #(setup-headline state))
+  (reset! (::autosave-timer state)
+   (utils/every 5000
+    #(autosave)))
   (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
   (when focus
     (utils/after 1000
@@ -151,6 +157,8 @@
   ; (reset! (::editing state) false)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
+  (js/clearInterval @(::autosave-timer state))
+  (reset! (::autosave-timer state) nil)
   (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) false])
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
@@ -183,7 +191,6 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
-                                          (save-on-exit? state)
                                           (dis/dispatch! [:alert-modal-hide])
                                           (dismiss-fn))
                       }]
@@ -196,7 +203,7 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
-                                            (save-on-exit? state)
+                                            (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
                         }]
@@ -246,6 +253,7 @@
                             (rum/local nil ::uploading-media)
                             (rum/local false ::save-on-exit)
                             (rum/local false ::edited-data-loaded)
+                            (rum/local nil ::autosave-timer)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
@@ -316,11 +324,12 @@
                              :did-remount (fn [_ s]
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (let [save-on-exit (:entry-save-on-exit modal-data)]
-                                  (set! (.-onbeforeunload js/window) (if save-on-exit
-                                                                #(do
-                                                                  (save-on-exit? s)
-                                                                  "Do you want to save before leaving?")
-                                                                nil)))
+                                  (set! (.-onbeforeunload js/window)
+                                   (if save-on-exit
+                                    #(do
+                                      (save-on-exit? s)
+                                      "Do you want to save before leaving?")
+                                    nil)))
                                 (setup-editing-data s)
                                 (when (and (:modal-editing modal-data)
                                            @(::entry-saving s))
@@ -376,7 +385,9 @@
             [:div.activity-modal-header-right
               (when (or (utils/link-for (:links activity-data) "partial-update")
                         (utils/link-for (:links activity-data) "delete"))
-                (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (:org-data modal-data)))]
+                (let [all-boards (filter
+                                  #(not= (:slug %) utils/default-drafts-board-slug)
+                                  (:boards (:org-data modal-data)))]
                   [:div.more-dropdown
                     [:button.mlb-reset.activity-modal-more.dropdown-toggle
                       {:type "button"
