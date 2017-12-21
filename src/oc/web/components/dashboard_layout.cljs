@@ -243,15 +243,15 @@
                      :title "Visible to the world, including search engines"}
                     "Public"])]
               ;; Add entry button
-              (when (and (not is-all-posts)
-                         (not (:read-only org-data))
+              (when (and (not (:read-only org-data))
                          (or (utils/link-for (:links board-data) "create")
-                             is-drafts-board))
+                             is-drafts-board
+                             is-all-posts))
                 [:div.new-post-top-dropdown-container.group
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
-                                (if is-drafts-board
+                                (if (or is-drafts-board is-all-posts)
                                   (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}
@@ -311,10 +311,10 @@
                 :else
                 (entries-layout board-data board-filters)))
             ;; Add entry floating button
-            (when (and (not is-all-posts)
-                       (not (:read-only org-data))
+            (when (and (not (:read-only org-data))
                        (or (utils/link-for (:links board-data) "create")
-                           is-drafts-board))
+                           is-drafts-board
+                           is-all-posts))
               (let [opacity (if (or @(::show-floating-boards-dropdown s)
                                     (responsive/is-tablet-or-mobile?))
                               1
