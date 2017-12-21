@@ -80,11 +80,13 @@
         [:div.oc-menu-item
           [:a {:href (oc-urls/org-settings) :on-click team-settings-click} "Team Settings"]])
       (when (and (router/current-org-slug)
-                 is-admin?)
+                 is-admin?
+                 (not (responsive/is-mobile-size?)))
         [:div.oc-menu-item
           [:a {:href (oc-urls/org-settings-team) :on-click um-click} "Manage Members"]])
       (when (and (router/current-org-slug)
-                 is-admin?)
+                 is-admin?
+                 (not (responsive/is-mobile-size?)))
         [:div.oc-menu-item.divider-item
           [:a {:href (oc-urls/org-settings-invite) :on-click invite-click} "Invite People"]])
       ; (when (and (router/current-org-slug)
@@ -96,7 +98,8 @@
       ;                is-author?))
       ;   [:div.oc-menu-item.divider-item
       ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
-      (when (jwt/jwt)
+      (when (and (jwt/jwt)
+                 (not (responsive/is-mobile-size?)))
         [:div.oc-menu-item.divider-item
           [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
       (if (jwt/jwt)
