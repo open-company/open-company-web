@@ -1523,9 +1523,8 @@
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
-  (if (utils/link-for (:links (dispatcher/org-data db)) "activity")
-    (api/get-all-posts (dispatcher/org-data db))
-    (router/redirect-404!))
+  (when (utils/link-for (:links (dispatcher/org-data db)) "activity")
+    (api/get-all-posts (dispatcher/org-data db)))
   db)
 
 (defmethod dispatcher/action :all-posts-calendar
