@@ -293,7 +293,10 @@
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; All Posts
-              is-all-posts
+              (and is-all-posts
+                   (or (and is-mobile-size?
+                            (not current-activity-id))
+                       (not is-mobile-size?)))
               (rum/with-key
                (all-posts all-posts-data)
                (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
@@ -305,10 +308,15 @@
               :else
               (cond
                 ;; Drafts
-                is-drafts-board
+                (and is-drafts-board
+                     (or (and is-mobile-size?
+                              (not current-activity-id))
+                         (not is-mobile-size?)))
                 (drafts-layout board-data)
                 ;; Entries
-                :else
+                (or (and is-mobile-size?
+                         (not current-activity-id))
+                    (not is-mobile-size?))
                 (entries-layout board-data board-filters)))
             ;; Add entry floating button
             (when (and (not (:read-only org-data))
