@@ -443,6 +443,9 @@ div.left-navigation-sidebar {
     bottom: 16px;
 
     @include mobile() {
+      // Temp remove bottom links on mobile
+      display: none;
+
       opacity: 0.5;
       margin-left: 16px;
 
