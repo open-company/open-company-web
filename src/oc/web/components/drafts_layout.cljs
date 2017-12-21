@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.activity :as am]
             [oc.web.lib.activity-utils :as au]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn delete-clicked [draft e]
@@ -36,7 +37,8 @@
     {:class (utils/class-set {:empty-draft (not draft)
                               (str "draft-card-" (:uuid draft)) true})
      :key (str "draft-" (:created-at draft))
-     :on-click #(when draft
+     :on-click #(when (and draft
+                           (not (responsive/is-table-or-mobile?)))
                   (dis/dispatch! [:entry-edit draft]))}
     (when draft
       [:div.draft-card-inner
@@ -80,7 +82,8 @@
                 {:src (:thumbnail @(:body-thumbnail s))}]])]
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
-          (when (utils/link-for (:links draft) "delete")
+          (when (and (utils/link-for (:links draft) "delete")
+                     (not (responsive/is-table-or-mobile?)))
             [:button.delete-draft.mlb-reset
               {:title "Delete draft"
                :data-toggle "tooltip"

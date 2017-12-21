@@ -78,6 +78,9 @@ div.dashboard-layout {
               margin-left: 8px;
               padding: 0px;
               float: unset;
+
+              // Remove to show settings button on mobile
+              display: none;
             }
 
             &:hover {
@@ -180,6 +183,11 @@ div.dashboard-layout {
             transition: 0ms;
             cursor: pointer;
 
+            // Remove to show settings button on mobile
+            @include mobile() {
+              display: none;
+            }
+
             &:hover, &:active, &:focus, &.active {
               background-color: $carrot_orange;
               color: white;
@@ -243,6 +251,11 @@ div.dashboard-layout {
         z-index: 1000;
         box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
         opacity: 1;
+
+        // Remove to show settings button on mobile
+        @include mobile() {
+          display: none;
+        }
 
         &:hover, &.active {
           background-color: #FF7C6C;

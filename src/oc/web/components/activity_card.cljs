@@ -30,7 +30,8 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit topic])}
+            {:on-click #(when-not (responsive/is-table-or-mobile?)
+                          (dis/dispatch! [:entry-edit topic]))}
             "Add an update?"]]])])
 
 (defn- delete-clicked [e activity-data]
@@ -128,7 +129,8 @@
         ; Card labels
         [:div.activity-card-head-right
           (when (or (utils/link-for (:links activity-data) "partial-update")
-                    (utils/link-for (:links activity-data) "delete"))
+                    (utils/link-for (:links activity-data) "delete")
+                    (not (responsive/is-table-or-mobile?)))
             (let [all-boards (filter
                               #(not= (:slug %) utils/default-drafts-board-slug)
                               (:boards (drv/react s :org-data)))]
@@ -177,11 +179,12 @@
             (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
-                 :on-click #(router/nav!
-                             (oc-urls/board-filter-by-topic
-                              (router/current-org-slug)
-                              (:board-slug activity-data)
-                              (:topic-slug activity-data)))}
+                 :on-click #(when-not (responsive/is-table-or-mobile?)
+                             (router/nav!
+                              (oc-urls/board-filter-by-topic
+                               (router/current-org-slug)
+                               (:board-slug activity-data)
+                               (:topic-slug activity-data))))}
                 topic-name]))
           (when is-all-posts
             [:div.activity-tag.board-tag.on-gray
@@ -217,7 +220,8 @@
         (when share-thoughts
           [:div.activity-share-thoughts
             "Share your thoughts"])
-        (when (utils/link-for (:links activity-data) "partial-update")
+        (when (and (utils/link-for (:links activity-data) "partial-update")
+                   (not (responsive/is-table-or-mobile?)))
           [:button.mlb-reset.post-edit
             {:title "Edit"
              :data-toggle "tooltip"
