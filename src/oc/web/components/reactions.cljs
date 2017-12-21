@@ -92,25 +92,28 @@
                                                           (inc (:count reaction-data)))
                                                   :reacted (not reacted)})
                             reaction-data)]]
-              [:button.reaction-btn.btn-reset
-                {:key (str "reaction-" (:uuid entry-data) "-" idx)
-                 :class (utils/class-set {:reacted (:reacted r)
-                                          :can-react (not read-only-reaction)
-                                          :has-reactions (pos? (:count r))})
-                 :on-click (fn [e]
-                             (when (and (not is-loading) (not read-only-reaction))
-                               (when (and (not (:reacted r))
-                                          (not (js/isSafari))
-                                          (not (js/isEdge))
-                                          (not (js/isIE)))
-                                 (animate-reaction e s))
-                               (dis/dispatch! [:reaction-toggle entry-data r (not reacted)])))}
-                [:span.reaction
-                  {:class (when (pos? (:count r)) "has-count")}
-                  (:reaction r)]
-                [:div.count
-                  (when (pos? (:count r))
-                    (:count r))]]))
+              (when (or (not is-mobile?)
+                        (and is-mobile?
+                             (pos? (:count reaction-data))))
+                [:button.reaction-btn.btn-reset
+                  {:key (str "reaction-" (:uuid entry-data) "-" idx)
+                   :class (utils/class-set {:reacted (:reacted r)
+                                            :can-react (not read-only-reaction)
+                                            :has-reactions (pos? (:count r))})
+                   :on-click (fn [e]
+                               (when (and (not is-loading) (not read-only-reaction))
+                                 (when (and (not (:reacted r))
+                                            (not (js/isSafari))
+                                            (not (js/isEdge))
+                                            (not (js/isIE)))
+                                   (animate-reaction e s))
+                                 (dis/dispatch! [:reaction-toggle entry-data r (not reacted)])))}
+                  [:span.reaction
+                    {:class (when (pos? (:count r)) "has-count")}
+                    (:reaction r)]
+                  [:div.count
+                    (when (pos? (:count r))
+                      (:count r))]])))
           (when should-show-picker?
             [:button.reaction-btn.btn-reset.can-react.reaction-picker
               {:key (str "reaction-" (:uuid entry-data) "-picker")
