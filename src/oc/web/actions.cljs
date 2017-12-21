@@ -283,6 +283,9 @@
       ; auth settings loaded
       (do
         (api/get-current-user body)
+        ;; Start teams retrieve if we have a link
+        (when (utils/link-for (:links body) "collection")
+          (utils/after 5000 #(dispatcher/dispatch! [:teams-get])))
         (cond
           ; if showing the create organization UI load the list of teams
           ; if a link for it is present
@@ -507,7 +510,11 @@
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
   (if team-data
-    (assoc-in db (dispatcher/team-data-key (:team-id team-data)) team-data)
+    (do
+      (when (= (:team-id (dispatcher/org-data db)) (:team-id team-data))
+        (utils/after 100 #(dispatcher/dispatch! [:channels-enumerate (:team-id team-data)])))
+      ;; if team is the current org team, load the slack chennels
+      (assoc-in db (dispatcher/team-data-key (:team-id team-data)) team-data))
     db))
 
 (defmethod dispatcher/action :team-roster-loaded
@@ -805,45 +812,6 @@
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data))))
   (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defmethod dispatcher/action :private-board-add
-  [db [_]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        user-type (:selected-user-type (:private-board-invite db))
-        user-id (:selected-user-id (:private-board-invite db))
-        board-data (dispatcher/board-data db)
-        viewers (:viewers board-data)
-        authors (:authors board-data)
-        new-viewers (if (= user-type :viewer)
-                      (conj viewers {:user-id user-id :loading true})
-                      (filterv #(not= (:user-id %) user-id) viewers))
-        new-authors (if (= user-type :author)
-                      (conj authors {:user-id user-id :loading true})
-                      (filterv #(not= (:user-id %) user-id) authors))
-        new-board-data (merge board-data {:viewers new-viewers
-                                          :authors new-authors})]
-    (api/add-private-board board-data user-id user-type)
-    (assoc-in db board-key new-board-data)))
-
-(defmethod dispatcher/action :private-board-action
-  [db [_ user-id user-type link]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-        board-data (dispatcher/board-data db)
-        viewers (:viewers board-data)
-        authors (:authors board-data)
-        user (if (= user-type :viewer)
-                (first (filter #(= (:user-id %) user-id) viewers))
-                (first (filter #(= (:user-id %) user-id) authors)))
-        new-viewers (if (= user-type :viewer)
-                      (conj (filterv #(= (:user-id %) user-id) viewers) (assoc user :loading true))
-                      viewers)
-        new-authors (if (= user-type :authors)
-                      (conj (filterv #(= (:user-id %) user-id) authors) (assoc user :loading true))
-                      authors)
-        new-board-data (merge board-data {:viewers new-viewers
-                                          :authors new-authors})]
-    (api/private-board-user-action user link)
-    (assoc-in db board-key new-board-data)))
 
 (defmethod dispatcher/action :password-reset
   [db [_]]
@@ -1485,9 +1453,13 @@
 
 (defmethod dispatcher/action :board-edit
   [db [_ initial-board-data]]
-  (let [fixed-board-data (or
-                           initial-board-data
-                           {:name "" :slug "" :access "team"})]
+  (let [authors (or (map :user-id (:authors initial-board-data)) [])
+        viewers (or (map :user-id (:viewers initial-board-data)) [])
+        board-data (or
+                    initial-board-data
+                    {:name "" :slug "" :access "team"})
+        fixed-board-data (merge board-data {:viewers viewers
+                                            :authors authors})]
     (assoc db :board-editing fixed-board-data)))
 
 (defmethod dispatcher/action :board-edit-save
@@ -1849,4 +1821,51 @@
      (fn [err]
         (when-not err
           (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
+    db))
+
+(defmethod dispatcher/action :private-board-user-add
+  [db [_ user user-type]]
+  (let [board-data (:board-editing db)
+        current-authors (filterv #(not= % (:user-id user)) (:authors board-data))
+        current-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))
+        next-authors (if (= user-type :author)
+                       (vec (conj current-authors (:user-id user)))
+                       current-authors)
+        next-viewers (if (= user-type :viewer)
+                       (vec (conj current-viewers (:user-id user)))
+                       current-viewers)]
+    (assoc db :board-editing (merge board-data {:authors next-authors
+                                                :viewers next-viewers}))))
+
+(defmethod dispatcher/action :private-board-user-remove
+  [db [_ user]]
+  (let [board-data (:board-editing db)
+        next-authors (filterv #(not= % (:user-id user)) (:authors board-data))
+        next-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))]
+    (assoc db :board-editing (merge board-data {:authors next-authors
+                                                :viewers next-viewers}))))
+
+(defmethod dispatcher/action :private-board-kick-out-self
+  [db [_ user]]
+  ;; If the user is self (same user-id) kick out from the current private board
+  (when (= (:user-id user) (jwt/user-id))
+    (api/remove-user-from-private-board user))
+  db)
+
+(defmethod dispatcher/action :private-board-kick-out-self/finish
+  [db [_ success]]
+  (if success
+    ;; Redirect to the first available board
+    (let [org-data (dispatcher/org-data db)
+          all-boards (:boards org-data)
+          current-board-slug (router/current-board-slug)
+          except-this-boards (remove #(#{current-board-slug "drafts"} (:slug %)) all-boards)
+          redirect-url (if-let [next-board (first except-this-boards)]
+                         (oc-urls/board (:slug next-board))
+                         (oc-urls/org (router/current-org-slug)))]
+     (api/get-org org-data)
+     (utils/after 0 #(router/nav! redirect-url))
+     ;; Force board editing dismiss
+     (dissoc db :board-editing))
+    ;; An error occurred while kicking the user out, no-op to let the user retry
     db))
