@@ -331,7 +331,8 @@
                      :title "Start a new post"
                      :on-click (fn [_]
                                 (utils/remove-tooltips)
-                                (if is-drafts-board
+                                (if (or is-drafts-board
+                                        is-all-posts)
                                   (reset!
                                    (::show-floating-boards-dropdown s)
                                    (not @(::show-floating-boards-dropdown s)))
