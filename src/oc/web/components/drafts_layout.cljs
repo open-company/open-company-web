@@ -38,7 +38,7 @@
                               (str "draft-card-" (:uuid draft)) true})
      :key (str "draft-" (:created-at draft))
      :on-click #(when (and draft
-                           (not (responsive/is-table-or-mobile?)))
+                           (not (responsive/is-tablet-or-mobile?)))
                   (dis/dispatch! [:entry-edit draft]))}
     (when draft
       [:div.draft-card-inner
@@ -83,7 +83,7 @@
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
           (when (and (utils/link-for (:links draft) "delete")
-                     (not (responsive/is-table-or-mobile?)))
+                     (not (responsive/is-tablet-or-mobile?)))
             [:button.delete-draft.mlb-reset
               {:title "Delete draft"
                :data-toggle "tooltip"
