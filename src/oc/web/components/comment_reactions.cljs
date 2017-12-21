@@ -2,10 +2,11 @@
   (:require-macros [dommy.core :refer (sel1)]
                    [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [oc.web.components.reactions :as reactions]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.jwt :as jwt]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.components.reactions :as reactions]
             [cljsjs.web-animations]))
 
 (defn- read-only?
@@ -20,7 +21,9 @@
           reaction-data (last reactions-data)
           is-loading (utils/in? reactions-loading (:reaction reaction-data))
           reacted (:reacted reaction-data)
-          read-only-reaction (read-only? item-data)
+          is-mobile? (responsive/is-tablet-or-mobile?)
+          read-only-reaction (or is-mobile?
+                                 (read-only? item-data))
           r (if is-loading
               (merge reaction-data {:count (if reacted
                                             (dec (:count reaction-data))

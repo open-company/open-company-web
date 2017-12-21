@@ -8,6 +8,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.comment-reactions :as comment-reactions]
@@ -101,7 +102,8 @@
         can-delete? (utils/link-for (:links c) "delete")
         can-edit? (and (not is-emoji-comment?)
                        (utils/link-for (:links c) "partial-update"))
-        editable (or can-delete? can-edit?)
+        editable (and (not (responsive/is-tablet-or-mobile?))
+                      (or can-delete? can-edit?))
         should-show-comment-reaction? (and (not is-emoji-comment?)
                                            (or (not can-edit?)
                                                (and can-edit?
@@ -295,7 +297,11 @@
                             (utils/after 230 #(scroll-to-bottom s true))))
                         s)}
   [s activity-data]
-  (let [sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        plain-sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
+        sorted-comments (if is-mobile?
+                          (reverse plain-sorted-comments)
+                          plain-sorted-comments)
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
     (if show-loading
@@ -330,4 +336,5 @@
             [:div.comments-internal-empty
               [:div.no-comments-placeholder]
               [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
-          (add-comment activity-data)]])))
+          (when-not is-mobile?
+            (add-comment activity-data))]])))
